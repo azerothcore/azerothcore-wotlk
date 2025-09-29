@@ -205,7 +205,7 @@ struct boss_felmyst : public BossAI
 
         // Summon Kalecgos (human form of kalecgos fight)
         if (Creature* kalec = me->SummonCreature(NPC_KALECGOS_FELMYST, 1573.1461f, 755.20245f, 99.524956f, 3.595378f))
-            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS, 1474.2347f, 624.0703f, 29.32589f, false, true);
+            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS, 1474.2347f, 624.0703f, 29.32589f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
     }
 
     void ScheduleGroundAbilities()
@@ -312,9 +312,9 @@ struct boss_felmyst : public BossAI
                     ++_strafeCount;
                     _currentLane = urand(0, 2);
                     if (isRightSide)
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                 }, 5s);
                 break;
             case POINT_LANE:
@@ -328,9 +328,9 @@ struct boss_felmyst : public BossAI
                     DoCastSelf(SPELL_FELMYST_SPEED_BURST, true);
 
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, LeftSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, LeftSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, RightSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, RightSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                 }, 5s);
                 break;
             case POINT_AIR_BREATH_END:
@@ -338,9 +338,9 @@ struct boss_felmyst : public BossAI
 
                 me->m_Events.AddEventAtOffset([&] {
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide, false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide, FORCED_MOVEMENT_NONE, 0.f, false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide, false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide, FORCED_MOVEMENT_NONE, 0.f, false);
                 }, 2s);
                 break;
         }

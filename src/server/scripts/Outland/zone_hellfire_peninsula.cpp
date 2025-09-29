@@ -209,7 +209,7 @@ public:
                         {
                             ryga->SetWalk(true);
                             ryga->SetSpeed(MOVE_WALK, 1.0f);
-                            ryga->GetMotionMaster()->MovePoint(0, 515.877991f, 3885.67627f, 190.470535f, true);
+                            ryga->GetMotionMaster()->MovePoint(0, 515.877991f, 3885.67627f, 190.470535f, FORCED_MOVEMENT_NONE, 0.f, true);
                             Reset();
                         }
                     }
@@ -234,7 +234,7 @@ public:
                             ryga->SetStandState(UNIT_STAND_STATE_STAND);
                             ryga->SetWalk(true);
                             ryga->SetSpeed(MOVE_WALK, 1.0f);
-                            ryga->GetMotionMaster()->MovePoint(0, 504.59201f, 3882.12988f, 192.156006f, true);
+                            ryga->GetMotionMaster()->MovePoint(0, 504.59201f, 3882.12988f, 192.156006f, FORCED_MOVEMENT_NONE, 0.f, true);
                             Reset();
                         }
                     }

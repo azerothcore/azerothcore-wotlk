@@ -470,7 +470,7 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
  *
  * For transition movement between the ground and the air, use MoveLand or MoveTakeoff instead.
  */
-void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generatePath, bool forceDestination, MovementSlot slot, float orientation /* = 0.0f*/, ForcedMovement forcedMovement)
+void MotionMaster::MovePoint(uint32 id, float x, float y, float z, ForcedMovement forcedMovement, float speed, float orientation, bool generatePath, bool forceDestination, MovementSlot slot)
 {
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
@@ -478,12 +478,12 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generate
     if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) targeted point (Id: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Player>(id, x, y, z, forcedMovement, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination), slot);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) targeted point (ID: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, forcedMovement, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination), slot);
     }
 }
 
@@ -540,8 +540,8 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0
     }
 
     init.SetAnimation(Movement::ToGround);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_ACTIVE);
 }
 
 /**
@@ -570,16 +570,12 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 
     init.MoveTo(x, y, z);
 
     if (speed > 0.0f)
-    {
         init.SetVelocity(speed);
-    }
 
     if (!skipAnimation)
-    {
         init.SetAnimation(Movement::ToFly);
-    }
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_ACTIVE);
 }
 
 /**
@@ -613,8 +609,8 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     init.SetParabolic(max_height, 0);
     init.SetOrientationFixed(true);
     init.SetVelocity(speedXY);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(0), MOTION_SLOT_CONTROLLED);
+
+    Mutate(new EffectMovementGenerator(init, 0), MOTION_SLOT_CONTROLLED);
 }
 
 /**
@@ -653,8 +649,8 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
     init.SetVelocity(speedXY);
     if (target)
         init.SetFacing(target);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_CONTROLLED);
 }
 
 /**
@@ -696,8 +692,8 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), tz + _owner->GetHoverHeight());
     init.SetFall();
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_CONTROLLED);
 }
 
 /**

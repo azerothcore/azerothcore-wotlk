@@ -1960,7 +1960,7 @@ public:
 
         void SetData(uint32  /*id*/, uint32  /*value*/) override
         {
-            me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, false, true);
+            me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, FORCED_MOVEMENT_NONE, 0.f, false, true);
         }
 
         void UpdateAI(uint32  /*diff*/) override

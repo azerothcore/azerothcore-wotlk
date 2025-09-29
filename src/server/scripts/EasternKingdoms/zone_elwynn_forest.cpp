@@ -112,11 +112,11 @@ struct npc_cameron : public ScriptedAI
             if (Creature* children = ObjectAccessor::GetCreature(*me, _childrenGUIDs[i]))
             {
                 children->SetWalk(true);
-                children->GetMotionMaster()->MovePoint(0, MovePosPositions[i], true, MovePosPositions[i].GetOrientation());
+                children->GetMotionMaster()->MovePoint(0, MovePosPositions[i]);
             }
         }
         me->SetWalk(true);
-        me->GetMotionMaster()->MovePoint(0, MovePosPositions.back(), true, MovePosPositions.back().GetOrientation());
+        me->GetMotionMaster()->MovePoint(0, MovePosPositions.back());
     }
 
     void PathEndReached(uint32 pathId) override

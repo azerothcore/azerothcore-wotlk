@@ -140,7 +140,7 @@ struct boss_alar : public BossAI
                 _noQuillTimes = 0;
                 _platformRoll = RAND(0, 1);
                 _platform = _platformRoll ? 0 : 3;
-                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
+                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], FORCED_MOVEMENT_NONE, 0.f, false, true);
                 _platformMoveRepeatTimer = 16s;
             }
             else
@@ -150,7 +150,7 @@ struct boss_alar : public BossAI
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
                     SpawnPhoenixes(1, me);
                 }
-                me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
+                me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], FORCED_MOVEMENT_NONE, 0.f, false, true);
                 _platform = (_platform+1)%4;
                 _platformMoveRepeatTimer = 30s;
             }
@@ -258,7 +258,7 @@ struct boss_alar : public BossAI
         }, 30s);
         ScheduleTimedEvent(34s, [&]
         {
-            me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
+            me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], FORCED_MOVEMENT_NONE, 0.f, false, true);
             scheduler.DelayAll(15s);
         }, 57s);
 
