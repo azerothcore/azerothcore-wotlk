@@ -2630,6 +2630,7 @@ public:
     [[nodiscard]] Optional<float> GetFarSightDistance() const;
 
     float GetSightRange(WorldObject const* target = nullptr) const override;
+    bool IsWorldObjectOutOfSightRange(WorldObject const* target) const;
 
     std::string GetPlayerName();
 

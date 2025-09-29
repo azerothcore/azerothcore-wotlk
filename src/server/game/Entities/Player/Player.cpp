@@ -2243,7 +2243,7 @@ void Player::SetGameMaster(bool on)
         CombatStopWithPets();
 
         SetPhaseMask(uint32(PHASEMASK_ANYWHERE), false);    // see and visible in all phases
-        m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
+        SetServerSideVisibilityDetect(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
     else
     {
@@ -2279,7 +2279,7 @@ void Player::SetGameMaster(bool on)
         UpdateArea(m_areaUpdateId);
 
         getHostileRefMgr().setOnlineOfflineState(true);
-        m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+        SetServerSideVisibilityDetect(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
     }
 
     UpdateObjectVisibility();
@@ -2293,7 +2293,7 @@ void Player::SetGMVisible(bool on)
     {
         RemoveAurasDueToSpell(VISUAL_AURA);
         m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;
-        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+        SetServerSideVisibility(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
 
         getHostileRefMgr().setOnlineOfflineState(false);
         CombatStopWithPets();
@@ -2302,7 +2302,7 @@ void Player::SetGMVisible(bool on)
     {
         AddAura(VISUAL_AURA, this);
         m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;
-        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
+        SetServerSideVisibility(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
 }
 
@@ -16311,11 +16311,23 @@ float Player::GetSightRange(WorldObject const* target) const
 {
     float sightRange = WorldObject::GetSightRange(target);
     if (_farSightDistance)
-    {
         sightRange += *_farSightDistance;
-    }
 
     return sightRange;
+}
+
+bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
+{
+    // Special handling for Infinite visibility override objects -> they are zone wide visible
+    if (target->GetVisibilityOverrideType() == VisibilityDistanceType::Infinite)
+    {
+        // Same zone, always visible
+        if (target->GetZoneId() == GetZoneId())
+            return false;
+    }
+
+    // Check if out of range
+    return !m_seer->IsWithinDist(target, GetSightRange(target), false);
 }
 
 std::string Player::GetPlayerName()
