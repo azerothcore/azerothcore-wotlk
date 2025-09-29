@@ -121,10 +121,10 @@ public:
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
 
-            ScheduleTimedEvent(10s, [&]{
+            ScheduleTimedEvent(16s, [&]{
                 Talk(EMOTE_NOVA);
                 DoCastAOE(SPELL_POISON_NOVA);
-            }, 15s);
+            }, 16s, 53s);
 
             ScheduleTimedEvent(3s, [&] {
                 DoCastVictim(SPELL_POWERFULL_BITE);
