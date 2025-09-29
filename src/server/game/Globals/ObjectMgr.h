@@ -489,9 +489,6 @@ typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap
 #define MIN_CREATURE_AI_TEXT_STRING_ID (-1)                 // 'creature_ai_texts'
 #define MAX_CREATURE_AI_TEXT_STRING_ID (-1000000)
 
-// Acore Trainer Reference start range
-#define ACORE_TRAINER_START_REF      200000
-
 struct ModuleString
 {
     std::vector<std::string> Content;

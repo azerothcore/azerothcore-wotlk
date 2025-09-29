@@ -9298,9 +9298,6 @@ void ObjectMgr::LoadMailLevelRewards()
 
 void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell)
 {
-    if (entry >= ACORE_TRAINER_START_REF)
-        return;
-
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
     if (!cInfo)
     {
@@ -9390,7 +9387,9 @@ void ObjectMgr::LoadTrainerSpell()
 
     QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqLevel, a.ReqSpell FROM npc_trainer AS a "
                          "INNER JOIN npc_trainer AS b ON a.ID = -(b.SpellID) "
-                         "UNION SELECT * FROM npc_trainer WHERE SpellID > 0");
+                         "UNION SELECT * FROM npc_trainer WHERE SpellID > 0 "
+                         "AND ID NOT IN (SELECT -SpellID FROM npc_trainer "
+                         "WHERE SpellID < 0)");
 
     if (!result)
     {
