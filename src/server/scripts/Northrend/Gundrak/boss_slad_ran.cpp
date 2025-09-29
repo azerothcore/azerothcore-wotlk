@@ -117,7 +117,7 @@ public:
             ScheduleTimedEvent(16s, 53s, [&]{
                 Talk(EMOTE_NOVA);
                 DoCastAOE(SPELL_POISON_NOVA);
-            }, 15s, 53s);
+            }, 16s, 53s);
 
             ScheduleTimedEvent(3s, [&] {
                 DoCastVictim(SPELL_POWERFULL_BITE);
