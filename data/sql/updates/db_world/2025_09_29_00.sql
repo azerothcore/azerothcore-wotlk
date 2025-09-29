@@ -1,3 +1,4 @@
+-- DB update 2025_09_28_01 -> 2025_09_29_00
 
 -- Update SmartAI (Bleeding Hollow Necrolyte and Tunneler)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (16968, 19422));
