@@ -1,9 +1,4 @@
 --
--- Update summon position
-DELETE FROM `spell_target_position` WHERE `ID` = 49992;
-INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
-(49992, 0, 571, 479.019, -5941.53, 308.829, 0.0, 15595);
-
 -- Fixes "Bluff", Set `allowOverride` of action list
 UPDATE `smart_scripts` SET `action_param3` = 1 WHERE (`entryorguid` IN (23672, 23673, 23675, 24271)) AND (`source_type` = 0) AND (`event_type` = 8) AND (`event_param1` = 44609);
 
