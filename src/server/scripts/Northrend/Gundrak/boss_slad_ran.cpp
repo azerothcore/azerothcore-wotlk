@@ -121,7 +121,7 @@ public:
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
 
-            ScheduleTimedEvent(16s, [&]{
+            ScheduleTimedEvent(Seconds(urand(16, 53)), [&]{
                 Talk(EMOTE_NOVA);
                 DoCastAOE(SPELL_POISON_NOVA);
             }, 16s, 53s);
