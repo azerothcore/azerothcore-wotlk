@@ -27,6 +27,7 @@ enum Spells
     SPELL_MOJO_WAVE                     = 55626,
     SPELL_FREEZE_ANIM                   = 52656,
     SPELL_MIGHTY_BLOW                   = 54719,
+    SPELL_MORTAL_STRIKE                 = 54715,
 
     SPELL_ELEMENTAL_SPAWN_EFFECT        = 54888,
     SPELL_EMERGE                        = 54850,
@@ -57,6 +58,7 @@ enum Misc
     EVENT_COLOSSUS_HEALTH_1             = 2,
     EVENT_COLOSSUS_HEALTH_2             = 3,
     EVENT_COLOSSUS_START_FIGHT          = 4,
+    EVENT_COLOSSUS_START_FIGHT          = 5,
 
     EVENT_ELEMENTAL_HEALTH              = 10,
     EVENT_ELEMENTAL_SURGE               = 11,
@@ -146,6 +148,7 @@ public:
         {
             BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10s);
+            events.ScheduleEvent(EVENT_COLOSSUS_MORTAL_STRIKE, 7s);
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_1, 1s);
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_2, 1s);
         }
@@ -211,6 +214,10 @@ public:
                 case EVENT_COLOSSUS_MIGHTY_BLOW:
                     me->CastSpell(me->GetVictim(), SPELL_MIGHTY_BLOW, false);
                     events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10s);
+                    break;
+                case EVENT_COLOSSUS_MORTAL_STRIKE:
+                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
+                    events.ScheduleEvent(EVENT_COLOSSUS_MORTAL_STRIKE, 7s);
                     break;
                 case EVENT_COLOSSUS_HEALTH_1:
                     if (me->HealthBelowPct(51))
