@@ -58,7 +58,7 @@ enum Misc
     EVENT_COLOSSUS_HEALTH_1             = 2,
     EVENT_COLOSSUS_HEALTH_2             = 3,
     EVENT_COLOSSUS_START_FIGHT          = 4,
-    EVENT_COLOSSUS_START_FIGHT          = 5,
+    EVENT_COLOSSUS_MORTAL_STRIKE        = 5,
 
     EVENT_ELEMENTAL_HEALTH              = 10,
     EVENT_ELEMENTAL_SURGE               = 11,
