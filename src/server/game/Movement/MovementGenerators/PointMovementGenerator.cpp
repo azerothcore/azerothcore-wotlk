@@ -238,6 +238,11 @@ bool EffectMovementGenerator::Update(Unit* unit, uint32)
     return !unit->movespline->Finalized();
 }
 
+void EffectMovementGenerator::Initialize(Unit*)
+{
+    i_spline.Launch();
+}
+
 void EffectMovementGenerator::Finalize(Unit* unit)
 {
     if (!unit->IsCreature())

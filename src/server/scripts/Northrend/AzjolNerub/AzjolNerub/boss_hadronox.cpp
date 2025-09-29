@@ -258,7 +258,7 @@ public:
         {
             if (summon->GetEntry() != me->GetEntry())
             {
-                summon->GetMotionMaster()->MovePoint(0, *me, false);
+                summon->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false);
                 summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
             }
             summons.Summon(summon);

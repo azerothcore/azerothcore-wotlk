@@ -678,13 +678,13 @@ public:
                         me->SummonCreature(NPC_JAINA, EventPos[EVENT_SRC_JAINA], TEMPSUMMON_DEAD_DESPAWN, 180000);
                         if (Creature* uther = me->SummonCreature(NPC_UTHER, EventPos[EVENT_SRC_UTHER], TEMPSUMMON_DEAD_DESPAWN, 180000))
                         {
-                            uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_UTHER], false);
+                            uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_UTHER], FORCED_MOVEMENT_NONE, 0.f, false);
                             uther->SetTarget(me->GetGUID());
                             me->SetTarget(uther->GetGUID());
                         }
                         for (int i = 0; i < 3; ++i)
                             if (Creature* horse = me->SummonCreature(NPC_HORSE_ESCORT, EventPos[EVENT_SRC_HORSE1 + i], TEMPSUMMON_DEAD_DESPAWN, 180000))
-                                horse->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_HORSE1 + i], false);
+                                horse->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_HORSE1 + i], FORCED_MOVEMENT_NONE, 0.f, false);
 
                         ScheduleNextEvent(currentEvent, 4000);
                         break;
@@ -783,7 +783,7 @@ public:
                         {
                             Creature* summon = ObjectAccessor::GetCreature(*me, *i);
                             if (summon && summon->GetEntry() == NPC_HORSE_ESCORT)
-                                summon->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
+                                summon->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], FORCED_MOVEMENT_NONE, 0.f, false);
                         }
 
                         ScheduleNextEvent(currentEvent, 1000);
@@ -793,7 +793,7 @@ public:
                         {
                             uther->SetTarget();
                             uther->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                            uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
+                            uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], FORCED_MOVEMENT_NONE, 0.f, false);
                         }
                         ScheduleNextEvent(currentEvent, 1000);
                         break;
@@ -802,7 +802,7 @@ public:
                         {
                             jaina->SetTarget();
                             jaina->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                            jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
+                            jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], FORCED_MOVEMENT_NONE, 0.f, false);
                         }
                         Talk(SAY_PHASE116);
                         ScheduleNextEvent(currentEvent, 2000);
@@ -820,7 +820,7 @@ public:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
                         {
                             jaina->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                            jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
+                            jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], FORCED_MOVEMENT_NONE, 0.f, false);
                         }
                         summons.DespawnEntry(NPC_HORSE_ESCORT);
                         ScheduleNextEvent(currentEvent, 4000);

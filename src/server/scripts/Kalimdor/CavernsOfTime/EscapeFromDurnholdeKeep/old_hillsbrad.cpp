@@ -810,7 +810,7 @@ public:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                     {
                         epoch->SetImmuneToAll(false);
-                        epoch->GetMotionMaster()->MovePoint(0, *me, false, true);
+                        epoch->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false, true);
                     }
                     break;
                 case EVENT_THRALL_FACE_TARETHA:

@@ -20,15 +20,16 @@
 
 #include "Creature.h"
 #include "MovementGenerator.h"
+#include "MoveSplineInit.h"
 
 template<class T>
 class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
 {
 public:
     PointMovementGenerator(uint32 _id, float _x, float _y, float _z, ForcedMovement forcedMovement, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr,
-        bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty)
-        : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination),
-        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement)
+        bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty, bool reverseOrientation = false, ObjectGuid facingTargetGuid = ObjectGuid())
+        : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination), _reverseOrientation(reverseOrientation),
+        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement), _facingTargetGuid(facingTargetGuid)
     {
         if (_path)
             m_precomputedPath = *_path;
@@ -55,8 +56,10 @@ private:
     Movement::PointsArray m_precomputedPath;
     bool _generatePath;
     bool _forceDestination;
+    bool _reverseOrientation;
     ObjectGuid _chargeTargetGUID;
     ForcedMovement _forcedMovement;
+    ObjectGuid _facingTargetGuid;
 };
 
 class AssistanceMovementGenerator : public PointMovementGenerator<Creature>
@@ -73,14 +76,15 @@ public:
 class EffectMovementGenerator : public MovementGenerator
 {
 public:
-    explicit EffectMovementGenerator(uint32 Id) : m_Id(Id) {}
-    void Initialize(Unit*) override {}
+    explicit EffectMovementGenerator(Movement::MoveSplineInit& spline, uint32 Id) : m_Id(Id), i_spline(spline) {}
+    void Initialize(Unit*) override;
     void Finalize(Unit*) override;
     void Reset(Unit*) override {}
     bool Update(Unit*, uint32) override;
     MovementGeneratorType GetMovementGeneratorType() override { return EFFECT_MOTION_TYPE; }
 private:
     uint32 m_Id;
+    Movement::MoveSplineInit i_spline;
 };
 
 #endif

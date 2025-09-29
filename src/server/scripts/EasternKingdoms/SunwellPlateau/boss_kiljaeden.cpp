@@ -729,25 +729,18 @@ struct npc_kalecgos_kj : public NullCreatureAI
         if (summon->GetEntry() == NPC_SHATTERED_SUN_RIFTWAKER)
         {
             summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
-            Movement::MoveSplineInit init(summon);
+
             if (summons.size() == 1)
-            {
-                init.MoveTo(1727.08f, 656.82f, 28.37f, false, true);
-                init.SetFacing(5.14f);
-            }
+                summon->GetMotionMaster()->MovePoint(0, 1727.08f, 656.82f, 28.37f, FORCED_MOVEMENT_NONE, 0.f, 5.14f, false, true);
             else
-            {
-                init.MoveTo(1738.84f, 627.32f, 28.26f, false, true);
-                init.SetFacing(2.0f);
-            }
-            init.Launch();
+                summon->GetMotionMaster()->MovePoint(0, 1738.84f, 627.32f, 28.26f, FORCED_MOVEMENT_NONE, 0.f, 2.0f, false, true);
         }
         else if (summon->GetEntry() == NPC_SHATTRATH_PORTAL_DUMMY)
         {
             if (Creature* riftwaker = summon->FindNearestCreature(NPC_SHATTERED_SUN_RIFTWAKER, 10.0f))
                 riftwaker->CastSpell(summon, SPELL_OPEN_PORTAL_FROM_SHATTRATH, false);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 30.0f, false, true);
+            summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 30.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
         }
         else if (summon->GetEntry() == NPC_INERT_PORTAL)
             summon->CastSpell(summon, SPELL_BOSS_ARCANE_PORTAL_STATE, true);
@@ -762,7 +755,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
         {
             summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, 1710.15f, 639.23f, 27.311f, false, true);
+            summon->GetMotionMaster()->MovePoint(0, 1710.15f, 639.23f, 27.311f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
         }
         else if (summon->GetEntry() == NPC_THE_CORE_OF_ENTROPIUS)
             summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), 30.0f);

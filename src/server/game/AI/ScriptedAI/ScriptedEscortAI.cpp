@@ -186,7 +186,7 @@ void npc_escortAI::ReturnToLastPoint()
 {
     float x, y, z, o;
     me->GetHomePosition(x, y, z, o);
-    me->GetMotionMaster()->MovePoint(POINT_LAST_POINT, x, y, z, true, true, MOTION_SLOT_ACTIVE, 0.f, FORCED_MOVEMENT_RUN);
+    me->GetMotionMaster()->MovePoint(POINT_LAST_POINT, x, y, z, FORCED_MOVEMENT_RUN);
 }
 
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)

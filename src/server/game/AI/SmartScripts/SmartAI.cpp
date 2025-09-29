@@ -384,7 +384,7 @@ void SmartAI::ReturnToLastOOCPos()
 
     float x, y, z, o;
     me->GetHomePosition(x, y, z, o);
-    me->GetMotionMaster()->MovePoint(SMART_ESCORT_LAST_OOC_POINT, x, y, z, true, true, MOTION_SLOT_ACTIVE, 0.f, FORCED_MOVEMENT_RUN);
+    me->GetMotionMaster()->MovePoint(SMART_ESCORT_LAST_OOC_POINT, x, y, z, FORCED_MOVEMENT_RUN);
 }
 
 void SmartAI::UpdatePath(const uint32 diff)
