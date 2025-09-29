@@ -216,7 +216,7 @@ public:
                     events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10s);
                     break;
                 case EVENT_COLOSSUS_MORTAL_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
+                    DoCastVictim(SPELL_MORTAL_STRIKE);
                     events.ScheduleEvent(EVENT_COLOSSUS_MORTAL_STRIKE, 7s);
                     break;
                 case EVENT_COLOSSUS_HEALTH_1:
