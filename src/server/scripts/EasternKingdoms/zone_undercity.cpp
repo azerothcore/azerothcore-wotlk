@@ -142,7 +142,7 @@ public:
             {
                 summoned->SetDisableGravity(true);
                 float speed = summoned->GetDistance(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ() + 15.0f) / (1000.0f * 0.001f);
-                summoned->MonsterMoveWithSpeed(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ() + 15.0f, speed);
+                summoned->GetMotionMaster()->MovePoint(0, summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ() + 15.0f, FORCED_MOVEMENT_NONE, speed);
                 summoned->CastSpell(summoned, SPELL_RIBBON_OF_SOULS, false);
             }
         }
@@ -270,8 +270,7 @@ public:
                 if (EventMoveTimer <= diff)
                 {
                     me->SetDisableGravity(true);
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW, me->GetDistance(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW) / (5000 * 0.001f));
-                    me->SetPosition(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW, me->GetOrientation());
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW, FORCED_MOVEMENT_NONE, me->GetDistance(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW) / (5000 * 0.001f));
                     EventMove = false;
                 }
                 else EventMoveTimer -= diff;

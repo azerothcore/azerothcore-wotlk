@@ -381,8 +381,7 @@ public:
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     TurnGates(true, false);
-                    me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
-                    me->UpdatePosition(homePos);
+                    me->GetMotionMaster()->MovePoint(0, homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
                     _speakTimer = 60000;
                 }
                 else if (_speakTimer > 63500)
