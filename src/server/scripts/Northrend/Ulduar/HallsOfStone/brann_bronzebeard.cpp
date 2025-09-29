@@ -571,7 +571,7 @@ public:
                                 if (speed < tooFarAwaySpeed)
                                     speed = tooFarAwaySpeed;
 
-                                darkMatterTarget->MonsterMoveWithSpeed(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), speed);
+                                darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), FORCED_MOVEMENT_NONE, speed);
 
                                 if (darkMatterTarget->GetDistance(plr) < 15.0f)
                                 {
