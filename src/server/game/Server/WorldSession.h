@@ -621,6 +621,7 @@ public:                                                 // opcodes handlers
 
     void SendCharCreate(ResponseCodes result);
     void SendCharDelete(ResponseCodes result);
+    void SendCharLoginFailed(LoginFailureReason reason);
     void SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo);
     void SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo);
     void SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo);
