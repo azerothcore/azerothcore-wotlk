@@ -45,7 +45,6 @@ enum Misc
 {
     NPC_LIVING_MOJO                     = 29830,
     NPC_DRAKKARI_ELEMENTAL              = 29573,
-    NPC_DRAKKARI_GOLEM                  = 29832,
 
     ACTION_MERGE                        = 1,
     ACTION_INFORM                       = 2,
@@ -149,17 +148,6 @@ public:
             events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10s);
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_1, 1s);
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_2, 1s);
-
-            std::list<Creature*> golems;
-            me->GetCreatureListWithEntryInGrid(golems, NPC_DRAKKARI_GOLEM, 50.0f);
-            for (Creature* golem : golems)
-            {
-                if (golem && golem->IsAlive() && !golem->IsInCombat())
-                {
-                    golem->SetInCombatWith(who);
-                    golem->AddThreat(who, 0.0f);
-                }
-            }
         }
 
         void JustSummoned(Creature* summon) override
