@@ -369,9 +369,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         return;
     }
 
-    // speedup check for heroic class disabled case
-    uint32 req_level_for_heroic = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
-    if (AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT && req_level_for_heroic > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    // Speed check if heroic character minimum is greater than max player level
+    if (sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER) > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
         return;
@@ -438,7 +437,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             }
             bool haveSameRace = false;
             uint32 heroicReqLevel = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
-            bool hasHeroicReqLevel = (heroicReqLevel == 0);
             bool allowTwoSideAccounts = !sWorld->IsPvPRealm() || sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS) || !AccountMgr::IsPlayerAccount(GetSecurity());
             uint32 skipCinematics = sWorld->getIntConfig(CONFIG_SKIP_CINEMATICS);
             bool checkDeathKnightReqs = AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT;
@@ -450,6 +448,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
                 Field* field = result->Fetch();
                 uint8 accRace = field[1].Get<uint8>();
+                uint8 accLevel = field[0].Get<uint8>();
+                bool accLevelMeetHeroicReqLevel = accLevel >= heroicReqLevel;
 
                 if (checkDeathKnightReqs)
                 {
@@ -466,11 +466,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                         }
                     }
 
-                    if (!hasHeroicReqLevel)
+                    if (HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK) && !accLevelMeetHeroicReqLevel)
+                        UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK, true);
+
+                    if (!HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK) &&
+                        Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevelMeetHeroicReqLevel)
                     {
-                        uint8 accLevel = field[0].Get<uint8>();
-                        if (accLevel >= heroicReqLevel)
-                            hasHeroicReqLevel = true;
+                        UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK);
                     }
                 }
 
@@ -498,6 +500,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
                     field = result->Fetch();
                     accRace = field[1].Get<uint8>();
+                    accLevel = field[0].Get<uint8>();
+                    accLevelMeetHeroicReqLevel = accLevel >= heroicReqLevel;
 
                     if (!haveSameRace)
                         haveSameRace = createInfo->Race == accRace;
@@ -517,20 +521,34 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                             }
                         }
 
-                        if (!hasHeroicReqLevel)
+                        if (!HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK) &&
+                            Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevelMeetHeroicReqLevel)
                         {
-                            uint8 acc_level = field[0].Get<uint8>();
-                            if (acc_level >= heroicReqLevel)
-                                hasHeroicReqLevel = true;
+                            UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK);
                         }
                     }
                 }
             }
-
-            if (checkDeathKnightReqs && !hasHeroicReqLevel)
+            else
             {
-                SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
-                return;
+                // Edge case if player has removed all characters from the account and should therefore not be eligible to create a DK.
+                if (HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK))
+                    UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK, true);
+            }
+
+            if (checkDeathKnightReqs)
+            {
+                if (Expansion() < EXPANSION_WRATH_OF_THE_LICH_KING)
+                {
+                    SendCharCreate(CHAR_CREATE_EXPANSION_CLASS);
+                    return;
+                }
+
+                if (!HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK))
+                {
+                    SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
+                    return;
+                }
             }
 
             // Check name uniqueness in the same step as saving to database
