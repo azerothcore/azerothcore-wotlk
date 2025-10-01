@@ -32,6 +32,10 @@ enum qSniffing
 {
     SPELL_SUMMON_PURSUERS_PERIODIC          = 54993,
     SPELL_SNIFFING_CREDIT                   = 55477,
+    TALK_EMOTE_FROSTHOUND_SNIFF             = 0,
+    TALK_SEEN                               = 1,
+    TALK_CONFRONT                           = 2,
+    TALK_EMOTE_TRACKED_COMPLETE             = 3,
 };
 
 class npc_frosthound : public CreatureScript
@@ -41,7 +45,7 @@ public:
 
     struct npc_frosthoundAI : public npc_escortAI
     {
-        npc_frosthoundAI(Creature* creature) : npc_escortAI(creature) {}
+        explicit npc_frosthoundAI(Creature* creature) : npc_escortAI(creature), _summons(creature) {}
 
         void AttackStart(Unit* /*who*/) override {}
         void JustEngagedWith(Unit* /*who*/) override {}
@@ -56,6 +60,7 @@ public:
                     me->SetFaction(who->GetFaction());
                     me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
                     Start(false, true, who->GetGUID());
+                    Talk(TALK_EMOTE_FROSTHOUND_SNIFF, me);
                 }
             }
         }
@@ -85,18 +90,23 @@ public:
             switch (waypointId)
             {
                 case 0:
-                    me->TextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", nullptr, true);
+                    Talk(TALK_SEEN, player);
                     break;
                 case 19:
-                    me->TextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
+                    Talk(TALK_EMOTE_TRACKED_COMPLETE, me);
+                    Talk(TALK_CONFRONT, player);
                     if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                         summoner->ToPlayer()->KilledMonsterCredit(29677);
+                    _summons.DespawnAll();
+                    break;
+                default:
                     break;
             }
         }
 
         void JustSummoned(Creature* cr) override
         {
+            _summons.Summon(cr);
             cr->ToTempSummon()->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
             cr->ToTempSummon()->InitStats(20000);
             if (urand(0, 1))
@@ -104,6 +114,14 @@ public:
             else if (cr->AI())
                 cr->AI()->AttackStart(me);
         }
+
+        void Reset() override
+        {
+            _summons.DespawnAll();
+        }
+
+    private:
+        SummonList _summons;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
