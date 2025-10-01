@@ -1,3 +1,4 @@
+-- DB update 2025_09_30_02 -> 2025_10_01_00
 -- Update gameobject '186957' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (186957)) AND (`guid` IN (65654));
