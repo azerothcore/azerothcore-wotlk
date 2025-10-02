@@ -51,14 +51,7 @@ enum Misc
     MAX_CONSTRICTOR                             = 3,
     MAX_SUMMONS                                 = 5,
 
-    EVENT_POISON_NOVA                           = 1,
-    EVENT_POWERFULL_BITE                        = 2,
-    EVENT_VENOM_BOLT                            = 3,
-    EVENT_CHECK_HEALTH1                         = 4,
-    EVENT_CHECK_HEALTH2                         = 5,
-    EVENT_SUMMON1                               = 6,
-    EVENT_SUMMON2                               = 7,
-    EVENT_KILL_TALK                             = 8
+    EVENT_KILL_TALK                             = 1
 };
 
 const Position SpawnLoc[] =
@@ -121,17 +114,17 @@ public:
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
 
-            ScheduleTimedEvent(10s, [&]{
+            ScheduleTimedEvent(16s, 53s, [&]{
                 Talk(EMOTE_NOVA);
                 DoCastAOE(SPELL_POISON_NOVA);
-            }, 15s);
+            }, 16s, 53s);
 
             ScheduleTimedEvent(3s, [&] {
                 DoCastVictim(SPELL_POWERFULL_BITE);
             }, 10s);
 
             ScheduleTimedEvent(15s, [&] {
-                DoCastVictim(SPELL_VENOM_BOLT);
+                DoCastRandomTarget(SPELL_VENOM_BOLT, 0, 45.0f, false);
             }, 10s);
         }
 
