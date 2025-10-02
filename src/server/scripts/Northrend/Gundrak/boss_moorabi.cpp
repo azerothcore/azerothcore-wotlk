@@ -156,7 +156,7 @@ public:
                 case EVENT_GROUND_TREMOR:
                     if (roll_chance_i(50))
                         Talk(SAY_QUAKE);
-                    
+
                     if (me->GetDisplayId() != me->GetNativeDisplayId())
                     {
                         me->CastSpell(me, SPELL_QUAKE, false);
@@ -168,7 +168,7 @@ public:
                         events.ScheduleEvent(EVENT_GROUND_TREMOR, randtime(13s, 27s));
                     }
                     break;
-                    
+
                 case EVENT_NUMBLING_SHOUT:
                     if (me->GetDisplayId() != me->GetNativeDisplayId())
                     {
@@ -181,12 +181,12 @@ public:
                         events.ScheduleEvent(EVENT_NUMBLING_SHOUT, randtime(6s, 27s));
                     }
                     break;
-                    
+
                 case EVENT_DETERMINED_STAB:
                     me->CastSpell(me->GetVictim(), me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_DETERMINED_GORE : SPELL_DETERMINED_STAB, false);
                     events.ScheduleEvent(EVENT_DETERMINED_STAB, 8s);
                     break;
-                    
+
                 case EVENT_TRANSFORMATION:
                     Talk(EMOTE_TRANSFORM);
                     Talk(SAY_TRANSFORM);
