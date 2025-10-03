@@ -344,6 +344,14 @@ Updates.AllowRehash = 1
 Updates.CleanDeadRefMaxCount = 3
 
 #
+#    Updates.ExceptionShutdownDelay
+#        Description: Time (in milliseconds) to wait before shutting down after a fatal exception (e.g. failed SQL update).
+#        Default:     10000 - 10 seconds
+#                     0     - Disabled (immediate shutdown)
+
+Updates.ExceptionShutdownDelay = 10000
+
+#
 ###################################################################################################
 
 ###################################################################################################
