@@ -83,6 +83,7 @@ public:
             BossAI::Reset();
             events2.Reset();
             events2.ScheduleEvent(EVENT_PHANTOM, 21s);
+            me->SetCanDualWield(true);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -104,6 +105,7 @@ public:
                 me->RemoveAurasDueToSpell(SPELL_MOJO_FRENZY);
                 events.CancelEvent(EVENT_TRANSFORMATION);
                 Talk(EMOTE_TRANSFORMED);
+                me->SetCanDualWield(false);
             }
         }
 

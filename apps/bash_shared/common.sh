@@ -1,6 +1,7 @@
 function registerHooks() { acore_event_registerHooks "$@"; }
 function runHooks() { acore_event_runHooks "$@"; }
 
+#shellcheck source=../../conf/dist/config.sh
 source "$AC_PATH_CONF/dist/config.sh" # include dist to avoid missing conf variables
 
 # first check if it's defined in env, otherwise use the default
