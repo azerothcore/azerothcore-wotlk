@@ -82,7 +82,7 @@ struct npc_frosthound : public npc_escortAI
             case 0:
                 Talk(TALK_SEEN, player);
                 break;
-            case 19:
+            case 34:
                 Talk(TALK_EMOTE_TRACKED_COMPLETE, me);
                 Talk(TALK_CONFRONT, player);
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
