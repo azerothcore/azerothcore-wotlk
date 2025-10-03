@@ -259,7 +259,7 @@ Unit::Unit() : WorldObject(),
     m_modAttackSpeedPct[OFF_ATTACK] = 1.0f;
     m_modAttackSpeedPct[RANGED_ATTACK] = 1.0f;
 
-    m_canDualWield = false;
+    _dualWieldMode = DualWieldMode::AUTO;
 
     m_rootTimes = 0;
 
