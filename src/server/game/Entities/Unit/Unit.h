@@ -567,6 +567,13 @@ enum class SearchMethod
 
 typedef std::list<Player*> SharedVisionList;
 
+enum class DualWieldMode : uint8
+{
+    AUTO        = 0, // non-player units must have a valid offhand weapon to enable dual wield
+    DISABLED    = 1,
+    ENABLED     = 2,
+};
+
 struct AttackPosition {
     AttackPosition(Position pos) : _pos(std::move(pos)), _taken(false) {}
     bool operator==(const int val)
@@ -917,8 +924,9 @@ public:
 
     // Weapons systems
     [[nodiscard]] bool haveOffhandWeapon() const;
-    [[nodiscard]] bool CanDualWield() const { return m_canDualWield; }
-    virtual void SetCanDualWield(bool value) { m_canDualWield = value; }
+    [[nodiscard]] bool CanDualWield() const { return _dualWieldMode == DualWieldMode::ENABLED; }
+    virtual void SetCanDualWield(bool value) { _dualWieldMode = value ? DualWieldMode::ENABLED : DualWieldMode::DISABLED; }
+    virtual void SetDualWieldMode(DualWieldMode mode) { _dualWieldMode = mode; }
 
     virtual bool HasWeapon(WeaponAttackType type) const = 0;
     inline bool HasMainhandWeapon() const { return HasWeapon(BASE_ATTACK); }
@@ -1994,7 +2002,7 @@ public:
 
     //----------- Public variables ----------//
     uint32 m_extraAttacks;
-    bool m_canDualWield;
+    DualWieldMode _dualWieldMode;
 
     ControlSet m_Controlled;
 
