@@ -37,3 +37,8 @@ INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `
 (@PATH, 32, 7306.8794, -1531.1903, 928.2958, 0),
 (@PATH, 33, 7305.797, -1558.9252, 939.31244, 0),
 (@PATH, 34, 7305.19, -1566.0189, 940.9037, 0);
+
+-- set StandState to sitting
+DELETE FROM `creature_template_addon` WHERE (`entry` = 29695);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(29695, 0, 0, 1, 0, 0, 0, '');
