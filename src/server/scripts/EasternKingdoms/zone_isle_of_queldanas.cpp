@@ -610,61 +610,6 @@ public:
     };
 };
 
-/*###### THEIR: ######*/
-
-/*######
-## npc_greengill_slave
-######*/
-
-#define ENRAGE  45111
-#define ORB     45109
-#define QUESTG  11541
-#define DM      25060
-
-class npc_greengill_slave : public CreatureScript
-{
-public:
-    npc_greengill_slave() : CreatureScript("npc_greengill_slave") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_greengill_slaveAI(creature);
-    }
-
-    struct npc_greengill_slaveAI : public ScriptedAI
-    {
-        npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void JustEngagedWith(Unit* /*who*/) override { }
-
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-        {
-            Player* player = caster->ToPlayer();
-            if (!player)
-                return;
-
-            if (spellInfo->Id == ORB && !me->HasAura(ENRAGE))
-            {
-                if (player->GetQuestStatus(QUESTG) == QUEST_STATUS_INCOMPLETE)
-                    DoCast(player, 45110, true);
-
-                DoCast(me, ENRAGE);
-
-                if (Creature* Myrmidon = me->FindNearestCreature(DM, 70))
-                {
-                    me->AddThreat(Myrmidon, 100000.0f);
-                    AttackStart(Myrmidon);
-                }
-            }
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
 // 45396, 45398 - Weapon Coating Enchant
 class spell_gen_weapon_coating_enchant : public AuraScript
 {
@@ -690,6 +635,5 @@ void AddSC_isle_of_queldanas()
     new npc_bh_thalorien_dawnseeker();
     RegisterSpellScript(spell_bh_cleanse_quel_delar);
     new npc_grand_magister_rommath();
-    new npc_greengill_slave();
     RegisterSpellScript(spell_gen_weapon_coating_enchant);
 }
