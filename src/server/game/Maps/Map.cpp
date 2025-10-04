@@ -54,7 +54,7 @@ Map::~Map()
 {
     // UnloadAll must be called before deleting the map
 
-    m_Events.KillAllEvents(true);
+    m_Events.KillAllEvents(false);
 
     sScriptMgr->OnDestroyMap(this);
 
