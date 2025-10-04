@@ -310,20 +310,23 @@ public:
                     summons.DespawnAll();
                     me->CastSpell(me, SPELL_CALL_FLAMES, false);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 500ms);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 1s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 2500ms);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 4500ms);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 8s, 12s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
+                {
+                    std::list<Creature*> braziers;
+                    me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
+                    if (!braziers.empty())
                     {
-                        std::list<Creature*> braziers;
-                        me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
-                        if (!braziers.empty())
-                        {
-                            for (std::list<Creature*>::const_iterator itr = braziers.begin(); itr != braziers.end(); ++itr)
-                                (*itr)->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, (*itr), true);
-                        }
-                        break;
+                        std::vector<Creature*> brazierVector(braziers.begin(), braziers.end());
+                        uint32 randomIndex = urand(0, brazierVector.size() - 1);
+                        Creature* selectedBrazier = brazierVector[randomIndex];
+                        selectedBrazier->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
                     }
+                    break;
+                }
                 case EVENT_SORROWGRAVE_RITUAL:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
