@@ -2351,6 +2351,18 @@ Rate.Reputation.LowLevel.Quest = 1
 Rate.Reputation.RecruitAFriendBonus = 0.1
 
 #
+#    Rate.Reputation.Gain.WSG
+#    Rate.Reputation.Gain.AB
+#    Rate.Reputation.Gain.AV
+#        Description: Reputation bonus rate for WSG, AB and AV battlegrounds.
+#                     This is applied IN ADDITION to the global Rate.Reputation.Gain.
+#        Default:     1
+
+Rate.Reputation.Gain.WSG = 1
+Rate.Reputation.Gain.AB = 1
+Rate.Reputation.Gain.AV = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################

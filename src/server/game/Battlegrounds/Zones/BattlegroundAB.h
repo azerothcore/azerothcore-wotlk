@@ -299,6 +299,7 @@ private:
     EventMap _bgEvents;
     uint32 _honorTics;
     uint32 _reputationTics;
+    float _abReputationRate;
     uint8 _controlledPoints[PVP_TEAMS_COUNT] {};
     bool _teamScores500Disadvantage[PVP_TEAMS_COUNT] {};
     uint32 _configurableMaxTeamScore;
