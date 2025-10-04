@@ -56,9 +56,9 @@ public:
         if (quest->GetQuestId() == QUEST_TOME_VALOR)
         {
             creature->AI()->Talk(SAY_DS_START);
-
+            creature->SetWalk(false);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_daphne_stilwell::npc_daphne_stilwellAI, creature->AI()))
-                pEscortAI->Start(true, true, player->GetGUID());
+                pEscortAI->Start(true, player->GetGUID());
         }
 
         return true;

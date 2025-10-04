@@ -144,7 +144,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->AttackStop();
                         me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, false);
+                        me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                         events.ScheduleEvent(EVENT_FLIGHT, 50s);
                         events.DelayEvents(15s);
                         events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2s);
@@ -163,10 +163,10 @@ public:
                     events.ScheduleEvent(EVENT_FLAME_BREATH, 20s, 30s);
                     break;
                 case EVENT_AIR_MOVEMENT:
-                    me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, false);
+                    me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                     break;
                 case EVENT_LAND_BACK:
-                    me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, false);
+                    me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                     break;
                 case EVENT_LAND_GROUND:
                     me->SetReactState(REACT_AGGRESSIVE);
