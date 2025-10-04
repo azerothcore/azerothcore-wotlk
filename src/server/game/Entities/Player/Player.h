@@ -2568,13 +2568,10 @@ public:
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
     bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
-    bool SetCanFly(bool apply, bool packetOnly = false) override;
-    bool SetWaterWalking(bool apply, bool packetOnly = false) override;
-    bool SetFeatherFall(bool apply, bool packetOnly = false) override;
-    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
+    bool IsFreeFlying() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY); }
 
     // saving
     void AdditionalSavingAddMask(uint8 mask) { m_additionalSaveTimer = 2000; m_additionalSaveMask |= mask; }

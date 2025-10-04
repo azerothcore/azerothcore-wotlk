@@ -105,6 +105,9 @@ public:
                     break;
                 case GO_ECK_DOORS:
                 case GO_ECK_UNDERWATER_GATE:
+                    if (instance->IsHeroic())
+                        AddDoor(gameobject);
+                    break;
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
@@ -119,6 +122,9 @@ public:
             {
                 case GO_ECK_DOORS:
                 case GO_ECK_UNDERWATER_GATE:
+                    if (instance->IsHeroic())
+                        RemoveDoor(gameobject);
+                    break;
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
