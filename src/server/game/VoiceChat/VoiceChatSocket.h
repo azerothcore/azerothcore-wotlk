@@ -15,22 +15,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
+#ifndef __VoiceChatSocket_H__
+#define __VoiceChatSocket_H__
 
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "CombatLogPackets.h"
-#include "CombatPackets.h"
-#include "GuildPackets.h"
-#include "ItemPackets.h"
-#include "LFGPackets.h"
-#include "MiscPackets.h"
-#include "PetPackets.h"
-#include "QueryPackets.h"
-#include "TotemPackets.h"
-#include "VoiceChatPackets.h"
-#include "WorldStatePackets.h"
+#include "Socket.h"
+#include "VoiceChatDefines.h"
+#include <boost/asio/ip/tcp.hpp>
 
-#endif // AllPackets_h__
+using boost::asio::ip::tcp;
+
+class VoiceChatSocket : public Socket<VoiceChatSocket> {
+
+public:
+  explicit VoiceChatSocket(tcp::socket &&socket);
+
+  void Start() override;
+  bool Update() override;
+  // void SendPacket(ByteBuffer &packet);
+  void SendPacket(VoiceChatServerPacket pct);
+
+protected:
+  void ReadHandler() override;
+
+private:
+  bool HandlePing();
+  bool ProcessIncomingData();
+  bool IsValidAndOpen() const;
+  // bool HandleChannelCreated();
+  // Add other handlers as needed
+};
+
+#endif
