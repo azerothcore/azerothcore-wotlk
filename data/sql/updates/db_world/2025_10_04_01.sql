@@ -1,3 +1,4 @@
+-- DB update 2025_10_04_00 -> 2025_10_04_01
 -- Update gameobject 'Stolen Pack' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (191726)) AND (`guid` IN (42));
