@@ -1,3 +1,4 @@
+-- DB update 2025_10_04_04 -> 2025_10_04_05
 
 -- Update SmartAI (Horde Siege Tank and Barrels).
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (25334, 27064));
