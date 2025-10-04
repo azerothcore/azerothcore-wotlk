@@ -138,7 +138,7 @@ public:
                 if (events2.ExecuteEvent() == EVENT_PHANTOM)
                 {
                     me->CastSpell(me, SPELL_SUMMON_PHANTOM, true);
-                    events2.ScheduleEvent(EVENT_PHANTOM, randtime(20s, 25s));
+                    events2.ScheduleEvent(EVENT_PHANTOM, 20s, 25s);
                 }
             }
 
@@ -158,12 +158,12 @@ public:
                     if (me->GetDisplayId() != me->GetNativeDisplayId())
                     {
                         me->CastSpell(me, SPELL_QUAKE, false);
-                        events.ScheduleEvent(EVENT_GROUND_TREMOR, randtime(16s, 63s));
+                        events.ScheduleEvent(EVENT_GROUND_TREMOR, 16s, 63s);
                     }
                     else
                     {
                         me->CastSpell(me, SPELL_GROUND_TREMOR, false);
-                        events.ScheduleEvent(EVENT_GROUND_TREMOR, randtime(13s, 27s));
+                        events.ScheduleEvent(EVENT_GROUND_TREMOR, 13s, 27s);
                     }
                     break;
 
@@ -171,12 +171,12 @@ public:
                     if (me->GetDisplayId() != me->GetNativeDisplayId())
                     {
                         me->CastSpell(me, SPELL_NUMBING_ROAR, false);
-                        events.ScheduleEvent(EVENT_NUMBLING_SHOUT, randtime(8s, 54s));
+                        events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 8s, 54s);
                     }
                     else
                     {
                         me->CastSpell(me, SPELL_NUMBING_SHOUT, false);
-                        events.ScheduleEvent(EVENT_NUMBLING_SHOUT, randtime(6s, 27s));
+                        events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 6s, 27s);
                     }
                     break;
 
