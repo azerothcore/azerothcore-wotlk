@@ -1,3 +1,4 @@
+-- DB update 2025_10_04_02 -> 2025_10_04_03
 
 -- Set MT and WD
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 27482) AND (`guid` IN (104181));
