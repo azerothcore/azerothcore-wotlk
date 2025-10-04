@@ -7,6 +7,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27064, 0, 0, 1, 103, 0, 100, 512, 0, 25334, 1, 2, 0, 0, 11, 47916, 2, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On 1 or More Units in Range - Cast \'Fuel\''),
 (27064, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 4000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On 1 or More Units in Range - Despawn In 4000 ms'),
 (27064, 0, 2, 3, 11, 0, 100, 512, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On Respawn - Stop Attacking'),
-(27064, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Abandoned Fuel Tank - On Respawn - Disable Combat Movement'),
 (25334, 0, 0, 0, 8, 0, 100, 512, 47916, 0, 2000, 2000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Siege Tank - On Spellhit \'Fuel\' - Say Line 0'),
 (25334, 0, 1, 0, 28, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Horde Siege Tank - On Passenger Removed - Despawn In 1000 ms');
