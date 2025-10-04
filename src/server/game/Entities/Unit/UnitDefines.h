@@ -197,7 +197,7 @@ enum UnitState
     UNIT_STATE_IGNORE_PATHFINDING       = 0x10000000,       // do not use pathfinding in any MovementGenerator
     UNIT_STATE_NO_ENVIRONMENT_UPD       = 0x20000000,
 
-    UNIT_STATE_NO_COMBAT_MOVEMENT, // serverside only - should never be changed outside of core and hence shouldnt have a defined static value and be at the end
+    UNIT_STATE_NO_COMBAT_MOVEMENT       = 0x40000000,       // serverside only - should not be changed outside the core and should be placed at the end
 
     UNIT_STATE_ALL_STATE_SUPPORTED = UNIT_STATE_DIED | UNIT_STATE_MELEE_ATTACKING | UNIT_STATE_STUNNED | UNIT_STATE_ROAMING | UNIT_STATE_CHASE
     | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT | UNIT_STATE_FOLLOW | UNIT_STATE_ROOT | UNIT_STATE_CONFUSED
