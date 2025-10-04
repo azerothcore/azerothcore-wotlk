@@ -83,7 +83,6 @@ public:
             BossAI::Reset();
             events2.Reset();
             events2.ScheduleEvent(EVENT_PHANTOM, 21s);
-            summons.DespawnAll();
         }
 
         void JustEngagedWith(Unit* who) override
