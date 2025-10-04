@@ -13,4 +13,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 45111;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
-(45111, 0x00000800); 
+(45111, 0x00000800);
