@@ -1,3 +1,4 @@
+-- DB update 2025_10_02_01 -> 2025_10_04_00
 -- Update gameobject 'Big Rancid Meat' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (177665)) AND (`guid` IN (45717));
