@@ -1,3 +1,4 @@
+-- DB update 2025_10_04_01 -> 2025_10_04_02
 --
 SET @PATH := 29677;
 DELETE FROM `script_waypoint` WHERE `entry`=@PATH;
