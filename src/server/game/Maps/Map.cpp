@@ -54,6 +54,8 @@ Map::~Map()
 {
     // UnloadAll must be called before deleting the map
 
+    m_Events.KillAllEvents(true);
+
     sScriptMgr->OnDestroyMap(this);
 
     if (!m_scriptSchedule.empty())
@@ -447,7 +449,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         }
     }
 
-    _creatureRespawnScheduler.Update(t_diff);
+    m_Events.Update(t_diff);
 
     if (!t_diff)
     {
@@ -2760,13 +2762,13 @@ void Map::RemoveOldCorpses()
 
 void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer, Position pos)
 {
-    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid, pos](TaskContext)
+    m_Events.AddEventAtOffset([this, creatureGuid, pos]()
     {
         if (Creature* creature = GetCreature(creatureGuid))
             creature->Respawn();
         else
             SummonCreature(creatureGuid.GetEntry(), pos);
-    });
+    }, respawnTimer);
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
