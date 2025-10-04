@@ -118,7 +118,6 @@ public:
             Talk(SAY_DEATH);
             Talk(EMOTE_ALTAR);
 
-            summons.DespawnAll();
             BossAI::JustDied(killer);
         }
 
