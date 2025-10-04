@@ -91,8 +91,8 @@ public:
             BossAI::JustEngagedWith(who);
             me->CastSpell(me, SPELL_MOJO_FRENZY, true);
 
-            events.ScheduleEvent(EVENT_GROUND_TREMOR, randtime(13s, 30s));
-            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, randtime(8s, 38s));
+            events.ScheduleEvent(EVENT_GROUND_TREMOR, 13s, 30s);
+            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 8s, 38s);
             events.ScheduleEvent(EVENT_DETERMINED_STAB, 20s);
             events.ScheduleEvent(EVENT_TRANSFORMATION, 12s);
         }
