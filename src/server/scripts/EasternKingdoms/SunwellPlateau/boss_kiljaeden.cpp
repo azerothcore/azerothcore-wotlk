@@ -179,9 +179,12 @@ struct npc_kiljaeden_controller : public NullCreatureAI
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_SINISTER_REFLECTION)
         {
-            summon->m_Events.AddEventAtOffset([summon] {
-                if (summon && summon->IsAlive() && !summon->IsInCombat())
-                    summon->SetInCombatWithZone();
+            ObjectGuid summonGUID = summon->GetGUID();
+            summon->m_Events.AddEventAtOffset([this, summonGUID]()
+            {
+                if (Creature* _summon = ObjectAccessor::GetCreature(*me, summonGUID))
+                    if (_summon->IsAlive() && !_summon->IsInCombat())
+                        _summon->SetInCombatWithZone();
             }, 5s);
         }
         else if (summon->GetEntry() == NPC_KALECGOS_KJ)
