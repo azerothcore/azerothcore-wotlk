@@ -1,3 +1,4 @@
+-- DB update 2025_10_04_05 -> 2025_10_04_06
 -- Update gameobject 'Doodad_Nox_portal_top01' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (191542)) AND (`guid` IN (57145, 57146));
