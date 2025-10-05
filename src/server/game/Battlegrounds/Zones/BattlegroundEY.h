@@ -31,13 +31,10 @@ enum BG_EY_Events
     BG_EY_EVENT_CHECK_CPOINTS       = 4
 };
 
-enum BG_EY_Timers
-{
-    BG_EY_FLAG_RESPAWN_TIME         = 10 * IN_MILLISECONDS,
-    BG_EY_FLAG_ON_GROUND_TIME       = 10 * IN_MILLISECONDS,
-    BG_EY_FPOINTS_CHECK_TIME        = 2 * IN_MILLISECONDS,
-    BG_EY_FPOINTS_TICK_TIME         = 2 * IN_MILLISECONDS
-};
+constexpr Milliseconds BG_EY_FLAG_RESPAWN_TIME         = 10s;
+constexpr Milliseconds BG_EY_FLAG_ON_GROUND_TIME       = 10s;
+constexpr Milliseconds BG_EY_FPOINTS_CHECK_TIME        = 2s;
+constexpr Milliseconds BG_EY_FPOINTS_TICK_TIME         = 2s;
 
 enum BG_EY_ProgressBarConsts
 {

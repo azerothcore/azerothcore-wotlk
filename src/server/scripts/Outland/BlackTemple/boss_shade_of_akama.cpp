@@ -251,7 +251,7 @@ struct npc_akama_shade : public ScriptedAI
                 {
                     Talk(SAY_BROKEN_FREE_2);
                 }, 3);
-                ScheduleUniqueTimedEvent(52000ms, [&]
+                ScheduleUniqueTimedEvent(52s, [&]
                 {
                     std::list<Creature*> brokens;
                     me->GetCreatureListWithEntryInGrid(brokens, NPC_ASHTONGUE_BROKEN, 40.0f);

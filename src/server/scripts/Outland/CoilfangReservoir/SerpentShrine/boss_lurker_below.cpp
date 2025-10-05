@@ -129,7 +129,7 @@ struct boss_the_lurker_below : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        SchedulerPhaseOne(38800ms, 91000ms);
+        SchedulerPhaseOne(38800ms, 91s);
     }
 
     void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
@@ -191,7 +191,7 @@ struct boss_the_lurker_below : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             scheduler.CancelAll();
-            SchedulerPhaseOne(10000ms, 90750ms);
+            SchedulerPhaseOne(10s, 90750ms);
         });
     }
 

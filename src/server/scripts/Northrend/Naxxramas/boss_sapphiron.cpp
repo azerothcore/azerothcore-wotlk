@@ -280,7 +280,7 @@ public:
                         {
                             cr->GetMotionMaster()->MoveRandom(40);
                         }
-                        events.RepeatEvent(RAID_MODE(8000, 6500));
+                        events.Repeat(RAID_MODE(8000ms, 6500ms));
                         return;
                     }
                 case EVENT_FLIGHT_START:
@@ -349,7 +349,7 @@ public:
                             blockList.push_back((*itr)->GetGUID());
                             currentTarget = (*itr)->GetGUID();
                             --iceboltCount;
-                            events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, (me->GetExactDist(*itr) / 13.0f)*IN_MILLISECONDS);
+                            events.ScheduleEvent(EVENT_FLIGHT_ICEBOLT, Seconds(uint32(me->GetExactDist(*itr) / 13.0f)));
                         }
                         else
                         {

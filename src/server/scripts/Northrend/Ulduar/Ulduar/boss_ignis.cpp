@@ -247,7 +247,7 @@ public:
             bShattered = false;
             lastShatterMSTime = 0;
             events.Reset();
-            events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40000, 30000));
+            events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40s, 30s));
             events.ScheduleEvent(EVENT_SPELL_SCORCH, 10s);
             events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32s);
             events.ScheduleEvent(EVENT_GRAB, 25s);
@@ -347,7 +347,7 @@ public:
                         me->CastSpell(me, SPELL_BERSERK, true);
                         break;
                     }
-                    events.RepeatEvent(RAID_MODE(40000, 30000));
+                    events.Repeat(RAID_MODE(40s, 30s));
                     break;
                 case EVENT_SPELL_SCORCH:
                     Talk(SAY_SCORCH);

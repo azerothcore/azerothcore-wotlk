@@ -39,10 +39,7 @@ enum EventIds
     EVENT_SOLAKAR_WAVE                     = 3
 };
 
-enum Timers
-{
-    TIMER_SOLAKAR_WAVE = 30000
-};
+constexpr Milliseconds TIMER_SOLAKAR_WAVE = 30s;
 
 enum SolakarWaves
 {
