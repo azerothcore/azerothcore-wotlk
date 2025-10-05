@@ -17,6 +17,8 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "gundrak.h"
 
 enum Spells
@@ -125,11 +127,8 @@ public:
                 case EVENT_ECK_SPRING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true, false))
                     {
-                        me->GetThreatMgr().ResetAllThreat();
-                        me->AddThreat(target, 500.0f);
                         me->CastSpell(target, SPELL_ECK_SPRING, false);
                     }
-
                     events.ScheduleEvent(EVENT_ECK_SPRING, 5s, 10s);
                     break;
             }
@@ -139,7 +138,37 @@ public:
     };
 };
 
+class spell_eck_spring : public SpellScriptLoader
+{
+public:
+    spell_eck_spring() : SpellScriptLoader("spell_eck_spring") { }
+
+    class spell_eck_spring_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_eck_spring_SpellScript);
+
+        void HandleAfterCast()
+        {
+            if (Unit* caster = GetCaster())
+            {
+                caster->GetThreatMgr().ResetAllThreat();
+            }
+        }
+
+        void Register() override
+        {
+            AfterCast += SpellCastFn(spell_eck_spring_SpellScript::HandleAfterCast);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_eck_spring_SpellScript();
+    }
+};
+
 void AddSC_boss_eck()
 {
     new boss_eck();
+    new spell_eck_spring();
 }
