@@ -84,12 +84,12 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 7000);
-            events.ScheduleEvent(EVENT_SPELL_STEAL_FLESH, 11000);
-            events.ScheduleEvent(EVENT_SPELL_SUMMON_GHOULS, 16000);
-            events.ScheduleEvent(EVENT_EXPLODE_GHOUL, 22000);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 7s);
+            events.ScheduleEvent(EVENT_SPELL_STEAL_FLESH, 11s);
+            events.ScheduleEvent(EVENT_SPELL_SUMMON_GHOULS, 16s);
+            events.ScheduleEvent(EVENT_EXPLODE_GHOUL, 22s);
             if (IsHeroic())
-                events.ScheduleEvent(EVENT_SPELL_CURSE, 25000);
+                events.ScheduleEvent(EVENT_SPELL_CURSE, 25s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -130,29 +130,29 @@ public:
             {
                 case EVENT_SPELL_SHADOW_BOLT:
                     me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 case EVENT_SPELL_STEAL_FLESH:
                     if (!urand(0, 2))
                         Talk(SAY_STEAL_FLESH);
                     me->CastSpell(me->GetVictim(), SPELL_STEAL_FLESH_CHANNEL, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
                 case EVENT_SPELL_SUMMON_GHOULS:
                     if (!urand(0, 2))
                         Talk(SAY_SUMMON_GHOULS);
                     me->CastSpell(me, SPELL_SUMMON_GHOULS, false);
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 case EVENT_EXPLODE_GHOUL:
                     if (!urand(0, 2))
                         Talk(SAY_EXPLODE_GHOUL);
                     ExplodeGhoul();
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 case EVENT_SPELL_CURSE:
                     me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_TWISTED_FAITH, false);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     break;
             }
 

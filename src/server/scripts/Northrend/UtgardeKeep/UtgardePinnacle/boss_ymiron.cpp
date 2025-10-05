@@ -217,7 +217,7 @@ public:
                     {
                         if (me->GetHealth() < std::max(0.0f, float(me->GetMaxHealth() * (1.0f - (IsHeroic() ? 0.2f : 0.334f)*float(BoatNum + 1)))))
                         {
-                            events.DelayEvents(12000);
+                            events.DelayEvents(12s);
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->InterruptNonMeleeSpells(true);
                             me->CastSpell(me, SPELL_SCREAMS_OF_THE_DEAD, true);

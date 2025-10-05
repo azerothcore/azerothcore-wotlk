@@ -186,7 +186,7 @@ struct npc_pet_mage_mirror_image : CasterAI
     void UpdateAI(uint32 diff) override
     {
         events.Update(diff);
-        if (events.GetTimer() < 1200)
+        if (std::chrono::duration_cast<Milliseconds>(events.GetTimer() - TimePoint::min()) < 1200ms)
             return;
 
         if (!me->IsInCombat() || !me->GetVictim())
@@ -212,7 +212,7 @@ struct npc_pet_mage_mirror_image : CasterAI
 
         if (uint32 spellId = events.ExecuteEvent())
         {
-            events.RescheduleEvent(spellId, spellId == 59637 ? 6500 : 2500);
+            events.RescheduleEvent(spellId, spellId == 59637 ? 6500ms : 2500ms);
             me->CastSpell(me->GetVictim(), spellId, false);
         }
     }

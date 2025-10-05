@@ -484,7 +484,7 @@ public:
                 return;
             }
 
-            uint32 introDelay = 0;
+            Milliseconds  introDelay = 0ms;
             me->setActive(true);
             me->SetInCombatWithZone();
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -495,27 +495,27 @@ public:
             if (!_firstPull)
             {
                 events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
-                introDelay = 8000;
+                introDelay = 8s;
             }
             else
             {
                 summons.DespawnEntry(NPC_AZEROTH);
                 _firstPull = false;
                 Talk(SAY_ALGALON_START_TIMER);
-                introDelay = 22000;
+                introDelay = 22s;
                 events.ScheduleEvent(EVENT_START_COMBAT, 14s);
                 m_pInstance->SetData(DATA_DESPAWN_ALGALON, 0);
             }
 
-            events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500);
+            events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
             events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
-            events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500 + introDelay);
-            events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500 + introDelay);
-            events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500 + introDelay);
-            events.ScheduleEvent(EVENT_COSMIC_SMASH, 25000 + introDelay);
-            events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500 + introDelay);
-            events.ScheduleEvent(EVENT_BIG_BANG, 90000 + introDelay);
-            events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360000 + introDelay);
+            events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
+            events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
+            events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
+            events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
+            events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
+            events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
+            events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
 
             events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
             DoCheckHeraldOfTheTitans();
@@ -688,7 +688,7 @@ public:
                     break;
                 case EVENT_QUANTUM_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_QUANTUM_STRIKE, false);
-                    events.Repeat(3000ms, 4500ms);
+                    events.Repeat(3s, 4500ms);
                     break;
                 case EVENT_PHASE_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_PHASE_PUNCH, false);
@@ -871,12 +871,12 @@ public:
             if (movementType != POINT_MOTION_TYPE)
                 return;
 
-            uint32 delay = 1;
+            Milliseconds delay = 1ms;
             _currentPoint = pointId + 1;
             switch (pointId)
             {
                 case 2:
-                    delay = 8000;
+                    delay = 8s;
                     me->SetWalk(true);
                     break;
                 case 6:
@@ -1010,7 +1010,7 @@ public:
                     break;
                 case ACTION_BIG_BANG:
                     events.SetPhase(PHASE_BIG_BANG);
-                    events.DelayEvents(9500);
+                    events.DelayEvents(9500ms);
                     events.ScheduleEvent(EVENT_RESUME_UPDATING, 9500ms);
                     break;
             }
@@ -1146,7 +1146,7 @@ public:
             _locked = true;
             // Start Algalon event
             me->SetGameObjectFlag(GO_FLAG_IN_USE);
-            events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5000ms);
+            events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5s);
             if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
                 brann->AI()->DoAction(ACTION_START_INTRO);
 

@@ -161,7 +161,7 @@ public:
                         events.RescheduleEvent(EVENT_SPELL_UNHOLY_POWER, 1s);
                         break;
                     }
-                    events.RepeatEvent(3000);
+                    events.Repeat(3s);
                     break;
                 case EVENT_SPELL_UNHOLY_POWER:
                     Talk(SAY_DARK_MIGHT);

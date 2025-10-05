@@ -125,8 +125,8 @@ public:
         void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
-            events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25000);
+            events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16s);
+            events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25s);
             Talk(SAY_EADRIC_AGGRO);
             me->CastSpell(me, SPELL_VENGEANCE, false);
             if (pInstance)

@@ -355,7 +355,7 @@ public:
                 case EVENT_OVERWHELMING_POWER:
                     Talk(SAY_STEELBREAKER_POWER);
                     me->CastSpell(me->GetVictim(), SPELL_OVERWHELMING_POWER, true);
-                    events.RepeatEvent(RAID_MODE(61000, 36000));
+                    events.Repeat(RAID_MODE(61s, 36s));
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_STEELBREAKER_BERSERK);

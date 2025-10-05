@@ -300,7 +300,7 @@ public:
                     me->ClearUnitState(UNIT_STATE_CASTING);
                     DoCastAOE(DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H));
                     me->AddUnitState(UNIT_STATE_CASTING);
-                    events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9000, 7000));
+                    events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9s, 7s));
                 default:
                     break;
             }

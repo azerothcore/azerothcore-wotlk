@@ -111,13 +111,13 @@ public:
                     case EVENT_ANTIMAGIC_PULSE:
                     {
                         DoCastSelf(SPELL_ANTIMAGIC_PULSE);
-                        events.RepeatEvent(20000);
+                        events.Repeat(20s);
                         break;
                     }
                     case EVENT_MAGMA_SHACKLES:
                     {
                         DoCastSelf(SPELL_MAGMA_SHACKLES);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         break;
                     }
                 }

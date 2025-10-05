@@ -146,7 +146,7 @@ struct boss_high_king_maulgar : public BossAI
         {
             DoCastVictim(SPELL_MIGHTY_BLOW);
             context.Repeat(16200ms, 19s);
-        }).Schedule(67000ms, [this](TaskContext context)
+        }).Schedule(67s, [this](TaskContext context)
         {
             scheduler.DelayAll(15s);
             DoCastSelf(SPELL_WHIRLWIND);

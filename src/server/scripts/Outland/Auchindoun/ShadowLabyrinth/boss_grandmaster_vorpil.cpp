@@ -111,7 +111,7 @@ struct boss_grandmaster_vorpil : public BossAI
             case 8:
                 return 7200ms;
             case 9:
-                return 6000ms;
+                return 6s;
             default:
                 return 4800ms;
         }

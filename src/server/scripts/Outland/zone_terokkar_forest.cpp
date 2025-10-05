@@ -433,9 +433,9 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_WRATH, 0);
-            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4000);
-            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10000);
+            events.ScheduleEvent(EVENT_SPELL_WRATH, 0ms);
+            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4s);
+            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10s);
         }
 
         void UpdateEscortAI(uint32 diff) override
@@ -451,15 +451,15 @@ public:
             {
                 case EVENT_SPELL_WRATH:
                     me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3s);
                     break;
                 case EVENT_SPELL_MOONFIRE:
                     me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
-                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12000);
+                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12s);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
                     me->CastSpell(me->GetVictim(), SPELL_ENTANGLING_ROOTS, false);
-                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20s);
                     break;
             }
 

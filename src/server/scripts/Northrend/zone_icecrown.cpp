@@ -1257,8 +1257,8 @@ public:
 
             player->CastSpell(player, SPELL_WAITING_FOR_A_BOMBER, true);
             player->CastSpell(player, SPELL_FLIGHT_ORDERS, true);
-            events.ScheduleEvent(EVENT_START_FLIGHT, 0);
-            events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3000);
+            events.ScheduleEvent(EVENT_START_FLIGHT, 0ms);
+            events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3s);
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);

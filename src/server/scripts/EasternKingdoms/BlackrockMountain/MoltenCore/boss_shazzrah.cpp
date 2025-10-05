@@ -67,7 +67,7 @@ public:
                 case EVENT_ARCANE_EXPLOSION:
                 {
                     DoCastVictim(SPELL_ARCANE_EXPLOSION);
-                    events.RepeatEvent(urand(4000, 5000));
+                    events.Repeat(4s, 5s);
                     break;
                 }
                 case EVENT_SHAZZRAH_CURSE:
@@ -76,26 +76,26 @@ public:
                     {
                         DoCast(target, SPELL_SHAZZRAH_CURSE);
                     }
-                    events.RepeatEvent(urand(23000, 26000));
+                    events.Repeat(23s, 26s);
                     break;
                 }
                 case EVENT_MAGIC_GROUNDING:
                 {
                     DoCastSelf(SPELL_MAGIC_GROUNDING);
-                    events.RepeatEvent(urand(7000, 9000));
+                    events.Repeat(7s, 9s);
                     break;
                 }
                 case EVENT_COUNTERSPELL:
                 {
                     DoCastAOE(SPELL_COUNTERSPELL);
-                    events.RepeatEvent(urand(15000, 18000));
+                    events.Repeat(15s, 18s);
                     break;
                 }
                 case EVENT_SHAZZRAH_GATE:
                 {
                     DoCastAOE(SPELL_SHAZZRAH_GATE_DUMMY);
                     events.RescheduleEvent(EVENT_ARCANE_EXPLOSION, 3s, 6s);
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
                     break;
                 }
             }

@@ -233,7 +233,7 @@ public:
                     Talk(EMOTE_GAS_SPORE);
                     me->CastCustomSpell(SPELL_GAS_SPORE, SPELLVALUE_MAX_TARGETS, RAID_MODE<int32>(2, 3, 2, 3), me);
                     events.ScheduleEvent(EVENT_GAS_SPORE, 40s, 45s);
-                    events.DelayEventsToMax(20000, 1); // delay EVENT_VILE_GAS
+                    events.DelayEventsToMax(20s, 1); // delay EVENT_VILE_GAS
                     break;
                 case EVENT_VILE_GAS:
                     {
