@@ -17,8 +17,6 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "SpellScriptLoader.h"
 #include "gundrak.h"
 
 enum Spells
@@ -70,6 +68,15 @@ public:
             {
                 me->CastSpell(me, SPELL_ECK_SPRING_INIT, true);
                 me->SetReactState(REACT_AGGRESSIVE);
+            }
+        }
+
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_ECK_SPRING)
+            {
+                me->GetThreatMgr().ResetAllThreat();
+                me->AddThreat(target, 1.0f);
             }
         }
 
@@ -138,41 +145,7 @@ public:
     };
 };
 
-class spell_eck_spring : public SpellScriptLoader
-{
-public:
-    spell_eck_spring() : SpellScriptLoader("spell_eck_spring") { }
-
-    class spell_eck_spring_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_eck_spring_SpellScript);
-
-        void HandleHitTarget(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                if (Unit* target = GetHitUnit())
-                {
-                    caster->GetThreatMgr().ResetAllThreat();
-                    caster->AddThreat(target, 1.0f);
-                }
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_eck_spring_SpellScript::HandleHitTarget, EFFECT_0, SPELL_EFFECT_JUMP_DEST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_eck_spring_SpellScript();
-    }
-};
-
 void AddSC_boss_eck()
 {
     new boss_eck();
-    new spell_eck_spring();
 }
