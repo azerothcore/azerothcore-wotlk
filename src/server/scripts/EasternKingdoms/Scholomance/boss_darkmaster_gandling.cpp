@@ -41,7 +41,7 @@ constexpr Milliseconds TIMER_ARCANE_MAX = 14s;
 constexpr Milliseconds TIMER_CURSE_MIN = 20s;
 //constexpr Milliseconds TIMER_CURSE_MAX = 30s;
 constexpr Milliseconds TIMER_SHIELD_MIN = 30s;
-constexpr Milliseconds TIMER_SHIELD_MAX = 40s;
+//constexpr Milliseconds TIMER_SHIELD_MAX = 40s;
 constexpr Milliseconds TIMER_PORTAL = 25s;
 
  enum IdPortalSpells
