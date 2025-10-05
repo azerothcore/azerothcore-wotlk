@@ -197,23 +197,21 @@ public:
             if (!unit->EntryEquals(NPC_RUINS_DWELLER))
                 return;
 
-            if (Creature* dweller = unit->ToCreature())
-                if (CreatureGroup* formation = unit->ToCreature()->GetFormation())
-                    if (Creature* leader = formation->GetLeader())
+            if (CreatureGroup* formation = unit->ToCreature()->GetFormation())
+            {
+                scheduler.CancelAll();
+                scheduler.Schedule(1s, [this, dweller, formation](TaskContext /*context*/)
+                {
+                    if (!formation->IsAnyMemberAlive() && instance->IsHeroic())
                     {
-                        scheduler.CancelAll();
-                        scheduler.Schedule(1s, [this, dweller, formation](TaskContext /*context*/)
-                        {
-                            if (!formation->IsAnyMemberAlive() && instance->IsHeroic())
-                            {
-                                if (dweller)
-                                    dweller->AI()->Talk(EMOTE_SUMMON_ECK);
+                        if (dweller)
+                            dweller->AI()->Talk(EMOTE_SUMMON_ECK);
 
-                                instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, { 1624.70f, 891.43f, 95.08f, 1.2f });
-                            }
-
-                        });
+                        instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, { 1624.70f, 891.43f, 95.08f, 1.2f });
                     }
+
+                });
+            }
         }
 
         void Update(uint32 diff) override
