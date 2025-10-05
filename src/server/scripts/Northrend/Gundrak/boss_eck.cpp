@@ -147,19 +147,21 @@ public:
     {
         PrepareSpellScript(spell_eck_spring_SpellScript);
 
-        void HandleAfterCast()
+        void HandleHitTarget(SpellEffIndex /*effIndex*/)
         {
             if (Unit* caster = GetCaster())
             {
-                caster->GetThreatMgr().ResetAllThreat();
-                //Small threat so that he attacks the person he jumped on
-                caster->AddThreat(target, 10.0f);
+                if (Unit* target = GetHitUnit())
+                {
+                    caster->GetThreatMgr().ResetAllThreat();
+                    caster->AddThreat(target, 1.0f);
+                }
             }
         }
 
         void Register() override
         {
-            AfterCast += SpellCastFn(spell_eck_spring_SpellScript::HandleAfterCast);
+            OnEffectHitTarget += SpellEffectFn(spell_eck_spring_SpellScript::HandleHitTarget, EFFECT_0, SPELL_EFFECT_JUMP_DEST);
         }
     };
 
