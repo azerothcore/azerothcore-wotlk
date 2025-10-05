@@ -125,6 +125,12 @@ namespace Movement
         if (!args.Validate(unit))
             return 0;
 
+        if (moveFlags & MOVEMENTFLAG_ROOT)
+        {
+            LOG_TRACE("movement", "Invalid movement during root. Entry: %u IsImmobilized %s, moveflags %u", unit->GetEntry(), unit->IsImmobilizedState() ? "true" : "false", moveFlags);
+            return 0;
+        }
+
         unit->m_movementInfo.SetMovementFlags(moveFlags);
         move_spline.Initialize(args);
 
