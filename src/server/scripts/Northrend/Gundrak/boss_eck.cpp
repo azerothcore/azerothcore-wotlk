@@ -152,6 +152,8 @@ public:
             if (Unit* caster = GetCaster())
             {
                 caster->GetThreatMgr().ResetAllThreat();
+                //Small threat so that he attacks the person he jumped on
+                caster->AddThreat(target, 10.0f);
             }
         }
 
