@@ -194,7 +194,7 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
-            if (!instance->IsHeroic() || !unit->EntryEquals(NPC_RUINS_DWELLER))
+            if (!instance->IsHeroic() || !unit->EntryEquals(NPC_RUINS_DWELLER) || IsBossDone(DATA_ECK_THE_FEROCIOUS))
                 return;
 
             if (Creature* dweller = unit->ToCreature())
