@@ -23,6 +23,7 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
+#include "Log.h"
 
 namespace Movement
 {
