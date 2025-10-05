@@ -30,7 +30,7 @@ enum Spells
 
 constexpr Milliseconds TIMER_HEAL = 12s;
 constexpr Milliseconds TIMER_MINDBLAST = 16s;
-constexpr Milliseconds   TIMER_RENEW = 12s;
+constexpr Milliseconds TIMER_RENEW = 12s;
 constexpr Milliseconds TIMER_SHADOWBOLT = 16s;
 constexpr Milliseconds TIMER_WORDPAIN = 12s;
 
