@@ -609,7 +609,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
                 AttackStart(who);
             }
 
-            _events.ScheduleEvent(EVENT_FROSTBOLT, 3s, 4000);
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 3s, 4s);
         }
 
         void SpellHit(Unit* unit, SpellInfo const* spell) override
