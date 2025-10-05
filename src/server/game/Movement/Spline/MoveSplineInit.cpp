@@ -103,7 +103,13 @@ namespace Movement
 
         bool isOrientationOnly = args.path.size() == 2 && args.path[0] == args.path[1];
 
-        if ((moveFlags & MOVEMENTFLAG_ROOT) || isOrientationOnly)
+        if (moveFlags & MOVEMENTFLAG_ROOT) // This case should essentially never occur - hence the trace logging - hints to issues elsewhere
+        {
+            LOG_TRACE("movement", "Invalid movement during root. Entry: %u IsImmobilized %s, moveflags %u", unit->GetEntry(), unit->IsImmobilizedState() ? "true" : "false", moveFlags);
+            moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
+        }
+
+        if (isOrientationOnly)
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
 
         if (!args.HasVelocity)
@@ -124,12 +130,6 @@ namespace Movement
 
         if (!args.Validate(unit))
             return 0;
-
-        if (moveFlags & MOVEMENTFLAG_ROOT)
-        {
-            LOG_TRACE("movement", "Invalid movement during root. Entry: %u IsImmobilized %s, moveflags %u", unit->GetEntry(), unit->IsImmobilizedState() ? "true" : "false", moveFlags);
-            return 0;
-        }
 
         unit->m_movementInfo.SetMovementFlags(moveFlags);
         move_spline.Initialize(args);
