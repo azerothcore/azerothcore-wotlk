@@ -98,31 +98,31 @@ public:
             {
                 case EVENT_SNAP_KICK:
                     DoCastVictim(SPELL_SNAPKICK);
-                    events.Repeat(6ms * IN_MILLISECONDS);
+                    events.Repeat(6s);
                     break;
                 case EVENT_CLEAVE:
                     DoCastVictim(SPELL_CLEAVE);
-                    events.Repeat(12ms * IN_MILLISECONDS);
+                    events.Repeat(12s);
                     break;
                 case EVENT_UPPERCUT:
                     DoCastVictim(SPELL_UPPERCUT);
-                    events.Repeat(14ms * IN_MILLISECONDS);
+                    events.Repeat(14s);
                     break;
                 case EVENT_MORTAL_STRIKE:
                     DoCastVictim(SPELL_MORTALSTRIKE);
-                    events.Repeat(10ms * IN_MILLISECONDS);
+                    events.Repeat(10s);
                     break;
                 case EVENT_PUMMEL:
                     DoCastVictim(SPELL_PUMMEL);
-                    events.Repeat(16ms * IN_MILLISECONDS);
+                    events.Repeat(16s);
                     break;
                 case EVENT_THROW_AXE:
                     DoCastRandomTarget(SPELL_THROWAXE);
-                    events.Repeat(8ms * IN_MILLISECONDS);
+                    events.Repeat(8s);
                     break;
                 case EVENT_THRASH:
                     DoCastSelf(SPELL_THRASH);
-                    events.Repeat(10ms * IN_MILLISECONDS);
+                    events.Repeat(10s);
                     break;
             }
         }

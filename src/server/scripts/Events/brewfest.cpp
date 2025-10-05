@@ -1714,12 +1714,12 @@ struct npc_coren_direbrew : public ScriptedAI
                 case EVENT_SUMMON_MOLE_MACHINE:
                 {
                     me->CastCustomSpell(SPELL_MOLE_MACHINE_TARGET_PICKER, SPELLVALUE_MAX_TARGETS, 1, nullptr, true);
-                    _events.Repeat(15ms * IN_MILLISECONDS);
+                    _events.Repeat(15s);
                     break;
                 }
                 case EVENT_DIREBREW_DISARM:
                     DoCastSelf(SPELL_DIREBREW_DISARM_PRE_CAST, true);
-                    _events.Repeat(20ms * IN_MILLISECONDS);
+                    _events.Repeat(20s);
                     break;
                 default:
                     break;

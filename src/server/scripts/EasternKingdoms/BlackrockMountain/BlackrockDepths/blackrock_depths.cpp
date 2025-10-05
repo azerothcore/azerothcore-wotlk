@@ -111,7 +111,7 @@ public:
                     {
                         case SPELL_GOUT_OF_FLAMES:
                             DoCast(SPELL_GOUT_OF_FLAMES);
-                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, randtime(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
+                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND);
                             break;
                         default:
                             break;

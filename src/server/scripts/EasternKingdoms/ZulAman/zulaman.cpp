@@ -152,7 +152,7 @@ struct npc_forest_frog : public ScriptedAI
 
                 eventTimer = 4;
                 if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
-                    events.ScheduleEvent(eventTimer, 5ms * MINUTE * IN_MILLISECONDS); // vendors wait for 5 minutes before running away and despawning
+                    events.ScheduleEvent(eventTimer, 300s); // vendors wait for 5 minutes before running away and despawning
                 else
                     events.ScheduleEvent(eventTimer, 6s);
                 break;
