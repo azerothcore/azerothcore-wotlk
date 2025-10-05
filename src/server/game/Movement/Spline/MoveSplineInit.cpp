@@ -106,7 +106,7 @@ namespace Movement
 
         if (moveFlags & MOVEMENTFLAG_ROOT) // This case should essentially never occur - hence the trace logging - hints to issues elsewhere
         {
-            LOG_TRACE("movement", "Invalid movement during root. Entry: %u IsImmobilized %s, moveflags %u", unit->GetEntry(), unit->IsImmobilizedState() ? "true" : "false", moveFlags);
+            LOG_TRACE("movement", "Invalid movement during root. Entry: {} IsImmobilized {}, moveflags {}", unit->GetEntry(), unit->IsImmobilizedState() ? "true" : "false", moveFlags);
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
         }
 
