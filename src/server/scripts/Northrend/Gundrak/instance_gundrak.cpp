@@ -194,7 +194,7 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
-            if (!unit->EntryEquals(NPC_RUINS_DWELLER))
+            if (!instance->IsHeroic() || !unit->EntryEquals(NPC_RUINS_DWELLER))
                 return;
 
             if (Creature* dweller = unit->ToCreature())
@@ -203,14 +203,13 @@ public:
                     scheduler.CancelAll();
                     scheduler.Schedule(1s, [this, dweller, formation](TaskContext /*context*/)
                     {
-                        if (!formation->IsAnyMemberAlive() && instance->IsHeroic())
+                        if (!formation->IsAnyMemberAlive())
                         {
                             if (dweller)
                                 dweller->AI()->Talk(EMOTE_SUMMON_ECK);
 
                             instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, { 1624.70f, 891.43f, 95.08f, 1.2f });
                         }
-
                     });
                 }
         }
