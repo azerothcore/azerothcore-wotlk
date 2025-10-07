@@ -112,8 +112,6 @@ public:
     float GetPctMods() const { return m_pctMods; }
     void SetPctMods(float pctMods) { m_pctMods = pctMods; }
 
-    // xinef: stacking
-    uint32 GetAuraGroup() const { return m_auraGroup; }
     int32 GetOldAmount() const { return m_oldAmount; }
     void SetOldAmount(int32 amount) { m_oldAmount = amount; }
     void SetEnabled(bool enabled) { m_isAuraEnabled = enabled; }
@@ -131,8 +129,6 @@ private:
     float m_critChance;
     float m_pctMods;
 
-    // xinef: stacking
-    uint32 m_auraGroup;
     int32 m_oldAmount;
     bool m_isAuraEnabled;
     // xinef: channel information for channel triggering
