@@ -3102,6 +3102,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 case SPELL_AURA_WATER_BREATHING:
                     spellInfo->AttributesCu |= SPELL_ATTR0_CU_NO_INITIAL_THREAT;
                     break;
+                default:
+                    break;
             }
 
             switch (spellInfo->Effects[j].ApplyAuraName)
@@ -3676,6 +3678,9 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                             if (triggerSpell->AttributesCu & SPELL_ATTR0_CU_BINARY_SPELL)
                                 allNonBinary = false;
                         }
+                        break;
+                    default:
+                        break;
                 }
             }
         }
