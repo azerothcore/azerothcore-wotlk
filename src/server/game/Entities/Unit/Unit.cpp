@@ -12711,6 +12711,8 @@ uint32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, ui
             case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
                 DoneTotal = 0;
                 break;
+            default:
+                break;
         }
         if (spellProto->Effects[i].Effect == SPELL_EFFECT_HEALTH_LEECH)
             DoneTotal = 0;
