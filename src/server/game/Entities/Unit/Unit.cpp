@@ -20403,10 +20403,10 @@ void Unit::SetFacingToObject(WorldObject* object)
     init.Launch();
 }
 
-void Unit::SetTimedFacingToObject(WorldObject* object, uint32 time)
+void Unit::SetTimedFacingToObject(WorldObject* object, Milliseconds time)
 {
     // never face when already moving
-    if (!IsStopped() || !time)
+    if (!IsStopped() || time == 0ms)
         return;
 
     /// @todo figure out under what conditions creature will move towards object instead of facing it where it currently is.
@@ -20416,7 +20416,7 @@ void Unit::SetTimedFacingToObject(WorldObject* object, uint32 time)
     init.Launch();
 
     if (Creature* c = ToCreature())
-        c->m_Events.AddEvent(new ResetToHomeOrientation(*c), c->m_Events.CalculateTime(time));
+        c->m_Events.AddEventAtOffset(new ResetToHomeOrientation(*c), time);
     else
         LOG_ERROR("entities.unit", "Unit::SetTimedFacingToObject called on non-creature unit {}. This should never happen.", GetEntry());
 }
