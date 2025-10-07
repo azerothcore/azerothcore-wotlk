@@ -2196,6 +2196,8 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                 case SPELL_AURA_TRACK_RESOURCES:
                 case SPELL_AURA_TRACK_STEALTHED:
                     return SPELL_SPECIFIC_TRACKER;
+                default:
+                    break;
             }
         }
     }
@@ -2278,6 +2280,8 @@ uint32 SpellInfo::GetMaxTicks() const
                 case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     if (Effects[x].Amplitude != 0)
                         return DotDuration / Effects[x].Amplitude;
+                    break;
+                default:
                     break;
             }
     }
