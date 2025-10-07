@@ -602,7 +602,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
 
         if (addUnit && !itr->first->IsHighestExclusiveAura(this, true))
             addUnit = false;
-        
+
         if (addUnit)
         {
             // persistent area aura does not hit flying targets

@@ -6087,7 +6087,7 @@ int32 Unit::GetTotalAuraModifier(AuraType auratype) const
 
     // Add the highest of the Same Effect Stack Rule SpellGroups to the accumulator
     for (auto itr = sameEffectSpellGroup.begin(); itr != sameEffectSpellGroup.end(); ++itr)
-        modifier += itr->second;    
+        modifier += itr->second;
 
     return modifier;
 }

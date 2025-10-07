@@ -1688,7 +1688,7 @@ void SpellMgr::LoadSpellGroups()
     mSpellSpellGroup.clear();                                  // need for reload case
     mSpellGroupSpell.clear();
 
-    //                                                    0       1            
+    //                                                    0       1
     QueryResult result = WorldDatabase.Query("SELECT id, spell_id FROM spell_group");
     if (!result)
     {
