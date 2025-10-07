@@ -68,7 +68,7 @@ void SummonList::DespawnEntry(uint32 entry)
     }
 }
 
-void SummonList::DespawnAll(uint32 delay /*= 0*/)
+void SummonList::DespawnAll(Milliseconds delay /*= 0ms*/)
 {
     while (!storage_.empty())
     {

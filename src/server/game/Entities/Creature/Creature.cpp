@@ -251,7 +251,7 @@ CreatureBaseStats const* CreatureBaseStats::GetBaseStats(uint8 level, uint8 unit
 
 bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    m_owner.DespawnOrUnsummon(0s, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
+    m_owner.DespawnOrUnsummon(0ms, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
     return true;
 }
 
@@ -2179,7 +2179,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
             GetMap()->ScheduleCreatureRespawn(GetGUID(), forceRespawnTimer);
 }
 
-void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds forcedRespawnTimer)
+void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0ms*/, Seconds forcedRespawnTimer /*= 0s*/)
 {
     if (TempSummon* summon = this->ToTempSummon())
         summon->UnSummon(msTimeToDespawn.count());
@@ -2204,7 +2204,7 @@ void Creature::DespawnOnEvade(Seconds respawnDelay)
         return;
     }
 
-    DespawnOrUnsummon(Milliseconds(0), respawnDelay);
+    DespawnOrUnsummon(0ms, respawnDelay);
 }
 
 void Creature::InitializeReactState()

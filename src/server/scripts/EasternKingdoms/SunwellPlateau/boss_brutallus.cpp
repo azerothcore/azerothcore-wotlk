@@ -360,7 +360,7 @@ struct npc_madrigosa : public NullCreatureAI
             break;
         case EVENT_SPAWN_FELMYST:
             DoCastAOE(SPELL_SUMMON_FELBLAZE, true);
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             break;
         }
     }

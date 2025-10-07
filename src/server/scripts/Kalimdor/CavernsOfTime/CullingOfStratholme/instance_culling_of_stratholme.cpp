@@ -307,7 +307,7 @@ public:
                     if (Creature* cr = instance->SummonCreature(NPC_CHROMIE_MIDDLE, pos))
                     {
                         cr->SetVisible(false);
-                        cr->DespawnOrUnsummon(1000);
+                        cr->DespawnOrUnsummon(1s);
                         sCreatureTextMgr->SendChat(cr, textId, player, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
                     }
                 }

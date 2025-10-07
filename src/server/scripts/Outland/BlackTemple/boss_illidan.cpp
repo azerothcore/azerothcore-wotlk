@@ -923,7 +923,7 @@ struct npc_akama_illidan : public ScriptedAI
                 me->m_Events.AddEventAtOffset([&] {
                     Talk(SAY_AKAMA_COUNCIL_2);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                }, 8000ms); // 7800ms
+                }, 8s); // 7800ms
             }
             break;
             // Reached Door
@@ -1436,7 +1436,7 @@ class spell_illidan_parasitic_shadowfiend_trigger : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Creature* target = GetHitCreature())
-            target->DespawnOrUnsummon(1);
+            target->DespawnOrUnsummon(1ms);
     }
 
     void Register() override
@@ -1692,7 +1692,7 @@ class spell_illidan_cage_trap : public SpellScript
             if (GetCaster()->GetExactDist2d(target) < 4.0f)
             {
                 target->AI()->DoAction(ACTION_ILLIDAN_CAGED);
-                GetCaster()->ToCreature()->DespawnOrUnsummon(1);
+                GetCaster()->ToCreature()->DespawnOrUnsummon(1ms);
                 if (GameObject* gobject = GetCaster()->FindNearestGameObject(GO_CAGE_TRAP, 10.0f))
                     gobject->SetLootState(GO_JUST_DEACTIVATED);
             }

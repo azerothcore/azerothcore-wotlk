@@ -205,7 +205,7 @@ public:
                     break;
                 case EVENT_SUMMON_SABOTEOUR:
                     DoSummon(NPC_SABOTEOUR, me, 2.0f, 0, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->DespawnOrUnsummon(3000);
+                    me->DespawnOrUnsummon(3s);
                     break;
             }
 
@@ -1136,7 +1136,7 @@ public:
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(11686);
                         me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-                        me->DespawnOrUnsummon(1000);
+                        me->DespawnOrUnsummon(1s);
                     }
                     ++count;
                 }

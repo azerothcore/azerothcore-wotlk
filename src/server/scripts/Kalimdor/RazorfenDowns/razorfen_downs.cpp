@@ -115,7 +115,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(5000);
+            me->DespawnOrUnsummon(5s);
         }
 
         void sQuestAccept(Player* /*player*/, Quest const* quest) override

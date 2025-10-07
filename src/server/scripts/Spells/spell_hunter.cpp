@@ -302,7 +302,7 @@ class spell_hun_taming_the_beast : public AuraScript
     {
         if (Unit* target = GetTarget())
             if (Creature* creature = target->ToCreature())
-                creature->DespawnOrUnsummon(1);
+                creature->DespawnOrUnsummon(1ms);
     }
 
     void Register() override

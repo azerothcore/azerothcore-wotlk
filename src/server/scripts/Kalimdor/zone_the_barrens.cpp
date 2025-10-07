@@ -300,11 +300,11 @@ public:
             for (uint8 i = 0; i < 6; ++i) // unsummon challengers
                 if (AffrayChallenger[i])
                     if (Creature* creature = ObjectAccessor::GetCreature((*me), AffrayChallenger[i]))
-                        creature->DespawnOrUnsummon(1);
+                        creature->DespawnOrUnsummon(1ms);
 
             if (BigWill) // unsummon bigWill
                 if (Creature* creature = ObjectAccessor::GetCreature((*me), BigWill))
-                    creature->DespawnOrUnsummon(1);
+                    creature->DespawnOrUnsummon(1ms);
         }
 
         void MoveInLineOfSight(Unit* who) override

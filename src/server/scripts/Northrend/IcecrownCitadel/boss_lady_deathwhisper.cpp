@@ -482,7 +482,7 @@ public:
                             minrange = summon->GetExactDist(p);
                         }
 
-                summon->ToTempSummon()->DespawnOrUnsummon(30000);
+                summon->ToTempSummon()->DespawnOrUnsummon(30s);
             }
             else
             {
@@ -949,7 +949,7 @@ public:
                     me->GetMotionMaster()->MovementExpired();
                     me->StopMoving();
                     me->SetControlled(true, UNIT_STATE_STUNNED);
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
                     break;
                 default:
                     break;
@@ -977,7 +977,7 @@ public:
 
             if (!me->GetVictim() || me->GetVictim()->GetGUID() != targetGUID)
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
                 return;
             }
 

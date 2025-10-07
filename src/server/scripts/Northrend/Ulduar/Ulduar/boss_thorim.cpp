@@ -859,7 +859,7 @@ public:
             else if (param == ACTION_SIF_TRANSFORM)
             {
                 me->CastSpell(me, SPELL_SIF_TRANSFORM, true);
-                me->DespawnOrUnsummon(5000);
+                me->DespawnOrUnsummon(5s);
                 events.Reset();
                 _allowCast = false;
             }
@@ -875,7 +875,7 @@ public:
             {
                 case EVENT_SIF_FINISH_DOMINION:
                     Talk(SAY_SIF_HM_MISSED);
-                    me->DespawnOrUnsummon(5000);
+                    me->DespawnOrUnsummon(5s);
                     break;
                 case EVENT_SIF_START_TALK:
                     Talk(SAY_SIF_AGGRO);

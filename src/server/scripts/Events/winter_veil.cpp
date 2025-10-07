@@ -192,7 +192,7 @@ class spell_winter_veil_racer_slam_hit : public SpellScript
             return;
 
         target->CastSpell(target->GetPositionX() + irand(-10, 10), target->GetPositionY() + irand(-10, 10), target->GetPositionZ(), SPELL_RACER_DEATH_VISUAL, true);
-        target->DespawnOrUnsummon(3000);
+        target->DespawnOrUnsummon(3s);
         target->CastSpell(target, SPELL_RACER_FLAMES, true);
         caster->CastSpell(caster, SPELL_RACER_KILL_COUNTER, true);
 

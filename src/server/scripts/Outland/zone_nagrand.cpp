@@ -464,7 +464,7 @@ public:
             player->KilledMonsterCredit(NPC_MAGHAR_PRISONER);
 
             prisoner->AI()->Talk(SAY_FREE, player);
-            prisoner->DespawnOrUnsummon(6000);
+            prisoner->DespawnOrUnsummon(6s);
         }
 
         return true;

@@ -603,7 +603,7 @@ struct npc_dark_iron_attack_mole_machine : public ScriptedAI
             {
                 me->SummonCreature(NPC_DARK_IRON_GUZZLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                 summonTimer = 0;
-                me->DespawnOrUnsummon(3000);
+                me->DespawnOrUnsummon(3s);
             }
         }
     }

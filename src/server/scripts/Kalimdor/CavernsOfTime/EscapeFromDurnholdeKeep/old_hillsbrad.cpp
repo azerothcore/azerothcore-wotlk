@@ -382,7 +382,7 @@ public:
                     if (Creature* horse = me->FindNearestCreature(NPC_SKARLOC_MOUNT, 10.0f))
                     {
                         horse->GetMotionMaster()->MovePoint(0, 2501.15f, 572.14f, 54.13f);
-                        horse->DespawnOrUnsummon(30 * IN_MILLISECONDS);
+                        horse->DespawnOrUnsummon(30s);
                     }
                     Talk(SAY_EMOTE_HORSE);
                     SetEscortPaused(true);

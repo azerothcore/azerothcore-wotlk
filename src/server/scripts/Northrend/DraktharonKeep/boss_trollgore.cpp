@@ -214,7 +214,7 @@ class spell_trollgore_corpse_explode_aura : public AuraScript
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Creature* target = GetTarget()->ToCreature())
-            target->DespawnOrUnsummon(1);
+            target->DespawnOrUnsummon(1ms);
     }
 
     void Register() override

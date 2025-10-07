@@ -1322,7 +1322,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
     };
 

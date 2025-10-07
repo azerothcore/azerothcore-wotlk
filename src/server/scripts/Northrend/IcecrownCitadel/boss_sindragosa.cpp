@@ -722,7 +722,7 @@ public:
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
                 player->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
-                me->DespawnOrUnsummon(5000);
+                me->DespawnOrUnsummon(5s);
             }
         }
 

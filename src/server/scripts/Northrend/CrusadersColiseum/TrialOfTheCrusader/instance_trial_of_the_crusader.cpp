@@ -348,9 +348,9 @@ public:
                             }
 
                             if (Creature* c = instance->GetCreature(NPC_AcidmawGUID))
-                                c->DespawnOrUnsummon(10000);
+                                c->DespawnOrUnsummon(10s);
                             if (Creature* c = instance->GetCreature(NPC_DreadscaleGUID))
-                                c->DespawnOrUnsummon(10000);
+                                c->DespawnOrUnsummon(10s);
                             if (AchievementTimer + 10 >= GameTime::GetGameTime().count())
                                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_JORMUNGAR_ACHIEV);
                             AchievementTimer = 0;
@@ -420,7 +420,7 @@ public:
 
                             for (ObjectGuid const& guid : NPC_ChampionGUIDs)
                                 if (Creature* c = instance->GetCreature(guid))
-                                    c->DespawnOrUnsummon(15000);
+                                    c->DespawnOrUnsummon(15s);
                             NPC_ChampionGUIDs.clear();
 
                             if (Creature* c = instance->GetCreature(NPC_TirionGUID))
@@ -1314,7 +1314,7 @@ public:
                         {
                             c->SetVisible(true);
                             c->AI()->Talk(SAY_STAGE_4_05);
-                            c->DespawnOrUnsummon(0);
+                            c->DespawnOrUnsummon(0ms);
                         }
 
                         break;

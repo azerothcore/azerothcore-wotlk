@@ -3706,7 +3706,7 @@ class spell_gen_despawn_self : public SpellScript
     void HandleDummy(SpellEffIndex effIndex)
     {
         if (GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_DUMMY || GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_SCRIPT_EFFECT)
-            GetCaster()->ToCreature()->DespawnOrUnsummon(1);
+            GetCaster()->ToCreature()->DespawnOrUnsummon(1ms);
     }
 
     void Register() override

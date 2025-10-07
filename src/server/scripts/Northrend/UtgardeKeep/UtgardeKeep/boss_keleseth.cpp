@@ -80,7 +80,7 @@ struct npc_frost_tomb : public NullCreatureAI
         if (PrisonerGUID)
             if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 p->RemoveAurasDueToSpell(SPELL_FROST_TOMB_AURA);
-        me->DespawnOrUnsummon(5000);
+        me->DespawnOrUnsummon(5s);
     }
 
     void UpdateAI(uint32  /*diff*/) override

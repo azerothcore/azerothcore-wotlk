@@ -344,7 +344,7 @@ public:
                 if (Creature* pIchoron = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ICHORON_GUID)))
                     if (pIchoron->AI())
                         pIchoron->AI()->DoAction(ACTION_WATER_ELEMENT_KILLED);
-            me->DespawnOrUnsummon(2500);
+            me->DespawnOrUnsummon(2500ms);
         }
 
         void AttackStart(Unit* /*who*/) override {}

@@ -135,7 +135,7 @@ public:
                                     if (me->GetDistance(c) < 3.0f)
                                     {
                                         c->CastSpell(me, SPELL_ARCANE_POWER, false);
-                                        c->DespawnOrUnsummon(8000);
+                                        c->DespawnOrUnsummon(8s);
                                         found = true;
                                     }
                         if (found)

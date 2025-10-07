@@ -409,7 +409,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(20000);
+            me->DespawnOrUnsummon(20s);
             if (pInstance)
                 if (Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_PALETRESS)))
                     paletress->AI()->DoAction(1);
@@ -722,7 +722,7 @@ public:
 
         void JustDied(Unit* /*pKiller*/) override
         {
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
             if (pInstance)
                 pInstance->SetData(DATA_ARGENT_SOLDIER_DEFEATED, 0);
         }

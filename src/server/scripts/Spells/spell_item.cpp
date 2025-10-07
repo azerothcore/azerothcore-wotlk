@@ -347,7 +347,7 @@ class spell_item_rocket_chicken : public AuraScript
     {
         if (roll_chance_i(5))
         {
-            GetTarget()->ToCreature()->DespawnOrUnsummon(8000);
+            GetTarget()->ToCreature()->DespawnOrUnsummon(8s);
             GetTarget()->Kill(GetTarget(), GetTarget());
         }
         else if (roll_chance_i(50))
@@ -468,7 +468,7 @@ class spell_item_toxic_wasteling : public SpellScript
             GetCaster()->GetMotionMaster()->MoveIdle();
             GetCaster()->ToCreature()->SetHomePosition(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f);
             GetCaster()->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 12.0f, 3.0f, 1);
-            target->DespawnOrUnsummon(1500);
+            target->DespawnOrUnsummon(1500ms);
         }
     }
 
@@ -505,7 +505,7 @@ class spell_item_lil_xt : public SpellScript
             return;
         if (GetCaster()->IsCreature() && GetCaster()->ToCreature()->AI())
             GetCaster()->ToCreature()->AI()->Talk(2);
-        target->DespawnOrUnsummon(500);
+        target->DespawnOrUnsummon(500ms);
     }
 
     void Register() override

@@ -499,7 +499,7 @@ public:
                     break;
                 case NPC_INFILTRATOR_MINCHAR_BQ:
                     if (BloodQuickeningState == DONE)
-                        creature->DespawnOrUnsummon(1);
+                        creature->DespawnOrUnsummon(1ms);
                     break;
                 case NPC_MINCHAR_BEAM_STALKER:
                     if (BloodQuickeningState != DONE)
@@ -661,7 +661,7 @@ public:
                     {
                         c->CastSpell(c, VOID_ZONE_VISUAL, true);
                         unit->SummonCreature(NPC_RISEN_DEATHSPEAKER_SERVANT, *unit, TEMPSUMMON_MANUAL_DESPAWN);
-                        unit->ToCreature()->DespawnOrUnsummon(3000);
+                        unit->ToCreature()->DespawnOrUnsummon(3s);
                     }
                     break;
                 default:

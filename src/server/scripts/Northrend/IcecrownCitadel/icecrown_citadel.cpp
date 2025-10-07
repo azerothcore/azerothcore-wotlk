@@ -534,12 +534,12 @@ public:
                         if (Creature* factionNPC = ObjectAccessor::GetCreature(*me, _factionNPC))
                         {
                             factionNPC->GetMotionMaster()->MovePath(factionNPC->GetSpawnId() * 10, false);
-                            factionNPC->DespawnOrUnsummon(46500);
+                            factionNPC->DespawnOrUnsummon(46500ms);
                             std::list<Creature*> followers;
                             factionNPC->GetCreaturesWithEntryInRange(followers, 30, _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_KOR_KRON_GENERAL : NPC_ALLIANCE_COMMANDER);
                             for (Creature* follower : followers)
                             {
-                                follower->DespawnOrUnsummon(46500);
+                                follower->DespawnOrUnsummon(46500ms);
                             }
                         }
                         me->setActive(false);
@@ -1810,7 +1810,7 @@ public:
             {
                 _vehicleCheckTimer = 500;
                 if (!me->GetVehicle())
-                    me->DespawnOrUnsummon(100);
+                    me->DespawnOrUnsummon(100ms);
             }
             else
                 _vehicleCheckTimer -= diff;
@@ -2151,7 +2151,7 @@ class spell_svalna_remove_spear : public SpellScript
         {
             if (Unit* vehicle = target->GetVehicleBase())
                 vehicle->RemoveAurasDueToSpell(SPELL_IMPALING_SPEAR);
-            target->DespawnOrUnsummon(1);
+            target->DespawnOrUnsummon(1ms);
         }
     }
 

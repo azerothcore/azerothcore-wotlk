@@ -133,7 +133,7 @@ public:
             events.ScheduleEvent(EVENT_DARK_STRIKE, 4s, 7s);
             events.ScheduleEvent(EVENT_DARK_MENDING, 15s, 30s);
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 2s, 4s);
-            events.ScheduleEvent(EVENT_IMMOLATE, 3500ms, 6000ms);
+            events.ScheduleEvent(EVENT_IMMOLATE, 3500ms, 6s);
         }
 
         void UpdateAI(uint32 diff) override
