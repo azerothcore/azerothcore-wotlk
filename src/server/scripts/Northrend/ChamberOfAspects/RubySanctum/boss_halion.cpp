@@ -1120,7 +1120,7 @@ class spell_halion_twilight_realm_aura : public AuraScript
         target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
         if (!GetTarget()->IsPlayer())
             return;
-        GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
+        GetTarget()->m_Events.AddEventAtOffset(new SendEncounterUnit(GetTarget()->ToPlayer()), 500ms);
     }
 
     void Register() override
@@ -1153,7 +1153,7 @@ class spell_halion_leave_twilight_realm_aura : public AuraScript
 
         if (!GetTarget()->IsPlayer())
             return;
-        GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
+        GetTarget()->m_Events.AddEventAtOffset(new SendEncounterUnit(GetTarget()->ToPlayer()), 500ms);
     }
 
     void Register() override

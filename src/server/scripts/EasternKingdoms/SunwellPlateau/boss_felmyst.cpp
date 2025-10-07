@@ -321,7 +321,7 @@ struct boss_felmyst : public BossAI
                 Talk(EMOTE_BREATH);
                 me->m_Events.AddEventAtOffset([&] {
                     for (uint8 i = 0; i < 16; ++i)
-                        me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(i*250));
+                        me->m_Events.AddEventAtOffset(new CorruptTriggers(me, _currentLane), Milliseconds(i*250));
                 }, 5s);
 
                 me->m_Events.AddEventAtOffset([&] {

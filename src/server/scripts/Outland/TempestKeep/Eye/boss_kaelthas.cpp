@@ -1032,7 +1032,7 @@ public:
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         if (_owner->IsBeingTeleportedNear())
-            _owner->m_Events.AddEvent(new lapseTeleport(_owner), _owner->m_Events.CalculateTime(1));
+            _owner->m_Events.AddEventAtOffset(new lapseTeleport(_owner), 1ms);
         else if (!_owner->IsBeingTeleported())
         {
             _owner->CastSpell(_owner, SPELL_GRAVITY_LAPSE_KNOCKBACK, true);
@@ -1062,7 +1062,7 @@ class spell_kaelthas_gravity_lapse : public SpellScript
             if (Player* target = GetHitPlayer())
             {
                 GetCaster()->CastSpell(target, _currentSpellId++, true);
-                target->m_Events.AddEvent(new lapseTeleport(target), target->m_Events.CalculateTime(1));
+                target->m_Events.AddEventAtOffset(new lapseTeleport(target), 1ms);
             }
     }
 

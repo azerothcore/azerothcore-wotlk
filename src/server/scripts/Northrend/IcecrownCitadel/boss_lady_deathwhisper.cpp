@@ -522,7 +522,7 @@ public:
                     darnavan->GetMotionMaster()->MoveIdle();
                     darnavan->StopMoving();
                     darnavan->SetReactState(REACT_PASSIVE);
-                    darnavan->m_Events.AddEvent(new DaranavanMoveEvent(*darnavan), darnavan->m_Events.CalculateTime(10000));
+                    darnavan->m_Events.AddEventAtOffset(new DaranavanMoveEvent(*darnavan), 10s);
                     darnavan->AI()->Talk(SAY_DARNAVAN_RESCUED);
                     if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {

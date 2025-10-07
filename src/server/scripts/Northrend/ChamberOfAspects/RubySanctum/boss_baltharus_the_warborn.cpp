@@ -152,7 +152,7 @@ public:
             if (action == ACTION_INTRO_BALTHARUS && !_introDone)
             {
                 _introDone = true;
-                me->m_Events.AddEvent(new DelayedTalk(me, SAY_BALTHARUS_INTRO), me->m_Events.CalculateTime(6000));
+                me->m_Events.AddEventAtOffset(new DelayedTalk(me, SAY_BALTHARUS_INTRO), 6s);
             }
             else if (action == ACTION_CLONE)
             {
@@ -204,7 +204,7 @@ public:
             summon->SetHealth(me->GetHealth());
             summon->CastSpell(summon, SPELL_SPAWN_EFFECT, true);
             summon->SetReactState(REACT_PASSIVE);
-            summon->m_Events.AddEvent(new RestoreFight(summon), summon->m_Events.CalculateTime(2000));
+            summon->m_Events.AddEventAtOffset(new RestoreFight(summon), 2s);
         }
 
         void UpdateAI(uint32 diff) override

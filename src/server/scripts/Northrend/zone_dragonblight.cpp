@@ -1439,7 +1439,7 @@ public:
         {
             me->SetDisplayId(me->GetNativeDisplayId());
             me->CastSpell(me, SPELL_SAC_EMERGE, true);
-            me->m_Events.AddEvent(new SACActivateEvent(me), me->m_Events.CalculateTime(4000));
+            me->m_Events.AddEventAtOffset(new SACActivateEvent(me), 4s);
         }
 
         void Deactivate()
@@ -1452,7 +1452,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             me->RemoveAurasDueToSpell(SPELL_SAC_GHOUL_AREA_AURA);
-            me->m_Events.AddEvent(new SACDeactivateEvent(me), me->m_Events.CalculateTime(4000));
+            me->m_Events.AddEventAtOffset(new SACDeactivateEvent(me), 4s);
         }
 
         void JustRespawned() override

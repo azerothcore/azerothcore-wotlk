@@ -1174,7 +1174,7 @@ public:
                 summons->SetLootRecipient(player);
                 summons->CastSpell(summons, SPELL_SPAWN_IN, false);
                 summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
-                summons->m_Events.AddEvent(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), summons->m_Events.CalculateTime(5200));
+                summons->m_Events.AddEventAtOffset(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), 5200ms);
                 _creatureGuid = summons->GetGUID();
             }
         }

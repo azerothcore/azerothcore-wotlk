@@ -1023,8 +1023,8 @@ public:
                     {
                         if (crusader->GetEntry() == crusader->GetCreatureData()->id1)
                         {
-                            crusader->m_Events.AddEvent(new CaptainSurviveTalk(*crusader), crusader->m_Events.CalculateTime(delay));
-                            delay += 6000;
+                            crusader->m_Events.AddEventAtOffset(new CaptainSurviveTalk(*crusader), delay);
+                            delay += 6s;
                         }
                         else
                             Unit::Kill(crusader, crusader);
