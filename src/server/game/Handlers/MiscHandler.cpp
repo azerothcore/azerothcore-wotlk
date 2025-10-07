@@ -468,7 +468,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
-        GetPlayer()->SetRooted(true);
+        GetPlayer()->SetRooted(true, true, true);
         GetPlayer()->SetUnitFlag(UNIT_FLAG_STUNNED);
     }
 
@@ -492,7 +492,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCance
     // not remove flags if can't free move - its not set in Logout request code.
     if (GetPlayer()->CanFreeMove())
     {
-        GetPlayer()->SetRooted(false);
+        GetPlayer()->SetRooted(false, true, true);
 
         GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
         GetPlayer()->RemoveUnitFlag(UNIT_FLAG_STUNNED);

@@ -2066,7 +2066,8 @@ protected:
     void SetFeared(bool apply, Unit* fearedBy = nullptr, bool isFear = false);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
-    void SetRooted(bool apply, bool isStun = false);
+    void SetRooted(bool apply, bool stun = false, bool logout = false);
+    void SendMoveRoot(bool state);
 
     //----------- Protected variables ----------//
     UnitAI* i_AI;
