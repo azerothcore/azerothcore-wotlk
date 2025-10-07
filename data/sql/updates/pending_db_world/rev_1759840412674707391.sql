@@ -207,5 +207,4 @@ INSERT INTO `spell_group_stack_rules` (`group_id`,`stack_rule`, `description`) V
 -- additions
 (1089,4, "Mark of the Wild"),
 (1113,4, "Thorns"),
-(1126,3, "Stamina Buffs")
-;
+(1126,3, "Stamina Buffs");
