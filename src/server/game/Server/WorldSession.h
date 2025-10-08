@@ -601,7 +601,6 @@ public:
     // Time Synchronisation
     void ResetTimeSync();
     void SendTimeSync();
-
 public:                                                 // opcodes handlers
     void Handle_NULL(WorldPacket& null);                // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
