@@ -124,13 +124,4 @@ protected:
     const ObjectGuid m_owner;
 };
 
-class ForcedUnsummonDelayEvent : public BasicEvent
-{
-public:
-    ForcedUnsummonDelayEvent(TempSummon& owner) : BasicEvent(), m_owner(owner) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
-
-private:
-    TempSummon& m_owner;
-};
 #endif

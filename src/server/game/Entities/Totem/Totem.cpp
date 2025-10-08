@@ -123,7 +123,10 @@ void Totem::UnSummon(Milliseconds msTime)
 {
     if (msTime > 0ms)
     {
-        m_Events.AddEventAtOffset(new ForcedUnsummonDelayEvent(*this), msTime);
+        m_Events.AddEventAtOffset([this]()
+        {
+            UnSummon();
+        }, msTime);
         return;
     }
 
