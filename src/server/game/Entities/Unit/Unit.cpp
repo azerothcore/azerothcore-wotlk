@@ -4480,7 +4480,7 @@ bool Unit::IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType aur
                         bool hasMoreThanOneEffect = base->HasMoreThanOneEffectForType(auraType);
                         uint32 removedAuras = m_removedAurasCount;
                         RemoveAura(aurApp);
-                        if (hasMoreThanOneEffect || m_removedAurasCount > removedAuras + 1)
+                        if (hasMoreThanOneEffect || m_removedAurasCount > removedAuras)
                             itr = auras.begin();
                     }
                 }
