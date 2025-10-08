@@ -92,24 +92,18 @@ public:
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
-        WorldPacket data(12);
-
         bool canFly = false;
         if (enable.has_value())
         {
-            data.SetOpcode(*enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY);
             canFly = *enable;
+            target->SetCanFly(canFly);
         }
         else
         {
             canFly = handler->GetSession()->GetPlayer()->CanFly();
-            data.SetOpcode(canFly ? SMSG_MOVE_UNSET_CAN_FLY : SMSG_MOVE_SET_CAN_FLY);
-            canFly = !canFly;
+            target->SetCanFly(!canFly);
         }
 
-        data << target->GetPackGUID();
-        data << uint32(0);                                      // unknown
-        target->SendMessageToSet(&data, true);
         handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target), canFly ? "on" : "off");
         return true;
     }
