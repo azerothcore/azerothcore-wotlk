@@ -133,7 +133,7 @@ void EventProcessor::CancelEventGroup(uint8 group)
     }
 }
 
-void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime, uint8 eventGroup)
+void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime /*= true*/, uint8 eventGroup /*= 0*/)
 {
     if (set_addtime)
         Event->m_addTime = m_time;
