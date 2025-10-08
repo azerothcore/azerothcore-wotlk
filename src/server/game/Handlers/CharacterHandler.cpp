@@ -1763,6 +1763,12 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
     std::string iconName;
     recvData >> iconName;
 
+    if (iconName.length() > 100) // DB limitation
+    {
+        LOG_ERROR("entities.player.cheat", "Character GUID {} tried to create equipment set {} with too long an icon name!", _player->GetGUID().ToString(), setGuid);
+        return;
+    }
+
     EquipmentSet eqSet;
 
     eqSet.Guid      = setGuid;
