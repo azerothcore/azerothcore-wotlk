@@ -30,14 +30,19 @@ enum Data
     DATA_MOORABI                        = 1,
     DATA_DRAKKARI_COLOSSUS              = 2,
     DATA_GAL_DARAH                      = 3,
-    DATA_ECK_THE_FEROCIOUS_INIT         = 4,
-    DATA_ECK_THE_FEROCIOUS              = 5,
-    MAX_ENCOUNTERS                      = 6
+    DATA_ECK_THE_FEROCIOUS              = 4,
+    MAX_ENCOUNTERS                      = 5
 };
 
 enum Creatures
 {
+    NPC_RUINS_DWELLER                   = 29920,
     NPC_ECK_THE_FEROCIOUS               = 29932
+};
+
+enum GDTexts
+{
+    EMOTE_SUMMON_ECK                    = 0
 };
 
 enum GameObjects
