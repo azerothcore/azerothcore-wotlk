@@ -202,8 +202,9 @@ enum PetScalingSpells
     SPELL_RISEN_GHOUL_SELF_STUN         = 47466,
 };
 
-#define PET_FOLLOW_DIST  1.0f
+#define PET_FOLLOW_DIST 2.0f
 #define PET_FOLLOW_ANGLE (M_PI/2)
+#define MINI_PET_FOLLOW_ANGLE (M_PI_F)
 
 class PetStable
 {
