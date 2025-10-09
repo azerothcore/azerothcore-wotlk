@@ -2431,10 +2431,10 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                     }
                 case SUMMON_TYPE_MINIPET:
                     // For companions, recalculate the position to ensure they spawn at the intended π/4 angle.
-                    *destTarget = m_originalCaster->GetNearPosition(
+                    destTarget->Relocate(m_originalCaster->GetNearPosition(
                         m_originalCaster->GetDistance2d(destTarget->GetPositionX(), destTarget->GetPositionY()),
                         MINI_PET_SUMMON_ANGLE
-                    );
+                    ));
                     [[fallthrough]];
                 case SUMMON_TYPE_JEEVES:
                     {
