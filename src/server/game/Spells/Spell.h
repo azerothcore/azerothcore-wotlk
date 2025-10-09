@@ -39,6 +39,7 @@ class ByteBuffer;
 class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
+#define TRAJECTORY_MISSILE_SIZE 3.0f
 
 enum SpellCastFlags
 {
@@ -90,6 +91,13 @@ enum SpellRangeFlag
     SPELL_RANGE_DEFAULT             = 0,
     SPELL_RANGE_MELEE               = 1,     //melee
     SPELL_RANGE_RANGED              = 2,     //hunter range and ranged weapon
+};
+
+enum SpellFinishReason : uint8
+{
+    SPELL_FINISHED_SUCCESSFUL_CAST     = 0, // spell has sucessfully launched
+    SPELL_FINISHED_CANCELED            = 1, // spell has been canceled (interrupts)
+    SPELL_FINISHED_CHANNELING_COMPLETE = 2  // spell channeling has been finished
 };
 
 struct SpellDestination
