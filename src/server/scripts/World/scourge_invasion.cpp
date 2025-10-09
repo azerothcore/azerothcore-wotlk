@@ -63,14 +63,8 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
 
     void UpdateWeather(bool startEvent)
     {
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        Weather* weather = me->GetMap()->GetOrGenerateZoneDefaultWeather(me->GetZoneId());
+        if (weather)
         {
             if (startEvent)
                 weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
@@ -92,6 +86,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
             Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_END);
             ChangeZoneEventStatus(false);
             UpdateWeather(false);
+            me->DespawnOrUnsummon();
         }
     }
 
@@ -361,7 +356,6 @@ struct npc_necrotic_shard : public ScriptedAI
     {
         scheduler.Schedule(5s, [this](TaskContext context) // Spawn Cultists every 60 minutes.
         {
-            me->SetFullHealth();
             DespawnShadowsOfDoom(); // Despawn all remaining Shadows before respawning the Cultists?
             SummonCultists();
             context.Repeat(1h);
@@ -519,7 +513,8 @@ struct npc_necrotic_shard : public ScriptedAI
                 // Buff Players.
                 DoCastSelf(SPELL_SOUL_REVIVAL, true);
                 // Sending the Death Bolt.
-                DoCastAOE(SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+                if (Creature* relay = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_RELAY, 200.0f))
+                    me->CastSpell(relay, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
                 DespawnCultists(); // Despawn remaining Cultists (should never happen).
                 DespawnEventDoodads();
                 sWorldState->Save(SAVE_ID_SCOURGE_INVASION);
@@ -955,14 +950,8 @@ struct npc_pallid_horror : public ScriptedAI
 
     void UpdateWeather(bool startEvent)
     {
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        Weather* weather = me->GetMap()->GetOrGenerateZoneDefaultWeather(me->GetZoneId());
+        if (weather)
         {
             if (startEvent)
                 weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);

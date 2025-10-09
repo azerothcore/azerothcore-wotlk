@@ -9,6 +9,10 @@ This directory contains the module management system for AzerothCore, providing 
 - **Custom Directory Naming**: Prevent conflicts with custom directory names
 - **Duplicate Prevention**: Smart detection and prevention of duplicate installations
 - **Multi-Host Support**: GitHub, GitLab, and other Git hosts
+- **Module Exclusion**: Support for excluding modules via environment variable
+- **Interactive Menu System**: Easy-to-use menu interface for module management
+- **Colored Output**: Enhanced terminal output with color support (respects NO_COLOR)
+- **Flat Directory Structure**: Uses flat module installation (no owner subfolders)
 
 ## 📁 File Structure
 
@@ -100,8 +104,31 @@ repo[:dirname][@branch[:commit]]
 # Search with multiple terms
 ./acore.sh module search auction house
 
-# Show all available modules
+# Search with input prompt
 ./acore.sh module search
+```
+
+### Listing Installed Modules
+
+```bash
+# List all installed modules
+./acore.sh module list
+```
+
+### Interactive Menu
+
+```bash
+# Start interactive menu system
+./acore.sh module
+
+# Menu options:
+# s - Search for available modules
+# i - Install one or more modules  
+# u - Update installed modules
+# r - Remove installed modules
+# l - List installed modules
+# h - Show detailed help
+# q - Close this menu
 ```
 
 ## 🔍 Cross-Format Recognition
@@ -129,11 +156,53 @@ The system prevents common conflicts:
 ```bash
 # If 'mod-transmog' directory already exists:
 $ ./acore.sh module install mod-transmog:mod-transmog
-Error: Directory 'mod-transmog' already exists.
 Possible solutions:
   1. Use a different directory name: mod-transmog:my-custom-name
   2. Remove the existing directory first
   3. Use the update command if this is the same module
+```
+
+### Duplicate Module Prevention
+The system uses intelligent owner/name matching to prevent installing the same module multiple times, even when specified in different formats.
+
+## 🚫 Module Exclusion
+
+You can exclude modules from installation using the `MODULES_EXCLUDE_LIST` environment variable:
+
+```bash
+# Exclude specific modules (space-separated)
+export MODULES_EXCLUDE_LIST="mod-test-module azerothcore/mod-dev-only"
+./acore.sh module install --all  # Will skip excluded modules
+
+# Supports cross-format matching
+export MODULES_EXCLUDE_LIST="https://github.com/azerothcore/mod-transmog.git"
+./acore.sh module install mod-transmog  # Will be skipped as excluded
+```
+
+The exclusion system:
+- Uses the same cross-format recognition as other module operations
+- Works with all installation methods (`install`, `install --all`)
+- Provides clear feedback when modules are skipped
+- Supports URLs, owner/name format, and simple names
+
+## 🎨 Color Support
+
+The module manager provides enhanced terminal output with colors:
+
+- **Info**: Cyan text for informational messages
+- **Success**: Green text for successful operations
+- **Warning**: Yellow text for warnings
+- **Error**: Red text for errors
+- **Headers**: Bold cyan text for section headers
+
+Color support is automatically disabled when:
+- Output is not to a terminal (piped/redirected)
+- `NO_COLOR` environment variable is set
+- Terminal doesn't support colors
+
+You can force color output with:
+```bash
+export FORCE_COLOR=1
 ```
 
 ## 🔄 Integration
@@ -165,24 +234,78 @@ azerothcore/mod-transmog master abc123def456
 https://github.com/custom/mod-custom.git develop def456abc789
 mod-eluna:custom-eluna-dir main 789abc123def
 ```
+
+The list maintains:
+- **Alphabetical ordering** by normalized owner/name for consistency
+- **Original format preservation** of how modules were specified
+- **Automatic deduplication** across different specification formats
+- **Custom directory tracking** when specified
+
 ## 🔧 Configuration
 
 ### Environment Variables
-- `MODULES_LIST_FILE`: Override default modules list path
-- `J_PATH_MODULES`: Modules installation directory
-- `AC_PATH_ROOT`: AzerothCore root path
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `MODULES_LIST_FILE` | Override default modules list path | `$AC_PATH_ROOT/conf/modules.list` |
+| `MODULES_EXCLUDE_LIST` | Space-separated list of modules to exclude | - |
+| `J_PATH_MODULES` | Modules installation directory | `$AC_PATH_ROOT/modules` |
+| `AC_PATH_ROOT` | AzerothCore root path | - |
+| `NO_COLOR` | Disable colored output | - |
+| `FORCE_COLOR` | Force colored output even when not TTY | - |
 
 ### Default Paths
-- Modules list: `$AC_PATH_ROOT/conf/modules.list`
+- **Modules list**: `$AC_PATH_ROOT/conf/modules.list`
+- **Installation directory**: `$J_PATH_MODULES` (flat structure, no owner subfolders)
+
+## 🏗️ Architecture
+
+### Core Functions
+
+| Function | Purpose |
+|----------|---------|
+| `inst_module()` | Main dispatcher and interactive menu |
+| `inst_parse_module_spec()` | Parse advanced module syntax |
+| `inst_extract_owner_name()` | Normalize modules for cross-format recognition |
+| `inst_mod_list_*()` | Module list management (read/write/update) |
+| `inst_module_*()` | Module operations (install/update/remove/search) |
+
+### Key Features
+
+- **Flat Directory Structure**: All modules install directly under `modules/` without owner subdirectories
+- **Smart Conflict Detection**: Prevents directory name conflicts with helpful suggestions
+- **Cross-Platform Compatibility**: Works on Linux, macOS, and Windows (Git Bash)
+- **Version Compatibility**: Checks `acore-module.json` for AzerothCore version compatibility
+- **Git Integration**: Uses Joiner system for Git repository management
+
+### Debug Mode
+
+For debugging module operations, you can examine the generated commands:
+```bash
+# Check what Joiner commands would be executed
+tail -f /tmp/joiner_called.txt  # In test environments
+```
 
 ## 🤝 Contributing
 
 When modifying the module manager:
 
-1. Maintain backwards compatibility
-2. Update tests in `test_module_commands.bats`
-3. Update this documentation
-4. Test cross-format recognition thoroughly
-5. Ensure helpful error messages
+1. **Maintain backwards compatibility** with existing module list format
+2. **Update tests** in `test_module_commands.bats` for new functionality
+3. **Update this documentation** for any new features or changes
+4. **Test cross-format recognition** thoroughly across all supported formats
+5. **Ensure helpful error messages** for common user mistakes
+6. **Test exclusion functionality** with various module specification formats
+7. **Verify color output** works correctly in different terminal environments
 
+### Testing Guidelines
 
+```bash
+# Run all module-related tests
+cd apps/installer
+bats test/test_module_commands.bats
+
+# Test with different environments
+NO_COLOR=1 ./acore.sh module list
+FORCE_COLOR=1 ./acore.sh module help
+```
