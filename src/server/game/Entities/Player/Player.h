@@ -1090,11 +1090,6 @@ public:
         SetFloatValue(UNIT_FIELD_COMBATREACH, scale * DEFAULT_COMBAT_REACH);
     }
 
-    [[nodiscard]] bool hasSpanishClient()
-    {
-        return GetSession()->GetSessionDbLocaleIndex() == LOCALE_esES || GetSession()->GetSessionDbLocaleIndex() == LOCALE_esMX;
-    }
-
     bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, Unit* target = nullptr, bool newInstance = false);
     bool TeleportTo(WorldLocation const& loc, uint32 options = 0, Unit* target = nullptr)
     {
@@ -1339,7 +1334,6 @@ public:
     {
         return StoreItem(dest, pItem, update);
     }
-    Item* BankItem(uint16 pos, Item* pItem, bool update);
     void RemoveItem(uint8 bag, uint8 slot, bool update, bool swap = false);
     void MoveItemFromInventory(uint8 bag, uint8 slot, bool update);
     // in trade, auction, guild bank, mail....
@@ -1600,7 +1594,6 @@ public:
     void SetBindPoint(ObjectGuid guid);
     void SendTalentWipeConfirm(ObjectGuid guid);
     void ResetPetTalents();
-    void CalcRage(uint32 damage, bool attacker);
     void RegenerateAll();
     void Regenerate(Powers power);
     void RegenerateHealth();
@@ -2571,13 +2564,10 @@ public:
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
     bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
-    bool SetCanFly(bool apply, bool packetOnly = false) override;
-    bool SetWaterWalking(bool apply, bool packetOnly = false) override;
-    bool SetFeatherFall(bool apply, bool packetOnly = false) override;
-    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
+    bool IsFreeFlying() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY); }
 
     // saving
     void AdditionalSavingAddMask(uint8 mask) { m_additionalSaveTimer = 2000; m_additionalSaveMask |= mask; }
