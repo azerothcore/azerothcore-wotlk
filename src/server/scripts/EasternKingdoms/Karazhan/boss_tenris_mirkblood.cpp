@@ -117,6 +117,11 @@ struct boss_tenris_mirkblood : public BossAI
             }, 6s, 15s);
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+    }
+
     void KilledUnit(Unit* victim) override
     {
         if (!victim)
