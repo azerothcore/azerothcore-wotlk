@@ -505,6 +505,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -538,9 +539,6 @@ public:
             SetCommentatorMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
@@ -549,6 +547,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -583,9 +582,6 @@ public:
             SetDevMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleGPSCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
