@@ -282,7 +282,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-                if (mirkblood->IsAlive())
+                if (mirkblood->IsAlive() && !mirkblood->IsInCombat())
                     mirkblood->AI()->Talk(SAY_APPROACH, player);
 
         return false;
@@ -298,7 +298,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-                if (mirkblood->IsAlive())
+                if (mirkblood->IsAlive() && mirkblood->IsImmuneToPC())
                     mirkblood->SetImmuneToPC(false);
 
         return false;
