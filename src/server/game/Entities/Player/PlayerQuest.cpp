@@ -2345,13 +2345,13 @@ bool Player::HasQuestForItem(uint32 itemid, uint32 excludeQuestId /* 0 */, bool 
 
 void Player::SendQuestComplete(uint32 quest_id)
 {
-    if (quest_id)
-    {
-        WorldPackets::Quest::QuestUpdateComplete questUpdateComplete;
-        questUpdateComplete.QuestId = quest_id;
-        GetSession()->SendPacket(questUpdateComplete.Write());
-        LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = {}", quest_id);
-    }
+    if (!quest_id)
+        return;
+
+    WorldPackets::Quest::QuestUpdateComplete questUpdateComplete;
+    questUpdateComplete.QuestId = quest_id;
+    GetSession()->SendPacket(questUpdateComplete.Write());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = {}", quest_id);
 }
 
 void Player::SendQuestReward(Quest const* quest, uint32 XP)
@@ -2377,25 +2377,25 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
 
 void Player::SendQuestFailed(uint32 questId, InventoryResult reason)
 {
-    if (questId)
-    {
-        WorldPackets::Quest::QuestGiverQuestFailed questGiverQuestFailed;
-        questGiverQuestFailed.QuestId = questId;
-        questGiverQuestFailed.FailureReason = reason; // failed reason (valid reasons: 4, 16, 50, 17, 74, other values show default message)
-        GetSession()->SendPacket(questGiverQuestFailed.Write());
-        LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
-    }
+    if (!questId)
+        return;
+
+    WorldPackets::Quest::QuestGiverQuestFailed questGiverQuestFailed;
+    questGiverQuestFailed.QuestId = questId;
+    questGiverQuestFailed.FailureReason = reason; // failed reason (valid reasons: 4, 16, 50, 17, 74, other values show default message)
+    GetSession()->SendPacket(questGiverQuestFailed.Write());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
 }
 
 void Player::SendQuestTimerFailed(uint32 quest_id)
 {
-    if (quest_id)
-    {
-        WorldPackets::Quest::QuestUpdateFailedTimer questUpdateFailedTimer;
-        questUpdateFailedTimer.QuestId = quest_id;
-        GetSession()->SendPacket(questUpdateFailedTimer.Write());
-        LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
-    }
+    if (!quest_id)
+        return;
+
+    WorldPackets::Quest::QuestUpdateFailedTimer questUpdateFailedTimer;
+    questUpdateFailedTimer.QuestId = quest_id;
+    GetSession()->SendPacket(questUpdateFailedTimer.Write());
+    LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
 }
 
 void Player::SendCanTakeQuestResponse(QuestFailedReason msg) const
@@ -2430,14 +2430,14 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
 
 void Player::SendPushToPartyResponse(Player const* player, QuestShareMessages msg) const
 {
-    if (player)
-    {
-        WorldPackets::Quest::QuestPushResult questPushResult;
-        questPushResult.PlayerGuid = player->GetGUID();
-        questPushResult.QuestShareMessage = msg;
-        GetSession()->SendPacket(questPushResult.Write());
-        LOG_DEBUG("network", "WORLD: Sent MSG_QUEST_PUSH_RESULT");
-    }
+    if (!player)
+        return;
+
+    WorldPackets::Quest::QuestPushResult questPushResult;
+    questPushResult.PlayerGuid = player->GetGUID();
+    questPushResult.QuestShareMessage = msg;
+    GetSession()->SendPacket(questPushResult.Write());
+    LOG_DEBUG("network", "WORLD: Sent MSG_QUEST_PUSH_RESULT");
 }
 
 void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/, uint16 /*count*/)
