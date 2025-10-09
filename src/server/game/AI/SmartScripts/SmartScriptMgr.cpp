@@ -555,6 +555,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_RANDOM_POINT:
         case SMART_TARGET_ROLE_SELECTION:
         case SMART_TARGET_LOOT_RECIPIENTS:
+        case SMART_TARGET_VEHICLE_PASSENGER:
         case SMART_EVENT_SUMMONED_UNIT_DIES:
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
         case SMART_TARGET_PLAYER_RANGE:
@@ -866,6 +867,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ZONE_UNDER_ATTACK: return NO_PARAMS;
             case SMART_ACTION_LOAD_GRID: return NO_PARAMS;
             case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
+            case SMART_ACTION_DO_ACTION: return sizeof(SmartAction::doAction);
             case SMART_ACTION_SET_GUID: return sizeof(SmartAction::setGuid);
             case SMART_ACTION_SCRIPTED_SPAWN: return sizeof(SmartAction::scriptSpawn);
             case SMART_ACTION_SET_SCALE: return sizeof(SmartAction::setScale);
