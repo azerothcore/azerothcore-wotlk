@@ -1026,9 +1026,9 @@ DisconnectToleranceInterval = 0
 #                     exploiting boss encounters by alt+f4 and skipping crucial boss abilities
 #                     or escaping opponents in PvP. This setting is used to allow/disallow
 #                     players to log back into characters that are left in world.
-#        Default:     1 - (by clicking "Enter World" player will log back into a character
+#        Default:     1 - (By clicking "Enter World" player will log back into a character
 #                         that is already in world)
-#                     0 - (by clicking "Enter World" player will get an error message when
+#                     0 - (By clicking "Enter World" player will get an error message when
 #                         trying to log into a character that is left in world, and has to
 #                         wait a minute for the character to be removed from world)
 
@@ -3320,9 +3320,9 @@ MinCharterName = 2
 #        Default:     0 - (Disabled, limited server timezone dependent client check)
 #                     1 - (Enabled, strictly basic Latin characters)
 #                     2 - (Enabled, strictly realm zone specific, see RealmZone setting)
-#        NOTE:        Client needs to have the appropriate fonts installed which support
-#                     the charset. For non-official localization, custom fonts need to be
-#                     placed in clientdir/Fonts.
+#        NOTE:            Client needs to have the appropriate fonts installed which support
+#                         the charset. For non-official localization, custom fonts need to be
+#                         placed in clientdir/Fonts.
 #                     3 - (Enabled, basic Latin characters + server timezone specific)
 
 StrictCharterNames = 0
@@ -3896,7 +3896,7 @@ Arena.ArenaWinRatingModifier1 = 48
 #
 #    Arena.ArenaWinRatingModifier2
 #        Description: Modifier of rating addition when winner team rating is
-#                     equal or more (>=) than 1300 (increasing this value will give more rating).
+#                     equal or more than 1300 (increasing this value will give more rating).
 #        Default:     24
 
 Arena.ArenaWinRatingModifier2 = 24
@@ -3992,9 +3992,9 @@ IsPreloadedContinentTransport.Enabled = 0
 #        Default:     0 - (Disabled, limited server timezone dependent client check)
 #                     1 - (Enabled, strictly basic Latin characters)
 #                     2 - (Enabled, strictly realm zone specific, see RealmZone setting)
-#        NOTE:        Client needs to have the appropriate fonts installed which support
-#                     the charset. For non-official localization, custom fonts need to be
-#                     placed in clientdir/Fonts.
+#        NOTE:            Client needs to have the appropriate fonts installed which support
+#                         the charset. For non-official localization, custom fonts need to be
+#                         placed in clientdir/Fonts.
 #                     3 - (Enabled, basic Latin characters + server timezone specific)
 
 StrictChannelNames = 0
