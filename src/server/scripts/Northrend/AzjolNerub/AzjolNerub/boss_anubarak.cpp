@@ -56,21 +56,24 @@ enum Misc
 {
     ACHIEV_TIMED_START_EVENT            = 20381,
 
-    EVENT_CHECK_HEALTH_25               = 1,
-    EVENT_CHECK_HEALTH_50               = 2,
-    EVENT_CHECK_HEALTH_75               = 3,
-    EVENT_CARRION_BEETELS               = 4,
-    EVENT_LEECHING_SWARM                = 5,
-    EVENT_IMPALE                        = 6,
-    EVENT_POUND                         = 7,
-    EVENT_CLOSE_DOORS                   = 8,
-    EVENT_EMERGE                        = 9,
-    EVENT_SUMMON_VENOMANCER             = 10,
-    EVENT_SUMMON_DARTER                 = 11,
-    EVENT_SUMMON_GUARDIAN               = 12,
-    EVENT_SUMMON_ASSASSINS              = 13,
-    EVENT_ENABLE_ROTATE                 = 14,
-    EVENT_KILL_TALK                     = 15
+    EVENT_CARRION_BEETELS               = 1,
+    EVENT_LEECHING_SWARM                = 2,
+    EVENT_IMPALE                        = 3,
+    EVENT_POUND                         = 4,
+    EVENT_CLOSE_DOORS                   = 5,
+    EVENT_EMERGE                        = 6,
+    EVENT_SUMMON_VENOMANCER             = 7,
+    EVENT_SUMMON_DARTER                 = 8,
+    EVENT_SUMMON_GUARDIAN               = 9,
+    EVENT_SUMMON_ASSASSINS              = 10,
+    EVENT_ENABLE_ROTATE                 = 11,
+    EVENT_KILL_TALK                     = 12
+};
+
+enum ANAnubarakNpcs
+{
+    NPC_ANUBAR_GUARDIAN                 = 29216,
+    NPC_ANUBAR_VENOMANCER               = 29217
 };
 
 class boss_anub_arak : public CreatureScript
@@ -83,10 +86,9 @@ class boss_anub_arak : public CreatureScript
             boss_anub_arakAI(Creature* creature) : BossAI(creature, DATA_ANUBARAK_EVENT)
             {
                 me->m_SightDistance = 120.0f;
-                intro = false;
+                _intro = false;
+                _summonedMinions = false;
             }
-
-            bool intro;
 
             void EnterEvadeMode(EvadeReason why) override
             {
@@ -96,9 +98,9 @@ class boss_anub_arak : public CreatureScript
 
             void MoveInLineOfSight(Unit* who) override
             {
-                if (!intro && who->IsPlayer())
+                if (!_intro && who->IsPlayer())
                 {
-                    intro = true;
+                    _intro = true;
                     Talk(SAY_INTRO);
                 }
                 BossAI::MoveInLineOfSight(who);
@@ -129,8 +131,42 @@ class boss_anub_arak : public CreatureScript
             void Reset() override
             {
                 BossAI::Reset();
+                _summonedMinions = false;
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+
+                ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
+                    Talk(SAY_SUBMERGE);
+                    _summonedMinions = false;
+                    DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
+                    DoCastSelf(SPELL_SUBMERGE, false);
+
+                    me->m_Events.AddEventAtOffset([this] {
+                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                        DoCastSelf(SPELL_IMPALE_PERIODIC, true);
+                    }, 2s);
+
+                    events.Reset();
+                    events.ScheduleEvent(EVENT_EMERGE, 60s);
+                    events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2s);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s);
+                    events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 15s);
+                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20s);
+                    events.ScheduleEvent(EVENT_SUMMON_DARTER, 30s);
+                    events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35s);
+                }, false);
+            }
+
+            void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
+            {
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                    return;
+
+                if (_summonedMinions && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_GUARDIAN) && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_VENOMANCER))
+                {
+                    events.Reset();
+                    events.ScheduleEvent(EVENT_EMERGE, 5s);
+                }
             }
 
             void JustEngagedWith(Unit* ) override
@@ -141,16 +177,13 @@ class boss_anub_arak : public CreatureScript
                 events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500ms);
                 events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s);
                 events.ScheduleEvent(EVENT_POUND, 15s);
-                events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 1s);
-                events.ScheduleEvent(EVENT_CHECK_HEALTH_50, 1s);
-                events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 1s);
                 events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s);
             }
 
             void SummonHelpers(float x, float y, float z, uint32 spellId)
             {
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z);
+                me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             }
 
             void UpdateAI(uint32 diff) override
@@ -159,10 +192,12 @@ class boss_anub_arak : public CreatureScript
                     return;
 
                 events.Update(diff);
+                scheduler.Update(diff);
+
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
-                switch (uint32 eventId = events.ExecuteEvent())
+                switch (events.ExecuteEvent())
                 {
                     case EVENT_CLOSE_DOORS:
                         _JustEngagedWith();
@@ -191,34 +226,14 @@ class boss_anub_arak : public CreatureScript
                         me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
                         me->DisableRotate(false);
                         break;
-                    case EVENT_CHECK_HEALTH_25:
-                    case EVENT_CHECK_HEALTH_50:
-                    case EVENT_CHECK_HEALTH_75:
-                        if (me->HealthBelowPct(eventId*25))
-                        {
-                            Talk(SAY_SUBMERGE);
-                            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                            me->CastSpell(me, SPELL_IMPALE_PERIODIC, true);
-                            me->CastSpell(me, SPELL_SUBMERGE, false);
-                            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-
-                            events.DelayEvents(46000, 0);
-                            events.ScheduleEvent(EVENT_EMERGE, 45s);
-                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2s);
-                            events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s);
-                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 15s);
-                            events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20s);
-                            events.ScheduleEvent(EVENT_SUMMON_DARTER, 30s);
-                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35s);
-                            break;
-                        }
-                        events.ScheduleEvent(eventId, 500ms);
-                        break;
                     case EVENT_EMERGE:
                         me->CastSpell(me, SPELL_EMERGE, true);
                         me->RemoveAura(SPELL_SUBMERGE);
                         me->RemoveAura(SPELL_IMPALE_PERIODIC);
                         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
+                        events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500ms);
+                        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s);
+                        events.ScheduleEvent(EVENT_POUND, 15s);
                         break;
                     case EVENT_SUMMON_ASSASSINS:
                         SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_ASSASSIN);
@@ -232,6 +247,7 @@ class boss_anub_arak : public CreatureScript
                         SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_GUARDIAN);
                         break;
                     case EVENT_SUMMON_VENOMANCER:
+                        _summonedMinions = true;
                         SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_VENOMANCER);
                         break;
                 }
@@ -239,6 +255,10 @@ class boss_anub_arak : public CreatureScript
                 if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     DoMeleeAttackIfReady();
             }
+
+            private:
+                bool _intro;
+                bool _summonedMinions;
         };
 
         CreatureAI* GetAI(Creature* creature) const override

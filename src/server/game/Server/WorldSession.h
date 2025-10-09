@@ -389,6 +389,10 @@ public:
 
     void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
     void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
+    void SynchronizeMovement(MovementInfo& movementInfo);
+    void HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover);
+    bool VerifyMovementInfo(MovementInfo const& movementInfo, Player* plrMover, Unit* mover, Opcodes opcode) const;
+    bool ProcessMovementInfo(MovementInfo& movementInfo, Unit* mover, Player* plrMover, WorldPacket& recvData);
 
     void SendPacket(WorldPacket const* packet);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
@@ -592,6 +596,10 @@ public:
     // Time Synchronisation
     void ResetTimeSync();
     void SendTimeSync();
+
+    // Movement packet order
+    uint32 GetOrderCounter() const { return _orderCounter; }
+    void IncrementOrderCounter() { ++_orderCounter; }
 public:                                                 // opcodes handlers
     void Handle_NULL(WorldPacket& null);                // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
@@ -611,6 +619,7 @@ public:                                                 // opcodes handlers
 
     void SendCharCreate(ResponseCodes result);
     void SendCharDelete(ResponseCodes result);
+    void SendCharLoginFailed(LoginFailureReason reason);
     void SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo);
     void SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo);
     void SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo);
@@ -628,11 +637,6 @@ public:                                                 // opcodes handlers
 
     // new party stats
     void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
-
-    void HandleMoveWaterWalkAck(WorldPacket& recvPacket);
-    void HandleFeatherFallAck(WorldPacket& recvData);
-
-    void HandleMoveHoverAck(WorldPacket& recvData);
 
     void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
@@ -978,7 +982,7 @@ public:                                                 // opcodes handlers
     void HandleFarSightOpcode(WorldPacket& recvData);
     void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
     void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
-    void HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData);
+    void HandleMoveFlagChangeOpcode(WorldPacket& recvData);
     void HandleSetTitleOpcode(WorldPacket& recvData);
     void HandleRealmSplitOpcode(WorldPacket& recvData);
     void HandleTimeSyncResp(WorldPacket& recvData);
@@ -1245,6 +1249,8 @@ private:
     std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
     uint32 _timeSyncNextCounter;
     uint32 _timeSyncTimer;
+
+    uint32 _orderCounter;
 
     WorldSession(WorldSession const& right) = delete;
     WorldSession& operator=(WorldSession const& right) = delete;
