@@ -139,7 +139,7 @@ void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime
         Event->m_addTime = m_time;
     Event->m_execTime = e_time;
     Event->m_eventGroup = eventGroup;
-    m_events.insert(std::pair<uint64, BasicEvent*>(e_time, Event));
+    m_events.emplace(e_time, Event);
 }
 
 void EventProcessor::ModifyEventTime(BasicEvent* event, Milliseconds newTime)
@@ -151,7 +151,7 @@ void EventProcessor::ModifyEventTime(BasicEvent* event, Milliseconds newTime)
 
         event->m_execTime = newTime.count();
         m_events.erase(itr);
-        m_events.insert(std::pair<uint64, BasicEvent*>(newTime.count(), event));
+        m_events.emplace(newTime.count(), event);
         break;
     }
 }
