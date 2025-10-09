@@ -1,3 +1,4 @@
+-- DB update 2025_10_07_01 -> 2025_10_09_00
 
 -- Add Npcs to Rhino.
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 29931;
