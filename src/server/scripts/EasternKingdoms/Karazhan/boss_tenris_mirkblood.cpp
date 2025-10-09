@@ -280,9 +280,10 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-            if (mirkblood->IsAlive())
-                mirkblood->AI()->Talk(SAY_APPROACH, player);
+        if (InstanceScript* instance = player->GetInstanceScript())
+            if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                if (mirkblood->IsAlive())
+                    mirkblood->AI()->Talk(SAY_APPROACH, player);
 
         return false;
     }
@@ -295,9 +296,10 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-            if (mirkblood->IsAlive())
-                mirkblood->SetImmuneToPC(false);
+        if (InstanceScript* instance = player->GetInstanceScript())
+            if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                if (mirkblood->IsAlive())
+                    mirkblood->SetImmuneToPC(false);
 
         return false;
     }
