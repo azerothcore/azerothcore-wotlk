@@ -1,3 +1,4 @@
+-- DB update 2025_10_09_01 -> 2025_10_09_02
 -- Update gameobject 'Frostglow' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (192077)) AND (`guid` IN (46));

@@ -1,3 +1,4 @@
+-- DB update 2025_10_09_00 -> 2025_10_09_01
 -- Update gameobject 'Lava' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (191854, 191858, 191859, 191855, 191856, 191857)) AND (`guid` IN (58982, 59037, 59050, 67174, 67176, 67178));
