@@ -1732,7 +1732,7 @@ public:
         {
 
             ++reqKillCount;
-            if (events.HasNextEventTime(EVENT_DECREASE_REQ_COUNT_BY_100))
+            if (events.HasTimeUntilEvent(EVENT_DECREASE_REQ_COUNT_BY_100))
                 events.RescheduleEvent(EVENT_DECREASE_REQ_COUNT_BY_100, 10s);
             summons.Summon(s);
             s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);

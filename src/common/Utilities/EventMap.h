@@ -80,20 +80,6 @@ public:
     }
 
     /**
-    * @name GetTimer
-    * @return Current timer value.
-    */
-    TimePoint GetTimer() const
-    {
-        return _time;
-    }
-
-    void SetTimer(TimePoint time)
-    {
-        _time = time;
-    }
-
-    /**
     * @name GetPhaseMask
     * @return Active phases as mask.
     */
@@ -232,26 +218,6 @@ public:
     * @param group Group to cancel.
     */
     void CancelEventGroup(GroupIndex group);
-
-    /**
-    * @name GetNextEventTime
-    * @brief Returns closest occurence of specified event.
-    * @param eventId Wanted event id.
-    * @return Time of found event.
-    */
-    TimePoint GetNextEventTime(EventId eventId) const;
-
-    /**
-     * @name GetNextEventTime
-     * @return Time of next event.
-     */
-    TimePoint GetNextEventTime() const;
-
-    /**
-     * @name HasEventNextTime
-     * @return Time of next event.
-     */
-    bool HasNextEventTime(EventId eventId) const;
 
     /**
     * @name IsInPhase

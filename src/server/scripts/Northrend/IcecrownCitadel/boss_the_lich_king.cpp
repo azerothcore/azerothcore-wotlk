@@ -885,7 +885,7 @@ public:
                     summon->StopMovingOnCurrentPos();
                     break;
                 case NPC_VALKYR_SHADOWGUARD:
-                    if (_phase == PHASE_THREE || events.HasNextEventTime(EVENT_QUAKE_2))
+                    if (_phase == PHASE_THREE || events.HasTimeUntilEvent(EVENT_QUAKE_2))
                         summon->DespawnOrUnsummon(1);
                     break;
                 default:
@@ -1098,16 +1098,16 @@ public:
                     break;
                 case EVENT_DEFILE:
                     {
-                        TimePoint evTime = events.GetNextEventTime(EVENT_SUMMON_VALKYR);
+                        Milliseconds evTime = events.GetTimeUntilEvent(EVENT_SUMMON_VALKYR);
                         // if defile (cast time 2sec) is less than 3 before valkyr appears
                         // we've to decide
-                        if (evTime != TimePoint::min() && (events.GetTimer() > evTime || std::chrono::duration_cast<Milliseconds>(evTime - events.GetTimer()) < 5s))
+                        if (evTime < 5s)
                         {
                             // if valkyr is less than 1.5 secs after defile (cast time 2 sec) then we've a sync issue, so
                             // we need to cancel it (break) and schedule a defile to be casted 5 or 4 seconds after valkyr
-                            if (events.GetTimer() > evTime || std::chrono::duration_cast<Milliseconds>(evTime - events.GetTimer()) < 3500ms)
+                            if (evTime < 3500ms)
                             {
-                                Milliseconds t = events.GetTimer() > evTime ? 0ms : std::chrono::duration_cast<Milliseconds>(evTime - events.GetTimer());
+                                Milliseconds t = evTime > 0ms ? evTime : 0ms;
                                 events.ScheduleEvent(EVENT_DEFILE, t + (Is25ManRaid() ? 5s : 4s), EVENT_GROUP_ABILITIES);
                                 break;
                             }
@@ -1151,10 +1151,8 @@ public:
                         // schedule a defile (or reschedule it) if next defile event
                         // doesn't exist ( now > next defile ) or defile is coming too soon
                         Milliseconds minTime = (Is25ManRaid() ? 5s : 4s);
-                        TimePoint evTime = events.GetNextEventTime(EVENT_DEFILE);
-                        if (evTime != TimePoint::min())
-                            if (events.GetTimer() > evTime || evTime - events.GetTimer() < minTime)
-                                events.RescheduleEvent(EVENT_DEFILE, minTime, EVENT_GROUP_ABILITIES);
+                        if (events.GetTimeUntilEvent(EVENT_DEFILE) < minTime)
+                            events.RescheduleEvent(EVENT_DEFILE, minTime, EVENT_GROUP_ABILITIES);
                     }
                     break;
                 case EVENT_VILE_SPIRITS:

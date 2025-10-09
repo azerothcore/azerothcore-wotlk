@@ -160,7 +160,7 @@ public:
                 summon->SetRegeneratingHealth(false);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->m_Events.AddEvent(new RestoreFight(summon), summon->m_Events.CalculateTime(3000));
-                if (!events.HasNextEventTime(EVENT_COLOSSUS_HEALTH_2))
+                if (!events.HasTimeUntilEvent(EVENT_COLOSSUS_HEALTH_2))
                 {
                     summon->SetHealth(summon->GetMaxHealth() / 2);
                     summon->LowerPlayerDamageReq(summon->GetMaxHealth() / 2);

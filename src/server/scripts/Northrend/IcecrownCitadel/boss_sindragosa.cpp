@@ -546,16 +546,12 @@ public:
                     events.ScheduleEvent(EVENT_UNCHAINED_MAGIC, 30s, 35s, EVENT_GROUP_LAND_PHASE);
                     break;
                 case EVENT_ICY_GRIP:
-                {
                     me->CastSpell((Unit*)nullptr, SPELL_ICY_GRIP, false);
                     events.DelayEventsToMax(1001ms, 0);
                     events.ScheduleEvent(EVENT_BLISTERING_COLD, 1s, EVENT_GROUP_LAND_PHASE);
-                    TimePoint evTime = events.GetNextEventTime(EVENT_ICE_TOMB);
-                    if (evTime != TimePoint::min())
-                        if (events.GetTimer() > evTime || std::chrono::duration_cast<Milliseconds>(evTime - events.GetTimer()) < 7s)
-                            events.RescheduleEvent(EVENT_ICE_TOMB, 7s);
+                    if (events.GetTimeUntilEvent(EVENT_ICE_TOMB) < 7s)
+                        events.RescheduleEvent(EVENT_ICE_TOMB, 7s);
                     break;
-                }
                 case EVENT_BLISTERING_COLD:
                     Talk(EMOTE_WARN_BLISTERING_COLD);
                     me->CastSpell(me, SPELL_BLISTERING_COLD, false);
@@ -655,10 +651,8 @@ public:
                         Talk(EMOTE_WARN_FROZEN_ORB, target);
                         me->CastSpell(target, SPELL_ICE_TOMB_DUMMY, true);
                         me->CastSpell(target, SPELL_FROST_BEACON, true);
-                        TimePoint evTime = events.GetNextEventTime(EVENT_ICY_GRIP);
-                        if (evTime != TimePoint::min())
-                            if (events.GetTimer() > evTime || std::chrono::duration_cast<Milliseconds>(evTime - events.GetTimer()) < 8s)
-                                events.RescheduleEvent(EVENT_ICY_GRIP, 8s, EVENT_GROUP_LAND_PHASE);
+                        if (events.GetTimeUntilEvent(EVENT_ICY_GRIP) < 8s)
+                            events.RescheduleEvent(EVENT_ICY_GRIP, 8s, EVENT_GROUP_LAND_PHASE);
                     }
                     events.ScheduleEvent(EVENT_ICE_TOMB, 18s, 22s);
                     break;

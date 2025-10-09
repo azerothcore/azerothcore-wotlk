@@ -89,7 +89,7 @@ struct boss_keristrasza : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (!events.HasNextEventTime(EVENT_KILL_TALK))
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_SLAY);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);

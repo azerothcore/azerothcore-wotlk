@@ -114,7 +114,6 @@ struct boss_anomalus : public BossAI
         BossAI::JustEngagedWith(who);
 
         activeRifts = 0;
-        //events.SetTimer(45000);
         events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
         events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
         events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);

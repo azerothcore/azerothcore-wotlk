@@ -102,7 +102,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!events.HasNextEventTime(EVENT_KILL_TALK))
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);

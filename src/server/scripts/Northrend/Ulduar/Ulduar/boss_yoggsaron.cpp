@@ -696,8 +696,8 @@ public:
                 yoggb->AI()->Talk(EMOTE_YOGG_SARON_BRAIN_SHATTERED);
             }
 
-            TimePoint timer = events.GetNextEventTime(EVENT_SARA_P2_OPEN_PORTALS);
-            Milliseconds portalTime = (timer > events.GetTimer() ? std::chrono::duration_cast<Milliseconds>(timer - events.GetTimer()) : 0ms);
+            Milliseconds timer = events.GetTimeUntilEvent(EVENT_SARA_P2_OPEN_PORTALS);
+            Milliseconds portalTime = (timer > 0ms ? timer : 0ms);
             events.DelayEvents(Milliseconds(param + 100));
             events.RescheduleEvent(EVENT_SARA_P2_OPEN_PORTALS, portalTime, 0, EVENT_PHASE_TWO);
             events.ScheduleEvent(EVENT_SARA_P2_REMOVE_STUN, Milliseconds(param), 0, EVENT_PHASE_TWO);

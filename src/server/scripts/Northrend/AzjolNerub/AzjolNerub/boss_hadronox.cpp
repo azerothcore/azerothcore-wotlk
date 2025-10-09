@@ -111,7 +111,7 @@ public:
         uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
-                return !me->isActiveObject() || events.HasNextEventTime(EVENT_HADRONOX_MOVE4) ? 1 : 0;
+                return !me->isActiveObject() || events.HasTimeUntilEvent(EVENT_HADRONOX_MOVE4) ? 1 : 0;
             return 0;
         }
 

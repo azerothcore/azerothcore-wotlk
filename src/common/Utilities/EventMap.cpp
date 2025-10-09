@@ -192,28 +192,6 @@ void EventMap::CancelEventGroup(GroupIndex group)
     }
 }
 
-TimePoint EventMap::GetNextEventTime(EventId eventId) const
-{
-    if (Empty())
-        return TimePoint::min();
-
-    for (auto const& [time, event] : _eventMap)
-        if (eventId == event._id)
-            return time;
-
-    return TimePoint::min();
-}
-
-TimePoint EventMap::GetNextEventTime() const
-{
-    return Empty() ? TimePoint::min() : _eventMap.begin()->first;
-}
-
-bool EventMap::HasNextEventTime(EventId eventId) const
-{
-    return GetNextEventTime(eventId) != TimePoint::min();
-}
-
 bool EventMap::IsInPhase(PhaseIndex phase) const
 {
     return phase <= sizeof(PhaseIndex) * 8 && (!phase || _phaseMask & PhaseMask(1u << (phase - 1u)));

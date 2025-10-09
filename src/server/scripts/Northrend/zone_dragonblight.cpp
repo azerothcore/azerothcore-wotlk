@@ -1095,7 +1095,7 @@ public:
 
         void SetGUID(ObjectGuid guid, int32  /*id*/) override
         {
-            if (playerGUID || events.HasNextEventTime(998) || events.HasNextEventTime(2))
+            if (playerGUID || events.HasTimeUntilEvent(998) || events.HasTimeUntilEvent(2))
                 return;
 
             me->setActive(true);
