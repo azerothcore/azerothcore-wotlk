@@ -1246,7 +1246,7 @@ class spell_item_healing_trance : public AuraScript
         PreventDefaultAction();
         if (Unit* unitTarget = GetTarget())
         {
-            uint32 itemSpell = GetSpellInfo()->Id;
+            uint32 const itemSpell = GetSpellInfo()->Id;
             uint32 spellId = 0;
 
             if (itemSpell == SPELL_HEALING_DISCOUNT)
