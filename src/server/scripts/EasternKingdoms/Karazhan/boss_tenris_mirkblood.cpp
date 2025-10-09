@@ -117,11 +117,6 @@ struct boss_tenris_mirkblood : public BossAI
             }, 6s, 15s);
     }
 
-    void JustDied(Unit* /*killer*/) override
-    {
-        _JustDied();
-    }
-
     void KilledUnit(Unit* victim) override
     {
         if (!victim)
@@ -285,10 +280,9 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-                    mirkblood->AI()->Talk(SAY_APPROACH, player);
+        if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+            if (mirkblood->IsAlive())
+                mirkblood->AI()->Talk(SAY_APPROACH, player);
 
         return false;
     }
@@ -301,10 +295,9 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-                    mirkblood->SetImmuneToPC(false);
+        if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+            if (mirkblood->IsAlive())
+                mirkblood->SetImmuneToPC(false);
 
         return false;
     }
