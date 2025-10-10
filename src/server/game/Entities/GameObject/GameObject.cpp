@@ -1738,13 +1738,20 @@ void GameObject::Use(Unit* user)
                             //provide error, no fishable zone or area should be 0
                             if (!zone_skill)
                                 LOG_ERROR("sql.sql", "Fishable areaId {} are not properly defined in `skill_fishing_base_level`.", subzone);
+                            
+                            const int32 no_miss_skill = zone_skill + 95;
 
                             int32 skill = player->GetSkillValue(SKILL_FISHING);
 
                             int32 chance;
-                            if (skill < zone_skill)
+                            // fishing pool catches are 100%
+                            //TODO: find reasonable value for fishing hole search
+                            GameObject* ok = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
+                            if (ok) 
+                                chance = 100;
+                            else if (skill < no_miss_skill)
                             {
-                                chance = int32(pow((double)skill / zone_skill, 2) * 100);
+                                chance = int32(pow((double)skill / no_miss_skill, 2) * 100);
                                 if (chance < 1)
                                     chance = 1;
                             }
@@ -1753,7 +1760,7 @@ void GameObject::Use(Unit* user)
 
                             int32 roll = irand(1, 100);
 
-                            LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
+                            LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {})", skill, zone_skill, chance, roll);
 
                             if (sScriptMgr->OnPlayerUpdateFishingSkill(player, skill, zone_skill, chance, roll))
                             {
@@ -1768,8 +1775,7 @@ void GameObject::Use(Unit* user)
                                 SetOwnerGUID(player->GetGUID());
                                 SetSpellId(0); // prevent removing unintended auras at Unit::RemoveGameObject
 
-                                //TODO: find reasonable value for fishing hole search
-                                GameObject* ok = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
+                                // fishing pool catch
                                 if (ok)
                                 {
                                     ok->Use(player);
