@@ -20125,24 +20125,6 @@ private:
     AuraType _auraType;
 };
 
-class ResetToHomeOrientation : public BasicEvent
-{
-public:
-    ResetToHomeOrientation(Creature& self) : _self(self) { }
-
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-    {
-            if (_self.IsInWorld() && _self.FindMap() && _self.IsAlive() && !_self.IsInCombat())
-            {
-                _self.SetFacingTo(_self.GetHomePosition().GetOrientation());
-            }
-
-        return true;
-    }
-private:
-    Creature& _self;
-};
-
 void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex)
 {
     AuraEffect* aurEff = nullptr;
