@@ -388,7 +388,8 @@ public:
         _creature->CastSpell(_creature, ExperiencedSpells[_level], true);
         if (_level < (_creature->GetMap()->IsHeroic() ? 4 : 3))
         {
-            _creature->m_Events.AddEventAtOffset(this, Milliseconds(timer)+ExperiencedTimes[_level]);
+            Milliseconds nextExperienceEventTime = Milliseconds(timer) + ExperiencedTimes[_level];
+            _creature->m_Events.AddEventAtOffset(this, nextExperienceEventTime);
             return false;
         }
 
