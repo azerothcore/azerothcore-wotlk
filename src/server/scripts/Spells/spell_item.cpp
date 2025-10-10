@@ -1467,9 +1467,7 @@ class spell_item_blessing_of_ancient_kings : public AuraScript
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
         if (!healInfo)
-        {
             return;
-        }
 
         int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 15.0f));
         // xinef: all heals contribute to one bubble
@@ -1478,7 +1476,7 @@ class spell_item_blessing_of_ancient_kings : public AuraScript
             // The shield is supposed to cap out at 20,000 absorption...
             absorb += protEff->GetAmount();
 
-            /// ...but Blizz wrote this instead, see #23152 for details
+            /// ...but Blizz wrote this instead. See #23152 for details
             if (absorb > 20000)
                 absorb = 200000;
 
