@@ -450,7 +450,7 @@ void TransportMgr::SpawnContinentTransports()
 
     // Preloads Deeprun Tram to fix issues with Subway carts syncronization
     /**
-     \todo: This is a temporary workaround. Consider removing TransportMgr::PreloadGridsFromQuery() as part of fix.
+     @todo: This is a temporary workaround. Consider removing TransportMgr::PreloadGridsFromQuery() as part of fix.
      Takenbacon: "In the long run the most likely ideal fix would be to always spawn all transport types (and thus loading their grid) on map creation"
      See https://github.com/azerothcore/azerothcore-wotlk/pull/23009 for more details.
     */
