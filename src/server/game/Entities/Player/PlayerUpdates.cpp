@@ -978,7 +978,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, ObjectGuid const itemGuid /*= ObjectGuid::Empty*/)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, ObjectGuid const& itemGuid /*= ObjectGuid::Empty*/)
 {
     if (IsInFeralForm())
         return; // always maximized SKILL_FERAL_COMBAT in fact
@@ -1023,7 +1023,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, ObjectGui
     UpdateAllCritPercentages();
 }
 
-void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, ObjectGuid const itemGuid /*= ObjectGuid::Empty*/)
+void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, ObjectGuid const& itemGuid /*= ObjectGuid::Empty*/)
 {
     uint8  playerLevel = GetLevel();
     uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
