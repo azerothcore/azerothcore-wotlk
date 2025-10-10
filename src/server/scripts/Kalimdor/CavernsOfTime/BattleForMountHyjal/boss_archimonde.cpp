@@ -335,7 +335,7 @@ struct boss_archimonde : public BossAI
         Talk(SAY_SLAY);
     }
 
-    void SetGUID(ObjectGuid guid, int32 type) override
+    void SetGUID(ObjectGuid const& guid, int32 type) override
     {
         if (type == GUID_GAIN_SOUL_CHARGE_PLAYER)
         {

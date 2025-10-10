@@ -93,7 +93,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(ObjectGuid const& guid, int32) override
         {
             _playerGUID = guid;
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);

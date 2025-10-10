@@ -118,7 +118,7 @@ public:
             return !victim->HasAura(SPELL_TIMELAPSE);
         }
 
-        void SetGUID(ObjectGuid guid, int32 id) override
+        void SetGUID(ObjectGuid const& guid, int32 id) override
         {
             if (id == GUID_LEVER_USER)
             {

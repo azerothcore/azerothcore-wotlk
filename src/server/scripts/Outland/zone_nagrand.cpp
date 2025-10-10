@@ -303,7 +303,7 @@ public:
         uint32 HealTimer;
         uint32 FrostShockTimer;
 
-        void SetGUID(ObjectGuid guid, int32  /*questId*/) override
+        void SetGUID(ObjectGuid const& guid, int32  /*questId*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             Start(true, false, guid);
