@@ -1738,7 +1738,7 @@ void GameObject::Use(Unit* user)
                             //provide error, no fishable zone or area should be 0
                             if (!zone_skill)
                                 LOG_ERROR("sql.sql", "Fishable areaId {} are not properly defined in `skill_fishing_base_level`.", subzone);
-                            
+
                             const int32 no_miss_skill = zone_skill + 95;
 
                             int32 skill = player->GetSkillValue(SKILL_FISHING);
@@ -1747,7 +1747,7 @@ void GameObject::Use(Unit* user)
                             // fishing pool catches are 100%
                             //TODO: find reasonable value for fishing hole search
                             GameObject* ok = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
-                            if (ok) 
+                            if (ok)
                                 chance = 100;
                             else if (skill < no_miss_skill)
                             {
