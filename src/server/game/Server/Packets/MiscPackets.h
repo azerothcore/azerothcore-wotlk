@@ -210,6 +210,32 @@ namespace WorldPackets
 
             uint32 Time = 0;
         };
+
+        class Complain final : public ClientPacket
+        {
+        public:
+            Complain(WorldPacket&& packet) : ClientPacket(CMSG_COMPLAIN, std::move(packet)) {}
+
+            void Read() override;
+
+            uint8 SpamType = 0; // 0 - mail, 1 - chat
+            ObjectGuid SpammerGuid;
+            uint32 Unk1 = 0;
+            uint32 Unk2 = 0;
+            uint32 Unk3 = 0;
+            uint32 Unk4 = 0;
+            std::string Description = "";
+        };
+
+        class ComplainResult final : public ServerPacket
+        {
+        public:
+            ComplainResult() : ServerPacket(SMSG_COMPLAIN_RESULT, 1) {}
+
+            WorldPacket const* Write() override;
+
+            uint8 Unk = 0;
+        };
     }
 }
 
