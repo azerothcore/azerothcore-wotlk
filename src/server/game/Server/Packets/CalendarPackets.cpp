@@ -15,22 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
-
-#include "BankPackets.h"
 #include "CalendarPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "CombatLogPackets.h"
-#include "CombatPackets.h"
-#include "GuildPackets.h"
-#include "ItemPackets.h"
-#include "LFGPackets.h"
-#include "MiscPackets.h"
-#include "PetPackets.h"
-#include "QueryPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
 
-#endif // AllPackets_h__
+void WorldPackets::Calendar::GetEvent::Read()
+{
+    _worldPacket >> EventId;
+}
+
+void WorldPackets::Calendar::GuildFilter::Read()
+{
+    _worldPacket >> MinimumLevel;
+    _worldPacket >> MaximumLevel;
+    _worldPacket >> MinimumRank;
+}
+
+void WorldPackets::Calendar::ArenaTeam::Read()
+{
+    _worldPacket >> ArenaTeamId;
+}
+
+void WorldPackets::Calendar::CalendarComplain::Read()
+{
+    _worldPacket >> EventId;
+    _worldPacket >> ComplainGuid;
+}
