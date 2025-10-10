@@ -23,6 +23,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <numbers>
 
 enum ReactStates : uint8;
 
@@ -202,8 +203,10 @@ enum PetScalingSpells
     SPELL_RISEN_GHOUL_SELF_STUN         = 47466,
 };
 
-#define PET_FOLLOW_DIST  1.0f
-#define PET_FOLLOW_ANGLE (M_PI/2)
+constexpr float PET_FOLLOW_DIST = 2.0f;
+constexpr float PET_FOLLOW_ANGLE = std::numbers::pi_v<float> / 2;
+constexpr float MINI_PET_SUMMON_ANGLE = std::numbers::pi_v<float> / 4;
+constexpr float MINI_PET_FOLLOW_ANGLE = std::numbers::pi_v<float>;
 
 class PetStable
 {

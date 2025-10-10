@@ -2766,6 +2766,15 @@ void SpellMgr::UnloadSpellInfoStore()
     mSpellInfoMap.clear();
 }
 
+void SpellMgr::UnloadSpellInfoImplicitTargetConditionLists()
+{
+    for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
+    {
+        if (mSpellInfoMap[i])
+            mSpellInfoMap[i]->_UnloadImplicitTargetConditionLists();
+    }
+}
+
 void SpellMgr::LoadSpellSpecificAndAuraState()
 {
     uint32 oldMSTime = getMSTime();
@@ -3396,15 +3405,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 }
 
             // Xinef: Cooldown overwrites
-            // Jotunheim Rapid-Fire Harpoon: Energy Reserve
-            case 56585:
-                spellInfo->RecoveryTime = 30000;
-                spellInfo->_requireCooldownInfo = true;
-                break;
-            // Jotunheim Rapid-Fire Harpoon: Rapid-Fire Harpoon
-            case 56570:
-                spellInfo->RecoveryTime = 200;
-                break;
             // Burst of Speed
             case 57493:
                 spellInfo->RecoveryTime = 60000;

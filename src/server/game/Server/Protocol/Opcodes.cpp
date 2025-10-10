@@ -374,7 +374,7 @@ void OpcodeTable::Initialize()
     /*0x0F3*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_NORMAL_FALL,                                   STATUS_NEVER);
     /*0x0F4*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_SET_HOVER,                                     STATUS_NEVER);
     /*0x0F5*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_UNSET_HOVER,                                   STATUS_NEVER);
-    /*0x0F6*/ DEFINE_HANDLER(CMSG_MOVE_HOVER_ACK,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleMoveHoverAck                       );
+    /*0x0F6*/ DEFINE_HANDLER(CMSG_MOVE_HOVER_ACK,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleMoveFlagChangeOpcode               );
     /*0x0F7*/ DEFINE_SERVER_OPCODE_HANDLER(MSG_MOVE_HOVER,                                          STATUS_NEVER);
     /*0x0F8*/ DEFINE_HANDLER(CMSG_TRIGGER_CINEMATIC_CHEAT,                                          STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x0F9*/ DEFINE_HANDLER(CMSG_OPENING_CINEMATIC,                                                STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
@@ -847,8 +847,8 @@ void OpcodeTable::Initialize()
     /*0x2CC*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_RAID_INSTANCE_INFO,                                 STATUS_NEVER);
     /*0x2CD*/ DEFINE_HANDLER(CMSG_REQUEST_RAID_INFO,                                                STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleRequestRaidInfoOpcode              );
     /*0x2CE*/ DEFINE_HANDLER(CMSG_MOVE_TIME_SKIPPED,                                                STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveTimeSkippedOpcode              );
-    /*0x2CF*/ DEFINE_HANDLER(CMSG_MOVE_FEATHER_FALL_ACK,                                            STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleFeatherFallAck                     );
-    /*0x2D0*/ DEFINE_HANDLER(CMSG_MOVE_WATER_WALK_ACK,                                              STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveWaterWalkAck                   );
+    /*0x2CF*/ DEFINE_HANDLER(CMSG_MOVE_FEATHER_FALL_ACK,                                            STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveFlagChangeOpcode               );
+    /*0x2D0*/ DEFINE_HANDLER(CMSG_MOVE_WATER_WALK_ACK,                                              STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveFlagChangeOpcode               );
     /*0x2D1*/ DEFINE_HANDLER(CMSG_MOVE_NOT_ACTIVE_MOVER,                                            STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveNotActiveMover                 );
     /*0x2D2*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PLAY_SOUND,                                         STATUS_NEVER);
     /*0x2D3*/ DEFINE_HANDLER(CMSG_BATTLEFIELD_STATUS,                                               STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleBattlefieldStatusOpcode            );
@@ -965,7 +965,7 @@ void OpcodeTable::Initialize()
     /*0x342*/ DEFINE_HANDLER(MSG_MOVE_STOP_SWIM_CHEAT,                                              STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x343*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_SET_CAN_FLY,                                   STATUS_NEVER);
     /*0x344*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_UNSET_CAN_FLY,                                 STATUS_NEVER);
-    /*0x345*/ DEFINE_HANDLER(CMSG_MOVE_SET_CAN_FLY_ACK,                                             STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveSetCanFlyAckOpcode             );
+    /*0x345*/ DEFINE_HANDLER(CMSG_MOVE_SET_CAN_FLY_ACK,                                             STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveFlagChangeOpcode               );
     /*0x346*/ DEFINE_HANDLER(CMSG_MOVE_SET_FLY,                                                     STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMovementOpcodes                    );
     /*0x347*/ DEFINE_HANDLER(CMSG_SOCKET_GEMS,                                                      STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleSocketOpcode                       );
     /*0x348*/ DEFINE_HANDLER(CMSG_ARENA_TEAM_CREATE,                                                STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );

@@ -22,6 +22,7 @@
 #include "ArenaTeamMgr.h"
 #include "ArenaTeam.h"
 #include <memory>
+#include "WorldMock.h"
 
 // Used to expose Type property.
 class ArenaTeamTest : public ArenaTeam
@@ -46,6 +47,13 @@ class ArenaTeamFilterTest : public ::testing::Test
 protected:
     void SetUp() override
     {
+        _previousWorld = std::move(sWorld);
+        _worldMock = new ::testing::NiceMock<WorldMock>();
+        ON_CALL(*_worldMock, getIntConfig(::testing::_)).WillByDefault(::testing::Return(0));
+        ON_CALL(*_worldMock, getIntConfig(CONFIG_LEGACY_ARENA_START_RATING)).WillByDefault(::testing::Return(1500));
+        ON_CALL(*_worldMock, getIntConfig(CONFIG_ARENA_START_RATING)).WillByDefault(::testing::Return(0));
+        sWorld.reset(_worldMock);
+
         team1 = ArenaTeamWithType(2); // 2v2
         team2 = ArenaTeamWithType(3); // 3v3
         team3 = ArenaTeamWithType(5); // 5v5
@@ -60,12 +68,16 @@ protected:
         delete team1;
         delete team2;
         delete team3;
+
+        sWorld = std::move(_previousWorld);
     }
 
     ArenaTeamMgr::ArenaTeamContainer arenaTeams;
     ArenaTeam* team1;
     ArenaTeam* team2;
     ArenaTeam* team3;
+    std::unique_ptr<IWorld> _previousWorld;
+    ::testing::NiceMock<WorldMock>* _worldMock = nullptr;
 };
 
 // Test for ArenaTeamFilterAllTeams: it should return all teams without filtering

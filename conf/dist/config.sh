@@ -108,6 +108,15 @@ CCUSTOMOPTIONS=${CCUSTOMOPTIONS:-''}
 AC_CCACHE=${AC_CCACHE:-false}
 export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
 
+#
+# Enable running the cmake install as root
+# Installing as root allows to set the SUID bit on
+# the worldserver binary. This is required if you want
+# to bind the worldserver to reserved ports
+# Default: 0 (false)
+#
+export AC_ENABLE_ROOT_CMAKE_INSTALL=${AC_ENABLE_ROOT_CMAKE_INSTALL:-0}
+
 ##############################################
 #
 #  GOOGLE PERF TOOLS

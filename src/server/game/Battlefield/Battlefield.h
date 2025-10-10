@@ -146,6 +146,7 @@ class BfGraveyard
 {
 public:
     BfGraveyard(Battlefield* Bf);
+    virtual ~BfGraveyard() = default;
 
     // Method to changing who controls the graveyard
     void GiveControlTo(TeamId team);

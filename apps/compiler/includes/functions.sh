@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
 
 # Set SUDO variable - one liner
-SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+SUDO=""
+
+IS_SUDO_ENABLED=${AC_ENABLE_ROOT_CMAKE_INSTALL:-0}
+
+# Allow callers to opt-out from privilege escalation during install/perms adjustments
+if [[ $IS_SUDO_ENABLED == 1 ]]; then
+  SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+fi
 
 function comp_clean() {
   DIRTOCLEAN=${BUILDPATH:-var/build/obj}
@@ -143,9 +150,13 @@ function comp_compile() {
       popd >> /dev/null || exit 1
 
       # set all aplications SUID bit
-      echo "Setting permissions on binary files"
-      find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chown root:root -- {} +
-      find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chmod u+s  -- {} +
+      if [[ $IS_SUDO_ENABLED == 0 ]]; then
+        echo "Skipping root ownership and SUID changes (IS_SUDO_ENABLED=0)"
+      else
+        echo "Setting permissions on binary files"
+        find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chown root:root -- {} +
+        find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chmod u+s  -- {} +
+      fi
 
       [[ -f "$confDir/worldserver.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"

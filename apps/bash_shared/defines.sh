@@ -19,10 +19,10 @@ case $AC_PATH_ROOT in
   *) AC_PATH_ROOT=$PWD/$AC_PATH_ROOT;;
 esac
 
-AC_PATH_CONF="$AC_PATH_ROOT/conf"
+export AC_PATH_CONF="$AC_PATH_ROOT/conf"
 
-AC_PATH_MODULES="$AC_PATH_ROOT/modules"
+export AC_PATH_MODULES="$AC_PATH_ROOT/modules"
 
-AC_PATH_DEPS="$AC_PATH_ROOT/deps"
+export AC_PATH_DEPS="$AC_PATH_ROOT/deps"
 
-AC_PATH_VAR="$AC_PATH_ROOT/var"
+export AC_PATH_VAR="$AC_PATH_ROOT/var"

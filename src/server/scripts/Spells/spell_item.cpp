@@ -1083,7 +1083,7 @@ class spell_item_enchanted_broom_periodic : public AuraScript
         {
             if (owner->isMoving())
             {
-                GetTarget()->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, GetTarget()->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+                GetTarget()->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, MINI_PET_FOLLOW_ANGLE, MOTION_SLOT_ACTIVE);
             }
             else
             {
@@ -1206,27 +1206,38 @@ class spell_item_direbrew_remote_aura : public AuraScript
     }
 };
 
-enum EyeOfGruul
+enum HealingTrance
 {
-    SPELL_DRUID_ITEM_HEALING_TRANCE   = 37721,
-    SPELL_PALADIN_ITEM_HEALING_TRANCE = 37723,
-    SPELL_PRIEST_ITEM_HEALING_TRANCE  = 37706,
-    SPELL_SHAMAN_ITEM_HEALING_TRANCE  = 37722
+    SPELL_HEALING_DISCOUNT                      = 37705,
+    SPELL_SOUL_PRESERVER                        = 60510,
+    SPELL_PRIEST_EYE_OF_GRUUL_HEALING_TRANCE    = 37706,
+    SPELL_DRUID_EYE_OF_GRUUL_HEALING_TRANCE     = 37721,
+    SPELL_SHAMAN_EYE_OF_GRUUL_HEALING_TRANCE    = 37722,
+    SPELL_PALADIN_EYE_OF_GRUUL_HEALING_TRANCE   = 37723,
+    SPELL_DRUID_SOUL_PRESERVER_HEALING_TRANCE   = 60512,
+    SPELL_PALADIN_SOUL_PRESERVER_HEALING_TRANCE = 60513,
+    SPELL_PRIEST_SOUL_PRESERVER_HEALING_TRANCE  = 60514,
+    SPELL_SHAMAN_SOUL_PRESERVER_HEALING_TRANCE  = 60515,
 };
 
 // 37705 - Healing Discount
-class spell_item_eye_of_gruul_healing_discount : public AuraScript
+// 60510 - Soul Preserver
+class spell_item_healing_trance : public AuraScript
 {
-    PrepareAuraScript(spell_item_eye_of_gruul_healing_discount);
+    PrepareAuraScript(spell_item_healing_trance);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
-                SPELL_DRUID_ITEM_HEALING_TRANCE,
-                SPELL_PALADIN_ITEM_HEALING_TRANCE,
-                SPELL_PRIEST_ITEM_HEALING_TRANCE,
-                SPELL_SHAMAN_ITEM_HEALING_TRANCE
+                SPELL_PRIEST_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_DRUID_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_SHAMAN_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_PALADIN_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_DRUID_SOUL_PRESERVER_HEALING_TRANCE,
+                SPELL_PALADIN_SOUL_PRESERVER_HEALING_TRANCE,
+                SPELL_PRIEST_SOUL_PRESERVER_HEALING_TRANCE,
+                SPELL_SHAMAN_SOUL_PRESERVER_HEALING_TRANCE,
             });
     }
 
@@ -1235,32 +1246,57 @@ class spell_item_eye_of_gruul_healing_discount : public AuraScript
         PreventDefaultAction();
         if (Unit* unitTarget = GetTarget())
         {
-            uint32 spell_id = 0;
-            switch (unitTarget->getClass())
+            uint32 const itemSpell = GetSpellInfo()->Id;
+            uint32 spellId = 0;
+
+            if (itemSpell == SPELL_HEALING_DISCOUNT)
             {
+                switch (unitTarget->getClass())
+                {
                 case CLASS_DRUID:
-                    spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_DRUID_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 case CLASS_PALADIN:
-                    spell_id = SPELL_PALADIN_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_PALADIN_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 case CLASS_PRIEST:
-                    spell_id = SPELL_PRIEST_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_PRIEST_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 case CLASS_SHAMAN:
-                    spell_id = SPELL_SHAMAN_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_SHAMAN_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 default:
                     return; // ignore for non-healing classes
+                }
+            }
+            else if (itemSpell == SPELL_SOUL_PRESERVER)
+            {
+                switch (unitTarget->getClass())
+                {
+                case CLASS_DRUID:
+                    spellId = SPELL_DRUID_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                case CLASS_PALADIN:
+                    spellId = SPELL_PALADIN_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                case CLASS_PRIEST:
+                    spellId = SPELL_PRIEST_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                case CLASS_SHAMAN:
+                    spellId = SPELL_SHAMAN_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                default:
+                    return; // ignore for non-healing classes
+                }
             }
 
-            unitTarget->CastSpell(unitTarget, spell_id, true, nullptr, aurEff);
+            unitTarget->CastSpell(unitTarget, spellId, true, nullptr, aurEff);
         }
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_eye_of_gruul_healing_discount::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectProc += AuraEffectProcFn(spell_item_healing_trance::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -4292,7 +4328,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_summon_or_dismiss);
     RegisterSpellScript(spell_item_draenic_pale_ale);
     RegisterSpellAndAuraScriptPair(spell_item_direbrew_remote, spell_item_direbrew_remote_aura);
-    RegisterSpellScript(spell_item_eye_of_gruul_healing_discount);
+    RegisterSpellScript(spell_item_healing_trance);
     RegisterSpellScript(spell_item_summon_argent_knight);
     RegisterSpellScript(spell_item_instant_statue);
     // 23074 Arcanite Dragonling
