@@ -20368,7 +20368,7 @@ void Unit::SetFacingTo(float ori)
     init.Launch();
 }
 
-void Unit::SetFacingToObject(WorldObject* object)
+void Unit::SetFacingToObject(WorldObject* object, Milliseconds timed /*= 0ms*/)
 {
     // never face when already moving
     if (!IsStopped())
@@ -20379,24 +20379,20 @@ void Unit::SetFacingToObject(WorldObject* object)
     init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZ());
     init.SetFacing(GetAngle(object));   // when on transport, GetAngle will still return global coordinates (and angle) that needs transforming
     init.Launch();
-}
 
-void Unit::SetTimedFacingToObject(WorldObject* object, Milliseconds time)
-{
-    // never face when already moving
-    if (!IsStopped() || time == 0ms)
-        return;
-
-    /// @todo figure out under what conditions creature will move towards object instead of facing it where it currently is.
-    Movement::MoveSplineInit init(this);
-    init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZ());
-    init.SetFacing(GetAngle(object));   // when on transport, GetAngle will still return global coordinates (and angle) that needs transforming
-    init.Launch();
-
-    if (Creature* c = ToCreature())
-        c->m_Events.AddEventAtOffset(new ResetToHomeOrientation(*c), time);
-    else
-        LOG_ERROR("entities.unit", "Unit::SetTimedFacingToObject called on non-creature unit {}. This should never happen.", GetEntry());
+    if (timed > 0ms)
+    {
+        if (Creature* c = ToCreature())
+        {
+            c->m_Events.AddEventAtOffset([c]()
+            {
+                if (c->IsInWorld() && c->FindMap() && c->IsAlive() && !c->IsInCombat())
+                    c->SetFacingTo(c->GetHomePosition().GetOrientation());
+            }, timed);
+        }
+        else
+            LOG_ERROR("entities.unit", "Unit::SetFacingToObject called on non-creature unit {}. This should never happen.", GetEntry());
+    }
 }
 
 bool Unit::SetWalk(bool enable)
