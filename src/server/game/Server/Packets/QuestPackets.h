@@ -93,7 +93,7 @@ namespace WorldPackets
         class QuestConfirmAccept final : public ServerPacket
         {
         public:
-            QuestConfirmAccept() : ServerPacket(SMSG_QUEST_CONFIRM_ACCEPT, 4 + 32 + 8) {}
+            QuestConfirmAccept() : ServerPacket(SMSG_QUEST_CONFIRM_ACCEPT, 4 + 16 + 8) {}
 
             WorldPacket const* Write() override;
 
