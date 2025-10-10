@@ -1742,7 +1742,7 @@ void GameObject::Use(Unit* user)
                             // no miss skill is zone skill + 95 since at least patch 2.1
                             int32 const noMissSkill = zoneSkill + 95;
 
-                            int32 skill = player->GetSkillValue(SKILL_FISHING);
+                            int32 const skill = player->GetSkillValue(SKILL_FISHING);
 
                             int32 chance;
                             // fishing pool catches are 100%
@@ -1759,7 +1759,7 @@ void GameObject::Use(Unit* user)
                             else
                                 chance = 100;
 
-                            int32 roll = irand(1, 100);
+                            int32 const roll = irand(1, 100);
 
                             LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} no-miss skill: {}, chance {} roll: {})", skill, zoneSkill, noMissSkill, chance, roll);
 
