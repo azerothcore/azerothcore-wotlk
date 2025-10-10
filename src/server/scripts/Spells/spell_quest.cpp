@@ -1377,10 +1377,10 @@ class spell_q12937_relief_for_the_fallen : public AuraScript
             target->ToCreature()->AI()->Talk(TALK_FALLEN_EARTHEN_HEALED);
 
             ObjectGuid casterGUID = caster->GetGUID();
-            caster->m_Events.AddEventAtOffset([casterGUID] {
+            caster->m_Events.AddEventAtOffset([casterGUID]{
                 if (Player* caster = ObjectAccessor::FindPlayer(casterGUID))
                     caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true);
-                }, 5s);
+            }, 5s);
         }
     }
 
