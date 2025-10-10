@@ -158,7 +158,7 @@ public:
                                 }
 
                                 orc->m_Events.AddEventAtOffset(new OrcMoveEvent(orc), 3s);
-                                orc->m_Events.AddEventAtOffset(new OrcDeathEvent(orc), 3s);
+                                orc->m_Events.AddEventAtOffset(new OrcDeathEvent(orc), 9s);
                             }
                         }
                     }
