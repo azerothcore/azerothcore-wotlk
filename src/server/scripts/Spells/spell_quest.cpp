@@ -1364,20 +1364,23 @@ class spell_q12937_relief_for_the_fallen : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Player* caster = GetCaster()->ToPlayer();
-        Unit* target = GetUnitOwner();
-        if (target && target->ToCreature())
+        if (GetCaster() && GetCaster()->IsPlayer())
         {
-            caster->KilledMonsterCredit(NPC_FALLEN_EARTHEN_DEFENDER);
-            target->ToCreature()->DespawnOrUnsummon(5000);
-            target->SetStandState(UNIT_STAND_STATE_STAND);
-            target->ToCreature()->AI()->Talk(TALK_FALLEN_EARTHEN_HEALED);
+            Player* caster = GetCaster()->ToPlayer();
+            Unit* target = GetUnitOwner();
+            if (target && target->ToCreature())
+            {
+                caster->KilledMonsterCredit(NPC_FALLEN_EARTHEN_DEFENDER);
+                target->ToCreature()->DespawnOrUnsummon(5000);
+                target->SetStandState(UNIT_STAND_STATE_STAND);
+                target->ToCreature()->AI()->Talk(TALK_FALLEN_EARTHEN_HEALED);
 
-            ObjectGuid casterGUID = caster->GetGUID();
-            caster->m_Events.AddEventAtOffset([casterGUID]{
-                if (Player* caster = ObjectAccessor::FindPlayer(casterGUID))
-                    caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true);
-            }, 5s);
+                ObjectGuid casterGUID = caster->GetGUID();
+                caster->m_Events.AddEventAtOffset([casterGUID] {
+                    if (Player* caster = ObjectAccessor::FindPlayer(casterGUID))
+                        caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true);
+                    }, 5s);
+            }
         }
     }
 
