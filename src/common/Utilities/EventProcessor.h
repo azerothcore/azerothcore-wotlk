@@ -122,6 +122,8 @@ class EventProcessor
 
         void CancelEventGroup(uint8 group);
 
+        bool HaveEventList() const { return !m_events.empty(); }
+
     protected:
         uint64 m_time{0};
         EventList m_events;
