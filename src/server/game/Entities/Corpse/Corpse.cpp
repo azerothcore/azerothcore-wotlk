@@ -121,7 +121,7 @@ void Corpse::DeleteFromDB(CharacterDatabaseTransaction trans)
     DeleteFromDB(GetOwnerGUID(), trans);
 }
 
-void Corpse::DeleteFromDB(ObjectGuid const ownerGuid, CharacterDatabaseTransaction trans)
+void Corpse::DeleteFromDB(ObjectGuid const& ownerGuid, CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CORPSE);
     stmt->SetData(0, ownerGuid.GetCounter());

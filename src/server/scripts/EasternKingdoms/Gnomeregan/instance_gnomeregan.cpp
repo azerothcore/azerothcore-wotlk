@@ -131,7 +131,7 @@ public:
         uint32 checkTimer;
         ObjectGuid playerGUID;
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(ObjectGuid const& guid, int32) override
         {
             playerGUID = guid;
         }

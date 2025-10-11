@@ -129,7 +129,7 @@ public:
             ImmuneFlagSet(false, _faction);
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 faction) override
+        void SetGUID(ObjectGuid const& playerGUID, int32 faction) override
         {
             _playerGUID = playerGUID;
             _faction = faction;

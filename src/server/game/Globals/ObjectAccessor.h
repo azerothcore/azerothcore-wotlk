@@ -60,18 +60,18 @@ public:
 namespace ObjectAccessor
 {
     // these functions return objects only if in map of specified object
-    WorldObject* GetWorldObject(WorldObject const&, ObjectGuid const guid);
-    Object* GetObjectByTypeMask(WorldObject const&, ObjectGuid const guid, uint32 typemask);
-    Corpse* GetCorpse(WorldObject const& u, ObjectGuid const guid);
-    GameObject* GetGameObject(WorldObject const& u, ObjectGuid const guid);
-    Transport* GetTransport(WorldObject const& u, ObjectGuid const guid);
-    DynamicObject* GetDynamicObject(WorldObject const& u, ObjectGuid const guid);
-    Unit* GetUnit(WorldObject const&, ObjectGuid const guid);
-    Creature* GetCreature(WorldObject const& u, ObjectGuid const guid);
-    Pet* GetPet(WorldObject const&, ObjectGuid const guid);
-    Player* GetPlayer(Map const*, ObjectGuid const guid);
-    Player* GetPlayer(WorldObject const&, ObjectGuid const guid);
-    Creature* GetCreatureOrPetOrVehicle(WorldObject const&, ObjectGuid const);
+    WorldObject* GetWorldObject(WorldObject const&, ObjectGuid const& guid);
+    Object* GetObjectByTypeMask(WorldObject const&, ObjectGuid const& guid, uint32 typemask);
+    Corpse* GetCorpse(WorldObject const& u, ObjectGuid const& guid);
+    GameObject* GetGameObject(WorldObject const& u, ObjectGuid const& guid);
+    Transport* GetTransport(WorldObject const& u, ObjectGuid const& guid);
+    DynamicObject* GetDynamicObject(WorldObject const& u, ObjectGuid const& guid);
+    Unit* GetUnit(WorldObject const&, ObjectGuid const& guid);
+    Creature* GetCreature(WorldObject const& u, ObjectGuid const& guid);
+    Pet* GetPet(WorldObject const&, ObjectGuid const& guid);
+    Player* GetPlayer(Map const*, ObjectGuid const& guid);
+    Player* GetPlayer(WorldObject const&, ObjectGuid const& guid);
+    Creature* GetCreatureOrPetOrVehicle(WorldObject const&, ObjectGuid const&);
 
     // these functions return objects if found in whole world
     // ACCESS LIKE THAT IS NOT THREAD SAFE

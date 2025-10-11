@@ -2358,27 +2358,27 @@ void BattlegroundMap::RemoveAllPlayers()
                     player->TeleportTo(player->GetEntryPoint());
 }
 
-Corpse* Map::GetCorpse(ObjectGuid const guid)
+Corpse* Map::GetCorpse(ObjectGuid const& guid)
 {
     return _objectsStore.Find<Corpse>(guid);
 }
 
-Creature* Map::GetCreature(ObjectGuid const guid)
+Creature* Map::GetCreature(ObjectGuid const& guid)
 {
     return _objectsStore.Find<Creature>(guid);
 }
 
-GameObject* Map::GetGameObject(ObjectGuid const guid)
+GameObject* Map::GetGameObject(ObjectGuid const& guid)
 {
     return _objectsStore.Find<GameObject>(guid);
 }
 
-Pet* Map::GetPet(ObjectGuid const guid)
+Pet* Map::GetPet(ObjectGuid const& guid)
 {
     return dynamic_cast<Pet*>(_objectsStore.Find<Creature>(guid));
 }
 
-Transport* Map::GetTransport(ObjectGuid guid)
+Transport* Map::GetTransport(ObjectGuid const& guid)
 {
     if (guid.GetHigh() != HighGuid::Mo_Transport && guid.GetHigh() != HighGuid::Transport)
         return nullptr;
@@ -2387,7 +2387,7 @@ Transport* Map::GetTransport(ObjectGuid guid)
     return go ? go->ToTransport() : nullptr;
 }
 
-DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
+DynamicObject* Map::GetDynamicObject(ObjectGuid const& guid)
 {
     return _objectsStore.Find<DynamicObject>(guid);
 }
@@ -2679,7 +2679,7 @@ void Map::RemoveCorpse(Corpse* corpse)
         _corpseBones.erase(corpse);
 }
 
-Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= false*/)
+Corpse* Map::ConvertCorpseToBones(ObjectGuid const& ownerGuid, bool insignia /*= false*/)
 {
     Corpse* corpse = GetCorpseByPlayer(ownerGuid);
     if (!corpse)

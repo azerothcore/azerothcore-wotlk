@@ -42,7 +42,7 @@ void AddGossipItemFor(Player* player, uint32 gossipMenuID, uint32 gossipMenuItem
     player->PlayerTalkClass->GetGossipMenu().AddMenuItem(gossipMenuID, gossipMenuItemID, sender, action, boxMoney);
 }
 
-void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const guid)
+void SendGossipMenuFor(Player* player, uint32 npcTextID, ObjectGuid const& guid)
 {
     player->PlayerTalkClass->SendGossipMenu(npcTextID, guid);
 }

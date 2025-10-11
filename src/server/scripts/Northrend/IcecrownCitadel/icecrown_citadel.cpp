@@ -772,7 +772,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 type/* = 0*/) override
+        void SetGUID(ObjectGuid const& guid, int32 type/* = 0*/) override
         {
             if (type == ACTION_VRYKUL_DEATH)
             {

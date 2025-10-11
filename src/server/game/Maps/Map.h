@@ -338,12 +338,12 @@ public:
     GameObject* SummonGameObject(uint32 entry, Position const& pos, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 100, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
-    Corpse* GetCorpse(ObjectGuid const guid);
-    Creature* GetCreature(ObjectGuid const guid);
-    GameObject* GetGameObject(ObjectGuid const guid);
-    Transport* GetTransport(ObjectGuid const guid);
-    DynamicObject* GetDynamicObject(ObjectGuid const guid);
-    Pet* GetPet(ObjectGuid const guid);
+    Corpse* GetCorpse(ObjectGuid const& guid);
+    Creature* GetCreature(ObjectGuid const& guid);
+    GameObject* GetGameObject(ObjectGuid const& guid);
+    Transport* GetTransport(ObjectGuid const& guid);
+    DynamicObject* GetDynamicObject(ObjectGuid const& guid);
+    Pet* GetPet(ObjectGuid const& guid);
 
     MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
 
@@ -438,7 +438,7 @@ public:
     void DeleteCorpseData();
     void AddCorpse(Corpse* corpse);
     void RemoveCorpse(Corpse* corpse);
-    Corpse* ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia = false);
+    Corpse* ConvertCorpseToBones(ObjectGuid const& ownerGuid, bool insignia = false);
     void RemoveOldCorpses();
 
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);

@@ -152,7 +152,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid const guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
         {
             _charmerGUID = guid;
         }
