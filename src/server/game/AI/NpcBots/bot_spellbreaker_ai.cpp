@@ -348,7 +348,7 @@ public:
 
     private:
 
-        mutable bool _doCrit;
+        mutable bool _doCrit{};
 
         void ProcessSpellsteal(Unit* target)
         {

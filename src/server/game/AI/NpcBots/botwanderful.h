@@ -78,11 +78,11 @@ public:
 
         inline uint32 Id() const { return wp ? wp->GetWPId() : 0; }
 
-        inline std::strong_ordering operator<=>(WanderNodeLink const& other) const noexcept = default;
+        inline constexpr std::strong_ordering operator<=>(WanderNodeLink const& other) const noexcept = default;
 
         struct WeightExtractor {
-            constexpr uint32 operator()(WanderNodeLink const& wpl) { return wpl.weight; }
-            constexpr uint32 operator()(WanderNodeLink const* wpl) { return wpl->weight; }
+            inline constexpr uint32 operator()(WanderNodeLink const& wpl) const noexcept { return wpl.weight; }
+            inline constexpr uint32 operator()(WanderNodeLink const* wpl) const noexcept { return wpl->weight; }
         };
     };
 

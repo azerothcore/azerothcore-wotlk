@@ -244,7 +244,7 @@ public:
 
             //improved + Longevity applied to cds
 
-            if (IsSpellReady(BESTIAL_WRATH_1, diff, false) && canDPS && opponent && dist < 10 &&
+            if (IsSpellReady(BESTIAL_WRATH_1, diff, false) && canDPS && dist < 10 &&
                 (opponent->GetHealth() > petOwner->GetMaxHealth()/4 * (1 + opponent->getAttackers().size()) ||
                 opponent->GetTypeId() == TYPEID_PLAYER))
             {
@@ -318,7 +318,7 @@ public:
                 return;
             }
 
-            if (IsSpellReady(CALL_OF_THE_WILD_1, diff, false) && canDPS && opponent && dist < 10)
+            if (IsSpellReady(CALL_OF_THE_WILD_1, diff, false) && canDPS && dist < 10)
             {
                 me->CastSpell(me, GetSpell(CALL_OF_THE_WILD_1), false);
                 SetSpellCooldown(CALL_OF_THE_WILD_1, 210000);

@@ -54,6 +54,10 @@ Notes:
 Methods may have null arg1 (Unit*):
 DamageTaken(Unit*, ), JustDied(Unit*, ), OwnerAttackedBy(Unit*, ), HealReceived(Unit*, )
 Possibly others
+Performance impact factors:
+ - Containers for selection
+ - GetDistance() instead of IsWithinDist() (extra sqrt)
+ - std::ostringstream::str() instead of std::ostringstream::view()
 */
 
 #ifdef _MSC_VER
@@ -531,7 +535,10 @@ void bot_ai::CheckOwnerExpiry()
                     }
                 }
                 if (item_idx >= BOT_INVENTORY_SIZE)
+                {
                     BOT_LOG_ERROR("npcbots", "bot_ai::CheckOwnerExpiry(): item id {} guid {} not found in bot's inventory!\n{}", itemId, itemGuidLow, me->GetGUID().ToString());
+                    continue;
+                }
 
                 items.push_back(_equips[item_idx]);
                 _removeEquipment(item_idx);
@@ -580,7 +587,7 @@ void bot_ai::CheckOwnerExpiry()
 
 void bot_ai::InitUnitFlags()
 {
-    if (BotMgr::DisplayEquipment() == true && CanDisplayNonWeaponEquipmentChanges())
+    if (BotMgr::DisplayEquipment() && CanDisplayNonWeaponEquipmentChanges())
     {
         (const_cast<CreatureTemplate*>(me->GetCreatureTemplate()))->unit_flags2 |= UNIT_FLAG2_MIRROR_IMAGE;
         me->ReplaceAllUnitFlags2(UnitFlags2(me->GetCreatureTemplate()->unit_flags2));
@@ -1257,7 +1264,7 @@ void bot_ai::SetBotCommandState(uint32 st, bool force, Position* newpos, float* 
             return;
     }
 
-    Vehicle* veh = me->GetVehicle();
+    Vehicle const* veh = me->GetVehicle();
     VehicleSeatEntry const* seat = veh ? veh->GetSeatForPassenger(me) : nullptr;
     bool canControl = seat ? (seat->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL) : false;
     Unit* mover = canControl ? veh->GetBase() : !veh ? me : nullptr;
@@ -1816,7 +1823,7 @@ void bot_ai::CureGroup(uint32 cureSpell, uint32 diff)
 {
     if (!cureSpell) return;
     if (GC_Timer > diff) return;
-    if (me->IsMounted())
+    if (me->IsMounted()) return;
     if (IsTank() && me->GetVictim() && me->GetMap()->IsRaid()) return;
     if (IsCasting()) return;
 

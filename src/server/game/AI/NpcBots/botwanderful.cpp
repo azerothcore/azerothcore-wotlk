@@ -392,7 +392,7 @@ void WanderNode::Link(WanderNodeLink&& wpl)
     if (!HasLink(wpl))
     {
         _links.push_back(std::move(wpl));
-        wpl.wp->_setLinkedBy(this);
+        _links.back().wp->_setLinkedBy(this);
         SetupLinkFromAura();
     }
 }

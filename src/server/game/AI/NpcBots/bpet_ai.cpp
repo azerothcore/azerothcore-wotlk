@@ -98,6 +98,7 @@ bot_pet_ai::bot_pet_ai(Creature* creature) : CreatureAI(creature)
     _updateTimerMedium = 0;
     _updateTimerEx1 = urand(12000, 15000);
     checkAurasTimer = 0;
+    shouldUpdateStats = false;
 
     _wanderer = false;
 
@@ -106,6 +107,8 @@ bot_pet_ai::bot_pet_ai(Creature* creature) : CreatureAI(creature)
     myType = 0;
     petOwner = nullptr;
     canUpdate = true;
+
+    opponent = nullptr;
 }
 bot_pet_ai::~bot_pet_ai()
 {

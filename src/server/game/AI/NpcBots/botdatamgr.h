@@ -48,7 +48,7 @@ public:
     inline bool HasFlag(uint32 flags_) const { return !!(flags & flags_); }
 
 private:
-    explicit NpcBotMgrData(uint8 idist_follow, uint8 idist_attack, uint8 iattack_range_mode, uint8 iattack_angle_mode, uint32 iengage_delay_dps, uint32 iengage_delay_heal, uint32 iflags) :
+    NpcBotMgrData(uint8 idist_follow, uint8 idist_attack, uint8 iattack_range_mode, uint8 iattack_angle_mode, uint32 iengage_delay_dps, uint32 iengage_delay_heal, uint32 iflags) :
         dist_follow(idist_follow), dist_attack(idist_attack), attack_range_mode(iattack_range_mode), attack_angle_mode(iattack_angle_mode),
         engage_delay_dps(iengage_delay_dps), engage_delay_heal(iengage_delay_heal), flags(iflags) { }
 };
@@ -85,40 +85,31 @@ public:
     MiscValuesContainer miscvalues;
 
 private:
-    explicit NpcBotData(uint32 iroles, uint32 ifaction, uint8 ispec = 1) : owner(0), hire_time(0), roles(iroles), faction(ifaction), spec(ispec)
+    NpcBotData(uint32 iroles, uint32 ifaction, uint8 ispec = 1) : owner(0), hire_time(0), roles(iroles), faction(ifaction), spec(ispec)
     {
         for (uint8 i = 0; i != BOT_INVENTORY_SIZE; ++i)
             equips[i] = 0;
     }
-    NpcBotData(NpcBotData const&);
+    NpcBotData(NpcBotData const&) = delete;
+    NpcBotData(NpcBotData&&) = delete;
+    NpcBotData& operator=(NpcBotData const&) = delete;
+    NpcBotData& operator=(NpcBotData&&) = delete;
 };
 
 struct NpcBotAppearanceData
 {
-    friend class BotDataMgr;
-    friend struct WanderingBotsGenerator;
-public:
     uint8 gender;
     uint8 skin;
     uint8 face;
     uint8 hair;
     uint8 haircolor;
     uint8 features;
-private:
-    explicit NpcBotAppearanceData() {}
-    NpcBotAppearanceData(NpcBotAppearanceData const&);
 };
 
 struct NpcBotExtras
 {
-    friend class BotDataMgr;
-    friend struct WanderingBotsGenerator;
-public:
     uint8 race;
     uint8 bclass;
-private:
-    explicit NpcBotExtras() {}
-    NpcBotExtras(NpcBotExtras const&);
 };
 
 struct NpcBotTransmogData
@@ -127,19 +118,15 @@ struct NpcBotTransmogData
 public:
     std::pair<uint32 /*item_id*/, int32 /*fake_id*/> transmogs[BOT_TRANSMOG_INVENTORY_SIZE];
 private:
-    explicit NpcBotTransmogData()
+    NpcBotTransmogData()
     {
         for (uint8 i = 0; i != BOT_TRANSMOG_INVENTORY_SIZE; ++i)
             transmogs[i] = { 0, -1 };
     }
-    NpcBotTransmogData(NpcBotTransmogData const&);
 };
 
 struct NpcBotStats
 {
-public:
-    NpcBotStats() {}
-
     uint32 entry;
     uint32 maxhealth;
     uint32 maxpower;
