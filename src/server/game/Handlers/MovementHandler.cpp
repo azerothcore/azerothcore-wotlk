@@ -967,79 +967,36 @@ void WorldSession::ComputeNewClockDelta()
 
 void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 {
+    LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging((Opcodes)recvData.GetOpcode()));
+
     ObjectGuid guid;
-    recvData >> guid.ReadAsPacked();
-
-    Unit* mover = _player->m_mover;
-    if (!mover || guid != mover->GetGUID())
-    {
-        recvData.rfinish(); // prevent warnings spam
-        return;
-    }
-
-    uint32 movementCounter;
-    recvData >> movementCounter;
-
+    uint32 counter;
     MovementInfo movementInfo;
-    movementInfo.guid = guid;
+    recvData >> guid.ReadAsPacked();
+    recvData >> counter;
     ReadMovementInfo(recvData, &movementInfo);
 
-     /* process position-change */
-    int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
-    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
-    {
-        LOG_INFO("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
-        movementInfo.time = getMSTime();
-    }
-    else
-    {
-        movementInfo.time = (uint32)movementTime;
-    }
-
-    movementInfo.guid = mover->GetGUID();
-    mover->m_movementInfo = movementInfo;
-    mover->UpdatePosition(movementInfo.pos);
-
-}
-
-void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
-{
-    ObjectGuid guid;
-    recvData >> guid.ReadAsPacked();
-
     Unit* mover = _player->m_mover;
-    if (!mover || guid != mover->GetGUID())
-    {
-        recvData.rfinish(); // prevent warnings spam
+
+    if (mover->GetGUID() != guid)
         return;
-    }
 
-    uint32 movementCounter;
-    recvData >> movementCounter;
-
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-     /* process position-change */
-    int64 movementTime = (int64) movementInfo.time + _timeSyncClockDelta;
-    if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
+    if (recvData.GetOpcode() == CMSG_FORCE_MOVE_UNROOT_ACK) // unroot case
     {
-        LOG_INFO("misc", "The computed movement time using clockDelta is erronous. Using fallback instead");
-        movementInfo.time = getMSTime();
+        if (!mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT))
+            return;
     }
-    else
+    else // root case
     {
-        movementInfo.time = (uint32)movementTime;
+        if (mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT))
+            return;
     }
 
-    if (G3D::fuzzyEq(movementInfo.fallTime, 0.f))
-    {
-        movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FALLING);
-    }
+    if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
+        return;
 
-    movementInfo.guid = mover->GetGUID();
-    mover->m_movementInfo = movementInfo;
-    mover->UpdatePosition(movementInfo.pos);
-
+    WorldPacket data(recvData.GetOpcode() == CMSG_FORCE_MOVE_UNROOT_ACK ? MSG_MOVE_UNROOT : MSG_MOVE_ROOT);
+    data << guid.WriteAsPacked();
+    WriteMovementInfo(&data, &movementInfo);
+    mover->SendMessageToSet(&data, _player);
 }
