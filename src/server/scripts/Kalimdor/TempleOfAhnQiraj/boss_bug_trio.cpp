@@ -310,7 +310,7 @@ public:
             me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             DoFinalSpell();
             Talk(EMOTE_DEVOURED);
-            me->DespawnOrUnsummon(3000);
+            me->DespawnOrUnsummon(3s);
             return;
         }
 

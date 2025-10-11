@@ -80,7 +80,7 @@ public:
             if (finished)
             {
                 Talk(SAY_OUTRO);
-                me->DespawnOrUnsummon(20000);
+                me->DespawnOrUnsummon(20s);
             }
         }
 

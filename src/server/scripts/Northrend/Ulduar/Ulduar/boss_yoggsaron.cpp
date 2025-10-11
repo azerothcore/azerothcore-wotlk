@@ -1807,7 +1807,7 @@ public:
             }
 
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
 
     private:

@@ -110,7 +110,7 @@ public:
         if (Creature* archi = instance->GetCreature(DATA_ARCHIMONDE))
         {
             archi->AI()->DoAction(ACTION_BECOME_ACTIVE_AND_CHANNEL);
-            archi->AI()->Talk(SAY_ARCHIMONDE_INTRO, 25000ms);
+            archi->AI()->Talk(SAY_ARCHIMONDE_INTRO, 25s);
         }
         BossAI::JustDied(killer);
     }

@@ -251,7 +251,7 @@ struct npc_akama_shade : public ScriptedAI
                 {
                     Talk(SAY_BROKEN_FREE_2);
                 }, 3);
-                ScheduleUniqueTimedEvent(52000ms, [&]
+                ScheduleUniqueTimedEvent(52s, [&]
                 {
                     std::list<Creature*> brokens;
                     me->GetCreatureListWithEntryInGrid(brokens, NPC_ASHTONGUE_BROKEN, 40.0f);
@@ -391,7 +391,7 @@ struct npc_creature_generator_akama : public ScriptedAI
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
         spawnCounter--;
-        summon->DespawnOrUnsummon(10000);
+        summon->DespawnOrUnsummon(10s);
         summons.Despawn(summon);
     }
 

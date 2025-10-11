@@ -692,7 +692,7 @@ void Pet::Update(uint32 diff)
                     }
                 }
 
-                if (m_duration > 0s)
+                if (m_duration > 0ms)
                 {
                     if (m_duration > _diff)
                         m_duration -= _diff;
@@ -708,7 +708,7 @@ void Pet::Update(uint32 diff)
                 if (getPowerType() == POWER_FOCUS)
                 {
                     m_petRegenTimer -= _diff;
-                    if (m_petRegenTimer <= 0s)
+                    if (m_petRegenTimer <= 0ms)
                     {
                         m_petRegenTimer += PET_FOCUS_REGEN_INTERVAL;
                         Regenerate(POWER_FOCUS);
@@ -1026,7 +1026,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     Unit* owner = GetOwner();
     if (!owner) // just to be sure, asynchronous now
     {
-        DespawnOrUnsummon(1000);
+        DespawnOrUnsummon(1s);
         return false;
     }
 

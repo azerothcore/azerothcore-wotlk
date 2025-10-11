@@ -285,10 +285,7 @@ struct boss_zuljin : public BossAI
         instance->SetBossState(DATA_ZULJIN, DONE);
         Talk(SAY_DEATH);
         summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
-
-        me->m_Events.AddEventAtOffset( [this] {
-            summons.DespawnAll();
-        }, 3s);
+        summons.DespawnAll(3s);
     }
 
     void SpawnAdds()

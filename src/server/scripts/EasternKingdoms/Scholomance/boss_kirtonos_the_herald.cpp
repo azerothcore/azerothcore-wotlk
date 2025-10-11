@@ -103,7 +103,7 @@ public:
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
             instance->SetData(DATA_KIRTONOS_THE_HERALD, FAIL);
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void MovementInform(uint32 type, uint32 id) override

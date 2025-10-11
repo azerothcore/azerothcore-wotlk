@@ -44,9 +44,9 @@ public:
             if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
             {
                 me->CastSpell(me, 44460, true);
-                me->DespawnOrUnsummon(10000);
+                me->DespawnOrUnsummon(10s);
                 cow->CastSpell(cow, 44460, true);
-                cow->DespawnOrUnsummon(10000);
+                cow->DespawnOrUnsummon(10s);
                 if (me->IsSummon())
                     if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                         owner->CastSpell(owner, 44463, true);

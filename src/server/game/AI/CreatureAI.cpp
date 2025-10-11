@@ -50,9 +50,9 @@ AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; 
  * @param WorldObject target The target of the speech, in case it has elements such as $n, where the target's name will be referrenced.
  * @param Milliseconds delay Delay until the creature says the text line. Creatures will talk immediately by default.
  */
-void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0s*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0ms*/)
 {
-    if (delay > Seconds::zero())
+    if (delay > 0ms)
     {
         ObjectGuid targetGuid;
 

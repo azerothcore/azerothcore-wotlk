@@ -342,7 +342,7 @@ struct npc_frozen_core : public ScriptedAI
                     DoCast(ahune, SPELL_SYNCH_HEALTH, true);
                 else
                     DoCastSelf(SPELL_SUICIDE);
-                _events.Repeat(3000ms, 3000ms);
+                _events.Repeat(3s, 3s);
                 break;
             default:
                 break;
@@ -430,7 +430,7 @@ struct npc_ahune_bunny : public ScriptedAI
             case EVENT_SUMMON_COLDWEAVE:
                 DoCast(SPELL_SUMMON_COLDWEAVE);
                 DoCast(SPELL_SUMMON_COLDWEAVE);
-                _events.Repeat(8000ms);
+                _events.Repeat(8s);
                 if (_submerged)
                     _events.ScheduleEvent(EVENT_SUMMON_FROSTWIND, 4000, 0, PHASE_ONE);
                 break;
@@ -619,7 +619,7 @@ struct npc_ahune_ice_spear_bunny : public ScriptedAI
         _scheduler.Schedule(2500ms, [this](TaskContext /*task*/)
             {
                 DoCastSelf(SPELL_ICE_SPEAR_DELAY);
-                me->DespawnOrUnsummon(3500);
+                me->DespawnOrUnsummon(3500ms);
             });
     }
 

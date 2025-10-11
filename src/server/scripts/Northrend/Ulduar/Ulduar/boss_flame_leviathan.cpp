@@ -748,7 +748,7 @@ public:
                     _despawnTimer = 0;
                     if (Vehicle* veh = me->GetVehicle())
                         if (veh->GetPassenger(0) == me || veh->GetPassenger(1) == me)
-                            me->DespawnOrUnsummon(1);
+                            me->DespawnOrUnsummon(1ms);
                 }
             }
 
@@ -1157,7 +1157,7 @@ public:
 
                     _beamTimer = 0;
                     _removeTimer = 1;
-                    me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+                    me->DespawnOrUnsummon(5s);
                 }
             }
             if (_removeTimer)
@@ -1364,7 +1364,7 @@ public:
                     liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);
                 }
 
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 
@@ -1750,7 +1750,7 @@ class spell_vehicle_grab_pyrite : public SpellScript
                     target->CastSpell(seat, GetEffectValue());
 
                     if (target->IsCreature())
-                        target->ToCreature()->DespawnOrUnsummon(1300);
+                        target->ToCreature()->DespawnOrUnsummon(1300ms);
                 }
             }
     }

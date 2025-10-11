@@ -95,7 +95,7 @@ struct boss_selin_fireheart : public BossAI
         BossAI::JustEngagedWith(who);
         ScheduleTimedEvent(2500ms, [&]{
             DoCastRandomTarget(SPELL_DRAIN_LIFE);
-        }, 10000ms);
+        }, 10s);
         ScheduleTimedEvent(2s, [&]{
             me->RemoveAuraFromStack(SPELL_MANA_RAGE_TRIGGER);
             DoCastAOE(SPELL_FEL_EXPLOSION);

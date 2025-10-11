@@ -162,7 +162,7 @@ void WorldUpdateTime::SetRecordUpdateTimeInterval(Milliseconds t)
 
 void WorldUpdateTime::RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uint32 sessionCount)
 {
-    if (_recordUpdateTimeInverval > 0s && diff > _recordUpdateTimeMin.count())
+    if (_recordUpdateTimeInverval > 0ms && diff > _recordUpdateTimeMin.count())
     {
         if (GetMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
         {

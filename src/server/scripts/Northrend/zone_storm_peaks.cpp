@@ -159,7 +159,7 @@ public:
                     me->RemoveAllAurasExceptType(SPELL_AURA_MECHANIC_IMMUNITY);
                     Talk(1);
                     caster->ToPlayer()->KilledMonsterCredit(me->GetEntry());
-                    me->DespawnOrUnsummon(8000);
+                    me->DespawnOrUnsummon(8s);
                     me->GetMotionMaster()->MoveJump(8721.94f, -1955, 963, 70.0f, 30.0f);
                 }
             }
@@ -1149,13 +1149,13 @@ public:
                     }
                     else
                     {
-                        me->DespawnOrUnsummon(100);
+                        me->DespawnOrUnsummon(100ms);
                     }
                     break;
                 case 24:
                     if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
                     {
-                        me->DespawnOrUnsummon(100);
+                        me->DespawnOrUnsummon(100ms);
                     }
                     break;
                 default:

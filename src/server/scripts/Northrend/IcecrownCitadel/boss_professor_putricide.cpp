@@ -352,7 +352,7 @@ public:
         {
             if (summon->GetEntry() != 38308 && summon->GetEntry() != 38309 && (!me->IsInCombat() || me->IsInEvadeMode()))
             {
-                summon->DespawnOrUnsummon(1);
+                summon->DespawnOrUnsummon(1ms);
                 return;
             }
 
@@ -757,7 +757,7 @@ public:
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
             {
                 if (!professor->IsInCombat())
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                 else
                     professor->AI()->JustSummoned(me);
             }
@@ -1056,7 +1056,7 @@ class spell_putricide_ooze_channel : public SpellScript
         if (targets.empty())
         {
             FinishCast(SPELL_FAILED_NO_VALID_TARGETS);
-            GetCaster()->ToCreature()->DespawnOrUnsummon(1);    // despawn next update
+            GetCaster()->ToCreature()->DespawnOrUnsummon(1ms);    // despawn next update
             return;
         }
 
@@ -1491,7 +1491,7 @@ class spell_putricide_eat_ooze : public SpellScript
             {
                 target->RemoveAurasDueToSpell(SPELL_GROW_STACKER);
                 target->RemoveAura(grow);
-                target->DespawnOrUnsummon(1);
+                target->DespawnOrUnsummon(1ms);
             }
             else
                 grow->ModStackAmount(-4);

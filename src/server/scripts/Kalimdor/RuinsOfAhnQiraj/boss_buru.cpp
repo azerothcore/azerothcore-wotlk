@@ -231,7 +231,7 @@ struct npc_buru_egg : public ScriptedAI
             }
         }
 
-        me->DespawnOrUnsummon(5000);
+        me->DespawnOrUnsummon(5s);
     }
 
     void UpdateAI(uint32 /*diff*/) override { }

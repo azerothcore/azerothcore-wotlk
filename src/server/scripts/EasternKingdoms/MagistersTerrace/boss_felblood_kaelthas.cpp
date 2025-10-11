@@ -138,7 +138,7 @@ struct boss_felblood_kaelthas : public BossAI
 
         ScheduleTimedEvent(0ms, [&]{
             DoCastVictim(SPELL_FIREBALL);
-        }, 3000ms, 4500ms);
+        }, 3s, 4500ms);
         ScheduleTimedEvent(15s, [&]{
             Talk(SAY_PHOENIX);
             DoCastSelf(SPELL_PHOENIX);

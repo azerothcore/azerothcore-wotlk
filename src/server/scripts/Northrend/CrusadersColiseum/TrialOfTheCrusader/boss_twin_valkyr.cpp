@@ -710,7 +710,7 @@ public:
                 return;
 
             if (urand(0, 2))
-                me->DespawnOrUnsummon(0);
+                me->DespawnOrUnsummon(0ms);
         }
 
         void MoveToNextPoint()
@@ -884,7 +884,7 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
                             creature->GetMotionMaster()->MoveIdle();
                             creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
                             creature->SetDisplayId(11686);
-                            creature->DespawnOrUnsummon(1500);
+                            creature->DespawnOrUnsummon(1500ms);
                         }
     }
 

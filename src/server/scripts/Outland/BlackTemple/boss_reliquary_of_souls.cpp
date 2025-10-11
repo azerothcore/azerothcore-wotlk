@@ -107,7 +107,7 @@ public:
             {
                 summoner->GetAI()->DoAction(_action);
                 _owner.SetStandState(UNIT_STAND_STATE_SUBMERGED);
-                _owner.DespawnOrUnsummon(200);
+                _owner.DespawnOrUnsummon(200ms);
             }
         return true;
     }

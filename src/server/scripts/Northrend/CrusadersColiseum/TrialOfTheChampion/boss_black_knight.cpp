@@ -131,7 +131,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             ScriptedAI::EnterEvadeMode(why);
         }
 
@@ -182,7 +182,7 @@ public:
                 events.Reset();
                 events.ScheduleEvent(EVENT_ANNOUNCER_SAY_ZOMBIE, 2500ms);
                 events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, 7s, 9s);
-                events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7000ms);
+                events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7s);
                 events.ScheduleEvent(EVENT_SPELL_DEATH_RESPITE, 13s, 15s);
                 events.ScheduleEvent(EVENT_SPELL_OBLITERATE, 11s, 19s);
             }
@@ -214,7 +214,7 @@ public:
 
                             events.Reset();
                             events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, 7s, 9s);
-                            events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7000ms);
+                            events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7s);
                             events.ScheduleEvent(EVENT_SPELL_OBLITERATE, 11s, 19s);
                             events.ScheduleEvent(EVENT_SPELL_DESECRATION, 2s, 3s);
                             break;

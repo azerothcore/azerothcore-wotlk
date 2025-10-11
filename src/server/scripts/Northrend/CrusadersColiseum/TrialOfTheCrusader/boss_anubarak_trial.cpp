@@ -574,7 +574,7 @@ public:
             if (spell->Id == SPELL_SPIKE_FAIL)
             {
                 me->RemoveAllAuras();
-                me->DespawnOrUnsummon(1500);
+                me->DespawnOrUnsummon(1500ms);
             }
         }
 

@@ -177,14 +177,14 @@ private:
 class DelayedCastEvent : public BasicEvent
 {
 public:
-    DelayedCastEvent(Creature* trigger, uint32 spellId, ObjectGuid originalCaster, uint32 despawnTime) : _trigger(trigger), _originalCaster(originalCaster), _spellId(spellId), _despawnTime(despawnTime)
+    DelayedCastEvent(Creature* trigger, uint32 spellId, ObjectGuid originalCaster, Milliseconds despawnTime) : _trigger(trigger), _originalCaster(originalCaster), _spellId(spellId), _despawnTime(despawnTime)
     {
     }
 
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         _trigger->CastSpell(_trigger, _spellId, false, nullptr, nullptr, _originalCaster);
-        if (_despawnTime)
+        if (_despawnTime > 0ms)
             _trigger->DespawnOrUnsummon(_despawnTime);
         return true;
     }
@@ -193,7 +193,7 @@ private:
     Creature* _trigger;
     ObjectGuid _originalCaster;
     uint32 _spellId;
-    uint32 _despawnTime;
+    Milliseconds _despawnTime;
 };
 
 class AuraRemoveEvent : public BasicEvent
@@ -406,7 +406,7 @@ public:
                 // this display id was found in sniff instead of the one on aura
                 me->SetDisplayId(11686);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->DespawnOrUnsummon(4000);
+                me->DespawnOrUnsummon(4s);
                 if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                     lichKing->CastSpell(lichKing, SPELL_SPAWN_CHEST, false);
                 _instance->SetData(DATA_WEEKLY_QUEST_ID, 0); // show hidden npc if necessary
@@ -417,12 +417,12 @@ public:
         {
             if (summon->GetEntry() == NPC_DREAM_PORTAL_PRE_EFFECT)
             {
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_DREAM_PORTAL, me->GetGUID(), 6000), summon->m_Events.CalculateTime(15000));
+                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_DREAM_PORTAL, me->GetGUID(), 6s), summon->m_Events.CalculateTime(15000));
                 summon->m_Events.AddEvent(new AuraRemoveEvent(summon, SPELL_DREAM_PORTAL_VISUAL_PRE), summon->m_Events.CalculateTime(15000));
             }
             else if (summon->GetEntry() == NPC_NIGHTMARE_PORTAL_PRE_EFFECT)
             {
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_NIGHTMARE_PORTAL, me->GetGUID(), 6000), summon->m_Events.CalculateTime(15000));
+                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_NIGHTMARE_PORTAL, me->GetGUID(), 6s), summon->m_Events.CalculateTime(15000));
                 summon->m_Events.AddEvent(new AuraRemoveEvent(summon, SPELL_NIGHTMARE_PORTAL_VISUAL_PRE), summon->m_Events.CalculateTime(15000));
             }
         }
@@ -750,9 +750,9 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_COLUMN_OF_FROST)
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8000), summon->m_Events.CalculateTime(2000));
+                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8s), summon->m_Events.CalculateTime(2000));
             else if (summon->GetEntry() == NPC_MANA_VOID)
-                summon->DespawnOrUnsummon(36000);
+                summon->DespawnOrUnsummon(36s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -886,7 +886,7 @@ public:
                     me->GetMotionMaster()->MoveIdle();
                     // must use originalCaster the same for all clouds to allow stacking
                     me->CastSpell(me, EMERALD_VIGOR, false, nullptr, nullptr, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
-                    me->DespawnOrUnsummon(1000);
+                    me->DespawnOrUnsummon(1s);
                     break;
                 default:
                     break;
@@ -1054,7 +1054,7 @@ public:
                     timer = 0;
                     me->SetDisplayId(11686);
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->DespawnOrUnsummon(2000);
+                    me->DespawnOrUnsummon(2s);
                 }
                 else
                     timer -= diff;
@@ -1096,7 +1096,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (me->GetInstanceScript() && me->GetInstanceScript()->GetBossState(DATA_VALITHRIA_DREAMWALKER) == DONE)
-                summon->DespawnOrUnsummon(1);
+                summon->DespawnOrUnsummon(1ms);
             else if (Unit* target = SelectTargetFromPlayerList(200.0f))
                 summon->AI()->AttackStart(target);
         }

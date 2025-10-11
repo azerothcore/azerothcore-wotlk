@@ -44,7 +44,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
         WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
         if (!path || path->empty())
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             return;
         }
 
@@ -108,7 +108,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
 
                         if (me->GetDistance2d(x, y) < 10.0f)
                         {
-                            me->DespawnOrUnsummon(1000);
+                            me->DespawnOrUnsummon(1s);
                             if (Vehicle* vehicle = me->GetVehicleKit())
                                 if (Unit* passenger = vehicle->GetPassenger(0))
                                 {

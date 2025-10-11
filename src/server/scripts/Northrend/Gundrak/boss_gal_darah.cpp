@@ -133,7 +133,7 @@ public:
                 despawnTime = (summon->GetDistance(target) / 40.0f * 1000) + 500;
             }
 
-            summon->DespawnOrUnsummon(despawnTime);
+            summon->DespawnOrUnsummon(Milliseconds(despawnTime));
         }
 
         uint32 GetData(uint32  /*type*/) const override

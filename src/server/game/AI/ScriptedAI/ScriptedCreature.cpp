@@ -68,7 +68,7 @@ void SummonList::DespawnEntry(uint32 entry)
     }
 }
 
-void SummonList::DespawnAll(uint32 delay /*= 0*/)
+void SummonList::DespawnAll(Milliseconds delay /*= 0ms*/)
 {
     while (!storage_.empty())
     {
@@ -325,13 +325,13 @@ void ScriptedAI::ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax
         return;
     }
 
-    scheduler.Schedule(timerMin == 0s ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
+    scheduler.Schedule(timerMin == 0ms ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
     {
         exec();
 
         if (!uniqueId)
         {
-            repeatMax > 0s ? context.Repeat(repeatMin, repeatMax) : context.Repeat(repeatMin);
+            repeatMax > 0ms ? context.Repeat(repeatMin, repeatMax) : context.Repeat(repeatMin);
         }
     });
 
@@ -654,7 +654,7 @@ void BossAI::_JustEngagedWith()
     ScheduleTasks();
     if (callForHelpRange)
     {
-        ScheduleTimedEvent(0s, [&]
+        ScheduleTimedEvent(0ms, [&]
         {
             me->CallForHelp(callForHelpRange);
         }, 2s);

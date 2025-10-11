@@ -641,7 +641,7 @@ public:
             {
                 DoCast(target, SPELL_REVIVE);
             }
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 

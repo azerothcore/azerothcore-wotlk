@@ -1153,7 +1153,7 @@ public:
 
             ScriptedAI::EnterEvadeMode(why);
             if (me->IsSummon())
-                me->ToTempSummon()->DespawnOrUnsummon(1);
+                me->ToTempSummon()->DespawnOrUnsummon(1ms);
         }
     };
 };
