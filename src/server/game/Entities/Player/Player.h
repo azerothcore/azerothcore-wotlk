@@ -448,8 +448,6 @@ typedef std::list<Item*> ItemDurationList;
 
 enum PlayerMovementType
 {
-    MOVE_ROOT       = 1,
-    MOVE_UNROOT     = 2,
     MOVE_WATER_WALK = 3,
     MOVE_LAND_WALK  = 4
 };

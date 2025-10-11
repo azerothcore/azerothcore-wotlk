@@ -628,7 +628,6 @@ public:                                                 // opcodes handlers
     void HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet);
 
     // new
-    void HandleMoveUnRootAck(WorldPacket& recvPacket);
     void HandleMoveRootAck(WorldPacket& recvPacket);
 
     // new inspect
