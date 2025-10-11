@@ -3713,6 +3713,33 @@ bool Creature::CanGeneratePickPocketLoot() const
     return (lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < GameTime::GetGameTime().count());
 }
 
+void Creature::SetTextRepeatId(uint8 textGroup, uint8 id)
+{
+    CreatureTextRepeatIds& repeats = m_textRepeat[textGroup];
+    if (std::find(repeats.begin(), repeats.end(), id) == repeats.end())
+        repeats.push_back(id);
+    else
+        LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup {} for Creature({}) {}, id {} already added", uint32(textGroup), GetName(), GetGUID().ToString(), uint32(id));
+}
+
+CreatureTextRepeatIds const& Creature::GetTextRepeatGroup(uint8 textGroup)
+{
+    static CreatureTextRepeatIds const emptyIds;
+
+    CreatureTextRepeatGroup::const_iterator groupItr = m_textRepeat.find(textGroup);
+    if (groupItr != m_textRepeat.end())
+        return groupItr->second;
+
+    return emptyIds;
+}
+
+void Creature::ClearTextRepeatGroup(uint8 textGroup)
+{
+    CreatureTextRepeatGroup::iterator groupItr = m_textRepeat.find(textGroup);
+    if (groupItr != m_textRepeat.end())
+        groupItr->second.clear();
+}
+
 void Creature::SetRespawnTime(uint32 respawn)
 {
     m_respawnTime = respawn ? GameTime::GetGameTime().count() + respawn : 0;
