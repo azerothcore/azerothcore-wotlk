@@ -3722,15 +3722,15 @@ void Creature::SetTextRepeatId(uint8 textGroup, uint8 id)
         LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup {} for Creature({}) {}, id {} already added", uint32(textGroup), GetName(), GetGUID().ToString(), uint32(id));
 }
 
-CreatureTextRepeatIds Creature::GetTextRepeatGroup(uint8 textGroup)
+CreatureTextRepeatIds const& Creature::GetTextRepeatGroup(uint8 textGroup)
 {
-    CreatureTextRepeatIds ids;
+    static CreatureTextRepeatIds const emptyIds;
 
     CreatureTextRepeatGroup::const_iterator groupItr = m_textRepeat.find(textGroup);
     if (groupItr != m_textRepeat.end())
-        ids = groupItr->second;
+        return groupItr->second;
 
-    return ids;
+    return emptyIds;
 }
 
 void Creature::ClearTextRepeatGroup(uint8 textGroup)
