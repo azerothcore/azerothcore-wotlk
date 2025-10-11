@@ -342,6 +342,7 @@ foreach(ModuleName ${MODULE_LIST__})
 
   foreach(configFileName ${MODULE_CONFIG_LIST})
     CopyModuleConfig("${MODULE_CONFIG_PATH}/${configFileName}")
+    string(REGEX REPLACE "\.dist$" "" configFileName ${configFileName})
     set(CONFIG_LIST ${CONFIG_LIST}${configFileName},)
     message(STATUS "  |  * ${configFileName}")
   endforeach()

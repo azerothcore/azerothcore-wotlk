@@ -1364,6 +1364,9 @@ class spell_q12937_relief_for_the_fallen : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        if (!GetCaster() || !GetCaster()->IsPlayer())
+            return;
+
         Player* caster = GetCaster()->ToPlayer();
         Unit* target = GetUnitOwner();
         if (target && target->ToCreature())
