@@ -1164,8 +1164,11 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     SendPacket(&data);
 
     // Xinef: fix possible problem with flag UNIT_FLAG_STUNNED added during logout
-    if (!pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
+    if (pCurrChar->HasUnitState(UNIT_STATE_LOGOUT_TIMER))
+    {
+        pCurrChar->SetRooted(false, true, true);
         pCurrChar->RemoveUnitFlag(UNIT_FLAG_STUNNED);
+    }
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
