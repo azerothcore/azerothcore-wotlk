@@ -2595,6 +2595,7 @@ void Player::GiveLevel(uint8 level)
     m_Played_time[PLAYED_TIME_LEVEL] = 0;                   // Level Played Time reset
 
     _ApplyAllLevelScaleItemMods(false);
+    _RemoveAllAuraStatMods();
 
     SetLevel(level);
 
@@ -2617,6 +2618,7 @@ void Player::GiveLevel(uint8 level)
         UpdateSkillsToMaxSkillsForLevel();
 
     _ApplyAllLevelScaleItemMods(true);
+    _ApplyAllAuraStatMods();
 
     if (!isDead())
     {
@@ -4534,12 +4536,6 @@ void Player::SetMovement(PlayerMovementType pType)
     const PackedGuid& guid = GetPackGUID();
     switch (pType)
     {
-        case MOVE_ROOT:
-            data.Initialize(SMSG_FORCE_MOVE_ROOT, guid.size() + 4);
-            break;
-        case MOVE_UNROOT:
-            data.Initialize(SMSG_FORCE_MOVE_UNROOT, guid.size() + 4);
-            break;
         case MOVE_WATER_WALK:
             data.Initialize(SMSG_MOVE_WATER_WALK, guid.size() + 4);
             break;
@@ -4593,10 +4589,10 @@ void Player::BuildPlayerRepop()
     SetHealth(1); // convert player body to ghost
     SetMovement(MOVE_WATER_WALK);
     SetWaterWalking(true);
-    if (!GetSession()->isLogingOut())
-    {
-        SetMovement(MOVE_UNROOT);
-    }
+
+    if (!IsImmobilizedState())
+        SendMoveRoot(false);
+
     RemoveUnitFlag(UNIT_FLAG_SKINNABLE); // BG - remove insignia related
     int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
     if (corpseReclaimDelay >= 0)
@@ -4633,7 +4629,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     setDeathState(DeathState::Alive);
     SetMovement(MOVE_LAND_WALK);
-    SetMovement(MOVE_UNROOT);
+    SendMoveRoot(false);
     SetWaterWalking(false);
     m_deathTimer = 0;
 
@@ -4697,7 +4693,7 @@ void Player::KillPlayer()
     if (IsFlying() && !GetTransport())
         GetMotionMaster()->MoveFall();
 
-    SetMovement(MOVE_ROOT);
+    SendMoveRoot(true);
 
     StopMirrorTimers();                                     //disable timers(bars)
 
@@ -11868,9 +11864,6 @@ void Player::SendInitialPacketsAfterAddToMap()
     uint32 newzone, newarea;
     GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
-
-    if (HasStunAura())
-        SetMovement(MOVE_ROOT);
 
     WorldPacket setCompoundState(SMSG_MULTIPLE_MOVES, 100);
     setCompoundState << uint32(0); // size placeholder

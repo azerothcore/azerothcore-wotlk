@@ -363,7 +363,7 @@ void OpcodeTable::Initialize()
     /*0x0E8*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FORCE_MOVE_ROOT,                                    STATUS_NEVER);
     /*0x0E9*/ DEFINE_HANDLER(CMSG_FORCE_MOVE_ROOT_ACK,                                              STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveRootAck                        );
     /*0x0EA*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FORCE_MOVE_UNROOT,                                  STATUS_NEVER);
-    /*0x0EB*/ DEFINE_HANDLER(CMSG_FORCE_MOVE_UNROOT_ACK,                                            STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveUnRootAck                      );
+    /*0x0EB*/ DEFINE_HANDLER(CMSG_FORCE_MOVE_UNROOT_ACK,                                            STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMoveRootAck                        );
     /*0x0EC*/ DEFINE_HANDLER(MSG_MOVE_ROOT,                                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x0ED*/ DEFINE_HANDLER(MSG_MOVE_UNROOT,                                                       STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x0EE*/ DEFINE_HANDLER(MSG_MOVE_HEARTBEAT,                                                    STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleMovementOpcodes                    );
