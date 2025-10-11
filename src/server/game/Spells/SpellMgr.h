@@ -20,7 +20,6 @@
 
 // For static or at-server-startup loaded spell data
 
-#include "Common.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "Unit.h"
@@ -330,56 +329,49 @@ struct SpellBonusEntry
 
 typedef std::unordered_map<uint32, SpellBonusEntry>     SpellBonusMap;
 
-enum SpellGroupSpecialFlags
+enum SpellGroup
 {
-    SPELL_GROUP_SPECIAL_FLAG_NONE                       = 0x000,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE              = 0x001,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN            = 0x002,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE            = 0x004,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH           = 0x008,
-    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX        = 0x00F,
-    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST           = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK        = 0x020,
-    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK          = 0x040,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1                  = 0x100,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2                  = 0x200,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3                  = 0x400,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4                  = 0x800,
-    SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK           = 0x1000,
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_SAME_SPELL   = 0x2000,
-    SPELL_GROUP_SPECIAL_FLAG_MAX                        = 0x4000,
-
-    SPELL_GROUP_SPECIAL_FLAG_FLASK                      = SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE | SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN
+    SPELL_GROUP_NONE             = 0,
+    SPELL_GROUP_ELIXIR_BATTLE    = 1,
+    SPELL_GROUP_ELIXIR_GUARDIAN  = 2,
+    SPELL_GROUP_CORE_RANGE_MAX   = 3
 };
 
-enum SpellGroupStackFlags
+namespace std
 {
-    SPELL_GROUP_STACK_FLAG_NONE                 = 0x00,
-    SPELL_GROUP_STACK_FLAG_EXCLUSIVE            = 0x01,
-    SPELL_GROUP_STACK_FLAG_NOT_SAME_CASTER      = 0x02,
-    SPELL_GROUP_STACK_FLAG_FLAGGED              = 0x04, // xinef: just a marker
-    SPELL_GROUP_STACK_FLAG_NEVER_STACK          = 0x08,
-    SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE     = 0x10,
-    SPELL_GROUP_STACK_FLAG_MAX                  = 0x20,
+    template<>
+    struct hash<SpellGroup>
+    {
+        size_t operator()(SpellGroup const& group) const
+        {
+            return hash<uint32>()(uint32(group));
+        }
+    };
+}
 
-    // Internal use
-    SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST     = 0x100,
-    SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST       = 0x200,
+#define SPELL_GROUP_DB_RANGE_MIN 1000
+
+//                  spell_id, group_id
+typedef std::unordered_multimap<uint32, SpellGroup> SpellSpellGroupMap;
+typedef std::pair<SpellSpellGroupMap::const_iterator, SpellSpellGroupMap::const_iterator> SpellSpellGroupMapBounds;
+
+//                      group_id, spell_id
+typedef std::unordered_multimap<SpellGroup, int32> SpellGroupSpellMap;
+typedef std::pair<SpellGroupSpellMap::const_iterator, SpellGroupSpellMap::const_iterator> SpellGroupSpellMapBounds;
+
+enum SpellGroupStackRule
+{
+    SPELL_GROUP_STACK_RULE_DEFAULT,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE_FROM_SAME_CASTER,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST,
+    SPELL_GROUP_STACK_RULE_MAX
 };
 
-enum SpellGroupIDs
-{
-    SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS     = 1
-};
+typedef std::unordered_map<SpellGroup, SpellGroupStackRule> SpellGroupStackMap;
 
-struct SpellStackInfo
-{
-    uint32 groupId;
-    SpellGroupSpecialFlags specialFlags;
-};
-//             spell_id, group_id
-typedef std::map<uint32, SpellStackInfo> SpellGroupMap;
-typedef std::map<uint32, SpellGroupStackFlags> SpellGroupStackMap;
+typedef std::unordered_map<SpellGroup, std::unordered_set<uint32 /*auraName*/>> SameEffectStackMap;
 
 struct SpellThreatEntry
 {
@@ -679,12 +671,18 @@ public:
     // Spell target coordinates
     [[nodiscard]] SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
 
-    // Spell Groups
-    [[nodiscard]] uint32 GetSpellGroup(uint32 spellid) const;
-    [[nodiscard]] SpellGroupSpecialFlags GetSpellGroupSpecialFlags(uint32 spell_id) const;
-    [[nodiscard]] SpellGroupStackFlags GetGroupStackFlags(uint32 groupid) const;
-    SpellGroupStackFlags CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const;
-    void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
+    // Spell Groups table
+    SpellSpellGroupMapBounds GetSpellSpellGroupMapBounds(uint32 spell_id) const;
+    bool IsSpellMemberOfSpellGroup(uint32 spell_id, SpellGroup group_id) const;
+
+    SpellGroupSpellMapBounds GetSpellGroupSpellMapBounds(SpellGroup group_id) const;
+    void GetSetOfSpellsInSpellGroup(SpellGroup group_id, std::set<uint32>& foundSpells) const;
+    void GetSetOfSpellsInSpellGroup(SpellGroup group_id, std::set<uint32>& foundSpells, std::set<SpellGroup>& usedGroups) const;
+
+    // Spell Group Stack Rules table
+    bool AddSameEffectStackRuleSpellGroups(SpellInfo const* spellInfo, uint32 auraType, int32 amount, std::map<SpellGroup, int32>& groups) const;
+    SpellGroupStackRule CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2) const;
+    SpellGroupStackRule GetSpellGroupStackRule(SpellGroup group_id) const;
 
     // Spell proc event table
     [[nodiscard]] SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
@@ -798,8 +796,10 @@ private:
     SpellRequiredMap           mSpellReq;
     SpellLearnSkillMap         mSpellLearnSkills;
     SpellTargetPositionMap     mSpellTargetPositions;
-    SpellGroupMap              mSpellGroupMap;
-    SpellGroupStackMap         mSpellGroupStackMap;
+    SpellSpellGroupMap         mSpellSpellGroup;
+    SpellGroupSpellMap         mSpellGroupSpell;
+    SpellGroupStackMap         mSpellGroupStack;
+    SameEffectStackMap         mSpellSameEffectStack;
     SpellProcEventMap          mSpellProcEventMap;
     SpellProcMap               mSpellProcMap;
     SpellBonusMap              mSpellBonusMap;
