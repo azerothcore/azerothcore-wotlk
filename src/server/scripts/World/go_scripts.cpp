@@ -1066,7 +1066,7 @@ class go_southfury_moonstone : public GameObjectScript
 public:
     go_southfury_moonstone() : GameObjectScript("go_southfury_moonstone") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         //implicitTarget=48 not implemented as of writing this code, and manual summon may be just ok for our purpose
         //player->CastSpell(player, SPELL_SUMMON_RIZZLE, false);
@@ -1076,6 +1076,7 @@ public:
             // no need casting spell blackjack, it's casted by script npc_rizzle_sprysprocket.
             //creature->CastSpell(player, SPELL_BLACKJACK, false);
             creature->AI()->AttackStart(player);
+            go->DespawnOrUnsummon(8000ms);
         }
 
         return false;
