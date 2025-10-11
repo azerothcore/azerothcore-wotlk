@@ -392,7 +392,7 @@ public:
     void UpdateLeashExtensionTime();
     uint8 GetLeashTimer() const;
 
-    CreatureTextRepeatIds GetTextRepeatGroup(uint8 textGroup);
+    CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);
     void ClearTextRepeatGroup(uint8 textGroup);
 
