@@ -54,6 +54,8 @@ Map::~Map()
 {
     // UnloadAll must be called before deleting the map
 
+    // Kill all scheduled events without executing them, since the map and its objects are being destroyed.
+    // This prevents events from running on invalid or deleted objects during map destruction.
     m_Events.KillAllEvents(false);
 
     sScriptMgr->OnDestroyMap(this);
