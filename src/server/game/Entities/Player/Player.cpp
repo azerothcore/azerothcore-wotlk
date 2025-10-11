@@ -7312,13 +7312,15 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                             continue;
                     }
 
-                    CastItemCombatSpell(target, attType, procVictim, procEx, item, proto);
+                    CastItemCombatSpell(target, attType, procVictim, procEx, i, proto);
                 }
     }
 }
 
-void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
+void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, uint8 itemslot, ItemTemplate const* proto)
 {
+    Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, itemslot);
+
     if (!sScriptMgr->OnPlayerCanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
         return;
 
@@ -7365,7 +7367,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
     // item combat enchantments
     for (uint8 e_slot = 0; e_slot < MAX_ENCHANTMENT_SLOT; ++e_slot)
     {
-        uint32 enchant_id = item->GetEnchantmentId(EnchantmentSlot(e_slot));
+        uint32 enchant_id = item ? item->GetEnchantmentId(EnchantmentSlot(e_slot)) : 0;
         SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
         if (!pEnchant)
             continue;
@@ -7430,16 +7432,19 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
             if (roll_chance_f(chance))
             {
-                // Xinef: implement enchant charges
-                if (uint32 charges = item->GetEnchantmentCharges(EnchantmentSlot(e_slot)))
+                if (item)
                 {
-                    if (!--charges)
+                    // Xinef: implement enchant charges
+                    if (uint32 charges = item->GetEnchantmentCharges(EnchantmentSlot(e_slot)))
                     {
-                        ApplyEnchantment(item, EnchantmentSlot(e_slot), false);
-                        item->ClearEnchantment(EnchantmentSlot(e_slot));
+                        if (!--charges)
+                        {
+                            ApplyEnchantment(item, EnchantmentSlot(e_slot), false);
+                            item->ClearEnchantment(EnchantmentSlot(e_slot));
+                        }
+                        else
+                            item->SetEnchantmentCharges(EnchantmentSlot(e_slot), charges);
                     }
-                    else
-                        item->SetEnchantmentCharges(EnchantmentSlot(e_slot), charges);
                 }
 
                 Unit* unitTarget = spellInfo->IsPositive() ? this : target;
