@@ -769,12 +769,12 @@ public:
             // so that can't be the issue
             // See BoomEvent class
             // Schedule 1s delayed
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
+            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
+            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

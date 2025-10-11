@@ -513,7 +513,7 @@ public:
                             spellId = BLOOD_BEAM_VISUAL_LLEG;
                         else
                             spellId = BLOOD_BEAM_VISUAL_RLEG;
-                        creature->m_Events.AddEvent(new DelayedCastMincharEvent(creature, spellId), creature->m_Events.CalculateTime(1000));
+                        creature->m_Events.AddEventAtOffset(new DelayedCastMincharEvent(creature, spellId), 1s);
                     }
                     break;
                 case NPC_SKYBREAKER_DECKHAND:
@@ -608,7 +608,7 @@ public:
             std::string name2("Kor'kron ");
             if (!creature->GetTransport() && creature->GetPositionZ() <= 205.0f && creature->GetExactDist2d(-439.0f, 2210.0f) <= 150.0f && (creature->GetEntry() == 37544 || creature->GetEntry() == 37545 || creature->GetName().compare(0, name1.length(), name1) == 0 || creature->GetName().compare(0, name2.length(), name2) == 0))
                 if (!creature->GetLootRecipient())
-                    creature->m_Events.AddEvent(new RespawnEvent(*creature), creature->m_Events.CalculateTime(3000));
+                    creature->m_Events.AddEventAtOffset(new RespawnEvent(*creature), 3s);
 
             switch (creature->GetEntry())
             {

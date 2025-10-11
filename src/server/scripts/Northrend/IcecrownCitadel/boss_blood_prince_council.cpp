@@ -375,7 +375,7 @@ public:
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->ForceValuesUpdateAtIndex(UNIT_NPC_FLAGS);   // was in sniff. don't ask why
-                    me->m_Events.AddEvent(new StandUpEvent(*me), me->m_Events.CalculateTime(1000));
+                    me->m_Events.AddEventAtOffset(new StandUpEvent(*me), 1s);
                     DoAction(ACTION_REMOVE_INVOCATION);
                     me->SetHealth(1);
                     break;
@@ -645,7 +645,7 @@ public:
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->ForceValuesUpdateAtIndex(UNIT_NPC_FLAGS);   // was in sniff. don't ask why
-                    me->m_Events.AddEvent(new StandUpEvent(*me), me->m_Events.CalculateTime(1000));
+                    me->m_Events.AddEventAtOffset(new StandUpEvent(*me), 1s);
                     DoAction(ACTION_REMOVE_INVOCATION);
                     me->SetHealth(1);
                     break;
@@ -889,7 +889,7 @@ public:
                     summon->CastSpell(summon, SPELL_KINETIC_BOMB, true, nullptr, nullptr, me->GetGUID());
                     break;
                 case NPC_SHOCK_VORTEX:
-                    summon->m_Events.AddEvent(new ShockVortexExplodeEvent(*summon), summon->m_Events.CalculateTime(4500));
+                    summon->m_Events.AddEventAtOffset(new ShockVortexExplodeEvent(*summon), 4500ms);
                     break;
                 default:
                     break;
@@ -939,7 +939,7 @@ public:
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->ForceValuesUpdateAtIndex(UNIT_NPC_FLAGS);   // was in sniff. don't ask why
-                    me->m_Events.AddEvent(new StandUpEvent(*me), me->m_Events.CalculateTime(1000));
+                    me->m_Events.AddEventAtOffset(new StandUpEvent(*me), 1s);
                     me->SetHealth(me->GetMaxHealth());
                     DoAction(ACTION_CAST_INVOCATION);
                     break;

@@ -574,7 +574,7 @@ public:
                         summon->SetHomePosition(x, y, z, o);
                         summon->UpdatePosition(x, y, z, o, true);
                         summon->StopMovingOnCurrentPos();
-                        summon->m_Events.AddEvent(new CosmicSmashDamageEvent(summon), summon->m_Events.CalculateTime(4000));
+                        summon->m_Events.AddEventAtOffset(new CosmicSmashDamageEvent(summon), 4s);
                         break;
                     }
                 case NPC_UNLEASHED_DARK_MATTER:

@@ -100,20 +100,19 @@ class EventProcessor
 
         void Update(uint32 p_time);
         void KillAllEvents(bool force);
-        void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true) { AddEvent(Event, e_time, set_addtime, 0); };
-        void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime, uint8 eventGroup);
+
+        void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true, uint8 eventGroup = 0);
         template<typename T>
-        is_lambda_event<T> AddEvent(T&& event, Milliseconds e_time, bool set_addtime = true) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), e_time, set_addtime); }
-        void AddEventAtOffset(BasicEvent* event, Milliseconds offset) { AddEvent(event, CalculateTime(offset.count()), true, 0); }
-        void AddEventAtOffset(BasicEvent* event, Milliseconds offset, Milliseconds offset2) { AddEvent(event, CalculateTime(randtime(offset, offset2).count()), true, false); }
+        is_lambda_event<T> AddEvent(T&& event, Milliseconds e_time, bool set_addtime = true, uint8 eventGroup = 0) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), e_time.count(), set_addtime, eventGroup); }
+
+        void AddEventAtOffset(BasicEvent* event, Milliseconds offset, uint8 eventGroup = 0) { AddEvent(event, CalculateTime(offset.count()), true, eventGroup); }
         template<typename T>
-        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, uint8 eventGroup) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), CalculateTime(offset.count()), true, eventGroup); };
+        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, uint8 eventGroup = 0) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset, eventGroup); };
+
+        void AddEventAtOffset(BasicEvent* event, Milliseconds offset, Milliseconds offset2, uint8 eventGroup = 0) { AddEvent(event, CalculateTime(randtime(offset, offset2).count()), true, eventGroup); }
         template<typename T>
-        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, Milliseconds offset2, uint8 eventGroup) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), CalculateTime(randtime(offset, offset2).count()), true, eventGroup); };
-        template<typename T>
-        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset); }
-        template<typename T>
-        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, Milliseconds offset2) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset, offset2); }
+        is_lambda_event<T> AddEventAtOffset(T&& event, Milliseconds offset, Milliseconds offset2, uint8 eventGroup = 0) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset, offset2, eventGroup); };
+
         void ModifyEventTime(BasicEvent* event, Milliseconds newTime);
         [[nodiscard]] uint64 CalculateTime(uint64 t_offset) const;
 
@@ -121,6 +120,7 @@ class EventProcessor
         [[nodiscard]] uint64 CalculateQueueTime(uint64 delay) const;
 
         void CancelEventGroup(uint8 group);
+        bool HaveEventList() const { return !m_events.empty(); }
 
     protected:
         uint64 m_time{0};

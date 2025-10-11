@@ -11073,7 +11073,7 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
     return gain;
 }
 
-bool RedirectSpellEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool RedirectSpellEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     if (Unit* auraOwner = ObjectAccessor::GetUnit(_self, _auraOwnerGUID))
     {
@@ -19582,15 +19582,6 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     }
 }
 
-bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
-{
-    Position pos = _self;
-    _self.MovePositionToFirstCollision(pos, 20.0f, M_PI);
-    _self.GetMotionMaster()->MovePoint(0, pos);
-    _self.ToCreature()->DespawnOrUnsummon(_duration);
-    return true;
-}
-
 void Unit::_ExitVehicle(Position const* exitPosition)
 {
     if (!m_vehicle)
@@ -19689,7 +19680,13 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             else if (vehicleBase->IsCreature())
             {
                 vehicle->Uninstall();
-                vehicleBase->m_Events.AddEvent(new VehicleDespawnEvent(*vehicleBase, 2000), vehicleBase->m_Events.CalculateTime(2000));
+                vehicleBase->m_Events.AddEventAtOffset([vehicleBase]()
+                {
+                    Position pos = *vehicleBase;
+                    vehicleBase->MovePositionToFirstCollision(pos, 20.0f, M_PI);
+                    vehicleBase->GetMotionMaster()->MovePoint(0, pos);
+                    vehicleBase->ToCreature()->DespawnOrUnsummon(2000);
+                }, 2s);
             }
 
             // xinef: ugly hack, no appripriate hook later to cast spell
@@ -19709,7 +19706,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             setDeathState(DeathState::JustDied);
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else
-            ToTempSummon()->UnSummon(2000); // Approximation
+            ToTempSummon()->UnSummon(2s); // Approximation
     }
 
     if (player)
@@ -20096,7 +20093,7 @@ class AuraMunchingQueue : public BasicEvent
 public:
     AuraMunchingQueue(Unit& owner, ObjectGuid targetGUID, int32 basePoints, uint32 spellId, AuraEffect* aurEff, AuraType auraType) : _owner(owner), _targetGUID(targetGUID), _basePoints(basePoints), _spellId(spellId), _aurEff(aurEff), _auraType(auraType) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
         if (_owner.IsInWorld() && _owner.FindMap())
             if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
@@ -20123,24 +20120,6 @@ private:
     uint32 _spellId;
     AuraEffect* _aurEff;
     AuraType _auraType;
-};
-
-class ResetToHomeOrientation : public BasicEvent
-{
-public:
-    ResetToHomeOrientation(Creature& self) : _self(self) { }
-
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-    {
-            if (_self.IsInWorld() && _self.FindMap() && _self.IsAlive() && !_self.IsInCombat())
-            {
-                _self.SetFacingTo(_self.GetHomePosition().GetOrientation());
-            }
-
-        return true;
-    }
-private:
-    Creature& _self;
 };
 
 void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex)
@@ -20394,7 +20373,13 @@ void Unit::SetTimedFacingToObject(WorldObject* object, uint32 time)
     init.Launch();
 
     if (Creature* c = ToCreature())
-        c->m_Events.AddEvent(new ResetToHomeOrientation(*c), c->m_Events.CalculateTime(time));
+    {
+        c->m_Events.AddEventAtOffset([c]()
+        {
+            if (c->IsInWorld() && c->FindMap() && c->IsAlive() && !c->IsInCombat())
+                c->SetFacingTo(c->GetHomePosition().GetOrientation());
+        }, Milliseconds(time));
+    }
     else
         LOG_ERROR("entities.unit", "Unit::SetTimedFacingToObject called on non-creature unit {}. This should never happen.", GetEntry());
 }
