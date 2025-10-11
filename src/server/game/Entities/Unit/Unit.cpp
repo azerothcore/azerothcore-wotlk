@@ -19680,7 +19680,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             else if (vehicleBase->IsCreature())
             {
                 vehicle->Uninstall();
-                vehicleBase->m_Events.AddEventAtOffset([=]()
+                vehicleBase->m_Events.AddEventAtOffset([vehicleBase]()
                 {
                     Position pos = *vehicleBase;
                     vehicleBase->MovePositionToFirstCollision(pos, 20.0f, M_PI);
