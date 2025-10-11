@@ -101,7 +101,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         uint8 controlledPoints = _controlledPoints[teamId];
                         if (controlledPoints == 0)
                         {
-                            _bgEvents.ScheduleEvent(eventId, 3000);
+                            _bgEvents.ScheduleEvent(eventId, 3s);
                             break;
                         }
 
@@ -170,8 +170,8 @@ void BattlegroundAB::StartingEventOpenDoors()
     DoorOpen(BG_AB_OBJECT_GATE_A);
     DoorOpen(BG_AB_OBJECT_GATE_H);
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, BG_AB_EVENT_START_BATTLE);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3000);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3000);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3s);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3s);
 }
 
 void BattlegroundAB::AddPlayer(Player* player)

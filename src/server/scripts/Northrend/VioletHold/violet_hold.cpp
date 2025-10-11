@@ -1198,11 +1198,11 @@ struct npc_violet_hold_defense_system : public ScriptedAI
         {
             case EVENT_ARCANE_LIGHTNING:
                 DoCastAOE(RAND(SPELL_ARCANE_LIGHTNING, SPELL_ARCANE_LIGHTNING_VISUAL));
-                events.RepeatEvent(2000);
+                events.Repeat(2s);
                 break;
             case EVENT_ARCANE_LIGHTNING_INSTAKILL:
                 DoCastAOE(SPELL_ARCANE_LIGHTNING_INSTAKILL);
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 break;
         }
     }

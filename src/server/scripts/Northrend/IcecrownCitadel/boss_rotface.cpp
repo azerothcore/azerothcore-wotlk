@@ -131,13 +131,13 @@ public:
         {
         }
 
-        uint32 infectionCooldown;
+        Milliseconds infectionCooldown;
         ObjectGuid _oozeFloodDummyGUIDs[4][2];
         uint8 _oozeFloodStage;
 
         void Reset() override
         {
-            infectionCooldown = 14000;
+            infectionCooldown = 14s;
 
             for (uint8 i = 0; i < 4; ++i)
                 for (uint8 j = 0; j < 2; ++j)
@@ -283,14 +283,14 @@ public:
                             DoCastSelf(SPELL_SLIME_SPRAY);
                         }
                     }
-                    events.DelayEvents(1);
+                    events.DelayEvents(1ms);
                     events.ScheduleEvent(EVENT_SLIME_SPRAY, 20s);
                     events.ScheduleEvent(EVENT_UNROOT, 0ms);
                     break;
                 case EVENT_HASTEN_INFECTIONS:
-                    if (infectionCooldown >= 8000)
+                    if (infectionCooldown >= 8s)
                     {
-                        infectionCooldown -= 2000;
+                        infectionCooldown -= 2s;
                         events.ScheduleEvent(EVENT_HASTEN_INFECTIONS, 90s);
                     }
                     break;

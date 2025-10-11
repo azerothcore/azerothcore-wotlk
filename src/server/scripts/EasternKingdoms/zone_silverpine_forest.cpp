@@ -328,7 +328,7 @@ public:
         {
             HasEnded = false;
             TalkRNG = urand(0,1);
-            events.ScheduleEvent(EVENT_APPA_INTRO, 2000);
+            events.ScheduleEvent(EVENT_APPA_INTRO, 2s);
             summons.DespawnAll();
         }
 
@@ -387,31 +387,31 @@ public:
                 case EVENT_APPA_INTRO:
                     Talk(SAY_APPA_INTRO);
                     SummonCrowd();
-                    events.ScheduleEvent(EVENT_APPA_SAY_1, 3000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_1, 3s);
                     break;
                 case EVENT_APPA_SAY_1:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_1 : SAY_APPA_OPTION_2_1);
-                    events.ScheduleEvent(EVENT_APPA_SAY_2, 5000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_2, 5s);
                     break;
                 case EVENT_APPA_SAY_2:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_2 : SAY_APPA_OPTION_2_2);
-                    events.ScheduleEvent(EVENT_APPA_SAY_3, 5000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_3, 5s);
                     break;
                 case EVENT_APPA_SAY_3:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_3 : SAY_APPA_OPTION_2_3);
-                    events.ScheduleEvent(EVENT_APPA_SAY_4, 5000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_4, 5s);
                     break;
                 case EVENT_APPA_SAY_4:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_4 : SAY_APPA_OPTION_2_4);
-                    events.ScheduleEvent(EVENT_APPA_OUTRO, 5000);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO, 5s);
                     break;
                 case EVENT_APPA_OUTRO:
                     Talk(SAY_APPA_OUTRO);
-                    events.ScheduleEvent(EVENT_APPA_OUTRO_CROWD, 3000);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO_CROWD, 3s);
                     break;
                 case EVENT_APPA_OUTRO_CROWD:
                     EmoteCrowd();
-                    events.ScheduleEvent(EVENT_APPA_OUTRO_END, 5000);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO_END, 5s);
                     break;
                 case EVENT_APPA_OUTRO_END: // Despawn for Apparition is handled via Areatrigger SAI (5m)
                     summons.DespawnAll();

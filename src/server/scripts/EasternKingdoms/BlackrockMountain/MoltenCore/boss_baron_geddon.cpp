@@ -91,7 +91,7 @@ public:
                 case EVENT_INFERNO:
                 {
                     DoCastAOE(SPELL_INFERNO);
-                    events.RepeatEvent(urand(21000, 26000));
+                    events.Repeat(21s, 26s);
                     break;
                 }
                 case EVENT_IGNITE_MANA:
@@ -101,7 +101,7 @@ public:
                         DoCast(target, SPELL_IGNITE_MANA);
                     }
 
-                    events.RepeatEvent(urand(27000, 32000));
+                    events.Repeat(27s, 32s);
                     break;
                 }
                 case EVENT_LIVING_BOMB:
@@ -111,7 +111,7 @@ public:
                         DoCast(target, SPELL_LIVING_BOMB);
                     }
 
-                    events.RepeatEvent(urand(11000, 16000));
+                    events.Repeat(11s, 16s);
                     break;
                 }
             }

@@ -262,7 +262,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_COUNCIL_SLAY);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -582,7 +582,7 @@ struct boss_veras_darkshadow : public boss_illidari_council_memberAI
             break;
         }
 
-        if (events.GetNextEventTime(EVENT_SPELL_VANISH_OUT) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_SPELL_VANISH_OUT))
             DoMeleeAttackIfReady();
     }
 };

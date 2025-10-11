@@ -28,14 +28,11 @@ enum Spells
     SPELL_ENVELOPING_WEB     = 15471
 };
 
-enum Timers
-{
-    TIMER_SHADOWBOLT = 7000,
-    TIMER_CURSE_TONGUES = 24000,
-    TIMER_CURSE_WEAKNESS = 12000,
-    TIMER_DEMON_ARMOR = 3000, // virtually only cast once
-    TIMER_ENVELOPING_WEB = 16000
-};
+constexpr Milliseconds TIMER_SHADOWBOLT = 7s;
+constexpr Milliseconds TIMER_CURSE_TONGUES = 24s;
+constexpr Milliseconds TIMER_CURSE_WEAKNESS = 12s;
+constexpr Milliseconds TIMER_DEMON_ARMOR = 3s; //virtually only cast once
+constexpr Milliseconds TIMER_ENVELOPING_WEB = 16s;
 
 class boss_anubshiah : public CreatureScript
 {
@@ -54,11 +51,11 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-            events.ScheduleEvent(SPELL_SHADOWBOLT, 0.2 * (int)TIMER_SHADOWBOLT);
-            events.ScheduleEvent(SPELL_CURSE_TONGUES, 0.2 * (int)TIMER_CURSE_TONGUES);
-            events.ScheduleEvent(SPELL_CURSE_WEAKNESS, 0.2 * (int)TIMER_CURSE_WEAKNESS);
-            events.ScheduleEvent(SPELL_DEMON_ARMOR, 0.2 * (int)TIMER_DEMON_ARMOR);
-            events.ScheduleEvent(SPELL_ENVELOPING_WEB, 0.2 * (int)TIMER_ENVELOPING_WEB);
+            events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT / 5);
+            events.ScheduleEvent(SPELL_CURSE_TONGUES, TIMER_CURSE_TONGUES / 5);
+            events.ScheduleEvent(SPELL_CURSE_WEAKNESS, TIMER_CURSE_WEAKNESS / 5);
+            events.ScheduleEvent(SPELL_DEMON_ARMOR, TIMER_DEMON_ARMOR / 5);
+            events.ScheduleEvent(SPELL_ENVELOPING_WEB, TIMER_ENVELOPING_WEB / 5);
         }
 
         void UpdateAI(uint32 diff) override
@@ -80,21 +77,21 @@ public:
                 {
                 case SPELL_SHADOWBOLT:
                     DoCastVictim(SPELL_SHADOWBOLT);
-                    events.ScheduleEvent(SPELL_SHADOWBOLT, urand(TIMER_SHADOWBOLT - 2000, TIMER_SHADOWBOLT + 2000));
+                    events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT - 2s, TIMER_SHADOWBOLT + 2s);
                     break;
                 case SPELL_CURSE_TONGUES:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(target, SPELL_CURSE_TONGUES);
                     }
-                    events.ScheduleEvent(SPELL_CURSE_TONGUES, urand(TIMER_CURSE_TONGUES - 2000, TIMER_CURSE_TONGUES + 2000));
+                    events.ScheduleEvent(SPELL_CURSE_TONGUES, TIMER_CURSE_TONGUES - 2s, TIMER_CURSE_TONGUES + 2s);
                     break;
                 case SPELL_CURSE_WEAKNESS:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
                         DoCast(target, SPELL_CURSE_WEAKNESS);
                     }
-                    events.ScheduleEvent(SPELL_CURSE_WEAKNESS, urand(TIMER_CURSE_WEAKNESS - 2000, TIMER_CURSE_WEAKNESS + 2000));
+                    events.ScheduleEvent(SPELL_CURSE_WEAKNESS, TIMER_CURSE_WEAKNESS - 2s, TIMER_CURSE_WEAKNESS + 2s);
                     break;
                 case SPELL_DEMON_ARMOR:
                     DoCast(me, SPELL_DEMON_ARMOR);
@@ -103,7 +100,7 @@ public:
                 case SPELL_ENVELOPING_WEB:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                         DoCast(target, SPELL_ENVELOPING_WEB);
-                    events.ScheduleEvent(SPELL_ENVELOPING_WEB, urand(TIMER_ENVELOPING_WEB - 2000, TIMER_ENVELOPING_WEB + 2000));
+                    events.ScheduleEvent(SPELL_ENVELOPING_WEB, TIMER_ENVELOPING_WEB - 2s, TIMER_ENVELOPING_WEB + 2s);
                     break;
                 default:
                     break;

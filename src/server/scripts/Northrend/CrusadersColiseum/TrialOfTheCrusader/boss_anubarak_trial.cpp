@@ -655,7 +655,7 @@ public:
                 me->NearTeleportTo(target->GetPositionX() + cos(o) * 5.0f, target->GetPositionY() + std::sin(o) * 5.0f, target->GetPositionZ() + 0.6f, target->GetOrientation());
                 AttackStart(target);
                 me->GetMotionMaster()->MoveChase(target);
-                events.DelayEvents(3000);
+                events.DelayEvents(3s);
             }
         }
 

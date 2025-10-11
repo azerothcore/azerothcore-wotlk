@@ -426,7 +426,7 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.ScheduleEvent(EVENT_TOXIC_VOLLEY, 5000);
+            events.ScheduleEvent(EVENT_TOXIC_VOLLEY, 5s);
         }
         void JustDied(Unit*  /*killer*/) override
         {

@@ -58,7 +58,7 @@ public:
                 case EVENT_GEHENNAS_CURSE:
                 {
                     DoCastVictim(SPELL_GEHENNAS_CURSE);
-                    events.RepeatEvent(urand(25000, 30000));
+                    events.Repeat(25s, 30s);
                     break;
                 }
                 case EVENT_RAIN_OF_FIRE:
@@ -67,7 +67,7 @@ public:
                     {
                         DoCast(target, SPELL_RAIN_OF_FIRE, true);
                     }
-                    events.RepeatEvent(6000);
+                    events.Repeat(6s);
                     break;
                 }
                 case EVENT_SHADOW_BOLT:
@@ -88,7 +88,7 @@ public:
                         DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
                     }
 
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     break;
                 }
             }

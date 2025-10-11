@@ -131,7 +131,7 @@ public:
                     Talk(SAY_DEFILING_HORROR);
                     me->CastSpell((Unit*)nullptr, SPELL_DEFILING_HORROR, false);
                     me->SetControlled(true, UNIT_STATE_ROOT);
-                    events.DelayEventsToMax(5000, 0);
+                    events.DelayEventsToMax(5s, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 4s);
                     events.ScheduleEvent(EVENT_DEFILING_HORROR, 20s);
                     break;

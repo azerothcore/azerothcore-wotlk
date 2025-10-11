@@ -213,7 +213,7 @@ public:
                                 ScriptedAI::EnterEvadeMode();
                                 return;
                             }
-                            events.ScheduleEvent(EVENT_CHECK_RESET, 5000);
+                            events.ScheduleEvent(EVENT_CHECK_RESET, 5s);
                             break;
                         }
                 }

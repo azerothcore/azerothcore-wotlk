@@ -132,7 +132,7 @@ struct boss_magus_telestra : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_KILL);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);

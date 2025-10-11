@@ -57,19 +57,19 @@ public:
                 case EVENT_IMPENDING_DOOM:
                 {
                     DoCastVictim(SPELL_IMPENDING_DOOM);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 }
                 case EVENT_LUCIFRON_CURSE:
                 {
                     DoCastVictim(SPELL_LUCIFRON_CURSE);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 }
                 case EVENT_SHADOW_SHOCK:
                 {
                     DoCastVictim(SPELL_SHADOW_SHOCK);
-                    events.RepeatEvent(5000);
+                    events.Repeat(5s);
                     break;
                 }
             }

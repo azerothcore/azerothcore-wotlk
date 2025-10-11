@@ -440,7 +440,7 @@ public:
                     if (gothikWaves[waveCount][0])
                     {
                         SummonHelpers(gothikWaves[waveCount][0]);
-                        events.RepeatEvent(gothikWaves[waveCount][1]);
+                        events.Repeat(Milliseconds(gothikWaves[waveCount][1]));
                     }
                     else
                     {
@@ -522,7 +522,7 @@ public:
                     events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 3s);
                     break;
                 case NPC_DEAD_RIDER:
-                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 2000ms, 3500ms);
+                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 2s, 3500ms);
                     events.ScheduleEvent(EVENT_UNHOLY_FRENZY, 5s, 9s);
                     break;
                 case NPC_DEAD_HORSE:

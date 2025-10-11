@@ -227,7 +227,7 @@ public:
                     case EVENT_FIREBALL:
                         DoCastVictim(SPELL_FIREBALL);
                         events.ScheduleEvent(EVENT_FIREBALL, 8s, 21s);
-                        if (events.GetNextEventTime(EVENT_FIREBLAST) < 3 * IN_MILLISECONDS)
+                        if (events.GetTimeUntilEvent(EVENT_FIREBLAST) < 3s)
                         {
                             events.RescheduleEvent(EVENT_FIREBLAST, 3s);
                         }
@@ -235,7 +235,7 @@ public:
                     case EVENT_FIREBLAST:
                         DoCastVictim(SPELL_FIREBLAST);
                         events.ScheduleEvent(EVENT_FIREBLAST, 5s, 8s);
-                        if (events.GetNextEventTime(EVENT_FIREBALL) < 3 * IN_MILLISECONDS)
+                        if (events.GetTimeUntilEvent(EVENT_FIREBALL) < 3s)
                         {
                             events.RescheduleEvent(EVENT_FIREBALL, 3s);
                         }

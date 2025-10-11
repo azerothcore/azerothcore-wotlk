@@ -345,7 +345,7 @@ public:
             {
                 case NPC_BLACKWING_DRAGON:
                     --addsCount[0];
-                    if (EggEvent != DONE && _events.GetTimeUntilEvent(EVENT_RAZOR_SPAWN) == Milliseconds::max())
+                    if (EggEvent != DONE && !_events.HasTimeUntilEvent(EVENT_RAZOR_SPAWN))
                     {
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 1s);
                     }
@@ -353,7 +353,7 @@ public:
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_MAGE:
                     --addsCount[1];
-                    if (EggEvent != DONE && _events.GetTimeUntilEvent(EVENT_RAZOR_SPAWN) == Milliseconds::max())
+                    if (EggEvent != DONE && !_events.HasTimeUntilEvent(EVENT_RAZOR_SPAWN))
                     {
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 1s);
                     }
@@ -413,7 +413,7 @@ public:
 
                             if (spawnMoreAdds)
                             {
-                                _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 15000);
+                                _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 15s);
                             }
                         }
                         break;

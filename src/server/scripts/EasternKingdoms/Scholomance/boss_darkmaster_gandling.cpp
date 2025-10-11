@@ -36,16 +36,13 @@ enum BossData
     GANDLING_ROOM_TO_USE
 };
 
-enum Timers
-{
-    TIMER_ARCANE_MIN = 8000,
-    TIMER_ARCANE_MAX = 14000,
-    TIMER_CURSE_MIN = 20000,
-    TIMER_CURSE_MAX = 30000,
-    TIMER_SHIELD_MIN = 30000,
-    TIMER_SHIELD_MAX = 40000,
-    TIMER_PORTAL = 25000
-};
+constexpr Milliseconds TIMER_ARCANE_MIN = 8s;
+constexpr Milliseconds TIMER_ARCANE_MAX = 14s;
+constexpr Milliseconds TIMER_CURSE_MIN = 20s;
+//constexpr Milliseconds TIMER_CURSE_MAX = 30s;
+constexpr Milliseconds TIMER_SHIELD_MIN = 30s;
+//constexpr Milliseconds TIMER_SHIELD_MAX = 40s;
+constexpr Milliseconds TIMER_PORTAL = 25s;
 
  enum IdPortalSpells
  {
@@ -335,18 +332,18 @@ public:
                 {
                 case SPELL_ARCANE_MISSILES:
                     DoCastVictim(SPELL_ARCANE_MISSILES);
-                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, TIMER_ARCANE_MIN, TIMER_ARCANE_MAX);
                     break;
                 case SPELL_CURSE_DARKMASTER:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         DoCast(target, SPELL_CURSE_DARKMASTER);
                     }
-                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, TIMER_ARCANE_MIN, TIMER_ARCANE_MAX);
                     break;
                 case SPELL_SHADOW_SHIELD:
                     DoCastSelf(SPELL_SHADOW_SHIELD);
-                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, TIMER_ARCANE_MIN, TIMER_ARCANE_MAX);
                     break;
 
                 case SPELL_SHADOW_PORTAL:

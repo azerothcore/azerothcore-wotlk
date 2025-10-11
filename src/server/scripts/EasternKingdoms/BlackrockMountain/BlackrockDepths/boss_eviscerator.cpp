@@ -26,12 +26,9 @@ enum Spells
     SPELL_SHIELD            = 7121
 };
 
-enum Timers
-{
-    TIMER_SHADOWBOLT_VOLLEY = 7000,
-    TIMER_REND              = 20000,
-    TIMER_SHIELD            = 12000
-};
+constexpr Milliseconds TIMER_SHADOWBOLT_VOLLEY = 7s;
+constexpr Milliseconds TIMER_REND = 20s;
+constexpr Milliseconds TIMER_SHIELD = 12s;
 
 class boss_eviscerator : public CreatureScript
 {
@@ -52,9 +49,9 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-            events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, 0.2 * (int)TIMER_SHADOWBOLT_VOLLEY);
-            events.ScheduleEvent(SPELL_REND, 0.2 * (int) TIMER_REND);
-            events.ScheduleEvent(SPELL_SHIELD, 0.2 * (int) TIMER_SHIELD);
+            events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY / 5);
+            events.ScheduleEvent(SPELL_REND, TIMER_REND / 5);
+            events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD / 5);
         }
 
         void DamageTaken(Unit* /* doneBy */, uint32& /* damage */, DamageEffectType /* damagetype */, SpellSchoolMask damageSchoolMask) override
@@ -86,11 +83,11 @@ public:
                 {
                 case SPELL_SHADOWBOLT_VOLLEY:
                     DoCastVictim(SPELL_SHADOWBOLT_VOLLEY);
-                    events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, urand(TIMER_SHADOWBOLT_VOLLEY - 2000, TIMER_SHADOWBOLT_VOLLEY + 2000));
+                    events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY - 2s, TIMER_SHADOWBOLT_VOLLEY + 2s);
                     break;
                 case SPELL_REND:
                     DoCastVictim(SPELL_REND);
-                    events.ScheduleEvent(SPELL_REND, urand(TIMER_REND - 2000, TIMER_REND + 2000));
+                    events.ScheduleEvent(SPELL_REND, TIMER_REND - 2s, TIMER_REND + 2s);
                     break;
                 case SPELL_SHIELD:
                     SpellShieldReady = true;

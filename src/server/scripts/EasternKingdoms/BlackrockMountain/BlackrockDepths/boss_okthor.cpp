@@ -27,13 +27,10 @@ enum Spells
     SPELL_SLOW              = 19137
 };
 
-enum Timers
-{
-    TIMER_ARCANE_BOLT        = 7000,
-    TIMER_ARCANE_EXPLOSION  = 24000,
-    TIMER_POLYMORPH         = 12000,
-    TIMER_SLOW              = 15000
-};
+constexpr Milliseconds TIMER_ARCANE_BOLT = 7s;
+constexpr Milliseconds TIMER_ARCANE_EXPLOSION = 24s;
+constexpr Milliseconds TIMER_POLYMORPH = 12s;
+constexpr Milliseconds TIMER_SLOW = 15s;
 
 class boss_okthor : public CreatureScript
 {
@@ -49,15 +46,15 @@ public:
     {
         boss_okthorAI(Creature* creature) : BossAI(creature, DATA_OKTHOR) {}
 
-        uint32 nextArcaneExplosionTime;
+        Milliseconds nextArcaneExplosionTime;
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-            events.ScheduleEvent(SPELL_ARCANE_BOLT, 0.2 * (int) TIMER_ARCANE_BOLT);
-            events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, 0.2 * (int) TIMER_ARCANE_EXPLOSION);
-            events.ScheduleEvent(SPELL_POLYMORPH, 0.2 * (int) TIMER_POLYMORPH);
-            events.ScheduleEvent(SPELL_SLOW, 500);
+            events.ScheduleEvent(SPELL_ARCANE_BOLT, TIMER_ARCANE_BOLT / 5);
+            events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, TIMER_ARCANE_EXPLOSION / 5);
+            events.ScheduleEvent(SPELL_POLYMORPH, TIMER_POLYMORPH / 5);
+            events.ScheduleEvent(SPELL_SLOW, 500ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -82,17 +79,17 @@ public:
                     {
                         DoCast(target, SPELL_ARCANE_BOLT);
                     }
-                    events.ScheduleEvent(SPELL_ARCANE_BOLT, urand(TIMER_ARCANE_BOLT - 2000, TIMER_ARCANE_BOLT + 2000));
+                    events.ScheduleEvent(SPELL_ARCANE_BOLT, TIMER_ARCANE_BOLT - 2s, TIMER_ARCANE_BOLT + 2s);
                     break;
                 case SPELL_ARCANE_EXPLOSION:
                     if (me->GetDistance2d(me->GetVictim()) < 50.0f)
                     {
                         DoCast(SPELL_ARCANE_EXPLOSION);
-                        nextArcaneExplosionTime = urand(TIMER_ARCANE_EXPLOSION - 2000, TIMER_ARCANE_EXPLOSION + 2000);
+                        nextArcaneExplosionTime = randtime(TIMER_ARCANE_EXPLOSION - 2s, TIMER_ARCANE_EXPLOSION + 2s);
                     }
                     else
                     {
-                        nextArcaneExplosionTime = 0.3*urand(TIMER_ARCANE_EXPLOSION - 2000, TIMER_ARCANE_EXPLOSION + 2000);
+                        nextArcaneExplosionTime = randtime(TIMER_ARCANE_EXPLOSION - 2s, TIMER_ARCANE_EXPLOSION + 2s) / 3;
                     }
                     events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, nextArcaneExplosionTime);
                     break;
@@ -101,7 +98,7 @@ public:
                     {
                         DoCast(target, SPELL_POLYMORPH);
                     }
-                    events.ScheduleEvent(SPELL_POLYMORPH, urand(TIMER_POLYMORPH - 2000, TIMER_POLYMORPH + 2000));
+                    events.ScheduleEvent(SPELL_POLYMORPH, TIMER_POLYMORPH - 2s, TIMER_POLYMORPH + 2s);
                     break;
                 case SPELL_SLOW:
                     if (me->GetDistance2d(me->GetVictim()) < 50.0f)

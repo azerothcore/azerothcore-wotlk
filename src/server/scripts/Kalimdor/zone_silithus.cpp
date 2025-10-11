@@ -1145,7 +1145,7 @@ public:
                 }
             }
 
-            me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
+            me->DespawnOrUnsummon(5s, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
             me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             CloseGossipMenuFor(player);
             return false;
