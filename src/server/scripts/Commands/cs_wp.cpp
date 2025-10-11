@@ -26,10 +26,14 @@
 
 using namespace Acore::ChatCommands;
 
+namespace {
+    constexpr uint32 wpEntry = VISUAL_WAYPOINT;
+}
+
 class wp_commandscript : public CommandScript
 {
 public:
-    wp_commandscript() : CommandScript("wp_commandscript") { }
+    wp_commandscript() : CommandScript("wp_commandscript") {}
 
     ChatCommandTable GetCommands() const override
     {
@@ -49,6 +53,122 @@ public:
         };
         return commandTable;
     }
+
+    static bool AddWaypointsByPreparedStatement(ChatHandler* handler, WorldDatabaseConnection::Statements index, uint32 pathid, Creature* target = nullptr)
+    {
+        ASSERT(handler);
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(index);
+        stmt->SetData(0, pathid);
+        PreparedQueryResult result = WorldDatabase.Query(stmt);
+
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUND, pathid);
+            return false;
+        }
+
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 point = fields[0].Get<uint32>();
+            float x = fields[1].Get<float>();
+            float y = fields[2].Get<float>();
+            float z = fields[3].Get<float>();
+            float o = fields[4].Get<float>();
+            uint32 wpguid = fields[5].Get<uint32>();
+
+            Player* chr = handler->GetSession()->GetPlayer();
+            Map* map = chr->GetMap();
+
+            // Try to create new creature
+            Creature* wpCreature = new Creature;
+            if (!wpCreature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), wpEntry, 0, x, y, z, o))
+            {
+                handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, wpEntry);
+                delete wpCreature;
+                return false;
+            }
+
+            // Remove old waypoint for the same path_id and point if exists
+            if (wpguid != 0)
+                RemoveWaypointById(handler, wpguid);
+
+            // Save new waypoint to db
+            wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
+
+            // Set "wpguid" column to the new visual waypoint
+            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_WPGUID);
+            stmt->SetData(0, wpCreature->GetSpawnId());
+            stmt->SetData(1, pathid);
+            stmt->SetData(2, point);
+
+            WorldDatabase.Execute(stmt);
+
+            // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
+            if (!wpCreature->LoadCreatureFromDB(wpCreature->GetSpawnId(), map, true, true))
+            {
+                handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, wpEntry);
+                delete wpCreature;
+                return false;
+            }
+
+            if (target)
+            {
+                wpCreature->SetDisplayId(target->GetDisplayId());
+                wpCreature->SetObjectScale(0.5f);
+                wpCreature->SetLevel(point > STRONG_MAX_LEVEL ? STRONG_MAX_LEVEL : point);
+            }
+        } while (result->NextRow());
+
+        return true;
+    }
+
+    /**
+    * Remove an existing waypoint by dbGuid.
+    *
+    * @param guid: The dbGuid of the waypoint
+    * @param deleteFromWaypointData: true if the caller wants to delete the wpGuid from the waypoint_data table
+    *                                should be false if we immediately recreate the waypoint and set a new value
+    *
+    * @return true - command did succeed, false - something went wrong
+    *
+    */
+    static bool RemoveWaypointById(ChatHandler* handler, const ObjectGuid::LowType guid, bool deleteFromWaypointData = false)
+    {
+        ASSERT(handler);
+        const auto creatureRange = handler->GetSession()->GetPlayer()->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
+        if (creatureRange.first != creatureRange.second)
+        {
+            std::for_each(
+                creatureRange.first,
+                creatureRange.second,
+                [&](auto& guidCreaturePair) {
+                    if (deleteFromWaypointData)
+                    {
+                        // Set "wpguid" column to "empty"
+                        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_BY_WPGUID);
+                        stmt->SetData(0, guid);
+                        WorldDatabase.Execute(stmt);
+                    }
+
+                    // Remove creature
+                    Creature* creature = guidCreaturePair.second;
+                    creature->CombatStop();
+                    creature->DeleteFromDB();
+                    creature->AddObjectToRemoveList();
+                }
+            );
+
+            return true;
+        }
+        else
+        {
+            handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
+
+            return false;
+        }
+    }
+
     /**
     * Add a waypoint to a creature.
     *
@@ -427,11 +547,11 @@ public:
                 return true;
             }
 
-            std::string arg_string  = arg_2;
+            std::string arg_string = arg_2;
 
             if ((arg_string != "setid") && (arg_string != "delay") && (arg_string != "command")
-                    && (arg_string != "datalong") && (arg_string != "datalong2") && (arg_string != "dataint") && (arg_string != "posx")
-                    && (arg_string != "posy") && (arg_string != "posz") && (arg_string != "orientation"))
+                && (arg_string != "datalong") && (arg_string != "datalong2") && (arg_string != "dataint") && (arg_string != "posx")
+                && (arg_string != "posy") && (arg_string != "posz") && (arg_string != "orientation"))
             {
                 handler->SendSysMessage("|cffff33ffERROR: No valid argument present.|r");
                 return true;
@@ -556,8 +676,8 @@ public:
         // Check
         // Remember: "show" must also be the name of a column!
         if ((show != "delay") && (show != "action") && (show != "action_chance")
-                && (show != "move_type") && (show != "del") && (show != "move") && (show != "wpadd")
-           )
+            && (show != "move_type") && (show != "del") && (show != "move") && (show != "wpadd")
+            )
         {
             return false;
         }
@@ -736,62 +856,59 @@ public:
         return true;
     }
 
-    static bool HandleWpShowCommand(ChatHandler* handler, const char* args)
+    static bool HandleWpShowCommand(ChatHandler* handler, std::string show, Optional<ObjectGuid::LowType> guid)
     {
-        if (!*args)
-            return false;
-
-        // first arg: on, off, first, last
-        char* show_str = strtok((char*)args, " ");
-        if (!show_str)
-            return false;
-
-        // second arg: GUID (optional, if a creature is selected)
-        char* guid_str = strtok((char*)nullptr, " ");
-
         uint32 pathid = 0;
         Creature* target = handler->getSelectedCreature();
 
-        // Did player provide a PathID?
-
-        if (!guid_str)
-        {
-            // No PathID provided
-            // -> Player must have selected a creature
-
-            if (!target)
-            {
-                handler->SendErrorMessage(LANG_SELECT_CREATURE);
-                return false;
-            }
-
-            pathid = target->GetWaypointPath();
-        }
-        else
-        {
-            // PathID provided
-            // Warn if player also selected a creature
-            // -> Creature selection is ignored <-
-            if (target)
-                handler->SendSysMessage(LANG_WAYPOINT_CREATSELECTED);
-
-            pathid = atoi((char*)guid_str);
-        }
-
-        std::string show = show_str;
-
-        //handler->PSendSysMessage("wpshow - show: {}", show);
-
-        // Show info for the selected waypoint
+        // Checks for early return
         if (show == "info")
         {
-            // Check if the user did specify a visual waypoint
-            if (!target || target->GetEntry() != VISUAL_WAYPOINT)
+            // Check if the user is targeting a visual waypoint
+            if (!target || target->GetEntry() != wpEntry)
             {
                 handler->SendErrorMessage(LANG_WAYPOINT_VP_SELECT);
                 return false;
             }
+        }
+        // If command equals "off" we do not need a guid or target, just delete all WPs in the current map
+        else if (show != "off")
+        {
+            // Did player provide a PathID?
+            if (guid)
+            {
+                // PathID provided
+                // Warn if player also selected a creature
+                // -> Creature selection is ignored <-
+                if (target)
+                    handler->SendSysMessage(LANG_WAYPOINT_CREATSELECTED);
 
+                pathid = *guid;
+            }
+            else
+            {
+                // No PathID provided
+                // -> Player must have selected a creature
+                if (!target)
+                {
+                    handler->SendErrorMessage(LANG_SELECT_CREATURE);
+                    return false;
+                }
+
+                pathid = target->GetWaypointPath();
+
+                // If target hasn't got a path -> we should return an error
+                if (pathid == 0)
+                {
+                    handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUND, target->GetEntry());
+                    return false;
+                }
+            }
+        }
+
+        // Show info for the selected waypoint
+        if (show == "info")
+        {
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_ALL_BY_WPGUID);
 
             stmt->SetData(0, target->GetSpawnId());
@@ -825,218 +942,35 @@ public:
             return true;
         }
 
+        // Show all waypoints in #pathid
         if (show == "on")
         {
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_BY_ID);
+            handler->PSendSysMessage("|cff00ff00DEBUG: wp on, PathID: |r|cff00ffff{}|r", pathid);
 
-            stmt->SetData(0, pathid);
-
-            PreparedQueryResult result = WorldDatabase.Query(stmt);
-
-            if (!result)
-            {
-                handler->SendErrorMessage("|cffff33ffPath no found.|r");
-                return false;
-            }
-
-            handler->PSendSysMessage("|cff00ff00DEBUG: wp on, PathID: |cff00ffff{}|r", pathid);
-
-            // Delete all visuals for this NPC
-            stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_WPGUID_BY_ID);
-
-            stmt->SetData(0, pathid);
-
-            PreparedQueryResult result2 = WorldDatabase.Query(stmt);
-
-            if (result2)
-            {
-                bool hasError = false;
-                do
-                {
-                    Field* fields = result2->Fetch();
-                    uint32 wpguid = fields[0].Get<uint32>();
-                    Creature* creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(ObjectGuid::Create<HighGuid::Unit>(VISUAL_WAYPOINT, wpguid));
-
-                    if (!creature)
-                    {
-                        handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, wpguid);
-                        hasError = true;
-
-                        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
-                        stmt->SetData(0, wpguid);
-
-                        WorldDatabase.Execute(stmt);
-                    }
-                    else
-                    {
-                        creature->CombatStop();
-                        creature->DeleteFromDB();
-                        creature->AddObjectToRemoveList();
-                    }
-                } while (result2->NextRow());
-
-                if (hasError)
-                {
-                    handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR1);
-                    handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR2);
-                    handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR3);
-                }
-            }
-
-            do
-            {
-                Field* fields = result->Fetch();
-                uint32 point    = fields[0].Get<uint32>();
-                float x         = fields[1].Get<float>();
-                float y         = fields[2].Get<float>();
-                float z         = fields[3].Get<float>();
-
-                uint32 id = VISUAL_WAYPOINT;
-
-                Player* chr = handler->GetSession()->GetPlayer();
-                Map* map = chr->GetMap();
-                float o = chr->GetOrientation();
-
-                Creature* wpCreature = new Creature;
-                if (!wpCreature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
-                {
-                    handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-                    delete wpCreature;
-                    return false;
-                }
-
-                wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
-
-                // Set "wpguid" column to the visual waypoint
-                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_WPGUID);
-                stmt->SetData(0, wpCreature->GetSpawnId());
-                stmt->SetData(1, pathid);
-                stmt->SetData(2, point);
-
-                WorldDatabase.Execute(stmt);
-
-                // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
-                if (!wpCreature->LoadCreatureFromDB(wpCreature->GetSpawnId(), map, true, true))
-                {
-                    handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-                    delete wpCreature;
-                    return false;
-                }
-
-                if (target)
-                {
-                    wpCreature->SetDisplayId(target->GetDisplayId());
-                    wpCreature->SetObjectScale(0.5f);
-                    wpCreature->SetLevel(point > STRONG_MAX_LEVEL ? STRONG_MAX_LEVEL : point);
-                }
-            } while (result->NextRow());
-
-            handler->SendSysMessage("|cff00ff00Showing the current creature's path.|r");
-            return true;
+            return AddWaypointsByPreparedStatement(handler, WORLD_SEL_WAYPOINT_DATA_POS_BY_ID, pathid, target);
         }
 
+        // Show first waypoint in #pathid
         if (show == "first")
         {
-            handler->PSendSysMessage("|cff00ff00DEBUG: wp first, GUID: {}|r", pathid);
+            handler->PSendSysMessage("|cff00ff00DEBUG: wp first, PathID: |r|cff00ffff{}|r", pathid);
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_FIRST_BY_ID);
-            stmt->SetData(0, pathid);
-
-            PreparedQueryResult result = WorldDatabase.Query(stmt);
-            if (!result)
-            {
-                handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUND, pathid);
-                return false;
-            }
-
-            Field* fields = result->Fetch();
-            float x         = fields[0].Get<float>();
-            float y         = fields[1].Get<float>();
-            float z         = fields[2].Get<float>();
-            uint32 id = VISUAL_WAYPOINT;
-
-            Player* chr = handler->GetSession()->GetPlayer();
-            float o = chr->GetOrientation();
-            Map* map = chr->GetMap();
-
-            Creature* creature = new Creature;
-            if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
-            {
-                handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-                delete creature;
-                return false;
-            }
-
-            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
-            if (!creature->LoadCreatureFromDB(creature->GetSpawnId(), map, true, true))
-            {
-                handler->PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, id);
-                delete creature;
-                return false;
-            }
-
-            if (target)
-            {
-                creature->SetDisplayId(target->GetDisplayId());
-                creature->SetObjectScale(0.5f);
-            }
-
-            return true;
+            return AddWaypointsByPreparedStatement(handler, WORLD_SEL_WAYPOINT_DATA_POS_FIRST_BY_ID, pathid, target);
         }
 
+        // Show last waypoint in #pathid
         if (show == "last")
         {
             handler->PSendSysMessage("|cff00ff00DEBUG: wp last, PathID: |r|cff00ffff{}|r", pathid);
 
-            WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_LAST_BY_ID);
-            stmt->SetData(0, pathid);
-
-            PreparedQueryResult result = WorldDatabase.Query(stmt);
-            if (!result)
-            {
-                handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUNDLAST, pathid);
-                return false;
-            }
-
-            Field* fields = result->Fetch();
-            float x = fields[0].Get<float>();
-            float y = fields[1].Get<float>();
-            float z = fields[2].Get<float>();
-            float o = fields[3].Get<float>();
-            uint32 id = VISUAL_WAYPOINT;
-
-            Player* chr = handler->GetSession()->GetPlayer();
-            Map* map = chr->GetMap();
-
-            Creature* creature = new Creature;
-            if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, chr->GetPhaseMaskForSpawn(), id, 0, x, y, z, o))
-            {
-                handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);
-                delete creature;
-                return false;
-            }
-
-            creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
-            if (!creature->LoadCreatureFromDB(creature->GetSpawnId(), map, true, true))
-            {
-                handler->PSendSysMessage(LANG_WAYPOINT_NOTCREATED, id);
-                delete creature;
-                return false;
-            }
-
-            if (target)
-            {
-                creature->SetDisplayId(target->GetDisplayId());
-                creature->SetObjectScale(0.5f);
-            }
-
-            return true;
+            return AddWaypointsByPreparedStatement(handler, WORLD_SEL_WAYPOINT_DATA_POS_LAST_BY_ID, pathid, target);
         }
 
+        // Delete all waypoints
         if (show == "off")
         {
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_BY_ID);
-            stmt->SetArguments(1, 1, 1);
+            stmt->SetArguments(wpEntry, wpEntry, wpEntry);
 
             PreparedQueryResult result = WorldDatabase.Query(stmt);
             if (!result)
@@ -1045,42 +979,22 @@ public:
                 return false;
             }
 
-            bool hasError = false;
-
-            do
+            if (result)
             {
-                Field* fields = result->Fetch();
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
-                Creature* creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(ObjectGuid::Create<HighGuid::Unit>(VISUAL_WAYPOINT, guid));
-                if (!creature)
+                bool hasError = false;
+
+                do
                 {
-                    handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
-                    hasError = true;
+                    Field* fields = result->Fetch();
+                    ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                    hasError |= !RemoveWaypointById(handler, guid, true);
 
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
+                } while (result->NextRow());
 
-                    stmt->SetData(0, guid);
-
-                    WorldDatabase.Execute(stmt);
-                }
-                else
+                if (hasError)
                 {
-                    creature->CombatStop();
-                    creature->DeleteFromDB();
-                    creature->AddObjectToRemoveList();
+                    handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR1);
                 }
-            } while (result->NextRow());
-
-            // set "wpguid" column to "empty" - no visual waypoint spawned
-            stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_ALL_WPGUID);
-
-            WorldDatabase.Execute(stmt);
-
-            if (hasError)
-            {
-                handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR1);
-                handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR2);
-                handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR3);
             }
 
             handler->SendSysMessage(LANG_WAYPOINT_VP_ALLREMOVED);
