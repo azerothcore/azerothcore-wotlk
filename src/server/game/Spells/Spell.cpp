@@ -7693,6 +7693,8 @@ SpellCastResult Spell::CheckItems()
 
         if (Item* weaponItem = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
             m_weaponItemGUID = weaponItem->GetGUID();
+        else
+            m_weaponItemGUID = ObjectGuid::Empty;
     }
 
     return SPELL_CAST_OK;
