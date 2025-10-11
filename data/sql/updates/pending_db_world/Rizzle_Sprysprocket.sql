@@ -108,5 +108,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (23025, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 61, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rizzle\'s Depth Charge - On Just Summoned - Set Swim On'),
 (23025, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 33554432, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rizzle\'s Depth Charge - On Just Summoned - Set Flags Not Selectable'),
 (23025, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rizzle\'s Depth Charge - On Just Summoned - Set Reactstate Passive'),
-(23025, 0, 4, 5, 101, 0, 100, 0, 1, 5, 1000, 1000, 1000, 0, 11, 38576, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Rizzle\'s Depth Charge - On 1 or More Players in Range - Cast \'Knockback\''),
+(23025, 0, 4, 5, 101, 0, 100, 0, 1, 5, 1000, 1000, 1000, 0, 11, 38576, 2, 0, 0, 0, 0, 21, 5, 0, 0, 0, 0, 0, 0, 0, 'Rizzle\'s Depth Charge - On 1 or More Players in Range - Cast \'Knockback\''),
 (23025, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rizzle\'s Depth Charge - On 1 or More Players in Range - Despawn In 1000 ms');
