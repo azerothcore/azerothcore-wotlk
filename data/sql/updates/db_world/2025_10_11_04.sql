@@ -1,3 +1,4 @@
+-- DB update 2025_10_11_03 -> 2025_10_11_04
 --
 DELETE FROM `creature` WHERE (`guid` = 248652) AND (`id1` = 14693);
 DELETE FROM `game_event_creature` WHERE (`guid` = 248652) AND (`eventEntry` = 120);
