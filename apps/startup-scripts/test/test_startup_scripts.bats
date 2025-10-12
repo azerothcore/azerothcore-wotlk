@@ -160,7 +160,19 @@ teardown() {
     # Create registry with pm2 provider service
     cat > "$AC_SERVICE_CONFIG_DIR/service_registry.json" << 'EOF'
 [
-  {"name":"test-world","provider":"pm2","type":"service","bin_path":"/bin/worldserver","args":"","systemd_type":"--user","restart_policy":"always"}
+  {
+    "name":"test-world",
+    "provider":"pm2",
+    "type":"service",
+    "bin_path":"/bin/worldserver",
+    "args":"",
+    "systemd_type":"--user",
+    "restart_policy":"always",
+    "exec":{
+      "command":"/bin/true",
+      "args":[]
+    }
+  }
 ]
 EOF
     # Create minimal service config and run-engine config files required by 'send'
@@ -215,7 +227,19 @@ EOF
     # Create registry and config as in previous test
     cat > "$AC_SERVICE_CONFIG_DIR/service_registry.json" << 'EOF'
 [
-  {"name":"test-world","provider":"pm2","type":"service","bin_path":"/bin/worldserver","args":"","systemd_type":"--user","restart_policy":"always"}
+  {
+    "name":"test-world",
+    "provider":"pm2",
+    "type":"service",
+    "bin_path":"/bin/worldserver",
+    "args":"",
+    "systemd_type":"--user",
+    "restart_policy":"always",
+    "exec":{
+      "command":"/bin/true",
+      "args":[]
+    }
+  }
 ]
 EOF
     echo "RUN_ENGINE_CONFIG_FILE=\"$AC_SERVICE_CONFIG_DIR/test-world-run-engine.conf\"" > "$AC_SERVICE_CONFIG_DIR/test-world.conf"

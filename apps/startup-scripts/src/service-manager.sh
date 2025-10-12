@@ -97,59 +97,51 @@ function make_path_absolute() {
     echo "$(realpath -m "$input" 2>/dev/null || echo "$input")"
 }
 
-# Relativize absolute paths embedded in a command string (space-separated tokens
-# and key=value forms). Keeps non-path tokens intact.
-function relativize_command_string() {
-    local cmd_str="$1"
-    local token
-    local out=()
-    # Robust tokenization: use eval to split respecting quotes and spaces in paths.
-    # This handles quoted arguments and paths with spaces.
-    eval "set -- $cmd_str"
-    for token in "$@"; do
-        # Handle key=value form
-        if [[ "$token" == *=* ]]; then
-            local key="${token%%=*}"
-            local val="${token#*=}"
-            if [[ "$val" = /* ]]; then
-                val="$(make_path_relative "$val")"
-                token="$key=$val"
-            fi
+# Tokenize a shell command string without executing it. Supports basic quoting
+# and escaping rules so paths with spaces remain intact.
+# Serialize a command definition (binary + args) to JSON while converting paths
+# to be relative to CONFIG_DIR when possible.
+function serialize_exec_definition() {
+    local command_path="$1"
+    shift
+    local -a args=("$@")
+    local rel_command="$command_path"
+
+    if [[ -n "$command_path" ]]; then
+        rel_command="$(make_path_relative "$command_path")"
+    fi
+
+    local -a rel_args=()
+    local arg
+    for arg in "${args[@]}"; do
+        if [[ "$arg" == /* ]]; then
+            rel_args+=("$(make_path_relative "$arg")")
         else
-            # Plain token starting with absolute path
-            if [[ "$token" = /* ]]; then
-                token="$(make_path_relative "$token")"
-            fi
+            rel_args+=("$arg")
         fi
-        out+=("$token")
     done
-    printf '%s ' "${out[@]}" | sed 's/ $//'
+
+    local args_json
+    args_json=$(printf '%s\0' "${rel_args[@]}" | jq -R -s 'split("\u0000")[:-1]')
+
+    jq -n --arg command "$rel_command" --argjson args "$args_json" '{command: $command, args: $args}'
 }
 
-# Absolutize relative paths embedded in a command string by resolving
-# them against CONFIG_DIR. Leaves flags and non-path tokens unchanged.
-function absolutize_command_string() {
-    local cmd_str="$1"
+# Combine command + args into a shell-safe string suitable for pm2/systemd
+# ExecStart lines. Each token is bash-quoted to preserve spaces.
+function render_exec_command() {
+    local command_path="$1"
+    shift
+    local -a args=("$@")
+    local parts=()
     local token
-    local out=()
-    read -r -a tokens <<< "$cmd_str"
-    for token in "${tokens[@]}"; do
-        if [[ "$token" == *=* ]]; then
-            local key="${token%%=*}"
-            local val="${token#*=}"
-            if [[ -n "$val" && ! "$val" = /* && "$val" == */* ]]; then
-                val="$(make_path_absolute "$val")"
-                token="$key=$val"
-            fi
-        else
-            # Candidate relative path tokens (contain a slash but aren't absolute)
-            if [[ "$token" == */* && ! "$token" = /* && ! "$token" == -* ]]; then
-                token="$(make_path_absolute "$token")"
-            fi
-        fi
-        out+=("$token")
+
+    parts+=("$(printf '%q' "$command_path")")
+    for token in "${args[@]}"; do
+        parts+=("$(printf '%q' "$token")")
     done
-    printf '%s ' "${out[@]}" | sed 's/ $//'
+
+    (IFS=' '; printf '%s' "${parts[*]}")
 }
 
 # Check dependencies
@@ -173,15 +165,10 @@ function add_service_to_registry() {
     local gdb_enabled="$9"
     local pm2_opts="${10}"
     local server_config="${11}"
-    local real_bin_path="${12:-}" # Optional: execution command (for PM2/systemd this is the run-engine command)
+    local exec_definition="${12:-}" # JSON payload describing command + args
 
     # Convert paths to relative if possible for portability
     local relative_bin_path="$(make_path_relative "$bin_path")"
-    local relative_exec_command=""
-    if [ -n "$real_bin_path" ]; then
-        # Treat as a command string; relativize embedded paths
-        relative_exec_command="$(relativize_command_string "$real_bin_path")"
-    fi
     
     # Convert server_config to relative if possible for portability  
     local relative_server_config=""
@@ -198,11 +185,14 @@ function add_service_to_registry() {
 
     # Add the new entry to the registry
     tmp_file=$(mktemp)
+    local exec_json_payload="null"
+    if [ -n "$exec_definition" ]; then
+        exec_json_payload="$exec_definition"
+    fi
     jq --arg name "$service_name" \
        --arg provider "$provider" \
        --arg type "$service_type" \
        --arg bin_path "$relative_bin_path" \
-       --arg real_bin_path "$relative_exec_command" \
        --arg args "$args" \
        --arg created "$(date -Iseconds)" \
        --arg systemd_type "$systemd_type" \
@@ -211,7 +201,8 @@ function add_service_to_registry() {
        --arg gdb_enabled "$gdb_enabled" \
        --arg pm2_opts "$pm2_opts" \
        --arg server_config "$relative_server_config" \
-       '. += [{"name": $name, "provider": $provider, "type": $type, "bin_path": $bin_path, "real_bin_path": $real_bin_path, "args": $args, "created": $created, "status": "active", "systemd_type": $systemd_type, "restart_policy": $restart_policy, "session_manager": $session_manager, "gdb_enabled": $gdb_enabled, "pm2_opts": $pm2_opts, "server_config": $server_config}]' \
+       --argjson exec "$exec_json_payload" \
+       '. += [{"name": $name, "provider": $provider, "type": $type, "bin_path": $bin_path, "exec": $exec, "args": $args, "created": $created, "status": "active", "systemd_type": $systemd_type, "restart_policy": $restart_policy, "session_manager": $session_manager, "gdb_enabled": $gdb_enabled, "pm2_opts": $pm2_opts, "server_config": $server_config}]' \
        "$REGISTRY_FILE" > "$tmp_file" && mv "$tmp_file" "$REGISTRY_FILE"
 
     echo -e "${GREEN}Service '$service_name' added to registry${NC}"
@@ -313,22 +304,29 @@ function restore_missing_services() {
         local name=$(echo "$service" | jq -r '.name')
         local provider=$(echo "$service" | jq -r '.provider')
         local service_type=$(echo "$service" | jq -r '.type') 
-        local bin_path_raw=$(echo "$service" | jq -r '.bin_path')
-        local args=$(echo "$service" | jq -r '.args')
         local systemd_type=$(echo "$service" | jq -r '.systemd_type // "--user"')
         local restart_policy=$(echo "$service" | jq -r '.restart_policy // "always"')
         local session_manager=$(echo "$service" | jq -r '.session_manager // "none"')
         local gdb_enabled=$(echo "$service" | jq -r '.gdb_enabled // "0"')
         local pm2_opts=$(echo "$service" | jq -r '.pm2_opts // ""')
-        local server_config_raw=$(echo "$service" | jq -r '.server_config // ""')
-        
-        # Convert paths back to absolute for operation
-        local bin_path="$(make_path_absolute "$bin_path_raw")"
-        local server_config=""
-        if [ -n "$server_config_raw" ] && [ "$server_config_raw" != "null" ] && [ "$server_config_raw" != "" ]; then
-            server_config="$(make_path_absolute "$server_config_raw")"
-        else
-            server_config="$server_config_raw"
+        local status=$(echo "$service" | jq -r '.status // "active"')
+        local service_resolved="$(get_service_info_resolved "$name")"
+        local bin_path="$(echo "$service_resolved" | jq -r '.bin_path // "unknown"')"
+        local server_config="$(echo "$service_resolved" | jq -r '.server_config // ""')"
+        if [ "$server_config" = "null" ]; then
+            server_config=""
+        fi
+        local exec_definition_raw="$(echo "$service" | jq -c '.exec // null')"
+        local exec_command_abs="$(echo "$service_resolved" | jq -r '.exec.command // ""')"
+        local -a exec_args_abs=()
+        if [ -n "$exec_definition_raw" ] && [ "$exec_definition_raw" != "null" ]; then
+            while IFS= read -r arg; do
+                exec_args_abs+=("$arg")
+            done < <(echo "$service_resolved" | jq -r '.exec.args[]?')
+        fi
+        local exec_command_string=""
+        if [ -n "$exec_command_abs" ] && [ "$exec_command_abs" != "null" ]; then
+            exec_command_string="$(render_exec_command "$exec_command_abs" "${exec_args_abs[@]}")"
         fi
         
         echo ""
@@ -338,13 +336,20 @@ function restore_missing_services() {
         
         if [ "$bin_path" = "unknown" ] || [ "$bin_path" = "null" ] || [ "$status" = "migrated" ]; then
             echo "  Binary: <needs manual configuration>"
-            echo "  Args: <needs manual configuration>"
+            echo "  Exec: <needs manual configuration>"
             echo ""
             echo -e "${YELLOW}This service needs to be recreated manually:${NC}"
             echo "  $0 create $service_type $name --provider $provider --bin-path /path/to/your/bin"
         else
             echo "  Binary: $bin_path"
-            echo "  Args: $args"
+            if [ -n "$exec_command_string" ]; then
+                echo "  Exec: $exec_command_string"
+            else
+                echo "  Exec: <unavailable>"
+            fi
+            if [ -n "$server_config" ]; then
+                echo "  Server config: $server_config"
+            fi
         fi
         echo ""
         
@@ -361,18 +366,26 @@ function restore_missing_services() {
                 else
                     echo -e "${BLUE}Recreating service '$name'...${NC}"
                     if [ "$provider" = "pm2" ]; then
-                        if [ "$args" != "null" ] && [ -n "$args" ]; then
-                            pm2_create_service "$name" "$bin_path $args" "$restart_policy" $pm2_opts
+                        if [ -z "$exec_command_string" ] || [ "$exec_definition_raw" = "null" ]; then
+                            echo -e "${RED}Cannot recreate PM2 service automatically: missing exec definition${NC}"
                         else
-                            pm2_create_service "$name" "$bin_path" "$restart_policy" $pm2_opts
+                            if [ -n "$pm2_opts" ]; then
+                                pm2_create_service "$name" "$exec_command_string" "$restart_policy" "$bin_path" "$server_config" "$exec_definition_raw" $pm2_opts
+                            else
+                                pm2_create_service "$name" "$exec_command_string" "$restart_policy" "$bin_path" "$server_config" "$exec_definition_raw"
+                            fi
                         fi
                     elif [ "$provider" = "systemd" ]; then
                         echo -e "${BLUE}Attempting to recreate systemd service '$name' automatically...${NC}"
-                        if systemd_create_service "$name" "$bin_path $args" "$restart_policy" "$systemd_type" "$session_manager" "$gdb_enabled" "$server_config"; then
-                            echo -e "${GREEN}Systemd service '$name' recreated successfully${NC}"
+                        if [ -z "$exec_command_string" ] || [ "$exec_definition_raw" = "null" ]; then
+                            echo -e "${RED}Cannot recreate systemd service automatically: missing exec definition${NC}"
                         else
-                            echo -e "${RED}Failed to recreate systemd service '$name'. Please recreate manually.${NC}"
-                            echo "  $0 create $name $service_type --provider systemd --bin-path $bin_path"
+                            if systemd_create_service "$name" "$exec_command_string" "$restart_policy" "$bin_path" "$server_config" "$exec_definition_raw" "$systemd_type"; then
+                                echo -e "${GREEN}Systemd service '$name' recreated successfully${NC}"
+                            else
+                                echo -e "${RED}Failed to recreate systemd service '$name'. Please recreate manually.${NC}"
+                                echo "  $0 create $name $service_type --provider systemd --bin-path $bin_path"
+                            fi
                         fi
                     fi
                 fi
@@ -616,12 +629,14 @@ function get_service_info_resolved() {
     
     # Extract paths and convert them
     local bin_path_raw="$(echo "$service_info" | jq -r '.bin_path // ""')"
-    local real_bin_path_raw="$(echo "$service_info" | jq -r '.real_bin_path // ""')"
     local server_config_raw="$(echo "$service_info" | jq -r '.server_config // ""')"
+    local exec_command_raw="$(echo "$service_info" | jq -r '.exec.command // ""')"
+    local exec_args_raw_json="$(echo "$service_info" | jq -c '.exec.args // []')"
     
     local bin_path_resolved=""
-    local real_bin_path_resolved=""
     local server_config_resolved=""
+    local exec_command_resolved=""
+    local -a exec_args_resolved=()
     
     if [ -n "$bin_path_raw" ] && [ "$bin_path_raw" != "null" ] && [ "$bin_path_raw" != "" ]; then
         bin_path_resolved="$(make_path_absolute "$bin_path_raw")"
@@ -629,11 +644,22 @@ function get_service_info_resolved() {
         bin_path_resolved="$bin_path_raw"
     fi
 
-    # real_bin_path contains the exec command; absolutize embedded relative paths
-    if [ -n "$real_bin_path_raw" ] && [ "$real_bin_path_raw" != "null" ]; then
-        real_bin_path_resolved="$(absolutize_command_string "$real_bin_path_raw")"
+    if [ -n "$exec_command_raw" ] && [ "$exec_command_raw" != "null" ]; then
+        exec_command_resolved="$(make_path_absolute "$exec_command_raw")"
     else
-        real_bin_path_resolved="$real_bin_path_raw"
+        exec_command_resolved="$exec_command_raw"
+    fi
+
+    if [ -n "$exec_args_raw_json" ] && [ "$exec_args_raw_json" != "null" ]; then
+        while IFS= read -r arg; do
+            if [[ -z "$arg" ]]; then
+                exec_args_resolved+=("$arg")
+            elif [[ "$arg" == /* ]]; then
+                exec_args_resolved+=("$(make_path_absolute "$arg")")
+            else
+                exec_args_resolved+=("$arg")
+            fi
+        done < <(echo "$exec_args_raw_json" | jq -r '.[]?')
     fi
     
     if [ -n "$server_config_raw" ] && [ "$server_config_raw" != "null" ] && [ "$server_config_raw" != "" ]; then
@@ -641,29 +667,35 @@ function get_service_info_resolved() {
     else
         server_config_resolved="$server_config_raw"
     fi
+
+    local exec_args_resolved_json
+    exec_args_resolved_json=$(printf '%s\0' "${exec_args_resolved[@]}" | jq -R -s 'split("\u0000")[:-1]')
+    local exec_resolved_json
+    exec_resolved_json=$(jq -n --arg command "${exec_command_resolved:-}" --argjson args "$exec_args_resolved_json" '{command: $command, args: $args}')
     
     # Return the service info with resolved paths
     echo "$service_info" | jq --arg bin_path "$bin_path_resolved" \
-                              --arg real_bin_path "$real_bin_path_resolved" \
                               --arg server_config "$server_config_resolved" \
-                              '.bin_path = $bin_path | .real_bin_path = $real_bin_path | .server_config = $server_config'
+                              --argjson exec "$exec_resolved_json" \
+                              '.bin_path = $bin_path | .exec = $exec | .server_config = $server_config'
 }
 
 # PM2 service management functions
 function pm2_create_service() {
     local service_name="$1"
-    local command="$2"
+    local command_string="$2"
     local restart_policy="$3"
     local real_bin_path="$4"
     local server_config_path="$5"
-    shift 5
+    local exec_definition="$6"
+    shift 6
     
     check_pm2 || return 1
     
     # Parse additional PM2 options
     local max_memory=""
     local max_restarts=""
-    local additional_args=""
+    local -a extra_pm2_args=()
     
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -676,39 +708,75 @@ function pm2_create_service() {
                 shift 2
                 ;;
             *)
-                additional_args+=" $1"
+                extra_pm2_args+=("$1")
                 shift
                 ;;
         esac
     done
-    
+
+    if [ -z "$exec_definition" ] || [ "$exec_definition" = "null" ]; then
+        echo -e "${RED}Error: Missing exec definition for PM2 service '$service_name'${NC}"
+        return 1
+    fi
+
+    local exec_command_rel
+    exec_command_rel=$(echo "$exec_definition" | jq -r '.command // empty')
+    if [ -z "$exec_command_rel" ] || [ "$exec_command_rel" = "null" ]; then
+        echo -e "${RED}Error: Exec command not defined for service '$service_name'${NC}"
+        return 1
+    fi
+
+    local exec_command_abs
+    exec_command_abs="$(make_path_absolute "$exec_command_rel")"
+    local -a exec_args_abs=()
+    while IFS= read -r arg; do
+        if [[ -z "$arg" ]]; then
+            exec_args_abs+=("$arg")
+        elif [[ "$arg" == /* ]]; then
+            exec_args_abs+=("$(make_path_absolute "$arg")")
+        elif [[ "$arg" == */* && "$arg" != -* ]]; then
+            exec_args_abs+=("$(make_path_absolute "$arg")")
+        else
+            exec_args_abs+=("$arg")
+        fi
+    done < <(echo "$exec_definition" | jq -r '.args[]?')
 
     # Set stop exit codes based on restart policy
-    local stop_exit_codes=""
+    local -a pm2_args=(start "$exec_command_abs" --name "$service_name")
     if [ "$restart_policy" = "always" ]; then
         # PM2 will restart on any exit code (including 0)
-        stop_exit_codes=""
+        :
     else
         # PM2 will not restart on clean shutdown (exit code 0)
-        stop_exit_codes=" --stop-exit-codes 0"
+        pm2_args+=("--stop-exit-codes" "0")
     fi
-    # Build PM2 start command with AzerothCore environment variable
-    local pm2_cmd="AC_LAUNCHED_BY_PM2=1 pm2 start '$command$additional_args' --name '$service_name'$stop_exit_codes"
     
     # Add memory limit if specified
     if [ -n "$max_memory" ]; then
-        pm2_cmd+=" --max-memory-restart $max_memory"
+        pm2_args+=("--max-memory-restart" "$max_memory")
     fi
     
     # Add max restarts if specified
     if [ -n "$max_restarts" ]; then
-        pm2_cmd+=" --max-restarts $max_restarts"
+        pm2_args+=("--max-restarts" "$max_restarts")
+    fi
+
+    if [ ${#extra_pm2_args[@]} -gt 0 ]; then
+        pm2_args+=("${extra_pm2_args[@]}")
+    fi
+
+    if [ ${#exec_args_abs[@]} -gt 0 ]; then
+        pm2_args+=("--")
+        pm2_args+=("${exec_args_abs[@]}")
     fi
     
     # Execute command
     echo -e "${YELLOW}Creating PM2 service: $service_name${NC}"
+    if [ -n "$command_string" ]; then
+        echo "  Exec: $command_string"
+    fi
     
-    if eval "$pm2_cmd"; then
+    if AC_LAUNCHED_BY_PM2=1 pm2 "${pm2_args[@]}"; then
         echo -e "${GREEN}PM2 service '$service_name' created successfully${NC}"
         pm2 save
         
@@ -717,8 +785,12 @@ function pm2_create_service() {
         pm2 startup --auto >/dev/null 2>&1 || true
         
         # Add to registry (use real binary path instead of command for portability)
-        local clean_command="$command$additional_args"
-        add_service_to_registry "$service_name" "pm2" "executable" "$real_bin_path" "$additional_args" "" "$restart_policy" "none" "0" "$max_memory $max_restarts" "$server_config_path" "$command"
+        local extra_args_serialized=""
+        if [ ${#extra_pm2_args[@]} -gt 0 ]; then
+            extra_args_serialized="$(printf '%s ' "${extra_pm2_args[@]}")"
+            extra_args_serialized="${extra_args_serialized% }"
+        fi
+        add_service_to_registry "$service_name" "pm2" "executable" "$real_bin_path" "$extra_args_serialized" "" "$restart_policy" "none" "0" "$max_memory $max_restarts" "$server_config_path" "$exec_definition"
 
         return 0
     else
@@ -813,11 +885,12 @@ function systemd_create_service() {
     local restart_policy="$3"
     local real_bin_path="$4"
     local server_config_path="$5"
+    local exec_definition="$6"
     local systemd_type="--user"
     local bin_path=""
     local gdb_enabled="0"
     local server_config=""
-    shift 5
+    shift 6
     
     check_systemd || return 1
     
@@ -954,7 +1027,7 @@ EOF
     echo -e "${GREEN}Systemd service '$service_name' created successfully with session manager '$session_manager'${NC}"
     
     # Add to registry
-    add_service_to_registry "$service_name" "systemd" "service" "$real_bin_path" "" "$systemd_type" "$restart_policy" "$session_manager" "$gdb_enabled" "" "$server_config_path" "$command"
+    add_service_to_registry "$service_name" "systemd" "service" "$real_bin_path" "" "$systemd_type" "$restart_policy" "$session_manager" "$gdb_enabled" "" "$server_config_path" "$exec_definition"
     
     return 0
 }
@@ -1260,24 +1333,29 @@ SYSTEMD_TYPE="$systemd_type"
 PM2_OPTS="$pm2_opts"
 EOF
     
-    # Build run-engine command
-    local run_engine_cmd="$SCRIPT_DIR/run-engine start $server_binary_path --config $run_engine_config"
+    # Build run-engine command definition
+    local run_engine_path="$SCRIPT_DIR/run-engine"
+    local -a run_engine_args=("start" "$server_binary_path" "--config" "$run_engine_config")
+    local run_engine_cmd
+    run_engine_cmd="$(render_exec_command "$run_engine_path" "${run_engine_args[@]}")"
+    local exec_definition
+    exec_definition="$(serialize_exec_definition "$run_engine_path" "${run_engine_args[@]}")"
     
     # Create the actual service
     local service_creation_success=false
     if [ "$provider" = "pm2" ]; then
         if [ -n "$pm2_opts" ]; then
-            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" $pm2_opts; then
+            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" "$exec_definition" $pm2_opts; then
                 service_creation_success=true
             fi
         else
-            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config"; then
+            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" "$exec_definition"; then
                 service_creation_success=true
             fi
         fi
         
     elif [ "$provider" = "systemd" ]; then
-        if systemd_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" "$systemd_type"; then
+        if systemd_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" "$exec_definition" "$systemd_type"; then
             service_creation_success=true
         fi
     fi
@@ -2010,8 +2088,8 @@ function attach_interactive_shell() {
 }
 
 # Normalize existing registry entries to use relative paths for fields that
-# represent filesystem paths (bin_path, server_config) and embedded paths in
-# command strings (real_bin_path) when CONFIG_DIR is set.
+# represent filesystem paths (bin_path, server_config) and refresh exec command
+# definitions to the new schema.
 function normalize_registry_paths() {
     if [ ! -f "$REGISTRY_FILE" ]; then
         echo -e "${YELLOW}No registry file found at: $REGISTRY_FILE${NC}"
@@ -2033,13 +2111,12 @@ function normalize_registry_paths() {
         [ -z "$entry" ] && continue
 
         # Extract raw values (empty if null or missing)
-        local bin_path_raw server_config_raw real_cmd_raw
+        local bin_path_raw server_config_raw
         bin_path_raw=$(echo "$entry" | jq -r '.bin_path // empty')
         server_config_raw=$(echo "$entry" | jq -r '.server_config // empty')
-        real_cmd_raw=$(echo "$entry" | jq -r '.real_bin_path // empty')
 
         # Compute normalized values
-        local bin_path_new server_config_new real_cmd_new
+        local bin_path_new server_config_new
         if [ -n "$bin_path_raw" ]; then
             bin_path_new="$(make_path_relative "$bin_path_raw")"
         else
@@ -2050,23 +2127,41 @@ function normalize_registry_paths() {
         else
             server_config_new=""
         fi
-        if [ -n "$real_cmd_raw" ]; then
-            real_cmd_new="$(relativize_command_string "$real_cmd_raw")"
-        else
-            real_cmd_new=""
+
+        local exec_command_raw
+        exec_command_raw=$(echo "$entry" | jq -r '.exec.command // empty')
+        local exec_args_array=()
+        local exec_json_new="null"
+        if [ -n "$exec_command_raw" ]; then
+            while IFS= read -r arg; do
+                exec_args_array+=("$arg")
+            done < <(echo "$entry" | jq -r '.exec.args[]?')
+            exec_json_new="$(serialize_exec_definition "$exec_command_raw" "${exec_args_array[@]}")"
         fi
 
         # Update entry (only override when non-empty; preserve nulls)
         local updated
-        updated=$(echo "$entry" | jq \
-            --arg bin "$bin_path_new" \
-            --arg srv "$server_config_new" \
-            --arg rcmd "$real_cmd_new" \
-            '
-              (.bin_path)     |= (if $bin  != "" then $bin  else . end) |
-              (.server_config) |= (if $srv  != "" then $srv  else . end) |
-              (.real_bin_path) |= (if $rcmd != "" then $rcmd else . end)
-            ')
+        if [ "$exec_json_new" != "null" ]; then
+            updated=$(echo "$entry" | jq \
+                --arg bin "$bin_path_new" \
+                --arg srv "$server_config_new" \
+                --argjson exec "$exec_json_new" \
+                '
+                  (.bin_path)     |= (if $bin  != "" then $bin  else . end) |
+                  (.server_config) |= (if $srv  != "" then $srv  else . end) |
+                  (.exec)          =  $exec |
+                  del(.real_bin_path)
+                ')
+        else
+            updated=$(echo "$entry" | jq \
+                --arg bin "$bin_path_new" \
+                --arg srv "$server_config_new" \
+                '
+                  (.bin_path)     |= (if $bin  != "" then $bin  else . end) |
+                  (.server_config) |= (if $srv  != "" then $srv  else . end) |
+                  del(.real_bin_path)
+                ')
+        fi
 
         # Append to new array
         if ! jq --argjson e "$updated" '. += [$e]' "$tmp_file" > "$tmp_file.new"; then
