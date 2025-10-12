@@ -178,7 +178,12 @@ struct npc_kiljaeden_controller : public NullCreatureAI
     {
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_SINISTER_REFLECTION)
-            summon->SetInCombatWithZone();
+        {
+            summon->m_Events.AddEventAtOffset([summon] {
+                if (summon && summon->IsAlive() && !summon->IsInCombat())
+                    summon->SetInCombatWithZone();
+            }, 5s);
+        }
         else if (summon->GetEntry() == NPC_KALECGOS_KJ)
             summon->setActive(true);
     }
@@ -381,14 +386,8 @@ struct boss_kiljaeden : public BossAI
                     if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                     {
                         anveena->RemoveAllAuras();
-                        anveena->DespawnOrUnsummon(3500);
-                    }
-                }, 34s);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-                    {
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
+                        anveena->DespawnOrUnsummon(1500);
                         DoCastSelf(SPELL_CUSTOM_08_STATE, true);
                         me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         scheduler.CancelAll();
@@ -1187,6 +1186,26 @@ class spell_kiljaeden_dragon_breath : public SpellScript
     }
 };
 
+// 45848 - Shield of the Blue
+class spell_kiljaeden_shield_of_the_blue : public AuraScript
+{
+    PrepareAuraScript(spell_kiljaeden_shield_of_the_blue);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->RemoveAurasDueToSpell(SPELL_FIRE_BLOOM);
+            target->RemoveMovementImpairingAuras(false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_shield_of_the_blue::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_kiljaeden()
 {
     RegisterSunwellPlateauCreatureAI(npc_kiljaeden_controller);
@@ -1202,4 +1221,5 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     RegisterSpellScript(spell_kiljaeden_dragon_breath);
+    RegisterSpellScript(spell_kiljaeden_shield_of_the_blue);
 }

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -173,6 +173,10 @@ INSERT INTO `pool_template` VALUES
 (136,1,'Bloodsail Charts - Stranglethorn Vale'),
 (137,1,'Tanaris - Inconspicuous Landmark Pool'),
 (138,2,'Glinting Mud - 2/10'),
+(139,10,'Eastern Kingdoms - Giant Clam - 10/32'),
+(140,2,'Kalimdor - Giant Clam - 2/4'),
+(141,12,'Blackfathom Deeps - Giant Clam - 12/27'),
+(142,20,'Eastern Kingdoms - Giant Clam - 20/80'),
 (145,1,''),
 (146,1,''),
 (147,1,''),
@@ -7384,6 +7388,36 @@ INSERT INTO `pool_template` VALUES
 (22381,1,'Scarlet Crusader/Preacher/Marksman Spawn (25 out 26)'),
 (22382,1,'Scarlet Crusader/Preacher/Marksman Spawn (26 out 26)'),
 (22383,6,'Havenshire Stallions/Mares/Colts (1 out 1)'),
+(22384,50,'Saronite Arrows (Phase 2)'),
+(22385,40,'Saronite Arrows (Phase 1)'),
+(22386,1,'Citizen of Havenshire random spawn 1'),
+(22387,1,'Citizen of Havenshire random spawn 2'),
+(22388,1,'Citizen of Havenshire random spawn 3'),
+(22389,1,'Citizen of Havenshire random spawn 4'),
+(22390,1,'Citizen of Havenshire random spawn 5'),
+(22391,1,'Citizen of Havenshire random spawn 6'),
+(22392,1,'Citizen of Havenshire random spawn 7'),
+(22393,1,'Citizen of Havenshire random spawn 8'),
+(22394,1,'Citizen of Havenshire random spawn 9'),
+(22395,1,'Citizen of Havenshire random spawn 10'),
+(22396,1,'Citizen of Havenshire random spawn 11'),
+(22397,1,'Citizen of Havenshire random spawn 12'),
+(22398,1,'Citizen of Havenshire random spawn 13'),
+(22399,1,'Citizen of Havenshire random spawn 14'),
+(22400,1,'Citizen of Havenshire random spawn 15'),
+(22401,1,'Citizen of Havenshire random spawn 16'),
+(22402,1,'Citizen of Havenshire random spawn 17'),
+(22403,1,'Citizen of Havenshire random spawn 18'),
+(22404,1,'Citizen of Havenshire random spawn 19'),
+(22405,1,'Citizen of Havenshire random spawn 20'),
+(22406,1,'Citizen of Havenshire random spawn 21'),
+(22407,1,'Citizen of Havenshire random spawn 22'),
+(22408,1,'Azure Spellbinder/Inquisitor 1'),
+(22409,1,'Azure Spellbinder/Inquisitor 2'),
+(22410,1,'Azure Spellbinder/Inquisitor 3'),
+(22411,1,'Azure Spellbinder/Inquisitor 4'),
+(22412,1,'Azure Spellbinder/Inquisitor 5'),
+(22413,1,'Azure Spellbinder/Inquisitor 6'),
 (42939,1,'Drogoth the Roamer'),
 (43157,1,'Ripscale'),
 (50000,5,'Raised Mud type 10 (190779)'),
@@ -7413,5 +7447,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:20
-
+-- Dump completed on 2025-07-19 12:09:28

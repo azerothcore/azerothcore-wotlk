@@ -567,6 +567,13 @@ enum class SearchMethod
 
 typedef std::list<Player*> SharedVisionList;
 
+enum class DualWieldMode : uint8
+{
+    AUTO        = 0, // non-player units must have a valid offhand weapon to enable dual wield
+    DISABLED    = 1,
+    ENABLED     = 2,
+};
+
 struct AttackPosition {
     AttackPosition(Position pos) : _pos(std::move(pos)), _taken(false) {}
     bool operator==(const int val)
@@ -633,7 +640,7 @@ public:
     typedef std::multimap<AuraStateType,  AuraApplication*> AuraStateAurasMap;
     typedef std::pair<AuraStateAurasMap::const_iterator, AuraStateAurasMap::const_iterator> AuraStateAurasMapBounds;
 
-    typedef std::list<AuraEffect*> AuraEffectList;
+    typedef std::vector<AuraEffect*> AuraEffectList;
     typedef std::list<Aura*> AuraList;
     typedef std::list<AuraApplication*> AuraApplicationList;
     typedef std::list<DiminishingReturn> Diminishing;
@@ -726,7 +733,7 @@ public:
     // Movement flags
     void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
     void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
-    [[nodiscard]] bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.flags & f) == f; }
+    [[nodiscard]] bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.flags & f) != 0; }
     [[nodiscard]] uint32 GetUnitMovementFlags() const { return m_movementInfo.flags; }
     void SetUnitMovementFlags(uint32 f) { m_movementInfo.flags = f; }
 
@@ -735,6 +742,9 @@ public:
     [[nodiscard]] uint16 HasExtraUnitMovementFlag(uint16 f) const { return m_movementInfo.flags2 & f; }
     [[nodiscard]] uint16 GetExtraUnitMovementFlags() const { return m_movementInfo.flags2; }
     void SetExtraUnitMovementFlags(uint16 f) { m_movementInfo.flags2 = f; }
+
+    inline bool IsCrowdControlled() const { return HasFlag(UNIT_FIELD_FLAGS, (UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_STUNNED)); }
+    inline bool IsImmobilizedState() const { return HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED); }
 
     /*********************************************************/
     /***           UNIT TYPES, CLASSES, RACES...           ***/
@@ -817,10 +827,17 @@ public:
     bool IsValidAssistTarget(Unit const* target) const;
     bool _IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) const;
 
+    // Client controlled: check if unit currently is under client control (has active "mover"), optionally check for specific client (server-side)
+    bool IsClientControlled(Player const* exactClient = nullptr) const;
+    // Controlling client: server PoV on which client (player) controls movement of the unit at the moment, obtain "mover" (server-side)
+    Player const* GetClientControlling() const;
+
     // Combat range
+    [[nodiscard]] float GetBoundaryRadius() const { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; }
     [[nodiscard]] float GetCombatReach() const override { return m_floatValues[UNIT_FIELD_COMBATREACH]; }
     [[nodiscard]] float GetMeleeReach() const { float reach = m_floatValues[UNIT_FIELD_COMBATREACH]; return reach > MIN_MELEE_REACH ? reach : MIN_MELEE_REACH; }
     [[nodiscard]] bool IsWithinRange(Unit const* obj, float dist) const;
+    bool IsWithinBoundaryRadius(const Unit* obj) const;
     bool IsWithinCombatRange(Unit const* obj, float dist2compare) const;
     bool IsWithinMeleeRange(Unit const* obj, float dist = 0.f) const;
     float GetMeleeRange(Unit const* target) const;
@@ -913,8 +930,9 @@ public:
 
     // Weapons systems
     [[nodiscard]] bool haveOffhandWeapon() const;
-    [[nodiscard]] bool CanDualWield() const { return m_canDualWield; }
-    virtual void SetCanDualWield(bool value) { m_canDualWield = value; }
+    [[nodiscard]] bool CanDualWield() const { return _dualWieldMode == DualWieldMode::ENABLED; }
+    virtual void SetCanDualWield(bool value) { _dualWieldMode = value ? DualWieldMode::ENABLED : DualWieldMode::DISABLED; }
+    virtual void SetDualWieldMode(DualWieldMode mode) { _dualWieldMode = mode; }
 
     virtual bool HasWeapon(WeaponAttackType type) const = 0;
     inline bool HasMainhandWeapon() const { return HasWeapon(BASE_ATTACK); }
@@ -1153,6 +1171,7 @@ public:
     static uint32 DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage const* cleanDamage = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* spellProto = nullptr, bool durabilityLoss = true, bool allowGM = false, Spell const* spell = nullptr);
     void DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss);
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell = nullptr);
+    void DealDamageShieldDamage(Unit* victim);
     static void DealDamageMods(Unit const* victim, uint32& damage, uint32* absorb);
 
     static void Kill(Unit* killer, Unit* victim, bool durabilityLoss = true, WeaponAttackType attackType = BASE_ATTACK, SpellInfo const* spellProto = nullptr, Spell const* spell = nullptr);
@@ -1492,6 +1511,7 @@ public:
     [[nodiscard]] Player* GetSpellModOwner() const;
     [[nodiscard]] Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
     [[nodiscard]] Spell* GetCurrentSpell(uint32 spellType) const { return m_currentSpells[spellType]; }
+    [[nodiscard]] Spell* GetFirstCurrentCastingSpell() const;
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
     [[nodiscard]] int32 GetCurrentSpellCastTime(uint32 spell_id) const;
 
@@ -1592,6 +1612,7 @@ public:
     SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
     SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
     SpellCastResult CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    SpellCastResult CastCustomSpell(SpellInfo const* spellInfo, CustomSpellValues const& value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
 
     /*********************************************************/
     /***     METHODS RELATED TO GAMEOBJECT & DYNOBEJCTS    ***/
@@ -1623,6 +1644,7 @@ public:
     [[nodiscard]] virtual bool CanFly() const = 0;
     [[nodiscard]] bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_DISABLE_GRAVITY); }
     [[nodiscard]] bool IsFalling() const;
+    [[nodiscard]] bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT); }
 
     [[nodiscard]] float GetHoverHeight() const { return IsHovering() ? GetFloatValue(UNIT_FIELD_HOVERHEIGHT) : 0.0f; }
 
@@ -1634,6 +1656,12 @@ public:
     {
         return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
                              UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
+    }
+
+    [[nodiscard]] bool HasLeewayMovement() const
+    {
+         return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT | MOVEMENTFLAG_FALLING)
+                && !IsWalking();
     }
 
     void KnockbackFrom(float x, float y, float speedXY, float speedZ);
@@ -1656,10 +1684,10 @@ public:
     virtual bool SetWalk(bool enable);
     virtual bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true);
     virtual bool SetSwim(bool enable);
-    virtual bool SetCanFly(bool enable, bool packetOnly = false);
-    virtual bool SetWaterWalking(bool enable, bool packetOnly = false);
-    virtual bool SetFeatherFall(bool enable, bool packetOnly = false);
-    virtual bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true);
+    void SetCanFly(bool enable);
+    void SetWaterWalking(bool enable);
+    void SetFeatherFall(bool enable);
+    void SetHover(bool enable);
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
     [[nodiscard]] const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
@@ -1686,6 +1714,7 @@ public:
     [[nodiscard]] uint8 getStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
     [[nodiscard]] bool IsSitState() const;
     [[nodiscard]] bool IsStandState() const;
+    [[nodiscard]] bool IsStandUpOnMovementState() const;
     void SetStandState(uint8 state);
 
     void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
@@ -1893,6 +1922,7 @@ public:
     void SetInFront(WorldObject const* target);
     void SetFacingTo(float ori);
     void SetFacingToObject(WorldObject* object);
+    void SetTimedFacingToObject(WorldObject* object, uint32 time); // Reset to home orientation after given time
 
     bool isInAccessiblePlaceFor(Creature const* c) const;
     bool isInFrontInMap(Unit const* target, float distance, float arc = M_PI) const;
@@ -1975,7 +2005,7 @@ public:
 
     //----------- Public variables ----------//
     uint32 m_extraAttacks;
-    bool m_canDualWield;
+    DualWieldMode _dualWieldMode;
 
     ControlSet m_Controlled;
 
@@ -2019,7 +2049,7 @@ public:
     Movement::MoveSpline* movespline;
 
 protected:
-    explicit Unit (bool isWorldObject);
+    explicit Unit();
 
     void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) override;
 
@@ -2036,7 +2066,8 @@ protected:
     void SetFeared(bool apply, Unit* fearedBy = nullptr, bool isFear = false);
     void SetConfused(bool apply);
     void SetStunned(bool apply);
-    void SetRooted(bool apply, bool isStun = false);
+    void SetRooted(bool apply, bool stun = false, bool logout = false);
+    void SendMoveRoot(bool state);
 
     //----------- Protected variables ----------//
     UnitAI* i_AI;
@@ -2107,8 +2138,6 @@ protected:
     // xinef: apply resilience
     bool m_applyResilience;
     bool _instantCast;
-
-    uint32 m_rootTimes;
 
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);

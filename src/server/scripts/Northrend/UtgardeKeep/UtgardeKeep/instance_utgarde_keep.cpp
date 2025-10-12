@@ -229,7 +229,7 @@ public:
                             c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode(), c);
                         if (c->GetLootMode())
                             c->loot.generateMoneyLoot(c->GetCreatureTemplate()->mingold, c->GetCreatureTemplate()->maxgold);
-                        c->DestroyForNearbyPlayers();
+                        c->DestroyForVisiblePlayers();
                         c->SetVisible(true);
                     }
                     break;
@@ -244,7 +244,7 @@ public:
                             c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode(), c);
                         if (c->GetLootMode())
                             c->loot.generateMoneyLoot(c->GetCreatureTemplate()->mingold, c->GetCreatureTemplate()->maxgold);
-                        c->DestroyForNearbyPlayers();
+                        c->DestroyForVisiblePlayers();
                         c->SetVisible(true);
                     }
                     break;

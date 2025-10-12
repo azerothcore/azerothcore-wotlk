@@ -240,12 +240,15 @@ public:
 
     [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
     [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
+    bool HasMovementGeneratorType(MovementGeneratorType type) const;
     [[nodiscard]] uint32 GetCurrentSplineId() const; // Xinef: Escort system
 
     void propagateSpeedChange();
     void ReinitializeMovement();
 
     bool GetDestination(float& x, float& y, float& z);
+
+    void DistanceYourself(float range);
 private:
     void Mutate(MovementGenerator* m, MovementSlot slot);                  // use Move* functions instead
 

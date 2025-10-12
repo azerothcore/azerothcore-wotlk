@@ -206,7 +206,7 @@ bool Acore::Hyperlinks::LinkTags::spell::StoreTo(SpellInfo const*& val, std::str
     if (!(t.TryConsumeTo(spellId) && t.IsEmpty()))
         return false;
 
-    return !!(val = sSpellMgr->GetSpellInfo(spellId));
+    return (val = sSpellMgr->GetSpellInfo(spellId));
 }
 
 bool Acore::Hyperlinks::LinkTags::talent::StoreTo(TalentLinkData& val, std::string_view text)

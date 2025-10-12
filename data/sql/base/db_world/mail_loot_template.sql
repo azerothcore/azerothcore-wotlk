@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -111,6 +111,13 @@ INSERT INTO `mail_loot_template` VALUES
 (160,21746,0,100,0,1,0,1,1,'Lucky Red Envelope'),
 (161,21216,0,100,0,1,0,1,1,'Smokywood Pastures Extra-Special Gift'),
 (168,21746,0,100,0,1,0,1,1,'Lucky Red Envelope'),
+(171,22723,0,100,0,1,0,1,1,'A Letter from the Keeper of the Rolls'),
+(172,23008,0,100,0,1,0,1,1,'Sealed Research Report'),
+(173,23010,0,100,0,1,0,1,1,'Sealed Research Report'),
+(174,23011,0,100,0,1,0,1,1,'Sealed Research Report'),
+(175,23012,0,100,0,1,0,1,1,'Sealed Research Report'),
+(176,23013,0,100,0,1,0,1,1,'Sealed Research Report'),
+(177,23016,0,100,0,1,0,1,1,'Sealed Research Report'),
 (180,24132,0,100,0,1,0,1,1,'A Letter from the Admiral'),
 (183,31698,0,100,0,1,0,1,1,'Letter from Shattrath'),
 (211,37676,0,100,0,1,0,1,1,'Vengeful Nether Drake'),
@@ -158,5 +165,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:09
-
+-- Dump completed on 2025-07-19 12:09:16

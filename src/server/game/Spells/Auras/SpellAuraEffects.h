@@ -110,6 +110,7 @@ public:
     uint8 GetCasterLevel() const { return m_casterLevel; }
     bool CanApplyResilience() const { return m_applyResilience; }
     float GetPctMods() const { return m_pctMods; }
+    void SetPctMods(float pctMods) { m_pctMods = pctMods; }
 
     // xinef: stacking
     uint32 GetAuraGroup() const { return m_auraGroup; }

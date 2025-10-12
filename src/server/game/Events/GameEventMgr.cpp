@@ -1934,7 +1934,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
 
 uint32 GameEventMgr::GetHolidayEventId(uint32 holidayId) const
 {
-    auto const& events = sGameEventMgr->GetEventMap();
+    auto const& events = GetEventMap();
 
     for (auto const& eventEntry : events)
     {

@@ -87,8 +87,9 @@ enum ConditionTypes
     CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,           // quest_id         0              0                  true if satisfied exclusive group
     CONDITION_HAS_AURA_TYPE            = 102,           // aura_type        0              0                  true if has aura type
     CONDITION_WORLD_SCRIPT             = 103,           // conditionId      state          0                  true if WorldState::IsConditionFulfilled returns true
+    CONDITION_AI_DATA                  = 104,           // dataId           value          0                  true if AI::GetData returns value
 
-    CONDITION_AC_END                   = 104            // placeholder
+    CONDITION_AC_END                   = 105            // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:

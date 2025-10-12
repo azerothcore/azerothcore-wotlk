@@ -1614,7 +1614,7 @@ void SpellMgr::LoadSpellTargetPositions()
         }
         if (found)
         {
-            if (!sSpellMgr->GetSpellTargetPosition(i))
+            if (!GetSpellTargetPosition(i))
                 LOG_DEBUG("spells.aura", "Spell (ID: {}) does not have record in `spell_target_position`", i);
         }
     }*/
@@ -2348,7 +2348,7 @@ void SpellMgr::LoadPetLevelupSpellMap()
     LOG_INFO("server.loading", " ");
 }
 
-bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaultSpellsEntry& petDefSpells)
+static bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaultSpellsEntry& petDefSpells)
 {
     // skip empty list;
     bool have_spell = false;
@@ -3405,15 +3405,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 }
 
             // Xinef: Cooldown overwrites
-            // Jotunheim Rapid-Fire Harpoon: Energy Reserve
-            case 56585:
-                spellInfo->RecoveryTime = 30000;
-                spellInfo->_requireCooldownInfo = true;
-                break;
-            // Jotunheim Rapid-Fire Harpoon: Rapid-Fire Harpoon
-            case 56570:
-                spellInfo->RecoveryTime = 200;
-                break;
             // Burst of Speed
             case 57493:
                 spellInfo->RecoveryTime = 60000;
@@ -3448,9 +3439,9 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 
         spellInfo->_InitializeExplicitTargetMask();
 
-        if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
+        if (HasSpellCooldownOverride(spellInfo->Id))
         {
-            SpellCooldownOverride spellOverride = sSpellMgr->GetSpellCooldownOverride(spellInfo->Id);
+            SpellCooldownOverride spellOverride = GetSpellCooldownOverride(spellInfo->Id);
 
             if (spellInfo->RecoveryTime != spellOverride.RecoveryTime)
             {
@@ -3497,7 +3488,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
-                        if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
+                        if (SpellInfo const* triggerSpell = GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
                         {
                             overrideAttr = true;
                             if (triggerSpell->AttributesCu & SPELL_ATTR0_CU_BINARY_SPELL)

@@ -31,14 +31,7 @@ enum Spells
     SPELL_REMOVE_MUSHROOM_POWER             = 57283,
 
     // Mushroom
-    SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS    = 56648,
-    SPELL_POISONOUS_MUSHROOM_POISON_CLOUD   = 57061,
-    SPELL_POISONOUS_MUSHROOM_VISUAL_AURA    = 56741,
-    SPELL_POISONOUS_MUSHROOM_VISUAL_AREA    = 61566, // Self
-    SPELL_HEALTHY_MUSHROOM_VISUAL_AURA      = 56740,
-    SPELL_PUTRID_MUSHROOM                   = 31690,
-    SPELL_GROW                              = 57059,
-    SPELL_SHRINK                            = 31691,
+    SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS    = 56648
 };
 
 enum Creatures
@@ -94,13 +87,12 @@ Position const MushroomPositions[MAX_MUSHROOMS_COUNT] =
 
 struct boss_amanitar : public BossAI
 {
-    boss_amanitar(Creature* creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false) { }
+    boss_amanitar(Creature* creature) : BossAI(creature, DATA_AMANITAR) { }
 
     void Reset() override
     {
         _Reset();
         _mushroomsDeque.clear();
-        mushroomsSummoned = false;
     }
 
     void JustEngagedWith(Unit* /*attacker*/) override
@@ -110,7 +102,7 @@ struct boss_amanitar : public BossAI
         }, 10s, 15s);
 
         ScheduleTimedEvent(10s, 14s, [&] {
-            DoCastVictim(SPELL_BASH, false);
+            DoCastVictim(SPELL_BASH);
         }, 15s, 20s);
 
         ScheduleTimedEvent(15s, 20s, [&] {
@@ -153,10 +145,10 @@ struct boss_amanitar : public BossAI
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
     }
 
-    void SummonedCreatureDies(Creature* summon, Unit* killer) override
+    void SummonedCreatureDespawn(Creature* summon) override
     {
         _mushroomsDeque.push_back(summon->GetPosition());
-        BossAI::SummonedCreatureDies(summon, killer);
+        BossAI::SummonedCreatureDespawn(summon);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -167,104 +159,11 @@ struct boss_amanitar : public BossAI
 
 private:
     std::deque<Position> _mushroomsDeque;
-    bool mushroomsSummoned;
 
     void SummonMushroom(Position const& pos)
     {
         me->SummonCreature(roll_chance_i(40) ? NPC_HEALTHY_MUSHROOM : NPC_POISONOUS_MUSHROOM, pos, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 4000);
     }
-};
-
-struct npc_amanitar_mushrooms : public ScriptedAI
-{
-    npc_amanitar_mushrooms(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        me->SetCombatMovement(false);
-
-        //TODO: this prolly needs to be done in database
-        pCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        pCreature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        pCreature->SetRegeneratingHealth(false);
-    }
-
-    // Disabled events
-    void JustEngagedWith(Unit* /*who*/) override {}
-    void AttackStart(Unit* /*victim*/) override {}
-    void EnterEvadeMode(EvadeReason /*why*/) override {}
-
-    void Reset() override
-    {
-        me->SetReactState(REACT_PASSIVE);
-        DoCastSelf(SPELL_PUTRID_MUSHROOM);
-
-        if (me->GetEntry() == NPC_POISONOUS_MUSHROOM)
-        {
-            DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AURA, true);
-        }
-        else
-        {
-            DoCastSelf(SPELL_HEALTHY_MUSHROOM_VISUAL_AURA, true);
-        }
-
-        events.ScheduleEvent(EVENT_GROW, 800ms);
-
-        if (me->GetEntry() == NPC_POISONOUS_MUSHROOM)
-        {
-            events.ScheduleEvent(EVENT_CHECK_PLAYER, 250ms);
-        }
-    }
-
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        if (me->GetEntry() == NPC_HEALTHY_MUSHROOM && damage >= me->GetHealth())
-        {
-            DoCastSelf(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS, true);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (events.Empty())
-            return;
-
-        events.Update(diff);
-        while (uint32 const eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_GROW:
-                {
-                    DoCastSelf(SPELL_GROW);
-                    break;
-                }
-                case EVENT_CHECK_PLAYER:
-                {
-                    if (Player* plr = me->SelectNearestPlayer(2.0f))
-                    {
-                        plr->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
-                        DoCastSelf(SPELL_POISONOUS_MUSHROOM_VISUAL_AREA);
-                        DoCastSelf(SPELL_POISONOUS_MUSHROOM_POISON_CLOUD);
-                        DoCastSelf(SPELL_SHRINK);
-                        events.ScheduleEvent(EVENT_KILLSELF, 4s);
-                    }
-                    else
-                    {
-                        events.Repeat(250ms);
-                    }
-
-                    break;
-                }
-                case EVENT_KILLSELF:
-                {
-                    me->DisappearAndDie();
-                    break;
-                }
-            }
-        }
-    }
-
-private:
-    EventMap events;
 };
 
 // 57283 Remove Mushroom Power
@@ -274,8 +173,7 @@ class spell_amanitar_remove_mushroom_power : public AuraScript
 
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* target = GetTarget())
-            target->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
     }
 
     void Register() override
@@ -287,8 +185,5 @@ class spell_amanitar_remove_mushroom_power : public AuraScript
 void AddSC_boss_amanitar()
 {
     RegisterAhnKahetCreatureAI(boss_amanitar);
-    RegisterAhnKahetCreatureAI(npc_amanitar_mushrooms);
-
-    // Spells
     RegisterSpellScript(spell_amanitar_remove_mushroom_power);
 }

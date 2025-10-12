@@ -166,7 +166,7 @@ enum BG_AB_Misc
     BG_AB_HONOR_TICK_NORMAL             = 260,
     BG_AB_HONOR_TICK_WEEKEND            = 160,
     BG_AB_REP_TICK_NORMAL               = 160,
-    BG_AB_REP_TICK_WEEKEND              = 120,
+    BG_AB_REP_TICK_WEEKEND              = 150,
 
     BG_AB_WARNING_NEAR_VICTORY_SCORE    = 1400,
     BG_AB_MAX_TEAM_SCORE                = 1600,
@@ -299,6 +299,7 @@ private:
     EventMap _bgEvents;
     uint32 _honorTics;
     uint32 _reputationTics;
+    float _abReputationRate;
     uint8 _controlledPoints[PVP_TEAMS_COUNT] {};
     bool _teamScores500Disadvantage[PVP_TEAMS_COUNT] {};
     uint32 _configurableMaxTeamScore;

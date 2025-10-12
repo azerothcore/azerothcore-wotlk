@@ -16,7 +16,9 @@
  */
 
 #include "ServerMailMgr.h"
+#include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "Common.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Log.h"
@@ -240,21 +242,28 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         case ServerMailConditionType::Faction:
             if (conditionValue < TEAM_ALLIANCE || conditionValue > TEAM_HORDE)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Faction' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Faction' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
             }
             break;
         case ServerMailConditionType::Race:
             if (conditionValue & ~RACEMASK_ALL_PLAYABLE)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Race' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Race' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
             }
             break;
         case ServerMailConditionType::Class:
             if (conditionValue & ~CLASSMASK_ALL_PLAYABLE)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Class' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Class' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                continue;
+            }
+            break;
+        case ServerMailConditionType::AccountFlags:
+            if ((conditionValue & ~ACCOUNT_FLAGS_ALL) != 0)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'AccountFlags' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
             }
             break;
@@ -344,6 +353,8 @@ bool ServerMailCondition::CheckCondition(Player* player) const
         return (player->getRaceMask() & value) != 0;
     case ServerMailConditionType::Class:
         return (player->getClassMask() & value) != 0;
+    case ServerMailConditionType::AccountFlags:
+        return player->GetSession()->HasAccountFlag(value);
     default:
         [[unlikely]] LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
         return false;

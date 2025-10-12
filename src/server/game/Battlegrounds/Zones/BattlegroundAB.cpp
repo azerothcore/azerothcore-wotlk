@@ -115,7 +115,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
-                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
+                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, uint32(10 * _abReputationRate), teamId);
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
                             if (teamId == TEAM_ALLIANCE)
@@ -419,6 +419,10 @@ TeamId BattlegroundAB::GetPrematureWinner()
 
 bool BattlegroundAB::SetupBattleground()
 {
+    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
+    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
+    _abReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_AB);
+
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
     {
         AddObject(BG_AB_OBJECT_BANNER_NEUTRAL + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_NODE_BANNER_0 + i, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
@@ -467,9 +471,6 @@ void BattlegroundAB::Init()
     Battleground::Init();
 
     _bgEvents.Reset();
-
-    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
-    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
 
     _capturePointInfo[BG_AB_NODE_STABLES]._iconNone = WORLD_STATE_BATTLEGROUND_AB_STABLE_ICON;
     _capturePointInfo[BG_AB_NODE_FARM]._iconNone = WORLD_STATE_BATTLEGROUND_AB_FARM_ICON;

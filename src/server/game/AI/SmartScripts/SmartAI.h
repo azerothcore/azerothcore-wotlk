@@ -40,6 +40,8 @@ enum SmartEscortVars
     SMART_MAX_AID_DIST                  = SMART_ESCORT_MAX_PLAYER_DIST / 2,
 };
 
+#define DISTANCING_CONSTANT 1.f // buffer for better functionality of distancing
+
 class SmartAI : public CreatureAI
 {
 public:
@@ -63,11 +65,11 @@ public:
     bool IsEscorted() override { return (mEscortState & SMART_ESCORT_ESCORTING); }
     void RemoveEscortState(uint32 uiEscortState) { mEscortState &= ~uiEscortState; }
     void SetAutoAttack(bool on) { mCanAutoAttack = on; }
-    void SetCombatMove(bool on, float chaseRange = 0.0f);
-    bool CanCombatMove() { return mCanCombatMove; }
+    void SetCombatMovement(bool on, bool stopOrStartMovement);
+    void SetCurrentRangeMode(bool on, float range = 0.f);
+    void DistanceYourself(float range);
     void SetFollow(Unit* target, float dist = 0.0f, float angle = 0.0f, uint32 credit = 0, uint32 end = 0, uint32 creditType = 0, bool aliveState = true);
     void StopFollow(bool complete);
-    void MoveAway(float distance);
 
     void SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker);
     SmartScript* GetScript() { return &mScript; }
@@ -212,6 +214,8 @@ public:
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
 
+    void DistancingEnded() override;
+
 private:
     bool mIsCharmed;
     uint32 mFollowCreditType;
@@ -239,7 +243,6 @@ private:
     bool mRun;
     bool mEvadeDisabled;
     bool mCanAutoAttack;
-    bool mCanCombatMove;
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
 
@@ -257,6 +260,13 @@ private:
     void CheckConditions(const uint32 diff);
     ConditionList conditions;
     uint32 m_ConditionsTimer;
+
+    bool _chaseOnInterrupt;
+    std::unordered_map<uint32, uint32> aiDataSet;
+
+    bool _currentRangeMode;
+    float _attackDistance;
+    float _pendingDistancing;
 };
 
 class SmartGameObjectAI : public GameObjectAI

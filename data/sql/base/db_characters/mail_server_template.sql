@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_characters
+-- Host: localhost    Database: acore_characters
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -22,14 +22,8 @@ DROP TABLE IF EXISTS `mail_server_template`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mail_server_template` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `reqLevel` tinyint unsigned NOT NULL DEFAULT '0',
-  `reqPlayTime` int unsigned NOT NULL DEFAULT '0',
   `moneyA` int unsigned NOT NULL DEFAULT '0',
   `moneyH` int unsigned NOT NULL DEFAULT '0',
-  `itemA` int unsigned NOT NULL DEFAULT '0',
-  `itemCountA` int unsigned NOT NULL DEFAULT '0',
-  `itemH` int unsigned NOT NULL DEFAULT '0',
-  `itemCountH` int unsigned NOT NULL DEFAULT '0',
   `subject` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `body` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `active` tinyint unsigned NOT NULL DEFAULT '1',
@@ -54,5 +48,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:11
-
+-- Dump completed on 2025-07-19 12:10:14

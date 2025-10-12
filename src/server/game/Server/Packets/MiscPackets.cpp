@@ -67,6 +67,21 @@ WorldPacket const* WorldPackets::Misc::Playsound::Write()
     return &_worldPacket;
 }
 
+void WorldPackets::Misc::MinimapPingClient::Read()
+{
+    _worldPacket >> MapX;
+    _worldPacket >> MapY;
+}
+
+WorldPacket const* WorldPackets::Misc::MinimapPing::Write()
+{
+    _worldPacket << SourceGuid;
+    _worldPacket << float(MapX);
+    _worldPacket << float(MapY);
+
+    return &_worldPacket;
+}
+
 void WorldPackets::Misc::RandomRollClient::Read()
 {
     _worldPacket >> Min;
@@ -122,6 +137,34 @@ WorldPacket const* WorldPackets::Misc::CrossedInebriationThreshold::Write()
 WorldPacket const* WorldPackets::Misc::UITime::Write()
 {
     _worldPacket << uint32(Time);
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Misc::Complain::Read()
+{
+    _worldPacket >> SpamType; // 0 - mail, 1 - chat
+    _worldPacket >> SpammerGuid;
+    switch (SpamType)
+    {
+    case 0:
+        _worldPacket >> Unk1; // const 0
+        _worldPacket >> Unk2; // probably mail id
+        _worldPacket >> Unk3; // const 0
+        break;
+    case 1:
+        _worldPacket >> Unk1; // probably language
+        _worldPacket >> Unk2; // message type?
+        _worldPacket >> Unk3; // probably channel id
+        _worldPacket >> Unk4; // unk random value
+        _worldPacket >> Description; // spam description string (messagetype, channel name, player name, message)
+        break;
+    }
+}
+
+WorldPacket const* WorldPackets::Misc::ComplainResult::Write()
+{
+    _worldPacket << Unk;
 
     return &_worldPacket;
 }

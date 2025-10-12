@@ -592,6 +592,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
+    // Vindication
+    ApplySpellFix({ 67, 26017}, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 0;
+    });
+
     // Arcane Missiles
     ApplySpellFix({ 5143, 5144, 5145, 8416, 8417, 10211, 10212, 25345, 27075, 38699, 38704, 42843, 42846 }, [](SpellInfo* spellInfo)
     {
@@ -5137,6 +5143,20 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21); // -1
     });
 
+    ApplySpellFix({
+        28032, // Zap Crystal
+        28056, // Zap Crystal Corpse
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Earth Shield
+    ApplySpellFix({ 55599, 58981 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_LIMIT_N;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
@@ -5273,6 +5293,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4693)); // Siege Engine, Accessory
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(1520)); // Wyrmrest Vanquisher
+    vse->m_flags |= VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
 
     // pussywizard: fix z offset for some vehicles:
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(6206)); // Marrowgar - Bone Spike

@@ -692,7 +692,6 @@ struct ItemTemplate
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     ItemFlagsCustom FlagsCu;
-    WorldPacket queryData;                                  // pussywizard
 
     // helpers
     [[nodiscard]] bool HasSignature() const
@@ -700,8 +699,7 @@ struct ItemTemplate
         return GetMaxStackSize() == 1 &&
                Class != ITEM_CLASS_CONSUMABLE &&
                Class != ITEM_CLASS_QUEST &&
-               !HasFlag(ITEM_FLAG_NO_CREATOR) &&
-               ItemId != 6948; /*Hearthstone*/
+               !HasFlag(ITEM_FLAG_NO_CREATOR);
     }
 
     [[nodiscard]] bool CanChangeEquipStateInCombat() const
@@ -827,8 +825,6 @@ struct ItemTemplate
     [[nodiscard]] bool HasFlag(ItemFlags flag) const { return (Flags & flag) != 0; }
     [[nodiscard]] bool HasFlag2(ItemFlags2 flag) const { return (Flags2 & flag) != 0; }
     [[nodiscard]] bool HasFlagCu(ItemFlagsCustom flag) const { return (FlagsCu & flag) != 0; }
-
-    void InitializeQueryData();
 };
 
 // Benchmarked: Faster than std::map (insert/find)

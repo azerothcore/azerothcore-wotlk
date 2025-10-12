@@ -80,7 +80,7 @@ public:
                 if (_timer > 5000)
                 {
                     me->CastSpell(nullptr, 9056);
-                    me->DestroyForNearbyPlayers();
+                    me->DestroyForVisiblePlayers();
                     _timer = 0;
                 }
             }
@@ -322,7 +322,7 @@ public:
                 std::list<Player*> players;
                 Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
                 Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
-                Cell::VisitWorldObjects(me, searcher, 0.3f);
+                Cell::VisitObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -369,7 +369,7 @@ public:
                 std::list<Player*> players;
                 Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
                 Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
-                Cell::VisitWorldObjects(me, searcher, 0.3f);
+                Cell::VisitObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -823,7 +823,7 @@ public:
                             std::list<Player*> targets;
                             Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
                             Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
-                            Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
+                            Cell::VisitObjects(me, searcher, me->GetVisibilityRange());
                             for (Player* player : targets)
                             {
                                 if (player->GetTeamId() == TEAM_HORDE)
@@ -1066,7 +1066,7 @@ class go_southfury_moonstone : public GameObjectScript
 public:
     go_southfury_moonstone() : GameObjectScript("go_southfury_moonstone") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         //implicitTarget=48 not implemented as of writing this code, and manual summon may be just ok for our purpose
         //player->CastSpell(player, SPELL_SUMMON_RIZZLE, false);
@@ -1076,6 +1076,7 @@ public:
             // no need casting spell blackjack, it's casted by script npc_rizzle_sprysprocket.
             //creature->CastSpell(player, SPELL_BLACKJACK, false);
             creature->AI()->AttackStart(player);
+            go->DespawnOrUnsummon(8000ms);
         }
 
         return false;

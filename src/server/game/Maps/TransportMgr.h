@@ -158,6 +158,8 @@ private:
     TransportInstanceMap _instanceTransports;
 
     TransportAnimationContainer _transportAnimations;
+
+    void PreloadGridsFromQuery(std::string const& query, uint32& count);
 };
 
 #define sTransportMgr TransportMgr::instance()

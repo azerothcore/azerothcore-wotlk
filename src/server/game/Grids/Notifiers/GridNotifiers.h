@@ -43,19 +43,18 @@ namespace Acore
     struct VisibleNotifier
     {
         Player& i_player;
-        GuidUnorderedSet vis_guids;
         std::vector<Unit*>& i_visibleNow;
         bool i_gobjOnly;
-        bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
-            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
+        VisibleNotifier(Player& player, bool gobjOnly) :
+            i_player(player), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly)
         {
             i_visibleNow.clear();
         }
 
         void Visit(GameObjectMapType&);
+        template<class T> void Visit(std::vector<T>& m);
         template<class T> void Visit(GridRefMgr<T>& m);
         void SendToSelf(void);
     };
@@ -73,8 +72,9 @@ namespace Acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player, bool largeOnly): VisibleNotifier(player, false, largeOnly) { }
+        PlayerRelocationNotifier(Player& player): VisibleNotifier(player, false) { }
 
+        template<class T> void Visit(std::vector<T>& m) { VisibleNotifier::Visit(m); }
         template<class T> void Visit(GridRefMgr<T>& m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType&);
     };
@@ -111,6 +111,7 @@ namespace Acore
             , skipped_receiver(skipped), required3dDist(req3dDist)
         {
         }
+        void Visit(VisiblePlayersMap const& m);
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);
@@ -152,16 +153,6 @@ namespace Acore
 
             player->GetSession()->SendPacket(i_message);
         }
-    };
-
-    struct ObjectUpdater
-    {
-        uint32 i_timeDiff;
-        bool i_largeOnly;
-        explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
-        template<class T> void Visit(GridRefMgr<T>& m);
-        void Visit(PlayerMapType&) {}
-        void Visit(CorpseMapType&) {}
     };
 
     // SEARCHERS & LIST SEARCHERS & WORKERS
@@ -1166,7 +1157,11 @@ namespace Acore
                 return;
 
             if (u->AI())
+            {
+                u->SetNoCallForHelp(true); // avoid recursive call for help causing stack overflow
                 u->AI()->AttackStart(i_enemy);
+                u->SetNoCallForHelp(false);
+            }
         }
     private:
         Unit* const i_funit;
@@ -1457,6 +1452,24 @@ namespace Acore
         float m_fRange;
     };
 
+    class AllGameObjectsMatchingOneEntryInRange
+    {
+    public:
+        AllGameObjectsMatchingOneEntryInRange(WorldObject const* object, std::vector<uint32> entries, float maxRange) : m_pObject(object), m_uiEntries(entries), m_fRange(maxRange) {}
+        bool operator()(GameObject *go)
+        {
+            if (std::ranges::any_of( m_uiEntries, [go](uint32 entry) { return go->GetEntry() == entry; }) && m_pObject->IsWithinDist(go, m_fRange, false))
+                return true;
+
+            return false;
+        }
+
+    private:
+        WorldObject const* m_pObject;
+        std::vector<uint32> m_uiEntries;
+        float m_fRange;
+    };
+
     class AllCreaturesOfEntryInRange
     {
     public:
@@ -1472,6 +1485,24 @@ namespace Acore
     private:
         WorldObject const* m_pObject;
         uint32 m_uiEntry;
+        float m_fRange;
+    };
+
+    class AllCreaturesMatchingOneEntryInRange
+    {
+    public:
+        AllCreaturesMatchingOneEntryInRange(WorldObject const* object, std::vector<uint32> entries, float maxRange) : m_pObject(object), m_uiEntries(entries), m_fRange(maxRange) {}
+        bool operator()(Unit* unit)
+        {
+            if (std::ranges::any_of(m_uiEntries, [unit](uint32 entry) { return unit->GetEntry() == entry; }) && m_pObject->IsWithinDist(unit, m_fRange, false))
+                return true;
+
+            return false;
+        }
+
+    private:
+        WorldObject const* m_pObject;
+        std::vector<uint32> m_uiEntries;
         float m_fRange;
     };
 

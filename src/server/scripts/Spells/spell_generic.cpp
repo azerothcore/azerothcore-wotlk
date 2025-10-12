@@ -1358,11 +1358,7 @@ class spell_gen_cannibalize : public SpellScript
         // search for nearby enemy corpse in range
         Acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
         Acore::WorldObjectSearcher<Acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
-        Cell::VisitWorldObjects(caster, searcher, max_range);
-        if (!result)
-        {
-            Cell::VisitGridObjects(caster, searcher, max_range);
-        }
+        Cell::VisitObjects(caster, searcher, max_range);
         if (!result)
         {
             return SPELL_FAILED_NO_EDIBLE_CORPSES;
@@ -5320,6 +5316,55 @@ class spell_gen_set_health : public SpellScript
     }
 };
 
+// 67557 - Serverside - Pet Scaling - Master Spell 03 - Intellect, Spirit, Resilience
+class spell_pet_intellect_spirit_resilience_scaling : public AuraScript
+{
+    PrepareAuraScript(spell_pet_intellect_spirit_resilience_scaling)
+
+    void CalculateIntellectAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
+            amount = static_cast<int32>(CalculatePct(std::max<float>(0, modOwner->GetStat(STAT_INTELLECT)), 30));
+    }
+
+    void CalculateSpiritAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
+            amount = static_cast<int32>(CalculatePct(std::max<float>(0, modOwner->GetStat(STAT_SPIRIT)), 30));
+    }
+
+    void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->ApplySpellImmune(GetId(), IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+    {
+        if (!GetUnitOwner()->IsPet())
+            return;
+
+        isPeriodic = true;
+        amplitude = 3 * IN_MILLISECONDS;
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_intellect_spirit_resilience_scaling::CalculateIntellectAmount, EFFECT_0, SPELL_AURA_MOD_STAT);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_intellect_spirit_resilience_scaling::CalculateSpiritAmount, EFFECT_1,SPELL_AURA_MOD_STAT);
+        // The resilience scaling is not used. The owner's resilience is used directly
+        // DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_intellect_spirit_resilience_scaling::CalculateResilienceAmount, EFFECT_2, SPELL_AURA_MOD_RATING);
+        OnEffectApply += AuraEffectApplyFn(spell_pet_intellect_spirit_resilience_scaling::HandleEffectApply, EFFECT_2, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_pet_intellect_spirit_resilience_scaling::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pet_intellect_spirit_resilience_scaling::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+    }
+};
+
 // 67561 - Serverside - Pet Scaling - Master Spell 06 - Spell Hit, Expertise, Spell Penetration
 class spell_pet_spellhit_expertise_spellpen_scaling : public AuraScript
 {
@@ -5429,6 +5474,58 @@ public:
 
 private:
     uint32 _spellId;
+};
+
+class spell_gen_cooldown_all : public SpellScript
+{
+    PrepareSpellScript(spell_gen_cooldown_all);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+            player->RemoveAllSpellCooldown();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_cooldown_all::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 29007 - Drink (Freshly-Squeezed Lemonade)
+// 29008 - Food (Friendship Bread)
+enum HeartFood
+{
+    SPELL_VISUAL_KIT_HEART_EMOTE = 6552
+};
+
+class spell_gen_food_heart_emote : public AuraScript
+{
+    PrepareAuraScript(spell_gen_food_heart_emote);
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = 5 * IN_MILLISECONDS;
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_VISUAL_KIT_HEART_EMOTE);
+    }
+
+    void HandleUpdatePeriodic(AuraEffect* /*aurEff*/)
+    {
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_VISUAL_KIT_HEART_EMOTE);
+    }
+
+    void Register() override
+    {
+        AuraType effName = (m_scriptSpellId == 29007) ? SPELL_AURA_MOD_POWER_REGEN : SPELL_AURA_MOD_REGEN;
+        OnEffectApply += AuraEffectApplyFn(spell_gen_food_heart_emote::OnApply, EFFECT_0, effName, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_food_heart_emote::CalcPeriodic, EFFECT_0, effName);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_food_heart_emote::HandleUpdatePeriodic, EFFECT_0, effName);
+    }
 };
 
 void AddSC_generic_spell_scripts()
@@ -5589,8 +5686,11 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
     RegisterSpellScript(spell_gen_set_health);
+    RegisterSpellScript(spell_pet_intellect_spirit_resilience_scaling);
     RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
     RegisterSpellScript(spell_gen_proc_on_victim);
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_down", SPELL_TRANSLOCATION_DOWN);
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
+    RegisterSpellScript(spell_gen_cooldown_all);
+    RegisterSpellScript(spell_gen_food_heart_emote);
 }

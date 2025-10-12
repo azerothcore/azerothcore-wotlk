@@ -31,6 +31,7 @@ enum AreaTableIDs : uint32
     AREA_ELWYNN_FOREST                                       = 12,
     AREA_DUROTAR                                             = 14,
     AREA_DUSTWALLOW_MARSH                                    = 15,
+    AREA_AZSHARA                                             = 16,
     AREA_THE_BARRENS                                         = 17,
     AREA_WESTERN_PLAGUELANDS                                 = 28,
     AREA_STRANGLETHORN_VALE                                  = 33,

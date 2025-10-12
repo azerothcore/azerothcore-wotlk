@@ -74,7 +74,7 @@ public:
 
         if (sGuildMgr->GetGuildByName(guildName))
         {
-            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS);
+            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS, guildName);
             return false;
         }
 
@@ -249,6 +249,20 @@ public:
         handler->PSendSysMessage(LANG_GUILD_INFO_BANK_GOLD, guild->GetTotalBankMoney() / 100 / 100); // Bank Gold (in gold coins)
         handler->PSendSysMessage(LANG_GUILD_INFO_MOTD, guild->GetMOTD()); // Message of the Day
         handler->PSendSysMessage(LANG_GUILD_INFO_EXTRA_INFO, guild->GetInfo()); // Extra Information
+
+        QueryResult result = CharacterDatabase.Query("SELECT rid, rname FROM guild_rank WHERE guildid = {}", guild->GetId());
+        if (result)
+        {
+            handler->PSendSysMessage(LANG_GUILD_INFO_RANKS);
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 rid = fields[0].Get<uint32>();
+                std::string rname = fields[1].Get<std::string>();
+
+                handler->PSendSysMessage(LANG_GUILD_INFO_RANKS_LIST, rid, rname);
+            } while (result->NextRow());
+        }
         return true;
     }
 };

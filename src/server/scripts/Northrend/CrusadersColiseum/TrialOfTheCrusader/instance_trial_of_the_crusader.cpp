@@ -104,7 +104,7 @@ public:
                             c->UpdatePosition(630.88f, 131.39f, 140.8f, 3.02f, true);
 
                         c->StopMovingOnCurrentPos();
-                        c->DestroyForNearbyPlayers();
+                        c->DestroyForVisiblePlayers();
                     }
                 }
             }
@@ -792,7 +792,7 @@ public:
                             {
                                 icehowl->UpdatePosition(513.19f, 139.48f, 395.22f, 3 * M_PI / 2, true);
                                 icehowl->StopMovingOnCurrentPos();
-                                icehowl->DestroyForNearbyPlayers();
+                                icehowl->DestroyForVisiblePlayers();
                             }
                         }
                         break;
@@ -959,7 +959,7 @@ public:
                         {
                             jaraxxus->UpdatePosition(613.83f, 139.5f, 395.22f, 3 * M_PI / 2, true);
                             jaraxxus->StopMovingOnCurrentPos();
-                            jaraxxus->DestroyForNearbyPlayers();
+                            jaraxxus->DestroyForVisiblePlayers();
                         }
 
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))

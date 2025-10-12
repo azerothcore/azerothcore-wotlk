@@ -28,88 +28,90 @@
 #include "Vehicle.h"
 #include "WaypointMgr.h"
 
-enum qSniffing
+enum qSniffingOutThePerpetrator
 {
+    NPC_FROSTHOUND                          = 29677,
     SPELL_SUMMON_PURSUERS_PERIODIC          = 54993,
     SPELL_SNIFFING_CREDIT                   = 55477,
+    TALK_EMOTE_FROSTHOUND_SNIFF             = 0,
+    TALK_SEEN                               = 1,
+    TALK_CONFRONT                           = 2,
+    TALK_EMOTE_TRACKED_COMPLETE             = 3,
 };
 
-class npc_frosthound : public CreatureScript
+struct npc_frosthound : public npc_escortAI
 {
-public:
-    npc_frosthound() : CreatureScript("npc_frosthound") { }
+    explicit npc_frosthound(Creature* creature) : npc_escortAI(creature), _summons(creature) {}
 
-    struct npc_frosthoundAI : public npc_escortAI
+    void AttackStart(Unit* /*who*/) override {}
+    void JustEngagedWith(Unit* /*who*/) override {}
+    void EnterEvadeMode(EvadeReason /* why */) override {}
+    void JustDied(Unit* /*killer*/) override { }
+    void OnCharmed(bool /*apply*/) override { }
+
+    void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
     {
-        npc_frosthoundAI(Creature* creature) : npc_escortAI(creature) {}
-
-        void AttackStart(Unit* /*who*/) override {}
-        void JustEngagedWith(Unit* /*who*/) override {}
-        void EnterEvadeMode(EvadeReason /* why */) override {}
-
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
+        if (who->IsPlayer())
         {
-            if (who->IsPlayer())
+            if (apply)
             {
-                if (apply)
-                {
-                    me->SetFaction(who->GetFaction());
-                    me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
-                    Start(false, true, who->GetGUID());
-                }
+                me->SetFaction(who->GetFaction());
+                me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
+                Start(false, true, who->GetGUID());
+                Talk(TALK_EMOTE_FROSTHOUND_SNIFF, me);
             }
         }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-        }
-
-        void OnCharmed(bool /*apply*/) override
-        {
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            npc_escortAI::UpdateAI(diff);
-
-            if (!UpdateVictim())
-                return;
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            Player* player = GetPlayerForEscort();
-            if (!player)
-                return;
-
-            switch (waypointId)
-            {
-                case 0:
-                    me->TextEmote("You've been seen! Use the net and Freezing elixir to keep the dwarves away!", nullptr, true);
-                    break;
-                case 19:
-                    me->TextEmote("The frosthound has located the thief's hiding place. Confront him!", 0, true);
-                    if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                        summoner->ToPlayer()->KilledMonsterCredit(29677);
-                    break;
-            }
-        }
-
-        void JustSummoned(Creature* cr) override
-        {
-            cr->ToTempSummon()->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
-            cr->ToTempSummon()->InitStats(20000);
-            if (urand(0, 1))
-                cr->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
-            else if (cr->AI())
-                cr->AI()->AttackStart(me);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_frosthoundAI(creature);
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        npc_escortAI::UpdateAI(diff);
+
+        if (!UpdateVictim())
+            return;
+    }
+
+    void WaypointReached(uint32 waypointId) override
+    {
+        Player* player = GetPlayerForEscort();
+        if (!player)
+            return;
+
+        switch (waypointId)
+        {
+            case 0:
+                Talk(TALK_SEEN, player);
+                break;
+            case 34:
+                Talk(TALK_EMOTE_TRACKED_COMPLETE, me);
+                Talk(TALK_CONFRONT, player);
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                    summoner->ToPlayer()->KilledMonsterCredit(NPC_FROSTHOUND);
+                _summons.DespawnAll();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void JustSummoned(Creature* cr) override
+    {
+        _summons.Summon(cr);
+        cr->ToTempSummon()->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT);
+        cr->ToTempSummon()->InitStats(20000);
+        if (urand(0, 1))
+            cr->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
+        else if (cr->AI())
+            cr->AI()->AttackStart(me);
+    }
+
+    void Reset() override
+    {
+        _summons.DespawnAll();
+    }
+
+private:
+    SummonList _summons;
 };
 
 enum eIronWatcher
@@ -1167,9 +1169,34 @@ public:
         return new npc_vehicle_d16_propelled_deliveryAI(creature);
     }
 };
+
+enum StormcrestEagle
+{
+    NPC_STORMCREST_EAGLE = 29854
+};
+
+// 56393 - Feed Stormcrest Eagle
+class spell_feed_stormcrest_eagle : public SpellScript
+{
+    PrepareSpellScript(spell_feed_stormcrest_eagle);
+
+    SpellCastResult CheckCast()
+    {
+        if (GetCaster()->FindNearestCreature(NPC_STORMCREST_EAGLE, 15.0f, true))
+            return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_feed_stormcrest_eagle::CheckCast);
+    }
+};
+
 void AddSC_storm_peaks()
 {
-    new npc_frosthound();
+    RegisterCreatureAI(npc_frosthound);
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     new npc_wild_wyrm();
@@ -1183,4 +1210,5 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_close_rift_aura);
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
+    RegisterSpellScript(spell_feed_stormcrest_eagle);
 }

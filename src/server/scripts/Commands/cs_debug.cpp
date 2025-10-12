@@ -73,7 +73,7 @@ public:
             { "hostile",        HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
-            { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
+            { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::Yes},
             { "cooldown",       HandleDebugCooldownCommand,            SEC_ADMINISTRATOR, Console::No },
             { "getitemstate",   HandleDebugGetItemStateCommand,        SEC_ADMINISTRATOR, Console::No },
             { "lootrecipient",  HandleDebugGetLootRecipientCommand,    SEC_ADMINISTRATOR, Console::No },
@@ -92,14 +92,15 @@ public:
             { "update",         HandleDebugUpdateCommand,              SEC_ADMINISTRATOR, Console::No },
             { "itemexpire",     HandleDebugItemExpireCommand,          SEC_ADMINISTRATOR, Console::No },
             { "areatriggers",   HandleDebugAreaTriggersCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::No },
+            { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::Yes},
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
             { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
             { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
             { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
-            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No }
+            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No },
+            { "visibilitydata", HandleDebugVisibilityDataCommand,      SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -911,7 +912,7 @@ public:
             Creature* passenger = nullptr;
             Acore::AllCreaturesOfEntryInRange check(handler->GetPlayer(), entry, 20.0f);
             Acore::CreatureSearcher<Acore::AllCreaturesOfEntryInRange> searcher(handler->GetPlayer(), passenger, check);
-            Cell::VisitAllObjects(handler->GetPlayer(), searcher, 30.0f);
+            Cell::VisitObjects(handler->GetPlayer(), searcher, 30.0f);
 
             if (!passenger || passenger == target)
                 return false;
@@ -1347,11 +1348,11 @@ public:
 
     static void HandleDebugObjectCountMap(ChatHandler* handler, Map* map)
     {
-        handler->PSendSysMessage("Map Id: {} Name: '{}' Instance Id: {} Creatures: {} GameObjects: {} SetActive Objects: {}",
+        handler->PSendSysMessage("Map Id: {} Name: '{}' Instance Id: {} Creatures: {} GameObjects: {} Update Objects: {}",
                 map->GetId(), map->GetMapName(), map->GetInstanceId(),
                 uint64(map->GetObjectsStore().Size<Creature>()),
                 uint64(map->GetObjectsStore().Size<GameObject>()),
-                uint64(map->GetActiveNonPlayersCount()));
+                uint64(map->GetUpdatableObjectsCount()));
 
         CreatureCountWorker worker;
         TypeContainerVisitor<CreatureCountWorker, MapStoredObjectTypesContainer> visitor(worker);
@@ -1401,6 +1402,36 @@ public:
         if (errMsg > 0)
             handler->PSendSysMessage(errMsg);
 
+        return true;
+    }
+
+    static bool HandleDebugVisibilityDataCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+            return false;
+
+        std::array<uint32, NUM_CLIENT_OBJECT_TYPES> objectByTypeCount = {};
+
+        ObjectVisibilityContainer const& objectVisibilityContainer = player->GetObjectVisibilityContainer();
+        for (auto const& kvPair : *objectVisibilityContainer.GetVisibleWorldObjectsMap())
+        {
+            WorldObject const* obj = kvPair.second;
+            ++objectByTypeCount[obj->GetTypeId()];
+        }
+
+        uint32 zoneWideVisibleObjectsInZone = 0;
+        if (ZoneWideVisibleWorldObjectsSet const* farVisibleSet = player->GetMap()->GetZoneWideVisibleWorldObjectsForZone(player->GetZoneId()))
+            zoneWideVisibleObjectsInZone = farVisibleSet->size();
+
+        handler->PSendSysMessage("Visibility Range: {}", player->GetVisibilityRange());
+        handler->PSendSysMessage("Visible Creatures: {}", objectByTypeCount[TYPEID_UNIT]);
+        handler->PSendSysMessage("Visible Players: {}", objectByTypeCount[TYPEID_PLAYER]);
+        handler->PSendSysMessage("Visible GameObjects: {}", objectByTypeCount[TYPEID_GAMEOBJECT]);
+        handler->PSendSysMessage("Visible DynamicObjects: {}", objectByTypeCount[TYPEID_DYNAMICOBJECT]);
+        handler->PSendSysMessage("Visible Corpses: {}", objectByTypeCount[TYPEID_CORPSE]);
+        handler->PSendSysMessage("Players we are visible to: {}", objectVisibilityContainer.GetVisiblePlayersMap().size());
+        handler->PSendSysMessage("Zone wide visible objects in zone: {}", zoneWideVisibleObjectsInZone);
         return true;
     }
 };

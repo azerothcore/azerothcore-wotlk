@@ -34,6 +34,7 @@ void AddSC_npc_stave_of_ancients();
 void AddSC_server_mail();
 void AddSC_transport_zeppelins();
 void AddSC_suns_reach_reclamation();
+void AddSC_scourge_invasion();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -57,4 +58,5 @@ void AddWorldScripts()
     AddSC_server_mail();
     AddSC_transport_zeppelins();
     AddSC_suns_reach_reclamation();
+    AddSC_scourge_invasion();
 }

@@ -25,7 +25,6 @@
 #define ATTACK_DISTANCE              5.0f
 #define VISIBILITY_COMPENSATION      15.0f                  // increase searchers
 #define INSPECT_DISTANCE             28.0f
-#define VISIBILITY_INC_FOR_GOBJECTS  30.0f                  // pussywizard
 #define SPELL_SEARCHER_COMPENSATION  30.0f                  // increase searchers size in case we have large npc near cell border
 #define TRADE_DISTANCE               11.11f
 #define MAX_VISIBILITY_DISTANCE      250.0f                 // max distance for visible objects, experimental
@@ -48,6 +47,8 @@
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
 #define DEFAULT_COLLISION_HEIGHT    2.03128f                // Most common value in dbc
+#define LEEWAY_MIN_MOVE_SPEED       4.97f                   // NYI
+#define LEEWAY_BONUS_RANGE          2.66f
 
 // used for creating values for respawn for example
 inline uint32 PAIR64_HIPART(uint64 x);

@@ -26,14 +26,17 @@
 
 enum ANData
 {
-    DATA_KRIKTHIR_THE_GATEWATCHER_EVENT = 0,
-    DATA_HADRONOX_EVENT                 = 1,
+    DATA_KRIKTHIR                       = 0,
+    DATA_HADRONOX                       = 1,
     DATA_ANUBARAK_EVENT                 = 2,
     MAX_ENCOUNTERS                      = 3
 };
 
 enum ANIds
 {
+    NPC_WATCHER_NARJIL                  = 28729,
+    NPC_WATCHER_GASHRA                  = 28730,
+    NPC_WATCHER_SILTHIK                 = 28731,
     NPC_SKITTERING_SWARMER              = 28735,
     NPC_SKITTERING_INFECTIOR            = 28736,
     NPC_KRIKTHIR_THE_GATEWATCHER        = 28684,
