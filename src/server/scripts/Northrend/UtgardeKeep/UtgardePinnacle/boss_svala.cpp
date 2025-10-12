@@ -388,7 +388,6 @@ public:
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     summons.DespawnAll();
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL, 25s);
                     break;
             }
 
