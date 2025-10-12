@@ -742,7 +742,7 @@ function pm2_create_service() {
     done < <(echo "$exec_definition" | jq -r '.args[]?')
 
     # Set stop exit codes based on restart policy
-    local -a pm2_args=(start "$exec_command_abs" --name "$service_name")
+    local -a pm2_args=(start "$exec_command_abs" --interpreter none --name "$service_name")
     if [ "$restart_policy" = "always" ]; then
         # PM2 will restart on any exit code (including 0)
         :
@@ -2283,7 +2283,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             print_help
             exit 1
         fi
-        if [ "$3" = "--follow" ]; then
+        if [ "${3:-}" = "--follow" ]; then
             service_logs "$2" "true"
         else
             service_logs "$2" "false"
