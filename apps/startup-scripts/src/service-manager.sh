@@ -131,7 +131,7 @@ function serialize_exec_definition() {
     done
 
     local args_json
-    args_json=$(printf '%s\0' "${rel_args[@]}" | jq -R -s 'split("\u0000")[:-1]')
+    args_json=$(printf '%s\0' "${rel_args[@]}" "__AC_SENTINEL__" | jq -R -s 'split("\u0000")[:-1]')
 
     jq -n --arg command "$rel_command" --argjson args "$args_json" '{command: $command, args: $args}'
 }
@@ -694,14 +694,20 @@ function get_service_info_resolved() {
     fi
 
     if [ -n "$exec_args_raw_json" ] && [ "$exec_args_raw_json" != "null" ]; then
+        local prev_arg=""
         while IFS= read -r arg; do
             if [[ -z "$arg" ]]; then
                 exec_args_resolved+=("$arg")
+            elif [ "$prev_arg" = "--config" ]; then
+                exec_args_resolved+=("$(make_path_absolute "$arg")")
             elif [[ "$arg" == /* ]]; then
+                exec_args_resolved+=("$(make_path_absolute "$arg")")
+            elif [[ "$arg" == */* && "$arg" != -* ]]; then
                 exec_args_resolved+=("$(make_path_absolute "$arg")")
             else
                 exec_args_resolved+=("$arg")
             fi
+            prev_arg="$arg"
         done < <(echo "$exec_args_raw_json" | jq -r '.[]?')
     fi
     
@@ -995,9 +1001,12 @@ function pm2_create_service() {
     local exec_command_abs
     exec_command_abs="$(make_path_absolute "$exec_command_rel")"
     local -a exec_args_abs=()
+    local prev_arg=""
     while IFS= read -r arg; do
         if [[ -z "$arg" ]]; then
             exec_args_abs+=("$arg")
+        elif [ "$prev_arg" = "--config" ]; then
+            exec_args_abs+=("$(make_path_absolute "$arg")")
         elif [[ "$arg" == /* ]]; then
             exec_args_abs+=("$(make_path_absolute "$arg")")
         elif [[ "$arg" == */* && "$arg" != -* ]]; then
@@ -1005,6 +1014,7 @@ function pm2_create_service() {
         else
             exec_args_abs+=("$arg")
         fi
+        prev_arg="$arg"
     done < <(echo "$exec_definition" | jq -r '.args[]?')
 
     # Set stop exit codes based on restart policy
