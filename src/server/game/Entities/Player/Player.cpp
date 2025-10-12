@@ -14396,7 +14396,7 @@ bool Player::CanSeeVendor(Creature const* creature) const
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
         return false;
 
-    uint32 menuId = creature->GetCreatureTemplate()->GossipMenuId;
+    uint32 const menuId = creature->GetCreatureTemplate()->GossipMenuId;
     if (!AnyVendorOptionAvailable(menuId, creature))
         return false;
 
