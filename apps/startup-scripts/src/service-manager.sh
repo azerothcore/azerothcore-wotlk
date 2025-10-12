@@ -17,6 +17,18 @@ ROOT_DIR="$(cd "$CURRENT_PATH/../../.." && pwd)"
 CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services}"
 REGISTRY_FILE="$CONFIG_DIR/service_registry.json"
 
+# Default values for variables that might be loaded from config files
+# This prevents "unbound variable" errors when sourcing configuration files
+RUN_ENGINE_CONFIG_FILE="${RUN_ENGINE_CONFIG_FILE:-}"
+SESSION_MANAGER="${SESSION_MANAGER:-}"
+SESSION_NAME="${SESSION_NAME:-}"
+BINPATH="${BINPATH:-}"
+SERVERBIN="${SERVERBIN:-}"
+CONFIG="${CONFIG:-}"
+RESTART_POLICY="${RESTART_POLICY:-}"
+GDB_ENABLED="${GDB_ENABLED:-}"
+SERVER_CONFIG="${SERVER_CONFIG:-}"
+
 # Colors for output
 readonly YELLOW='\033[1;33m'
 readonly GREEN='\033[0;32m'
@@ -755,12 +767,12 @@ function pm2_remove_service() {
         pm2 save
         echo -e "${GREEN}PM2 service '$service_name' stopped and removed${NC}"
         
-        # Remove from registry
-        remove_service_from_registry "$service_name"
+        # Note: Registry removal is handled by the caller (delete_service)
+        return 0
     else
-        echo -e "${YELLOW}PM2 service '$service_name' not found or already removed${NC}"
-        # Still try to remove from registry in case it's orphaned
-        remove_service_from_registry "$service_name"
+        echo -e "${YELLOW}PM2 service '$service_name' not found${NC}"
+        # Service not found in PM2 - let caller decide about registry
+        return 0
     fi
     
     return 0
@@ -1010,9 +1022,7 @@ function systemd_remove_service() {
             echo -e "${YELLOW}Note: Service may still be running but configuration was removed${NC}"
         fi
         
-        # Remove from registry
-        remove_service_from_registry "$service_name"
-        
+        # Note: Registry removal is handled by the caller (delete_service)
         return 0
     else
         echo -e "${RED}Failed to remove systemd service file '$service_file'${NC}"
@@ -1489,8 +1499,9 @@ function delete_service() {
     fi
     
     if [ "$removal_success" = "true" ]; then
-        # Always ensure registry entry is removed, even if underlying service file was missing
+        # Remove from registry only after successful service removal
         remove_service_from_registry "$service_name"
+        
         # Remove run-engine configuration file
         if [ -n "${RUN_ENGINE_CONFIG_FILE:-}" ] && [ -f "$RUN_ENGINE_CONFIG_FILE" ]; then
             rm -f "$RUN_ENGINE_CONFIG_FILE"
@@ -1503,6 +1514,7 @@ function delete_service() {
         echo -e "${GREEN}Service '$service_name' deleted successfully${NC}"
     else
         echo -e "${RED}Failed to remove service '$service_name' from $provider${NC}"
+        echo -e "${YELLOW}Registry entry preserved. Service may need manual cleanup.${NC}"
         return 1
     fi
 }
@@ -2132,10 +2144,12 @@ function attach_screen_session() {
 
 
 # Main execution
-check_dependencies
+# Only run the main logic if this script is executed directly (not sourced)
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    check_dependencies
 
-# Main command processing
-case "${1:-help}" in
+    # Main command processing
+    case "${1:-help}" in
     create)
         if [ $# -lt 3 ]; then
             echo -e "${RED}Error: Not enough arguments for create command${NC}"
@@ -2260,3 +2274,5 @@ case "${1:-help}" in
         exit 1
         ;;
 esac
+
+fi  # End of main execution block
