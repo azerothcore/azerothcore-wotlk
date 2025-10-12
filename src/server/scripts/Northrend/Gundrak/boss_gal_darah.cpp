@@ -52,16 +52,15 @@ enum Events
     EVENT_KILL_TALK                     = 1
 };
 
-struct boss_gal_darahAI : public BossAI
+struct boss_gal_darah : public BossAI
 {
-    boss_gal_darahAI(Creature* creature) : BossAI(creature, DATA_GAL_DARAH) {}
+    boss_gal_darah(Creature* creature) : BossAI(creature, DATA_GAL_DARAH) {}
 
     void Reset() override
     {
         BossAI::Reset();
         impaledList.clear();
         _stampedeVictim.Clear();
-        phaseCounter = 0;
     }
 
     void InitializeAI() override
@@ -168,7 +167,6 @@ struct boss_gal_darahAI : public BossAI
     }
 
 private:
-    uint8 phaseCounter;
     GuidSet impaledList;
     ObjectGuid _stampedeVictim;
 };
@@ -233,7 +231,7 @@ public:
 
 void AddSC_boss_gal_darah()
 {
-    RegisterGundrakeCreatureAI(boss_gal_darah);
+    RegisterGundrakCreatureAI(boss_gal_darah);
     RegisterSpellScript(spell_galdarah_impaling_charge);
     RegisterSpellScript(spell_galdarah_transform);
     new achievement_share_the_love();
