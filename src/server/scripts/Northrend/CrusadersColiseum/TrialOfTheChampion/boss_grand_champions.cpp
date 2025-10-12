@@ -246,7 +246,8 @@ public:
             events.Reset();
         }
 
-        void MoveInLineOfSight(Unit* who) override {
+        void MoveInLineOfSight(Unit* who) override
+        {
             if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST)
                 ScriptedAI::MoveInLineOfSight(who);
         }
@@ -415,7 +416,8 @@ public:
             }
         }
 
-        void MoveInLineOfSight(Unit* who) override {
+        void MoveInLineOfSight(Unit* who) override
+        {
             if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST)
                 npc_escortAI::MoveInLineOfSight(who);
         }
