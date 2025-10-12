@@ -76,7 +76,7 @@ struct boss_gal_darah : public BossAI
         if (spellInfo->Id == SPELL_TRANSFORM_TO_RHINO)
         {
             ScheduleTimedEvent(8s, 11s, [&] {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                 {
                     DoCast(target, SPELL_IMPALING_CHARGE);
                     impaledList.insert(target->GetGUID());
