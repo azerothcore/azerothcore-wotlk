@@ -85,11 +85,15 @@ public:
             DoCastSelf(SPELL_START_VISUAL);
         }
 
-        void ScheduleEvents(bool troll)
+        void ScheduleEvents()
         {
             scheduler.CancelAll();
 
-            if (troll)
+            ScheduleTimedEvent(32s, [&] {
+                ScheduleEvents();
+            }, 32s);
+
+            if (me->HasAura(SPELL_TRANSFORM_TO_RHINO))
             {
                 ScheduleTimedEvent(10s, [&]{
                     Talk(SAY_SUMMON_RHINO);
@@ -133,7 +137,7 @@ public:
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
 
-            ScheduleEvents(true);
+            ScheduleEvents();
             me->RemoveAurasDueToSpell(SPELL_START_VISUAL);
             me->InterruptNonMeleeSpells(true);
         }
