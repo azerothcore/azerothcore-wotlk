@@ -113,9 +113,11 @@ public:
             instance = creature->GetInstanceScript();
             Started = false;
             ArthasGUID.Clear();
+            lastBrazierGUID.Clear();
         }
 
         ObjectGuid ArthasGUID;
+        ObjectGuid lastBrazierGUID;
         bool Started;
         InstanceScript* instance;
         EventMap events;
@@ -133,6 +135,7 @@ public:
             summons.DespawnAll();
             events.Reset();
             events2.Reset();
+            lastBrazierGUID.Clear();
             if (!Started)
                 me->SetImmuneToAll(true);
             else
@@ -320,10 +323,24 @@ public:
                     me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
                     if (!braziers.empty())
                     {
-                        std::vector<Creature*> brazierVector(braziers.begin(), braziers.end());
-                        uint32 randomIndex = urand(0, brazierVector.size() - 1);
-                        Creature* selectedBrazier = brazierVector[randomIndex];
-                        selectedBrazier->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
+                        std::vector<Creature*> availableBraziers;
+                        for (Creature* brazier : braziers)
+                        {
+                            if (brazier->GetGUID() != lastBrazierGUID)
+                                availableBraziers.push_back(brazier);
+                        }
+
+                        if (availableBraziers.empty())
+                            availableBraziers.assign(braziers.begin(), braziers.end());
+
+                        uint32 randomIndex = urand(0, availableBraziers.size() - 1);
+                        Creature* selectedBrazier = availableBraziers[randomIndex];
+                        
+                        if (selectedBrazier)
+                        {
+                            selectedBrazier->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
+                            lastBrazierGUID = selectedBrazier->GetGUID();
+                        }
                     }
                     break;
                 }
@@ -356,6 +373,7 @@ public:
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveFall(0, true);
                     summons.DespawnAll();
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL, 25s);
                     break;
             }
 
