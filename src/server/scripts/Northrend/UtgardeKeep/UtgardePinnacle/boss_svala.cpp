@@ -136,17 +136,15 @@ public:
             events.Reset();
             events2.Reset();
             lastBrazierGUID.Clear();
-            
+
             if (!Started)
             {
-                // Before transformation - normal ground state
                 me->SetImmuneToAll(true);
                 me->SetHover(false);
                 me->SetDisableGravity(false);
             }
             else
             {
-                // After transformation - maintain hover state
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
                 me->SetHover(true);
@@ -346,7 +344,7 @@ public:
 
                         uint32 randomIndex = urand(0, availableBraziers.size() - 1);
                         Creature* selectedBrazier = availableBraziers[randomIndex];
-                        
+
                         if (selectedBrazier)
                         {
                             selectedBrazier->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
@@ -384,7 +382,7 @@ public:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->SetDisableGravity(false);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
-                    
+
                     AttackStart(me->GetVictim());
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
                     summons.DespawnAll();
