@@ -887,6 +887,7 @@ static LocationXYZO ThrallSpawn[] =
     // Valimathras Trashspawn
     { 1325.059f, 332.652f, -65.027f, 2.186f       },
     { 1270.474f, 350.982f, -65.027f, 0.034f       },
+    { 1805.753f, 285.499f, 70.399f, 4.691f       }
 };
 
 #define GOSSIP_WRYNN      "Reporting for duty, your majesty! Let the assault begin!"
@@ -2382,7 +2383,8 @@ public:
             switch (summoned->GetEntry())
             {
                 case NPC_BLIGHT_ABBERATION:
-                    summoned->AI()->AttackStart(me);
+                    summoned->SetHomePosition(me->GetPosition());
+                    summoned->AddThreat(me, 100.0f);
                     break;
                 case NPC_WARSONG_BATTLEGUARD:
                     summoned->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SYLVANAS_BUFF, true);
@@ -2424,6 +2426,10 @@ public:
                     me->AddThreat(summoned, 100.0f);
                     summoned->AI()->AttackStart(me);
                     break;
+                case NPC_KHANOK:
+                    summoned->SetHomePosition(me->GetPosition());
+                    summoned->AddThreat(me, 100.0f);
+                    summoned->AI()->AttackStart(me);
                 default:
                     break;
             }
@@ -2580,10 +2586,8 @@ public:
                     // Bossspawn 1
                     if (Creature* temp = me->SummonCreature(NPC_BLIGHT_ABBERATION, ThrallSpawn[28].x, ThrallSpawn[28].y, ThrallSpawn[28].z, ThrallSpawn[28].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900 * IN_MILLISECONDS))
                     {
-                        temp->GetMotionMaster()->MoveJump(ThrallSpawn[62].x, ThrallSpawn[62].y, ThrallSpawn[62].z, 10.0f, 20.0f, 0);
-                        temp->AddThreat(me, 100.0f);
                         me->AddThreat(temp, 100.0f);
-                        temp->AI()->AttackStart(me);
+                        me->AI()->AttackStart(temp);
                     }
                     break;
                 case 6:
@@ -2747,7 +2751,11 @@ public:
                     break;
                 // NPC_KHANOK - Inner Sunktum Spawn Middle
                 case 17:
-                    me->SummonCreature(NPC_KHANOK, ThrallSpawn[68].x, ThrallSpawn[68].y, ThrallSpawn[68].z, TEMPSUMMON_DEAD_DESPAWN);
+                    if (Creature* temp = me->SummonCreature(NPC_KHANOK, ThrallSpawn[68].x, ThrallSpawn[68].y, ThrallSpawn[68].z, TEMPSUMMON_DEAD_DESPAWN))
+                    {
+                        me->AddThreat(temp, 100.0f);
+                        me->AI()->AttackStart(temp);
+                    }
                     break;
                 case 18:
                     if (Creature* temp = me->SummonCreature(NPC_WARSONG_BATTLEGUARD, ThrallSpawn[69].x, ThrallSpawn[69].y, ThrallSpawn[69].z, ThrallSpawn[69].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 240 * IN_MILLISECONDS))
@@ -3167,9 +3175,8 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HostileList, NPC_DOCTOR_H, 1000.0f);
                                 me->GetCreatureListWithEntryInGrid(HostileList, NPC_CHEMIST_H, 1000.0f);
                                 me->GetCreatureListWithEntryInGrid(HostileList, NPC_BLIGHT_SLINGER, 1000.0f);
-                                if (!HostileList.empty())
-                                    for (std::list<Creature*>::iterator itr = HostileList.begin(); itr != HostileList.end(); itr++)
-                                        (*itr)->DespawnOrUnsummon();
+                                for (auto& creature : HostileList)
+                                    creature->DespawnOrUnsummon();
                                 for (uint8 i = 0; i < 7; ++i)
                                     me->SummonGameObject(GO_HORDE_BANNER, ThrallSpawn[i + 37].x, ThrallSpawn[i + 37].y, ThrallSpawn[i + 37].z, ThrallSpawn[i + 37].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
                                 SpawnWave(6);
@@ -3620,9 +3627,11 @@ public:
                                 valimathras->RemoveAura(SPELL_AURA_OF_VARIMATHRAS);
                                 valimathras->RemoveAura(SPELL_OPENING_LEGION_PORTALS);
                                 valimathras->AI()->Talk(SAY_VALIMATHRAS_ATTACK);
+                                valimathras->SetHomePosition(me->GetPosition());
                                 valimathras->AddThreat(me, 100.0f);
                                 me->AddThreat(valimathras, 100.0f);
                                 valimathras->AI()->AttackStart(me);
+                                me->AI()->AttackStart(valimathras);
                             }
                             bStepping = false;
                             JumpToNextStep(0 * IN_MILLISECONDS);
@@ -3945,7 +3954,6 @@ public:
         {
             me->SetCorpseDelay(1);
             me->SetRespawnTime(1);
-            _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20s);
             _events.ScheduleEvent(EVENT_BLACK_ARROW, 15s);
             _events.ScheduleEvent(EVENT_SHOOT, 5s);
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 6s);
@@ -3974,10 +3982,6 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_SUMMON_SKELETON:
-                        DoCast(me, SPELL_SUMMON_SKELETON);
-                        _events.ScheduleEvent(EVENT_SUMMON_SKELETON, 20s, 30s);
-                        break;
                     case EVENT_BLACK_ARROW:
                         if (Unit* victim = me->GetVictim())
                             DoCast(victim, SPELL_BLACK_ARROW);
