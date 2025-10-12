@@ -70,6 +70,7 @@ public:
         {
             BossAI::Reset();
             impaledList.clear();
+            _stampedeVictim.Clear();
             phaseCounter = 0;
         }
 
@@ -95,7 +96,7 @@ public:
                     Talk(SAY_SUMMON_RHINO);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
                     {
-                        _stampedVictim = target->GetGUID();
+                        _stampedeVictim = target->GetGUID();
                         DoCast(target, SPELL_STAMPEDE);
                     }
                 }, 15s);
@@ -150,7 +151,7 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            if (Unit* target = ObjectAccessor::GetUnit(*me, _stampedVictim))
+            if (Unit* target = ObjectAccessor::GetUnit(*me, _stampedeVictim))
                 summon->CastSpell(target, SPELL_STAMPEDE_DMG, true);
 
             summons.Summon(summon);
@@ -179,7 +180,7 @@ public:
         private:
             uint8 phaseCounter;
             GuidSet impaledList;
-            ObjectGuid _stampedVictim;
+            ObjectGuid _stampedeVictim;
     };
 };
 
