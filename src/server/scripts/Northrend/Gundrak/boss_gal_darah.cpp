@@ -89,11 +89,7 @@ public:
         {
             scheduler.CancelAll();
 
-            ScheduleTimedEvent(32s, [&] {
-                ScheduleEvents();
-            }, 32s);
-
-            if (me->HasAura(SPELL_TRANSFORM_TO_RHINO))
+            if (!me->HasAura(SPELL_TRANSFORM_TO_RHINO))
             {
                 ScheduleTimedEvent(10s, [&]{
                     Talk(SAY_SUMMON_RHINO);
@@ -111,6 +107,11 @@ public:
                 ScheduleTimedEvent(11s, 19s, [&] {
                     DoCastAOE(SPELL_WHIRLING_SLASH);
                 }, 17s, 19s);
+
+                ScheduleTimedEvent(32s, [&] {
+                    DoCastSelf(SPELL_TRANSFORM_TO_RHINO);
+                    ScheduleEvents();
+                }, 32s);
             }
             else
             {
@@ -129,6 +130,11 @@ public:
                 ScheduleTimedEvent(7s, 10s, [&] {
                     DoCastAOE(SPELL_STOMP);
                 }, 10s, 12s);
+
+                ScheduleTimedEvent(32s, [&] {
+                    DoCastSelf(SPELL_TRANSFORM_TO_TROLL);
+                    ScheduleEvents();
+                }, 32s);
             }
         }
 
