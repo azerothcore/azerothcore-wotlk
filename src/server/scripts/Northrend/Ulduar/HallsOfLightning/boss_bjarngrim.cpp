@@ -131,11 +131,6 @@ struct boss_bjarngrim : public npc_escortAI
         Start(true, false, ObjectGuid::Empty, nullptr, false, true);
     }
 
-    InstanceScript* m_pInstance;
-    EventMap events;
-    SummonList summons;
-    uint8 m_uiStance;
-
     void Reset() override
     {
         events.Reset();
@@ -357,14 +352,17 @@ struct boss_bjarngrim : public npc_escortAI
 
         DoMeleeAttackIfReady();
     }
+
+    private:
+        InstanceScript* m_pInstance;
+        EventMap events;
+        SummonList summons;
+        uint8 m_uiStance;
 };
 
 struct npc_stormforged_lieutenant : public ScriptedAI
 {
     npc_stormforged_lieutenant(Creature* creature) : ScriptedAI(creature) { }
-
-    EventMap events;
-    ObjectGuid BjarngrimGUID;
 
     void Reset() override
     {
@@ -408,6 +406,10 @@ struct npc_stormforged_lieutenant : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
+
+    private:
+        EventMap events;
+        ObjectGuid BjarngrimGUID;
 };
 
 void AddSC_boss_bjarngrim()
