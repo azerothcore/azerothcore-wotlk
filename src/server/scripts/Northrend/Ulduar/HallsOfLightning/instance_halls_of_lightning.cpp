@@ -34,17 +34,11 @@ public:
     {
         instance_halls_of_lightning_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
-            Initialize();
-        };
-
-        void Initialize() override
-        {
             SetHeaders(DataHeader);
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
+            SetBossNumber(MAX_ENCOUNTERS);
             volkhanAchievement = false;
             bjarngrimAchievement = false;
-        }
+        };
 
         bool IsEncounterInProgress() const override
         {
