@@ -59,14 +59,10 @@ struct boss_gal_darah : public BossAI
     void Reset() override
     {
         BossAI::Reset();
+        DoCastSelf(SPELL_START_VISUAL);
         impaledList.clear();
         _stampedeVictim.Clear();
-    }
 
-    void InitializeAI() override
-    {
-        BossAI::InitializeAI();
-        DoCastSelf(SPELL_START_VISUAL);
     }
 
     void JustReachedHome() override
@@ -75,35 +71,9 @@ struct boss_gal_darah : public BossAI
         DoCastSelf(SPELL_START_VISUAL);
     }
 
-    void ScheduleEvents()
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
     {
-        scheduler.CancelAll();
-
-        if (!me->HasAura(SPELL_TRANSFORM_TO_RHINO))
-        {
-            ScheduleTimedEvent(10s, [&] {
-                Talk(SAY_SUMMON_RHINO);
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
-                {
-                    _stampedeVictim = target->GetGUID();
-                    DoCast(target, SPELL_STAMPEDE);
-                }
-            }, 15s);
-
-            ScheduleTimedEvent(10s, 16s, [&] {
-                DoCastVictim(SPELL_PUNCTURE);
-            }, 15s, 18s);
-
-            ScheduleTimedEvent(11s, 19s, [&] {
-                DoCastAOE(SPELL_WHIRLING_SLASH);
-            }, 17s, 19s);
-
-            ScheduleTimedEvent(32s, [&] {
-                DoCastSelf(SPELL_TRANSFORM_TO_RHINO);
-                ScheduleEvents();
-            }, 32s);
-        }
-        else
+        if (spellInfo->Id == SPELL_TRANSFORM_TO_RHINO)
         {
             ScheduleTimedEvent(8s, 11s, [&] {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
@@ -126,6 +96,37 @@ struct boss_gal_darah : public BossAI
                 ScheduleEvents();
             }, 32s);
         }
+        else if (spellInfo->Id == SPELL_TRANSFORM_TO_TROLL)
+        {
+            ScheduleEvents();
+        }
+    }
+
+    void ScheduleEvents()
+    {
+        scheduler.CancelAll();
+
+        ScheduleTimedEvent(10s, [&] {
+            Talk(SAY_SUMMON_RHINO);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
+            {
+                _stampedeVictim = target->GetGUID();
+                DoCast(target, SPELL_STAMPEDE);
+            }
+        }, 15s);
+
+        ScheduleTimedEvent(10s, 16s, [&] {
+            DoCastVictim(SPELL_PUNCTURE);
+        }, 15s, 18s);
+
+        ScheduleTimedEvent(11s, 19s, [&] {
+            DoCastAOE(SPELL_WHIRLING_SLASH);
+        }, 17s, 19s);
+
+        ScheduleTimedEvent(32s, [&] {
+            DoCastSelf(SPELL_TRANSFORM_TO_RHINO);
+            scheduler.CancelAll();
+        }, 32s);
     }
 
     void JustEngagedWith(Unit* who) override
