@@ -172,7 +172,7 @@ function serialize_exec_definition() {
     done
 
     local args_json
-    args_json=$(printf '%s\0' "${rel_args[@]}" | jq -R -s 'split("\u0000")[:-1]')
+    args_json=$(printf '%s\0' "${rel_args[@]}" "__AC_SENTINEL__" | jq -R -s 'split("\u0000")[:-1]')
 
     jq -n --arg command "$rel_command" --argjson args "$args_json" '{command: $command, args: $args}'
 }
