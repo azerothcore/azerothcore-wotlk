@@ -14341,7 +14341,7 @@ bool Player::AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) c
 
     while (!menusToCheck.empty())
     {
-        uint32 currentMenuId = menusToCheck.front();
+        uint32 const currentMenuId = menusToCheck.front();
         menusToCheck.pop();
 
         if (visitedMenus.find(currentMenuId) != visitedMenus.end())
