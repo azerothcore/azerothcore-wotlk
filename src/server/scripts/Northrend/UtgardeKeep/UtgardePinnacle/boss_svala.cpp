@@ -136,13 +136,21 @@ public:
             events.Reset();
             events2.Reset();
             lastBrazierGUID.Clear();
+            
             if (!Started)
+            {
+                // Before transformation - normal ground state
                 me->SetImmuneToAll(true);
+                me->SetHover(false);
+                me->SetDisableGravity(false);
+            }
             else
             {
+                // After transformation - maintain hover state
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
                 me->SetHover(true);
+                me->SetDisableGravity(true);
             }
         }
 
@@ -233,6 +241,7 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
+                    me->SetDisableGravity(true);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
                     me->SetHover(true);
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
@@ -283,6 +292,7 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
+                    me->SetDisableGravity(false);
                     me->GetMotionMaster()->MoveFall(0, true);
                     events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
                     break;
@@ -324,6 +334,7 @@ public:
                     if (!braziers.empty())
                     {
                         std::vector<Creature*> availableBraziers;
+
                         for (Creature* brazier : braziers)
                         {
                             if (brazier->GetGUID() != lastBrazierGUID)
@@ -357,6 +368,7 @@ public:
                         DoTeleportPlayer(target, 296.632f, -346.075f, 90.63f, 4.6f);
                         me->NearTeleportTo(296.632f, -346.075f, 110.0f, 4.6f, false);
                         me->SetControlled(true, UNIT_STATE_ROOT);
+                        me->SetDisableGravity(true);
                     }
 
                     events.DelayEvents(25001); // +1 just to be sure
@@ -370,8 +382,11 @@ public:
                 case EVENT_SORROWGRAVE_FINISH_RITUAL:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->SetDisableGravity(false);
+                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
+                    
                     AttackStart(me->GetVictim());
-                    me->GetMotionMaster()->MoveFall(0, true);
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
                     summons.DespawnAll();
                     events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL, 25s);
                     break;
