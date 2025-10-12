@@ -3072,9 +3072,7 @@ public:
         WorldSession* session = handler->GetSession();
 
         if (!session)
-        {
             return false;
-        }
 
         auto SetBMMod = [&](bool enable)
         {
