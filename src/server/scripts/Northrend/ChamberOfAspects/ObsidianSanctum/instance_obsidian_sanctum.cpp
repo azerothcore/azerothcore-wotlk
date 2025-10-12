@@ -30,7 +30,7 @@ BossBoundaryData const boundaries =
 class instance_obsidian_sanctum : public InstanceMapScript
 {
 public:
-    instance_obsidian_sanctum() : InstanceMapScript("instance_obsidian_sanctum", 615) { }
+    instance_obsidian_sanctum() : InstanceMapScript("instance_obsidian_sanctum", MAP_THE_OBSIDIAN_SANCTUM) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

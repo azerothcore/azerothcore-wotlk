@@ -25,7 +25,7 @@
 class instance_pit_of_saron : public InstanceMapScript
 {
 public:
-    instance_pit_of_saron() : InstanceMapScript("instance_pit_of_saron", 658) { }
+    instance_pit_of_saron() : InstanceMapScript("instance_pit_of_saron", MAP_PIT_OF_SARON) { }
 
     struct instance_pit_of_saron_InstanceScript : public InstanceScript
     {

@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "Config.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"

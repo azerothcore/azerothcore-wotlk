@@ -217,7 +217,11 @@ enum AcoreStrings
     LANG_INVALID_GAMEOBJECT_TYPE        = 176,
     LANG_GAMEOBJECT_DAMAGED             = 177,
     LANG_GRID_POSITION                  = 178,
-    // 179-185 used in other client versions
+
+    LANG_ACCOUNT_FLAGS_PINFO            = 179,
+
+    // Free 180-185
+
     LANG_TRANSPORT_POSITION             = 186,
     LANG_PROFANITY_NAME                 = 187,
     LANG_2FA_SECRET_TOO_LONG            = 188,
@@ -331,7 +335,8 @@ enum AcoreStrings
     LANG_COMMAND_WHISPERON              = 285,
     LANG_COMMAND_WHISPEROFF             = 286,
     LANG_COMMAND_CREATGUIDNOTFOUND      = 287,
-    // TICKET STRINGS NEED REWRITE // 288-296 FREE
+    LANG_COMMAND_GONOTENOUGHSPAWNS      = 288,
+    // TICKET STRINGS NEED REWRITE // 289-296 FREE
 
     // END
     LANG_COMMAND_WANDER_DISTANCE        = 297,
@@ -971,7 +976,9 @@ enum AcoreStrings
     LANG_GUILD_INFO_BANK_GOLD           = 1181,
     LANG_GUILD_INFO_MOTD                = 1182,
     LANG_GUILD_INFO_EXTRA_INFO          = 1183,
-    // Room for more level 3              1184-1198 not used
+    LANG_GUILD_INFO_RANKS               = 1184,
+    LANG_GUILD_INFO_RANKS_LIST          = 1185,
+    // Room for more level 3              1186-1198 not used
 
     // Debug commands
     LANG_DO_NOT_USE_6X_DEBUG_AREATRIGGER_LEFT = 1999,
@@ -1168,8 +1175,10 @@ enum AcoreStrings
     LANG_GM_ANNOUNCE_COLOR               = 6615,
 
     LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
+    LANG_GM_SPECTATOR_ON                 = 6617,
+    LANG_GM_SPECTATOR_OFF                = 6618,
 
-    // Free strings 6617-7522
+    // Free strings 6619-7522
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,

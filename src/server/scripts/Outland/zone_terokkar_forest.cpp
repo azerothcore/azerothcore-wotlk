@@ -26,7 +26,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
-// Ours
 enum fumping
 {
     SPELL_SUMMON_SAND_GNOME1            = 39240,
@@ -221,7 +220,6 @@ class spell_q10898_skywing : public SpellScript
     }
 };
 
-// Theirs
 /*######
 ## npc_unkor_the_ruthless
 ######*/
@@ -612,7 +610,6 @@ public:
 
 void AddSC_terokkar_forest()
 {
-    // Ours
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
     RegisterSpellAndAuraScriptPair(spell_q10929_fumping, spell_q10929_fumping_aura);
     RegisterSpellScript(spell_q10036_torgos);
@@ -620,8 +617,6 @@ void AddSC_terokkar_forest()
     RegisterSpellScript(spell_q10923_evil_draws_near_periodic_aura);
     RegisterSpellScript(spell_q10923_evil_draws_near_visual);
     RegisterSpellScript(spell_q10898_skywing);
-
-    // Theirs
     new npc_unkor_the_ruthless();
     new npc_isla_starmane();
     new go_skull_pile();

@@ -30,7 +30,7 @@ static DoorData const doorData[] =
 class instance_mechanar : public InstanceMapScript
 {
 public:
-    instance_mechanar(): InstanceMapScript("instance_mechanar", 554) { }
+    instance_mechanar(): InstanceMapScript("instance_mechanar", MAP_TEMPEST_KEEP_THE_MECHANAR) { }
 
     struct instance_mechanar_InstanceMapScript : public InstanceScript
     {

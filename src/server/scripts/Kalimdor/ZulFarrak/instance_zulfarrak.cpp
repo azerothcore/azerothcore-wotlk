@@ -106,7 +106,7 @@ static PyramidEventData pyramidSpawns[pyramidSpawnTotal] =
 class instance_zulfarrak : public InstanceMapScript
 {
 public:
-    instance_zulfarrak() : InstanceMapScript(ZFScriptName, 209) {}
+    instance_zulfarrak() : InstanceMapScript(ZFScriptName, MAP_ZUL_FARRAK) {}
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
@@ -498,7 +498,7 @@ class spell_zulfarrak_unlocking : public SpellScript
         std::list<WorldObject*> cagesList;
         Acore::AllWorldObjectsInRange objects(GetCaster(), 15.0f);
         Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(GetCaster(), cagesList, objects);
-        Cell::VisitAllObjects(GetCaster(), searcher, 15.0f);
+        Cell::VisitObjects(GetCaster(), searcher, 15.0f);
         for (std::list<WorldObject*>::const_iterator itr = cagesList.begin(); itr != cagesList.end(); ++itr)
         {
             if (GameObject* go = (*itr)->ToGameObject())

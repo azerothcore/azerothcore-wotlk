@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Renataki
-SD%Complete: 100
-SDComment:
-SDCategory: Zul'Gurub
-EndScriptData */
-
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "zulgurub.h"
@@ -150,7 +143,7 @@ public:
                         events.ScheduleEvent(EVENT_VANISH, 38s, 45s);
                         return;
                     case EVENT_AMBUSH:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                         {
                             me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetOrientation());
                             DoCast(target, SPELL_AMBUSH, true);

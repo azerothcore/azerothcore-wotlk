@@ -58,11 +58,7 @@ uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, D
 
     for (auto const& [scriptID, script] : ScriptRegistry<UnitScript>::ScriptPointerList)
     {
-        auto const& dmg = script->DealDamage(AttackerUnit, pVictim, damage, damagetype);
-        if (dmg != damage)
-        {
-            return damage;
-        }
+        damage = script->DealDamage(AttackerUnit, pVictim, damage, damagetype);
     }
 
     return damage;

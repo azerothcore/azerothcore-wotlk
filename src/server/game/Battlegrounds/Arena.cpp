@@ -26,6 +26,7 @@
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
 void ArenaScore::AppendToPacket(WorldPacket& data)
@@ -150,14 +151,14 @@ void Arena::RemovePlayer(Player* /*player*/)
 void Arena::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(2);
-    packet.Worldstates.emplace_back(ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN, GetAlivePlayersCountByTeam(TEAM_HORDE));
-    packet.Worldstates.emplace_back(ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD, GetAlivePlayersCountByTeam(TEAM_ALLIANCE));
+    packet.Worldstates.emplace_back(WORLD_STATE_ARENA_ALIVE_PLAYERS_GREEN, GetAlivePlayersCountByTeam(TEAM_HORDE));
+    packet.Worldstates.emplace_back(WORLD_STATE_ARENA_ALIVE_PLAYERS_GOLD, GetAlivePlayersCountByTeam(TEAM_ALLIANCE));
 }
 
 void Arena::UpdateArenaWorldState()
 {
-    UpdateWorldState(ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN, GetAlivePlayersCountByTeam(TEAM_HORDE));
-    UpdateWorldState(ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD, GetAlivePlayersCountByTeam(TEAM_ALLIANCE));
+    UpdateWorldState(WORLD_STATE_ARENA_ALIVE_PLAYERS_GREEN, GetAlivePlayersCountByTeam(TEAM_HORDE));
+    UpdateWorldState(WORLD_STATE_ARENA_ALIVE_PLAYERS_GOLD, GetAlivePlayersCountByTeam(TEAM_ALLIANCE));
 }
 
 void Arena::HandleKillPlayer(Player* player, Player* killer)

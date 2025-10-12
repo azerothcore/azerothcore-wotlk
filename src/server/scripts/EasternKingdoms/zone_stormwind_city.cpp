@@ -15,21 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Stormwind_City
-SD%Complete: 100
-SDComment: Quest support: 1447, 4185, 11223, 434.
-SDCategory: Stormwind City
-EndScriptData */
-
-/* ContentData
-npc_archmage_malin
-npc_tyrion
-npc_tyrion_spybot
-npc_marzon_silent_blade
-npc_lord_gregor_lescovar
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -472,10 +457,32 @@ public:
     }
 };
 
+enum KingVarianWrynn : uint32
+{
+    // Deathknight Starting Zone End
+    QUEST_WHERE_KINGS_WALK       = 13188,
+};
+
+class npc_king_varian_wrynn : public CreatureScript
+{
+public:
+    npc_king_varian_wrynn() : CreatureScript("npc_king_varian_wrynn") { }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/) override
+    {
+
+        if (quest->GetQuestId() == QUEST_WHERE_KINGS_WALK)
+            sLFGMgr->InitializeLockedDungeons(player);
+
+        return true;
+    }
+};
+
 void AddSC_stormwind_city()
 {
     new npc_tyrion();
     new npc_tyrion_spybot();
     new npc_lord_gregor_lescovar();
     new npc_marzon_silent_blade();
+    new npc_king_varian_wrynn();
 }

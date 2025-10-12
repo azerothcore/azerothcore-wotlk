@@ -15,19 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- /* ScriptData
- Name: server_commandscript
- %Complete: 100
- Comment: All server related commands
- Category: commandscripts
- EndScriptData */
-
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Common.h"
 #include "GameTime.h"
 #include "GitRevision.h"
 #include "Log.h"
+#include "MapMgr.h"
 #include "ModuleMgr.h"
 #include "MotdMgr.h"
 #include "MySQLThreading.h"
@@ -108,7 +102,10 @@ public:
     // Triggering corpses expire check in world
     static bool HandleServerCorpsesCommand(ChatHandler* /*handler*/)
     {
-        sWorld->RemoveOldCorpses();
+        sMapMgr->DoForAllMaps([](Map* map)
+        {
+            map->RemoveOldCorpses();
+        });
         return true;
     }
 

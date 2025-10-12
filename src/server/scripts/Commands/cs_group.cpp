@@ -36,6 +36,7 @@ public:
             { "join",    HandleGroupJoinCommand,    SEC_GAMEMASTER, Console::No },
             { "remove",  HandleGroupRemoveCommand,  SEC_GAMEMASTER, Console::No },
             { "disband", HandleGroupDisbandCommand, SEC_GAMEMASTER, Console::No },
+            { "revive",  HandleGroupReviveCommand,  SEC_GAMEMASTER, Console::No },
             { "leader",  HandleGroupLeaderCommand,  SEC_GAMEMASTER, Console::No }
         };
 
@@ -252,6 +253,39 @@ public:
             if (flags.empty())
             {
                 flags = "None";
+            }
+        }
+
+        return true;
+    }
+
+    static bool HandleGroupReviveCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+            return false;
+
+        Player* targetPlayer = target->GetConnectedPlayer();
+        Group* group = targetPlayer->GetGroup();
+        std::string nameLink = handler->playerLink(target->GetName());
+
+        if (!group)
+        {
+            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink);
+            return false;
+        }
+
+        for (GroupReference* it = group->GetFirstMember(); it != nullptr; it = it->next())
+        {
+            Player* target = it->GetSource();
+            if (target)
+            {
+                target->RemoveAurasDueToSpell(27827); // Spirit of Redemption
+                target->ResurrectPlayer(!AccountMgr::IsPlayerAccount(target->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
+                target->SpawnCorpseBones();
+                target->SaveToDB(false, false);
             }
         }
 

@@ -21,7 +21,7 @@
 class instance_the_stockade : public InstanceMapScript
 {
 public:
-    instance_the_stockade() : InstanceMapScript("instance_the_stockade", 34) { }
+    instance_the_stockade() : InstanceMapScript("instance_the_stockade", MAP_STORMWIND_STOCKADE) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

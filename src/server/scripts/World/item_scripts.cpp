@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "ItemScript.h"
 #include "Player.h"
@@ -45,11 +46,11 @@ public:
         switch (itemId)
         {
             case 24538:
-                if (player->GetAreaId() != 3628)
+                if (player->GetAreaId() != AREA_HALAA)
                     disabled = true;
                 break;
             case 34489:
-                if (player->GetZoneId() != 4080)
+                if (player->GetZoneId() != AREA_ISLE_OF_QUEL_DANAS)
                     disabled = true;
                 break;
             case 34475:
@@ -135,9 +136,7 @@ public:
 
 enum PetrovClusterBombs
 {
-    SPELL_PETROV_BOMB           = 42406,
-    AREA_ID_SHATTERED_STRAITS   = 4064,
-    ZONE_ID_HOWLING             = 495
+    SPELL_PETROV_BOMB           = 42406
 };
 
 class item_petrov_cluster_bombs : public ItemScript
@@ -147,10 +146,10 @@ public:
 
     bool OnUse(Player* player, Item* item, const SpellCastTargets& /*targets*/) override
     {
-        if (player->GetZoneId() != ZONE_ID_HOWLING)
+        if (player->GetZoneId() != AREA_HOWLING_FJORD)
             return false;
 
-        if (!player->GetTransport() || player->GetAreaId() != AREA_ID_SHATTERED_STRAITS)
+        if (!player->GetTransport() || player->GetAreaId() != AREA_SHATTERED_STRAITS)
         {
             player->SendEquipError(EQUIP_ERR_NONE, item, nullptr);
 

@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: account_commandscript
-%Complete: 100
-Comment: All account related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AES.h"
 #include "AccountMgr.h"
 #include "Base32.h"
@@ -278,10 +271,15 @@ public:
         ///- %Parse the command line arguments
         char* accountName = strtok((char*)args, " ");
         char* password = strtok(nullptr, " ");
+        char* email = strtok(nullptr, " ");
+
         if (!accountName || !password)
             return false;
 
-        AccountOpResult result = AccountMgr::CreateAccount(std::string(accountName), std::string(password));
+        // if email is not specified, use empty string
+        std::string emailStr = email ? email : "";
+
+        AccountOpResult result = AccountMgr::CreateAccount(std::string(accountName), std::string(password), emailStr);
         switch (result)
         {
             case AOR_OK:

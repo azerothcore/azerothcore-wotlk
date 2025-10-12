@@ -36,7 +36,7 @@ bool EoEDrakeEnterVehicleEvent::Execute(uint64 /*eventTime*/, uint32 /*updateTim
 class instance_eye_of_eternity : public InstanceMapScript
 {
 public:
-    instance_eye_of_eternity() : InstanceMapScript("instance_eye_of_eternity", 616) { }
+    instance_eye_of_eternity() : InstanceMapScript("instance_eye_of_eternity", MAP_THE_EYE_OF_ETERNITY) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

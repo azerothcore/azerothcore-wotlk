@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "firework_show.h"
 #include "firework_show_BootyBay.h"
 #include "firework_show_Exodar.h"
@@ -32,16 +33,16 @@
 
 // <mapId, zoneId>, show
 std::map<std::pair<uint32, uint32>, FireworkShow const *> const FireworkShowStore = {
-    { { 0,   1    }, &fireworkShowIronforge    },
-    { { 0,   33   }, &fireworkShowBootyBay     },
-    { { 0,   1497 }, &fireworkShowUndercity    },
-    { { 0,   1519 }, &fireworkShowStormwind    },
-    { { 1,   141  }, &fireworkShowTeldrassil   },
-    { { 1,   1637 }, &fireworkShowOrgrimmar    },
-    { { 1,   1638 }, &fireworkShowThunderBluff },
-    { { 530, 3430 }, &fireworkShowSilvermoon   },
-    { { 530, 3557 }, &fireworkShowExodar       },
-    { { 530, 3703 }, &fireworkShowShattrath    },
+    { { MAP_EASTERN_KINGDOMS, AREA_DUN_MOROGH         }, &fireworkShowIronforge    },
+    { { MAP_EASTERN_KINGDOMS, AREA_STRANGLETHORN_VALE }, &fireworkShowBootyBay     },
+    { { MAP_EASTERN_KINGDOMS, AREA_UNDERCITY          }, &fireworkShowUndercity    },
+    { { MAP_EASTERN_KINGDOMS, AREA_STORMWIND_CITY     }, &fireworkShowStormwind    },
+    { { MAP_KALIMDOR,         AREA_TELDRASSIL         }, &fireworkShowTeldrassil   },
+    { { MAP_KALIMDOR,         AREA_ORGRIMMAR          }, &fireworkShowOrgrimmar    },
+    { { MAP_KALIMDOR,         AREA_THUNDER_BLUFF      }, &fireworkShowThunderBluff },
+    { { MAP_OUTLAND,          AREA_EVERSONG_WOODS     }, &fireworkShowSilvermoon   },
+    { { MAP_OUTLAND,          AREA_THE_EXODAR         }, &fireworkShowExodar       },
+    { { MAP_OUTLAND,          AREA_SHATTRATH_CITY     }, &fireworkShowShattrath    },
 };
 
 struct go_firework_show : public GameObjectAI

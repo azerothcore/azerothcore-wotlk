@@ -37,7 +37,7 @@ ObjectData const creatureData[] =
 class instance_arcatraz : public InstanceMapScript
 {
 public:
-    instance_arcatraz() : InstanceMapScript("instance_arcatraz", 552) { }
+    instance_arcatraz() : InstanceMapScript("instance_arcatraz", MAP_TEMPEST_KEEP_THE_ARCATRAZ) { }
 
     struct instance_arcatraz_InstanceMapScript : public InstanceScript
     {

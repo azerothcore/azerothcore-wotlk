@@ -57,7 +57,7 @@ Position const KalecgosSpawnPos = { 164.3747f, -397.1197f, 2.151798f, 1.66219f }
 class instance_magisters_terrace : public InstanceMapScript
 {
 public:
-    instance_magisters_terrace() : InstanceMapScript("instance_magisters_terrace", 585) { }
+    instance_magisters_terrace() : InstanceMapScript("instance_magisters_terrace", MAP_MAGISTERS_TERRACE) { }
 
     struct instance_magisters_terrace_InstanceMapScript : public InstanceScript
     {

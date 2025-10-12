@@ -307,7 +307,7 @@ public:
         else
         {
             uint32 timer = wintergrasp->GetTimer() / 1000;
-            player->SendUpdateWorldState(4354, GameTime::GetGameTime().count() + timer);
+            player->SendUpdateWorldState(WORLD_STATE_BATTLEFIELD_WG_CLOCK_TEXTS, GameTime::GetGameTime().count() + timer);
             if (timer < 15 * MINUTE)
             {
                 AddGossipItemFor(player, WG_GOSSIP_MENU_QUEUE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);

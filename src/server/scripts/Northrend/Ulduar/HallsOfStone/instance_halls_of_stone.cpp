@@ -23,7 +23,7 @@
 class instance_halls_of_stone : public InstanceMapScript
 {
 public:
-    instance_halls_of_stone() : InstanceMapScript("instance_halls_of_stone", 599) { }
+    instance_halls_of_stone() : InstanceMapScript("instance_halls_of_stone", MAP_HALLS_OF_STONE) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

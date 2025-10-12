@@ -28,7 +28,7 @@ ObjectData const creatureData[] =
 class instance_onyxias_lair : public InstanceMapScript
 {
 public:
-    instance_onyxias_lair() : InstanceMapScript("instance_onyxias_lair", 249) { }
+    instance_onyxias_lair() : InstanceMapScript("instance_onyxias_lair", MAP_ONYXIAS_LAIR) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

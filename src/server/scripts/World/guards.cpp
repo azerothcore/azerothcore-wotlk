@@ -15,19 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Guards
-SD%Complete: 100
-SDComment:
-SDCategory: Guards
-EndScriptData */
-
-/* ContentData
-guard_generic
-guard_shattrath_aldor
-guard_shattrath_scryer
-EndContentData */
-
 #include "CreatureScript.h"
 #include "GuardAI.h"
 #include "Player.h"

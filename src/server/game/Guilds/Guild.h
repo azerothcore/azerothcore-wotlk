@@ -699,7 +699,7 @@ public:
     void HandleSetEmblem(WorldSession* session, const EmblemInfo& emblemInfo);
     void HandleSetLeader(WorldSession* session, std::string_view name);
     void HandleSetBankTabInfo(WorldSession* session, uint8 tabId, std::string_view name, std::string_view icon);
-    void HandleSetMemberNote(WorldSession* session, std::string_view name, std::string_view note, bool officer);
+    void HandleSetMemberNote(WorldSession* session, std::string_view name, std::string_view note, bool isPublic);
     void HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_view name, uint32 rights, uint32 moneyPerDay, std::array<GuildBankRightsAndSlots, GUILD_BANK_MAX_TABS> const& rightsAndSlots);
     void HandleBuyBankTab(WorldSession* session, uint8 tabId);
     void HandleInviteMember(WorldSession* session, std::string const& name);

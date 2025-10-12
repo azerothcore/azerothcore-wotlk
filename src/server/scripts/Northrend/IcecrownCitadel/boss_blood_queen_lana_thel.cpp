@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
@@ -798,7 +799,7 @@ class spell_blood_queen_vampiric_bite : public SpellScript
 
     SpellCastResult CheckTarget()
     {
-        if (GetExplTargetUnit()->GetMapId() != 631)
+        if (GetExplTargetUnit()->GetMapId() != MAP_ICECROWN_CITADEL)
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         if (IsVampire(GetExplTargetUnit()))
         {
@@ -819,7 +820,7 @@ class spell_blood_queen_vampiric_bite : public SpellScript
             return;
         }
 
-        if (!GetCaster()->IsPlayer() || GetCaster()->GetMapId() != 631)
+        if (!GetCaster()->IsPlayer() || GetCaster()->GetMapId() != MAP_ICECROWN_CITADEL)
             return;
         InstanceScript* instance = GetCaster()->GetInstanceScript();
         if (!instance || instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != IN_PROGRESS)

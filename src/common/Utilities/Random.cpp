@@ -69,6 +69,14 @@ Milliseconds randtime(Milliseconds min, Milliseconds max)
     return min + Milliseconds(urand(0, diff));
 }
 
+Seconds randtime(Seconds min, Seconds max)
+{
+    long long diff = max.count() - min.count();
+    ASSERT(diff >= 0);
+    ASSERT(diff <= (uint32) - 1);
+    return min + Seconds(urand(0, diff));
+}
+
 uint32 rand32()
 {
     return GetRng()->RandomUInt32();

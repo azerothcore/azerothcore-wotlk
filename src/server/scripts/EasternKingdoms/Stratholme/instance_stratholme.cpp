@@ -58,7 +58,7 @@ Position const SlaughterPos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
 class instance_stratholme : public InstanceMapScript
 {
 public:
-    instance_stratholme() : InstanceMapScript("instance_stratholme", 329) { }
+    instance_stratholme() : InstanceMapScript("instance_stratholme", MAP_STRATHOLME) { }
 
     struct instance_stratholme_InstanceMapScript : public InstanceScript
     {

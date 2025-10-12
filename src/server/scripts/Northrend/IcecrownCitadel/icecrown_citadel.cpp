@@ -16,6 +16,7 @@
  */
 
 #include "icecrown_citadel.h"
+#include "AreaDefines.h"
 #include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -627,7 +628,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_DEATH_PLAGUE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_RECENTLY_INFECTED))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_RECENTLY_INFECTED))
                         {
                             Talk(EMOTE_DEATH_PLAGUE_WARNING, target);
                             DoCast(target, SPELL_DEATH_PLAGUE);
@@ -855,7 +856,7 @@ public:
                 std::list<Creature*> temp;
                 FrostwingVrykulSearcher check(me, 150.0f);
                 Acore::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
-                Cell::VisitGridObjects(me, searcher, 150.0f);
+                Cell::VisitObjects(me, searcher, 150.0f);
 
                 _aliveTrash.clear();
                 for (std::list<Creature*>::iterator itr = temp.begin(); itr != temp.end(); ++itr)
@@ -900,14 +901,14 @@ public:
                 Player* player = nullptr;
                 Acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
                 Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
-                Cell::VisitWorldObjects(me, searcher, 140.0f);
+                Cell::VisitObjects(me, searcher, 140.0f);
                 // wipe
                 if (!player || me->GetExactDist(4357.0f, 2606.0f, 350.0f) > 125.0f)
                 {
                     //Talk(SAY_CROK_DEATH);
                     FrostwingGauntletRespawner respawner;
                     Acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
-                    Cell::VisitGridObjects(me, worker, 333.0f);
+                    Cell::VisitObjects(me, worker, 333.0f);
                     return;
                 }
             }
@@ -1161,7 +1162,7 @@ public:
                     Talk(SAY_SVALNA_AGGRO);
                     break;
                 case EVENT_IMPALING_SPEAR:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_IMPALING_SPEAR))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         me->AddAura(70203, me);
@@ -1347,7 +1348,7 @@ public:
                     Events.ScheduleEvent(EVENT_ARNATH_SMITE, 4s, 7s);
                     break;
                 case EVENT_ARNATH_DOMINATE_MIND:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_DOMINATE_MIND))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_DOMINATE_MIND))
                         DoCast(target, SPELL_DOMINATE_MIND);
                     Events.ScheduleEvent(EVENT_ARNATH_DOMINATE_MIND, 28s, 37s);
                     break;
@@ -1364,7 +1365,7 @@ public:
             Creature* target = nullptr;
             Acore::MostHPMissingInRange u_check(me, 60.0f, 0);
             Acore::CreatureLastSearcher<Acore::MostHPMissingInRange> searcher(me, target, u_check);
-            Cell::VisitGridObjects(me, searcher, 60.0f);
+            Cell::VisitObjects(me, searcher, 60.0f);
             return target;
         }
     };
@@ -1425,7 +1426,7 @@ public:
                         Events.ScheduleEvent(EVENT_BRANDON_JUDGEMENT_OF_COMMAND, 8s, 13s);
                         break;
                     case EVENT_BRANDON_HAMMER_OF_BETRAYAL:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
                             DoCast(target, SPELL_HAMMER_OF_BETRAYAL);
                         Events.ScheduleEvent(EVENT_BRANDON_HAMMER_OF_BETRAYAL, 45s, 60s);
                         break;
@@ -1552,12 +1553,12 @@ public:
                         Events.ScheduleEvent(EVENT_RUPERT_FEL_IRON_BOMB, 15s, 20s);
                         break;
                     case EVENT_RUPERT_MACHINE_GUN:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                             DoCast(target, SPELL_MACHINE_GUN);
                         Events.ScheduleEvent(EVENT_RUPERT_MACHINE_GUN, 25s, 30s);
                         break;
                     case EVENT_RUPERT_ROCKET_LAUNCH:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                             DoCast(target, SPELL_ROCKET_LAUNCH);
                         Events.ScheduleEvent(EVENT_RUPERT_ROCKET_LAUNCH, 10s, 15s);
                         break;
@@ -2260,7 +2261,7 @@ public:
                     {
                         FrostwingGauntletRespawner respawner;
                         Acore::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
-                        Cell::VisitGridObjects(crok, worker, 333.0f);
+                        Cell::VisitObjects(crok, worker, 333.0f);
                         return true;
                     }
                     else
@@ -2397,7 +2398,7 @@ class spell_icc_yd_summon_undead : public SpellScript
     void HandleDummyLaunch(SpellEffIndex /*effIndex*/)
     {
         if (Unit* c = GetCaster())
-            if (c->GetMapId() == 631)
+            if (c->GetMapId() == MAP_ICECROWN_CITADEL)
                 for (uint8 i = 0; i < 5; ++i)
                     c->CastSpell(c, 71302, true);
     }

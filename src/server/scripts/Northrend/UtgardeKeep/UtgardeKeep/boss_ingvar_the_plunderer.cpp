@@ -366,7 +366,7 @@ struct boss_ingvar_the_plunderer : public ScriptedAI
         case EVENT_AXE_PICKUP:
             if (Creature* c = ObjectAccessor::GetCreature(*me, ThrowGUID))
             {
-                c->DestroyForNearbyPlayers();
+                c->DestroyForVisiblePlayers();
                 c->DespawnOrUnsummon();
                 summons.DespawnAll();
             }

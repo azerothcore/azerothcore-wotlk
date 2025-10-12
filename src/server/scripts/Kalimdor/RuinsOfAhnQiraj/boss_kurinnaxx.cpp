@@ -57,7 +57,7 @@ struct boss_kurinnaxx : public BossAI
             context.Repeat(8s, 10s);
         }).Schedule(5s, 15s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.f, true, false))
             {
                 target->CastSpell(target, SPELL_SAND_TRAP, true, nullptr, nullptr, me->GetGUID());
             }

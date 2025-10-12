@@ -81,7 +81,7 @@ struct boss_lieutenant_drake : public BossAI
             context.Repeat(25s);
         }).Schedule(1s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, false, false))
             {
                 DoCast(target, SPELL_EXPLODING_SHOT);
             }

@@ -15,21 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Tanaris
-SD%Complete: 80
-SDComment: Quest support: 1560, 2954, 4005, 10277, 10279(Special flight path). Noggenfogger vendor
-SDCategory: Tanaris
-EndScriptData */
-
-/* ContentData
-npc_aquementas
-npc_custodian_of_time
-npc_steward_of_time
-npc_stone_watcher_of_norgannon
-npc_tooga
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

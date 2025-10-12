@@ -50,7 +50,7 @@ DoorData const doorData[] =
 class instance_temple_of_ahnqiraj : public InstanceMapScript
 {
 public:
-    instance_temple_of_ahnqiraj() : InstanceMapScript("instance_temple_of_ahnqiraj", 531) { }
+    instance_temple_of_ahnqiraj() : InstanceMapScript("instance_temple_of_ahnqiraj", MAP_AHN_QIRAJ_TEMPLE) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

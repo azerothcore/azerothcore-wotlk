@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "MapMgr.h"
@@ -26,6 +27,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
+#include "WorldStateDefines.h"
 #include "ruby_sanctum.h"
 
 enum Texts
@@ -186,7 +188,7 @@ public:
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         InstanceScript* instance = _owner->GetInstanceScript();
-        if (!instance || _owner->GetMapId() != 724)
+        if (!instance || _owner->GetMapId() != MAP_THE_RUBY_SANCTUM)
             return true;
 
         if (instance->GetBossState(DATA_HALION) != IN_PROGRESS)
@@ -395,7 +397,7 @@ public:
                     events.ScheduleEvent(EVENT_METEOR_STRIKE, 40s);
                     break;
                 case EVENT_FIERY_COMBUSTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false, -SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_FIERY_COMBUSTION, false);
                     events.ScheduleEvent(EVENT_FIERY_COMBUSTION, 25s);
                     break;
@@ -538,7 +540,7 @@ public:
                     _events.ScheduleEvent(EVENT_BREATH, 10s, 12s);
                     break;
                 case EVENT_SOUL_CONSUMPTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, SPELL_TWILIGHT_REALM))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false, SPELL_TWILIGHT_REALM))
                         me->CastSpell(target, SPELL_SOUL_CONSUMPTION, false);
                     _events.ScheduleEvent(EVENT_SOUL_CONSUMPTION, 20s);
                     break;
@@ -715,8 +717,8 @@ public:
                     break;
             }
 
-            _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, _corporeality * 10);
-            _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 100 - _corporeality * 10);
+            _instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, _corporeality * 10);
+            _instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 100 - _corporeality * 10);
 
             if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_TWILIGHT_HALION)))
             {
@@ -949,7 +951,7 @@ public:
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
             return;
 
-        if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != 724)
+        if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != MAP_THE_RUBY_SANCTUM)
             return;
 
         GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
@@ -1272,9 +1274,9 @@ class spell_halion_twilight_division : public SpellScript
         if (GameObject* gobject = halion->FindNearestGameObject(GO_HALION_PORTAL_1, 100.0f))
             gobject->Delete();
 
-        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 1);
-        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, 50);
-        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 50);
+        instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 1);
+        instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 50);
+        instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 50);
     }
 
     void Register() override

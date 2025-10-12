@@ -78,6 +78,7 @@ void AddSC_bosses_opera();
 void AddSC_boss_netherspite();
 void AddSC_karazhan();
 void AddSC_boss_nightbane();
+void AddSC_boss_tenris_mirkblood();
 void AddSC_boss_felblood_kaelthas();         // Magister's Terrace
 void AddSC_boss_selin_fireheart();
 void AddSC_boss_vexallus();
@@ -229,6 +230,7 @@ void AddEasternKingdomsScripts()
     AddSC_boss_netherspite();
     AddSC_karazhan();
     AddSC_boss_nightbane();
+    AddSC_boss_tenris_mirkblood();
     AddSC_boss_felblood_kaelthas();         // Magister's Terrace
     AddSC_boss_selin_fireheart();
     AddSC_boss_vexallus();

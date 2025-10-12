@@ -21,17 +21,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"
-/* ScriptData
-SDName: Nagrand
-SD%Complete: 90
-SDComment: Quest support: 9868, 9874, 10085. TextId's unknown for altruis_the_sufferer and greatmother_geyah (npc_text)
-SDCategory: Nagrand
-EndScriptData */
-
-/* ContentData
-npc_maghar_captive
-npc_creditmarker_visit_with_ancestors
-EndContentData */
 
 /*#####
 ## npc_maghar_captive

@@ -73,7 +73,7 @@ struct boss_mekgineer_steamrigger : public BossAI
             context.Repeat(35100ms, 54100ms);
         }).Schedule(6050ms, 17650ms, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_SAW_BLADE, 1) != SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_SAW_BLADE, 0, 0.0f, true, false, false) != SPELL_CAST_OK)
             {
                 DoCastVictim(SPELL_SAW_BLADE);
             }

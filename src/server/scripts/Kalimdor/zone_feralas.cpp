@@ -20,12 +20,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Feralas
-SD%Complete: 100
-SDComment: Quest support: 3520 Special vendor Gregan Brewspewer
-SDCategory: Feralas
-EndScriptData */
 
 enum GordunniTrap
 {

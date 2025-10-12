@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
@@ -22,13 +23,14 @@
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include "ulduar.h"
 
 class instance_ulduar : public InstanceMapScript
 {
 public:
-    instance_ulduar() : InstanceMapScript("instance_ulduar", 603) { }
+    instance_ulduar() : InstanceMapScript("instance_ulduar", MAP_ULDUAR) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
@@ -173,8 +175,8 @@ public:
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
             packet.Worldstates.reserve(2);
-            packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_TIMER_ENABLED, (m_algalonTimer && m_algalonTimer <= 60) ? 1 : 0);
-            packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_DESPAWN_TIMER, std::min<int32>(m_algalonTimer, 60));
+            packet.Worldstates.emplace_back(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, (m_algalonTimer && m_algalonTimer <= 60) ? 1 : 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, std::min<int32>(m_algalonTimer, 60));
         }
 
         void OnPlayerEnter(Player* player) override
@@ -769,15 +771,15 @@ public:
                     SaveToDB();
                     return;
                 case DATA_DESPAWN_ALGALON:
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, 60);
+                    DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
+                    DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 60);
                     m_algalonTimer = 60;
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     SaveToDB();
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
                 case DATA_ALGALON_DEFEATED:
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 0);
+                    DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 0);
                     m_algalonTimer = (type == DATA_ALGALON_DEFEATED ? TIMER_ALGALON_DEFEATED : TIMER_ALGALON_SUMMONED);
                     _events.CancelEvent(EVENT_UPDATE_ALGALON_TIMER);
                     SaveToDB();
@@ -1090,7 +1092,7 @@ public:
                     if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
                         algalon->AI()->DoAction(ACTION_FEEDS_ON_TEARS_FAILED);
             }
-            else if (unit->IsCreature() && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
+            else if (unit->IsCreature() && unit->GetAreaId() == AREA_THE_CONSERVATORY_OF_LIFE)
             {
                 if (GameTime::GetGameTime().count() > (m_conspeedatoryAttempt + DAY))
                 {
@@ -1148,8 +1150,8 @@ public:
 
             if (m_algalonTimer && m_algalonTimer <= 60 && GetData(TYPE_ALGALON) != DONE)
             {
-                DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
-                DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, m_algalonTimer);
+                DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
+                DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, m_algalonTimer);
             }
 
             data >> C_of_Ulduar_MASK;
@@ -1190,7 +1192,7 @@ public:
                     }
 
                     SaveToDB();
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, --m_algalonTimer);
+                    DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, --m_algalonTimer);
                     if (m_algalonTimer)
                     {
                         _events.Repeat(1min);

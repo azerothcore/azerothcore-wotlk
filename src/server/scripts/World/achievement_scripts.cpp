@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "BattlegroundAB.h"
 #include "BattlegroundAV.h"
 #include "BattlegroundIC.h"
@@ -192,16 +193,6 @@ public:
     }
 };
 
-enum ArgentTournamentAreas
-{
-    AREA_ARGENT_TOURNAMENT_FIELDS  = 4658,
-    AREA_RING_OF_ASPIRANTS         = 4670,
-    AREA_RING_OF_ARGENT_VALIANTS   = 4671,
-    AREA_RING_OF_ALLIANCE_VALIANTS = 4672,
-    AREA_RING_OF_HORDE_VALIANTS    = 4673,
-    AREA_RING_OF_CHAMPIONS         = 4669,
-};
-
 class achievement_tilted : public AchievementCriteriaScript
 {
 public:
@@ -213,12 +204,12 @@ public:
             return false;
 
         uint32 areaid = player->GetAreaId();
-        bool checkArea =    areaid == AREA_ARGENT_TOURNAMENT_FIELDS ||
-                            areaid == AREA_RING_OF_ASPIRANTS ||
-                            areaid == AREA_RING_OF_ARGENT_VALIANTS ||
-                            areaid == AREA_RING_OF_ALLIANCE_VALIANTS ||
-                            areaid == AREA_RING_OF_HORDE_VALIANTS ||
-                            areaid == AREA_RING_OF_CHAMPIONS;
+        bool checkArea =    areaid == AREA_ARGENT_TOURNAMENT_GROUNDS ||
+                            areaid == AREA_THE_ASPIRANTS_RING ||
+                            areaid == AREA_THE_ARGENT_VALIANTS_RING ||
+                            areaid == AREA_THE_ALLIANCE_VALIANTS_RING ||
+                            areaid == AREA_THE_HORDE_VALIANTS_RING ||
+                            areaid == AREA_THE_RING_OF_CHAMPIONS;
 
         return checkArea && player->duel && player->duel->IsMounted;
     }

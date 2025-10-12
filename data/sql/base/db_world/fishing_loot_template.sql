@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -250,7 +250,6 @@ INSERT INTO `fishing_loot_template` VALUES
 (3805,11017,11017,100,0,1,1,1,1,'(ReferenceTable)'),
 (3859,11013,11013,100,0,1,1,1,1,'(ReferenceTable)'),
 (3979,11023,11023,100,0,1,1,1,1,'(ReferenceTable)'),
-(3979,45328,0,25,1,1,0,1,1,'Bloated Slippery Eel'),
 (3980,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
 (3982,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
 (3994,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
@@ -284,9 +283,7 @@ INSERT INTO `fishing_loot_template` VALUES
 (4478,11018,11018,100,0,1,1,1,1,'(ReferenceTable)'),
 (4479,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
 (4560,11026,11026,100,0,1,0,1,1,'(ReferenceTable)'),
-(4560,45903,0,20,1,1,0,1,1,'Corroded Jewelry'),
 (4567,11024,11024,100,0,1,1,1,1,'(ReferenceTable)'),
-(4567,45323,0,100,1,1,0,1,1,'Severed Arm'),
 (4568,11025,11025,100,0,1,1,1,1,'(ReferenceTable)'),
 (4813,3671,0,4.5,0,1,1,1,1,'Lifeless Skull'),
 (4813,4875,0,5,0,1,1,1,1,'Slimy Bone'),
@@ -307,5 +304,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:46
-
+-- Dump completed on 2025-07-19 12:08:56

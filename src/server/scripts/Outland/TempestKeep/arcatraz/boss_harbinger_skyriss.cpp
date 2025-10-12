@@ -92,7 +92,7 @@ struct boss_harbinger_skyriss : public BossAI
             context.Repeat(25s);
         }).Schedule(30s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_DOMINATION, 1, 30.0f) == SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_DOMINATION, 0, 30.0f, true, false, false) == SPELL_CAST_OK)
             {
                 Talk(SAY_MIND);
             }

@@ -77,7 +77,7 @@ DoorData const doorData[] =
 class instance_blackrock_spire : public InstanceMapScript
 {
 public:
-    instance_blackrock_spire() : InstanceMapScript(BRSScriptName, 229) { }
+    instance_blackrock_spire() : InstanceMapScript(BRSScriptName, MAP_BLACKROCK_SPIRE) { }
 
     struct instance_blackrock_spireMapScript : public InstanceScript
     {

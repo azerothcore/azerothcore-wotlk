@@ -98,7 +98,7 @@ private:
 class instance_blackrock_depths : public InstanceMapScript
 {
 public:
-    instance_blackrock_depths() : InstanceMapScript("instance_blackrock_depths", 230) { }
+    instance_blackrock_depths() : InstanceMapScript("instance_blackrock_depths", MAP_BLACKROCK_DEPTHS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

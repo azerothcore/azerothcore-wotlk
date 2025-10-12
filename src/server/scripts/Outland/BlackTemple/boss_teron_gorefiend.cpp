@@ -65,9 +65,11 @@ enum Misc
 
 struct ShadowOfDeathSelector
 {
+    Unit const* _tank;
+    ShadowOfDeathSelector(Unit const* tank) : _tank(tank) {}
     bool operator()(Unit const* target) const
     {
-        return target && !target->HasAura(SPELL_SHADOW_OF_DEATH) && !target->HasAura(SPELL_POSSESS_SPIRIT_IMMUNE);
+        return target && !target->HasAura(SPELL_SHADOW_OF_DEATH) && !target->HasAura(SPELL_POSSESS_SPIRIT_IMMUNE) && target != _tank;
     }
 };
 
@@ -113,7 +115,7 @@ struct boss_teron_gorefiend : public BossAI
 
         ScheduleTimedEvent(10s, [&]
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, ShadowOfDeathSelector()))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ShadowOfDeathSelector(me->GetThreatMgr().GetCurrentVictim())))
                 me->CastSpell(target, SPELL_SHADOW_OF_DEATH, false);
         }, 30s, 50s);
 

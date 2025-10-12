@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameObject.h"
 #include "InstanceMapScript.h"
@@ -269,7 +270,7 @@ public:
         {
             Initialize();
 
-            if (me->GetMapId() == 469)
+            if (me->GetMapId() == MAP_BLACKWING_LAIR)
             {
                 if (Creature* nefarian = me->FindNearestCreature(NPC_NEFARIAN, 1000.0f, true))
                 {

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -27,7 +28,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
-// Ours
 enum eDrakeHunt
 {
     SPELL_DRAKE_HATCHLING_SUBDUED       = 46691,
@@ -72,7 +72,6 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
     }
 };
 
-// Theirs
 /*######
 ## npc_sinkhole_kill_credit
 ######*/
@@ -710,16 +709,23 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ADD_ARCANE_CHAINS:
-                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        if (TempSummon* tempSummon = me->ToTempSummon())
                         {
-                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
-                            _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1s);
+                            if (Unit* summoner = tempSummon->GetSummonerUnit())
+                            {
+                                summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
+                                _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1s);
+                            }
                         }
                         break;
+
                     case EVENT_FOLLOW_PLAYER:
-                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        if (TempSummon* tempSummon = me->ToTempSummon())
                         {
-                            StartFollow(summoner);
+                            if (Player* summoner = tempSummon->GetSummonerUnit()->ToPlayer())
+                            {
+                                StartFollow(summoner);
+                            }
                         }
                         break;
                 }
@@ -2036,7 +2042,6 @@ public:
 // NPC 25301: Counselor Talbot
 enum CounselorTalbot
 {
-    AREA_LAST_RITES     = 4128,
     SPELL_DEFLECTION    = 51009,
     SPELL_SOUL_BLAST    = 50992,
     SPELL_VAMPIRIC_BOLT = 51016,
@@ -2070,7 +2075,7 @@ public:
                 return;
             }
 
-            if (me->GetAreaId() == AREA_LAST_RITES)
+            if (me->GetAreaId() == AREA_NAXXANAR)
             {
                 _events.Update(diff);
 
@@ -2119,16 +2124,60 @@ public:
     }
 };
 
+// 45612 - Necropolis Beam
+class spell_necropolis_beam: public SpellScript
+{
+    PrepareSpellScript(spell_necropolis_beam);
+
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+        float floorZ = caster->GetMapHeight(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+        if (floorZ > INVALID_HEIGHT)
+            dest._position.m_positionZ = floorZ;
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_necropolis_beam::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+    }
+};
+
+enum SoulDeflectionSpells
+{
+    SPELL_SOUL_DEFLECTION_DAMAGE = 51011
+};
+
+class spell_soul_deflection : public AuraScript
+{
+    PrepareAuraScript(spell_soul_deflection);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SOUL_DEFLECTION_DAMAGE });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        if (!eventInfo.GetDamageInfo() || !eventInfo.GetDamageInfo()->GetDamage() || !GetTarget())
+            return;
+
+        GetCaster()->CastCustomSpell(SPELL_SOUL_DEFLECTION_DAMAGE, SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_soul_deflection::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_borean_tundra()
 {
-    // Ours
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
     new npc_thassarian();
     new npc_thassarian2();
     new npc_leryssa();
     new npc_counselor_talbot();
-
-    // Theirs
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
     new npc_iruk();
@@ -2146,4 +2195,6 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
     RegisterCreatureAI(npc_jenny);
+    RegisterSpellScript(spell_necropolis_beam);
+    RegisterSpellScript(spell_soul_deflection);
 }

@@ -15,19 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Winterspring
-SD%Complete: Almost Completely Emptied
-SDComment: Vendor Rivern Frostwind. Quest Support 4901
-SDCategory: Winterspring
-EndScriptData */
-
-/* ContentData
-npc_rivern_frostwind
-npc_ranshalla
-go_elune_fire
-EndContentData */
-
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
 #include "Player.h"
@@ -35,7 +22,6 @@ EndContentData */
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 
-// Theirs
 /*######
 ## npc_rivern_frostwind
 ######*/
@@ -618,7 +604,6 @@ public:
 
 void AddSC_winterspring()
 {
-    // Theirs
     new npc_rivern_frostwind();
     new npc_ranshalla();
     new go_elune_fire();

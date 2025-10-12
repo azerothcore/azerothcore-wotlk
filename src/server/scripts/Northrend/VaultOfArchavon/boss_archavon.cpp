@@ -143,7 +143,7 @@ class boss_archavon : public CreatureScript
                         events.Repeat(15s);
                         break;
                     case EVENT_CHOKING_CLOUD:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                         {
                             DoCast(target, RAID_MODE(SPELL_CRUSHING_LEAP_10, SPELL_CRUSHING_LEAP_25), true); //10y ~ 80y, ignore range
                         }

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -1272,8 +1272,7 @@ INSERT INTO `spell_bonus_data` VALUES
 (59885,0.0299,0.0299,0.0175,0.0175,'Pet Skills - Rake'),
 (59886,0.0299,0.0299,0.0175,0.0175,'Pet Skills - Rake'),
 (60043,0.571,0,0,0,'Shaman - Lava Burst'),
-(60089,0,0,0.15,0,'Druid - Faerie Fire (feral),
- damage'),
+(60089,0,0,0.15,0,'Druid - Faerie Fire (feral),\n damage'),
 (61193,0.333,0.333,0,0,'Pet Skills - Spirit Strike'),
 (61194,0.333,0.333,0,0,'Pet Skills - Spirit Strike'),
 (61195,0.333,0.333,0,0,'Pet Skills - Spirit Strike'),
@@ -1320,5 +1319,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:37
-
+-- Dump completed on 2025-07-19 12:09:39

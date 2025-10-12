@@ -1087,7 +1087,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr7>::ToString(SpellAttr7 value)
         case SPELL_ATTR7_NO_ATTACK_DODGE: return { "SPELL_ATTR7_NO_ATTACK_DODGE", "Spell cannot be dodged 23@Attr7", "Motivate, Mutilate, Shattering Throw" };
         case SPELL_ATTR7_NO_ATTACK_PARRY: return { "SPELL_ATTR7_NO_ATTACK_PARRY", "Spell cannot be parried 24@Attr7", "Motivate, Mutilate, Perform Speech, Shattering Throw" };
         case SPELL_ATTR7_NO_ATTACK_MISS: return { "SPELL_ATTR7_NO_ATTACK_MISS", "Spell cannot be missed 25@Attr7", "" };
-        case SPELL_ATTR7_TREAT_AS_NPC_AOE: return { "SPELL_ATTR7_TREAT_AS_NPC_AOE", "Unknown attribute 26@Attr7", "" };
+        case SPELL_ATTR7_TREAT_AS_NPC_AOE: return { "SPELL_ATTR7_TREAT_AS_NPC_AOE", "Treat as NPC AoE", "" };
         case SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA: return { "SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA", "Bypasses the prevent resurrection aura", "" };
         case SPELL_ATTR7_DO_NOT_COUNT_FOR_PVP_SCOREBOARD: return { "SPELL_ATTR7_DO_NOT_COUNT_FOR_PVP_SCOREBOARD", "Consolidate in raid buff frame (client only)", "" };
         case SPELL_ATTR7_REFLECTION_ONLY_DEFENDS: return { "SPELL_ATTR7_REFLECTION_ONLY_DEFENDS", "Unknown attribute 29@Attr7", "only 69028, 71237" };

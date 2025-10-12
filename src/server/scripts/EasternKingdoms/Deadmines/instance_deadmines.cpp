@@ -22,7 +22,7 @@
 class instance_deadmines : public InstanceMapScript
 {
 public:
-    instance_deadmines() : InstanceMapScript("instance_deadmines", 36) { }
+    instance_deadmines() : InstanceMapScript("instance_deadmines", MAP_DEADMINES) { }
 
     struct instance_deadmines_InstanceMapScript : public InstanceScript
     {

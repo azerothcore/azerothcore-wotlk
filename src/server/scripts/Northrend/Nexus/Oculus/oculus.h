@@ -97,12 +97,6 @@ enum AchievData
     CRITERIA_RUBY_VOID                  = 7323,
 };
 
-enum OculusWorldStates
-{
-    WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW   = 3524,
-    WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT = 3486
-};
-
 enum MISC
 {
     POINT_MOVE_DRAKES

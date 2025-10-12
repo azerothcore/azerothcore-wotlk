@@ -214,7 +214,7 @@ struct boss_netherspite : public BossAI
             context.Repeat(90s);
         }).Schedule(15s, PORTAL_PHASE, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_VOIDZONE, 1, 45.0f, true, true);
+            DoCastRandomTarget(SPELL_VOIDZONE, 0, 45.0f, true, true, false);
             context.Repeat(15s);
         });
     }

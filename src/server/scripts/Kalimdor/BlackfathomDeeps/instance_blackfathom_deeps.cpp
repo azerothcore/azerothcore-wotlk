@@ -22,7 +22,7 @@
 class instance_blackfathom_deeps : public InstanceMapScript
 {
 public:
-    instance_blackfathom_deeps() : InstanceMapScript("instance_blackfathom_deeps", 48) { }
+    instance_blackfathom_deeps() : InstanceMapScript("instance_blackfathom_deeps", MAP_BLACKFATHOM_DEEPS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

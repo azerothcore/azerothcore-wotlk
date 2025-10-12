@@ -30,7 +30,7 @@ ObjectData const creatureData[] =
 class instance_the_underbog : public InstanceMapScript
 {
 public:
-    instance_the_underbog() : InstanceMapScript(TheUnderbogScriptName, 546) { }
+    instance_the_underbog() : InstanceMapScript(TheUnderbogScriptName, MAP_COILFANG_THE_UNDERBOG) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

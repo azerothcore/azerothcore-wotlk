@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
@@ -364,7 +365,7 @@ class spell_rog_killing_spree : public SpellScript
     SpellCastResult CheckCast()
     {
         // Kologarn area, Killing Spree should not work
-        if (GetCaster()->GetMapId() == 603 /*Ulduar*/ && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
+        if (GetCaster()->GetMapId() == MAP_ULDUAR && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         return SPELL_CAST_OK;
     }

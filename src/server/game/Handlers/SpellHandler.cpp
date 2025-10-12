@@ -686,7 +686,7 @@ void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& tot
         return;
 
     uint8 slotId = totemDestroyed.Slot;
-    slotId += SUMMON_SLOT_TOTEM;
+    slotId += SUMMON_SLOT_TOTEM_FIRE;
 
     if (slotId >= MAX_TOTEM_SLOT)
         return;
@@ -854,6 +854,9 @@ void WorldSession::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
     Position pos = *spell->m_targets.GetDstPos();
     pos.Relocate(x, y, z);
     spell->m_targets.ModDst(pos);
+
+    // we changed dest, recalculate flight time
+    spell->RecalculateDelayMomentForDst();
 
     WorldPacket data(SMSG_SET_PROJECTILE_POSITION, 21);
     data << casterGuid;

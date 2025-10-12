@@ -15,18 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Silverpine_Forest
-SD%Complete: 100
-SDComment: Quest support: 435, 452
-SDCategory: Silverpine Forest
-EndScriptData */
-
-/* ContentData
-npc_deathstalker_erland
-pyrewood_ambush
-EndContentData */
-
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"

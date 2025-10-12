@@ -852,7 +852,7 @@ struct boss_sartharion_dragonAI : public BossAI
 
         if (isCalledBySartharion)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 500, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 500, true, false))
             {
                 AttackStart(target);
             }

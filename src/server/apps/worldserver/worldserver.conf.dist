@@ -344,6 +344,14 @@ Updates.AllowRehash = 1
 Updates.CleanDeadRefMaxCount = 3
 
 #
+#    Updates.ExceptionShutdownDelay
+#        Description: Time (in milliseconds) to wait before shutting down after a fatal exception (e.g. failed SQL update).
+#        Default:     10000 - 10 seconds
+#                     0     - Disabled (immediate shutdown)
+
+Updates.ExceptionShutdownDelay = 10000
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -656,7 +664,7 @@ Allow.IP.Based.Action.Logging = 0
 Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
 # Appender.GM=2,5,15,gm_%s.log
-Appender.Errors=2,5,0,Errors.log
+Appender.Errors=2,2,0,Errors.log,w
 # Appender.DB=3,5,0
 
 #  Logger config values: Given a logger "name"
@@ -678,12 +686,14 @@ Appender.Errors=2,5,0,Errors.log
 #
 
 Logger.root=2,Console Server
+#Logger.metric=2,Console Server
 #Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server
 Logger.server=4,Console Server
 Logger.sql.sql=2,Console Errors
+Logger.sql.updates=4,Console Server Errors
 Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
@@ -782,7 +792,6 @@ Logger.spells.scripts=2,Console Errors
 #Logger.spells=4,Console Server
 #Logger.sql.dev=4,Console Server
 #Logger.sql.driver=4,Console Server
-#Logger.sql.updates=4,Console Server
 #Logger.vehicles=4,Console Server
 #Logger.warden=4,Console Server
 #Logger.weather=4,Console Server
@@ -812,6 +821,37 @@ Log.Async.Enable = 0
 Metric.Enable = 0
 
 #
+#    Metric.InfluxDB
+#        Description: Connection settings for InfluxDB.
+#
+#        For InfluxDB v1:
+#                     Only fill in Metric.InfluxDB.Connection.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port;database"
+#
+#        For InfluxDB v2:
+#                     Fill in every field.
+#
+#        NOTE:        Currently, Grafana will not work with the provided json files to visualize
+#                     data from InfluxDB v2.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port"
+#                     Metric.InfluxDB.v2 = 0 - (Disabled)
+#                                          1 - (Enabled)
+#                     Metric.InfluxDB.Org = "my-org"
+#                     Metric.InfluxDB.Bucket = "my-bucket"
+#                     Metric.InfluxDB.Token = "my-token"
+#
+
+Metric.InfluxDB.Connection = "127.0.0.1;8086;worldserver"
+Metric.InfluxDB.v2 = 0
+Metric.InfluxDB.Org = ""
+Metric.InfluxDB.Bucket = ""
+Metric.InfluxDB.Token = ""
+
+#
 #    Metric.Interval
 #        Description: Interval between every batch of data sent in seconds.
 #                     Longer interval means larger batch of data. If the batch
@@ -820,15 +860,6 @@ Metric.Enable = 0
 #
 
 Metric.Interval = 1
-
-#
-#    Metric.ConnectionInfo
-#        Description: Connection settings for metric database (currently InfluxDB).
-#        Example:     "hostname;port;database"
-#        Default:     "127.0.0.1;8086;worldserver"
-#
-
-Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
 
 #
 #    Metric.OverallStatusInterval
@@ -962,7 +993,7 @@ Expansion = 2
 #    ClientCacheVersion
 #        Description: Client cache version for client cache data reset. Use any value different
 #                     from DB and not recently been used to trigger client side cache reset.
-#        Default:     0 - (Use DB value from world DB db_version.cache_id field)
+#        Default:     0 - (Use DB value from world DB version.cache_id field)
 
 ClientCacheVersion = 0
 
@@ -1270,7 +1301,7 @@ Visibility.GroupMode = 1
 #        Description: Visibility distance to see other players or gameobjects.
 #                     Visibility on continents on retail ~100 yards. In BG/Arenas ~250.
 #                     For instances default ~170.
-#                     Max limited by active player zone: ~ 333
+#                     Max: 250
 #                     Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #        Default:     100  - (Visibility.Distance.Continents)
 #                     170 - (Visibility.Distance.Instances)
@@ -1395,18 +1426,6 @@ CheckGameObjectLoS = 1
 #                     1 - (Enabled)
 
 PreloadAllNonInstancedMapGrids = 0
-
-#
-#    SetAllCreaturesWithWaypointMovementActive
-#        Description: Set all creatures with waypoint movement active. This means that they will start
-#                     movement once they are loaded (which happens on grid load) and keep moving even
-#                     when no player is near. This will increase CPU usage significantly and can be
-#                     used with enabled "PreloadAllNonInstancedMapGrids" to start waypoint movement on
-#                     server startup.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-SetAllCreaturesWithWaypointMovementActive = 0
 
 #
 #     DontCacheRandomMovementPaths
@@ -1753,6 +1772,16 @@ CleanCharacterDB = 0
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
 PersistentCharacterCleanFlags = 0
+
+#
+#    ValidateSkillLearnedBySpells
+#        Description: If enabled, players will lose spells that are invalid for their race/class.
+#        Default:     1 - (Enabled, enforce valid spells)
+#                     0 - (Disabled, allow invalid spells)
+#        Disabling this and then having your character learn spells which require DBC edits can result in the character not being saved in the database
+#        Disable AT YOUR OWN RISK
+
+ValidateSkillLearnedBySpells = 1
 
 #
 ###################################################################################################
@@ -2322,6 +2351,18 @@ Rate.Reputation.LowLevel.Quest = 1
 Rate.Reputation.RecruitAFriendBonus = 0.1
 
 #
+#    Rate.Reputation.Gain.WSG
+#    Rate.Reputation.Gain.AB
+#    Rate.Reputation.Gain.AV
+#        Description: Reputation bonus rate for WSG, AB and AV battlegrounds.
+#                     This is applied IN ADDITION to the global Rate.Reputation.Gain.
+#        Default:     1
+
+Rate.Reputation.Gain.WSG = 1
+Rate.Reputation.Gain.AB = 1
+Rate.Reputation.Gain.AV = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -2825,6 +2866,14 @@ Rate.Creature.Aggro = 1
 CreatureFamilyFleeAssistanceRadius = 30
 
 #
+#    CreatureLeashRadius
+#        Description: Distance (in yards) for default leash due to being too far from pulled position.
+#        Default:     30 - (Enabled)
+#                     0  - (Disabled)
+
+CreatureLeashRadius = 30
+
+#
 #    CreatureFamilyAssistanceRadius
 #        Description: Distance for creatures calling for assistance from other creatures without
 #                     moving.
@@ -2972,6 +3021,15 @@ ListenRange.TextEmote = 40
 ListenRange.Yell = 300
 
 #
+#    Creature.RepositionAgainstNpcs
+#        Description: Enables circling and backwards repositioning during NPC versus NPC combat.
+#                     Set to 0 to keep the legacy optimization that disables these moves for NPCs.
+#        Default:     1 - (Enabled, uses more CPU, but looks better)
+#                     0 - (Disabled, uses less CPU)
+
+Creature.RepositionAgainstNpcs = 1
+
+#
 #    Creature.MovingStopTimeForPlayer
 #        Description: Time (in milliseconds) during which creature will not move after
 #                     interaction with player.
@@ -3111,6 +3169,16 @@ LeaveGroupOnLogout.Enabled = 0
 #
 
 Group.Raid.LevelRestriction = 10
+
+#
+#    Group.RandomRollMaximum
+#
+#     The maximum value for use with the client '/roll' command.
+#     Blizzlike and maximum value is 1000000. (Based on Classic and 3.3.5a client testing respectively)
+#        Default: 1000000
+#
+
+Group.RandomRollMaximum = 1000000
 
 #
 ###################################################################################################
@@ -3436,14 +3504,14 @@ Wintergrasp.Enable = 1
 
 #
 #     Wintergrasp.PlayerMax
-#         Description: Maximum number of players allowed in Wintergrasp.
-#         Default:     100
+#         Description: Maximum number of players allowed in Wintergrasp per team.
+#         Default:     120
 
-Wintergrasp.PlayerMax = 100
+Wintergrasp.PlayerMax = 120
 
 #
 #     Wintergrasp.PlayerMin
-#         Description: Minimum number of players required for Wintergrasp.
+#         Description: Minimum number of players required for Wintergrasp per team.
 #         Default:     0
 
 Wintergrasp.PlayerMin = 0
@@ -3451,9 +3519,9 @@ Wintergrasp.PlayerMin = 0
 #
 #     Wintergrasp.PlayerMinLvl
 #         Description: Required character level for the Wintergrasp battle.
-#         Default:     77
+#         Default:     75
 
-Wintergrasp.PlayerMinLvl = 77
+Wintergrasp.PlayerMinLvl = 75
 
 #
 #     Wintergrasp.BattleTimer
@@ -3482,6 +3550,14 @@ Wintergrasp.CrashRestartTimer = 10
 
 ###################################################################################################
 # BATTLEGROUND
+#
+#    Battleground.PrepTime
+#        Description: Time (in seconds) for battleground preparation phase. Strand of the Ancients will be
+#        the exception and will always use the default 120 seconds timer, due to its boat timing mechanic.
+#        Default:     120
+
+Battleground.PrepTime = 120
+
 #
 #    Battleground.CastDeserter
 #        Description: Cast Deserter spell at players who leave battlegrounds in progress.
@@ -3748,6 +3824,13 @@ Battleground.EyeOfTheStorm.CapturePoints = 1600
 ###################################################################################################
 # ARENA
 #
+#    Arena.PrepTime
+#        Description: Time (in seconds) for arena preparation phase.
+#        Default:     60
+
+Arena.PrepTime = 60
+
+#
 #    Arena.MaxRatingDifference
 #        Description: Maximum rating difference between two teams in rated matches.
 #        Default:     150 - (Enabled)
@@ -3825,10 +3908,17 @@ Arena.QueueAnnouncer.Detail = 3
 
 #
 #    Arena.ArenaStartRating
-#        Description: Start rating for new arena teams.
+#        Description: Start rating for new arena teams. (Applies to season 6 and higher)
 #        Default:     0
 
 Arena.ArenaStartRating = 0
+
+#
+#    Arena.LegacyArenaStartRating
+#        Description: Start rating for new arena teams. (Only applies to season 1 - 5)
+#        Default:     1500
+
+Arena.LegacyArenaStartRating = 1500
 
 #
 #    Arena.ArenaStartPersonalRating
@@ -4207,7 +4297,8 @@ AllowTwoSide.Interaction.Arena = 0
 
 #
 #    AllowTwoSide.Interaction.Auction
-#        Description: Allow auctions between factions.
+#        Description: Allow auctions between factions. This flags all auction houses as Neutral,
+#                     and would also take a Neutral auction house cut from auctions.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -4332,6 +4423,19 @@ Event.Announce = 0
 Sunsreach.CounterMax = 10000
 
 #
+#    ScourgeInvasion.CounterFirst
+#    ScourgeInvasion.CounterSecond
+#    ScourgeInvasion.CounterThird
+#        Description: Counter thresholds to be reached to transition phases
+#        Default:     50  - (ScourgeInvasion.CounterFirst)
+#                     100 - (ScourgeInvasion.CounterSecond)
+#                     150 - (ScourgeInvasion.CounterThird)
+
+ScourgeInvasion.CounterFirst  = 50
+ScourgeInvasion.CounterSecond = 100
+ScourgeInvasion.CounterThird  = 150
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4428,7 +4532,8 @@ Minigob.Manabonk.Enable = 1
 
 #
 #     Calculate.Creature.Zone.Area.Data
-#        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Description: Calculate at loading creature zoneId / areaId and save in creature table
+#                     WARNING: SLOW WORLD SERVER STARTUP. Should only be used for debugging.
 #        Default:     0  - (Do not show)
 #
 
@@ -4436,7 +4541,8 @@ Calculate.Creature.Zone.Area.Data = 0
 
 #
 #     Calculate.Gameoject.Zone.Area.Data
-#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table
+#                     WARNING: SLOW WORLD SERVER STARTUP. Should only be used for debugging.
 #        Default:     0  - (Do not show)
 #
 
@@ -4476,6 +4582,13 @@ MunchingBlizzlike.Enabled = 1
 #        Default: 1 - (Blizzlike)
 
 Daze.Enabled = 1
+
+#
+#    InfiniteAmmo.Enabled
+#        Description: Enable or disable ammo consumption for ranged attacks and thrown weapons.
+#        Default: 0 - (Blizzlike)
+
+InfiniteAmmo.Enabled = 0
 
 #
 ###################################################################################################

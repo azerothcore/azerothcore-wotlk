@@ -76,10 +76,6 @@ enum BattlegroundRVData
     BG_RV_STATE_OPEN_FENCES,
     BG_RV_STATE_SWITCH_PILLARS,
     BG_RV_STATE_CLOSE_FIRE,
-
-    BG_RV_WORLD_STATE_A                          = 0xe11,
-    BG_RV_WORLD_STATE_H                          = 0xe10,
-    BG_RV_WORLD_STATE                            = 0xe1a,
 };
 
 class AC_GAME_API BattlegroundRV : public Arena

@@ -20,6 +20,7 @@
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "WorldStateDefines.h"
 #include "trial_of_the_crusader.h"
 
 std::map<uint32, bool> validDedicatedInsanityItems;
@@ -27,7 +28,7 @@ std::map<uint32, bool> validDedicatedInsanityItems;
 class instance_trial_of_the_crusader : public InstanceMapScript
 {
 public:
-    instance_trial_of_the_crusader() : InstanceMapScript("instance_trial_of_the_crusader", 649) { }
+    instance_trial_of_the_crusader() : InstanceMapScript("instance_trial_of_the_crusader", MAP_TRIAL_OF_THE_CRUSADER) { }
 
     struct instance_trial_of_the_crusader_InstanceMapScript : public InstanceScript
     {
@@ -103,7 +104,7 @@ public:
                             c->UpdatePosition(630.88f, 131.39f, 140.8f, 3.02f, true);
 
                         c->StopMovingOnCurrentPos();
-                        c->DestroyForNearbyPlayers();
+                        c->DestroyForVisiblePlayers();
                     }
                 }
             }
@@ -283,7 +284,7 @@ public:
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if (Player* plr = itr->GetSource())
-                                plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
                     }
                     InstanceCleanup(true);
                     SaveToDB();
@@ -791,7 +792,7 @@ public:
                             {
                                 icehowl->UpdatePosition(513.19f, 139.48f, 395.22f, 3 * M_PI / 2, true);
                                 icehowl->StopMovingOnCurrentPos();
-                                icehowl->DestroyForNearbyPlayers();
+                                icehowl->DestroyForVisiblePlayers();
                             }
                         }
                         break;
@@ -958,7 +959,7 @@ public:
                         {
                             jaraxxus->UpdatePosition(613.83f, 139.5f, 395.22f, 3 * M_PI / 2, true);
                             jaraxxus->StopMovingOnCurrentPos();
-                            jaraxxus->DestroyForNearbyPlayers();
+                            jaraxxus->DestroyForVisiblePlayers();
                         }
 
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
@@ -1379,11 +1380,11 @@ public:
 
             if (instance->IsHeroic())
             {
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_SHOW, 1);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
             }
             else
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 0);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_SHOW, 0);
 
             if (DoNeedCleanup(plr))
             {
@@ -1555,7 +1556,7 @@ public:
                 Map::PlayerList const& pl = instance->GetPlayers();
                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                     if (Player* plr = itr->GetSource())
-                        plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                        plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
             }
 
             if (instance->IsHeroic() && AttemptsLeft == 0 )

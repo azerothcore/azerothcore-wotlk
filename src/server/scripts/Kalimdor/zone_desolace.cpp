@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Desolace
-SD%Complete: 100
-SDComment: Quest support: 5561
-SDCategory: Desolace
-EndScriptData */
-
-/* ContentData
-npc_aged_dying_ancient_kodo
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -33,7 +22,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
-// Ours
 enum Caravan
 {
     QUEST_BODYGUARD_FOR_HIRE            = 5821,
@@ -420,7 +408,6 @@ public:
     };
 };
 
-// Theirs
 enum DyingKodo
 {
     SAY_SMEED_HOME                  = 0,
@@ -473,7 +460,7 @@ public:
         {
             if (spell->Id == SPELL_KODO_KOMBO_ITEM)
             {
-                if (!caster->HasAnyAuras(SPELL_KODO_KOMBO_PLAYER_BUFF, SPELL_KODO_KOMBO_DESPAWN_BUFF)
+                if (!(caster->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) || me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
                         && (me->GetEntry() == NPC_AGED_KODO || me->GetEntry() == NPC_DYING_KODO || me->GetEntry() == NPC_ANCIENT_KODO))
                 {
                     me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
@@ -494,7 +481,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->HasAllAuras(SPELL_KODO_KOMBO_PLAYER_BUFF, SPELL_KODO_KOMBO_DESPAWN_BUFF))
+        if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) && creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
         {
             player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
@@ -512,9 +499,6 @@ public:
 
 void AddSC_desolace()
 {
-    // Ours
     new npc_cork_gizelton();
-
-    // Theirs
     new npc_aged_dying_ancient_kodo();
 }

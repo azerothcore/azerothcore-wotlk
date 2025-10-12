@@ -23,7 +23,7 @@
 class instance_razorfen_downs : public InstanceMapScript
 {
 public:
-    instance_razorfen_downs() : InstanceMapScript("instance_razorfen_downs", 129) { }
+    instance_razorfen_downs() : InstanceMapScript("instance_razorfen_downs", MAP_RAZORFEN_DOWNS) { }
 
     struct instance_razorfen_downs_InstanceMapScript : public InstanceScript
     {

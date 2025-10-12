@@ -21,6 +21,7 @@
 #include "GridNotifiers.h"
 #include "MapMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -1344,11 +1345,12 @@ enum Quest12937Data
 {
     SPELL_TRIGGER_AID_OF_THE_EARTHEN    = 55809,
     NPC_FALLEN_EARTHEN_DEFENDER         = 30035,
+    TALK_FALLEN_EARTHEN_HEALED          = 0
 };
 
-class spell_q12937_relief_for_the_fallen : public SpellScript
+class spell_q12937_relief_for_the_fallen : public AuraScript
 {
-    PrepareSpellScript(spell_q12937_relief_for_the_fallen);
+    PrepareAuraScript(spell_q12937_relief_for_the_fallen);
 
     bool Load() override
     {
@@ -1360,20 +1362,31 @@ class spell_q12937_relief_for_the_fallen : public SpellScript
         return ValidateSpellInfo({ SPELL_TRIGGER_AID_OF_THE_EARTHEN });
     }
 
-    void HandleDummy(SpellEffIndex /*effIndex*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        if (!GetCaster() || !GetCaster()->IsPlayer())
+            return;
+
         Player* caster = GetCaster()->ToPlayer();
-        if (Creature* target = GetHitCreature())
+        Unit* target = GetUnitOwner();
+        if (target && target->ToCreature())
         {
-            caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true, nullptr);
             caster->KilledMonsterCredit(NPC_FALLEN_EARTHEN_DEFENDER);
-            target->DespawnOrUnsummon();
+            target->ToCreature()->DespawnOrUnsummon(5000);
+            target->SetStandState(UNIT_STAND_STATE_STAND);
+            target->ToCreature()->AI()->Talk(TALK_FALLEN_EARTHEN_HEALED);
+
+            ObjectGuid casterGUID = caster->GetGUID();
+            caster->m_Events.AddEventAtOffset([casterGUID]{
+                if (Player* caster = ObjectAccessor::FindPlayer(casterGUID))
+                    caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true);
+            }, 5s);
         }
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_q12937_relief_for_the_fallen::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q12937_relief_for_the_fallen::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1527,12 +1540,27 @@ class spell_q12805_lifeblood_dummy : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        if (Creature* target = GetHitCreature())
+        Creature* target = GetHitCreature();
+
+        if (!target)
+            return;
+
+        if (Group* group = caster->GetGroup())
         {
-            caster->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT);
-            target->CastSpell(target, uint32(GetEffectValue()), true);
-            target->DespawnOrUnsummon(2000);
+            ObjectGuid targetGUID = target->GetGUID();
+            group->DoForAllMembers([targetGUID](Player* player)
+            {
+                if (Creature* shard = ObjectAccessor::GetCreature(*player, targetGUID))
+                    if (player->IsAtGroupRewardDistance(shard))
+                        player->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT);
+
+            });
         }
+        else
+            caster->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT);
+
+        target->CastSpell(target, uint32(GetEffectValue()), true);
+        target->DespawnOrUnsummon(2000);
     }
 
     void Register() override
@@ -1876,7 +1904,7 @@ class spell_q11010_q11102_q11023_choose_loc : public SpellScript
         std::list<Player*> playerList;
         Acore::AnyPlayerInObjectRangeCheck checker(caster, 65.0f);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(caster, playerList, checker);
-        Cell::VisitWorldObjects(caster, searcher, 65.0f);
+        Cell::VisitObjects(caster, searcher, 65.0f);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             // Check if found player target is on fly mount or using flying form
             if ((*itr)->HasFlyAura() || (*itr)->HasIncreaseMountedFlightSpeedAura())
@@ -2269,7 +2297,10 @@ class spell_q12619_emblazon_runeblade_effect : public SpellScript
 enum Quest_The_Storm_King
 {
     SPELL_RIDE_GYMER            = 43671,
-    SPELL_GRABBED               = 55424
+    SPELL_GRABBED               = 55424,
+    SPELL_HEALING_WINDS         = 55549,
+
+    NPC_STORM_CLOUD             = 29939
 };
 
 class spell_q12919_gymers_grab : public SpellScript
@@ -2284,10 +2315,14 @@ class spell_q12919_gymers_grab : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         int8 seatId = 2;
-        if (!GetHitCreature())
-            return;
-        GetHitCreature()->CastCustomSpell(SPELL_RIDE_GYMER, SPELLVALUE_BASE_POINT0, seatId, GetCaster(), true);
-        GetHitCreature()->CastSpell(GetHitCreature(), SPELL_GRABBED, true);
+        if (Creature* creature = GetHitCreature())
+        {
+            creature->CastCustomSpell(SPELL_RIDE_GYMER, SPELLVALUE_BASE_POINT0, seatId, GetCaster(), true);
+            creature->CastSpell(creature, SPELL_GRABBED, true);
+
+            if (creature->GetEntry() == NPC_STORM_CLOUD)
+                creature->CastSpell(GetCaster(), SPELL_HEALING_WINDS, true);
+        }
     }
 
     void Register() override

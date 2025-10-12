@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureAI.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
@@ -36,7 +37,7 @@ enum Events
 class instance_uldaman : public InstanceMapScript
 {
 public:
-    instance_uldaman() : InstanceMapScript("instance_uldaman", 70) { }
+    instance_uldaman() : InstanceMapScript("instance_uldaman", MAP_ULDAMAN) { }
 
     struct instance_uldaman_InstanceMapScript : public InstanceScript
     {
@@ -154,11 +155,6 @@ class spell_uldaman_sub_boss_agro_keepers : public SpellScript
     {
         OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
-};
-
-enum UldamanStonedEnum
-{
-    MAP_ULDAMAN = 70
 };
 
 class spell_uldaman_stoned_aura : public AuraScript

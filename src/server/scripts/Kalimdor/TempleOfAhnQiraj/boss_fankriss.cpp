@@ -98,7 +98,7 @@ struct boss_fankriss : public BossAI
             })
             .Schedule(15s, 20s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
                 {
                     uint32 spellId = Acore::Containers::SelectRandomContainerElement(entangleSpells);
                     DoCast(target, spellId);

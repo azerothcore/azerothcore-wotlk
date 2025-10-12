@@ -1759,7 +1759,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         }
 
         // set the "Crafted by ..." property of the item
-        if (pItem->GetTemplate()->HasSignature())
+        if (m_caster->IsPlayer() && pItem->GetTemplate()->HasSignature())
             pItem->SetGuidValue(ITEM_FIELD_CREATOR, player->GetGUID());
 
         // send info to the client
@@ -1854,7 +1854,7 @@ void Spell::EffectPersistentAA(SpellEffIndex effIndex)
         // Caster not in world, might be spell triggered from aura removal
         if (!caster->IsInWorld() || !caster->FindMap() || !ObjectAccessor::GetUnit(*caster, caster->GetGUID())) // pussywizard: temporary crash fix (FindMap and GetUnit are mine)
             return;
-        DynamicObject* dynObj = new DynamicObject(false);
+        DynamicObject* dynObj = new DynamicObject();
         if (!dynObj->CreateDynamicObject(caster->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_AREA_SPELL))
         {
             delete dynObj;
@@ -2429,8 +2429,14 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                         }
                         break;
                     }
-                case SUMMON_TYPE_JEEVES:
                 case SUMMON_TYPE_MINIPET:
+                    // For companions, recalculate the position to ensure they spawn at the intended π/4 angle.
+                    destTarget->Relocate(m_originalCaster->GetNearPosition(
+                        m_originalCaster->GetDistance2d(destTarget->GetPositionX(), destTarget->GetPositionY()),
+                        MINI_PET_SUMMON_ANGLE
+                    ));
+                    [[fallthrough]];
+                case SUMMON_TYPE_JEEVES:
                     {
                         summon = m_caster->GetMap()->SummonCreature(entry, *destTarget, properties, duration, m_originalCaster, m_spellInfo->Id, 0, personalSpawn);
                         if (!summon || !summon->HasUnitTypeMask(UNIT_MASK_MINION))
@@ -2446,8 +2452,9 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                         //summon->AI()->EnterEvadeMode();
                         if (properties->Type != SUMMON_TYPE_JEEVES)
                         {
+                            summon->SetFacingToObject(m_originalCaster);
                             summon->GetMotionMaster()->Clear(false);
-                            summon->GetMotionMaster()->MoveFollow(m_originalCaster, PET_FOLLOW_DIST, summon->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+                            summon->GetMotionMaster()->MoveFollow(m_originalCaster, PET_FOLLOW_DIST, MINI_PET_FOLLOW_ANGLE, MOTION_SLOT_ACTIVE);
                         }
                         break;
                     }
@@ -2731,7 +2738,7 @@ void Spell::EffectAddFarsight(SpellEffIndex effIndex)
     // Remove old farsight if exist
     bool updateViewerVisibility = m_caster->RemoveDynObject(m_spellInfo->Id);
 
-    DynamicObject* dynObj = new DynamicObject(true);
+    DynamicObject* dynObj = new DynamicObject();
     if (!dynObj->CreateDynamicObject(m_caster->GetMap()->GenerateLowGuid<HighGuid::DynamicObject>(), m_caster, m_spellInfo->Id, *destTarget, radius, DYNAMIC_OBJECT_FARSIGHT_FOCUS))
     {
         delete dynObj;
@@ -3428,11 +3435,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         spell_bonus += int32(0.08f * m_caster->GetTotalAttackPowerValue(BASE_ATTACK));
                         spell_bonus += int32(0.13f * m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSchoolMask()));
                         break;
-                    case 42463: // Seals of the Pure for Seal of Vengeance/Corruption
-                    case 53739:
-                        if (AuraEffect const* sealsOfPure = m_caster->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_PALADIN, 25, 0))
-                            AddPct(totalDamagePercentMod, sealsOfPure->GetAmount());
-                        break;
                     case 53385:  // Divine Storm deals normalized damage
                         normalized = true;
                         break;
@@ -3532,9 +3534,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 // Blood-Caked Strike - Blood-Caked Blade
                 if (m_spellInfo->SpellIconID == 1736)
                 {
-                    int32 weaponDamage = m_caster->CalculateDamage(m_attackType, false, true);
-                    ApplyPct(weaponDamage, std::min(uint32(3), unitTarget->GetDiseasesByCaster(m_caster->GetGUID())) * 12.5f);
-                    spell_bonus = weaponDamage;
+                    AddPct(totalDamagePercentMod, unitTarget->GetDiseasesByCaster(m_caster->GetGUID()) * 50.0f);
                     break;
                 }
                 // Heart Strike
@@ -3581,30 +3581,26 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
         }
     }
 
-    // apply to non-weapon bonus weapon total pct effect, weapon total flat effect included in weapon damage
-    if (fixed_bonus || spell_bonus)
+    bool const isPhysical = (m_spellSchoolMask & SPELL_SCHOOL_MASK_NORMAL);
+    if (isPhysical && (fixed_bonus || spell_bonus))
     {
         UnitMods unitMod;
         switch (m_attackType)
         {
-            default:
-            case BASE_ATTACK:
-                unitMod = UNIT_MOD_DAMAGE_MAINHAND;
-                break;
-            case OFF_ATTACK:
-                unitMod = UNIT_MOD_DAMAGE_OFFHAND;
-                break;
-            case RANGED_ATTACK:
-                unitMod = UNIT_MOD_DAMAGE_RANGED;
-                break;
+        default:
+        case BASE_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_MAINHAND;
+            break;
+        case OFF_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_OFFHAND;
+            break;
+        case RANGED_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_RANGED;
+            break;
         }
-
-        if (m_spellSchoolMask & SPELL_SCHOOL_MASK_NORMAL)
-        {
-            float weapon_total_pct = m_caster->GetModifierValue(unitMod, TOTAL_PCT);
-            fixed_bonus = int32(fixed_bonus * weapon_total_pct);
-            spell_bonus = int32(spell_bonus * weapon_total_pct);
-        }
+        float weapon_total_pct = m_caster->GetModifierValue(unitMod, TOTAL_PCT);
+        fixed_bonus = int32(fixed_bonus * weapon_total_pct);
+        spell_bonus = int32(spell_bonus * weapon_total_pct);
     }
 
     int32 weaponDamage = 0;
@@ -3612,15 +3608,11 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     if (m_caster->GetEntry() == 27893)
     {
         if (Unit* owner = m_caster->GetOwner())
-            weaponDamage = owner->CalculateDamage(m_attackType, normalized, true);
-    }
-    else if (m_spellInfo->Id == 5019) // Wands
-    {
-        weaponDamage = m_caster->CalculateDamage(m_attackType, true, false);
+            weaponDamage = owner->CalculateDamage(m_attackType, normalized, isPhysical);
     }
     else
     {
-        weaponDamage = m_caster->CalculateDamage(m_attackType, normalized, true);
+        weaponDamage = m_caster->CalculateDamage(m_attackType, normalized, isPhysical);
     }
 
     // Sequence is important
@@ -3952,7 +3944,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         {
                             int32 basepoints0 = damage;
                             // Cast Absorb on totems
-                            for (uint8 slot = SUMMON_SLOT_TOTEM; slot < MAX_TOTEM_SLOT; ++slot)
+                            for (uint8 slot = SUMMON_SLOT_TOTEM_FIRE; slot < MAX_TOTEM_SLOT; ++slot)
                             {
                                 if (!unitTarget->m_SummonSlot[slot])
                                     continue;
@@ -4058,7 +4050,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     UnitList targets;
     Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(unitTarget, unitTarget, unitTarget->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
     Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(unitTarget, targets, u_check);
-    Cell::VisitAllObjects(unitTarget, searcher, unitTarget->GetVisibilityRange());
+    Cell::VisitObjects(unitTarget, searcher, unitTarget->GetVisibilityRange());
     for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
         if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -4793,7 +4785,7 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
 
     float dist = m_caster->GetVisibilityRange() + VISIBILITY_COMPENSATION;
     Acore::MessageDistDelivererToHostile notifier(m_caster, &data, dist);
-    Cell::VisitWorldObjects(m_caster, notifier, dist);
+    Cell::VisitObjects(m_caster, notifier, dist);
 
     // xinef: we should also force pets to remove us from current target
     Unit::AttackerSet attackerSet;
@@ -4818,7 +4810,7 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
         UnitList targets;
         Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(m_caster, m_caster, m_caster->GetVisibilityRange()); // no VISIBILITY_COMPENSATION, distance is enough
         Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(m_caster, targets, u_check);
-        Cell::VisitAllObjects(m_caster, searcher, m_caster->GetVisibilityRange());
+        Cell::VisitObjects(m_caster, searcher, m_caster->GetVisibilityRange());
         for (UnitList::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             if (!(*iter)->HasUnitState(UNIT_STATE_CASTING))
@@ -5052,7 +5044,7 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     float speedxy = m_spellInfo->Effects[effIndex].MiscValue / 10.0f;
     float speedz = damage / 10.0f;
     //1891: Disengage
-    m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellFamilyName != SPELLFAMILY_HUNTER);
+    unitTarget->JumpTo(speedxy, speedz, m_spellInfo->SpellFamilyName != SPELLFAMILY_HUNTER);
 
     if (m_caster->IsPlayer())
     {
@@ -5260,7 +5252,7 @@ void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
         return;
 
     int32 mana = 0;
-    for (uint8 slot = SUMMON_SLOT_TOTEM; slot < MAX_TOTEM_SLOT; ++slot)
+    for (uint8 slot = SUMMON_SLOT_TOTEM_FIRE; slot < MAX_TOTEM_SLOT; ++slot)
     {
         if (!m_caster->m_SummonSlot[slot])
             continue;

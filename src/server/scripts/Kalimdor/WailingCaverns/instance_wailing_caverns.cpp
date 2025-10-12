@@ -22,7 +22,7 @@
 class instance_wailing_caverns : public InstanceMapScript
 {
 public:
-    instance_wailing_caverns() : InstanceMapScript("instance_wailing_caverns", 43) { }
+    instance_wailing_caverns() : InstanceMapScript("instance_wailing_caverns", MAP_WAILING_CAVERNS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

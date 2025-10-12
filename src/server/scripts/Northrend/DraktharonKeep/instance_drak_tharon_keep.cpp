@@ -34,7 +34,7 @@ DoorData const doorData[] =
 class instance_drak_tharon_keep : public InstanceMapScript
 {
 public:
-    instance_drak_tharon_keep() : InstanceMapScript("instance_drak_tharon_keep", 600) { }
+    instance_drak_tharon_keep() : InstanceMapScript("instance_drak_tharon_keep", MAP_DRAK_THARON_KEEP) { }
 
     struct instance_drak_tharon_keep_InstanceScript : public InstanceScript
     {

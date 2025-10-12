@@ -252,7 +252,7 @@ public:
                             me->SummonCreature(summons[0][i], cords[0][0] + ((i % 2) ? 4.0f : -4.0f), cords[0][1] + (i < 2 ? 4.0f : -4.0f), cords[0][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
-                        me->DestroyForNearbyPlayers();
+                        me->DestroyForVisiblePlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
                         releaseLockTimer = 1;
@@ -264,7 +264,7 @@ public:
                             me->SummonCreature(summons[1][i], cords[1][0] + ((i % 2) ? 4.0f : -4.0f), cords[1][1] + (i < 2 ? 4.0f : -4.0f), cords[1][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
-                        me->DestroyForNearbyPlayers();
+                        me->DestroyForVisiblePlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
                         releaseLockTimer = 1;
@@ -276,7 +276,7 @@ public:
                             me->SummonCreature(summons[2][i], cords[2][0] + ((i % 2) ? 4.0f : -4.0f), cords[2][1] + (i < 2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
-                        me->DestroyForNearbyPlayers();
+                        me->DestroyForVisiblePlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
                         releaseLockTimer = 1;

@@ -1,0 +1,151 @@
+#!/usr/bin/env bash
+
+# AzerothCore Starter Script
+# This script handles the execution of AzerothCore binaries with optional GDB support
+#
+# Usage: starter <binpath> <binfile> [gdb_file] [config] [syslog] [syserr] [gdb_enabled] [crashes_path]
+#
+# Parameters:
+#   $1 - Binary path (required)
+#   $2 - Binary file name (required)
+#   $3 - GDB configuration file (optional)
+#   $4 - Configuration file path (optional)
+#   $5 - System log file (optional)
+#   $6 - System error file (optional)
+#   $7 - GDB enabled flag (0/1, optional)
+#   $8 - Crashes directory path (optional)
+
+BINPATH="$1"
+BINFILE="$2"
+GDB_FILE="$3"
+CONFIG="$4"
+SYSLOG="$5"
+SYSERR="$6"
+GDB_ENABLED="${7:-0}"
+CRASHES_PATH="$8"
+
+# Default values
+CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_CRASHES_PATH=$(realpath "$BINPATH/crashes")
+[ -n "$CONFIG" ] && CONFIG_ABS=$(realpath "$CONFIG")
+
+# Set defaults if not provided
+CRASHES_PATH="${CRASHES_PATH:-$DEFAULT_CRASHES_PATH}"
+
+# Validate binary
+if [ -z "$BINPATH" ] || [ -z "$BINFILE" ]; then
+    echo "Error: Binary path and file are required"
+    echo "Usage: $0 <binpath> <binfile> [gdb_file] [config] [syslog] [syserr] [gdb_enabled] [crashes_path]"
+    exit 1
+fi
+
+BINARY="$BINPATH/$BINFILE"
+if [ ! -f "$BINARY" ]; then
+    echo "Error: Binary '$BINARY' not found"
+    exit 1
+fi
+
+# Create crashes directory if it doesn't exist
+mkdir -p "$CRASHES_PATH"
+
+cd "$BINPATH" || {
+    echo "Error: Could not change to binary path '$BINPATH'"
+    exit 1
+}
+
+EXECPATH=$(realpath "$BINFILE")
+
+if [ "$GDB_ENABLED" -eq 1 ]; then
+    echo "Starting $EXECPATH with GDB enabled"
+
+    # Generate GDB configuration on the fly
+    TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
+    GDB_TEMP_FILE="$CRASHES_PATH/gdb-$TIMESTAMP.conf"
+    GDB_OUTPUT_FILE="$CRASHES_PATH/gdb-$TIMESTAMP.txt"
+
+    # Create GDB configuration file if it is not defined
+    if [ -z "$GDB_FILE" ]; then
+
+        # Create GDB configuration
+        cat > "$GDB_TEMP_FILE" << EOF
+set logging file $GDB_OUTPUT_FILE
+set logging enabled on
+set debug timestamp
+EOF
+
+    # Add run command with config if specified
+    if [ -n "$CONFIG_ABS" ]; then
+        echo "run -c $CONFIG_ABS" >> "$GDB_TEMP_FILE"
+    else
+        echo "run" >> "$GDB_TEMP_FILE"
+    fi
+    
+    cat >> "$GDB_TEMP_FILE" << EOF
+bt
+bt full
+info thread
+thread apply all backtrace full
+EOF
+
+
+        GDB_FILE="$GDB_TEMP_FILE"
+    fi
+
+
+
+    # Create log files if specified
+    if [ -n "$SYSLOG" ]; then
+        [ ! -f "$SYSLOG" ] && touch "$SYSLOG"
+    fi
+
+    if [ -n "$SYSERR" ]; then
+        [ ! -f "$SYSERR" ] && touch "$SYSERR"
+    fi
+
+    # Execute with GDB
+    if [ "${WITH_CONSOLE:-0}" -eq 0 ] && [ -n "$SYSLOG" ] && [ -n "$SYSERR" ]; then
+        gdb -x "$GDB_FILE" --batch "$EXECPATH" >> "$SYSLOG" 2>> "$SYSERR"
+    else
+        echo "> Console enabled"
+        if [ -n "$SYSLOG" ] && [ -n "$SYSERR" ]; then
+            gdb -x "$GDB_FILE" --batch "$EXECPATH" > >(tee "$SYSLOG") 2> >(tee "$SYSERR" >&2)
+        else
+            gdb -x "$GDB_FILE" --batch "$EXECPATH"
+        fi
+    fi
+
+
+    # clean up temporary GDB file if it exists
+    if [ -n "$GDB_TEMP_FILE" ]; then
+        # Clean up temporary GDB file
+        rm -f "$GDB_TEMP_FILE"
+    fi
+else
+    echo "Starting $BINFILE without GDB"
+    # Determine if PM2 is active
+    is_pm2_active="0"
+    [ "$AC_LAUNCHED_BY_PM2" == "1" ] && is_pm2_active="1"
+    
+    # Determine if interactive mode is enabled
+    is_interactive_enabled="1"
+    [ "$AC_DISABLE_INTERACTIVE" == "1" ] && is_interactive_enabled="0"
+    
+    # use normal execution if we are running the binary under PM2 
+    # or when interactive mode is enabled
+    if [[ "$is_pm2_active" == "1" || "$is_interactive_enabled" == "1" ]]; then
+        echo "Running AC"
+        "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
+    else
+        # When AC_DISABLE_INTERACTIVE is set to 1 and we are not in PM2 
+        # This means we are using systemd without interactive mode and no session managers
+        # in this case we need to run AC with unbuffer for line-buffered output 
+        # NOTE unbuffer doesn't fully support interactive mode
+        if command -v unbuffer >/dev/null 2>&1; then
+            echo "Running AC with unbuffer for line-buffered output"
+            unbuffer "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
+        else
+            echo "⚠️  unbuffer not found, the output may not be line-buffered. Try installing expect."
+            exec "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
+        fi
+    fi
+fi

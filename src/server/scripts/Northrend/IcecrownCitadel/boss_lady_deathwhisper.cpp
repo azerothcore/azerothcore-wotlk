@@ -857,7 +857,7 @@ public:
                     events.Repeat(9s, 13s);
                     break;
                 case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                         me->CastSpell(target, SPELL_CURSE_OF_TORPOR, false);
                     events.Repeat(9s, 13s);
                     break;

@@ -269,10 +269,10 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
-Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
+Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
-    m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
+    m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_alreadyCallForHelp(false), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f),_sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), m_lastLeashExtensionTime(nullptr), m_cannotReachTimer(0),
     _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _isCombatMovementAllowed(true)
@@ -296,7 +296,6 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
 
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = false;
-    m_isTempWorldObject = false;
     _focusSpell = nullptr;
 
     m_respawnedTime = time_t(0);
@@ -372,7 +371,7 @@ void Creature::RemoveFromWorld()
 
 void Creature::DisappearAndDie()
 {
-    DestroyForNearbyPlayers();
+    DestroyForVisiblePlayers();
     //SetVisibility(VISIBILITY_OFF);
     //ObjectAccessor::UpdateObjectVisibility(this);
     if (IsAlive())
@@ -409,7 +408,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
     setDeathState(DeathState::Dead);
     RemoveAllAuras();
     if (!skipVisibility) // pussywizard
-        DestroyForNearbyPlayers(); // pussywizard: previous UpdateObjectVisibility()
+        DestroyForVisiblePlayers(); // pussywizard: previous UpdateObjectVisibility()
     loot.clear();
     uint32 respawnDelay = m_respawnDelay;
     if (IsAIEnabled)
@@ -526,7 +525,8 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, cinfo->HoverHeight);
 
-    SetCanDualWield(cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK));
+    if (cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK))
+        SetDualWieldMode(DualWieldMode::ENABLED);
 
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(cinfo->MovementType);
@@ -572,7 +572,8 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     ReplaceAllDynamicFlags(dynamicflags);
 
-    SetCanDualWield(cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK));
+    if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK))
+        SetDualWieldMode(DualWieldMode::ENABLED);
 
     SetAttackTime(BASE_ATTACK,   cInfo->BaseAttackTime);
     SetAttackTime(OFF_ATTACK,    cInfo->BaseAttackTime);
@@ -788,9 +789,7 @@ void Creature::Update(uint32 diff)
                     m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL, MOVE_BACKWARDS_CHECK_INTERVAL * 3);
                 }
                 else
-                {
                     m_moveBackwardsMovementTime -= diff;
-                }
 
                 // Circling the target
                 if (diff >= m_moveCircleMovementTime)
@@ -799,9 +798,17 @@ void Creature::Update(uint32 diff)
                     m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL, MOVE_CIRCLE_CHECK_INTERVAL * 2);
                 }
                 else
-                {
                     m_moveCircleMovementTime -= diff;
+
+                // Periodically check if able to move, if not, extend leash timer
+                if (diff >= m_extendLeashTime)
+                {
+                    if (HasUnitState(UNIT_STATE_LOST_CONTROL))
+                        UpdateLeashExtensionTime();
+                    m_extendLeashTime = EXTEND_LEASH_CHECK_INTERVAL;
                 }
+                else
+                    m_extendLeashTime -= diff;
             }
 
             // Call for assistance if not disabled
@@ -1074,7 +1081,7 @@ void Creature::DoFleeToGetAssistance()
         Acore::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
         Acore::CreatureLastSearcher<Acore::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
 
-        Cell::VisitGridObjects(this, searcher, radius);
+        Cell::VisitObjects(this, searcher, radius);
 
         SetNoSearchAssistance(true);
         UpdateSpeed(MOVE_RUN, false);
@@ -1573,7 +1580,7 @@ void Creature::SelectLevel(bool changelevel)
     SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
     SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
 
-    sScriptMgr->Creature_SelectLevel(cInfo, this);
+    sScriptMgr->OnCreatureSelectLevel(cInfo, this);
 }
 
 float Creature::_GetHealthMod(int32 Rank)
@@ -1937,22 +1944,16 @@ bool Creature::CanStartAttack(Unit const* who) const
     if (!_IsTargetAcceptable(who))
         return false;
 
-    // pussywizard: at this point we are either hostile to who or friendly to who->getAttackerForHelper()
-    // pussywizard: if who is in combat and has an attacker, help him if the distance is right (help because who is hostile or help because attacker is friendly)
-    bool assist = false;
-    if (who->IsEngaged() && IsWithinDist(who, ATTACK_DISTANCE))
-        if (Unit* victim = who->getAttackerForHelper())
-            if (IsWithinDistInMap(victim, sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS)))
-                assist = true;
-
-    if (!assist)
-        if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance, true, false)) // pussywizard: +m_combatDistance for turrets and similar
-            return false;
+    if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance, true, false)) // pussywizard: +m_combatDistance for turrets and similar
+        return false;
 
     if (!CanCreatureAttack(who))
         return false;
 
     if (HasUnitState(UNIT_STATE_STUNNED))
+        return false;
+
+    if (!IsHostileTo(who))
         return false;
 
     return IsWithinLOSInMap(who);
@@ -1987,8 +1988,6 @@ void Creature::setDeathState(DeathState state, bool despawn)
 
         Dismount();     // if creature is mounted on a virtual mount, remove it at death
 
-        setActive(false);
-
         if (HasSearchedAssistance())
         {
             SetNoSearchAssistance(false);
@@ -1999,7 +1998,7 @@ void Creature::setDeathState(DeathState state, bool despawn)
             m_formation->FormationReset(true, false);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
-        SetHover(false, false, false);
+        SetHover(false);
         SetDisableGravity(false, false, false);
 
         if (needsFalling)
@@ -2401,7 +2400,7 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
 
     Acore::NearestHostileUnitCheck u_check(this, dist, playerOnly);
     Acore::UnitLastSearcher<Acore::NearestHostileUnitCheck> searcher(this, target, u_check);
-    Cell::VisitAllObjects(this, searcher, dist);
+    Cell::VisitObjects(this, searcher, dist);
     return target;
 }
 
@@ -2418,7 +2417,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
     Unit* target = nullptr;
     Acore::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
     Acore::UnitLastSearcher<Acore::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
-    Cell::VisitAllObjects(this, searcher, std::max(dist, ATTACK_DISTANCE));
+    Cell::VisitObjects(this, searcher, std::max(dist, ATTACK_DISTANCE));
 
     return target;
 }
@@ -2454,7 +2453,7 @@ void Creature::CallAssistance(Unit* target /*= nullptr*/)
 
             Acore::AnyAssistCreatureInRangeCheck u_check(this, target, radius);
             Acore::CreatureListSearcher<Acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
-            Cell::VisitGridObjects(this, searcher, radius);
+            Cell::VisitObjects(this, searcher, radius);
 
             if (!assistList.empty())
             {
@@ -2488,9 +2487,12 @@ void Creature::CallForHelp(float radius, Unit* target /*= nullptr*/)
         return;
     }
 
+    if (m_alreadyCallForHelp) // avoid recursive call for help for any reason
+        return;
+
     Acore::CallOfHelpCreatureInRangeDo u_do(this, target, radius);
     Acore::CreatureWorker<Acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
-    Cell::VisitGridObjects(this, worker, radius);
+    Cell::VisitObjects(this, worker, radius);
 }
 
 bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /*= true*/) const
@@ -2536,6 +2538,9 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (checkfaction)
     {
         if (GetFaction() != u->GetFaction())
+            return false;
+
+        if (!RespondsToCallForHelp())
             return false;
     }
     else
@@ -2593,7 +2598,7 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
 void Creature::UpdateMoveInLineOfSightState()
 {
     // xinef: pets, guardians and units with scripts / smartAI should be skipped
-    if (IsPet() || HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) ||
+    if (IsPet() || HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLLABLE_GUARDIAN) ||
             GetScriptId() || GetAIName() == "SmartAI")
     {
         m_moveInLineOfSightStrictlyDisabled = false;
@@ -2674,29 +2679,29 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
         // pussywizard: don't check distance to home position if recently damaged (allow kiting away from spawnpoint!)
         // xinef: this should include taunt auras
-        if (!isWorldBoss() && (GetLastLeashExtensionTime() + 12 > GameTime::GetGameTime().count() || HasTauntAura()))
+        if (!isWorldBoss() && (GetLastLeashExtensionTime() + GetLeashTimer() > GameTime::GetGameTime().count() || HasTauntAura()))
             return true;
     }
 
     if (skipDistCheck)
         return true;
 
-    // xinef: added size factor for huge npcs
-    float dist = std::min<float>(GetDetectionRange() + GetObjectSize() * 2, 150.0f);
-
     if (Unit* unit = GetCharmerOrOwner())
     {
-        dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
-        return victim->IsWithinDist(unit, dist);
+        float visibilityDist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, DEFAULT_VISIBILITY_DISTANCE);
+        return victim->IsWithinDist(unit, visibilityDist);
     }
+
+    float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
+    if (!dist)
+        return true;
+
+    float x, y, z;
+    x = y = z = 0.0f;
+    if (GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE)->GetResetPosition(x, y, z))
+        return IsInDist2d(x, y, dist);
     else
-    {
-        // to prevent creatures in air ignore attacks because distance is already too high...
-        if (GetMovementTemplate().IsFlightAllowed())
-            return victim->IsInDist2d(&m_homePosition, dist);
-        else
-            return victim->IsInDist(&m_homePosition, dist);
-    }
+        return IsInDist2d(&m_homePosition, dist);
 }
 
 CreatureAddon const* Creature::GetCreatureAddon() const
@@ -2768,11 +2773,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
     //Load Path
     if (cainfo->path_id != 0)
-    {
-        if (sWorld->getBoolConfig(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE))
-            setActive(true);
         m_path_id = cainfo->path_id;
-    }
 
     if (!cainfo->auras.empty())
     {
@@ -3196,10 +3197,23 @@ bool Creature::IsImmuneToKnockback() const
 
 bool Creature::HasWeapon(WeaponAttackType type) const
 {
+    if (type == OFF_ATTACK)
+    {
+        switch (_dualWieldMode)
+        {
+            case DualWieldMode::ENABLED:
+                return true;
+            case DualWieldMode::DISABLED:
+                return false;
+            case DualWieldMode::AUTO:
+            default:
+                break;
+        }
+    }
+
     const uint8 slot = uint8(type);
     ItemEntry const* item = sItemStore.LookupEntry(GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot));
-
-    return ((item && item->ClassID == ITEM_CLASS_WEAPON) || (type == OFF_ATTACK && CanDualWield()));
+    return (item && item->ClassID == ITEM_CLASS_WEAPON);
 }
 
 /**
@@ -3230,8 +3244,9 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool
     {
         WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
         data << GetPackGUID();
-        data << uint32(0); //! movement counter
+        data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
 
         data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
         data << GetPackGUID();
@@ -3302,107 +3317,6 @@ void Creature::RefreshSwimmingFlag(bool recheck)
     // Creatures must be able to chase a target in water if they can enter water
     if (_isMissingSwimmingFlagOutOfCombat && CanEnterWater())
         SetUnitFlag(UNIT_FLAG_SWIMMING);
-}
-
-bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
-{
-    if (!Unit::SetCanFly(enable))
-        return false;
-
-    if (m_movedByPlayer)
-    {
-        sScriptMgr->AnticheatSetCanFlybyServer(m_movedByPlayer->ToPlayer(), enable);
-
-        if (!enable)
-            m_movedByPlayer->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_movedByPlayer->ToPlayer()->GetPositionZ());
-
-        WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
-        data << GetPackGUID();
-        data << uint32(0); //! movement counter
-        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-
-        data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-        return true;
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_FLYING : SMSG_SPLINE_MOVE_UNSET_FLYING, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
-{
-    if (!packetOnly && !Unit::SetWaterWalking(enable))
-        return false;
-
-    if (m_movedByPlayer)
-    {
-        WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
-        data << GetPackGUID();
-        data << uint32(0); //! movement counter
-        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-
-        data.Initialize(MSG_MOVE_WATER_WALK, 64);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-        return true;
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
-    return true;
-}
-
-bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
-{
-    if (!packetOnly && !Unit::SetFeatherFall(enable))
-        return false;
-
-    if (m_movedByPlayer)
-    {
-        WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
-        data << GetPackGUID();
-        data << uint32(0); //! movement counter
-        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-
-        data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-        return true;
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
-    return true;
-}
-
-bool Creature::SetHover(bool enable, bool packetOnly /*= false*/, bool updateAnimationTier /*= true*/)
-{
-    if (!packetOnly && !Unit::SetHover(enable))
-        return false;
-
-    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !IsRooted())
-    {
-        if (IsLevitating())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-        else if (IsHovering())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-        else
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
-    return true;
 }
 
 float Creature::GetAggroRange(Unit const* target) const
@@ -3732,6 +3646,16 @@ void Creature::UpdateLeashExtensionTime()
     (*GetLastLeashExtensionTimePtr()) = GameTime::GetGameTime().count();
 }
 
+uint8 Creature::GetLeashTimer() const
+{ // Based on testing on Classic, seems to range from ~11s for low level mobs (1-5) to ~16s for high level mobs (70+)
+    uint8 timerOffset = 11;
+
+    uint8 timerModifier = uint8(GetCreatureTemplate()->minlevel / 10) - 2;
+
+    // Formula is likely not quite correct, but better than flat timer
+    return std::max<uint8>(timerOffset, timerOffset + timerModifier);
+}
+
 bool Creature::CanPeriodicallyCallForAssistance() const
 {
     if (!IsInCombat())
@@ -3881,4 +3805,34 @@ std::string Creature::GetDebugInfo() const
         << "AIName: " << GetAIName() << " ScriptName: " << GetScriptName()
         << " WaypointPath: " << GetWaypointPath() << " SpawnId: " << GetSpawnId();
     return sstr.str();
+}
+
+// Note: This is called in a tight (heavy) loop, is it critical that all checks are FAST and are hopefully only simple conditionals.
+bool Creature::IsUpdateNeeded()
+{
+    if (WorldObject::IsUpdateNeeded())
+        return true;
+
+    if (GetMap()->isCellMarked(GetCurrentCell().GetCellCoord().GetId()))
+        return true;
+
+    if (IsInCombat())
+        return true;
+
+    if (!GetObjectVisibilityContainer().GetVisiblePlayersMap().empty())
+        return true;
+
+    if (ToTempSummon())
+        return true;
+
+    if (GetMotionMaster()->HasMovementGeneratorType(WAYPOINT_MOTION_TYPE))
+        return true;
+
+    if (HasUnitState(UNIT_STATE_EVADE))
+        return true;
+
+    if (m_formation && m_formation->GetLeader() != this)
+        return true;
+
+    return false;
 }

@@ -36,18 +36,6 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
-/* ScriptData
-SDName: Zulfarrak
-SD%Complete: 50
-SDComment: Consider it temporary, no instance script made for this instance yet.
-SDCategory: Zul'Farrak
-EndScriptData */
-
-/* ContentData
-npc_sergeant_bly
-npc_weegli_blastfuse
-EndContentData */
-
 /*######
 ## npc_sergeant_bly
 ######*/
@@ -665,7 +653,7 @@ public:
                 Unit* unit = nullptr;
                 Acore::MostHPMissingInRange u_check(me, 40.f, 1500);
                 Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
-                Cell::VisitGridObjects(me, searcher, 40.f);
+                Cell::VisitObjects(me, searcher, 40.f);
                 if (unit)
                 {
                     DoCast(unit, SPELL_HEAL);
@@ -683,7 +671,7 @@ public:
                 Unit* unit = nullptr;
                 Acore::MostHPMissingInRange u_check(me, 40.f, 700);
                 Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
-                Cell::VisitGridObjects(me, searcher, 40.f);
+                Cell::VisitObjects(me, searcher, 40.f);
                 if (unit)
                 {
                     DoCast(unit, SPELL_RENEW);

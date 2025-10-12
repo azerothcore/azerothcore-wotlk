@@ -33,7 +33,7 @@ ObjectData const creatureData[] =
 class instance_utgarde_keep : public InstanceMapScript
 {
 public:
-    instance_utgarde_keep() : InstanceMapScript("instance_utgarde_keep", 574) { }
+    instance_utgarde_keep() : InstanceMapScript("instance_utgarde_keep", MAP_UTGARDE_KEEP) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
@@ -229,7 +229,7 @@ public:
                             c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode(), c);
                         if (c->GetLootMode())
                             c->loot.generateMoneyLoot(c->GetCreatureTemplate()->mingold, c->GetCreatureTemplate()->maxgold);
-                        c->DestroyForNearbyPlayers();
+                        c->DestroyForVisiblePlayers();
                         c->SetVisible(true);
                     }
                     break;
@@ -244,7 +244,7 @@ public:
                             c->loot.FillLoot(lootid, LootTemplates_Creature, c->GetLootRecipient(), false, false, c->GetLootMode(), c);
                         if (c->GetLootMode())
                             c->loot.generateMoneyLoot(c->GetCreatureTemplate()->mingold, c->GetCreatureTemplate()->maxgold);
-                        c->DestroyForNearbyPlayers();
+                        c->DestroyForVisiblePlayers();
                         c->SetVisible(true);
                     }
                     break;

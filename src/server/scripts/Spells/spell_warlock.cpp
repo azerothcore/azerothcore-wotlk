@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Pet.h"
 #include "Player.h"
@@ -97,7 +98,7 @@ class spell_warl_eye_of_kilrogg : public AuraScript
             {
                 if (Unit* charm = player->GetCharm())
                 {
-                    if (charm->GetMapId() == 530 || charm->GetMapId() == 571)
+                    if (charm->GetMapId() == MAP_OUTLAND || charm->GetMapId() == MAP_NORTHREND)
                     {
                         charm->CastSpell(charm, SPELL_WARLOCK_EYE_OF_KILROGG_FLY, true);
                     }

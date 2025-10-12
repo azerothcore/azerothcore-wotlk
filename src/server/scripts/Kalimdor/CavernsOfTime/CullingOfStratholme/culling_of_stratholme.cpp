@@ -23,6 +23,7 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "WorldStateDefines.h"
 
 enum Says
 {
@@ -691,6 +692,7 @@ public:
                         // Start Event
                         Start(true, false);
                         SetDespawnAtEnd(false);
+                        SetDespawnAtFar(false);
 
                         ScheduleNextEvent(currentEvent, 9000);
                         break;
@@ -924,7 +926,7 @@ public:
                         break;
                     case EVENT_ACTION_PHASE2+9:
                         if (pInstance)
-                            pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 0);
+                            pInstance->DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 0);
 
                         Talk(SAY_PHASE210);
                         eventInRun = false;
@@ -954,7 +956,7 @@ public:
                         eventInRun = false;
                         ScheduleNextEvent(currentEvent, 0);
                         break;
-                    //After waypoint 23
+                    // After waypoint 23
                     case EVENT_ACTION_PHASE3+3:
                         SetRun(true);
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
@@ -970,10 +972,12 @@ public:
                             cr->AI()->Talk(SAY_PHASE305);
                         ScheduleNextEvent(currentEvent, 1000);
                         break;
+                    // Trio citizen transformation right as we enter Town Hall
                     case EVENT_ACTION_PHASE3+6:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN))
                         {
                             cr->UpdateEntry(NPC_INFINITE_HUNTER, nullptr, false);
+                            cr->SetFullHealth();
                             cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
@@ -983,6 +987,7 @@ public:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN4))
                         {
                             cr->UpdateEntry(NPC_INFINITE_AGENT, nullptr, false);
+                            cr->SetFullHealth();
                             cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
@@ -992,18 +997,19 @@ public:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                         {
                             cr->UpdateEntry(NPC_INFINITE_ADVERSARY, nullptr, false);
+                            cr->SetFullHealth();
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
                         }
-                        if (Creature* cr = GetEventNpc(NPC_INFINITE_AGENT)) // it is infinite agent now :)
+                        if (Creature* cr = GetEventNpc(NPC_INFINITE_AGENT))
                         {
                             cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
                         }
-                        if (Creature* cr = GetEventNpc(NPC_INFINITE_HUNTER)) // it is infinite hunter now :)
+                        if (Creature* cr = GetEventNpc(NPC_INFINITE_HUNTER))
                         {
                             cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
@@ -1148,16 +1154,7 @@ public:
                             if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_EXIT_GATE)))
                                 go->SetGoState(GO_STATE_ACTIVE);
 
-                            if (!me->GetMap()->GetPlayers().IsEmpty())
-                            {
-                                if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
-                                {
-                                    if (GameObject* chest = player->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 0))
-                                    {
-                                        chest->SetLootRecipient(me->GetMap());
-                                    }
-                                }
-                            }
+                            pInstance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
                         }
                         ScheduleNextEvent(currentEvent, 10000);
                         break;
@@ -1274,7 +1271,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
             else // if (data == COS_PROGRESS_KILLED_SALRAMM)
             {
                 if (pInstance)
-                    pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 10);
+                    pInstance->DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 10);
                 DoAction(ACTION_KILLED_SALRAMM);
             }
             break;
@@ -1331,7 +1328,7 @@ void npc_arthas::npc_arthasAI::SendNextWave(uint32 entry)
         else
             SummonNextWave();
 
-        pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, waveGroupId + 1);
+        pInstance->DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, waveGroupId + 1);
     }
 }
 

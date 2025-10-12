@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "BattlegroundMgr.h"
 #include "LFGMgr.h"
@@ -41,7 +42,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
         return true;
     }
 
-    if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && player->GetMapId() == 609)
+    if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && player->GetMapId() == MAP_EBON_HOLD)
     {
         handler->PSendSysMessage("Death Knights can't spectate before finishing questline.");
         return true;
@@ -163,7 +164,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     if (bgPreparation)
         return true;
 
-    float z = spectate->GetMapId() == 618 ? std::max(28.27f, spectate->GetPositionZ() + 0.25f) : spectate->GetPositionZ() + 0.25f;
+    float z = spectate->GetMapId() == MAP_THE_RING_OF_VALOR ? std::max(28.27f, spectate->GetPositionZ() + 0.25f) : spectate->GetPositionZ() + 0.25f;
 
     player->SetPendingSpectatorForBG(spectate->GetBattlegroundId());
     player->SetBattlegroundId(spectate->GetBattlegroundId(), spectate->GetBattlegroundTypeId(), PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);

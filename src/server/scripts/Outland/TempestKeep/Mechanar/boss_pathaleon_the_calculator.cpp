@@ -115,7 +115,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             context.Repeat(15s);
         }).Schedule(10s, 15s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_DOMINATION, 1, 50.0f) == SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_DOMINATION, 0, 50.0f, true, false, false) == SPELL_CAST_OK)
             {
                 Talk(SAY_DOMINATION);
             }

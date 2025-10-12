@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Arathi Highlands
-SD%Complete: 100
-SDComment: Quest support: 665
-SDCategory: Arathi Highlands
-EndScriptData */
-
-/* ContentData
-npc_professor_phizzlethorpe
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

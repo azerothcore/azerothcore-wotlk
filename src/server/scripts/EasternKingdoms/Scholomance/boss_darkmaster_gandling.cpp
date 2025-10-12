@@ -307,7 +307,7 @@ public:
                 if (victim && (target->GetGUID() == victim->GetGUID()))
                 {
                     me->AddThreat(victim, -1000000); // drop current player, add a ton to second. This should guarantee that we don't end up with both 1 and 2 in a cage...
-                    if (Unit* newTarget = SelectTarget(SelectTargetMethod::MaxThreat, 1, 200.0f)) // search in whole room
+                    if (Unit* newTarget = SelectTarget(SelectTargetMethod::MaxThreat, 0, 200.0f, false, false)) // search in whole room
                     {
                         me->AddThreat(newTarget, 1000000);
                     }

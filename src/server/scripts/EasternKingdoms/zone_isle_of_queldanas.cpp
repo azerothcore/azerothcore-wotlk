@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Pet.h"
@@ -23,19 +24,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Isle_of_Queldanas
-SD%Complete: 100
-SDComment: Quest support: 11524, 11525, 11532, 11533, 11542, 11543, 11541
-SDCategory: Isle Of Quel'Danas
-EndScriptData */
-
-/* ContentData
-npc_converted_sentry
-npc_greengill_slave
-EndContentData */
-
-/*###### OUR: ######*/
 
 enum ThalorienNpcs
 {
@@ -622,68 +610,30 @@ public:
     };
 };
 
-/*###### THEIR: ######*/
-
-/*######
-## npc_greengill_slave
-######*/
-
-#define ENRAGE  45111
-#define ORB     45109
-#define QUESTG  11541
-#define DM      25060
-
-class npc_greengill_slave : public CreatureScript
+// 45396, 45398 - Weapon Coating Enchant
+class spell_gen_weapon_coating_enchant : public AuraScript
 {
-public:
-    npc_greengill_slave() : CreatureScript("npc_greengill_slave") { }
+    PrepareAuraScript(spell_gen_weapon_coating_enchant);
 
-    CreatureAI* GetAI(Creature* creature) const override
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return new npc_greengill_slaveAI(creature);
+        Unit* caster = eventInfo.GetActor();
+        if (!caster)
+            return false;
+
+        return (caster->GetZoneId() == AREA_ISLE_OF_QUEL_DANAS || caster->GetZoneId() == AREA_SUNWELL_PLATEAU || caster->GetZoneId() == AREA_MAGISTERS_TERRACE);
     }
 
-    struct npc_greengill_slaveAI : public ScriptedAI
+    void Register() override
     {
-        npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void JustEngagedWith(Unit* /*who*/) override { }
-
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-        {
-            Player* player = caster->ToPlayer();
-            if (!player)
-                return;
-
-            if (spellInfo->Id == ORB && !me->HasAura(ENRAGE))
-            {
-                if (player->GetQuestStatus(QUESTG) == QUEST_STATUS_INCOMPLETE)
-                    DoCast(player, 45110, true);
-
-                DoCast(me, ENRAGE);
-
-                if (Creature* Myrmidon = me->FindNearestCreature(DM, 70))
-                {
-                    me->AddThreat(Myrmidon, 100000.0f);
-                    AttackStart(Myrmidon);
-                }
-            }
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoCheckProc += AuraCheckProcFn(spell_gen_weapon_coating_enchant::CheckProc);
+    }
 };
 
 void AddSC_isle_of_queldanas()
 {
-    // OUR:
     new npc_bh_thalorien_dawnseeker();
     RegisterSpellScript(spell_bh_cleanse_quel_delar);
     new npc_grand_magister_rommath();
-
-    // THEIR:
-    new npc_greengill_slave();
+    RegisterSpellScript(spell_gen_weapon_coating_enchant);
 }

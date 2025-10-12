@@ -422,6 +422,8 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
             else if (dungeon->seasonal && !IsSeasonActive(dungeon->id))
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
+            else if (player->IsClass(CLASS_DEATH_KNIGHT) && !player->IsGameMaster() &&!(player->IsQuestRewarded(13188) || player->IsQuestRewarded(13189)))
+                lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
             else if (ar)
             {
                 // Check required items
@@ -1493,6 +1495,7 @@ namespace lfg
             for (LfgLockMap::const_iterator it2 = cachedLockMap.begin(); it2 != cachedLockMap.end() && !dungeons.empty(); ++it2)
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
+
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
                 if (itDungeon != dungeons.end())
                 {
@@ -1668,11 +1671,8 @@ namespace lfg
             }
             else if (group != grp)
             {
-                // pussywizard:
                 if (!grp->IsFull())
                     grp->AddMember(player);
-                //else // some cleanup? LeaveLFG?
-                //  ;
             }
 
             grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);

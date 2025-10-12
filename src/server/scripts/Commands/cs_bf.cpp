@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: bf_commandscript
-%Complete: 100
-Comment: All bf related commands
-Category: commandscripts
-EndScriptData */
-
 #include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "ArenaSeasonMgr.h"
@@ -185,7 +186,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             err = ERR_BATTLEGROUND_QUEUED_FOR_RATED;
         }
         // don't let Death Knights join BG queues when they are not allowed to be teleported yet
-        else if (_player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && _player->GetMapId() == 609 && !_player->IsGameMaster() && !_player->HasSpell(50977))
+        else if (_player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && _player->GetMapId() == MAP_EBON_HOLD && !_player->IsGameMaster() && !_player->HasSpell(50977))
         {
             err = ERR_BATTLEGROUND_NONE;
         }

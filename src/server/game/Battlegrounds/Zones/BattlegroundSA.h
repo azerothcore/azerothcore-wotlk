@@ -20,6 +20,7 @@
 
 #include "Battleground.h"
 #include "BattlegroundScore.h"
+#include "WorldStateDefines.h"
 
 #define BG_SA_FLAG_AMOUNT           3
 #define BG_SA_DEMOLISHER_AMOUNT     4
@@ -40,35 +41,6 @@ enum BG_SA_GateState
     BG_SA_GATE_OK           = 1,
     BG_SA_GATE_DAMAGED      = 2,
     BG_SA_GATE_DESTROYED    = 3
-};
-
-enum BG_SA_WorldStates
-{
-    BG_SA_TIMER_MINS                = 3559,
-    BG_SA_TIMER_SEC_TENS            = 3560,
-    BG_SA_TIMER_SEC_DECS            = 3561,
-    BG_SA_ALLY_ATTACKS              = 4352,
-    BG_SA_HORDE_ATTACKS             = 4353,
-    BG_SA_PURPLE_GATEWS             = 3614,
-    BG_SA_RED_GATEWS                = 3617,
-    BG_SA_BLUE_GATEWS               = 3620,
-    BG_SA_GREEN_GATEWS              = 3623,
-    BG_SA_YELLOW_GATEWS             = 3638,
-    BG_SA_ANCIENT_GATEWS            = 3849,
-    BG_SA_LEFT_GY_ALLIANCE          = 3635,
-    BG_SA_RIGHT_GY_ALLIANCE         = 3636,
-    BG_SA_CENTER_GY_ALLIANCE        = 3637,
-    BG_SA_RIGHT_ATT_TOKEN_ALL       = 3627,
-    BG_SA_LEFT_ATT_TOKEN_ALL        = 3626,
-    BG_SA_LEFT_ATT_TOKEN_HRD        = 3629,
-    BG_SA_RIGHT_ATT_TOKEN_HRD       = 3628,
-    BG_SA_HORDE_DEFENCE_TOKEN       = 3631,
-    BG_SA_ALLIANCE_DEFENCE_TOKEN    = 3630,
-    BG_SA_RIGHT_GY_HORDE            = 3632,
-    BG_SA_LEFT_GY_HORDE             = 3633,
-    BG_SA_CENTER_GY_HORDE           = 3634,
-    BG_SA_BONUS_TIMER               = 0xdf3,
-    BG_SA_ENABLE_TIMER              = 3564,
 };
 
 enum npc
@@ -494,22 +466,22 @@ public:
         switch (id)
         {
             case BG_SA_GREEN_GATE:
-                uws = BG_SA_GREEN_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_GREEN_GATE;
                 break;
             case BG_SA_YELLOW_GATE:
-                uws = BG_SA_YELLOW_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_YELLOW_GATE;
                 break;
             case BG_SA_BLUE_GATE:
-                uws = BG_SA_BLUE_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_BLUE_GATE;
                 break;
             case BG_SA_RED_GATE:
-                uws = BG_SA_RED_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_RED_GATE;
                 break;
             case BG_SA_PURPLE_GATE:
-                uws = BG_SA_PURPLE_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_PURPLE_GATE;
                 break;
             case BG_SA_ANCIENT_GATE:
-                uws = BG_SA_ANCIENT_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_ANCIENT_GATE;
                 break;
         }
         return uws;

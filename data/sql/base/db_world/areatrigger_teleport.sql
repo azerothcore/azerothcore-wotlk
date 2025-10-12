@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -29,7 +29,6 @@ CREATE TABLE `areatrigger_teleport` (
   `target_position_z` float NOT NULL DEFAULT '0',
   `target_orientation` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
-
   FULLTEXT KEY `name` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -84,9 +83,9 @@ INSERT INTO `areatrigger_teleport` VALUES
 (924,'Zul\'Farrak Entrance',209,1213.52,841.59,8.93,6.09),
 (943,'Leap of Faith - End of fall',1,-5187.47,-2804.32,-8.375,5.76),
 (1064,'Onyxia\'s Lair - Dustwallow Instance',1,-4747.17,-3753.27,49.8122,0.713271),
-(1466,'Blackrock Mountain - Searing Gorge Instance?',230,458.32,26.52,-70.67,4.95),
+(1466,'Blackrock Depths Entrance',230,456.929,34.0923,-68.0896,4.71239),
 (1468,'Blackrock Spire - Searing Gorge Instance (Inside)',229,78.5083,-225.044,49.839,5.1),
-(1470,'Blackrock Spire - Searing Gorge Instance',0,-7524.19,-1230.13,285.743,2.09544),
+(1470,'Blackrock Spire Entrance',0,-7524.7,-1228.41,287.204,1.74533),
 (1472,'Blackrock Dephts - Searing Gorge Instance',0,-7179.63,-923.667,166.416,1.84097),
 (2068,'Blackrock Spire - Jump Exit',0,-7558.39,-1309.43,248.454,1.5708),
 (2166,'Deeprun Tram - Ironforge Instance (Inside)',0,-4838.95,-1318.46,501.868,1.42372),
@@ -115,29 +114,29 @@ INSERT INTO `areatrigger_teleport` VALUES
 (2606,'Alterac Valley - Horde Exit',0,534.868,-1087.68,106.119,3.35758),
 (2608,'Alterac Valley - Alliance Exit',0,98.432,-182.274,127.52,5.02654),
 (2848,'Onyxia\'s Lair Entrance',249,29.1607,-71.3372,-8.18032,4.58),
-(2886,'The Molten Bridge',409,1096,-467,-104.6,3.64),
-(2890,'Molten Core Entrance, Inside',0,-7510.59,-1041.45,180.911,3.8666),
-(3126,'Maraudon',1,-1186.98,2875.95,85.7258,1.78443),
-(3131,'Maraudon',1,-1471.07,2618.57,76.1944,0),
-(3133,'Maraudon',349,1019.69,-458.31,-43.43,0.31),
-(3134,'Maraudon',349,752.91,-616.53,-33.11,1.37),
-(3183,'Dire Maul',429,44.4499,-154.822,-2.71201,0),
-(3184,'Dire Maul',429,-201.11,-328.66,-2.72,5.22),
-(3185,'Dire Maul',429,9.31119,-837.085,-32.5305,0),
-(3186,'Dire Maul',429,-62.9658,159.867,-3.46206,3.14788),
-(3187,'Dire Maul',429,31.5609,159.45,-3.4777,0.01),
-(3189,'Dire Maul',429,255.249,-16.0561,-2.58737,4.7),
-(3190,'Dire Maul',1,-3831.79,1250.23,160.223,0),
-(3191,'Dire Maul',1,-3747.96,1249.18,160.217,3.15827),
-(3193,'Dire Maul',1,-3520.65,1077.72,161.138,1.5009),
-(3194,'Dire Maul',1,-3737.48,934.975,160.973,3.13864),
-(3195,'Dire Maul',1,-3980.58,776.193,161.006,0),
-(3196,'Dire Maul',1,-4030.21,127.966,26.8109,0),
-(3197,'Dire Maul',1,-3577.67,841.859,134.594,0),
-(3528,'The Molten Core Window Entrance',409,1096,-467,-104.6,3.64),
-(3529,'The Molten Core Window(Lava) Entrance',409,1096,-467,-104.6,3.64),
+(2886,'The Molten Bridge',409,1091.89,-466.985,-105.084,3.14159),
+(2890,'The Molten Core, Exit (from inside of the Instance)',0,-7508.32,-1039.74,180.912,3.83972),
+(3126,'Maraudon, The Wicked Grotto [Purple Wing] (Exit)',1,-1186.98,2875.95,85.7258,1.78443),
+(3131,'Maraudon, Foulspore Cavern [Orange Wing] (Exit)',1,-1471.07,2618.57,76.1944,0),
+(3133,'Maraudon, Foulspore Cavern [Orange Wing] (Entrance)',349,1019.69,-458.31,-43.43,0.31),
+(3134,'Maraudon, The Wicked Grotto [Purple Wing] (Entrance)',349,752.91,-616.53,-33.11,1.37),
+(3183,'Dire Maul, East Wing [West] (Entrance)',429,44.4499,-154.822,-2.71201,0),
+(3184,'Dire Maul, East Wing [South] (Entrance)',429,-201.11,-328.66,-2.72,5.22),
+(3185,'Dire Maul, East Wing [East] (Entrance)',429,9.31119,-837.085,-32.5305,0),
+(3186,'Dire Maul, West Wing [South] (Entrance)',429,-62.9658,159.867,-3.46206,3.14788),
+(3187,'Dire Maul, West Wing [North] (Entrance)',429,31.5609,159.45,-3.4777,0.01),
+(3189,'Dire Maul, North Wing (Entrance)',429,255.249,-16.0561,-2.58737,4.7),
+(3190,'Dire Maul, West Wing [South] (Exit)',1,-3831.79,1250.23,160.223,0),
+(3191,'Dire Maul, West Wing [North](Exit)',1,-3747.96,1249.18,160.217,3.15827),
+(3193,'Dire Maul, North Wing (Exit)',1,-3520.65,1077.72,161.138,1.5009),
+(3194,'Dire Maul, East Wing [West] (Exit)',1,-3737.48,934.975,160.973,3.13864),
+(3195,'Dire Maul, East Wing [South] (Exit)',1,-3980.58,776.193,161.006,0),
+(3196,'Dire Maul, East Wing [East] (Exit)',1,-4030.21,127.966,26.8109,0),
+(3197,'Dire Maul, Alzzin the Wildshaper\'s broken wall [1-Way] (Exit)',1,-3577.67,841.859,134.594,0),
+(3528,'The Molten Core Window Entrance',409,1091.89,-466.985,-105.084,3.14159),
+(3529,'The Molten Core Window(Lava) Entrance',409,1091.89,-466.985,-105.084,3.14159),
 (3726,'Blackwing Lair - Blackrock Mountain - Eastern Kingdoms',469,-7673.03,-1106.08,396.651,0.703353),
-(3728,'Blackrock Spire, Unknown',229,174.74,-474.77,116.84,3.2),
+(3728,'Blackrock Spire, Exit (from inside of Blackwing Lair Instance)',229,174.74,-474.77,116.84,3.2),
 (3928,'Zul\'Gurub Entrance ',309,-11916.1,-1230.53,92.5334,4.71867),
 (3930,'Zul\'Gurub Exit ',0,-11916.3,-1208.37,92.2868,1.61792),
 (3948,'Arathi Basin Alliance Out',0,-1198,-2533,22,0),
@@ -265,14 +264,14 @@ INSERT INTO `areatrigger_teleport` VALUES
 (5148,'CoT Stratholme - Exit Target',1,-8756.6,-4457.02,-200.481,1.39626),
 (5150,'Culling of Stratholme (entrance)',595,1431.1,556.92,36.69,5.16),
 (5181,'Culling of Stratholme (exit 2)',1,-8756.87,-4459.29,-200.73,1.32),
-(5191,'Naxxramas (entrance1)',533,3005.68,-3447.77,293.93,4.65),
-(5192,'Naxxramas (entrance2)',533,3019.34,-3434.36,293.99,6.27),
-(5193,'Naxxramas (entrance3)',533,3005.9,-3420.58,294.11,1.58),
-(5194,'Naxxramas (entrance4)',533,2992.5,-3434.42,293.94,3.13),
-(5196,'Naxxramas (exit1)',571,3679.25,-1278.58,243.55,2.39),
-(5197,'Naxxramas (exit2)',571,3679.03,-1259.68,243.55,3.98),
-(5198,'Naxxramas (exit3)',571,3661.14,-1279.55,243.55,0.82),
-(5199,'Naxxramas (exit4)',571,3660.01,-1260.99,243.55,5.51),
+(5191,'Naxxramas, East (Entrance)',533,3005.68,-3447.77,293.93,4.65),
+(5192,'Naxxramas, North (Entrance)',533,3019.34,-3434.36,293.99,6.27),
+(5193,'Naxxramas, West (Entrance)',533,3005.9,-3420.58,294.11,1.58),
+(5194,'Naxxramas, South (Entrance)',533,2992.5,-3434.42,293.94,3.13),
+(5196,'Naxxramas, North-East (Exit)',571,3679.25,-1278.58,243.55,2.39),
+(5197,'Naxxramas, North-West (Exit)',571,3679.03,-1259.68,243.55,3.98),
+(5198,'Naxxramas, South-East (Exit)',571,3661.14,-1279.55,243.55,0.82),
+(5199,'Naxxramas, South-West (Exit)',571,3660.01,-1260.99,243.55,5.51),
 (5205,'Gundrak (entrance south)',604,1891.84,832.169,176.669,2.109),
 (5206,'Gundrak (entrance north)',604,1894.58,652.713,176.666,4.078),
 (5209,'Violet Hold (entrance)',608,1808.82,803.93,44.364,6.282),
@@ -326,5 +325,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:16
-
+-- Dump completed on 2025-07-19 12:08:38

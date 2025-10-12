@@ -25,18 +25,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Karazhan
-SD%Complete: 100
-SDComment: Support for Barnes (Opera controller) and Berthold (Doorman), Support for Quest 9645.
-SDCategory: Karazhan
-EndScriptData */
-
-/* ContentData
-npc_barnes
-npc_berthold
-npc_image_of_medivh
-EndContentData */
 
 enum Spells
 {
@@ -51,7 +39,17 @@ enum Spells
     SPELL_FIRE_BALL             = 30967,
     SPELL_UBER_FIREBALL         = 30971,
     SPELL_CONFLAGRATION_BLAST   = 30977,
-    SPELL_MANA_SHIELD           = 31635
+    SPELL_MANA_SHIELD           = 31635,
+
+    // Wrath of the Titans
+    SPELL_WRATH_OF_THE_TITANS   = 30554,
+
+    SPELL_WRATH_PROC_BLAST      = 30605,
+    SPELL_WRATH_PROC_BOLT       = 30606,
+    SPELL_WRATH_PROC_FLAME      = 30607,
+    SPELL_WRATH_PROC_SPITE      = 30608,
+    SPELL_WRATH_PROC_CHILL      = 30609,
+
 };
 
 enum Creatures
@@ -608,10 +606,106 @@ class spell_karazhan_temptation : public AuraScript
     }
 };
 
+// 30610 - Wrath of the Titans Stacker
+class spell_karazhan_wrath_titans_stacker : public SpellScript
+{
+    PrepareSpellScript(spell_karazhan_wrath_titans_stacker);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WRATH_OF_THE_TITANS });
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        caster->CastSpell(caster, SPELL_WRATH_OF_THE_TITANS, true);
+        if (Aura* aur = caster->GetAura(SPELL_WRATH_OF_THE_TITANS))
+            aur->SetStackAmount(5);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_karazhan_wrath_titans_stacker::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 30554 - Wrath of the Titans
+class spell_karazhan_wrath_titans_aura : public AuraScript
+{
+    PrepareAuraScript(spell_karazhan_wrath_titans_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WRATH_PROC_BLAST, SPELL_WRATH_PROC_BOLT, SPELL_WRATH_PROC_FLAME, SPELL_WRATH_PROC_SPITE, SPELL_WRATH_PROC_CHILL });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (!eventInfo.GetSpellInfo())
+            return false;
+
+        if (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
+            return false;
+
+        if (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()) == SPELL_SCHOOL_HOLY)
+            return false;
+
+        return true;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* target = eventInfo.GetActionTarget();
+        Player* caster = GetTarget()->ToPlayer();
+        if (!target || !caster)
+            return;
+
+        uint32 spellId = 0;
+        switch (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()))
+        {
+            case SPELL_SCHOOL_FIRE:
+                spellId = SPELL_WRATH_PROC_FLAME;
+                break;
+            case SPELL_SCHOOL_NATURE:
+                spellId = SPELL_WRATH_PROC_BOLT;
+                break;
+            case SPELL_SCHOOL_FROST:
+                spellId = SPELL_WRATH_PROC_CHILL;
+                break;
+            case SPELL_SCHOOL_SHADOW:
+                spellId = SPELL_WRATH_PROC_SPITE;
+                break;
+            case SPELL_SCHOOL_ARCANE:
+                spellId = SPELL_WRATH_PROC_BLAST;
+                break;
+            default:
+                return;
+        }
+
+        caster->CastSpell(target, spellId, true);
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_karazhan_wrath_titans_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_karazhan_wrath_titans_aura::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_karazhan()
 {
     new npc_barnes();
     new npc_image_of_medivh();
     new at_karazhan_side_entrance();
     RegisterSpellScript(spell_karazhan_temptation);
+    RegisterSpellScript(spell_karazhan_wrath_titans_stacker);
+    RegisterSpellScript(spell_karazhan_wrath_titans_aura);
 }

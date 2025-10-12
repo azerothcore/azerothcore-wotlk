@@ -230,15 +230,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 4;
     });
 
-    ApplySpellFix({
-        20424,  // Seal of Command
-        42463,  // Seal of Vengeance
-        53739   // Seal of Corruption
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
-    });
-
     // Spitfire Totem
     ApplySpellFix({ 38296 }, [](SpellInfo* spellInfo)
     {
@@ -272,18 +263,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         54741,  // Firestarter
         64823,  // Item - Druid T8 Balance 4P Bonus
         34477,  // Misdirection
-        44401,  // Missile Barrage
-        18820   // Insight
+        18820,  // Insight
+        57761   // Fireball!
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 1;
-    });
-
-    // Fireball
-    ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ProcCharges = 1;
-        spellInfo->SpellPriority = 50;
     });
 
     // Tidal Wave
@@ -606,6 +590,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 20424 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
+    // Vindication
+    ApplySpellFix({ 67, 26017}, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 0;
     });
 
     // Arcane Missiles
@@ -3587,7 +3577,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // That's Abominable
     ApplySpellFix({ 59565 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].MiscValueB = 1721; // controlable guardian
+        spellInfo->Effects[EFFECT_0].MiscValueB = 1721; // controllable guardian
     });
 
     // Investigate the Blue Recluse (1920)
@@ -4810,6 +4800,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Fatal Attraction
+    ApplySpellFix({ 40869 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER); // target set by script
+    });
+
+    // Fatal Attraction
     ApplySpellFix({ 40870 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
@@ -4896,6 +4892,269 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 45633, 45635 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
+    });
+
+    ApplySpellFix({
+        45662, // Encapsulate
+        45642  // Fire Bloom
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
+    });
+
+    // Torch (Death Knights near the Chapel)
+    ApplySpellFix({ 52953 }, [](SpellInfo* spellInfo)
+        {
+            spellInfo->MaxAffectedTargets = 1;
+        });
+
+    // Missile Barrage
+    ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
+        spellInfo->SpellPriority = 100;
+    });
+
+    // Auto Shot
+    ApplySpellFix({ 75 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_UNK;
+    });
+
+    // Life Tap
+    ApplySpellFix({ 1454 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
+    });
+
+    // Life Tap
+    ApplySpellFix({ 1455, 1456, 11687, 11688, 11689, 27222, 57946 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.0f;
+        spellInfo->MaxLevel = 16;
+        spellInfo->BaseLevel = 6;
+        spellInfo->SpellLevel = 6;
+    });
+
+    // Explosive Sheep
+    ApplySpellFix({ 4074 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(25);
+    });
+
+    // Phase Shift
+    ApplySpellFix({ 4511 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_MELEE_ATTACK;
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
+    });
+
+    // Charge Stun
+    ApplySpellFix({ 7922 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_NO_ACTIVE_DEFENSE;
+    });
+
+    // Tharnariun's Heal
+    ApplySpellFix({ 9457 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 &= ~SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_AND_TARGET_RESTRICTIONS;
+        spellInfo->Effects[EFFECT_0].DieSides = 0;
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
+    });
+
+    // Supercharge
+    ApplySpellFix({ 10732 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CategoryEntry = sSpellCategoryStore.LookupEntry(0);
+        spellInfo->Attributes &= ~(SPELL_ATTR0_IS_ABILITY | SPELL_ATTR0_DO_NOT_SHEATH);
+        spellInfo->Attributes |= SPELL_ATTR0_NOT_SHAPESHIFTED;
+        spellInfo->AttributesEx |= SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL;
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_TARGET_PER_SECOND_COST;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_CAN_PROC_FROM_PROCS;
+        spellInfo->FacingCasterFlags |= SPELL_FACING_FLAG_INFRONT;
+        spellInfo->InterruptFlags |= (SPELL_INTERRUPT_FLAG_MOVEMENT | SPELL_INTERRUPT_FLAG_PUSH_BACK |
+                                      SPELL_INTERRUPT_FLAG_UNK3 | SPELL_INTERRUPT_FLAG_INTERRUPT);
+        spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_JUMP;
+        spellInfo->ChannelInterruptFlags |= AURA_INTERRUPT_FLAG_UNK14;
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ALLY);
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ALLY);
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ALLY);
+        spellInfo->Effects[EFFECT_0].Amplitude = 3000;
+        spellInfo->Effects[EFFECT_1].Amplitude = 3000;
+        spellInfo->Effects[EFFECT_2].Amplitude = 3000;
+        spellInfo->SpellVisual[0] = 12656;
+    });
+
+    // Intercept
+    ApplySpellFix({ 20252 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes &= ~(SPELL_ATTR0_IS_ABILITY | SPELL_ATTR0_NOT_SHAPESHIFTED | SPELL_ATTR0_DO_NOT_SHEATH);
+        spellInfo->Attributes |= SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP;
+    });
+
+    // Intercept
+    ApplySpellFix({ 20253 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes &= ~(SPELL_ATTR0_IS_ABILITY | SPELL_ATTR0_NOT_SHAPESHIFTED | SPELL_ATTR0_DO_NOT_SHEATH);
+        spellInfo->Attributes |= SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP;
+        spellInfo->AttributesEx7 |= (SPELL_ATTR7_NO_ATTACK_DODGE | SPELL_ATTR7_NO_ATTACK_PARRY);
+        spellInfo->SpellLevel = 0;
+    });
+
+    // Heart of the Crusader
+    ApplySpellFix({ 20335, 20336, 20337 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+    });
+
+    // Heart of the Crusader (Rank 1)
+    ApplySpellFix({ 20335 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 21183; // Heart of the Crusader (Rank 1)
+    });
+
+    // Heart of the Crusader (Rank 2)
+    ApplySpellFix({ 20336 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 54498; // Heart of the Crusader (Rank 2)
+    });
+
+    // Heart of the Crusader (Rank 3)
+    ApplySpellFix({ 20337 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 54499; // Heart of the Crusader (Rank 3)
+    });
+
+    // Gordok Ogre Suit
+    ApplySpellFix({ 22736 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_MOUNT;
+    });
+
+    // Soul Flame
+    ApplySpellFix({ 23272 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
+    // Tree Disguise
+    ApplySpellFix({ 30298 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->InterruptFlags |= (SPELL_INTERRUPT_FLAG_MOVEMENT | SPELL_INTERRUPT_FLAG_PUSH_BACK |
+                                      SPELL_INTERRUPT_FLAG_UNK3 | SPELL_INTERRUPT_FLAG_INTERRUPT);
+        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_MOD_STUN;
+    });
+
+    // Internal Shake Camera w/ rumble sound
+    ApplySpellFix({ 33271 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_ALLOW_WHILE_MOUNTED;
+    });
+
+    // Glaive
+    ApplySpellFix({ 36500 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes &= ~SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL;
+        spellInfo->Effects[EFFECT_0].DieSides = 68;
+        spellInfo->Effects[EFFECT_0].BasePoints = 201;
+    });
+
+    // Create Anchorite Relic
+    ApplySpellFix({ 39183 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(0);
+    });
+
+    // Charge Rifts
+    ApplySpellFix({ 47747 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_45_YARDS);
+    });
+
+    // New Summon Test
+    ApplySpellFix({ 49214 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(3);
+    });
+
+    // Plague Strike
+    ApplySpellFix({ 54469 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
+        spellInfo->Effects[EFFECT_2].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
+    });
+
+    // Glyph of Chains of Ice:
+    ApplySpellFix({ 58620 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellLevel = 0;
+    });
+
+    // Exit Portal
+    ApplySpellFix({ 60474 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE;
+    });
+
+        // Eye of Acherus Flight (Boost)
+    ApplySpellFix({ 51923 }, [](SpellInfo* spellInfo)
+        {
+            spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED;
+            spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        });
+
+    // Shattering Throw
+    ApplySpellFix({ 64382 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes &= ~(SPELL_ATTR0_IS_ABILITY | SPELL_ATTR0_NOT_SHAPESHIFTED | SPELL_ATTR0_DO_NOT_SHEATH);
+        spellInfo->Attributes |= SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP;
+    });
+
+    ApplySpellFix({
+        43444, // Explosive Trap (Hex Lord Malacrass)
+        43447, // Freezing Trap (Hex Lord Malacrass)
+        43449, // Snake Trap (Hex Lord Malacrass)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
+    });
+
+    // Arcane Missiles
+    ApplySpellFix({ 58529, 61592 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+    });
+
+    // Siphon Bloodgem
+    ApplySpellFix({ 34367 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_TURNING;
+    });
+
+    // The Green Tower
+    ApplySpellFix({ 18097 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21); // -1
+    });
+
+    ApplySpellFix({
+        28032, // Zap Crystal
+        28056, // Zap Crystal Corpse
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+    });
+
+    // Earth Shield
+    ApplySpellFix({ 55599, 58981 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_LIMIT_N;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
@@ -5034,6 +5293,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4693)); // Siege Engine, Accessory
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(1520)); // Wyrmrest Vanquisher
+    vse->m_flags |= VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
 
     // pussywizard: fix z offset for some vehicles:
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(6206)); // Marrowgar - Bone Spike

@@ -276,10 +276,6 @@ enum UlduarMisc
     ACTION_TOWER_OF_FLAMES_DESTROYED        = 3,
     ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
 
-    // Algalon the Observer
-    WORLD_STATE_ALGALON_DESPAWN_TIMER       = 4131,
-    WORLD_STATE_ALGALON_TIMER_ENABLED       = 4132,
-
     EVENT_UPDATE_ALGALON_TIMER              = 1,
     ACTION_FEEDS_ON_TEARS_FAILED            = 0,
     ACTION_INIT_ALGALON                     = 1,
