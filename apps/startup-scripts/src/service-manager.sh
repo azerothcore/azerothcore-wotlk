@@ -98,12 +98,12 @@ function make_path_absolute() {
         local config_dir_abs
         config_dir_abs="$(realpath "$AC_SERVICE_CONFIG_DIR" 2>/dev/null || echo "$AC_SERVICE_CONFIG_DIR")"
         # Join and normalize; do not require the target to exist
-        echo "$(realpath -m "$config_dir_abs/$input" 2>/dev/null || echo "$config_dir_abs/$input")"
+        realpath -m "$config_dir_abs/$input" 2>/dev/null || echo "$config_dir_abs/$input"
         return
     fi
 
     # Fallback: try to normalize relative to current directory
-    echo "$(realpath -m "$input" 2>/dev/null || echo "$input")"
+    realpath -m "$input" 2>/dev/null || echo "$input"
 }
 
 # Tokenize a shell command string without executing it. Supports basic quoting
