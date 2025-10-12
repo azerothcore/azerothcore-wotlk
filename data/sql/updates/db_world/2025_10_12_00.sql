@@ -1,3 +1,4 @@
+-- DB update 2025_10_11_06 -> 2025_10_12_00
 --
 UPDATE `creature_template` SET `maxlevel` = 33 WHERE `entry` = 940;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 940);
