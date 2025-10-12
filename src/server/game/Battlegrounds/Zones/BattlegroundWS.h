@@ -272,6 +272,7 @@ private:
     ObjectGuid _droppedFlagGUID[2];
     uint8  _flagState[2];
     TeamId _lastFlagCaptureTeam;
+    float _wsReputationRate;
     uint32 _reputationCapture;
     uint32 _honorWinKills;
     uint32 _honorEndKills;
