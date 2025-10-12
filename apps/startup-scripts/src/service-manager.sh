@@ -13,57 +13,10 @@ SCRIPT_DIR="$CURRENT_PATH"
 
 ROOT_DIR="$(cd "$CURRENT_PATH/../../.." && pwd)"
 
-# Colors for output
-readonly YELLOW='\033[1;33m'
-readonly GREEN='\033[0;32m'
-readonly RED='\033[0;31m'
-readonly BLUE='\033[0;34m'
-readonly NC='\033[0m' # No Color
-
-canonicalize_path() {
-    local input="$1"
-
-    if [ -z "$input" ]; then
-        echo ""
-        return
-    fi
-
-    if command -v realpath >/dev/null 2>&1; then
-        local resolved
-        resolved="$(realpath -m "$input" 2>/dev/null)" && { echo "$resolved"; return; }
-    fi
-
-    if command -v python3 >/dev/null 2>&1; then
-        local py_resolved
-        py_resolved="$(python3 -c 'import os,sys; print(os.path.abspath(os.path.normpath(sys.argv[1])))' "$input" 2>/dev/null)" && {
-            echo "$py_resolved"
-            return
-        }
-    fi
-
-    if [ -d "$input" ]; then
-        (cd "$input" 2>/dev/null && pwd) && return
-    fi
-
-    local dir base
-    dir=$(dirname "$input")
-    base=$(basename "$input")
-    if [ -d "$dir" ]; then
-        (cd "$dir" 2>/dev/null && printf '%s/%s\n' "$(pwd)" "$base") && return
-    fi
-
-    echo "$input"
-}
-
 # Configuration directory (can be overridden with AC_SERVICE_CONFIG_DIR)
-CONFIG_DIR_RAW="${AC_SERVICE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services}"
-
-# Create config directory if it doesn't exist
-mkdir -p "$CONFIG_DIR_RAW"
-
-CONFIG_DIR="$(canonicalize_path "$CONFIG_DIR_RAW")"
-export AC_SERVICE_CONFIG_DIR="$CONFIG_DIR"
+CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services}"
 REGISTRY_FILE="$CONFIG_DIR/service_registry.json"
+export AC_SERVICE_CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-$CONFIG_DIR}"
 
 # Default values for variables that might be loaded from config files
 # This prevents "unbound variable" errors when sourcing configuration files
@@ -77,8 +30,14 @@ RESTART_POLICY="${RESTART_POLICY:-}"
 GDB_ENABLED="${GDB_ENABLED:-}"
 SERVER_CONFIG="${SERVER_CONFIG:-}"
 
+# Colors for output
+readonly YELLOW='\033[1;33m'
+readonly GREEN='\033[0;32m'
+readonly RED='\033[0;31m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
+
 # Create config directory if it doesn't exist
-# (already ensured above), but keep for robustness
 mkdir -p "$CONFIG_DIR"
 
 # Initialize registry if it doesn't exist
@@ -735,14 +694,20 @@ function get_service_info_resolved() {
     fi
 
     if [ -n "$exec_args_raw_json" ] && [ "$exec_args_raw_json" != "null" ]; then
+        local prev_arg=""
         while IFS= read -r arg; do
             if [[ -z "$arg" ]]; then
                 exec_args_resolved+=("$arg")
+            elif [ "$prev_arg" = "--config" ]; then
+                exec_args_resolved+=("$(make_path_absolute "$arg")")
             elif [[ "$arg" == /* ]]; then
+                exec_args_resolved+=("$(make_path_absolute "$arg")")
+            elif [[ "$arg" == */* && "$arg" != -* ]]; then
                 exec_args_resolved+=("$(make_path_absolute "$arg")")
             else
                 exec_args_resolved+=("$arg")
             fi
+            prev_arg="$arg"
         done < <(echo "$exec_args_raw_json" | jq -r '.[]?')
     fi
     
@@ -1036,9 +1001,12 @@ function pm2_create_service() {
     local exec_command_abs
     exec_command_abs="$(make_path_absolute "$exec_command_rel")"
     local -a exec_args_abs=()
+    local prev_arg=""
     while IFS= read -r arg; do
         if [[ -z "$arg" ]]; then
             exec_args_abs+=("$arg")
+        elif [ "$prev_arg" = "--config" ]; then
+            exec_args_abs+=("$(make_path_absolute "$arg")")
         elif [[ "$arg" == /* ]]; then
             exec_args_abs+=("$(make_path_absolute "$arg")")
         elif [[ "$arg" == */* && "$arg" != -* ]]; then
@@ -1046,6 +1014,7 @@ function pm2_create_service() {
         else
             exec_args_abs+=("$arg")
         fi
+        prev_arg="$arg"
     done < <(echo "$exec_definition" | jq -r '.args[]?')
 
     # Set stop exit codes based on restart policy
@@ -1575,10 +1544,10 @@ function create_service() {
     
     # Determine server binary based on service type
     local server_bin="${service_type}server"
-    local server_binary_path="$(canonicalize_path "$bin_path/$server_bin")"
+    local server_binary_path=$(realpath "$bin_path/$server_bin")
     local real_config_path=""
     if [ -n "$server_config" ]; then
-        real_config_path="$(canonicalize_path "$server_config")"
+        real_config_path=$(realpath "$server_config")
     fi
 
     # Check if binary exists
