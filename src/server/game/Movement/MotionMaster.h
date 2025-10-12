@@ -247,6 +247,8 @@ public:
     void ReinitializeMovement();
 
     bool GetDestination(float& x, float& y, float& z);
+
+    void DistanceYourself(float range);
 private:
     void Mutate(MovementGenerator* m, MovementSlot slot);                  // use Move* functions instead
 
