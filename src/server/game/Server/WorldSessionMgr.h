@@ -81,8 +81,6 @@ public:
 
     void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
-    bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
-    void SendZoneText(uint32 zone, std::string text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL);
     void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr);
 
     void DoForAllOnlinePlayers(std::function<void(Player*)> exec);
