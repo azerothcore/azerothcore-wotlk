@@ -1,3 +1,4 @@
+-- DB update 2025_10_12_00 -> 2025_10_12_01
 --
 -- With this smart script set, the worm will seek the first player within 18 yards to attack, with no regard to the player's level. Being outside of 18 yards when killing a Rotted One will avoid this behavior.
 -- Smart Script #2 will ensure the mob dies after 30 seconds, which is how long they are supposed to live.
