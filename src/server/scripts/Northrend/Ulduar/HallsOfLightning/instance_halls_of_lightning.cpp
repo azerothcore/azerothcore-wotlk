@@ -32,23 +32,10 @@ public:
 
     struct instance_halls_of_lightning_InstanceMapScript : public InstanceScript
     {
-        instance_halls_of_lightning_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); };
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-
-        ObjectGuid m_uiGeneralBjarngrimGUID;
-        ObjectGuid m_uiIonarGUID;
-        ObjectGuid m_uiLokenGUID;
-        ObjectGuid m_uiVolkhanGUID;
-
-        ObjectGuid m_uiBjarngrimDoorGUID;
-        ObjectGuid m_uiVolkhanDoorGUID;
-        ObjectGuid m_uiIonarDoorGUID;
-        ObjectGuid m_uiLokenDoorGUID;
-        ObjectGuid m_uiLokenGlobeGUID;
-
-        bool volkhanAchievement;
-        bool bjarngrimAchievement;
+        instance_halls_of_lightning_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        {
+            Initialize();
+        };
 
         void Initialize() override
         {
@@ -61,6 +48,9 @@ public:
 
         bool IsEncounterInProgress() const override
         {
+            if (InstanceScript::IsEncounterInProgress())
+                return true;
+
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
                 if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_LOKEN_INTRO)
@@ -211,6 +201,23 @@ public:
 
             return ObjectGuid::Empty;
         }
+
+    private:
+        uint32 m_auiEncounter[MAX_ENCOUNTER];
+
+        ObjectGuid m_uiGeneralBjarngrimGUID;
+        ObjectGuid m_uiIonarGUID;
+        ObjectGuid m_uiLokenGUID;
+        ObjectGuid m_uiVolkhanGUID;
+
+        ObjectGuid m_uiBjarngrimDoorGUID;
+        ObjectGuid m_uiVolkhanDoorGUID;
+        ObjectGuid m_uiIonarDoorGUID;
+        ObjectGuid m_uiLokenDoorGUID;
+        ObjectGuid m_uiLokenGlobeGUID;
+
+        bool volkhanAchievement;
+        bool bjarngrimAchievement;
     };
 };
 
