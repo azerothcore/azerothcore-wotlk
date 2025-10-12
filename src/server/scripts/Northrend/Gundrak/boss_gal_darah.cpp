@@ -92,8 +92,8 @@ struct boss_gal_darah : public BossAI
             }, 10s, 12s);
 
             ScheduleTimedEvent(32s, [&] {
+                scheduler.CancelAll();
                 DoCastSelf(SPELL_TRANSFORM_TO_TROLL);
-                ScheduleEvents();
             }, 32s);
         }
         else if (spellInfo->Id == SPELL_TRANSFORM_TO_TROLL)
@@ -104,8 +104,6 @@ struct boss_gal_darah : public BossAI
 
     void ScheduleEvents()
     {
-        scheduler.CancelAll();
-
         ScheduleTimedEvent(10s, [&] {
             Talk(SAY_SUMMON_RHINO);
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
@@ -124,8 +122,8 @@ struct boss_gal_darah : public BossAI
         }, 17s, 19s);
 
         ScheduleTimedEvent(32s, [&] {
-            DoCastSelf(SPELL_TRANSFORM_TO_RHINO);
             scheduler.CancelAll();
+            DoCastSelf(SPELL_TRANSFORM_TO_RHINO);
         }, 32s);
     }
 
