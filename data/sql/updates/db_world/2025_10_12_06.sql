@@ -1,3 +1,4 @@
+-- DB update 2025_10_12_05 -> 2025_10_12_06
 --
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=23 AND `SourceEntry`=0 AND `SourceId`=0 AND `SourceGroup` IN (3443, 12919, 15471);
 
