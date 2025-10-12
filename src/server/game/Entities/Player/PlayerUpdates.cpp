@@ -992,10 +992,12 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, ObjectGui
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
 
     Item* tmpitem = GetWeaponForAttack(attType, true);
-    Item* item = GetItemByGuid(itemGuid);
-    if (item && item != tmpitem && !item->IsBroken())
+    ObjectGuid tmpitemGUID = tmpitem ? tmpitem->GetGUID() : ObjectGuid::Empty;
+    if (itemGuid != ObjectGuid::Empty && itemGuid != tmpitemGUID)
     {
-        tmpitem = item;
+        Item* item = GetItemByGuid(itemGuid);
+        if (item && !item->IsBroken())
+            tmpitem = item;
     }
 
     if (!tmpitem && attType == BASE_ATTACK)
