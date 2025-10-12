@@ -172,7 +172,7 @@ public:
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
-            
+
             RollStance(STANCE_BATTLE);
 
             events.ScheduleEvent(EVENT_BJARNGRIM_CHANGE_STANCE, 20s, 0);
