@@ -175,17 +175,17 @@ public:
 
             // DEFENSIVE STANCE
             events.ScheduleEvent(EVENT_BJARNGRIM_REFLECTION, 8s, STANCE_DEFENSIVE);
-            events.ScheduleEvent(EVENT_BJARNGRIM_PUMMEL, 5s, STANCE_DEFENSIVE);
             events.ScheduleEvent(EVENT_BJARNGRIM_KNOCK, 16s, STANCE_DEFENSIVE);
             events.ScheduleEvent(EVENT_BJARNGRIM_IRONFORM, 12s, STANCE_DEFENSIVE);
 
             // BERSERKER STANCE
-            events.ScheduleEvent(EVENT_BJARNGRIM_MORTAL_STRIKE, 24s, STANCE_BERSERKER);
+            events.ScheduleEvent(EVENT_BJARNGRIM_INTERCEPT, 23s, STANCE_BERSERKER);
+            events.ScheduleEvent(EVENT_BJARNGRIM_CLEAVE, 25s, STANCE_BERSERKER);
             events.ScheduleEvent(EVENT_BJARNGRIM_WHIRLWIND, 26s, STANCE_BERSERKER);
 
             // BATTLE STANCE
-            events.ScheduleEvent(EVENT_BJARNGRIM_INTERCEPT, 23s, STANCE_BATTLE);
-            events.ScheduleEvent(EVENT_BJARNGRIM_CLEAVE, 25s, STANCE_BATTLE);
+            events.ScheduleEvent(EVENT_BJARNGRIM_PUMMEL, 5s, STANCE_BATTLE);
+            events.ScheduleEvent(EVENT_BJARNGRIM_MORTAL_STRIKE, 24s, STANCE_BATTLE);
             events.ScheduleEvent(EVENT_BJARNGRIM_SLAM, 30s, STANCE_BATTLE);
 
             if (m_pInstance)
