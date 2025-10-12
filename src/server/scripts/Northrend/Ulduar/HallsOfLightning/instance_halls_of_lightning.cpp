@@ -179,23 +179,6 @@ public:
             return m_auiEncounter[uiType];
         }
 
-        ObjectGuid GetGuidData(uint32 uiData) const override
-        {
-            switch (uiData)
-            {
-                case TYPE_BJARNGRIM:
-                    return m_uiGeneralBjarngrimGUID;
-                case TYPE_VOLKHAN:
-                    return m_uiVolkhanGUID;
-                case TYPE_IONAR:
-                    return m_uiIonarGUID;
-                case TYPE_LOKEN:
-                    return m_uiLokenGUID;
-            }
-
-            return ObjectGuid::Empty;
-        }
-
     private:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
