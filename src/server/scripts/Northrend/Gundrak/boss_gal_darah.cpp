@@ -54,7 +54,7 @@ enum Events
 
 struct boss_gal_darah : public BossAI
 {
-    boss_gal_darah(Creature* creature) : BossAI(creature, DATA_GAL_DARAH) {}
+    boss_gal_darah(Creature* creature) : BossAI(creature, DATA_GAL_DARAH) { }
 
     void Reset() override
     {
