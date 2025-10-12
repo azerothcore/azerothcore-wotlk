@@ -1,3 +1,4 @@
+-- DB update 2025_10_12_04 -> 2025_10_12_05
 DELETE FROM `creature_template_model` WHERE `CreatureID` IN (10184, 11262, 12758, 28681, 30084, 30161, 30245, 30248, 30249, 30282, 30592, 32295, 36561);
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
 (10184, 0, 8570, 1, 0, 51831),
