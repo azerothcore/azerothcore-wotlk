@@ -47,6 +47,7 @@ class InstanceScript;
 class Group;
 class InstanceSave;
 class Object;
+class Weather;
 class WorldObject;
 class TempSummon;
 class Player;
@@ -62,6 +63,7 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 class PathGenerator;
+class WorldSession;
 
 enum WeatherState : uint32;
 
@@ -132,6 +134,7 @@ struct ZoneDynamicInfo
     ZoneDynamicInfo();
 
     uint32 MusicId;
+    std::unique_ptr<Weather> DefaultWeather;
     WeatherState WeatherId;
     float WeatherGrade;
     uint32 OverrideLightId;
@@ -440,15 +443,22 @@ public:
 
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
 
+    bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession const* self = nullptr, TeamId teamId = TEAM_NEUTRAL) const;
+    void SendZoneText(uint32 zoneId, char const* text, WorldSession const* self = nullptr, TeamId teamId = TEAM_NEUTRAL) const;
+
     void SendInitTransports(Player* player);
     void SendRemoveTransports(Player* player);
-    void SendZoneDynamicInfo(Player* player);
+    void SendZoneDynamicInfo(uint32 zoneId, Player* player) const;
+    void SendZoneWeather(uint32 zoneId, Player* player) const;
+    void SendZoneWeather(ZoneDynamicInfo const& zoneDynamicInfo, Player* player) const;
     void SendInitSelf(Player* player);
 
+    void UpdateWeather(uint32 const diff);
     void UpdateExpiredCorpses(uint32 const diff);
 
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
+    Weather* GetOrGenerateZoneDefaultWeather(uint32 zoneId);
     void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
     void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
 
@@ -584,6 +594,7 @@ private:
     std::unordered_map<uint32, uint32> _zonePlayerCountMap;
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
+    IntervalTimer _weatherUpdateTimer;
     uint32 _defaultLight;
 
     IntervalTimer _corpseUpdateTimer;

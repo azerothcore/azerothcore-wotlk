@@ -49,7 +49,6 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mEvadeDisabled = false;
 
     mCanAutoAttack = true;
-    mCanCombatMove = true;
 
     mForcedPaused = false;
 
@@ -80,6 +79,9 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     m_ConditionsTimer = 0;
     if (me->GetVehicleKit())
         conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE, me->GetEntry());
+
+    _currentRangeMode = false;
+    _attackDistance = 0.f;
 }
 
 bool SmartAI::IsAIControlled() const
@@ -846,7 +848,7 @@ void SmartAI::AttackStart(Unit* who)
 
     if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
     {
-        if (mCanCombatMove)
+        if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
             SetRun(mRun);
             MovementGeneratorType type = me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE);
@@ -1047,35 +1049,47 @@ void SmartAI::sQuestReward(Player* player, Quest const* quest, uint32 opt)
     GetScript()->ProcessEventsFor(SMART_EVENT_REWARD_QUEST, player, quest->GetQuestId(), opt);
 }
 
-void SmartAI::SetCombatMove(bool on, float chaseRange)
+void SmartAI::SetCombatMovement(bool on, bool stopOrStartMovement)
 {
-    if (mCanCombatMove == on)
+    if (on)
+        me->ClearUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+    else
+        me->AddUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT);
+
+    if (!IsAIControlled() || HasEscortState(SMART_ESCORT_ESCORTING))
         return;
 
-    mCanCombatMove = on;
-
-    if (!IsAIControlled())
-        return;
-
-    if (!HasEscortState(SMART_ESCORT_ESCORTING))
+    if (stopOrStartMovement && me->GetVictim()) // Only change current movement while in combat
     {
-        if (on && me->GetVictim())
+        if (!me->IsCrowdControlled())
         {
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
-            {
-                SetRun(mRun);
-                me->GetMotionMaster()->MoveChase(me->GetVictim(), chaseRange);
-                me->CastStop();
-            }
-        }
-        else
-        {
-            me->StopMoving();
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
-                me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MoveIdle();
+            if (on)
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
+            else if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+                me->StopMoving();
         }
     }
+}
+
+void SmartAI::SetCurrentRangeMode(bool on, float range)
+{
+    _currentRangeMode = on;
+    _attackDistance = range;
+
+    if (Unit* victim = me->GetVictim())
+        me->GetMotionMaster()->MoveChase(victim, _attackDistance);
+}
+
+void SmartAI::DistanceYourself(float range)
+{
+    Unit* victim = me->GetVictim();
+    if (!victim || !victim->IsWithinMeleeRange(me))
+        return;
+
+    float combatReach = me->GetMeleeRange(victim);
+    float distance = DISTANCING_CONSTANT + std::max(combatReach * 1.5f, combatReach + range);
+    me->GetMotionMaster()->DistanceYourself(distance);
+    _pendingDistancing = distance;
 }
 
 void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, uint32 end, uint32 creditType, bool aliveState)
@@ -1130,32 +1144,6 @@ void SmartAI::StopFollow(bool complete)
     GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
-void SmartAI::MoveAway(float distance)
-{
-    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
-        return;
-
-    mCanCombatMove = false;
-
-    if (!IsAIControlled())
-        return;
-
-    if (!HasEscortState(SMART_ESCORT_ESCORTING))
-    {
-        if (me->GetVictim())
-        {
-            me->StopMoving();
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
-                me->GetMotionMaster()->Clear(false);
-
-            float x, y, z;
-            me->GetClosePoint(x, y, z, me->GetObjectSize(), distance, M_PI);
-            if (me->GetVictim()->IsWithinLOS(x, y, z))
-                me->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
-        }
-    }
-}
-
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)
 {
     if (invoker)
@@ -1181,6 +1169,12 @@ void SmartAI::PathEndReached(uint32 /*pathId*/)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_DATA_ENDED, nullptr, 0, me->GetWaypointPath());
     me->LoadPath(0);
+}
+
+void SmartAI::DistancingEnded()
+{
+    SetCurrentRangeMode(true, _pendingDistancing);
+    _pendingDistancing = 0.f;
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
