@@ -884,7 +884,6 @@ void World::SetInitialWorldSettings()
     stmt->SetData(2, GitRevision::GetFullVersion());
     LoginDatabase.Execute(stmt);
 
-    _timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
     _timers[WUPDATE_UPTIME].SetInterval(getIntConfig(CONFIG_UPTIME_UPDATE)*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
 
@@ -1184,13 +1183,6 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
         sWorldSessionMgr->UpdateSessions(diff);
-    }
-
-    /// <li> Handle weather updates when the timer has passed
-    if (_timers[WUPDATE_WEATHERS].Passed())
-    {
-        _timers[WUPDATE_WEATHERS].Reset();
-        WeatherMgr::Update(uint32(_timers[WUPDATE_WEATHERS].GetInterval()));
     }
 
     /// <li> Clean logs table

@@ -1001,20 +1001,25 @@ class spell_chapter2_persuasive_strike : public SpellScript
             creature->AI()->Talk(SAY_PERSUADED3, 24s);
             creature->AI()->Talk(SAY_PERSUADED4, 32s);
 
-            creature->m_Events.AddEventAtOffset([creature, player]
+            ObjectGuid playerGuid = player->GetGUID();
+
+            creature->m_Events.AddEventAtOffset([creature, playerGuid]
             {
-                if (player)
-                    sCreatureTextMgr->SendChat(creature, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+                if (Player* caster = ObjectAccessor::GetPlayer(*creature, playerGuid))
+                    sCreatureTextMgr->SendChat(creature, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, caster);
             }, 40s);
 
-            creature->m_Events.AddEventAtOffset([creature, player]
+            creature->m_Events.AddEventAtOffset([creature, playerGuid]
             {
                 creature->AI()->Talk(SAY_PERSUADED6);
-                if (player)
+
+                if (Player* caster = ObjectAccessor::GetPlayer(*creature, playerGuid))
                 {
-                    Unit::Kill(player, creature);
-                    player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
+                    Unit::Kill(caster, creature);
+                    caster->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
                 }
+                else
+                    creature->KillSelf();
             }, 48s);
         }
         else

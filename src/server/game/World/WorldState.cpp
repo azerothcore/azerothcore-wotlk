@@ -25,6 +25,7 @@
 #include "UnitAI.h"
 #include "Weather.h"
 #include "WorldState.h"
+#include "WorldConfig.h"
 #include "WorldStateDefines.h"
 #include <chrono>
 
@@ -1442,6 +1443,8 @@ void WorldState::StopScourgeInvasion()
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS);
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS);
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES);
+    sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);
+    sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BOSSES);
     BroadcastSIWorldstates();
     m_siData.Reset();
 
@@ -1564,22 +1567,25 @@ void WorldState::BroadcastSIWorldstates()
 
 void WorldState::HandleDefendedZones()
 {
-    if (m_siData.m_battlesWon < 50)
+    if (m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_FIRST))
     {
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
     }
-    else if (m_siData.m_battlesWon >= 50 && m_siData.m_battlesWon < 100)
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_FIRST) &&
+             m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND))
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
-    else if (m_siData.m_battlesWon >= 100 && m_siData.m_battlesWon < 150)
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND) &&
+             m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_THIRD))
     {
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
     }
-    else if (m_siData.m_battlesWon >= 150)
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_THIRD))
     {
-        sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION);
+        // The event is enabled via command, so we expect it to be disabled via command as well.
+        // sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);

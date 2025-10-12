@@ -26,6 +26,7 @@
 #include "Dynamic/TypeList.h"
 #include "GridRefMgr.h"
 #include <unordered_map>
+#include <vector>
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements
@@ -48,6 +49,24 @@ struct ContainerMapList<TypeList<H, T>>
 {
     ContainerMapList<H> _elements;
     ContainerMapList<T> _TailElements;
+};
+
+template<class OBJECT>
+struct ContainerVector
+{
+    std::vector<OBJECT*> _element;
+};
+
+template<>
+struct ContainerVector<TypeNull>
+{
+};
+
+template<class H, class T>
+struct ContainerVector<TypeList<H, T>>
+{
+    ContainerVector<H> _elements;
+    ContainerVector<T> _TailElements;
 };
 
 template<class OBJECT, class KEY_TYPE>
@@ -121,6 +140,33 @@ public:
 
 private:
     ContainerMapList<OBJECT_TYPES> i_elements;
+};
+
+template<class OBJECT_TYPES>
+class TypeVectorContainer
+{
+public:
+    template<class SPECIFIC_TYPE> [[nodiscard]] std::size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
+
+    template<class SPECIFIC_TYPE>
+    bool Insert(SPECIFIC_TYPE* obj)
+    {
+        SPECIFIC_TYPE* t = Acore::Insert(i_elements, obj);
+        return (t != nullptr);
+    }
+
+    template<class SPECIFIC_TYPE>
+    bool Remove(SPECIFIC_TYPE* obj)
+    {
+        SPECIFIC_TYPE* t = Acore::Remove(i_elements, obj);
+        return (t != nullptr);
+    }
+
+    ContainerVector<OBJECT_TYPES>& GetElements() { return i_elements; }
+    [[nodiscard]] const ContainerVector<OBJECT_TYPES>& GetElements() const { return i_elements; }
+
+private:
+    ContainerVector<OBJECT_TYPES> i_elements;
 };
 
 template<class OBJECT_TYPES, class KEY_TYPE>

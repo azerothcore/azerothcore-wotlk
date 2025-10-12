@@ -344,6 +344,14 @@ Updates.AllowRehash = 1
 Updates.CleanDeadRefMaxCount = 3
 
 #
+#    Updates.ExceptionShutdownDelay
+#        Description: Time (in milliseconds) to wait before shutting down after a fatal exception (e.g. failed SQL update).
+#        Default:     10000 - 10 seconds
+#                     0     - Disabled (immediate shutdown)
+
+Updates.ExceptionShutdownDelay = 10000
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3001,6 +3009,15 @@ ListenRange.TextEmote = 40
 ListenRange.Yell = 300
 
 #
+#    Creature.RepositionAgainstNpcs
+#        Description: Enables circling and backwards repositioning during NPC versus NPC combat.
+#                     Set to 0 to keep the legacy optimization that disables these moves for NPCs.
+#        Default:     1 - (Enabled, uses more CPU, but looks better)
+#                     0 - (Disabled, uses less CPU)
+
+Creature.RepositionAgainstNpcs = 1
+
+#
 #    Creature.MovingStopTimeForPlayer
 #        Description: Time (in milliseconds) during which creature will not move after
 #                     interaction with player.
@@ -4394,6 +4411,19 @@ Event.Announce = 0
 Sunsreach.CounterMax = 10000
 
 #
+#    ScourgeInvasion.CounterFirst
+#    ScourgeInvasion.CounterSecond
+#    ScourgeInvasion.CounterThird
+#        Description: Counter thresholds to be reached to transition phases
+#        Default:     50  - (ScourgeInvasion.CounterFirst)
+#                     100 - (ScourgeInvasion.CounterSecond)
+#                     150 - (ScourgeInvasion.CounterThird)
+
+ScourgeInvasion.CounterFirst  = 50
+ScourgeInvasion.CounterSecond = 100
+ScourgeInvasion.CounterThird  = 150
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4540,6 +4570,13 @@ MunchingBlizzlike.Enabled = 1
 #        Default: 1 - (Blizzlike)
 
 Daze.Enabled = 1
+
+#
+#    InfiniteAmmo.Enabled
+#        Description: Enable or disable ammo consumption for ranged attacks and thrown weapons.
+#        Default: 0 - (Blizzlike)
+
+InfiniteAmmo.Enabled = 0
 
 #
 ###################################################################################################
