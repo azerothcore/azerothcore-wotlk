@@ -1,3 +1,4 @@
+-- DB update 2025_10_12_01 -> 2025_10_12_02
 --
 -- GM Utility Spell Scripts
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (456, 2765, 1509, 18139, 6147, 2763, 20115, 20114, 24676, 24675);
