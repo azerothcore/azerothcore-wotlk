@@ -100,31 +100,31 @@ public:
                     }
                 }, 15s);
 
-                ScheduleTimedEvent(10s, [&] {
+                ScheduleTimedEvent(10s, 16s, [&] {
                     DoCastVictim(SPELL_PUNCTURE);
-                }, 8s);
+                }, 15s, 18s);
 
-                ScheduleTimedEvent(10s, [&] {
+                ScheduleTimedEvent(11s, 19s, [&] {
                     DoCastAOE(SPELL_WHIRLING_SLASH);
-                }, 21s);
+                }, 17s, 19s);
             }
             else
             {
-                ScheduleTimedEvent(21s, [&] {
+                ScheduleTimedEvent(8s, 11s, [&] {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
                     {
                         DoCast(target, SPELL_IMPALING_CHARGE);
                         impaledList.insert(target->GetGUID());
                     }
-                }, 21s);
+                }, 16s, 17s);
 
-                ScheduleTimedEvent(15s, [&] {
+                ScheduleTimedEvent(6s, 8s, [&] {
                     DoCastSelf(SPELL_ENRAGE);
-                }, 20s);
+                }, 16s, 17s);
 
-                ScheduleTimedEvent(5s, [&] {
+                ScheduleTimedEvent(7s, 10s, [&] {
                     DoCastAOE(SPELL_STOMP);
-                }, 20s);
+                }, 10s, 12s);
             }
         }
 
