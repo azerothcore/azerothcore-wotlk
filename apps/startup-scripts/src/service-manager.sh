@@ -56,28 +56,22 @@ function make_path_relative() {
         return
     fi
 
-    # If CONFIG_DIR (derived from AC_SERVICE_CONFIG_DIR) is available, compute
-    # a relative path from it to the absolute input (even if outside CONFIG_DIR).
-    if [ -n "${CONFIG_DIR:-}" ]; then
+    # If AC_SERVICE_CONFIG_DIR is explicitly set, check if path is under it
+    if [ -n "${AC_SERVICE_CONFIG_DIR:-}" ]; then
         local config_dir_abs
-        config_dir_abs="$(realpath "$CONFIG_DIR" 2>/dev/null || echo "$CONFIG_DIR")"
+        config_dir_abs="$(realpath "$AC_SERVICE_CONFIG_DIR" 2>/dev/null || echo "$AC_SERVICE_CONFIG_DIR")"
         local input_abs
         input_abs="$(realpath "$input" 2>/dev/null || echo "$input")"
 
-        # Try realpath --relative-to first
-        if relpath=$(realpath --relative-to "$config_dir_abs" "$input_abs" 2>/dev/null); then
-            echo "$relpath"
-            return
-        fi
-
-        # Fallback: manual prefix trim if inside CONFIG_DIR
+        # First check if the path is under the config directory
         if [[ "$input_abs" == "$config_dir_abs"/* ]]; then
+            # Remove the config directory prefix and leading slash
             echo "${input_abs#$config_dir_abs/}"
             return
         fi
     fi
 
-    # Last resort: return the original absolute input
+    # If not under AC_SERVICE_CONFIG_DIR or AC_SERVICE_CONFIG_DIR not set, return absolute path unchanged
     echo "$input"
 }
 
@@ -90,10 +84,10 @@ function make_path_absolute() {
         return
     fi
 
-    # Resolve relative paths against CONFIG_DIR when available
-    if [ -n "${CONFIG_DIR:-}" ] && [ -n "$input" ]; then
+    # Resolve relative paths against AC_SERVICE_CONFIG_DIR when explicitly set
+    if [ -n "${AC_SERVICE_CONFIG_DIR:-}" ] && [ -n "$input" ]; then
         local config_dir_abs
-        config_dir_abs="$(realpath "$CONFIG_DIR" 2>/dev/null || echo "$CONFIG_DIR")"
+        config_dir_abs="$(realpath "$AC_SERVICE_CONFIG_DIR" 2>/dev/null || echo "$AC_SERVICE_CONFIG_DIR")"
         # Join and normalize; do not require the target to exist
         echo "$(realpath -m "$config_dir_abs/$input" 2>/dev/null || echo "$config_dir_abs/$input")"
         return
@@ -109,10 +103,10 @@ function relativize_command_string() {
     local cmd_str="$1"
     local token
     local out=()
-    # Basic tokenization on whitespace. Assumes no spaces in path tokens.
-    # This is acceptable for our repo layout.
-    read -r -a tokens <<< "$cmd_str"
-    for token in "${tokens[@]}"; do
+    # Robust tokenization: use eval to split respecting quotes and spaces in paths.
+    # This handles quoted arguments and paths with spaces.
+    eval "set -- $cmd_str"
+    for token in "$@"; do
         # Handle key=value form
         if [[ "$token" == *=* ]]; then
             local key="${token%%=*}"
@@ -1283,7 +1277,7 @@ EOF
         fi
         
     elif [ "$provider" = "systemd" ]; then
-        if systemd_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" --"$systemd_type"; then
+        if systemd_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" "$systemd_type"; then
             service_creation_success=true
         fi
     fi
