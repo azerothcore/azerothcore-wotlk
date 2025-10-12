@@ -41,6 +41,7 @@
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
+#include <set>
 #include <string>
 #include <vector>
 
@@ -2548,7 +2549,9 @@ public:
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
-
+private:
+    [[nodiscard]] bool AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const;
+public:
     [[nodiscard]] uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
     void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
     Spell* m_spellModTakingSpell;
