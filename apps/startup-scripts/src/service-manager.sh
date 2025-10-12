@@ -16,6 +16,7 @@ ROOT_DIR="$(cd "$CURRENT_PATH/../../.." && pwd)"
 # Configuration directory (can be overridden with AC_SERVICE_CONFIG_DIR)
 CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services}"
 REGISTRY_FILE="$CONFIG_DIR/service_registry.json"
+export AC_SERVICE_CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-$CONFIG_DIR}"
 
 # Default values for variables that might be loaded from config files
 # This prevents "unbound variable" errors when sourcing configuration files
@@ -59,14 +60,22 @@ function make_path_relative() {
     # If AC_SERVICE_CONFIG_DIR is explicitly set, check if path is under it
     if [ -n "${AC_SERVICE_CONFIG_DIR:-}" ]; then
         local config_dir_abs
-        config_dir_abs="$(realpath "$AC_SERVICE_CONFIG_DIR" 2>/dev/null || echo "$AC_SERVICE_CONFIG_DIR")"
-        local input_abs
-        input_abs="$(realpath "$input" 2>/dev/null || echo "$input")"
+        config_dir_abs="$(realpath -m "$AC_SERVICE_CONFIG_DIR" 2>/dev/null || echo "$AC_SERVICE_CONFIG_DIR")"
+        local rel_path=""
 
-        # First check if the path is under the config directory
-        if [[ "$input_abs" == "$config_dir_abs"/* ]]; then
-            # Remove the config directory prefix and leading slash
-            echo "${input_abs#$config_dir_abs/}"
+        if command -v realpath >/dev/null 2>&1; then
+            rel_path="$(realpath --relative-to="$config_dir_abs" "$input" 2>/dev/null || true)"
+            if [ -z "$rel_path" ]; then
+                rel_path="$(realpath -m --relative-to="$config_dir_abs" "$input" 2>/dev/null || true)"
+            fi
+        fi
+
+        if [ -z "$rel_path" ] && command -v python3 >/dev/null 2>&1; then
+            rel_path="$(python3 -c 'import os,sys; print(os.path.relpath(sys.argv[1], sys.argv[2]))' "$input" "$config_dir_abs" 2>/dev/null || true)"
+        fi
+
+        if [ -n "$rel_path" ]; then
+            echo "$rel_path"
             return
         fi
     fi
@@ -328,6 +337,37 @@ function restore_missing_services() {
         if [ -n "$exec_command_abs" ] && [ "$exec_command_abs" != "null" ]; then
             exec_command_string="$(render_exec_command "$exec_command_abs" "${exec_args_abs[@]}")"
         fi
+        local server_binary_path_for_configs="$bin_path"
+        local run_engine_config_path=""
+        if [ ${#exec_args_abs[@]} -gt 0 ]; then
+            if [ -n "${exec_args_abs[1]:-}" ] && [ "${exec_args_abs[1]}" != "null" ]; then
+                server_binary_path_for_configs="${exec_args_abs[1]}"
+            fi
+            local arg_index
+            for arg_index in "${!exec_args_abs[@]}"; do
+                if [ "${exec_args_abs[$arg_index]}" = "--config" ]; then
+                    local next_index=$((arg_index + 1))
+                    if [ $next_index -lt ${#exec_args_abs[@]} ]; then
+                        run_engine_config_path="${exec_args_abs[$next_index]}"
+                    fi
+                    break
+                fi
+            done
+        fi
+        if [ -n "$server_binary_path_for_configs" ] && [ "$server_binary_path_for_configs" != "unknown" ] && [ "$server_binary_path_for_configs" != "null" ]; then
+            server_binary_path_for_configs="$(make_path_absolute "$server_binary_path_for_configs")"
+        fi
+        if [ -z "$run_engine_config_path" ] || [ "$run_engine_config_path" = "null" ]; then
+            run_engine_config_path="$CONFIG_DIR/$name-run-engine.conf"
+        else
+            run_engine_config_path="$(make_path_absolute "$run_engine_config_path")"
+        fi
+        if [ -d "$run_engine_config_path" ]; then
+            run_engine_config_path="$CONFIG_DIR/$name-run-engine.conf"
+        fi
+        if [[ "$run_engine_config_path" != /* ]]; then
+            run_engine_config_path="$(make_path_absolute "$run_engine_config_path")"
+        fi
         
         echo ""
         echo -e "${YELLOW}Service '$name' ($provider) is missing${NC}"
@@ -365,6 +405,9 @@ function restore_missing_services() {
                     fi
                 else
                     echo -e "${BLUE}Recreating service '$name'...${NC}"
+                    if ! ensure_service_configs_restored "$name" "$service_type" "$provider" "$server_binary_path_for_configs" "$server_config" "$restart_policy" "$session_manager" "$gdb_enabled" "$systemd_type" "$pm2_opts" "$run_engine_config_path" "false"; then
+                        echo -e "${YELLOW}Warning: Unable to restore configuration files for '$name'${NC}"
+                    fi
                     if [ "$provider" = "pm2" ]; then
                         if [ -z "$exec_command_string" ] || [ "$exec_definition_raw" = "null" ]; then
                             echo -e "${RED}Cannot recreate PM2 service automatically: missing exec definition${NC}"
@@ -444,7 +487,7 @@ function print_help() {
     echo "  $base_name update <service-name> [options]"
     echo "  $base_name delete <service-name>"
     echo "  $base_name list [provider]"
-    echo "  $base_name restore"
+    echo "  $base_name restore [--sync-only]"
     echo "  $base_name start|stop|restart|status <service-name>"
     echo "  $base_name logs <service-name> [--follow]"
     echo "  $base_name attach <service-name>"
@@ -525,7 +568,7 @@ function print_help() {
     echo "  - attach command automatically detects the configured session manager and connects appropriately"
     echo "  - attach always provides interactive access to the server console"
     echo "  - Use 'logs' command to view service logs without interaction"
-    echo "  - restore command checks registry and helps recreate missing services"
+    echo "  - restore command first normalizes registry paths, syncs config files, and then recreates missing services"
     echo ""
     echo "Environment Variables:"
     echo "  AC_SERVICE_CONFIG_DIR   - Override default config directory for services registry"
@@ -678,6 +721,229 @@ function get_service_info_resolved() {
                               --arg server_config "$server_config_resolved" \
                               --argjson exec "$exec_resolved_json" \
                               '.bin_path = $bin_path | .exec = $exec | .server_config = $server_config'
+}
+
+function ensure_service_configs_restored() {
+    local service_name="$1"
+    local service_type="$2"
+    local provider="$3"
+    local server_binary_path="$4"
+    local server_config_path="$5"
+    local restart_policy="$6"
+    local session_manager="$7"
+    local gdb_enabled="$8"
+    local systemd_type="$9"
+    local pm2_opts="${10:-}"
+    local run_engine_config_path="${11:-}"
+    local force_rewrite="${12:-false}"
+
+    if [ -z "$service_name" ]; then
+        return 1
+    fi
+
+    if [ -z "$server_binary_path" ] || [ "$server_binary_path" = "null" ] || [ "$server_binary_path" = "unknown" ]; then
+        return 0
+    fi
+
+    if [ "$server_config_path" = "null" ]; then
+        server_config_path=""
+    fi
+
+    if [ -z "$restart_policy" ] || [ "$restart_policy" = "null" ]; then
+        restart_policy="always"
+    fi
+
+    if [ -z "$session_manager" ] || [ "$session_manager" = "null" ]; then
+        session_manager="none"
+    fi
+
+    if [ -z "$gdb_enabled" ] || [ "$gdb_enabled" = "null" ]; then
+        gdb_enabled="0"
+    fi
+
+    if [ -z "$systemd_type" ] || [ "$systemd_type" = "null" ]; then
+        systemd_type="--user"
+    fi
+
+    pm2_opts="${pm2_opts:-}"
+    pm2_opts="${pm2_opts//$'\n'/ }"
+    pm2_opts="${pm2_opts#"${pm2_opts%%[![:space:]]*}"}"
+    pm2_opts="${pm2_opts%"${pm2_opts##*[![:space:]]}"}"
+
+    if [ -z "$run_engine_config_path" ] || [ "$run_engine_config_path" = "null" ]; then
+        run_engine_config_path="$CONFIG_DIR/$service_name-run-engine.conf"
+    fi
+
+    local service_conf_path="$CONFIG_DIR/$service_name.conf"
+    local server_binary_dir
+    local server_binary_name
+
+    server_binary_dir="$(dirname "$server_binary_path")"
+    server_binary_name="$(basename "$server_binary_path")"
+
+    mkdir -p "$(dirname "$run_engine_config_path")"
+
+    if [ "$force_rewrite" = "true" ] || [ ! -f "$run_engine_config_path" ]; then
+        echo -e "${BLUE}Restoring run-engine config: $run_engine_config_path${NC}"
+        cat > "$run_engine_config_path" << EOF
+# run-engine configuration for service: $service_name
+# Restored: $(date)
+
+# Enable/disable GDB execution
+export GDB_ENABLED=$gdb_enabled
+
+# Session manager (none|auto|tmux|screen)
+export SESSION_MANAGER="$session_manager"
+
+# Restart policy (on-failure|always)
+export RESTART_POLICY="$restart_policy"
+
+# Service mode - indicates this is running under a service manager (systemd/pm2)
+# When true, AC_DISABLE_INTERACTIVE will be set if no interactive session manager is used
+export SERVICE_MODE="true"
+
+# Session name for tmux/screen (optional)
+export SESSION_NAME="${service_name}"
+
+# Binary directory path
+export BINPATH="$server_binary_dir"
+
+# Server binary name
+export SERVERBIN="$server_binary_name"
+
+# Server configuration file path
+export CONFIG="$server_config_path"
+
+# Show console output for easier debugging
+export WITH_CONSOLE=1
+EOF
+    fi
+
+    if [ "$force_rewrite" = "true" ] || [ ! -f "$service_conf_path" ]; then
+        echo -e "${BLUE}Restoring service metadata: $service_conf_path${NC}"
+        cat > "$service_conf_path" << EOF
+# AzerothCore service configuration for $service_name
+# Restored: $(date)
+# Provider: $provider
+# Service Type: $service_type
+
+# run-engine configuration file
+RUN_ENGINE_CONFIG_FILE="$run_engine_config_path"
+
+# Restart policy
+RESTART_POLICY="$restart_policy"
+
+# Provider-specific options
+SYSTEMD_TYPE="$systemd_type"
+PM2_OPTS="$pm2_opts"
+EOF
+    fi
+
+    return 0
+}
+
+function sync_service_configs_from_registry() {
+    echo -e "${BLUE}Syncing service configuration files from registry...${NC}"
+
+    if [ ! -f "$REGISTRY_FILE" ] || [ ! -s "$REGISTRY_FILE" ]; then
+        echo -e "${YELLOW}No services registry found or empty${NC}"
+        return 0
+    fi
+
+    local services_count
+    services_count=$(jq length "$REGISTRY_FILE")
+    if [ "$services_count" -eq 0 ]; then
+        echo -e "${YELLOW}No services registered${NC}"
+        return 0
+    fi
+
+    local synced=0
+
+    for i in $(seq 0 $((services_count - 1))); do
+        local entry
+        entry=$(jq -c ".[$i]" "$REGISTRY_FILE")
+        [ -z "$entry" ] && continue
+
+        local name
+        name=$(echo "$entry" | jq -r '.name // empty')
+        [ -z "$name" ] && continue
+
+        local service_resolved
+        service_resolved="$(get_service_info_resolved "$name")"
+        [ -z "$service_resolved" ] && continue
+
+        local service_type provider restart_policy session_manager gdb_enabled systemd_type pm2_opts
+        service_type=$(echo "$entry" | jq -r '.type // ""')
+        provider=$(echo "$entry" | jq -r '.provider // ""')
+        restart_policy=$(echo "$entry" | jq -r '.restart_policy // "always"')
+        session_manager=$(echo "$entry" | jq -r '.session_manager // "none"')
+        gdb_enabled=$(echo "$entry" | jq -r '.gdb_enabled // "0"')
+        systemd_type=$(echo "$entry" | jq -r '.systemd_type // "--user"')
+        pm2_opts=$(echo "$entry" | jq -r '.pm2_opts // ""')
+
+        local server_binary_path
+        server_binary_path=$(echo "$service_resolved" | jq -r '.bin_path // ""')
+        if [ -z "$server_binary_path" ] || [ "$server_binary_path" = "null" ] || [ "$server_binary_path" = "unknown" ]; then
+            server_binary_path=""
+        fi
+
+        local server_config_path
+        server_config_path=$(echo "$service_resolved" | jq -r '.server_config // ""')
+        if [ -n "$server_config_path" ] && [ "$server_config_path" != "null" ]; then
+            server_config_path="$(make_path_absolute "$server_config_path")"
+        else
+            server_config_path=""
+        fi
+
+        local exec_definition
+        exec_definition=$(echo "$entry" | jq -c '.exec // null')
+        local -a exec_args=()
+        if [ -n "$exec_definition" ] && [ "$exec_definition" != "null" ]; then
+            while IFS= read -r arg; do
+                exec_args+=("$arg")
+            done < <(echo "$exec_definition" | jq -r '.args[]?')
+        fi
+
+        if { [ -z "$server_binary_path" ] || [ "$server_binary_path" = "null" ]; } && [ ${#exec_args[@]} -ge 2 ]; then
+            server_binary_path="$(make_path_absolute "${exec_args[1]}")"
+        fi
+
+        local run_engine_config_rel=""
+        for idx in "${!exec_args[@]}"; do
+            if [ "${exec_args[$idx]}" = "--config" ]; then
+                local next_idx=$((idx + 1))
+                if [ $next_idx -lt ${#exec_args[@]} ]; then
+                    run_engine_config_rel="${exec_args[$next_idx]}"
+                fi
+                break
+            fi
+        done
+
+        if [ -z "$run_engine_config_rel" ] || [ "$run_engine_config_rel" = "null" ]; then
+            run_engine_config_rel="$name-run-engine.conf"
+        fi
+
+        local run_engine_config_path
+        if [[ "$run_engine_config_rel" = /* ]]; then
+            run_engine_config_path="$run_engine_config_rel"
+        else
+            run_engine_config_path="$CONFIG_DIR/$run_engine_config_rel"
+        fi
+        run_engine_config_path="$(realpath -m "$run_engine_config_path" 2>/dev/null || echo "$run_engine_config_path")"
+
+        if [ -n "$server_binary_path" ]; then
+            server_binary_path="$(make_path_absolute "$server_binary_path")"
+        fi
+
+        ensure_service_configs_restored "$name" "$service_type" "$provider" "$server_binary_path" "$server_config_path" "$restart_policy" "$session_manager" "$gdb_enabled" "$systemd_type" "$pm2_opts" "$run_engine_config_path" "true"
+        synced=$((synced + 1))
+    done
+
+    if [ "$synced" -gt 0 ]; then
+        echo -e "${GREEN}Synchronized $synced service configuration file(s)${NC}"
+    else
+        echo -e "${YELLOW}No service configuration files required synchronization${NC}"
+    fi
 }
 
 # PM2 service management functions
@@ -2267,7 +2533,26 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
         list_services "${2:-}"
         ;;
     restore)
-        restore_missing_services
+        sync_only=false
+        if [ $# -gt 1 ]; then
+            for opt in "${@:2}"; do
+                case "$opt" in
+                    --sync-only)
+                        sync_only=true
+                        ;;
+                    *)
+                        echo -e "${RED}Error: Unknown option for restore command: $opt${NC}"
+                        print_help
+                        exit 1
+                        ;;
+                esac
+            done
+        fi
+        normalize_registry_paths
+        sync_service_configs_from_registry
+        if [ "$sync_only" = "false" ]; then
+            restore_missing_services
+        fi
         ;;
     start|stop|restart|status)
         if [ $# -lt 2 ]; then
