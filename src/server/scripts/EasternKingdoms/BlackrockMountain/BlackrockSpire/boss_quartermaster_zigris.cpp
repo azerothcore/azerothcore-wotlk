@@ -110,11 +110,11 @@ struct boss_quartermaster_zigris : public BossAI
                     if (me->IsWithinMeleeRange(me->GetVictim()))
                     {
                         DoCastVictim(SPELL_HOOKEDNET);
-                        events.RepeatEvent(16000);
+                        events.Repeat(16s);
                     }
                     else
                     {
-                        events.RepeatEvent(3000);
+                        events.Repeat(3s);
                     }
                     break;
                 case EVENT_SHOOT:
@@ -130,7 +130,7 @@ struct boss_quartermaster_zigris : public BossAI
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
             }
 

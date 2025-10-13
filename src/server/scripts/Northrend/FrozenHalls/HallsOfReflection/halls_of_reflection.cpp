@@ -658,7 +658,7 @@ public:
                     pLichKing->SendMovementFlagUpdate();
                     pLichKing->CastSpell(pLichKing, SPELL_FROSTMOURNE_EQUIP, false);
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_FROSTMOURNE), false);
-                    events.ScheduleEvent(EVENT_INTRO_LK_4_3, 1750);
+                    events.ScheduleEvent(EVENT_INTRO_LK_4_3, 1750ms);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_5, 6s);
                 break;
@@ -1153,7 +1153,7 @@ public:
 
             ScriptedAI::EnterEvadeMode(why);
             if (me->IsSummon())
-                me->ToTempSummon()->DespawnOrUnsummon(1);
+                me->ToTempSummon()->DespawnOrUnsummon(1ms);
         }
     };
 };
@@ -1732,7 +1732,7 @@ public:
         {
 
             ++reqKillCount;
-            if (events.GetNextEventTime(EVENT_DECREASE_REQ_COUNT_BY_100))
+            if (events.HasTimeUntilEvent(EVENT_DECREASE_REQ_COUNT_BY_100))
                 events.RescheduleEvent(EVENT_DECREASE_REQ_COUNT_BY_100, 10s);
             summons.Summon(s);
             s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);

@@ -341,7 +341,7 @@ public:
 
                                     Unit::Kill(c, c, false);
                                 }
-                                c->DespawnOrUnsummon(10000);
+                                c->DespawnOrUnsummon(10s);
                             }
                         pInstance->SetData(DATA_INSTANCE_PROGRESS, INSTANCE_PROGRESS_FINISHED_INTRO);
                     }
@@ -1082,7 +1082,7 @@ public:
                                     s->AddThreat(c, 0.0f);
                                 }
                         }
-                    events.RescheduleEvent(10, 3000);
+                    events.RescheduleEvent(10, 3s);
                     break;
             }
 
@@ -1381,7 +1381,7 @@ class spell_pos_slave_trigger_closest : public SpellScript
                         target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
                         if (Creature* c = target->ToCreature())
                         {
-                            c->DespawnOrUnsummon(7000);
+                            c->DespawnOrUnsummon(7s);
                             c->AI()->Talk(0, p);
                             c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
                         }
@@ -1406,7 +1406,7 @@ class spell_pos_rimefang_frost_nova : public SpellScript
             {
                 Unit::Kill(caster, target);
                 if (target->IsCreature())
-                    target->ToCreature()->DespawnOrUnsummon(30000);
+                    target->ToCreature()->DespawnOrUnsummon(30s);
             }
     }
 

@@ -330,7 +330,7 @@ public:
 
             if (Unit* arlokk = ObjectAccessor::GetUnit(*me, _instance->GetGuidData(NPC_ARLOKK)))
                 me->GetMotionMaster()->MovePoint(0, arlokk->GetPositionX(), arlokk->GetPositionY(), arlokk->GetPositionZ());
-            _events.ScheduleEvent(EVENT_ATTACK, 6000);
+            _events.ScheduleEvent(EVENT_ATTACK, 6s);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -355,7 +355,7 @@ public:
                 if (arlokk->IsAlive())
                     arlokk->GetAI()->SetData(_sideData, 0);
             }
-            me->DespawnOrUnsummon(4000);
+            me->DespawnOrUnsummon(4s);
         }
 
         void UpdateAI(uint32 diff) override

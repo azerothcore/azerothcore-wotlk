@@ -19681,7 +19681,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             else if (vehicleBase->IsCreature())
             {
                 vehicle->Uninstall();
-                vehicleBase->m_Events.AddEvent(new VehicleDespawnEvent(*vehicleBase, 2000), vehicleBase->m_Events.CalculateTime(2000));
+                vehicleBase->m_Events.AddEventAtOffset(new VehicleDespawnEvent(*vehicleBase, 2s), 2s);
             }
 
             // xinef: ugly hack, no appripriate hook later to cast spell
@@ -20791,7 +20791,10 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
             appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
 
         if (!target->CanSeeVendor(creature))
+        {
+            appendValue &= ~UNIT_NPC_FLAG_REPAIR;
             appendValue &= ~UNIT_NPC_FLAG_VENDOR_MASK;
+        }
 
         if (!creature->IsValidTrainerForPlayer(target, &appendValue))
             appendValue &= ~UNIT_NPC_FLAG_TRAINER;

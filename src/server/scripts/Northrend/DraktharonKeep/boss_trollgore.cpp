@@ -102,7 +102,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -214,7 +214,7 @@ class spell_trollgore_corpse_explode_aura : public AuraScript
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Creature* target = GetTarget()->ToCreature())
-            target->DespawnOrUnsummon(1);
+            target->DespawnOrUnsummon(1ms);
     }
 
     void Register() override

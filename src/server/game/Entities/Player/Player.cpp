@@ -90,6 +90,7 @@
 #include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include <cmath>
+#include <queue>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2087,7 +2088,7 @@ bool Player::CanInteractWithQuestGiver(Object* questGiver)
     return false;
 }
 
-Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
+Creature* Player::GetNPCIfCanInteractWith(ObjectGuid const& guid, uint32 npcflagmask)
 {
     // unit checks
     if (!guid)
@@ -2144,7 +2145,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     return creature;
 }
 
-GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const
+GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid const& guid, GameobjectTypes type) const
 {
     if (GameObject* go = GetMap()->GetGameObject(guid))
     {
@@ -4615,7 +4616,7 @@ void Player::KillPlayer()
     //UpdateObjectVisibility(); // pussywizard: not needed
 }
 
-void Player::OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans)
+void Player::OfflineResurrect(ObjectGuid const& guid, CharacterDatabaseTransaction trans)
 {
     Corpse::DeleteFromDB(guid, trans);
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
@@ -9013,7 +9014,7 @@ Pet* Player::GetPet() const
     return nullptr;
 }
 
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/, uint32 healthPct /*= 0*/)
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0ms*/, uint32 healthPct /*= 0*/)
 {
     PetStable& petStable = GetOrInitPetStable();
 
@@ -9034,7 +9035,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
                 ++itr;
         }
 
-        if (duration > 0s)
+        if (duration > 0ms)
             pet->SetDuration(duration);
 
         // Generate a new name for the newly summoned ghoul
@@ -9128,7 +9129,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         }
     }
 
-    if (duration > 0s)
+    if (duration > 0ms)
         pet->SetDuration(duration);
 
     if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
@@ -14364,6 +14365,67 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
     return false;
 }
 
+/**
+ * @brief Checks if any vendor option is available in the gossip menu tree for a given creature.
+ *
+ * @param menuId The starting gossip menu ID to check.
+ * @param creature Pointer to the creature whose gossip menus are being checked.
+ * @return true if a vendor option is available in any accessible menu; false otherwise.
+ */
+bool Player::AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const
+{
+    std::set<uint32> visitedMenus;
+    std::queue<uint32> menusToCheck;
+    menusToCheck.push(menuId);
+
+    while (!menusToCheck.empty())
+    {
+        uint32 const currentMenuId = menusToCheck.front();
+        menusToCheck.pop();
+
+        if (visitedMenus.find(currentMenuId) != visitedMenus.end())
+            continue;
+
+        visitedMenus.insert(currentMenuId);
+
+        GossipMenuItemsMapBounds menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(currentMenuId);
+
+        if (menuItemBounds.first == menuItemBounds.second && currentMenuId != 0)
+            continue;
+
+        for (auto itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
+        {
+            if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), itr->second.Conditions))
+                continue;
+
+            if (itr->second.OptionType == GOSSIP_OPTION_VENDOR)
+                return true;
+            else if (itr->second.ActionMenuID)
+            {
+                GossipMenusMapBounds menuBounds = sObjectMgr->GetGossipMenusMapBounds(itr->second.ActionMenuID);
+                bool menuAccessible = false;
+
+                if (menuBounds.first == menuBounds.second)
+                    menuAccessible = true;
+                else
+                {
+                    for (auto menuItr = menuBounds.first; menuItr != menuBounds.second; ++menuItr)
+                        if (sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), menuItr->second.Conditions))
+                        {
+                            menuAccessible = true;
+                            break;
+                        }
+                }
+
+                if (menuAccessible)
+                    menusToCheck.push(itr->second.ActionMenuID);
+            }
+        }
+    }
+
+    return false;
+}
+
 bool Player::CanSeeVendor(Creature const* creature) const
 {
     if (!creature->HasNpcFlag(UNIT_NPC_FLAG_VENDOR))
@@ -14371,9 +14433,11 @@ bool Player::CanSeeVendor(Creature const* creature) const
 
     ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(creature->GetEntry(), 0);
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
-    {
         return false;
-    }
+
+    uint32 const menuId = creature->GetCreatureTemplate()->GossipMenuId;
+    if (!AnyVendorOptionAvailable(menuId, creature))
+        return false;
 
     return true;
 }

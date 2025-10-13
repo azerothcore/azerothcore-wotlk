@@ -463,7 +463,7 @@ public:
                             _events.Reset();
                             _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1s);
                             player->KilledMonsterCredit(NPC_CAPTURED_RABID_THISTLE_BEAR);
-                            me->DespawnOrUnsummon(240000);
+                            me->DespawnOrUnsummon(240s);
                         }
                     }
                 }
@@ -552,7 +552,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid /*guid*/, int32 type) override
+        void SetGUID(ObjectGuid const& /*guid*/, int32 type) override
         {
             if (type == GUID_SCRIPT_INVOKER && _scriptRunning == false)
             {

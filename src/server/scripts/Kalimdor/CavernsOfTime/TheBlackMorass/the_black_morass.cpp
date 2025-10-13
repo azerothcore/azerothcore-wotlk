@@ -109,7 +109,7 @@ struct npc_medivh_bm : public ScriptedAI
     {
         if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
         {
-            summon->DespawnOrUnsummon(25000);
+            summon->DespawnOrUnsummon(25s);
             summon->CastSpell(summon, RAND(SPELL_BANISH_PURPLE, SPELL_BANISH_GREEN), true);
             summon->GetMotionMaster()->MoveSplinePath(&_airArray);
         }
@@ -137,13 +137,13 @@ struct npc_medivh_bm : public ScriptedAI
 
             me->CastSpell(me, SPELL_MEDIVH_CHANNEL, false);
 
-            events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 500);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH_50, 500);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 500);
-            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 2000);
-            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 4000);
-            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 6000);
-            events.ScheduleEvent(EVENT_SUMMON_FLYING_CRYSTAL, 8000);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 500ms);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH_50, 500ms);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 500ms);
+            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 2s);
+            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 4s);
+            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL, 6s);
+            events.ScheduleEvent(EVENT_SUMMON_FLYING_CRYSTAL, 8s);
         }
     }
 
@@ -154,7 +154,7 @@ struct npc_medivh_bm : public ScriptedAI
         if (param == ACTION_OUTRO)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_OUTRO_1, 4000);
+            events.ScheduleEvent(EVENT_OUTRO_1, 4s);
             me->InterruptNonMeleeSpells(true);
 
             me->SummonGameObject(GO_DARK_PORTAL, -2086.0f, 7125.6215f, 30.5f, 6.148f, 0.0f, 0.0f, 0.0f, 0.0f, 0);
@@ -180,43 +180,43 @@ struct npc_medivh_bm : public ScriptedAI
                     Talk(eventId + 1);
                     break;
                 }
-                events.ScheduleEvent(eventId, 500);
+                events.ScheduleEvent(eventId, 500ms);
                 break;
             case EVENT_SUMMON_CRYSTAL:
                 me->SummonCreature(NPC_DP_EMITTER_STALKER, me->GetPositionX() + 8.0f, me->GetPositionY(), me->GetPositionZ());
                 break;
             case EVENT_SUMMON_FLYING_CRYSTAL:
                 me->CastSpell(me, SPELL_PORTAL_CRYSTALS, true);
-                events.ScheduleEvent(EVENT_SUMMON_FLYING_CRYSTAL, 1000);
+                events.ScheduleEvent(EVENT_SUMMON_FLYING_CRYSTAL, 1s);
                 break;
             case EVENT_OUTRO_1:
                 me->SetFacingTo(6.21f);
                 Talk(SAY_MEDIVH_WIN);
-                events.ScheduleEvent(EVENT_OUTRO_2, 17000);
+                events.ScheduleEvent(EVENT_OUTRO_2, 17s);
                 break;
             case EVENT_OUTRO_2:
                 me->SetFacingTo(3.07f);
-                events.ScheduleEvent(EVENT_OUTRO_3, 2000);
+                events.ScheduleEvent(EVENT_OUTRO_3, 2s);
                 break;
             case EVENT_OUTRO_3:
-                SummonOrcs(-2046.158f, -3.0f, 37000, 30000, true);
-                events.ScheduleEvent(EVENT_OUTRO_4, 2000);
+                SummonOrcs(-2046.158f, -3.0f, 37s, 30000, true);
+                events.ScheduleEvent(EVENT_OUTRO_4, 2s);
                 break;
             case EVENT_OUTRO_4:
-                SummonOrcs(-2055.97f, -2.0f, 33000, 28000, false);
-                events.ScheduleEvent(EVENT_OUTRO_5, 2000);
+                SummonOrcs(-2055.97f, -2.0f, 33s, 28000, false);
+                events.ScheduleEvent(EVENT_OUTRO_5, 2s);
                 break;
             case EVENT_OUTRO_5:
-                SummonOrcs(-2064.0f, -1.5f, 29000, 26000, false);
-                events.ScheduleEvent(EVENT_OUTRO_6, 2000);
+                SummonOrcs(-2064.0f, -1.5f, 29s, 26000, false);
+                events.ScheduleEvent(EVENT_OUTRO_6, 2s);
                 break;
             case EVENT_OUTRO_6:
-                SummonOrcs(-2074.35f, -0.1f, 26000, 24000, false);
-                events.ScheduleEvent(EVENT_OUTRO_7, 7000);
+                SummonOrcs(-2074.35f, -0.1f, 26s, 24000, false);
+                events.ScheduleEvent(EVENT_OUTRO_7, 7s);
                 break;
             case EVENT_OUTRO_7:
                 Talk(SAY_MEDIVH_ORCS_ENTER);
-                events.ScheduleEvent(EVENT_OUTRO_8, 7000);
+                events.ScheduleEvent(EVENT_OUTRO_8, 7s);
                 break;
             case EVENT_OUTRO_8:
                 if (Creature* cr = me->FindNearestCreature(NPC_SHADOW_COUNCIL_ENFORCER, 20.0f))
@@ -228,7 +228,7 @@ struct npc_medivh_bm : public ScriptedAI
         }
     }
 
-    void SummonOrcs(float x, float y, uint32 duration, uint32 homeTime, bool first)
+    void SummonOrcs(float x, float y, Milliseconds duration, uint32 homeTime, bool first)
     {
         for (uint8 i = 0; i < 6; ++i)
         {
@@ -236,7 +236,7 @@ struct npc_medivh_bm : public ScriptedAI
             {
                 cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMapHeight(x, cr->GetPositionY() + y, cr->GetPositionZ(), true));
                 cr->m_Events.AddEvent(new NpcRunToHome(*cr), cr->m_Events.CalculateTime(homeTime + urand(0, 2000)));
-                cr->DespawnOrUnsummon(duration + urand(0, 2000));
+                cr->DespawnOrUnsummon(duration + randtime(0ms, 2s));
             }
         }
     }
@@ -355,7 +355,7 @@ struct npc_time_rift : public NullCreatureAI
     {
         if (creature->GetGUID() == _riftKeeperGUID)
         {
-            me->DespawnOrUnsummon(0);
+            me->DespawnOrUnsummon(0ms);
         }
     }
 
@@ -368,7 +368,7 @@ struct npc_time_rift : public NullCreatureAI
                 if (!_instance->GetCreature(DATA_AEONUS))
                 {
                     DoSelectSummon();
-                    events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15000);
+                    events.ScheduleEvent(EVENT_SUMMON_AT_RIFT, 15s);
                 }
                 break;
             case EVENT_SUMMON_BOSS:

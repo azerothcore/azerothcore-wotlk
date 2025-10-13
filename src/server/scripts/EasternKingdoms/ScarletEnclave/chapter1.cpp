@@ -230,7 +230,7 @@ public:
                     me->RemoveAllAuras();
                     me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
                     me->RestoreFaction();
-                    me->DespawnOrUnsummon(10000);
+                    me->DespawnOrUnsummon(10s);
                 }
             }
         }
@@ -396,7 +396,7 @@ public:
                 AttackStart(attacker);
         }
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(ObjectGuid const& guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3s);
@@ -407,7 +407,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
-                me->DespawnOrUnsummon(1500);
+                me->DespawnOrUnsummon(1500ms);
                 me->CastSpell(me, SPELL_GHOUL_SUBMERGE, true);
             }
         }
@@ -438,7 +438,7 @@ public:
                             if (owner->GetVictim())
                                 AttackStart(owner->GetVictim());
 
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     return;
             }
 
@@ -760,22 +760,22 @@ public:
                         {
                             case EVENT_ICY_TOUCH:
                                 DoCastVictim(SPELL_ICY_TOUCH);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_ICY_TOUCH, 5s, GCD_CAST);
                                 break;
                             case EVENT_PLAGUE_STRIKE:
                                 DoCastVictim(SPELL_PLAGUE_STRIKE);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_BLOOD_STRIKE:
                                 DoCastVictim(SPELL_BLOOD_STRIKE);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_DEATH_COIL:
                                 DoCastVictim(SPELL_DEATH_COIL);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_DEATH_COIL, 5s, GCD_CAST);
                                 break;
                         }
@@ -806,7 +806,7 @@ public:
 
         ObjectGuid prisonerGUID;
 
-        void SetGUID(ObjectGuid guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
@@ -866,7 +866,7 @@ public:
 
         ObjectGuid minerGUID;
 
-        void SetGUID(ObjectGuid guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }

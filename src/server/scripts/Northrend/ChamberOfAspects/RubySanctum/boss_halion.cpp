@@ -310,7 +310,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->IsPlayer() && events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (victim->IsPlayer() && !events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -335,7 +335,7 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (events.GetNextEventTime(EVENT_CHECK_HEALTH) != 0)
+            if (events.HasTimeUntilEvent(EVENT_CHECK_HEALTH))
                 return;
 
             if (!attacker || !me->InSamePhase(attacker))
@@ -477,7 +477,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->IsPlayer() && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (victim->IsPlayer() && !_events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 _events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -598,7 +598,7 @@ public:
 
         void SetData(uint32 id, uint32 value) override
         {
-            if (_events.GetNextEventTime(EVENT_CHECK_CORPOREALITY) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_CHECK_CORPOREALITY))
                 return;
 
             if (id == DATA_MATERIAL_DAMAGE_TAKEN)
@@ -1322,7 +1322,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
     };
 

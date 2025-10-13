@@ -588,9 +588,9 @@ public:
                             (*itr)->AI()->DoAction(ACTION_DESPAWN);
 
                         /*Talk(SAY_OUTRO_HORDE_1);
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10000);
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18000);
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24000);*/
+                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_1, 10s);
+                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_2, 18s);
+                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_3, 24s);*/
                     }
                     break;
                 case ACTION_EVADE:
@@ -651,8 +651,8 @@ public:
                             deathbringer->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             deathbringer->setDeathState(DeathState::Alive);
                         }
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 1000);
-                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_5, 4000);
+                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_4, 1s);
+                        _events.ScheduleEvent(EVENT_OUTRO_HORDE_5, 4s);
                         break;
                     case POINT_FINAL:
                         if (Creature* deathbringer = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_DEATHBRINGER_SAURFANG)))
@@ -1030,7 +1030,7 @@ public:
                 me->GetMotionMaster()->MoveCharge(chargePos[_index].GetPositionX(), chargePos[_index].GetPositionY(), chargePos[_index].GetPositionZ(), 13.0f, POINT_CHARGE);
             }
             else if (action == ACTION_DESPAWN)
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
         }
 
     private:

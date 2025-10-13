@@ -425,7 +425,7 @@ struct npc_demonic_vapor_trail : public NullCreatureAI
     void Reset() override
     {
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
-        me->DespawnOrUnsummon(20000);
+        me->DespawnOrUnsummon(20s);
     }
 
     void SpellHitTarget(Unit* /*unit*/, SpellInfo const* spellInfo) override
