@@ -157,7 +157,7 @@ struct boss_gal_darah : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.HasTimeUntilEvent(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_SLAY);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
