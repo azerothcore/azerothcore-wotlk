@@ -31,7 +31,7 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler }}-pch
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'liyunfan1223/azerothcore-wotlk' && !github.event.pull_request.draft
+    if: github.repository == 'mod-playerbots/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/linux-build
