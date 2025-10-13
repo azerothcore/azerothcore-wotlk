@@ -13,3 +13,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (31280, 0, 4, 0, 60, 1, 100, 512, 5000, 5000, 3000, 4000, 0, 0, 11, 59894, 0, 0, 0, 0, 0, 19, 32227, 90, 0, 0, 0, 0, 0, 0, 'Ymirheim Spear Gun - On Update - Cast \'Launch Spear\' (Phase 1)');
 
 UPDATE `creature_template` SET `ArmorModifier` = 0 WHERE (`entry` = 32227);
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 18) AND (`SourceGroup` IN (31884, 32227)) AND (`SourceEntry` = 46598) AND (`SourceId` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(18, 31884, 46598, 0, 0, 9, 0, 13310, 0, 0, 0, 0, 0, '', 'Kor\'kron Suppression Turret requires player to be on quest Assault by Air'),
+(18, 32227, 46598, 0, 0, 9, 0, 13309, 0, 0, 0, 0, 0, '', 'Skybreaker Suppression Turret requires player to be on quest Assault by Air');
+
