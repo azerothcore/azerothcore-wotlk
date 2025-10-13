@@ -372,7 +372,7 @@ public:
                             events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_4);
-                            events.ScheduleEvent(EVENT_SPAWN_SPECTATOR, 0);						
+                            events.ScheduleEvent(EVENT_SPAWN_SPECTATOR, 0ms);						
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 2s);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 3s);
                             events.ScheduleEvent(EVENT_RANDOM_TALK_VICTOR, 6s);

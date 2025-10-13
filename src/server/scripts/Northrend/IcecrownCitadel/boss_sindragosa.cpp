@@ -723,7 +723,7 @@ public:
                     bot->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
                     bot->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
                     bot->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
-                    me->DespawnOrUnsummon(5000);
+                    me->DespawnOrUnsummon(5s);
                 }
                 return;
             }
