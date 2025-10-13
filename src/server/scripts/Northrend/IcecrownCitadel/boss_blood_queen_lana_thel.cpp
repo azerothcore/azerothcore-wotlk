@@ -533,7 +533,7 @@ public:
             return _bloodboltedPlayers.count(guid) != 0;
         }
 
-        void SetGUID(ObjectGuid guid, int32 type = 0) override
+        void SetGUID(ObjectGuid const& guid, int32 type = 0) override
         {
             switch (type)
             {

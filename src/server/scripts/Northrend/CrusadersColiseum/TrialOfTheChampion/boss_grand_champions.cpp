@@ -255,7 +255,7 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
@@ -311,7 +311,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.Repeat(4500ms, 6000ms);
+                        events.Repeat(4500ms, 6s);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:
@@ -372,7 +372,7 @@ public:
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
 
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
 
@@ -640,7 +640,7 @@ public:
                             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
                             me->SetRegeneratingHealth(true);
                             events.Reset();
-                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
                             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
                             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
                             me->SetReactState(REACT_AGGRESSIVE);
@@ -766,7 +766,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.Repeat(4500ms, 6000ms);
+                        events.Repeat(4500ms, 6s);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:

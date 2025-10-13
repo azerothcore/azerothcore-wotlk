@@ -885,7 +885,7 @@ public:
                     summon->StopMovingOnCurrentPos();
                     break;
                 case NPC_VALKYR_SHADOWGUARD:
-                    if (_phase == PHASE_THREE || events.GetNextEventTime(EVENT_QUAKE_2))
+                    if (_phase == PHASE_THREE || events.HasTimeUntilEvent(EVENT_QUAKE_2))
                         summon->DespawnOrUnsummon(1);
                     break;
                 default:
@@ -944,7 +944,7 @@ public:
                     Talk(SAY_LK_REMORSELESS_WINTER);
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_1, false);
-                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15mins on movies
+                    //events.DelayEvents(62500ms, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15mins on movies
                     events.ScheduleEvent(EVENT_QUAKE, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
@@ -956,7 +956,7 @@ public:
                     me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                     me->CastSpell(me, SPELL_REMORSELESS_WINTER_2, false);
                     summons.DespawnEntry(NPC_VALKYR_SHADOWGUARD);
-                    //events.DelayEvents(62500, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15 mins on movies
+                    //events.DelayEvents(62500ms, EVENT_GROUP_BERSERK); // delay berserk timer, its not ticking during phase transitions, 15 mins on movies
                     events.ScheduleEvent(EVENT_QUAKE_2, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
@@ -1081,11 +1081,11 @@ public:
                 case EVENT_PAIN_AND_SUFFERING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
-                        //events.DelayEventsToMax(500, EVENT_GROUP_ABILITIES);
+                        //events.DelayEventsToMax(500ms, EVENT_GROUP_ABILITIES);
                         me->SetFacingTo(me->GetAngle(target));
                         me->CastSpell(target, SPELL_PAIN_AND_SUFFERING, false);
                     }
-                    events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, (IsHeroic() ? urand(1250, 1750) : urand(1750, 2250)), EVENT_GROUP_ABILITIES);
+                    events.Repeat((IsHeroic() ? randtime(1250ms, 1750ms) : randtime(1750ms, 2250ms)));
                     break;
                 case EVENT_SUMMON_ICE_SPHERE:
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_ICE_SPHERE, false);
@@ -1098,21 +1098,21 @@ public:
                     break;
                 case EVENT_DEFILE:
                     {
-                        uint32 evTime = events.GetNextEventTime(EVENT_SUMMON_VALKYR);
+                        Milliseconds evTime = events.GetTimeUntilEvent(EVENT_SUMMON_VALKYR);
                         // if defile (cast time 2sec) is less than 3 before valkyr appears
                         // we've to decide
-                        if (evTime && (events.GetTimer() > evTime || evTime - events.GetTimer() < 5000))
+                        if (evTime < 5s)
                         {
                             // if valkyr is less than 1.5 secs after defile (cast time 2 sec) then we've a sync issue, so
                             // we need to cancel it (break) and schedule a defile to be casted 5 or 4 seconds after valkyr
-                            if (events.GetTimer() > evTime || evTime - events.GetTimer() < 3500)
+                            if (evTime < 3500ms)
                             {
-                                uint32 t = events.GetTimer() > evTime ? 0 : evTime - events.GetTimer();
-                                events.ScheduleEvent(EVENT_DEFILE, t + (Is25ManRaid() ? 5000 : 4000), EVENT_GROUP_ABILITIES);
+                                Milliseconds t = evTime > 0ms ? evTime : 0ms;
+                                events.ScheduleEvent(EVENT_DEFILE, t + (Is25ManRaid() ? 5s : 4s), EVENT_GROUP_ABILITIES);
                                 break;
                             }
 
-                            // if valkyr is coming between 1.5 and 3 seconds after defile then we've to
+                            // if valkyr is coming within 2,5 seconds after defile then we've to
                             // delay valkyr just a bit
                             events.RescheduleEvent(EVENT_SUMMON_VALKYR, 5s, EVENT_GROUP_ABILITIES);
                         }
@@ -1150,12 +1150,9 @@ public:
 
                         // schedule a defile (or reschedule it) if next defile event
                         // doesn't exist ( now > next defile ) or defile is coming too soon
-                        uint32 minTime = (Is25ManRaid() ? 5000 : 4000);
-                        if (uint32 evTime = events.GetNextEventTime(EVENT_DEFILE))
-                            if (events.GetTimer() > evTime || evTime - events.GetTimer() < minTime)
-                            {
-                                events.RescheduleEvent(EVENT_DEFILE, minTime, EVENT_GROUP_ABILITIES);
-                            }
+                        Milliseconds minTime = (Is25ManRaid() ? 5s : 4s);
+                        if (events.GetTimeUntilEvent(EVENT_DEFILE) < minTime)
+                            events.RescheduleEvent(EVENT_DEFILE, minTime, EVENT_GROUP_ABILITIES);
                     }
                     break;
                 case EVENT_VILE_SPIRITS:
@@ -1180,7 +1177,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     events.ScheduleEvent(EVENT_START_ATTACK, 55s);
-                    events.DelayEvents(52500, EVENT_GROUP_VILE_SPIRITS);
+                    events.DelayEvents(52500ms, EVENT_GROUP_VILE_SPIRITS);
                     events.CancelEvent(EVENT_DEFILE);
                     events.CancelEvent(EVENT_SOUL_REAPER);
                     events.ScheduleEvent(EVENT_FROSTMOURNE_HEROIC, 6s, EVENT_GROUP_ABILITIES);
@@ -1508,9 +1505,9 @@ public:
                         theLichKing->GetMotionMaster()->MovePoint(0, CenterPosition);
                         uint32 travelTime = 1000 * theLichKing->GetExactDist(&CenterPosition) / theLichKing->GetSpeed(MOVE_WALK) + 1000;
 
-                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_4, 1 + travelTime);
-                        _events.ScheduleEvent(EVENT_OUTRO_LK_RAISE_DEAD, 1000 + travelTime);
-                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_5, 29000 + travelTime);
+                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_4, Milliseconds(1 + travelTime));
+                        _events.ScheduleEvent(EVENT_OUTRO_LK_RAISE_DEAD, Milliseconds(1000 + travelTime));
+                        _events.ScheduleEvent(EVENT_OUTRO_LK_TALK_5, Milliseconds(29000 + travelTime));
                     }
                     break;
                 case EVENT_OUTRO_LK_TALK_4:
@@ -2539,7 +2536,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 /* = 0*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /* = 0*/) override
         {
             _grabbedPlayer = guid;
         }
@@ -2620,7 +2617,7 @@ public:
             me->GetMotionMaster()->Clear();
             me->StopMovingOnCurrentPos();
 
-            _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0);
+            _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0ms);
         }
     };
 

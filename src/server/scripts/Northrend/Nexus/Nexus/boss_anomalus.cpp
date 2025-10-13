@@ -94,7 +94,7 @@ struct boss_anomalus : public BossAI
         {
             if (activeRifts > 0 && --activeRifts == 0 && me->HasAura(SPELL_RIFT_SHIELD))
             {
-                events.DelayEvents(me->GetAura(SPELL_RIFT_SHIELD)->GetDuration() - 46000);
+                events.DelayEvents(Milliseconds(me->GetAura(SPELL_RIFT_SHIELD)->GetDuration() - 46000));
                 me->RemoveAura(SPELL_RIFT_SHIELD);
                 me->InterruptNonMeleeSpells(false);
             }
@@ -114,7 +114,6 @@ struct boss_anomalus : public BossAI
         BossAI::JustEngagedWith(who);
 
         activeRifts = 0;
-        events.SetTimer(45000);
         events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
         events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
         events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
@@ -164,7 +163,7 @@ struct boss_anomalus : public BossAI
             Talk(EMOTE_RIFT);
             me->CastSpell(me, SPELL_CREATE_RIFT, false);
             //Once we hit 51% hp mark, after each rift we spawn an empowered
-            events.ScheduleEvent(me->HealthBelowPct(51) ? EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED : EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15000 : 25000);
+            events.ScheduleEvent(me->HealthBelowPct(51) ? EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED : EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
             break;
         case EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED:
             Talk(SAY_RIFT);

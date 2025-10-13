@@ -923,7 +923,7 @@ struct npc_akama_illidan : public ScriptedAI
                 me->m_Events.AddEventAtOffset([&] {
                     Talk(SAY_AKAMA_COUNCIL_2);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                }, 8000ms); // 7800ms
+                }, 8s); // 7800ms
             }
             break;
             // Reached Door
