@@ -62,7 +62,6 @@ struct boss_gal_darah : public BossAI
         DoCastSelf(SPELL_START_VISUAL);
         impaledList.clear();
         _stampedeVictim.Clear();
-
     }
 
     void JustReachedHome() override
