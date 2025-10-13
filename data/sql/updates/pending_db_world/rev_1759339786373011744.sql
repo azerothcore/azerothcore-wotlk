@@ -23,8 +23,11 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 UPDATE `vehicle_template_accessory` SET `summontype`=5 WHERE `entry`=31881 AND `seat_id`=1;
 UPDATE `vehicle_template_accessory` SET `summontype`=5 WHERE `entry`=32225 AND `seat_id`=1;
 
--- Immune to PC
+-- Add immune to PC
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 256 WHERE (`entry` IN (32225, 31881));
+
+-- Remove immune to NPC
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` & ~256 WHERE (`entry` IN (32227, 31884));
 
 UPDATE `vehicle_template_accessory` SET `minion`=0, `summontype`=5, `summontimer`=0 WHERE `entry`=31881 AND `seat_id`=0;
 UPDATE `vehicle_template_accessory` SET `minion`=0, `summontype`=5, `summontimer`=0 WHERE `entry`=32225 AND `seat_id`=0;
