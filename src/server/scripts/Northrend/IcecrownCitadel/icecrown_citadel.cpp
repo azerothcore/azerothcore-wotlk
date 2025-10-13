@@ -534,12 +534,12 @@ public:
                         if (Creature* factionNPC = ObjectAccessor::GetCreature(*me, _factionNPC))
                         {
                             factionNPC->GetMotionMaster()->MovePath(factionNPC->GetSpawnId() * 10, false);
-                            factionNPC->DespawnOrUnsummon(46500);
+                            factionNPC->DespawnOrUnsummon(46500ms);
                             std::list<Creature*> followers;
                             factionNPC->GetCreaturesWithEntryInRange(followers, 30, _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_KOR_KRON_GENERAL : NPC_ALLIANCE_COMMANDER);
                             for (Creature* follower : followers)
                             {
-                                follower->DespawnOrUnsummon(46500);
+                                follower->DespawnOrUnsummon(46500ms);
                             }
                         }
                         me->setActive(false);
@@ -679,7 +679,7 @@ public:
             {
                 case 1000:
                 case 11000:
-                    _events.ScheduleEvent(EVENT_ACTIVATE_TRAP, uint32(action));
+                    _events.ScheduleEvent(EVENT_ACTIVATE_TRAP, Milliseconds(action));
                     break;
                 default:
                     break;
@@ -772,7 +772,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 type/* = 0*/) override
+        void SetGUID(ObjectGuid const& guid, int32 type/* = 0*/) override
         {
             if (type == ACTION_VRYKUL_DEATH)
             {
@@ -1810,7 +1810,7 @@ public:
             {
                 _vehicleCheckTimer = 500;
                 if (!me->GetVehicle())
-                    me->DespawnOrUnsummon(100);
+                    me->DespawnOrUnsummon(100ms);
             }
             else
                 _vehicleCheckTimer -= diff;
@@ -2151,7 +2151,7 @@ class spell_svalna_remove_spear : public SpellScript
         {
             if (Unit* vehicle = target->GetVehicleBase())
                 vehicle->RemoveAurasDueToSpell(SPELL_IMPALING_SPEAR);
-            target->DespawnOrUnsummon(1);
+            target->DespawnOrUnsummon(1ms);
         }
     }
 
@@ -2796,38 +2796,38 @@ class SeveredEssenceSpellInfo
 public:
     uint8 Class;
     uint32 id;
-    uint32 cooldown_ms;
+    Milliseconds cooldown_ms;
     uint8 targetType;
     float range;
 };
 
 SeveredEssenceSpellInfo sesi_spells[] =
 {
-    {CLASS_SHAMAN, 71938, 5000, 1, 0.0f},
-    {CLASS_PALADIN, 57767, 8000, 2, 30.0f},
-    {CLASS_WARLOCK, 71937, 10000, 1, 0.0f},
-    {CLASS_DEATH_KNIGHT, 49576, 15000, 1, 30.0f},
-    {CLASS_ROGUE, 71933, 8000, 1, 0.0f},
-    {CLASS_MAGE, 71928, 4000, 1, 40.0f},
-    {CLASS_PALADIN, 71930, 5000, 2, 40.0f},
-    {CLASS_ROGUE, 71955, 40000, 1, 30.0f},
-    {CLASS_PRIEST, 71931, 5000, 2, 40.0f},
-    {CLASS_SHAMAN, 71934, 7000, 1, 0.0f},
-    {CLASS_DRUID, 71925, 5000, 1, 0.0f},
-    {CLASS_DEATH_KNIGHT, 71951, 8000, 1, 0.0f},
-    {CLASS_DEATH_KNIGHT, 71924, 8000, 1, 0.0f},
-    {CLASS_WARLOCK, 71965, 20000, 0, 0.0f},
-    {CLASS_PRIEST, 71932, 8000, 2, 40.0f},
-    {CLASS_DRUID, 71926, 10000, 1, 0.0f},
-    {CLASS_WARLOCK, 71936, 9000, 1, 0.0f},
-    {CLASS_ROGUE, 57640, 3000, 1, 0.0f},
-    {CLASS_WARRIOR, 71961, 5000, 1, 0.0f},
-    {CLASS_MAGE, 71929, 10000, 1, 0.0f},
-    {CLASS_WARRIOR, 53395, 5000, 1, 0.0f},
-    {CLASS_WARRIOR, 71552, 5000, 1, 0.0f},
-    {CLASS_HUNTER, 36984, 7000, 1, 0.0f},
-    {CLASS_HUNTER, 29576, 5000, 1, 0.0f},
-    {0, 0, 0, 0, 0.0f},
+    { CLASS_SHAMAN, 71938, 5s, 1, 0.0f },
+    { CLASS_PALADIN, 57767, 8s, 2, 30.0f },
+    { CLASS_WARLOCK, 71937, 10s, 1, 0.0f },
+    { CLASS_DEATH_KNIGHT, 49576, 15s, 1, 30.0f },
+    { CLASS_ROGUE, 71933, 8s, 1, 0.0f },
+    { CLASS_MAGE, 71928, 4s, 1, 40.0f },
+    { CLASS_PALADIN, 71930, 5s, 2, 40.0f },
+    { CLASS_ROGUE, 71955, 40s, 1, 30.0f },
+    { CLASS_PRIEST, 71931, 5s, 2, 40.0f },
+    { CLASS_SHAMAN, 71934, 7s, 1, 0.0f },
+    { CLASS_DRUID, 71925, 5s, 1, 0.0f },
+    { CLASS_DEATH_KNIGHT, 71951, 8s, 1, 0.0f },
+    { CLASS_DEATH_KNIGHT, 71924, 8s, 1, 0.0f },
+    { CLASS_WARLOCK, 71965, 20s, 0, 0.0f },
+    { CLASS_PRIEST, 71932, 8s, 2, 40.0f },
+    { CLASS_DRUID, 71926, 10s, 1, 0.0f },
+    { CLASS_WARLOCK, 71936, 9s, 1, 0.0f },
+    { CLASS_ROGUE, 57640, 3s, 1, 0.0f },
+    { CLASS_WARRIOR, 71961, 5s, 1, 0.0f },
+    { CLASS_MAGE, 71929, 10s, 1, 0.0f },
+    { CLASS_WARRIOR, 53395, 5s, 1, 0.0f },
+    { CLASS_WARRIOR, 71552, 5s, 1, 0.0f },
+    { CLASS_HUNTER, 36984, 7s, 1, 0.0f },
+    { CLASS_HUNTER, 29576, 5s, 1, 0.0f },
+    { 0, 0, 0ms, 0, 0.0f }
 };
 
 class npc_icc_severed_essence : public CreatureScript
@@ -2862,7 +2862,7 @@ public:
                 if (sesi_spells[i].id)
                 {
                     if (Class == sesi_spells[i].Class)
-                        events.ScheduleEvent(i + 1, sesi_spells[i].cooldown_ms / 4);
+                        events.ScheduleEvent(i + 1, Milliseconds(sesi_spells[i].cooldown_ms / 4));
                 }
                 else
                     break;
@@ -2895,7 +2895,7 @@ public:
                 if (target)
                     me->CastSpell(target, sesi_spells[e - 1].id, TRIGGERED_IGNORE_SHAPESHIFT);
 
-                events.RepeatEvent(sesi_spells[e - 1].cooldown_ms);
+                events.Repeat(sesi_spells[e - 1].cooldown_ms);
             }
 
             if (Class == CLASS_HUNTER)
@@ -3337,7 +3337,7 @@ public:
         void ScheduleBroodlings()
         {
             for (uint8 i = 0; i < 30; ++i)
-                events.ScheduleEvent(EVENT_SUMMON_BROODLING, 10000 + i * 350);
+                events.ScheduleEvent(EVENT_SUMMON_BROODLING, Milliseconds(10000 + i * 350));
         }
 
         void SummonBroodling()
@@ -3521,7 +3521,7 @@ public:
                 me->CastSpell(me, SPELL_GIANT_INSECT_SWARM, true);
 
                 for (uint8 i = 0; i < 60; ++i)
-                    events.ScheduleEvent(EVENT_GAUNTLET_PHASE1, i * 1000);
+                    events.ScheduleEvent(EVENT_GAUNTLET_PHASE1, Seconds(i));
                 events.ScheduleEvent(EVENT_GAUNTLET_PHASE2, 1min);
             }
         }

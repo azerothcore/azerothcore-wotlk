@@ -697,7 +697,7 @@ struct npc_hallows_end_soh : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason /* why */) override
     {
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     uint32 GetData(uint32 /*type*/) const override
@@ -763,7 +763,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                     }
 
                     CastFires(false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 }
                 case 4:
@@ -848,7 +848,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     c->RemoveAllAuras();
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
         else
         {
@@ -868,7 +868,7 @@ struct npc_hallows_end_soh : public ScriptedAI
             me->RemoveAllAuras();
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            events.ScheduleEvent(4, 2000);
+            events.ScheduleEvent(4, 2s);
         }
     }
 
@@ -1029,7 +1029,7 @@ struct boss_headless_horseman : public ScriptedAI
         std::list<Creature*> unitList;
         me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
         for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-            (*itr)->ToCreature()->DespawnOrUnsummon(500);
+            (*itr)->ToCreature()->DespawnOrUnsummon(500ms);
 
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
         if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
@@ -1202,7 +1202,7 @@ struct boss_headless_horseman : public ScriptedAI
                             talkCount = 0;
                             return; // pop and return, skip repeat
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 }
             case EVENT_HORSEMAN_FOLLOW:
@@ -1218,7 +1218,7 @@ struct boss_headless_horseman : public ScriptedAI
             case EVENT_HORSEMAN_CLEAVE:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_HORSEMAN_CLEAVE, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 }
             case EVENT_HORSEMAN_WHIRLWIND:
@@ -1226,11 +1226,11 @@ struct boss_headless_horseman : public ScriptedAI
                     if (me->HasAuraEffect(SPELL_HORSEMAN_WHIRLWIND, EFFECT_0))
                     {
                         me->RemoveAura(SPELL_HORSEMAN_WHIRLWIND);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         break;
                     }
                     me->CastSpell(me, SPELL_HORSEMAN_WHIRLWIND, true);
-                    events.RepeatEvent(6000);
+                    events.Repeat(6s);
                     break;
                 }
             case EVENT_HORSEMAN_CHECK_HEALTH:
@@ -1241,7 +1241,7 @@ struct boss_headless_horseman : public ScriptedAI
                         return;
                     }
 
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
                 }
             case EVENT_HORSEMAN_CONFLAGRATION:
@@ -1253,21 +1253,21 @@ struct boss_headless_horseman : public ScriptedAI
                         Talk(TALK_CONFLAGRATION);
                     }
 
-                    events.RepeatEvent(12500);
+                    events.Repeat(12500ms);
                     break;
                 }
             case EVENT_SUMMON_PUMPKIN:
                 {
                     if (talkCount < 4)
                     {
-                        events.RepeatEvent(1);
+                        events.Repeat(1ms);
                         talkCount++;
                         me->CastSpell(me, SPELL_SUMMON_PUMPKIN, false);
                     }
                     else
                     {
                         Talk(TALK_SPROUTING_PUMPKINS);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         talkCount = 0;
                     }
 

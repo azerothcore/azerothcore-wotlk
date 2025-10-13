@@ -75,7 +75,7 @@ struct boss_keristrasza : public BossAI
 
         me->CastSpell(me, SPELL_INTENSE_COLD, true);
         events.ScheduleEvent(EVENT_CRYSTALFIRE_BREATH, 14s);
-        events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
+        events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20s, 11s));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, 5s);
         events.ScheduleEvent(EVENT_HEALTH_CHECK, 1s);
         events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 1s);
@@ -89,7 +89,7 @@ struct boss_keristrasza : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_SLAY);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -174,7 +174,7 @@ struct boss_keristrasza : public BossAI
                 me->CastSpell(me, SPELL_CRYSTALIZE, false);
             else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                 me->CastSpell(target, SPELL_CRYSTAL_CHAINS, false);
-            events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
+            events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20s, 11s));
             break;
         }
 
