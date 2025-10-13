@@ -183,7 +183,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 index) override
+        void SetGUID(ObjectGuid const& guid, int32 index) override
         {
             if (index == GO_LAVA_BURST)
             {
