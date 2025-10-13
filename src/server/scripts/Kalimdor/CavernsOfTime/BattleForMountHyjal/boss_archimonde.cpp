@@ -297,7 +297,7 @@ struct boss_archimonde : public BossAI
                 }
             }
         }, 5s);
-        ScheduleTimedEvent(5000ms, [&]
+        ScheduleTimedEvent(5s, [&]
         {
             bool noPlayersInRange = true;
             if (Map* map = me->GetMap())

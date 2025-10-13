@@ -252,8 +252,8 @@ public:
                     me->CastSpell(me, SPELL_DEFENSIVE_STANCE, true);
                     me->CastSpell(me, SPELL_DEFENSIVE_AURA, true);
 
-                    events.DelayEvents(20000, STANCE_BERSERKER);
-                    events.DelayEvents(20000, STANCE_BATTLE);
+                    events.DelayEvents(20s, STANCE_BERSERKER);
+                    events.DelayEvents(20s, STANCE_BATTLE);
 
                     SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_SHIELD, EQUIP_NO_CHANGE);
                     break;
@@ -263,8 +263,8 @@ public:
                     me->CastSpell(me, SPELL_BERSERKER_STANCE, true);
                     me->CastSpell(me, SPELL_BERSERKER_AURA, true);
 
-                    events.DelayEvents(20000, STANCE_DEFENSIVE);
-                    events.DelayEvents(20000, STANCE_BATTLE);
+                    events.DelayEvents(20s, STANCE_DEFENSIVE);
+                    events.DelayEvents(20s, STANCE_BATTLE);
 
                     SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_SWORD, EQUIP_NO_CHANGE);
                     break;
@@ -274,8 +274,8 @@ public:
                     me->CastSpell(me, SPELL_BATTLE_STANCE, true);
                     me->CastSpell(me, SPELL_BATTLE_AURA, true);
 
-                    events.DelayEvents(20000, STANCE_BERSERKER);
-                    events.DelayEvents(20000, STANCE_DEFENSIVE);
+                    events.DelayEvents(20s, STANCE_BERSERKER);
+                    events.DelayEvents(20s, STANCE_DEFENSIVE);
 
                     SetEquipmentSlots(false, EQUIP_MACE, EQUIP_UNEQUIP, EQUIP_NO_CHANGE);
                     break;

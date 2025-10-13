@@ -157,7 +157,7 @@ public:
             me->SetImmuneToAll(true);
             Started = true;
             me->setActive(true);
-            events2.ScheduleEvent(EVENT_SVALA_START, 5000);
+            events2.ScheduleEvent(EVENT_SVALA_START, 5s);
             if (Creature* pArthas = me->SummonCreature(NPC_ARTHAS, 295.81f, -366.16f, 92.57f, 1.58f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 59000))
                 ArthasGUID = pArthas->GetGUID();
 
@@ -339,7 +339,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_ROOT);
                     }
 
-                    events.DelayEvents(25001); // +1 just to be sure
+                    events.DelayEvents(25001ms); // +1 just to be sure
                     events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL_SPELLS, 0ms);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FINISH_RITUAL, 25s);
                     return;
