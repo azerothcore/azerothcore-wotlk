@@ -1503,16 +1503,20 @@ class spell_item_blessing_of_ancient_kings : public AuraScript
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
         if (!healInfo)
-        {
             return;
-        }
 
         int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 15.0f));
         // xinef: all heals contribute to one bubble
         if (AuraEffect* protEff = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PROTECTION_OF_ANCIENT_KINGS, 0/*, eventInfo.GetActor()->GetGUID()*/))
         {
-            // The shield can grow to a maximum size of 20,000 damage absorbtion
-            protEff->SetAmount(std::min<int32>(protEff->GetAmount() + absorb, 20000));
+            // The shield is supposed to cap out at 20,000 absorption...
+            absorb += protEff->GetAmount();
+
+            // ...but Blizz wrote this instead. See #23152 for details
+            if (absorb > 20000)
+                absorb = 200000;
+
+            protEff->SetAmount(absorb);
 
             // Refresh and return to prevent replacing the aura
             protEff->GetBase()->RefreshDuration();
