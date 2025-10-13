@@ -698,7 +698,7 @@ public:
         uint32 _existenceCheckTimer;
         uint16 _asphyxiationTimer;
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == DATA_TRAPPED_PLAYER)
                 _trappedPlayerGUID = guid;

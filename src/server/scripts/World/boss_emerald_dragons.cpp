@@ -219,7 +219,7 @@ public:
             });
         }
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == GUID_DRAGON)
             {

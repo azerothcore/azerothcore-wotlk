@@ -1093,7 +1093,7 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32  /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32  /*id*/) override
         {
             if (playerGUID || events.HasTimeUntilEvent(998) || events.HasTimeUntilEvent(2))
                 return;

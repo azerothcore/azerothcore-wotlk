@@ -1128,8 +1128,8 @@ public:
     void SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint32 time, bool onEnterMap);
 
     bool CanInteractWithQuestGiver(Object* questGiver);
-    Creature* GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask);
-    [[nodiscard]] GameObject* GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const;
+    Creature* GetNPCIfCanInteractWith(ObjectGuid const& guid, uint32 npcflagmask);
+    [[nodiscard]] GameObject* GetGameObjectIfCanInteractWith(ObjectGuid const& guid, GameobjectTypes type) const;
 
     void ToggleAFK();
     void ToggleDND();
@@ -2033,7 +2033,7 @@ public:
     Corpse* CreateCorpse();
     void RemoveCorpse();
     void KillPlayer();
-    static void OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans);
+    static void OfflineResurrect(ObjectGuid const& guid, CharacterDatabaseTransaction trans);
     [[nodiscard]] bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
     [[nodiscard]] WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
