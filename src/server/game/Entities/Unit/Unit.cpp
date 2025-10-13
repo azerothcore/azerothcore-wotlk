@@ -20791,7 +20791,10 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
             appendValue &= ~UNIT_NPC_FLAG_SPELLCLICK;
 
         if (!target->CanSeeVendor(creature))
+        {
+            appendValue &= ~UNIT_NPC_FLAG_REPAIR;
             appendValue &= ~UNIT_NPC_FLAG_VENDOR_MASK;
+        }
 
         if (!creature->IsValidTrainerForPlayer(target, &appendValue))
             appendValue &= ~UNIT_NPC_FLAG_TRAINER;
