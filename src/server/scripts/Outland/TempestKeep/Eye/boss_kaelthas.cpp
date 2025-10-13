@@ -269,7 +269,7 @@ struct boss_kaelthas : public BossAI
 
     void AttackStart(Unit* who) override
     {
-        if (_phase == PHASE_FINAL /* check is scheduled&& events.GetNextEventTime(EVENT_GRAVITY_LAPSE_END) == 0*/)
+        if (_phase == PHASE_FINAL /* check is scheduled&& !events.HasTimeUntilEvent(EVENT_GRAVITY_LAPSE_END)*/)
             BossAI::AttackStart(who);
     }
 

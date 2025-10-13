@@ -566,14 +566,14 @@ public:
                             {
                                 SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_CREATE_CONCOCTION);
                                 me->CastSpell(me, SPELL_CREATE_CONCOCTION, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
+                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
                                 break;
                             }
                         case 3:
                             {
                                 SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_GUZZLE_POTIONS);
                                 me->CastSpell(me, SPELL_GUZZLE_POTIONS, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
+                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
                                 break;
                             }
                         default:
@@ -670,8 +670,8 @@ public:
 
         void ChangePhase()
         {
-            uint32 heroicDelay = (IsHeroic() ? 25000 : 0);
-            events.DelayEvents(24000 + heroicDelay, EVENT_GROUP_ABILITIES);
+            Milliseconds heroicDelay = (IsHeroic() ? 25s : 0ms);
+            events.DelayEvents(24s + heroicDelay, EVENT_GROUP_ABILITIES);
             me->AttackStop();
             if (!IsHeroic())
             {
@@ -715,8 +715,8 @@ public:
             {
                 case 1:
                     _phase = 2;
-                    events.ScheduleEvent(EVENT_MALLEABLE_GOO, urand(25000, 28000) + heroicDelay, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, urand(35000, 40000) + heroicDelay, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_MALLEABLE_GOO, randtime(25s, 28s) + heroicDelay, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, randtime(35s, 40s) + heroicDelay, EVENT_GROUP_ABILITIES);
                     break;
                 case 2:
                     _phase = 3;
@@ -745,7 +745,7 @@ public:
 
     ObjectGuid targetGUID;
 
-    void SetGUID(ObjectGuid guid, int32 type) override
+    void SetGUID(ObjectGuid const& guid, int32 type) override
     {
         if (type == -1)
             targetGUID = guid;

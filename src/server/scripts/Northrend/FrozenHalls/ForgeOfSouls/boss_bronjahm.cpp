@@ -115,7 +115,7 @@ public:
                 me->GetMotionMaster()->MoveIdle();
                 me->CastSpell(me, SPELL_TELEPORT, false);
                 events.CancelEvent(EVENT_SPELL_CORRUPT_SOUL);
-                events.DelayEvents(6000);
+                events.DelayEvents(6s);
                 events.RescheduleEvent(EVENT_SPELL_FEAR, 8s, 14s);
             }
         }

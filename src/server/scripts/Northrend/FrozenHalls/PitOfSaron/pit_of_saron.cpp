@@ -1082,7 +1082,7 @@ public:
                                     s->AddThreat(c, 0.0f);
                                 }
                         }
-                    events.RescheduleEvent(10, 3000);
+                    events.RescheduleEvent(10, 3s);
                     break;
             }
 

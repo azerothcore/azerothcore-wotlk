@@ -625,12 +625,12 @@ public:
                         uint32 Time = 40000 - (2500 * WaveNum);
                         SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3, 0);
                         if (WaveNum > 2)
-                            events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, urand(10 - WaveNum, 15 - WaveNum) * 1000);
+                            events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
                         if (WaveNum > 5)
-                            events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, urand(10 - WaveNum, 15 - WaveNum) * 1000);
+                            events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
 
                         WaveNum++;
-                        events.RepeatEvent(Time);
+                        events.Repeat(Milliseconds(Time));
                         break;
                     }
                     case EVENT_SUMMON_STORMCALLER:
@@ -931,10 +931,10 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             SetEscortPaused(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             me->SendMovementFlagUpdate();
-            events.ScheduleEvent(EVENT_DOOR_OPEN, 1500);
+            events.ScheduleEvent(EVENT_DOOR_OPEN, 1500ms);
             me->SetWalk(false);
             me->SetSpeed(MOVE_RUN, 1.0f, false);
-            events.ScheduleEvent(EVENT_RESUME_ESCORT, 3500);
+            events.ScheduleEvent(EVENT_RESUME_ESCORT, 3500ms);
             break;
         //Brann stops in front of Sjonnir and awaits the start of the battle.
         case 36:

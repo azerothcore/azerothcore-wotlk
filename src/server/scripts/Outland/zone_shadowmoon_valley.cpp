@@ -133,7 +133,7 @@ public:
         {
             ground = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             SummonInfernal();
-            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, urand(1000, 3000));
+            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 1s, 3s);
         }
 
         void SetData(uint32 id, uint32 data) override
@@ -161,7 +161,7 @@ public:
                             if (Unit* infernal = ObjectAccessor::GetUnit(*me, infernalGUID))
                                 if (infernal->GetDisplayId() == MODEL_INVISIBLE)
                                     me->CastSpell(infernal, SPELL_SUMMON_INFERNAL, true);
-                            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12000);
+                            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12s);
                             break;
                         }
                     default:
@@ -566,8 +566,8 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_KICK, urand(5000, 10000));
-            events.ScheduleEvent(EVENT_SUNDER, urand(5000, 10000));
+            events.ScheduleEvent(EVENT_KICK, 5s, 10s);
+            events.ScheduleEvent(EVENT_SUNDER, 5s, 10s);
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -582,7 +582,7 @@ public:
                 Tapped = true;
                 caster->GetClosePoint(x, y, z, me->GetObjectSize());
                 Talk(SAY_1);
-                events.ScheduleEvent(EVENT_WALK_TO_MUTTON, 0);
+                events.ScheduleEvent(EVENT_WALK_TO_MUTTON, 0ms);
             }
         }
 
@@ -593,7 +593,7 @@ public:
                 if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
                     me->SetFacingToObject(food);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
-                events.ScheduleEvent(EVENT_POISONED, 5000);
+                events.ScheduleEvent(EVENT_POISONED, 5s);
             }
         }
 
@@ -628,7 +628,7 @@ public:
                             Talk(SAY_POISONED_1);
                         CreditPlayer();
                         me->CastSpell(me, SPELL_VOMIT);
-                        events.ScheduleEvent(EVENT_KILL, 5000);
+                        events.ScheduleEvent(EVENT_KILL, 5s);
                         break;
                     case EVENT_KILL:
                         Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
@@ -642,11 +642,11 @@ public:
                 case EVENT_KICK:
                     if (me->GetVictim()->HasUnitState(SPELL_STATE_CASTING))
                         DoCastVictim(SPELL_KICK);
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
                 case EVENT_SUNDER:
                     DoCastVictim(SPELL_SUNDER);
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
             }
 

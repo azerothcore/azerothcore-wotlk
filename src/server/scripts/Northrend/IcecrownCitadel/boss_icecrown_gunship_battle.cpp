@@ -703,7 +703,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
+        void SetGUID(ObjectGuid const& guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
                 return;
@@ -847,7 +847,7 @@ public:
             {
                 time_t now = GameTime::GetGameTime().count();
                 if (_firstMageCooldown > now)
-                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
+                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, Seconds(_firstMageCooldown - now));
                 else
                     _events.ScheduleEvent(EVENT_SUMMON_MAGE, 1ms);
             }
@@ -1183,7 +1183,7 @@ public:
             {
                 time_t now = GameTime::GetGameTime().count();
                 if (_firstMageCooldown > now)
-                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
+                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, Seconds(_firstMageCooldown - now));
                 else
                     _events.ScheduleEvent(EVENT_SUMMON_MAGE, 1ms);
             }
