@@ -11,3 +11,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (31280, 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 80, 3128000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ymirheim Spear Gun - On Spellhit \'Suppression Charge\' - Run Script'),
 (31280, 0, 3, 0, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ymirheim Spear Gun - On Reset - Set Event Phase 1'),
 (31280, 0, 4, 0, 60, 1, 100, 512, 5000, 5000, 3000, 4000, 0, 0, 11, 59894, 0, 0, 0, 0, 0, 19, 32227, 90, 0, 0, 0, 0, 0, 0, 'Ymirheim Spear Gun - On Update - Cast \'Launch Spear\' (Phase 1)');
+
+UPDATE `creature_template` SET `ArmorModifier` = 0 WHERE (`entry` = 32227);
