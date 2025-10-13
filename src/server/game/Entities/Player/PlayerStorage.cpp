@@ -1536,7 +1536,7 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& des
 }
 
 //////////////////////////////////////////////////////////////////////////
-InventoryResult Player::CanStoreItems(Item** pItems, int count) const
+InventoryResult Player::CanStoreItems(Item** pItems, int32 count) const
 {
     Item* pItem2;
 
@@ -2654,9 +2654,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         AddEnchantmentDurations(pItem);
         AddItemDurations(pItem);
-
-        if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
-            ApplyItemObtainSpells(pItem, true);
+        UpdateItemObtainSpells(pItem, bag, slot);
 
         return pItem;
     }
@@ -2694,8 +2692,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         pItem2->SetState(ITEM_CHANGED, this);
 
-        if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
-            ApplyItemObtainSpells(pItem2, true);
+        UpdateItemObtainSpells(pItem2, bag, slot);
 
         return pItem2;
     }
@@ -2908,6 +2905,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
         RemoveEnchantmentDurations(pItem);
         RemoveItemDurations(pItem);
         RemoveTradeableItem(pItem);
+        ApplyItemObtainSpells(pItem, false);
 
         if (bag == INVENTORY_SLOT_BAG_0)
         {
@@ -6835,7 +6833,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
             || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
-            if (!sScriptMgr->OnPlayerNotAvoidSatisfy(partyLeader, ar, target_map, report))
+            if (!sScriptMgr->OnPlayerNotAvoidSatisfy(this, ar, target_map, report))
                 return true;
 
             if (report)

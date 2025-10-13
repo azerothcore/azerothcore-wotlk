@@ -348,7 +348,7 @@ public:
                                 {
                                     DoCastSelf(SPELL_DAMAGE_REFLECTION);
                                 }
-                                events.RepeatEvent(30000);
+                                events.Repeat(30s);
                                 break;
                             }
                             case EVENT_TELEPORT_RANDOM:
@@ -359,14 +359,14 @@ public:
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
                                 }
 
-                                events.RepeatEvent(30000);
+                                events.Repeat(30s);
                                 break;
                             }
                             case EVENT_TELEPORT_TARGET:
                             {
                                 DoCastSelf(SPELL_HATE_TO_ZERO, true);
                                 DoCastAOE(SPELL_TELEPORT_TARGET);
-                                events.RepeatEvent(30000);
+                                events.Repeat(30s);
                                 break;
                             }
                         }

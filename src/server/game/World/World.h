@@ -58,9 +58,7 @@ enum ShutdownExitCode : uint8
 /// Timers for different object refresh rates
 enum WorldTimers
 {
-    WUPDATE_WEATHERS,
     WUPDATE_UPTIME,
-    WUPDATE_CORPSES,
     WUPDATE_EVENTS,
     WUPDATE_CLEANDB,
     WUPDATE_AUTOBROADCAST,
@@ -240,8 +238,6 @@ public:
 
     [[nodiscard]] std::string const& GetRealmName() const override { return _realmName; } // pussywizard
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard
-
-    void RemoveOldCorpses() override;
 
 protected:
     void _UpdateGameTime();

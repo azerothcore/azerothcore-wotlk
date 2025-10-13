@@ -63,7 +63,7 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
         GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
         owner->SetFaction(FACTION_FRIENDLY);
         owner->SetImmuneToAll(true);
-        owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+        owner->DespawnOrUnsummon(180s);
     }
 
     void Register() override
@@ -609,7 +609,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
                 AttackStart(who);
             }
 
-            _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 3s, 4s);
         }
 
         void SpellHit(Unit* unit, SpellInfo const* spell) override
@@ -1421,7 +1421,7 @@ public:
             _playerGUID.Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*action*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1431,7 +1431,7 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                 me->SetFacingToObject(player);
 
-            _events.ScheduleEvent(EVENT_TALK, 1000);
+            _events.ScheduleEvent(EVENT_TALK, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1557,7 +1557,7 @@ public:
         void Reset() override
         {
             me->SetImmuneToAll(true);
-            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
+            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -2124,6 +2124,53 @@ public:
     }
 };
 
+// 45612 - Necropolis Beam
+class spell_necropolis_beam: public SpellScript
+{
+    PrepareSpellScript(spell_necropolis_beam);
+
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+        float floorZ = caster->GetMapHeight(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+        if (floorZ > INVALID_HEIGHT)
+            dest._position.m_positionZ = floorZ;
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_necropolis_beam::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+    }
+};
+
+enum SoulDeflectionSpells
+{
+    SPELL_SOUL_DEFLECTION_DAMAGE = 51011
+};
+
+class spell_soul_deflection : public AuraScript
+{
+    PrepareAuraScript(spell_soul_deflection);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SOUL_DEFLECTION_DAMAGE });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        if (!eventInfo.GetDamageInfo() || !eventInfo.GetDamageInfo()->GetDamage() || !GetTarget())
+            return;
+
+        GetCaster()->CastCustomSpell(SPELL_SOUL_DEFLECTION_DAMAGE, SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_soul_deflection::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -2148,4 +2195,6 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
     RegisterCreatureAI(npc_jenny);
+    RegisterSpellScript(spell_necropolis_beam);
+    RegisterSpellScript(spell_soul_deflection);
 }

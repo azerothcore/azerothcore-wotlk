@@ -4010,14 +4010,15 @@ enum ServerProcessTypes
 // Login Failure Reasons
 enum class LoginFailureReason : uint8
 {
-    Failed             = 0,
-    NoWorld            = 1,
-    DuplicateCharacter = 2,
-    NoInstances        = 3,
-    Disabled           = 4,
-    NoCharacter        = 5,
-    LockedForTransfer  = 6,
-    LockedByBilling    = 7
+    Failed             = 0, // Login failed
+    NoWorld            = 1, // World server down
+    DuplicateCharacter = 2, // A character with that name already exists
+    NoInstances        = 3, // No instance servers are available
+    Disabled           = 4, // Login for that race, class or character is currently disabled.
+    NoCharacter        = 5, // Character not found
+    LockedForTransfer  = 6, // You cannot log in until the character update process you recently initiated is complete.
+    LockedByBilling    = 7, // Character locked. Contact billing for more information
+    UsingRemote        = 8, // You cannot log in while using World of Warcraft Remote.
 };
 
 namespace Acore::Impl

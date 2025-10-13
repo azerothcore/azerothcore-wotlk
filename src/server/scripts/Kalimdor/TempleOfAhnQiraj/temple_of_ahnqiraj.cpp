@@ -393,10 +393,10 @@ struct npc_obsidian_nullifier : public ScriptedAI
 
             context.Repeat(6s);
         })
-        .Schedule(6000ms, 8400ms, [this](TaskContext context)
+        .Schedule(6s, 8400ms, [this](TaskContext context)
         {
             DoCastVictim(SPELL_CLEAVE, true);
-            context.Repeat(6000ms, 8400ms);
+            context.Repeat(6s, 8400ms);
         });
     }
 
@@ -447,7 +447,7 @@ struct npc_ahnqiraji_critter : public ScriptedAI
                 }
             }
 
-            context.Repeat(3500ms, 4000ms);
+            context.Repeat(3500ms, 4s);
         });
     }
 
@@ -474,7 +474,7 @@ struct npc_ahnqiraji_critter : public ScriptedAI
     {
         if (me->GetEntry() == NPC_QIRAJI_SCORPION)
         {
-            me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+            me->DespawnOrUnsummon(5s);
         }
     }
 

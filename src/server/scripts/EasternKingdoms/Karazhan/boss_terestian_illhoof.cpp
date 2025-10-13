@@ -88,7 +88,7 @@ struct npc_kilrek : public ScriptedAI
                 DoCast(Terestian, SPELL_BROKEN_PACT, true);
             }
         }
-        me->DespawnOrUnsummon(15000);
+        me->DespawnOrUnsummon(15s);
     }
 
     void UpdateAI(uint32 diff) override

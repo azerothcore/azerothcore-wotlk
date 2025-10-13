@@ -49,14 +49,14 @@ namespace PlayerSettingsStore
             return "";
 
         std::ostringstream data;
-        data << settings[0].value;
+        data << settings[0].value << ' ';
         for (size_t i = 1; i < settings.size(); ++i)
-            data << ' ' << settings[i].value;
+            data << settings[i].value << ' ';
         return data.str();
     }
 
     // helper: load a single source row for a player and parse to vector
-    static PlayerSettingVector LoadPlayerSettings(uint32 playerLowGuid, std::string const& source)
+    static PlayerSettingVector LoadPlayerSettings(ObjectGuid::LowType playerLowGuid, std::string const& source)
     {
         PlayerSettingVector result;
 
@@ -80,7 +80,7 @@ namespace PlayerSettingsStore
         return result;
     }
 
-    void UpdateSetting(uint32 playerLowGuid, std::string const& source, uint32 index, uint32 value)
+    void UpdateSetting(ObjectGuid::LowType playerLowGuid, std::string const& source, uint32 index, uint32 value)
     {
         if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
             return;
@@ -98,7 +98,7 @@ namespace PlayerSettingsStore
 }
 
 // Implementation of PrepareReplaceStatement
-CharacterDatabasePreparedStatement* PlayerSettingsStore::PrepareReplaceStatement(uint32 playerLowGuid, std::string const& source, PlayerSettingVector const& settings)
+CharacterDatabasePreparedStatement* PlayerSettingsStore::PrepareReplaceStatement(ObjectGuid::LowType playerLowGuid, std::string const& source, PlayerSettingVector const& settings)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_SETTINGS);
     stmt->SetData(0, playerLowGuid);
