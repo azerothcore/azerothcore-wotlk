@@ -42,9 +42,6 @@ enum Caravan
 
     MAX_CARAVAN_SUMMONS                 = 3,
 
-    TIME_SHOP_STOP                      = 10 * MINUTE * IN_MILLISECONDS,
-    TIME_HIRE_STOP                      = 4 * MINUTE * IN_MILLISECONDS,
-
     // Ambush
     NPC_KOLKAR_WAYLAYER                 = 12976,
     NPC_KOLKAR_AMBUSHER                 = 12977,
@@ -52,6 +49,9 @@ enum Caravan
     NPC_DOOMWARDER                      = 4677,
     NPC_NETHER                          = 4684,
 };
+
+constexpr Milliseconds TIME_SHOP_STOP = 600s;
+constexpr Milliseconds TIME_HIRE_STOP = 240s;
 
 class npc_cork_gizelton : public CreatureScript
 {
@@ -129,7 +129,7 @@ public:
             ImmuneFlagSet(false, _faction);
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 faction) override
+        void SetGUID(ObjectGuid const& playerGUID, int32 faction) override
         {
             _playerGUID = playerGUID;
             _faction = faction;
@@ -264,14 +264,14 @@ public:
             {
                 // Finished north path
                 case 52:
-                    me->SummonCreature(NPC_VENDOR_TRON, -694.61f, 1460.7f, 90.794f, 2.4f, TEMPSUMMON_TIMED_DESPAWN, TIME_SHOP_STOP + 15 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_VENDOR_TRON, -694.61f, 1460.7f, 90.794f, 2.4f, TEMPSUMMON_TIMED_DESPAWN, 600000 + 15 * IN_MILLISECONDS);
                     SetEscortPaused(true);
                     events.ScheduleEvent(EVENT_RESUME_PATH, TIME_SHOP_STOP);
                     CheckCaravan();
                     break;
                 // Finished south path
                 case 193:
-                    me->SummonCreature(NPC_SUPER_SELLER, -1905.5f, 2463.3f, 61.52f, 5.87f, TEMPSUMMON_TIMED_DESPAWN, TIME_SHOP_STOP + 15 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_SUPER_SELLER, -1905.5f, 2463.3f, 61.52f, 5.87f, TEMPSUMMON_TIMED_DESPAWN, 600000 + 15 * IN_MILLISECONDS);
                     SetEscortPaused(true);
                     events.ScheduleEvent(EVENT_RESUME_PATH, TIME_SHOP_STOP);
                     CheckCaravan();
@@ -474,7 +474,7 @@ public:
             else if (spell->Id == SPELL_KODO_KOMBO_GOSSIP)
             {
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->DespawnOrUnsummon(60000);
+                me->DespawnOrUnsummon(60s);
             }
         }
     };

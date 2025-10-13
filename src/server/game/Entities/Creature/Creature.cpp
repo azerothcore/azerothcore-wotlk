@@ -251,7 +251,7 @@ CreatureBaseStats const* CreatureBaseStats::GetBaseStats(uint8 level, uint8 unit
 
 bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    m_owner.DespawnOrUnsummon(0s, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
+    m_owner.DespawnOrUnsummon(0ms, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
     return true;
 }
 
@@ -525,7 +525,8 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, cinfo->HoverHeight);
 
-    SetCanDualWield(cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK));
+    if (cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK))
+        SetDualWieldMode(DualWieldMode::ENABLED);
 
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(cinfo->MovementType);
@@ -571,7 +572,8 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
     ReplaceAllDynamicFlags(dynamicflags);
 
-    SetCanDualWield(cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK));
+    if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK))
+        SetDualWieldMode(DualWieldMode::ENABLED);
 
     SetAttackTime(BASE_ATTACK,   cInfo->BaseAttackTime);
     SetAttackTime(OFF_ATTACK,    cInfo->BaseAttackTime);
@@ -1996,7 +1998,7 @@ void Creature::setDeathState(DeathState state, bool despawn)
             m_formation->FormationReset(true, false);
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
-        SetHover(false, false, false);
+        SetHover(false);
         SetDisableGravity(false, false, false);
 
         if (needsFalling)
@@ -2172,12 +2174,12 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
     // Xinef: Set new respawn time, ignore corpse decay time...
     RemoveCorpse(true);
 
-    if (forceRespawnTimer > Seconds::zero())
+    if (forceRespawnTimer > 0s)
         if (GetMap())
             GetMap()->ScheduleCreatureRespawn(GetGUID(), forceRespawnTimer);
 }
 
-void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds forcedRespawnTimer)
+void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0ms*/, Seconds forcedRespawnTimer /*= 0s*/)
 {
     if (TempSummon* summon = this->ToTempSummon())
         summon->UnSummon(msTimeToDespawn.count());
@@ -2202,7 +2204,7 @@ void Creature::DespawnOnEvade(Seconds respawnDelay)
         return;
     }
 
-    DespawnOrUnsummon(Milliseconds(0), respawnDelay);
+    DespawnOrUnsummon(0ms, respawnDelay);
 }
 
 void Creature::InitializeReactState()
@@ -3195,10 +3197,23 @@ bool Creature::IsImmuneToKnockback() const
 
 bool Creature::HasWeapon(WeaponAttackType type) const
 {
+    if (type == OFF_ATTACK)
+    {
+        switch (_dualWieldMode)
+        {
+            case DualWieldMode::ENABLED:
+                return true;
+            case DualWieldMode::DISABLED:
+                return false;
+            case DualWieldMode::AUTO:
+            default:
+                break;
+        }
+    }
+
     const uint8 slot = uint8(type);
     ItemEntry const* item = sItemStore.LookupEntry(GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot));
-
-    return ((item && item->ClassID == ITEM_CLASS_WEAPON) || (type == OFF_ATTACK && CanDualWield()));
+    return (item && item->ClassID == ITEM_CLASS_WEAPON);
 }
 
 /**
@@ -3229,8 +3244,9 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool
     {
         WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
         data << GetPackGUID();
-        data << uint32(0); //! movement counter
+        data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
 
         data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
         data << GetPackGUID();
@@ -3301,107 +3317,6 @@ void Creature::RefreshSwimmingFlag(bool recheck)
     // Creatures must be able to chase a target in water if they can enter water
     if (_isMissingSwimmingFlagOutOfCombat && CanEnterWater())
         SetUnitFlag(UNIT_FLAG_SWIMMING);
-}
-
-bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
-{
-    if (!Unit::SetCanFly(enable))
-        return false;
-
-    if (m_movedByPlayer)
-    {
-        sScriptMgr->AnticheatSetCanFlybyServer(m_movedByPlayer->ToPlayer(), enable);
-
-        if (!enable)
-            m_movedByPlayer->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_movedByPlayer->ToPlayer()->GetPositionZ());
-
-        WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
-        data << GetPackGUID();
-        data << uint32(0); //! movement counter
-        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-
-        data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-        return true;
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_FLYING : SMSG_SPLINE_MOVE_UNSET_FLYING, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
-{
-    if (!packetOnly && !Unit::SetWaterWalking(enable))
-        return false;
-
-    if (m_movedByPlayer)
-    {
-        WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
-        data << GetPackGUID();
-        data << uint32(0); //! movement counter
-        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-
-        data.Initialize(MSG_MOVE_WATER_WALK, 64);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-        return true;
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
-    return true;
-}
-
-bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
-{
-    if (!packetOnly && !Unit::SetFeatherFall(enable))
-        return false;
-
-    if (m_movedByPlayer)
-    {
-        WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
-        data << GetPackGUID();
-        data << uint32(0); //! movement counter
-        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-
-        data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-        return true;
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
-    return true;
-}
-
-bool Creature::SetHover(bool enable, bool packetOnly /*= false*/, bool updateAnimationTier /*= true*/)
-{
-    if (!packetOnly && !Unit::SetHover(enable))
-        return false;
-
-    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !IsRooted())
-    {
-        if (IsLevitating())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-        else if (IsHovering())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-        else
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
-    return true;
 }
 
 float Creature::GetAggroRange(Unit const* target) const
@@ -3796,6 +3711,33 @@ void Creature::SetPickPocketLootTime()
 bool Creature::CanGeneratePickPocketLoot() const
 {
     return (lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < GameTime::GetGameTime().count());
+}
+
+void Creature::SetTextRepeatId(uint8 textGroup, uint8 id)
+{
+    CreatureTextRepeatIds& repeats = m_textRepeat[textGroup];
+    if (std::find(repeats.begin(), repeats.end(), id) == repeats.end())
+        repeats.push_back(id);
+    else
+        LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup {} for Creature({}) {}, id {} already added", uint32(textGroup), GetName(), GetGUID().ToString(), uint32(id));
+}
+
+CreatureTextRepeatIds const& Creature::GetTextRepeatGroup(uint8 textGroup)
+{
+    static CreatureTextRepeatIds const emptyIds;
+
+    CreatureTextRepeatGroup::const_iterator groupItr = m_textRepeat.find(textGroup);
+    if (groupItr != m_textRepeat.end())
+        return groupItr->second;
+
+    return emptyIds;
+}
+
+void Creature::ClearTextRepeatGroup(uint8 textGroup)
+{
+    CreatureTextRepeatGroup::iterator groupItr = m_textRepeat.find(textGroup);
+    if (groupItr != m_textRepeat.end())
+        groupItr->second.clear();
 }
 
 void Creature::SetRespawnTime(uint32 respawn)

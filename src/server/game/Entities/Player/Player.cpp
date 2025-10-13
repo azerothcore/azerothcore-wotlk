@@ -90,6 +90,7 @@
 #include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include <cmath>
+#include <queue>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1337,9 +1338,10 @@ void Player::SendTeleportAckPacket()
 {
     WorldPacket data(MSG_MOVE_TELEPORT_ACK, 41);
     data << GetPackGUID();
-    data << uint32(0);                                     // this value increments every time
+    data << GetSession()->GetOrderCounter(); // movement counter
     BuildMovementPacket(&data);
     GetSession()->SendPacket(&data);
+    GetSession()->IncrementOrderCounter();
 }
 
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/, bool newInstance /*= false*/)
@@ -2086,7 +2088,7 @@ bool Player::CanInteractWithQuestGiver(Object* questGiver)
     return false;
 }
 
-Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
+Creature* Player::GetNPCIfCanInteractWith(ObjectGuid const& guid, uint32 npcflagmask)
 {
     // unit checks
     if (!guid)
@@ -2143,7 +2145,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     return creature;
 }
 
-GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const
+GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid const& guid, GameobjectTypes type) const
 {
     if (GameObject* go = GetMap()->GetGameObject(guid))
     {
@@ -2499,6 +2501,7 @@ void Player::GiveLevel(uint8 level)
     m_Played_time[PLAYED_TIME_LEVEL] = 0;                   // Level Played Time reset
 
     _ApplyAllLevelScaleItemMods(false);
+    _RemoveAllAuraStatMods();
 
     SetLevel(level);
 
@@ -2521,6 +2524,7 @@ void Player::GiveLevel(uint8 level)
         UpdateSkillsToMaxSkillsForLevel();
 
     _ApplyAllLevelScaleItemMods(true);
+    _ApplyAllAuraStatMods();
 
     if (!isDead())
     {
@@ -3800,7 +3804,7 @@ bool Player::resetTalents(bool noResetCost)
     if (m_canTitanGrip)
         SetCanTitanGrip(false);
     // xinef: remove dual wield if player does not have dual wield spell (shamans)
-    if (!HasSpell(674) && m_canDualWield)
+    if (!HasSpell(674) && CanDualWield())
         SetCanDualWield(false);
 
     AutoUnequipOffhandIfNeed();
@@ -4425,27 +4429,23 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
 void Player::SetMovement(PlayerMovementType pType)
 {
     WorldPacket data;
+    const PackedGuid& guid = GetPackGUID();
     switch (pType)
     {
-        case MOVE_ROOT:
-            data.Initialize(SMSG_FORCE_MOVE_ROOT,   GetPackGUID().size() + 4);
-            break;
-        case MOVE_UNROOT:
-            data.Initialize(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
-            break;
         case MOVE_WATER_WALK:
-            data.Initialize(SMSG_MOVE_WATER_WALK,   GetPackGUID().size() + 4);
+            data.Initialize(SMSG_MOVE_WATER_WALK, guid.size() + 4);
             break;
         case MOVE_LAND_WALK:
-            data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size() + 4);
+            data.Initialize(SMSG_MOVE_LAND_WALK, guid.size() + 4);
             break;
         default:
             LOG_ERROR("entities.player", "Player::SetMovement: Unsupported move type ({}), data not sent to client.", pType);
             return;
     }
-    data << GetPackGUID();
-    data << uint32(0);
+    data << guid;
+    data << GetSession()->GetOrderCounter(); // movement counter
     GetSession()->SendPacket(&data);
+    GetSession()->IncrementOrderCounter();
 }
 
 /* Preconditions:
@@ -4485,10 +4485,10 @@ void Player::BuildPlayerRepop()
     SetHealth(1); // convert player body to ghost
     SetMovement(MOVE_WATER_WALK);
     SetWaterWalking(true);
-    if (!GetSession()->isLogingOut())
-    {
-        SetMovement(MOVE_UNROOT);
-    }
+
+    if (!IsImmobilizedState())
+        SendMoveRoot(false);
+
     RemoveUnitFlag(UNIT_FLAG_SKINNABLE); // BG - remove insignia related
     int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
     if (corpseReclaimDelay >= 0)
@@ -4525,7 +4525,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     setDeathState(DeathState::Alive);
     SetMovement(MOVE_LAND_WALK);
-    SetMovement(MOVE_UNROOT);
+    SendMoveRoot(false);
     SetWaterWalking(false);
     m_deathTimer = 0;
 
@@ -4589,7 +4589,7 @@ void Player::KillPlayer()
     if (IsFlying() && !GetTransport())
         GetMotionMaster()->MoveFall();
 
-    SetMovement(MOVE_ROOT);
+    SendMoveRoot(true);
 
     StopMirrorTimers();                                     //disable timers(bars)
 
@@ -4616,7 +4616,7 @@ void Player::KillPlayer()
     //UpdateObjectVisibility(); // pussywizard: not needed
 }
 
-void Player::OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans)
+void Player::OfflineResurrect(ObjectGuid const& guid, CharacterDatabaseTransaction trans)
 {
     Corpse::DeleteFromDB(guid, trans);
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
@@ -9014,7 +9014,7 @@ Pet* Player::GetPet() const
     return nullptr;
 }
 
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/, uint32 healthPct /*= 0*/)
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0ms*/, uint32 healthPct /*= 0*/)
 {
     PetStable& petStable = GetOrInitPetStable();
 
@@ -9035,7 +9035,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
                 ++itr;
         }
 
-        if (duration > 0s)
+        if (duration > 0ms)
             pet->SetDuration(duration);
 
         // Generate a new name for the newly summoned ghoul
@@ -9129,7 +9129,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         }
     }
 
-    if (duration > 0s)
+    if (duration > 0ms)
         pet->SetDuration(duration);
 
     if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
@@ -11698,16 +11698,56 @@ void Player::SendInitialPacketsAfterAddToMap()
     GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
 
-    if (HasStunAura())
-        SetMovement(MOVE_ROOT);
+    WorldPacket setCompoundState(SMSG_MULTIPLE_MOVES, 100);
+    setCompoundState << uint32(0); // size placeholder
 
     // manual send package (have code in HandleEffect(this, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT, true); that must not be re-applied.
-    if (HasRootAura())
+    if (IsImmobilizedState())
     {
-        WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
-        data2 << GetPackGUID();
-        data2 << (uint32)2;
-        SendMessageToSet(&data2, true);
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_FORCE_MOVE_ROOT);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_FEATHER_FALL))
+    {
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_FEATHER_FALL);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_WATER_WALK))
+    {
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_WATER_WALK);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_HOVER))
+    {
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_SET_HOVER);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    // TODO: Pending mount protocol
+
+    if (setCompoundState.size() > 4)
+    {
+        setCompoundState.put<uint32>(0, setCompoundState.size() - 4);
+        SendDirectMessage(&setCompoundState);
     }
 
     SendEnchantmentDurations();                             // must be after add to map
@@ -14325,6 +14365,67 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
     return false;
 }
 
+/**
+ * @brief Checks if any vendor option is available in the gossip menu tree for a given creature.
+ *
+ * @param menuId The starting gossip menu ID to check.
+ * @param creature Pointer to the creature whose gossip menus are being checked.
+ * @return true if a vendor option is available in any accessible menu; false otherwise.
+ */
+bool Player::AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const
+{
+    std::set<uint32> visitedMenus;
+    std::queue<uint32> menusToCheck;
+    menusToCheck.push(menuId);
+
+    while (!menusToCheck.empty())
+    {
+        uint32 const currentMenuId = menusToCheck.front();
+        menusToCheck.pop();
+
+        if (visitedMenus.find(currentMenuId) != visitedMenus.end())
+            continue;
+
+        visitedMenus.insert(currentMenuId);
+
+        GossipMenuItemsMapBounds menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(currentMenuId);
+
+        if (menuItemBounds.first == menuItemBounds.second && currentMenuId != 0)
+            continue;
+
+        for (auto itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
+        {
+            if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), itr->second.Conditions))
+                continue;
+
+            if (itr->second.OptionType == GOSSIP_OPTION_VENDOR)
+                return true;
+            else if (itr->second.ActionMenuID)
+            {
+                GossipMenusMapBounds menuBounds = sObjectMgr->GetGossipMenusMapBounds(itr->second.ActionMenuID);
+                bool menuAccessible = false;
+
+                if (menuBounds.first == menuBounds.second)
+                    menuAccessible = true;
+                else
+                {
+                    for (auto menuItr = menuBounds.first; menuItr != menuBounds.second; ++menuItr)
+                        if (sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), menuItr->second.Conditions))
+                        {
+                            menuAccessible = true;
+                            break;
+                        }
+                }
+
+                if (menuAccessible)
+                    menusToCheck.push(itr->second.ActionMenuID);
+            }
+        }
+    }
+
+    return false;
+}
+
 bool Player::CanSeeVendor(Creature const* creature) const
 {
     if (!creature->HasNpcFlag(UNIT_NPC_FLAG_VENDOR))
@@ -14332,9 +14433,11 @@ bool Player::CanSeeVendor(Creature const* creature) const
 
     ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(creature->GetEntry(), 0);
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
-    {
         return false;
-    }
+
+    uint32 const menuId = creature->GetCreatureTemplate()->GossipMenuId;
+    if (!AnyVendorOptionAvailable(menuId, creature))
+        return false;
 
     return true;
 }
@@ -15270,7 +15373,7 @@ void Player::ActivateSpec(uint8 spec)
     if (!HasTalent(46917, GetActiveSpec()) && m_canTitanGrip)
         SetCanTitanGrip(false);
     // xinef: remove dual wield if player does not have dual wield spell (shamans)
-    if (!HasSpell(674) && m_canDualWield)
+    if (!HasSpell(674) && CanDualWield())
         SetCanDualWield(false);
 
     AutoUnequipOffhandIfNeed();
@@ -15932,95 +16035,11 @@ bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool /
 
     WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
     data << GetPackGUID();
-    data << uint32(0);          //! movement counter
+    data << GetSession()->GetOrderCounter(); // movement counter
     SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
 
     data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
-{
-    sScriptMgr->AnticheatSetCanFlybyServer(this, apply);
-
-    if (!packetOnly && !Unit::SetCanFly(apply))
-        return false;
-
-    if (!apply)
-        SetFallInformation(GameTime::GetGameTime().count(), GetPositionZ());
-
-    WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetHover(bool apply, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
-{
-    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
-    if (!packetOnly /* && !Unit::SetHover(apply)*/)
-    {
-        Unit::SetHover(apply);
-        // return false;
-    }
-
-    WorldPacket data(apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_HOVER, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetWaterWalking(bool apply, bool packetOnly /*= false*/)
-{
-    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
-    if (!packetOnly /* && !Unit::SetWaterWalking(apply)*/)
-    {
-        Unit::SetWaterWalking(apply);
-        // return false;
-    }
-
-    WorldPacket data(apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_WATER_WALK, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
-{
-    // Xinef: moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
-    if (!packetOnly/* && !Unit::SetFeatherFall(apply)*/)
-    {
-        Unit::SetFeatherFall(apply);
-        //return false;
-    }
-
-    WorldPacket data(apply ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
     data << GetPackGUID();
     BuildMovementPacket(&data);
     SendMessageToSet(&data, false);

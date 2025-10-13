@@ -139,7 +139,7 @@ struct npc_partygoer : public ScriptedAI
 
     void Reset() override
     {
-        _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(1000, 20000));
+        _events.ScheduleEvent(EVENT_RANDOM_ACTION, 1s, 20s);
     }
 
     void UpdateAI(uint32 diff) override

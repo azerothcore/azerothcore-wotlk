@@ -246,10 +246,16 @@ public:
             events.Reset();
         }
 
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST)
+                ScriptedAI::MoveInLineOfSight(who);
+        }
+
         void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
@@ -305,7 +311,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.Repeat(4500ms, 6000ms);
+                        events.Repeat(4500ms, 6s);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:
@@ -341,7 +347,7 @@ public:
         void JustDied(Unit* /*pKiller*/) override
         {
             me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
             if (pInstance)
                 pInstance->SetData(DATA_MOUNT_DIED, 0);
         }
@@ -366,7 +372,7 @@ public:
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
 
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
 
@@ -408,6 +414,12 @@ public:
                 me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST)
+                npc_escortAI::MoveInLineOfSight(who);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -628,7 +640,7 @@ public:
                             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
                             me->SetRegeneratingHealth(true);
                             events.Reset();
-                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
                             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
                             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
                             me->SetReactState(REACT_AGGRESSIVE);
@@ -754,7 +766,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.Repeat(4500ms, 6000ms);
+                        events.Repeat(4500ms, 6s);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:

@@ -491,9 +491,9 @@ public:
                         HideNozdormu();
                         if (Creature* cr = GetCopy())
                             cr->AI()->Talk(SAY_HOURGLASS_END_2, GetPlayer());
-                        me->DespawnOrUnsummon(500);
+                        me->DespawnOrUnsummon(500ms);
                         if (GetCopy())
-                            GetCopy()->DespawnOrUnsummon(500);
+                            GetCopy()->DespawnOrUnsummon(500ms);
                         break;
                     }
             }
@@ -626,7 +626,7 @@ public:
             {
                 Talk(0);
                 me->RemoveAllAuras();
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
@@ -726,7 +726,7 @@ public:
                 }
                 case EVENT_TAKE_OFF:
                 {
-                    me->DespawnOrUnsummon(4050);
+                    me->DespawnOrUnsummon(4050ms);
                     me->SetOrientation(2.5f);
                     me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
                     Position pos = me->GetPosition();
@@ -1055,12 +1055,12 @@ public:
             if (fromReset)
             {
                 if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
-                    c->DespawnOrUnsummon(1);
+                    c->DespawnOrUnsummon(1ms);
                 if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
                     c->RemoveAllAuras();
             }
             if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_2, 150.0f, true))
-                c->DespawnOrUnsummon(1);
+                c->DespawnOrUnsummon(1ms);
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_1, 150.0f))
                 go->Delete();
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
@@ -1093,9 +1093,9 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32  /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32  /*id*/) override
         {
-            if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
+            if (playerGUID || events.HasTimeUntilEvent(998) || events.HasTimeUntilEvent(2))
                 return;
 
             me->setActive(true);
@@ -1289,18 +1289,18 @@ public:
                                 {
                                     c->CastSpell(v, SPELL_SAC_KILL_VEGARD, true);
                                     v->SetDisplayId(11686);
-                                    v->DespawnOrUnsummon(1000);
+                                    v->DespawnOrUnsummon(1s);
                                     b->CastSpell(b, SPELL_SAC_HOLY_BOMB_EXPLOSION, true);
                                     b->CastSpell(b, SPELL_SAC_SUMMON_GO_2, true);
                                     if (Unit* vb = c->GetVehicleBase())
                                     {
                                         if (Unit* pass = vb->GetVehicleKit()->GetPassenger(0))
                                             if (pass->IsCreature())
-                                                pass->ToCreature()->DespawnOrUnsummon(1);
+                                                pass->ToCreature()->DespawnOrUnsummon(1ms);
                                         vb->RemoveAllAuras();
-                                        vb->ToCreature()->DespawnOrUnsummon(1);
+                                        vb->ToCreature()->DespawnOrUnsummon(1ms);
                                     }
-                                    c->ToCreature()->DespawnOrUnsummon(1);
+                                    c->ToCreature()->DespawnOrUnsummon(1ms);
                                 }
                     }
                     break;
@@ -1325,7 +1325,7 @@ public:
             if (spell->Id == SPELL_SAC_REPEL_HAMMER && target->IsCreature())
             {
                 target->CastSpell((Unit*)nullptr, SPELL_SAC_THROW_HAMMER, true);
-                target->ToCreature()->DespawnOrUnsummon(1);
+                target->ToCreature()->DespawnOrUnsummon(1ms);
                 if (Unit* c = target->GetVehicleBase())
                     c->RemoveAurasDueToSpell(SPELL_SAC_HOLY_ZONE_AURA);
             }
@@ -1559,7 +1559,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(1);
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
             if (Creature* c = me->FindNearestCreature(NPC_SAC_LICH_KING, 200.0f, true))
                 c->AI()->SetData(3, 3);
         }
@@ -2062,7 +2062,7 @@ class spell_q12096_q12092_dummy : public SpellScript
         {
             tree->CastSpell(player, SPELL_CREATE_ITEM_BARK);
             tree->AI()->Talk(SAY_WALKER_FRIENDLY, player);
-            tree->DespawnOrUnsummon(1000);
+            tree->DespawnOrUnsummon(1s);
         }
         else if (roll == 0) // enemy version
         {
@@ -2114,8 +2114,8 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            _events.ScheduleEvent(EVENT_HEMORRHAGE, urand(5000, 8000));
-            _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(12000, 15000));
+            _events.ScheduleEvent(EVENT_HEMORRHAGE, 5s, 8s);
+            _events.ScheduleEvent(EVENT_KIDNEY_SHOT, 12s, 15s);
 
             if (Player* player = who->ToPlayer())
                 Talk (SAY_AGGRO, player);
@@ -2321,7 +2321,7 @@ class spell_dragonblight_devour_ghoul_periodic : public AuraScript
         if (GetUnitOwner() && GetUnitOwner()->ToCreature())
         {
             GetUnitOwner()->ExitVehicle();
-            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
+            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2s);
         }
     }
 
