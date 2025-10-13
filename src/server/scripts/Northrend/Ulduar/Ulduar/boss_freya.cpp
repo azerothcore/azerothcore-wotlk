@@ -1024,7 +1024,7 @@ public:
             {
                 me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
                 me->CastSpell(me, me->GetMap()->Is25ManRaid() ? SPELL_LIFEBINDER_HEAL_25 : SPELL_LIFEBINDER_HEAL_10, true);
-                me->DespawnOrUnsummon(2000);
+                me->DespawnOrUnsummon(2s);
                 _healTimer = 0;
             }
         }
@@ -1063,7 +1063,7 @@ public:
             if (_despawnTimer >= 22000)
             {
                 me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
-                me->DespawnOrUnsummon(2200);
+                me->DespawnOrUnsummon(2200ms);
                 _despawnTimer = 0;
             }
         }
@@ -1203,7 +1203,7 @@ public:
                     if (Unit* target = SelectTargetFromPlayerList(80))
                         AttackStart(target);
                     else
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(1ms);
                     events.Repeat(10s);
                     break;
             }
@@ -1250,7 +1250,7 @@ public:
             if (_explodeTimer >= 11000)
             {
                 me->CastSpell(me, me->GetMap()->Is25ManRaid() ? SPELL_NATURE_BOMB_DAMAGE_25 : SPELL_NATURE_BOMB_DAMAGE_10, false);
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
                 _explodeTimer = 0;
             }
 

@@ -852,7 +852,7 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
         if (!initial)
         {
             std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
-            for (ObjectGuid& guid : m_sunsReachData.m_sunsReachReclamationPlayers)
+            for (ObjectGuid const& guid : m_sunsReachData.m_sunsReachReclamationPlayers)
                 if (Player* player = ObjectAccessor::FindPlayer(guid))
                 {
                     if (start)

@@ -50,10 +50,8 @@ enum NPC_Spells
 };
 //End Lanny NPCBot
 
-enum Timers
-{
-    TIMER_SOLAKAR_WAVE = 30000
-};
+constexpr Milliseconds TIMER_SOLAKAR_WAVE = 30s;
+
 
 enum SolakarWaves
 {
@@ -1086,7 +1084,7 @@ public:
                         break;
                     case EVENT_VAEL_3_DESPAWN:
                         DoCast(me, SPELL_VAELASTRASZ_SPAWN);
-                        me->DespawnOrUnsummon(1500);
+                        me->DespawnOrUnsummon(1500ms);
                         break;
                     default:
                         break;

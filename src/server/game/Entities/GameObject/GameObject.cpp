@@ -950,7 +950,7 @@ void GameObject::AddUniqueUse(Player* player)
     m_unique_users.insert(player->GetGUID());
 }
 
-void GameObject::DespawnOrUnsummon(Milliseconds delay, Seconds forceRespawnTime)
+void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRespawnTime /*= 0s*/)
 {
     if (delay > 0ms)
     {
@@ -3151,13 +3151,13 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     return nullptr;
 }
 
-void GameObject::AddToSkillupList(ObjectGuid playerGuid)
+void GameObject::AddToSkillupList(ObjectGuid const& playerGuid)
 {
     int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;
     m_SkillupList[playerGuid] = timer;
 }
 
-bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
+bool GameObject::IsInSkillupList(ObjectGuid const& playerGuid) const
 {
     for (auto const& itr : m_SkillupList)
     {
