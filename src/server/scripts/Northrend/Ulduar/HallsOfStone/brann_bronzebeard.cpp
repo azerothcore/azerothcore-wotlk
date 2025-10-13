@@ -443,8 +443,8 @@ public:
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     me->SetOrientation(3.132660f);
                     me->SendMovementFlagUpdate();
-                    events.ScheduleEvent(EVENT_SJONNIR_END_BRANN_YELL, 10000ms);
-                    events.ScheduleEvent(EVENT_SJONNIR_END_BRANN_LAST_YELL, 22000ms);
+                    events.ScheduleEvent(EVENT_SJONNIR_END_BRANN_YELL, 10s);
+                    events.ScheduleEvent(EVENT_SJONNIR_END_BRANN_LAST_YELL, 22s);
                     break;
                 case ACTION_SJONNIR_WIPE_START:
                     Reset();
@@ -508,7 +508,7 @@ public:
                                 kaddrak->CastSpell(plr, DUNGEON_MODE(SPELL_GLARE_OF_THE_TRIBUNAL, SPELL_GLARE_OF_THE_TRIBUNAL_H), true);
                         }
 
-                        events.RescheduleEvent(EVENT_KADDRAK_SWITCH_EYE, 1000ms);
+                        events.RescheduleEvent(EVENT_KADDRAK_SWITCH_EYE, 1s);
                         events.Repeat(1500ms);
                         break;
                     }
@@ -550,7 +550,7 @@ public:
 
                                 darkMatterTargetGUID = cr->GetGUID();
 
-                                events.RescheduleEvent(EVENT_DARK_MATTER_START, 5000ms);
+                                events.RescheduleEvent(EVENT_DARK_MATTER_START, 5s);
                             }
                         }
                         events.Repeat(30s);
@@ -575,7 +575,7 @@ public:
 
                                 if (darkMatterTarget->GetDistance(plr) < 15.0f)
                                 {
-                                    events.RescheduleEvent(EVENT_DARK_MATTER_END, 3000ms);
+                                    events.RescheduleEvent(EVENT_DARK_MATTER_END, 3s);
                                 }
                                 else if (darkMatterTarget->GetDistance(plr) < 30.0f)
                                 {
@@ -594,7 +594,7 @@ public:
                         if (Creature* darkMatterTarget = ObjectAccessor::GetCreature(*me, darkMatterTargetGUID))
                         {
                             darkMatterTarget->CastSpell(darkMatterTarget, darkMatterTarget->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
-                            darkMatterTarget->DespawnOrUnsummon(500);
+                            darkMatterTarget->DespawnOrUnsummon(500ms);
                         }
                         break;
                     }
@@ -625,12 +625,12 @@ public:
                         uint32 Time = 40000 - (2500 * WaveNum);
                         SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3, 0);
                         if (WaveNum > 2)
-                            events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, urand(10 - WaveNum, 15 - WaveNum) * 1000);
+                            events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
                         if (WaveNum > 5)
-                            events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, urand(10 - WaveNum, 15 - WaveNum) * 1000);
+                            events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
 
                         WaveNum++;
-                        events.RepeatEvent(Time);
+                        events.Repeat(Milliseconds(Time));
                         break;
                     }
                     case EVENT_SUMMON_STORMCALLER:
@@ -931,10 +931,10 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             SetEscortPaused(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             me->SendMovementFlagUpdate();
-            events.ScheduleEvent(EVENT_DOOR_OPEN, 1500);
+            events.ScheduleEvent(EVENT_DOOR_OPEN, 1500ms);
             me->SetWalk(false);
             me->SetSpeed(MOVE_RUN, 1.0f, false);
-            events.ScheduleEvent(EVENT_RESUME_ESCORT, 3500);
+            events.ScheduleEvent(EVENT_RESUME_ESCORT, 3500ms);
             break;
         //Brann stops in front of Sjonnir and awaits the start of the battle.
         case 36:

@@ -160,10 +160,12 @@ public:
 
             me->RemoveAllAuras();
             me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
-            RollStance(0, STANCE_DEFENSIVE);
 
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_BJARNGRIM, NOT_STARTED);
+
+            me->CastSpell(me, SPELL_BATTLE_STANCE, true);
+            SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_SHIELD, EQUIP_NO_CHANGE);
         }
 
         void JustEngagedWith(Unit*) override
@@ -171,21 +173,23 @@ public:
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
 
+            RollStance(STANCE_BATTLE);
+
             events.ScheduleEvent(EVENT_BJARNGRIM_CHANGE_STANCE, 20s, 0);
 
             // DEFENSIVE STANCE
             events.ScheduleEvent(EVENT_BJARNGRIM_REFLECTION, 8s, STANCE_DEFENSIVE);
-            events.ScheduleEvent(EVENT_BJARNGRIM_PUMMEL, 5s, STANCE_DEFENSIVE);
             events.ScheduleEvent(EVENT_BJARNGRIM_KNOCK, 16s, STANCE_DEFENSIVE);
             events.ScheduleEvent(EVENT_BJARNGRIM_IRONFORM, 12s, STANCE_DEFENSIVE);
 
             // BERSERKER STANCE
-            events.ScheduleEvent(EVENT_BJARNGRIM_MORTAL_STRIKE, 24s, STANCE_BERSERKER);
+            events.ScheduleEvent(EVENT_BJARNGRIM_INTERCEPT, 23s, STANCE_BERSERKER);
+            events.ScheduleEvent(EVENT_BJARNGRIM_CLEAVE, 25s, STANCE_BERSERKER);
             events.ScheduleEvent(EVENT_BJARNGRIM_WHIRLWIND, 26s, STANCE_BERSERKER);
 
             // BATTLE STANCE
-            events.ScheduleEvent(EVENT_BJARNGRIM_INTERCEPT, 23s, STANCE_BATTLE);
-            events.ScheduleEvent(EVENT_BJARNGRIM_CLEAVE, 25s, STANCE_BATTLE);
+            events.ScheduleEvent(EVENT_BJARNGRIM_PUMMEL, 5s, STANCE_BATTLE);
+            events.ScheduleEvent(EVENT_BJARNGRIM_MORTAL_STRIKE, 24s, STANCE_BATTLE);
             events.ScheduleEvent(EVENT_BJARNGRIM_SLAM, 30s, STANCE_BATTLE);
 
             if (m_pInstance)
@@ -248,8 +252,8 @@ public:
                     me->CastSpell(me, SPELL_DEFENSIVE_STANCE, true);
                     me->CastSpell(me, SPELL_DEFENSIVE_AURA, true);
 
-                    events.DelayEvents(20000, STANCE_BERSERKER);
-                    events.DelayEvents(20000, STANCE_BATTLE);
+                    events.DelayEvents(20s, STANCE_BERSERKER);
+                    events.DelayEvents(20s, STANCE_BATTLE);
 
                     SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_SHIELD, EQUIP_NO_CHANGE);
                     break;
@@ -259,8 +263,8 @@ public:
                     me->CastSpell(me, SPELL_BERSERKER_STANCE, true);
                     me->CastSpell(me, SPELL_BERSERKER_AURA, true);
 
-                    events.DelayEvents(20000, STANCE_DEFENSIVE);
-                    events.DelayEvents(20000, STANCE_BATTLE);
+                    events.DelayEvents(20s, STANCE_DEFENSIVE);
+                    events.DelayEvents(20s, STANCE_BATTLE);
 
                     SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_SWORD, EQUIP_NO_CHANGE);
                     break;
@@ -270,8 +274,8 @@ public:
                     me->CastSpell(me, SPELL_BATTLE_STANCE, true);
                     me->CastSpell(me, SPELL_BATTLE_AURA, true);
 
-                    events.DelayEvents(20000, STANCE_BERSERKER);
-                    events.DelayEvents(20000, STANCE_DEFENSIVE);
+                    events.DelayEvents(20s, STANCE_BERSERKER);
+                    events.DelayEvents(20s, STANCE_DEFENSIVE);
 
                     SetEquipmentSlots(false, EQUIP_MACE, EQUIP_UNEQUIP, EQUIP_NO_CHANGE);
                     break;

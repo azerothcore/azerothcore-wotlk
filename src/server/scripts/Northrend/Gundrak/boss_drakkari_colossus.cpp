@@ -161,7 +161,7 @@ public:
                 summon->SetRegeneratingHealth(false);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->m_Events.AddEvent(new RestoreFight(summon), summon->m_Events.CalculateTime(3000));
-                if (events.GetNextEventTime(EVENT_COLOSSUS_HEALTH_2) == 0)
+                if (!events.HasTimeUntilEvent(EVENT_COLOSSUS_HEALTH_2))
                 {
                     summon->SetHealth(summon->GetMaxHealth() / 2);
                     summon->LowerPlayerDamageReq(summon->GetMaxHealth() / 2);
@@ -308,7 +308,7 @@ public:
                         me->CastSpell(me, SPELL_FACE_ME, true);
                         me->CastSpell(me, SPELL_SURGE_VISUAL, true);
                         me->CastSpell(me, SPELL_MERGE, false);
-                        me->DespawnOrUnsummon(2000);
+                        me->DespawnOrUnsummon(2s);
                         events.Reset();
                         break;
                     }
@@ -382,7 +382,7 @@ public:
             {
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->MoveCharge(1672.96f, 743.488f, 143.338f, 7.0f, POINT_MERGE);
-                me->DespawnOrUnsummon(1200);
+                me->DespawnOrUnsummon(1200ms);
             }
         }
 

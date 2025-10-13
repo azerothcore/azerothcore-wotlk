@@ -255,7 +255,7 @@ public:
                 case EVENT_SENTINEL_BLAST:
                     me->CastSpell(me, SPELL_SENTINEL_BLAST, false);
                     events.Repeat(35s);
-                    events.DelayEvents(5000, 0);
+                    events.DelayEvents(5s, 0);
                     break;
                 case EVENT_RESPAWN_FERAL_DEFENDER:
                     {
@@ -393,7 +393,7 @@ public:
                 else
                 {
                     summons.DespawnAll();
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                 }
 
                 if (_feralEssenceStack)
