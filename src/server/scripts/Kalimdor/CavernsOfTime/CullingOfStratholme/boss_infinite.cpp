@@ -79,8 +79,8 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             me->InterruptNonMeleeSpells(false);
-            events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8000);
-            events.ScheduleEvent(EVENT_SPELL_CORRUPTING_BLIGHT, 12000);
+            events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8s);
+            events.ScheduleEvent(EVENT_SPELL_CORRUPTING_BLIGHT, 12s);
             Talk(SAY_AGGRO);
         }
 
@@ -147,12 +147,12 @@ public:
             {
                 case EVENT_SPELL_VOID_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_VOID_STRIKE, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 case EVENT_SPELL_CORRUPTING_BLIGHT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_CORRUPTING_BLIGHT, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
             }
 

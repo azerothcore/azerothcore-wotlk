@@ -1095,7 +1095,7 @@ public:
 
         void SetGUID(ObjectGuid guid, int32  /*id*/) override
         {
-            if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
+            if (playerGUID || events.HasTimeUntilEvent(998) || events.HasTimeUntilEvent(2))
                 return;
 
             me->setActive(true);
@@ -2114,8 +2114,8 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            _events.ScheduleEvent(EVENT_HEMORRHAGE, urand(5000, 8000));
-            _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(12000, 15000));
+            _events.ScheduleEvent(EVENT_HEMORRHAGE, 5s, 8s);
+            _events.ScheduleEvent(EVENT_KIDNEY_SHOT, 12s, 15s);
 
             if (Player* player = who->ToPlayer())
                 Talk (SAY_AGGRO, player);
