@@ -214,9 +214,7 @@ class spell_galdarah_transform : public SpellScript
 class achievement_share_the_love : public AchievementCriteriaScript
 {
 public:
-    achievement_share_the_love() : AchievementCriteriaScript("achievement_share_the_love")
-    {
-    }
+    achievement_share_the_love() : AchievementCriteriaScript("achievement_share_the_love") { }
 
     bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
