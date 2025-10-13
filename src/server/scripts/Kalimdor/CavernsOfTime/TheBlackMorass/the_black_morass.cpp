@@ -199,19 +199,19 @@ struct npc_medivh_bm : public ScriptedAI
                 events.ScheduleEvent(EVENT_OUTRO_3, 2s);
                 break;
             case EVENT_OUTRO_3:
-                SummonOrcs(-2046.158f, -3.0f, 37000, 30000, true);
+                SummonOrcs(-2046.158f, -3.0f, 37s, 30000, true);
                 events.ScheduleEvent(EVENT_OUTRO_4, 2s);
                 break;
             case EVENT_OUTRO_4:
-                SummonOrcs(-2055.97f, -2.0f, 33000, 28000, false);
+                SummonOrcs(-2055.97f, -2.0f, 33s, 28000, false);
                 events.ScheduleEvent(EVENT_OUTRO_5, 2s);
                 break;
             case EVENT_OUTRO_5:
-                SummonOrcs(-2064.0f, -1.5f, 29000, 26000, false);
+                SummonOrcs(-2064.0f, -1.5f, 29s, 26000, false);
                 events.ScheduleEvent(EVENT_OUTRO_6, 2s);
                 break;
             case EVENT_OUTRO_6:
-                SummonOrcs(-2074.35f, -0.1f, 26000, 24000, false);
+                SummonOrcs(-2074.35f, -0.1f, 26s, 24000, false);
                 events.ScheduleEvent(EVENT_OUTRO_7, 7s);
                 break;
             case EVENT_OUTRO_7:
