@@ -71,7 +71,7 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            StartTalking(TALK_SUMMON, 8 * IN_MILLISECONDS);
+            StartTalking(TALK_SUMMON, 8s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -92,7 +92,7 @@ public:
             instance->SetData(DATA_LORD_VALTHALAK, DONE);
         }
 
-        void StartTalking(uint32 talkGroupId, uint32 timer)
+        void StartTalking(uint32 talkGroupId, Milliseconds timer)
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -123,7 +123,7 @@ public:
 
                 events.CancelEvent(EVENT_SUMMON_SPECTRAL_ASSASSIN);
 
-                StartTalking(TALK_40_HP, 5 * IN_MILLISECONDS);
+                StartTalking(TALK_40_HP, 5s);
             }
 
             if (!frenzy15 && me->HealthBelowPctDamaged(15, damage))
@@ -132,7 +132,7 @@ public:
 
                 events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 12s, 19s, 0, EVENT_PHASE_FIGHT);
 
-                StartTalking(TALK_15_HP, 5 * IN_MILLISECONDS);
+                StartTalking(TALK_15_HP, 5s);
             }
         }
 

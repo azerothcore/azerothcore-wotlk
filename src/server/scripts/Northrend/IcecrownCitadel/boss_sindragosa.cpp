@@ -523,7 +523,7 @@ public:
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->SendMovementFlagUpdate();
                     me->CastSpell(me->GetVictim(), SPELL_TAIL_SMASH, false);
-                    events.DelayEventsToMax(1, 0);
+                    events.DelayEventsToMax(1ms, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 0ms);
                     events.ScheduleEvent(EVENT_TAIL_SMASH, 22s, 27s, EVENT_GROUP_LAND_PHASE);
                     break;
@@ -532,7 +532,7 @@ public:
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->SendMovementFlagUpdate();
                     me->CastSpell(me->GetVictim(), _isThirdPhase ? SPELL_FROST_BREATH_P2 : SPELL_FROST_BREATH_P1, false);
-                    events.DelayEventsToMax(1, 0);
+                    events.DelayEventsToMax(1ms, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 0ms);
                     events.ScheduleEvent(EVENT_FROST_BREATH, 20s, 25s, EVENT_GROUP_LAND_PHASE);
                     break;
@@ -547,11 +547,10 @@ public:
                     break;
                 case EVENT_ICY_GRIP:
                     me->CastSpell((Unit*)nullptr, SPELL_ICY_GRIP, false);
-                    events.DelayEventsToMax(1001, 0);
+                    events.DelayEventsToMax(1001ms, 0);
                     events.ScheduleEvent(EVENT_BLISTERING_COLD, 1s, EVENT_GROUP_LAND_PHASE);
-                    if (uint32 evTime = events.GetNextEventTime(EVENT_ICE_TOMB))
-                        if (events.GetTimer() > evTime || evTime - events.GetTimer() < 7000)
-                            events.RescheduleEvent(EVENT_ICE_TOMB, 7s);
+                    if (events.GetTimeUntilEvent(EVENT_ICE_TOMB) < 7s)
+                        events.RescheduleEvent(EVENT_ICE_TOMB, 7s);
                     break;
                 case EVENT_BLISTERING_COLD:
                     Talk(EMOTE_WARN_BLISTERING_COLD);
@@ -652,9 +651,8 @@ public:
                         Talk(EMOTE_WARN_FROZEN_ORB, target);
                         me->CastSpell(target, SPELL_ICE_TOMB_DUMMY, true);
                         me->CastSpell(target, SPELL_FROST_BEACON, true);
-                        if (uint32 evTime = events.GetNextEventTime(EVENT_ICY_GRIP))
-                            if (events.GetTimer() > evTime || evTime - events.GetTimer() < 8000)
-                                events.RescheduleEvent(EVENT_ICY_GRIP, 8s, EVENT_GROUP_LAND_PHASE);
+                        if (events.GetTimeUntilEvent(EVENT_ICY_GRIP) < 8s)
+                            events.RescheduleEvent(EVENT_ICY_GRIP, 8s, EVENT_GROUP_LAND_PHASE);
                     }
                     events.ScheduleEvent(EVENT_ICE_TOMB, 18s, 22s);
                     break;
@@ -700,7 +698,7 @@ public:
         uint32 _existenceCheckTimer;
         uint16 _asphyxiationTimer;
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == DATA_TRAPPED_PLAYER)
                 _trappedPlayerGUID = guid;
@@ -722,7 +720,7 @@ public:
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
                 player->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
-                me->DespawnOrUnsummon(5000);
+                me->DespawnOrUnsummon(5s);
             }
         }
 
@@ -1451,8 +1449,8 @@ public:
                         else destZ = me->GetPositionZ() + 25.0f;
                         me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), destZ, me->GetSpeed(MOVE_RUN));
                         float moveTime = std::fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                        _events.ScheduleEvent(EVENT_ICY_BLAST, uint32(moveTime) + urand(60000, 70000));
-                        _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, uint32(moveTime) + 250);
+                        _events.Repeat(Milliseconds(uint32(moveTime) + urand(60000, 70000)));
+                        _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, Milliseconds(uint32(moveTime) + 250));
                         break;
                     }
                 case EVENT_ICY_BLAST_CAST:
