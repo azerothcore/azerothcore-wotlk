@@ -526,11 +526,11 @@ public:
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;
 
-            events.RescheduleEvent(EVENT_SPELL_ANTI_MAGIC_ZONE, 15000);
-            events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8000);
-            events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5000);
-            events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10000);
-            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500);
+            events.RescheduleEvent(EVENT_SPELL_ANTI_MAGIC_ZONE, 15s);
+            events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8s);
+            events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5s);
+            events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500ms);
         }
 
         void Reset() override

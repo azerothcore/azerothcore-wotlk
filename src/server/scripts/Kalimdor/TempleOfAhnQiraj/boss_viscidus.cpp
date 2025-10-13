@@ -175,7 +175,7 @@ struct boss_viscidus : public BossAI
                 {
                     DoCastSelf(SPELL_EXPLODE_TRIGGER, true);
                 })
-                .Schedule(3000ms, [this](TaskContext /*context*/)
+                .Schedule(3s, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_INVIS_SELF, true);
                     me->SetAuraStack(SPELL_VISCIDUS_SHRINKS, me, 20);
