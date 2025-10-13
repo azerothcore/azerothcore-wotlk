@@ -1200,7 +1200,8 @@ void WorldObject::AddToWorld()
     GetMap()->GetZoneAndAreaId(GetPhaseMask(), _zoneId, _areaId, GetPositionX(), GetPositionY(), GetPositionZ());
     GetMap()->AddObjectToPendingUpdateList(this);
 
-    AddToMapVisibilityOverrideContainers();
+    if (IsZoneWideVisible())
+        GetMap()->AddWorldObjectToZoneWideVisibleMap(_zoneId, this);
 }
 
 void WorldObject::RemoveFromWorld()
