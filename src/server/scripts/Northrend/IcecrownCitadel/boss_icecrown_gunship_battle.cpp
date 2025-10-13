@@ -669,7 +669,7 @@ public:
                                     continue;
                                 Creature* c = (*itr)->ToCreature();
                                 if (c->GetEntry() == NPC_SKYBREAKER_MARINE || c->GetEntry() == NPC_SKYBREAKER_SERGEANT || c->GetEntry() == NPC_KOR_KRON_REAVER || c->GetEntry() == NPC_KOR_KRON_SERGEANT)
-                                    c->DespawnOrUnsummon(1);
+                                    c->DespawnOrUnsummon(1ms);
                             }
                         }
             }
@@ -881,7 +881,7 @@ public:
                 init.DisableTransportPathTransformations();
                 init.MovebyPath(path, 0);
                 init.Launch();
-                me->DespawnOrUnsummon(18000);
+                me->DespawnOrUnsummon(18s);
             }
         }
 
@@ -1217,7 +1217,7 @@ public:
                 init.DisableTransportPathTransformations();
                 init.MovebyPath(path, 0);
                 init.Launch();
-                me->DespawnOrUnsummon(18000);
+                me->DespawnOrUnsummon(18s);
             }
         }
 

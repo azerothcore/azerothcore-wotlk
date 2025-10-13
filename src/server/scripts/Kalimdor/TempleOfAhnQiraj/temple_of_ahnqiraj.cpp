@@ -474,7 +474,7 @@ struct npc_ahnqiraji_critter : public ScriptedAI
     {
         if (me->GetEntry() == NPC_QIRAJI_SCORPION)
         {
-            me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+            me->DespawnOrUnsummon(5s);
         }
     }
 

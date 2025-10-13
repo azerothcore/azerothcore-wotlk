@@ -109,7 +109,7 @@ struct npc_medivh_bm : public ScriptedAI
     {
         if (summon->GetEntry() == NPC_DP_CRYSTAL_STALKER)
         {
-            summon->DespawnOrUnsummon(25000);
+            summon->DespawnOrUnsummon(25s);
             summon->CastSpell(summon, RAND(SPELL_BANISH_PURPLE, SPELL_BANISH_GREEN), true);
             summon->GetMotionMaster()->MoveSplinePath(&_airArray);
         }
@@ -199,19 +199,19 @@ struct npc_medivh_bm : public ScriptedAI
                 events.ScheduleEvent(EVENT_OUTRO_3, 2s);
                 break;
             case EVENT_OUTRO_3:
-                SummonOrcs(-2046.158f, -3.0f, 37000, 30s, true);
+                SummonOrcs(-2046.158f, -3.0f, 37s, 30s, true);
                 events.ScheduleEvent(EVENT_OUTRO_4, 2s);
                 break;
             case EVENT_OUTRO_4:
-                SummonOrcs(-2055.97f, -2.0f, 33000, 28s, false);
+                SummonOrcs(-2055.97f, -2.0f, 33s, 28s, false);
                 events.ScheduleEvent(EVENT_OUTRO_5, 2s);
                 break;
             case EVENT_OUTRO_5:
-                SummonOrcs(-2064.0f, -1.5f, 29000, 26s, false);
+                SummonOrcs(-2064.0f, -1.5f, 29s, 26s, false);
                 events.ScheduleEvent(EVENT_OUTRO_6, 2s);
                 break;
             case EVENT_OUTRO_6:
-                SummonOrcs(-2074.35f, -0.1f, 26000, 24s, false);
+                SummonOrcs(-2074.35f, -0.1f, 26s, 24s, false);
                 events.ScheduleEvent(EVENT_OUTRO_7, 7s);
                 break;
             case EVENT_OUTRO_7:
@@ -228,7 +228,7 @@ struct npc_medivh_bm : public ScriptedAI
         }
     }
 
-    void SummonOrcs(float x, float y, uint32 duration, Milliseconds homeTime, bool first)
+    void SummonOrcs(float x, float y, Milliseconds duration, Milliseconds homeTime, bool first)
     {
         for (uint8 i = 0; i < 6; ++i)
         {
@@ -236,7 +236,7 @@ struct npc_medivh_bm : public ScriptedAI
             {
                 cr->GetMotionMaster()->MovePoint(0, (first && i == 3) ? x + 2.0f : x, cr->GetPositionY() + y, cr->GetMapHeight(x, cr->GetPositionY() + y, cr->GetPositionZ(), true));
                 cr->m_Events.AddEventAtOffset(new NpcRunToHome(*cr), homeTime + randtime(0ms, 2s));
-                cr->DespawnOrUnsummon(duration + urand(0, 2000));
+                cr->DespawnOrUnsummon(duration + randtime(0ms, 2s));
             }
         }
     }
@@ -355,7 +355,7 @@ struct npc_time_rift : public NullCreatureAI
     {
         if (creature->GetGUID() == _riftKeeperGUID)
         {
-            me->DespawnOrUnsummon(0);
+            me->DespawnOrUnsummon(0ms);
         }
     }
 

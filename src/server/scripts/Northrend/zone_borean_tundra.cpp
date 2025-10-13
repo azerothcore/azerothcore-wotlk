@@ -63,7 +63,7 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
         GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
         owner->SetFaction(FACTION_FRIENDLY);
         owner->SetImmuneToAll(true);
-        owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+        owner->DespawnOrUnsummon(180s);
     }
 
     void Register() override

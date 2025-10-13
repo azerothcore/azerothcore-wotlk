@@ -19677,7 +19677,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
                     Position pos = *vehicleBase;
                     vehicleBase->MovePositionToFirstCollision(pos, 20.0f, M_PI);
                     vehicleBase->GetMotionMaster()->MovePoint(0, pos);
-                    vehicleBase->ToCreature()->DespawnOrUnsummon(2000);
+                    vehicleBase->ToCreature()->DespawnOrUnsummon(2s);
                 }, 2s);
             }
 

@@ -391,7 +391,7 @@ struct npc_creature_generator_akama : public ScriptedAI
     void SummonedCreatureDies(Creature* summon, Unit*) override
     {
         spawnCounter--;
-        summon->DespawnOrUnsummon(10000);
+        summon->DespawnOrUnsummon(10s);
         summons.Despawn(summon);
     }
 

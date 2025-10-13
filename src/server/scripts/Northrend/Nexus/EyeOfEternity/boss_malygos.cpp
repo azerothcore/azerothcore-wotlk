@@ -803,10 +803,10 @@ public:
             {
                 case NPC_ARCANE_OVERLOAD:
                     summon->CastSpell(summon, SPELL_ARCANE_OVERLOAD_DMG, true);
-                    summon->DespawnOrUnsummon(45000);
+                    summon->DespawnOrUnsummon(45s);
                     break;
                 case NPC_STATIC_FIELD:
-                    summon->DespawnOrUnsummon(20000);
+                    summon->DespawnOrUnsummon(20s);
                     break;
             }
         }
@@ -1018,7 +1018,7 @@ public:
                     me->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->RemoveAura(SPELL_POWER_SPARK_VISUAL);
                     me->CastSpell(me, SPELL_POWER_SPARK_GROUND_BUFF, true);
-                    me->DespawnOrUnsummon(60000);
+                    me->DespawnOrUnsummon(60s);
                 }
             }
         }
@@ -1459,14 +1459,14 @@ public:
             else if (pass && pass->IsPlayer() && me->IsAlive())
             {
                 me->SetDisplayId(11686); // prevents nasty falling animation at despawn
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             me->SetDisplayId(11686); // prevents nasty falling animation at despawn
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
     };
 };

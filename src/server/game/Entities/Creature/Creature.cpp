@@ -2156,12 +2156,12 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
     // Xinef: Set new respawn time, ignore corpse decay time...
     RemoveCorpse(true);
 
-    if (forceRespawnTimer > Seconds::zero())
+    if (forceRespawnTimer > 0s)
         if (GetMap())
             GetMap()->ScheduleCreatureRespawn(GetGUID(), forceRespawnTimer);
 }
 
-void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds forcedRespawnTimer)
+void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0ms*/, Seconds forcedRespawnTimer /*= 0s*/)
 {
     if (TempSummon* summon = this->ToTempSummon())
         summon->UnSummon(msTimeToDespawn);
@@ -2186,7 +2186,7 @@ void Creature::DespawnOnEvade(Seconds respawnDelay)
         return;
     }
 
-    DespawnOrUnsummon(Milliseconds(0), respawnDelay);
+    DespawnOrUnsummon(0ms, respawnDelay);
 }
 
 void Creature::InitializeReactState()

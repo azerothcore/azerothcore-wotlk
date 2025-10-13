@@ -283,8 +283,7 @@ public:
 
     void RemoveCorpse(bool setSpawnTime = true, bool skipVisibility = false);
 
-    void DespawnOrUnsummon(Milliseconds msTimeToDespawn, Seconds forcedRespawnTimer);
-    void DespawnOrUnsummon(uint32 msTimeToDespawn = 0) { DespawnOrUnsummon(Milliseconds(msTimeToDespawn), 0s); };
+    void DespawnOrUnsummon(Milliseconds msTimeToDespawn = 0ms, Seconds forcedRespawnTimer = 0s);
     void DespawnOnEvade(Seconds respawnDelay = 20s);
 
     [[nodiscard]] time_t const& GetRespawnTime() const { return m_respawnTime; }

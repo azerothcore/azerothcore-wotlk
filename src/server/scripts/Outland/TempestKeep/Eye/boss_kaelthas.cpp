@@ -1013,7 +1013,7 @@ class spell_kaelthas_flame_strike : public AuraScript
     {
         GetUnitOwner()->RemoveAllAuras();
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLAME_STRIKE_DAMAGE, true);
-        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
+        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2s);
     }
 
     void Register() override
