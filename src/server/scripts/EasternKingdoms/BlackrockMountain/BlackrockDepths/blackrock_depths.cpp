@@ -27,11 +27,12 @@
 
 enum IronhandData
 {
-    IRONHAND_FLAMES_TIMER      = 16000,
-    IRONHAND_FLAMES_TIMER_RAND = 3000,
     IRONHAND_N_GROUPS          = 3,
     SPELL_GOUT_OF_FLAMES       = 15529
 };
+
+constexpr Milliseconds IRONHAND_FLAMES_TIMER = 16s;
+constexpr Milliseconds IRONHAND_FLAMES_TIMER_RAND = 3s;
 
 class go_shadowforge_brazier : public GameObjectScript
 {
@@ -110,7 +111,7 @@ public:
                     {
                         case SPELL_GOUT_OF_FLAMES:
                             DoCast(SPELL_GOUT_OF_FLAMES);
-                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, urand(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
+                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND);
                             break;
                         default:
                             break;

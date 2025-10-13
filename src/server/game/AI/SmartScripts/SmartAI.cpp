@@ -410,7 +410,7 @@ void SmartAI::UpdatePath(const uint32 diff)
 
             // Xinef: allow to properly hook out of range despawn action, which in most cases should perform the same operation as dying
             GetScript()->ProcessEventsFor(SMART_EVENT_DEATH, me);
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             return;
         }
         mEscortInvokerCheckTimer = 1000;
@@ -993,7 +993,7 @@ void SmartAI::SetData(uint32 id, uint32 value, WorldObject* invoker)
     GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, unit, id, value, false, nullptr, gob);
 }
 
-void SmartAI::SetGUID(ObjectGuid /*guid*/, int32 /*id*/)
+void SmartAI::SetGUID(ObjectGuid const& /*guid*/, int32 /*id*/)
 {
 }
 
