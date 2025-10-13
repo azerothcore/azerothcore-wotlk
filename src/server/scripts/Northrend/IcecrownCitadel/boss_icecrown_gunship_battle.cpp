@@ -703,7 +703,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
+        void SetGUID(ObjectGuid const& guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
                 return;
