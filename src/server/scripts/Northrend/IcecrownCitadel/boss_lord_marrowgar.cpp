@@ -397,7 +397,7 @@ public:
                     trapped->NearTeleportTo(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.GetPositionZ(), exitPos.GetOrientation(), false);
                 }
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -451,13 +451,13 @@ public:
                 }
                 else
                 {
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     return;
                 }
             }
             else
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
                 return;
             }
 

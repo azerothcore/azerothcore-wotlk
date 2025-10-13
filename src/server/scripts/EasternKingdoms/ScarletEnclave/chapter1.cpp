@@ -230,7 +230,7 @@ public:
                     me->RemoveAllAuras();
                     me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
                     me->RestoreFaction();
-                    me->DespawnOrUnsummon(10000);
+                    me->DespawnOrUnsummon(10s);
                 }
             }
         }
@@ -407,7 +407,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
-                me->DespawnOrUnsummon(1500);
+                me->DespawnOrUnsummon(1500ms);
                 me->CastSpell(me, SPELL_GHOUL_SUBMERGE, true);
             }
         }

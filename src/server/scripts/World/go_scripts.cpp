@@ -283,7 +283,7 @@ public:
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                 {
                     player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE);
-                    (*itr)->DespawnOrUnsummon(urand(45000, 60000));
+                    (*itr)->DespawnOrUnsummon(randtime(45s, 60s));
                     (*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2 * M_PI), MOTION_SLOT_CONTROLLED);
                 }
             }
@@ -1694,7 +1694,7 @@ public:
             for (std::list<Creature*>::const_iterator itr = childrenList.begin(); itr != childrenList.end(); ++itr)
             {
                 player->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
-                (*itr)->DespawnOrUnsummon(5000);
+                (*itr)->DespawnOrUnsummon(5s);
                 (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
                 (*itr)->AI()->Talk(SAY_FREE_0);
                 (*itr)->GetMotionMaster()->Clear();

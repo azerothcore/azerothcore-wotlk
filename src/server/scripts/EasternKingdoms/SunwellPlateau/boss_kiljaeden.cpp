@@ -387,7 +387,7 @@ struct boss_kiljaeden : public BossAI
                     {
                         anveena->RemoveAllAuras();
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
-                        anveena->DespawnOrUnsummon(1500);
+                        anveena->DespawnOrUnsummon(1500ms);
                         DoCastSelf(SPELL_CUSTOM_08_STATE, true);
                         me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         scheduler.CancelAll();
@@ -555,7 +555,7 @@ struct boss_kiljaeden : public BossAI
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
             summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            summon->DespawnOrUnsummon(urand(8000, 10000));
+            summon->DespawnOrUnsummon(randtime(8s, 10s));
         }
     }
 
@@ -919,7 +919,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
             {
                 velen->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
-                velen->DespawnOrUnsummon(5000);
+                velen->DespawnOrUnsummon(5s);
             }
             events.ScheduleEvent(eventId + 1, 3s);
             break;
@@ -929,7 +929,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
                     if (summon->GetEntry() == NPC_SHATTERED_SUN_SOLDIER)
                     {
                         summon->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
-                        summon->DespawnOrUnsummon(summon->GetExactDist2d(1734.96f, 642.43f) * 100);
+                        summon->DespawnOrUnsummon(Milliseconds(uint32(summon->GetExactDist2d(1734.96f, 642.43f) * 100)));
                     }
             events.ScheduleEvent(eventId + 1, 7s);
             break;

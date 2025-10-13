@@ -393,7 +393,7 @@ public:
                 else
                 {
                     summons.DespawnAll();
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                 }
 
                 if (_feralEssenceStack)

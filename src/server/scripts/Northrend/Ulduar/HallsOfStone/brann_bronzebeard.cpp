@@ -594,7 +594,7 @@ public:
                         if (Creature* darkMatterTarget = ObjectAccessor::GetCreature(*me, darkMatterTargetGUID))
                         {
                             darkMatterTarget->CastSpell(darkMatterTarget, darkMatterTarget->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
-                            darkMatterTarget->DespawnOrUnsummon(500);
+                            darkMatterTarget->DespawnOrUnsummon(500ms);
                         }
                         break;
                     }

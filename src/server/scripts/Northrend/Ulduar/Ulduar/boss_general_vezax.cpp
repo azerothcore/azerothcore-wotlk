@@ -450,7 +450,7 @@ public:
 
         void JustDied(Unit*  /*killer*/) override
         {
-            me->DespawnOrUnsummon(3000);
+            me->DespawnOrUnsummon(3s);
 
             if (pInstance)
                 if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))

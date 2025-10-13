@@ -42,7 +42,7 @@ void NPCStaveQuestAI::RevealForm()
     {
         me->UpdateEntry(GetFormEntry("evil"));
         me->SetFullHealth();
-        me->DespawnOrUnsummon(900000);
+        me->DespawnOrUnsummon(900s);
     }
 }
 
@@ -373,7 +373,7 @@ public:
                         SetHomePosition();
                         me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
                         me->SetImmuneToAll(true);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
                     events.Repeat(2s);
@@ -476,7 +476,7 @@ public:
         {
             if (flaggedForDespawn)
             {
-                me->DespawnOrUnsummon(0);
+                me->DespawnOrUnsummon(0ms);
                 flaggedForDespawn = false;
             }
         }
@@ -640,7 +640,7 @@ public:
             }
             else
             {
-                Precious()->DespawnOrUnsummon(0);
+                Precious()->DespawnOrUnsummon(0ms);
             }
         }
 
@@ -765,9 +765,9 @@ public:
                         me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
                         me->SetImmuneToAll(true);
 
-                        Precious()->DespawnOrUnsummon(5000);
+                        Precious()->DespawnOrUnsummon(5s);
 
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
                     events.Repeat(2s);
@@ -978,7 +978,7 @@ public:
                         me->CombatStop(true);
                         me->Say(NELSON_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
                     events.Repeat(2s);
@@ -1149,7 +1149,7 @@ public:
                         me->CombatStop(true);
                         me->Say(FRANKLIN_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
                     events.Repeat(2s);

@@ -242,7 +242,7 @@ public:
                     {
                         me->GetMotionMaster()->MoveIdle();
                         me->CastSpell(b, SPELL_CONSUME_SOUL, true);
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(1ms);
                         return;
                     }
 

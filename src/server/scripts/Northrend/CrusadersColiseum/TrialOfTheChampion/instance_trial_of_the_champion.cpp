@@ -1128,7 +1128,7 @@ public:
                         if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
                         {
                             boss->GetMotionMaster()->MovePoint(0, SpawnPosition);
-                            boss->DespawnOrUnsummon(3000);
+                            boss->DespawnOrUnsummon(3s);
                         }
                     }
                     break;
