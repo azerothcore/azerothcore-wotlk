@@ -1046,7 +1046,7 @@ public:
                         break;
                     case EVENT_VAEL_3_DESPAWN:
                         DoCast(me, SPELL_VAELASTRASZ_SPAWN);
-                        me->DespawnOrUnsummon(1500);
+                        me->DespawnOrUnsummon(1500ms);
                         break;
                     default:
                         break;

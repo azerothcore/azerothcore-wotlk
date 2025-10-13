@@ -826,9 +826,9 @@ public:
                     me->SetDisableGravity(false);
                     me->GetMotionMaster()->MoveFall();
                     if (Creature* frostmourne = me->FindNearestCreature(NPC_FROSTMOURNE_TRIGGER, 50.0f))
-                        frostmourne->DespawnOrUnsummon(1);
+                        frostmourne->DespawnOrUnsummon(1ms);
                     if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
-                        terenas->DespawnOrUnsummon(1);
+                        terenas->DespawnOrUnsummon(1ms);
 
                     me->m_Events.AddEvent(new LichKingDeathEvent(*me), me->m_Events.CalculateTime(2500)); // die after spinning anim is over, so death anim is visible
                     me->m_Events.AddEvent(new LichKingMovieEvent(*me), me->m_Events.CalculateTime(11500));
@@ -886,7 +886,7 @@ public:
                     break;
                 case NPC_VALKYR_SHADOWGUARD:
                     if (_phase == PHASE_THREE || events.HasTimeUntilEvent(EVENT_QUAKE_2))
-                        summon->DespawnOrUnsummon(1);
+                        summon->DespawnOrUnsummon(1ms);
                     break;
                 default:
                     break;
@@ -2078,7 +2078,7 @@ class spell_the_lich_king_shadow_trap_periodic : public SpellScript
         if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
             a->SetDuration(0);
         if (GetCaster()->IsCreature())
-            GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
+            GetCaster()->ToCreature()->DespawnOrUnsummon(3s);
     }
 
     void Register() override
@@ -2134,7 +2134,7 @@ public:
             {
                 me->RemoveAllAuras();
                 me->CastSpell(me, SPELL_ICE_BURST, true);
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
                 targetGUID.Clear();
                 timer = 9999;
                 me->InterruptNonMeleeSpells(true);
@@ -2238,7 +2238,7 @@ public:
                 if (Player* plr = ScriptedAI::SelectTargetFromPlayerList(100.0f, 0, true))
                     plr->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL_CLONE, true);
                 else
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
             }
         }
 
@@ -2449,7 +2449,7 @@ public:
             if (IsHeroic())
                 GoSiphon();
             else
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -2519,7 +2519,7 @@ public:
                         if (IsHeroic())
                             GoSiphon();
                         else
-                            me->DespawnOrUnsummon(1000);
+                            me->DespawnOrUnsummon(1s);
                     }
                     break;
                 case POINT_START_SIPHON:
@@ -2883,7 +2883,7 @@ class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScript
             c->GetMotionMaster()->Clear(true);
             c->StopMoving();
             c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
-            c->DespawnOrUnsummon(3000);
+            c->DespawnOrUnsummon(3s);
             c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
     }
@@ -2999,7 +2999,7 @@ public:
 
             _events.Reset();
             me->RemoveAllAuras();
-            me->DespawnOrUnsummon(500);
+            me->DespawnOrUnsummon(500ms);
 
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                 lichKing->AI()->SummonedCreatureDespawn(me);
@@ -3050,7 +3050,7 @@ public:
                 case EVENT_DESPAWN_SELF:
                     if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_THE_LICH_KING)))
                         lichKing->AI()->SummonedCreatureDespawn(me);
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     break;
                 default:
                     break;
@@ -3098,7 +3098,7 @@ public:
                     {
                         _events.Reset();
                         me->CastSpell((Unit*)nullptr, SPELL_RESTORE_SOUL, false);
-                        me->DespawnOrUnsummon(3000);
+                        me->DespawnOrUnsummon(3s);
                     }
                     break;
             }
@@ -3118,14 +3118,14 @@ public:
                     if (Creature* warden = me->FindNearestCreature(NPC_SPIRIT_WARDEN, 20.0f))
                     {
                         warden->CastSpell((Unit*)nullptr, SPELL_DESTROY_SOUL, false);
-                        warden->DespawnOrUnsummon(2000);
+                        warden->DespawnOrUnsummon(2s);
                     }
                     me->CastSpell(me, SPELL_TERENAS_LOSES_INSIDE, false);
                     me->SetDisplayId(16946);
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->DespawnOrUnsummon(2000);
+                    me->DespawnOrUnsummon(2s);
                 }
             }
         }
@@ -3414,7 +3414,7 @@ public:
         npc_lk_spirit_bombAI(Creature* creature) : NullCreatureAI(creature)
         {
             me->SetReactState(REACT_PASSIVE);
-            me->DespawnOrUnsummon(45000); // for safety
+            me->DespawnOrUnsummon(45s); // for safety
             timer = 0;
         }
 
@@ -3447,7 +3447,7 @@ public:
                     timer = 0;
                     me->RemoveAllAuras();
                     me->CastSpell((Unit*)nullptr, SPELL_EXPLOSION, false);
-                    me->DespawnOrUnsummon(1000);
+                    me->DespawnOrUnsummon(1s);
                 }
                 else
                     timer -= diff;

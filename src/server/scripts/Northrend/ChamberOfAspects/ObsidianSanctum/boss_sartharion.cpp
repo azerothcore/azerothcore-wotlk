@@ -1480,7 +1480,7 @@ public:
         {
             if (param == ACTION_SWITCH_PHASE)
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 

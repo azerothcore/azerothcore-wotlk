@@ -131,7 +131,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             ScriptedAI::EnterEvadeMode(why);
         }
 

@@ -170,7 +170,7 @@ struct boss_ouro : public BossAI
             }
         }
 
-        me->DespawnOrUnsummon(1000);
+        me->DespawnOrUnsummon(1s);
     }
 
     void CastGroundRupture()
@@ -273,7 +273,7 @@ struct boss_ouro : public BossAI
         if (me->GetThreatMgr().GetThreatList().empty())
         {
             DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
             instance->SetBossState(DATA_OURO, FAIL);
             if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
                 base->DespawnOrUnsummon();
@@ -334,7 +334,7 @@ struct npc_dirt_mound : ScriptedAI
         scheduler.Schedule(30s, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_SUMMON_SCARABS, true);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         })
             .Schedule(100ms, [this](TaskContext context)
         {

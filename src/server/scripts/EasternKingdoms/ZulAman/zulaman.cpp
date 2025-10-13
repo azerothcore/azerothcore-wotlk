@@ -78,7 +78,7 @@ struct npc_forest_frog : public ScriptedAI
     void MovementInform(uint32 type, uint32 data) override
     {
         if (type == POINT_MOTION_TYPE && data == POINT_DESPAWN)
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
     }
 
     void UpdateAI(uint32 diff) override

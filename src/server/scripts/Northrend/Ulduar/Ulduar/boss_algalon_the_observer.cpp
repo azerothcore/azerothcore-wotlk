@@ -443,7 +443,7 @@ public:
                     if (me->IsInCombat())
                         events.ScheduleEvent(EVENT_DESPAWN_ALGALON_4, 26s);
                     events.ScheduleEvent(EVENT_DESPAWN_ALGALON_5, 32s);
-                    me->DespawnOrUnsummon(39000);
+                    me->DespawnOrUnsummon(39s);
 
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
@@ -795,7 +795,7 @@ public:
                 case EVENT_OUTRO_11:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->CastSpell(me, SPELL_TELEPORT, false);
-                    me->DespawnOrUnsummon(3000);
+                    me->DespawnOrUnsummon(3s);
                     break;
                 case EVENT_DESPAWN_ALGALON_1:
                     Talk(SAY_ALGALON_DESPAWN_1);
@@ -812,7 +812,7 @@ public:
                 case EVENT_DESPAWN_ALGALON_5:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->CastSpell(me, SPELL_TELEPORT, false);
-                    me->DespawnOrUnsummon(3000);
+                    me->DespawnOrUnsummon(3s);
                     break;
                 case EVENT_CHECK_HERALD_ITEMS:
                     if (!DoCheckHeraldOfTheTitans())
@@ -886,7 +886,7 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
                     return;
                 case 10:
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     return;
                 case POINT_BRANN_OUTRO:
                 case POINT_BRANN_OUTRO_END:
@@ -1025,10 +1025,10 @@ public:
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, EVENT_ID_SUPERMASSIVE_START);
 
             caster->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_CREDIT, TRIGGERED_FULL_MASK);
-            caster->ToCreature()->DespawnOrUnsummon(1);
-            me->DespawnOrUnsummon(1);
+            caster->ToCreature()->DespawnOrUnsummon(1ms);
+            me->DespawnOrUnsummon(1ms);
             if (Creature* voidZone = caster->FindNearestCreature(NPC_ALGALON_VOID_ZONE_VISUAL_STALKER, 10.0f))
-                voidZone->DespawnOrUnsummon(1);
+                voidZone->DespawnOrUnsummon(1ms);
         }
 
         void UpdateAI(uint32 diff) override
