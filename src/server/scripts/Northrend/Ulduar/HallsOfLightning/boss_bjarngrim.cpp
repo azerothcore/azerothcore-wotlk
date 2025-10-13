@@ -160,16 +160,20 @@ public:
 
             me->RemoveAllAuras();
             me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
-            RollStance(0, STANCE_DEFENSIVE);
 
             if (m_pInstance)
                 m_pInstance->SetData(TYPE_BJARNGRIM, NOT_STARTED);
+
+            me->CastSpell(me, SPELL_BATTLE_STANCE, true);
+            SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_SHIELD, EQUIP_NO_CHANGE);
         }
 
         void JustEngagedWith(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
+
+            RollStance(STANCE_BATTLE);
 
             events.ScheduleEvent(EVENT_BJARNGRIM_CHANGE_STANCE, 20s, 0);
 
