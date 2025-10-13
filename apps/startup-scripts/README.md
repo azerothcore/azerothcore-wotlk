@@ -453,6 +453,40 @@ This is particularly useful for:
 - **Multiple Projects**: Separate service configurations per project
 - **Team Collaboration**: Share service setups across development teams
 
+#### Service Configuration Portability
+
+The service manager automatically stores binary and configuration paths as relative paths when they are located under the `AC_SERVICE_CONFIG_DIR`, making service configurations portable across environments:
+
+```bash
+# Set up a portable project structure
+export AC_SERVICE_CONFIG_DIR="/opt/myproject/services"
+mkdir -p "$AC_SERVICE_CONFIG_DIR"/{bin,etc}
+
+# Copy your binaries and configs
+cp /path/to/compiled/authserver "$AC_SERVICE_CONFIG_DIR/bin/"
+cp /path/to/authserver.conf "$AC_SERVICE_CONFIG_DIR/etc/"
+
+# Create service - paths under AC_SERVICE_CONFIG_DIR will be stored as relative
+./service-manager.sh create auth authserver \
+  --bin-path "$AC_SERVICE_CONFIG_DIR/bin" \
+  --server-config "$AC_SERVICE_CONFIG_DIR/etc/authserver.conf"
+
+# Registry will contain relative paths like "bin/authserver" and "etc/authserver.conf"
+# instead of absolute paths, making the entire directory portable
+```
+
+**Benefits:**
+- **Environment Independence**: Move the entire services directory between machines
+- **Container Friendly**: Perfect for Docker volumes and bind mounts
+- **Backup/Restore**: Archive and restore complete service configurations
+- **Development/Production Parity**: Same relative structure across environments
+
+**How it works:**
+- Paths under `AC_SERVICE_CONFIG_DIR` are automatically stored as relative paths
+- Paths outside `AC_SERVICE_CONFIG_DIR` are stored as absolute paths for safety
+- When services are restored or started, relative paths are resolved from `AC_SERVICE_CONFIG_DIR`
+- If `AC_SERVICE_CONFIG_DIR` is not set, all paths are stored as absolute paths (traditional behavior)
+
 #### Migration from Legacy Format
 
 If you have existing services in the old format, use the migration script:
