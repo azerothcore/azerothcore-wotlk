@@ -23,7 +23,7 @@ UPDATE `vehicle_template_accessory` SET `summontype`=5 WHERE `entry`=31881 AND `
 UPDATE `vehicle_template_accessory` SET `summontype`=5 WHERE `entry`=32225 AND `seat_id`=1;
 
 -- Add immune to PC
-UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 256 WHERE (`entry` IN (32225, 31881));
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 256 WHERE (`entry` IN (32225, 31881, 31882, 31891, 32223, 32225));
 
 -- Remove immune to NPC
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` & ~512 WHERE (`entry` IN (32227, 31884));
