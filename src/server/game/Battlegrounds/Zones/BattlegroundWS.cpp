@@ -426,15 +426,17 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
 
 bool BattlegroundWS::SetupBattleground()
 {
+    _wsReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_WSG);
+
     if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
     {
-        _reputationCapture = 45;
+        _reputationCapture = uint32(45 * _wsReputationRate);
         _honorWinKills = 3;
         _honorEndKills = 4;
     }
     else
     {
-        _reputationCapture = 35;
+        _reputationCapture = uint32(35 * _wsReputationRate);
         _honorWinKills = 1;
         _honorEndKills = 2;
     }
