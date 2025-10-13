@@ -1213,7 +1213,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1287,13 +1287,13 @@ public:
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->StopMoving();
                 me->CastSpell(me, SPELL_FLAMES, true);
-                me->DespawnOrUnsummon(999);
+                me->DespawnOrUnsummon(999ms);
                 me->CastSpell(me, SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
                 _exploded = true;
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*type*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*type*/) override
         {
             _chaseGUID = guid;
         }
@@ -1331,7 +1331,7 @@ public:
                 me->SetInCombatWithZone();
                 return;
             }
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
@@ -1424,7 +1424,7 @@ public:
                 case EVENT_BOMB_DESPAWN:
                     me->RemoveAllAuras();
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->DespawnOrUnsummon(exploded ? 5000 : 0);
+                    me->DespawnOrUnsummon(exploded ? 5s : 0ms);
                     break;
                 case EVENT_CONTINUE_FALLING:
                     me->GetMotionMaster()->MovementExpired(false);

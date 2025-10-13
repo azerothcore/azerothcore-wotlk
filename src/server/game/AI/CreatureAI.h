@@ -94,7 +94,7 @@ public:
         EVADE_REASON_OTHER
     };
 
-    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0s);
+    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0ms);
     void Talk(uint8 id, Milliseconds delay) { Talk(id, nullptr, delay); }
 
     WorldObject* GetSummoner() const;

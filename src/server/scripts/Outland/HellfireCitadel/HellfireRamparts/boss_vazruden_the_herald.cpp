@@ -155,7 +155,7 @@ struct boss_nazan : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     void JustEngagedWith(Unit*) override
@@ -262,7 +262,7 @@ struct boss_vazruden : public ScriptedAI
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
         Talk(SAY_WIPE);
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     void JustEngagedWith(Unit*) override

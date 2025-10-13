@@ -367,10 +367,10 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                     if (AllowStart())
                     {
                         PrepareEvent();
-                        events.RepeatEvent(300000);
+                        events.Repeat(300s);
                         return;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 }
             case EVENT_SPAWN_MOLE_MACHINE:
@@ -393,7 +393,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                         if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 398.11f, 0.0f))
                             cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                     }
-                    events.RepeatEvent(3000);
+                    events.Repeat(3s);
                     break;
                 }
             case EVENT_PRE_FINISH_ATTACK:
@@ -410,7 +410,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                 }
             case EVENT_BARTENDER_SAY:
                 {
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     Creature* sayer = GetRandomBartender();
                     if (!sayer)
                         return;
@@ -603,7 +603,7 @@ struct npc_dark_iron_attack_mole_machine : public ScriptedAI
             {
                 me->SummonCreature(NPC_DARK_IRON_GUZZLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                 summonTimer = 0;
-                me->DespawnOrUnsummon(3000);
+                me->DespawnOrUnsummon(3s);
             }
         }
     }
@@ -1714,12 +1714,12 @@ struct npc_coren_direbrew : public ScriptedAI
                 case EVENT_SUMMON_MOLE_MACHINE:
                 {
                     me->CastCustomSpell(SPELL_MOLE_MACHINE_TARGET_PICKER, SPELLVALUE_MAX_TARGETS, 1, nullptr, true);
-                    _events.RepeatEvent(15 * IN_MILLISECONDS);
+                    _events.Repeat(15s);
                     break;
                 }
                 case EVENT_DIREBREW_DISARM:
                     DoCastSelf(SPELL_DIREBREW_DISARM_PRE_CAST, true);
-                    _events.RepeatEvent(20 * IN_MILLISECONDS);
+                    _events.Repeat(20s);
                     break;
                 default:
                     break;
@@ -1743,7 +1743,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
 {
     npc_coren_direbrew_sisters(Creature* creature) : ScriptedAI(creature) { }
 
-    void SetGUID(ObjectGuid guid, int32 id) override
+    void SetGUID(ObjectGuid const& guid, int32 id) override
     {
         if (id == DATA_TARGET_GUID)
         {

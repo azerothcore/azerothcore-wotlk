@@ -268,7 +268,7 @@ public:
                     if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 50.0f))
                         waveDoorGUID = portcullis->GetGUID();
 
-                    events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                    events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                     events.ScheduleEvent(EVENT_START_1, 1s);
                 }
             }
@@ -311,7 +311,7 @@ public:
                             break;
                         //Lanny
                         case EVENT_START_2:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                             events.ScheduleEvent(EVENT_START_3, 1s);
@@ -361,7 +361,7 @@ public:
                             events.ScheduleEvent(EVENT_RANDOM_TALK_VICTOR, 8s);
                             break;
                         case EVENT_WAVES_TEXT_2:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 0s);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_3);
@@ -369,7 +369,7 @@ public:
                             events.ScheduleEvent(EVENT_RANDOM_TALK_REND, 6s);
                             break;
                         case EVENT_WAVES_TEXT_3:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_4);
                             events.ScheduleEvent(EVENT_SPAWN_SPECTATOR, 0);						
@@ -384,7 +384,7 @@ public:
                             events.ScheduleEvent(EVENT_RANDOM_TALK_REND, 6s);
                             break;
                         case EVENT_WAVES_TEXT_5:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_5);
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 1s);

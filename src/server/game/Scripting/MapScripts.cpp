@@ -757,7 +757,7 @@ void Map::ScriptsProcess()
             case SCRIPT_COMMAND_DESPAWN_SELF:
                 // Target or source must be Creature.
                 if (Creature* cSource = _GetScriptCreatureSourceOrTarget(source, target, step.script, true))
-                    cSource->DespawnOrUnsummon(step.script->DespawnSelf.DespawnDelay);
+                    cSource->DespawnOrUnsummon(Milliseconds(step.script->DespawnSelf.DespawnDelay));
                 break;
 
             case SCRIPT_COMMAND_LOAD_PATH:
@@ -880,7 +880,6 @@ void Map::ScriptsProcess()
                     if (!cSource->IsAlive())
                         return;
 
-                    cSource->GetMotionMaster()->MovementExpired();
                     cSource->GetMotionMaster()->MoveIdle();
 
                     switch (step.script->Movement.MovementType)

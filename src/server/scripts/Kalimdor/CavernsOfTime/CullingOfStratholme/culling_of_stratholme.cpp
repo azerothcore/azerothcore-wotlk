@@ -385,7 +385,7 @@ public:
         uint8 timeRiftId;
 
         Creature* GetEventNpc(uint32 entry);
-        void ScheduleNextEvent(uint32 currentEvent, uint32 time);
+        void ScheduleNextEvent(uint32 currentEvent, Milliseconds time);
         void SummonNextWave();
         void ReorderInstance(uint32 data);
         void JustEngagedWith(Unit* /*who*/) override ;
@@ -418,12 +418,12 @@ public:
             {
                 // Event
                 eventInRun = true;
-                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE1, 0);
+                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE1, 0ms);
             }
             else if (param == ACTION_START_CITY)
             {
                 Talk(SAY_PHASE201);
-                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2, 12000);
+                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2, 12s);
                 SetRun(false);
                 eventInRun = true;
 
@@ -435,7 +435,7 @@ public:
                 waveGroupId = 10;
                 eventInRun = true;
                 SetRun(true);
-                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2 + 9, 10000);
+                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2 + 9, 10s);
             }
             else if (param == ACTION_START_TOWN_HALL)
             {
@@ -486,7 +486,7 @@ public:
             {
                 EnterEvadeMode();
                 eventInRun = true;
-                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5 + 1, 22000);
+                actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5 + 1, 22s);
                 me->SetFacingTo(1.84f);
 
                 if (!me->GetMap()->GetPlayers().IsEmpty())
@@ -547,7 +547,7 @@ public:
                     if (Creature* stalker = me->SummonCreature(NPC_INVIS_TARGET, 2026.469f, 1287.088f, 143.596f, 1.37f, TEMPSUMMON_TIMED_DESPAWN, 14000))
                     {
                         me->SetFacingToObject(stalker);
-                        stalker->DespawnOrUnsummon(500);
+                        stalker->DespawnOrUnsummon(500ms);
                     }
                     break;
                 // Reached first cityman
@@ -579,7 +579,7 @@ public:
                     break;
                 // Inside Town Hall first scene pos
                 case 22:
-                    actionEvents.ScheduleEvent(EVENT_ACTION_PHASE3, 0);
+                    actionEvents.ScheduleEvent(EVENT_ACTION_PHASE3, 0ms);
                     eventInRun = true;
                     SetEscortPaused(true);
                     break;
@@ -652,7 +652,7 @@ public:
                 // Infront of malganis
                 case 55:
                     Talk(SAY_PHASE502);
-                    actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5, 7000);
+                    actionEvents.ScheduleEvent(EVENT_ACTION_PHASE5, 7s);
                     SetEscortPaused(true);
                     eventInRun = true;
                     break;
@@ -686,7 +686,7 @@ public:
                             if (Creature* horse = me->SummonCreature(NPC_HORSE_ESCORT, EventPos[EVENT_SRC_HORSE1 + i], TEMPSUMMON_DEAD_DESPAWN, 180000))
                                 horse->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_HORSE1 + i], false);
 
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE1+1:
                         // Start Event
@@ -694,24 +694,24 @@ public:
                         SetDespawnAtEnd(false);
                         SetDespawnAtFar(false);
 
-                        ScheduleNextEvent(currentEvent, 9000);
+                        ScheduleNextEvent(currentEvent, 9s);
                         break;
                     // After waypoint 0
                     case EVENT_ACTION_PHASE1+2:
                         Talk(SAY_PHASE101);
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE1+3:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE102);
 
-                        ScheduleNextEvent(currentEvent, 8000);
+                        ScheduleNextEvent(currentEvent, 8s);
                         break;
                     case EVENT_ACTION_PHASE1+4:
                         SetEscortPaused(false);
                         eventInRun = false;
                         Talk(SAY_PHASE103);
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     // After waypoint 1
                     case EVENT_ACTION_PHASE1+5:
@@ -719,63 +719,63 @@ public:
                             jaina->SetTarget(me->GetGUID());
 
                         Talk(SAY_PHASE104);
-                        ScheduleNextEvent(currentEvent, 10000);
+                        ScheduleNextEvent(currentEvent, 10s);
                         break;
                     case EVENT_ACTION_PHASE1+6:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE105);
 
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     case EVENT_ACTION_PHASE1+7:
                         Talk(SAY_PHASE106);
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE1+8:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE107);
 
-                        ScheduleNextEvent(currentEvent, 6000);
+                        ScheduleNextEvent(currentEvent, 6s);
                         break;
                     case EVENT_ACTION_PHASE1+9:
                         Talk(SAY_PHASE108);
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE1+10:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE109);
 
-                        ScheduleNextEvent(currentEvent, 8000);
+                        ScheduleNextEvent(currentEvent, 8s);
                         break;
                     case EVENT_ACTION_PHASE1+11:
                         Talk(SAY_PHASE110);
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE1+12:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE111);
 
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE1+13:
                         Talk(SAY_PHASE112);
-                        ScheduleNextEvent(currentEvent, 11000);
+                        ScheduleNextEvent(currentEvent, 11s);
                         break;
                     case EVENT_ACTION_PHASE1+14:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
                             jaina->AI()->Talk(SAY_PHASE113);
 
-                        ScheduleNextEvent(currentEvent, 2500);
+                        ScheduleNextEvent(currentEvent, 2500ms);
                         break;
                     case EVENT_ACTION_PHASE1+15:
                         Talk(SAY_PHASE114);
-                        ScheduleNextEvent(currentEvent, 9000);
+                        ScheduleNextEvent(currentEvent, 9s);
                         break;
                     case EVENT_ACTION_PHASE1+16:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
                             uther->AI()->Talk(SAY_PHASE115);
 
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE1+17:
                         for (SummonList::const_iterator i = summons.begin(); i != summons.end(); ++i)
@@ -785,7 +785,7 @@ public:
                                 summon->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
 
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     case EVENT_ACTION_PHASE1+18:
                         if (Creature* uther = GetEventNpc(NPC_UTHER))
@@ -794,7 +794,7 @@ public:
                             uther->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             uther->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     case EVENT_ACTION_PHASE1+19:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
@@ -804,7 +804,7 @@ public:
                             jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
                         Talk(SAY_PHASE116);
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE1+20:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
@@ -813,7 +813,7 @@ public:
                             jaina->AI()->Talk(SAY_PHASE117);
                         }
 
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE1+21:
                         if (Creature* jaina = GetEventNpc(NPC_JAINA))
@@ -822,7 +822,7 @@ public:
                             jaina->GetMotionMaster()->MovePoint(0, EventPos[EVENT_POS_RETREAT], false);
                         }
                         summons.DespawnEntry(NPC_HORSE_ESCORT);
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE1+22:
                         SetEscortPaused(false);
@@ -836,7 +836,7 @@ public:
                         me->SetTarget();
                         SetEscortPaused(false);
                         eventInRun = false;
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     // After waypoint 9
                     case EVENT_ACTION_PHASE2+1:
@@ -848,23 +848,23 @@ public:
                             cityman->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_CITYMAN]);
                         }
 
-                        ScheduleNextEvent(currentEvent, 9000);
+                        ScheduleNextEvent(currentEvent, 9s);
                         break;
                     case EVENT_ACTION_PHASE2+2:
                         Talk(SAY_PHASE203);
                         SetEscortPaused(false);
                         eventInRun = false;
-                        ScheduleNextEvent(currentEvent, 1500);
+                        ScheduleNextEvent(currentEvent, 1500ms);
                         break;
                     // After waypoint 11
                     case EVENT_ACTION_PHASE2+3:
                         if (Creature* stalker = me->SummonCreature(NPC_INVIS_TARGET, 2081.447f, 1287.770f, 141.3241f, 1.37f, TEMPSUMMON_TIMED_DESPAWN, 10000))
                         {
                             me->SetFacingToObject(stalker);
-                            stalker->DespawnOrUnsummon(500);
+                            stalker->DespawnOrUnsummon(500ms);
                         }
                         Talk(SAY_PHASE205);
-                        ScheduleNextEvent(currentEvent, 4000);
+                        ScheduleNextEvent(currentEvent, 4s);
                         break;
                     case EVENT_ACTION_PHASE2+4:
                         if (Creature* malganis = me->SummonCreature(NPC_MAL_GANIS, EventPos[EVENT_SRC_MALGANIS], TEMPSUMMON_TIMED_DESPAWN, 60000))
@@ -889,13 +889,13 @@ public:
                             unitList.clear();
                         }
 
-                        ScheduleNextEvent(currentEvent, 12000);
+                        ScheduleNextEvent(currentEvent, 12s);
                         break;
                     case EVENT_ACTION_PHASE2+5:
                         if (Creature* malganis = GetEventNpc(NPC_MAL_GANIS))
                             malganis->AI()->Talk(SAY_PHASE207);
 
-                        ScheduleNextEvent(currentEvent, 15000);
+                        ScheduleNextEvent(currentEvent, 15s);
                         break;
                     case EVENT_ACTION_PHASE2+6:
                         if (Creature* malganis = GetEventNpc(NPC_MAL_GANIS))
@@ -906,7 +906,7 @@ public:
                         }
 
                         Talk(SAY_PHASE208);
-                        ScheduleNextEvent(currentEvent, 11000);
+                        ScheduleNextEvent(currentEvent, 11s);
                         break;
                     case EVENT_ACTION_PHASE2+7:
                         summons.DespawnEntry(NPC_MAL_GANIS);
@@ -914,7 +914,7 @@ public:
                         summons.DespawnEntry(NPC_CITY_MAN2);
                         Talk(SAY_PHASE209);
                         me->SetReactState(REACT_DEFENSIVE);
-                        ScheduleNextEvent(currentEvent, 20000);
+                        ScheduleNextEvent(currentEvent, 20s);
                         if (pInstance)
                             pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_CITY_INTRO);
                         break;
@@ -941,36 +941,36 @@ public:
                             cr->SetTarget(me->GetGUID());
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN))
                             cr->SetTarget(me->GetGUID());
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     case EVENT_ACTION_PHASE3+1:
                         me->SetReactState(REACT_AGGRESSIVE);
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                             cr->AI()->Talk(SAY_PHASE302);
 
-                        ScheduleNextEvent(currentEvent, 7000);
+                        ScheduleNextEvent(currentEvent, 7s);
                         break;
                     case EVENT_ACTION_PHASE3+2:
                         Talk(SAY_PHASE303);
                         SetEscortPaused(false);
                         eventInRun = false;
-                        ScheduleNextEvent(currentEvent, 0);
+                        ScheduleNextEvent(currentEvent, 0ms);
                         break;
                     // After waypoint 23
                     case EVENT_ACTION_PHASE3+3:
                         SetRun(true);
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                             me->CastSpell(cr, SPELL_ARTHAS_CRUSADER_STRIKE, true);
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE3+4:
                         Talk(SAY_PHASE304);
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE3+5:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                             cr->AI()->Talk(SAY_PHASE305);
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     // Trio citizen transformation right as we enter Town Hall
                     case EVENT_ACTION_PHASE3+6:
@@ -981,7 +981,7 @@ public:
                             cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE3+7:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN4))
@@ -991,7 +991,7 @@ public:
                             cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE3+8:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
@@ -1016,35 +1016,35 @@ public:
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
                         }
-                        ScheduleNextEvent(currentEvent, 2000);
+                        ScheduleNextEvent(currentEvent, 2s);
                         break;
                     case EVENT_ACTION_PHASE3+9:
                         // Arthas is fighting infinites in town hall
                         if (me->IsInCombat())
                         {
-                            actionEvents.RepeatEvent(1000);
+                            actionEvents.Repeat(1s);
                             return;
                         }
 
                         summons.DespawnAll();
                         Talk(SAY_PHASE305_1);
                         me->SetFacingTo(0.0f);
-                        ScheduleNextEvent(currentEvent, 5000);
+                        ScheduleNextEvent(currentEvent, 5s);
                         break;
                     case EVENT_ACTION_PHASE3+10:
                         Talk(SAY_PHASE306);
-                        ScheduleNextEvent(currentEvent, 5000);
+                        ScheduleNextEvent(currentEvent, 5s);
                         break;
                     case EVENT_ACTION_PHASE3+11:
                         SetEscortPaused(false);
                         eventInRun = false;
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     case EVENT_ACTION_PHASE3+12:
                         // Arthas is fighting first chronos
                         if (me->IsInCombat())
                         {
-                            actionEvents.RepeatEvent(1000);
+                            actionEvents.Repeat(1s);
                             return;
                         }
 
@@ -1052,13 +1052,13 @@ public:
                         SetEscortPaused(false);
                         Talk(SAY_PHASE308);
                         me->SetFacingTo(M_PI);
-                        ScheduleNextEvent(currentEvent, 0);
+                        ScheduleNextEvent(currentEvent, 0ms);
                         break;
                     case EVENT_ACTION_PHASE3+13:
                         // Arthas is fighting second chronos
                         if (me->IsInCombat())
                         {
-                            actionEvents.RepeatEvent(1000);
+                            actionEvents.Repeat(1s);
                             return;
                         }
 
@@ -1066,18 +1066,18 @@ public:
                         SetEscortPaused(false);
                         Talk(SAY_PHASE311);
                         me->SetFacingTo(M_PI * 3 / 2);
-                        ScheduleNextEvent(currentEvent, 0);
+                        ScheduleNextEvent(currentEvent, 0ms);
                         break;
                     case EVENT_ACTION_PHASE3+14:
                         // Arthas is fighting third chronos
                         if (me->IsInCombat())
                         {
-                            actionEvents.RepeatEvent(1000);
+                            actionEvents.Repeat(1s);
                             return;
                         }
 
                         me->SetFacingTo(M_PI / 2);
-                        ScheduleNextEvent(currentEvent, 8000);
+                        ScheduleNextEvent(currentEvent, 8s);
                         break;
                     case EVENT_ACTION_PHASE3+15:
                         Talk(SAY_PHASE313);
@@ -1090,17 +1090,17 @@ public:
                             cr->GetMotionMaster()->MovePoint(0, EventPos[EVENT_DST_EPOCH]);
                         }
 
-                        ScheduleNextEvent(currentEvent, 3000);
+                        ScheduleNextEvent(currentEvent, 3s);
                         break;
                     case EVENT_ACTION_PHASE3+16:
                         if (Creature* cr = GetEventNpc(NPC_EPOCH))
                             cr->AI()->Talk(SAY_PHASE314);
 
-                        ScheduleNextEvent(currentEvent, 14000);
+                        ScheduleNextEvent(currentEvent, 14s);
                         break;
                     case EVENT_ACTION_PHASE3+17:
                         Talk(SAY_PHASE315);
-                        ScheduleNextEvent(currentEvent, 7000);
+                        ScheduleNextEvent(currentEvent, 7s);
                         break;
                     case EVENT_ACTION_PHASE3+18:
                         if (Creature* cr = GetEventNpc(NPC_EPOCH))
@@ -1111,13 +1111,13 @@ public:
                             cr->AddThreat(me, 0.0f);
                             cr->SetInCombatWithZone();
                         }
-                        ScheduleNextEvent(currentEvent, 1000);
+                        ScheduleNextEvent(currentEvent, 1s);
                         break;
                     case EVENT_ACTION_PHASE3+19:
                         // Arthas is fighting epoch chronos
                         if (me->IsInCombat())
                         {
-                            actionEvents.RepeatEvent(1000);
+                            actionEvents.Repeat(1s);
                             return;
                         }
 
@@ -1143,7 +1143,7 @@ public:
                         Talk(SAY_PHASE503);
                         SetEscortPaused(false);
                         eventInRun = false;
-                        ScheduleNextEvent(currentEvent, 5000);
+                        ScheduleNextEvent(currentEvent, 5s);
                         break;
                     case EVENT_ACTION_PHASE5+2:
                         me->SetFacingTo(5.28f);
@@ -1156,7 +1156,7 @@ public:
 
                             pInstance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
                         }
-                        ScheduleNextEvent(currentEvent, 10000);
+                        ScheduleNextEvent(currentEvent, 10s);
                         break;
                     case EVENT_ACTION_PHASE5+3:
                         eventInRun = false;
@@ -1179,13 +1179,13 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_ARTHAS_EXORCISM_N, SPELL_ARTHAS_EXORCISM_H), false);
 
-                    combatEvents.RepeatEvent(7300);
+                    combatEvents.Repeat(7300ms);
                     break;
                 case EVENT_COMBAT_HEALTH_CHECK:
                     if (HealthBelowPct(40))
                         me->CastSpell(me, SPELL_ARTHAS_HOLY_LIGHT, false);
 
-                    combatEvents.RepeatEvent(1000);
+                    combatEvents.Repeat(1s);
                     break;
             }
 
@@ -1210,7 +1210,7 @@ Creature* npc_arthas::npc_arthasAI::GetEventNpc(uint32 entry)
     return nullptr;
 }
 
-void npc_arthas::npc_arthasAI::ScheduleNextEvent(uint32 currentEvent, uint32 time)
+void npc_arthas::npc_arthasAI::ScheduleNextEvent(uint32 currentEvent, Milliseconds time)
 {
     actionEvents.ScheduleEvent(currentEvent + 1, time);
 }
@@ -1236,8 +1236,8 @@ void npc_arthas::npc_arthasAI::JustEngagedWith(Unit* /*who*/)
     DoCast(me, SPELL_ARTHAS_AURA);
 
     // Fight
-    combatEvents.ScheduleEvent(EVENT_COMBAT_EXORCISM, 2000);
-    combatEvents.ScheduleEvent(EVENT_COMBAT_HEALTH_CHECK, 2000);
+    combatEvents.ScheduleEvent(EVENT_COMBAT_EXORCISM, 2s);
+    combatEvents.ScheduleEvent(EVENT_COMBAT_HEALTH_CHECK, 2s);
 }
 
 void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
@@ -1261,7 +1261,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
             if (data == COS_PROGRESS_FINISHED_CITY_INTRO)
             {
                 eventInRun = true;
-                actionEvents.RescheduleEvent(EVENT_ACTION_PHASE2 + 8, 10000);
+                actionEvents.RescheduleEvent(EVENT_ACTION_PHASE2 + 8, 10s);
             }
             else if (data == COS_PROGRESS_KILLED_MEATHOOK)
             {
@@ -1343,7 +1343,7 @@ void npc_arthas::npc_arthasAI::SpawnTimeRift()
         if (Creature* cr = me->SummonCreature(/*entry*/(uint32)RiftAndSpawnsLocations[timeRiftId][i][0], RiftAndSpawnsLocations[timeRiftId][0][1], RiftAndSpawnsLocations[timeRiftId][0][2], RiftAndSpawnsLocations[timeRiftId][0][3], RiftAndSpawnsLocations[timeRiftId][0][4]))
         {
             if (cr->GetEntry() == NPC_TIME_RIFT)
-                cr->DespawnOrUnsummon(10000);
+                cr->DespawnOrUnsummon(10s);
             else // x, y, z (0 is entry)
             {
                 // first infinite
@@ -1538,7 +1538,7 @@ public:
                 if (me->GetDistance(2400, 1200, 135) > 20.0f && data >= COS_PROGRESS_FINISHED_CITY_INTRO)
                 {
                     if (data >= COS_PROGRESS_KILLED_SALRAMM)
-                        me->DespawnOrUnsummon(500);
+                        me->DespawnOrUnsummon(500ms);
                     else
                         InfectMe(3000);
                 }

@@ -64,7 +64,7 @@ struct boss_twilight_corrupter : public ScriptedAI
         {
             if (creature->IsAlive() && me->GetGUID() != creature->GetGUID())
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
                 break;
             }
         }
