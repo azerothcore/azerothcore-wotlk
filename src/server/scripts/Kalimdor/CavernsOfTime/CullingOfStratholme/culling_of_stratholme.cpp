@@ -547,7 +547,7 @@ public:
                     if (Creature* stalker = me->SummonCreature(NPC_INVIS_TARGET, 2026.469f, 1287.088f, 143.596f, 1.37f, TEMPSUMMON_TIMED_DESPAWN, 14000))
                     {
                         me->SetFacingToObject(stalker);
-                        stalker->DespawnOrUnsummon(500);
+                        stalker->DespawnOrUnsummon(500ms);
                     }
                     break;
                 // Reached first cityman
@@ -861,7 +861,7 @@ public:
                         if (Creature* stalker = me->SummonCreature(NPC_INVIS_TARGET, 2081.447f, 1287.770f, 141.3241f, 1.37f, TEMPSUMMON_TIMED_DESPAWN, 10000))
                         {
                             me->SetFacingToObject(stalker);
-                            stalker->DespawnOrUnsummon(500);
+                            stalker->DespawnOrUnsummon(500ms);
                         }
                         Talk(SAY_PHASE205);
                         ScheduleNextEvent(currentEvent, 4s);
@@ -1343,7 +1343,7 @@ void npc_arthas::npc_arthasAI::SpawnTimeRift()
         if (Creature* cr = me->SummonCreature(/*entry*/(uint32)RiftAndSpawnsLocations[timeRiftId][i][0], RiftAndSpawnsLocations[timeRiftId][0][1], RiftAndSpawnsLocations[timeRiftId][0][2], RiftAndSpawnsLocations[timeRiftId][0][3], RiftAndSpawnsLocations[timeRiftId][0][4]))
         {
             if (cr->GetEntry() == NPC_TIME_RIFT)
-                cr->DespawnOrUnsummon(10000);
+                cr->DespawnOrUnsummon(10s);
             else // x, y, z (0 is entry)
             {
                 // first infinite
@@ -1538,7 +1538,7 @@ public:
                 if (me->GetDistance(2400, 1200, 135) > 20.0f && data >= COS_PROGRESS_FINISHED_CITY_INTRO)
                 {
                     if (data >= COS_PROGRESS_KILLED_SALRAMM)
-                        me->DespawnOrUnsummon(500);
+                        me->DespawnOrUnsummon(500ms);
                     else
                         InfectMe(3000);
                 }

@@ -619,7 +619,7 @@ struct npc_ahune_ice_spear_bunny : public ScriptedAI
         _scheduler.Schedule(2500ms, [this](TaskContext /*task*/)
             {
                 DoCastSelf(SPELL_ICE_SPEAR_DELAY);
-                me->DespawnOrUnsummon(3500);
+                me->DespawnOrUnsummon(3500ms);
             });
     }
 

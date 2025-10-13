@@ -929,7 +929,7 @@ void GameObject::AddUniqueUse(Player* player)
     m_unique_users.insert(player->GetGUID());
 }
 
-void GameObject::DespawnOrUnsummon(Milliseconds delay, Seconds forceRespawnTime)
+void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRespawnTime /*= 0s*/)
 {
     if (delay > 0ms)
     {

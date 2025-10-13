@@ -211,7 +211,7 @@ public:
             if (me->IsAlive() && me->IsInCombat() && !me->IsInEvadeMode())
                 summons.Summon(summon);
             else
-                summon->DespawnOrUnsummon(1);
+                summon->DespawnOrUnsummon(1ms);
         }
 
         void KilledUnit(Unit* victim) override
@@ -373,7 +373,7 @@ public:
         {
             if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->SummonedCreatureDespawn(me);
-            me->DespawnOrUnsummon(0);
+            me->DespawnOrUnsummon(0ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -798,7 +798,7 @@ class spell_rotface_unstable_ooze_explosion_suicide_aura : public AuraScript
         target->SetVisible(false);
         target->RemoveAllAuras();
         //target->ToCreature()->DespawnOrUnsummon();
-        target->ToCreature()->DespawnOrUnsummon(60000);
+        target->ToCreature()->DespawnOrUnsummon(60s);
     }
 
     void Register() override

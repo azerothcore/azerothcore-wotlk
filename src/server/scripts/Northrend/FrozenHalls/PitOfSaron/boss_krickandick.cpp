@@ -506,7 +506,7 @@ class spell_exploding_orb_auto_grow_aura : public AuraScript
                 target->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
                 target->RemoveAurasDueToSpell(SPELL_EXPLODING_ORB_VISUAL);
                 if (target->IsCreature())
-                    target->ToCreature()->DespawnOrUnsummon(2000);
+                    target->ToCreature()->DespawnOrUnsummon(2s);
             }
     }
 

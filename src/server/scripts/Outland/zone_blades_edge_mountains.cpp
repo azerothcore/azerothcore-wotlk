@@ -116,7 +116,7 @@ public:
                         if (Creature* bunny = GetClosestCreatureWithEntry(me, NPC_EXPLOSION_BUNNY, 200.0f))
                             bunny->CastSpell(nullptr, SPELL_EXPLOSION, TRIGGERED_NONE);
                         if (Creature* cannon = ObjectAccessor::GetCreature(*me, CannonGUID))
-                            cannon->DespawnOrUnsummon(5000);
+                            cannon->DespawnOrUnsummon(5s);
                     }
 
                     me->SummonGameObject(GO_BIG_FIRE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 60);
@@ -460,7 +460,7 @@ public:
                         Talk(SAY_SPELL_INFLUENCE, who);
                         /// @todo Move the below to updateAI and run if this statement == true
                         DoCast(who, SPELL_DISPELLING_ANALYSIS, true);
-                        bird->DespawnOrUnsummon(2000);
+                        bird->DespawnOrUnsummon(2s);
                     }
                 }
             }
@@ -775,7 +775,7 @@ public:
             if (GameObject* relic = me->FindNearestGameObject(large ? GO_APEXIS_MONUMENT : GO_APEXIS_RELIC, searchDistance))
                 relic->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
 
         /*
@@ -1086,7 +1086,7 @@ public:
                 // Spell 37392 does not exist in dbc, manually spawning
                 me->SummonCreature(NPC_OSCILLATING_FREQUENCY_SCANNER_TOP_BUNNY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 50000);
                 me->SummonGameObject(GO_OSCILLATING_FREQUENCY_SCANNER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0, 0, 0, 0, 50);
-                me->DespawnOrUnsummon(50000);
+                me->DespawnOrUnsummon(50s);
             }
 
             timer = 500;

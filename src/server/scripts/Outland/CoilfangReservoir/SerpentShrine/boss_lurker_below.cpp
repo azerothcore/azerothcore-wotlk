@@ -88,7 +88,7 @@ struct boss_the_lurker_below : public BossAI
             pool->SetRespawnTime(10);
             pool->SaveRespawnTime(10);
         }
-        me->DespawnOrUnsummon(2000);
+        me->DespawnOrUnsummon(2s);
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override

@@ -697,7 +697,7 @@ struct npc_hallows_end_soh : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason /* why */) override
     {
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     uint32 GetData(uint32 /*type*/) const override
@@ -848,7 +848,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     c->RemoveAllAuras();
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
         else
         {
@@ -1029,7 +1029,7 @@ struct boss_headless_horseman : public ScriptedAI
         std::list<Creature*> unitList;
         me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
         for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-            (*itr)->ToCreature()->DespawnOrUnsummon(500);
+            (*itr)->ToCreature()->DespawnOrUnsummon(500ms);
 
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
         if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())

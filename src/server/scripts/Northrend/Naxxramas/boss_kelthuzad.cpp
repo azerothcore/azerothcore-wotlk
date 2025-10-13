@@ -507,7 +507,7 @@ public:
             {
                 if (!me->IsInCombat())
                 {
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
                 }
             }
             if (param == ACTION_GUARDIANS_OFF)
