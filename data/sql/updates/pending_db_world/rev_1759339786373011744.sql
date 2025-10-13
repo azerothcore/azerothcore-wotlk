@@ -19,3 +19,5 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (18, 31884, 46598, 0, 0, 9, 0, 13310, 0, 0, 0, 0, 0, '', 'Kor\'kron Suppression Turret requires player to be on quest Assault by Air'),
 (18, 32227, 46598, 0, 0, 9, 0, 13309, 0, 0, 0, 0, 0, '', 'Skybreaker Suppression Turret requires player to be on quest Assault by Air');
 
+UPDATE `vehicle_template_accessory` SET `summontype`=5 WHERE `entry`=31881 AND `seat_id`=1;
+UPDATE `vehicle_template_accessory` SET `summontype`=5 WHERE `entry`=32225 AND `seat_id`=1;
