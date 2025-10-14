@@ -50,3 +50,17 @@ WorldPacket const* WorldPackets::Pet::PetUnlearnedSpell::Write()
     _worldPacket << uint32(SpellID);
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Pet::PetActionSound::Write()
+{
+    _worldPacket << UnitGUID;
+    _worldPacket << int32(Action);
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Pet::PetDismissSound::Write()
+{
+    _worldPacket << int32(ModelId);
+    _worldPacket << float(ModelPosition.x) << float(ModelPosition.y) << float(ModelPosition.z);
+    return &_worldPacket;
+}
