@@ -295,26 +295,7 @@ struct boss_felmyst : public BossAI
                 me->m_Events.AddEventAtOffset([&]()
                 {
                     for (uint8 i = 0; i < 16; ++i)
-                    {
-                        uint8 currentlane = _currentLane;
-                        me->m_Events.AddEventAtOffset([this, currentlane]()
-                        {
-                            switch (currentlane)
-                            {
-                            case 0: //top
-                                me->CastSpell(me, SPELL_STRAFE_TOP, true);
-                                break;
-                            case 1: //middle
-                                me->CastSpell(me, SPELL_STRAFE_MIDDLE, true);
-                                break;
-                            case 2: //bottom
-                                me->CastSpell(me, SPELL_STRAFE_BOTTOM, true);
-                                break;
-                            default:
-                                break;
-                            }
-                        }, Milliseconds(i * 250));
-                    }
+                        me->m_Events.AddEventAtOffset(new CorruptTriggers(me, _currentLane), Milliseconds(i * 250));
                 }, 5s);
 
                 me->m_Events.AddEventAtOffset([&] {
