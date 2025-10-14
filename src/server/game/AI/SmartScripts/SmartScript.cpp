@@ -1728,7 +1728,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!IsSmart())
                 break;
 
-            ForcedMovement forcedMovement = (ForcedMovement)e.action.wpStart.forcedMovement;
+            ForcedMovement forcedMovement = static_cast<ForcedMovement>(e.action.wpStart.forcedMovement);
             uint32 entry = e.action.wpStart.pathID;
             bool repeat = e.action.wpStart.repeat != 0;
 
@@ -2541,7 +2541,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (closestWpId)
                         {
                             bool repeat = e.action.startClosestWaypoint.repeat;
-                            ForcedMovement forcedMovement = (ForcedMovement)e.action.startClosestWaypoint.forcedMovement;
+                            ForcedMovement forcedMovement = static_cast<ForcedMovement>(e.action.startClosestWaypoint.forcedMovement);
 
                             CAST_AI(SmartAI, creature->AI())->StartPath(forcedMovement, closestWpId, repeat);
                         }
