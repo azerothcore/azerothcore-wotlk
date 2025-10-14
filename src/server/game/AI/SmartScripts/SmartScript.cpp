@@ -640,7 +640,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             Unit* caster = me;
             // Areatrigger Cast!
-            if (e.GetScriptType() == SMART_SCRIPT_TYPE_AREATRIGGER)
+            if (e.IsAreatriggerScript())
                 caster = unit->SummonTrigger(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetOrientation(), 5000);
 
             if (e.action.cast.targetsLimit)
@@ -3990,27 +3990,29 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         }
         case SMART_TARGET_INSTANCE_STORAGE:
         {
-            if (InstanceScript* instance = GetBaseObject()->GetInstanceScript())
-            {
-                if (e.target.instanceStorage.type == 1)
-                {
-                    if (Creature* creature = instance->GetCreature(e.target.instanceStorage.index))
-                    {
-                        targets.push_back(creature);
-                    }
-                }
-                else if (e.target.instanceStorage.type == 2)
-                {
-                    if (GameObject* go = instance->GetGameObject(e.target.instanceStorage.index))
-                    {
-                        targets.push_back(go);
-                    }
-                }
-            }
+            InstanceScript* instance = nullptr;
+
+            if (e.IsAreatriggerScript() && scriptTrigger)
+                instance = scriptTrigger->GetInstanceScript();
             else
+                instance = GetBaseObject()->GetInstanceScript();
+
+            if (!instance)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_INSTANCE_STORAGE: Entry {} SourceType {} Event {} Action {} Target {} called outside an instance map.",
                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                return;
+            }
+
+            if (e.target.instanceStorage.type == 1)
+            {
+                if (Creature* creature = instance->GetCreature(e.target.instanceStorage.index))
+                    targets.push_back(creature);
+            }
+            else if (e.target.instanceStorage.type == 2)
+            {
+                if (GameObject* go = instance->GetGameObject(e.target.instanceStorage.index))
+                    targets.push_back(go);
             }
 
             break;

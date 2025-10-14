@@ -1993,6 +1993,8 @@ public:
     uint32 GetActionType() const { return (uint32)action.type; }
     uint32 GetTargetType() const { return (uint32)target.type; }
 
+    [[nodiscard]] bool IsAreatriggerScript() const { return source_type == SMART_SCRIPT_TYPE_AREATRIGGER; }
+
     uint32 timer;
     uint32 priority;
     bool active;

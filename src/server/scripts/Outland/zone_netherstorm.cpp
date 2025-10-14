@@ -99,7 +99,7 @@ public:
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 type) override
+        void SetGUID(ObjectGuid const& playerGUID, int32 type) override
         {
             if (type == DATA_START_ENCOUNTER)
             {
@@ -126,7 +126,7 @@ public:
 
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
                 Talk(SAY_SAEED_0);
-                events.ScheduleEvent(EVENT_START_WALK, 3000);
+                events.ScheduleEvent(EVENT_START_WALK, 3s);
             }
             else if (type == DATA_START_FIGHT)
             {
@@ -178,7 +178,7 @@ public:
                     SetEscortPaused(true);
                     break;
                 case 18:
-                    events.ScheduleEvent(EVENT_START_FIGHT1, 0);
+                    events.ScheduleEvent(EVENT_START_FIGHT1, 0ms);
                     SetEscortPaused(true);
                     break;
                 case 19:
@@ -227,7 +227,7 @@ public:
                     break;
                 case EVENT_START_FIGHT1:
                     Talk(SAY_SAEED_3);
-                    events.ScheduleEvent(EVENT_START_FIGHT2, 3000);
+                    events.ScheduleEvent(EVENT_START_FIGHT2, 3s);
                     break;
                 case EVENT_START_FIGHT2:
                     if (Creature* dimensius = me->FindNearestCreature(NPC_DIMENSIUS, 50.0f))

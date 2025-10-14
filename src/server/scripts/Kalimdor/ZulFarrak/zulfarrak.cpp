@@ -176,25 +176,25 @@ public:
                 if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
                 {
                     weegli->CastSpell(weegli, SPELL_BLYS_BAND_ESCAPE);
-                    weegli->DespawnOrUnsummon(10000);
+                    weegli->DespawnOrUnsummon(10s);
                 }
                 if (Creature* raven = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAVEN)))
                 {
                     raven->CastSpell(raven, SPELL_BLYS_BAND_ESCAPE);
-                    raven->DespawnOrUnsummon(10000);
+                    raven->DespawnOrUnsummon(10s);
                 }
                 if (Creature* oro = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ORO)))
                 {
                     oro->CastSpell(oro, SPELL_BLYS_BAND_ESCAPE);
-                    oro->DespawnOrUnsummon(10000);
+                    oro->DespawnOrUnsummon(10s);
                 }
                 if (Creature* murta = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURTA)))
                 {
                     murta->CastSpell(murta, SPELL_BLYS_BAND_ESCAPE);
-                    murta->DespawnOrUnsummon(10000);
+                    murta->DespawnOrUnsummon(10s);
                 }
                 DoCastSelf(SPELL_BLYS_BAND_ESCAPE);
-                me->DespawnOrUnsummon(10000);
+                me->DespawnOrUnsummon(10s);
                 Porthome_Timer = 156000; //set timer back so that the event doesn't keep triggering
             }
             else
@@ -436,7 +436,7 @@ public:
                             case 1:
                                 me->GetMotionMaster()->MovePoint(2, 1871.18f, 1100.f, 8.88f);
                                 Talk(SAY_WEEGLI_OUT_OF_HERE);
-                                me->DespawnOrUnsummon(8000);
+                                me->DespawnOrUnsummon(8s);
                                 instance->SetData(DATA_PYRAMID, PYRAMID_GATES_DESTROYED);
                                 destroyingDoor = false;
                                 break;

@@ -39,6 +39,7 @@ class ByteBuffer;
 class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
+#define TRAJECTORY_MISSILE_SIZE 3.0f
 
 enum SpellCastFlags
 {

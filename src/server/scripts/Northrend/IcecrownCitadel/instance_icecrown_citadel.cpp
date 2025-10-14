@@ -268,7 +268,7 @@ public:
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
 
-            if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
+            if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && !Events.HasTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA))
             {
                 Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
             }
@@ -499,7 +499,7 @@ public:
                     break;
                 case NPC_INFILTRATOR_MINCHAR_BQ:
                     if (BloodQuickeningState == DONE)
-                        creature->DespawnOrUnsummon(1);
+                        creature->DespawnOrUnsummon(1ms);
                     break;
                 case NPC_MINCHAR_BEAM_STALKER:
                     if (BloodQuickeningState != DONE)
@@ -661,7 +661,7 @@ public:
                     {
                         c->CastSpell(c, VOID_ZONE_VISUAL, true);
                         unit->SummonCreature(NPC_RISEN_DEATHSPEAKER_SERVANT, *unit, TEMPSUMMON_MANUAL_DESPAWN);
-                        unit->ToCreature()->DespawnOrUnsummon(3000);
+                        unit->ToCreature()->DespawnOrUnsummon(3s);
                     }
                     break;
                 default:

@@ -93,7 +93,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(ObjectGuid const& guid, int32) override
         {
             _playerGUID = guid;
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
@@ -207,7 +207,7 @@ public:
                             EnterEvadeMode();
                             return;
                         }
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                         break;
                     }
                 case EVENT_SUMMON_ARCHERS:
@@ -217,7 +217,7 @@ public:
                     _spoken = false;
                     SummonPeasants();
                     _spoken = false;
-                    events.RepeatEvent(60 * IN_MILLISECONDS);
+                    events.Repeat(60s);
                     break;
             }
         }
@@ -262,7 +262,7 @@ public:
                 if (Unit* creature = summon->GetSummonerUnit())
                     creature->GetAI()->DoAction(1);
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void JustDied(Unit*) override
