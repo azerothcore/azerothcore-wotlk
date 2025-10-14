@@ -1,3 +1,4 @@
+-- DB update 2025_10_12_06 -> 2025_10_14_00
 
 -- Move Waypoint from 'waypoints' to 'waypoint_data'
 DELETE FROM `waypoints` WHERE `entry` = 27482;
