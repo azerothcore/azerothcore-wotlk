@@ -19574,7 +19574,7 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     }
 }
 
-bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool VehicleDespawnEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     Position pos = _self;
     _self.MovePositionToFirstCollision(pos, 20.0f, M_PI);
@@ -20122,7 +20122,7 @@ class ResetToHomeOrientation : public BasicEvent
 public:
     ResetToHomeOrientation(Creature& self) : _self(self) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
         if (_self.IsInWorld() && _self.FindMap() && _self.IsAlive() && !_self.IsInCombat())
             _self.SetFacingTo(_self.GetHomePosition().GetOrientation());
