@@ -690,8 +690,7 @@ public:
                         break;
                     case EVENT_ACTION_PHASE1+1:
                         // Start Event
-                        me->SetWalk(false);
-                        Start(false);
+                        Start(true);
                         SetDespawnAtEnd(false);
                         SetDespawnAtFar(false);
 
