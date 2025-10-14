@@ -70,6 +70,7 @@ private:
     {
         tree.clear();
         objects.clear();
+        bounds = G3D::AABox::empty();
         // create space for the first node
         tree.push_back(3u << 30u); // dummy leaf
         tree.insert(tree.end(), 2, 0);
