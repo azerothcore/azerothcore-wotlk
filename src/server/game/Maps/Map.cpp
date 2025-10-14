@@ -734,8 +734,6 @@ void Map::RemoveFromMap(T* obj, bool remove)
     obj->RemoveFromWorld();
 
     obj->RemoveFromGrid();
-    if (obj->IsFarVisible())
-        RemoveWorldObjectFromFarVisibleMap(obj);
 
     obj->ResetMap();
 

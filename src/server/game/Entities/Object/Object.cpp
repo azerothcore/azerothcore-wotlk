@@ -1100,23 +1100,45 @@ void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)
     if (type == GetVisibilityOverrideType())
         return;
 
-    if (IsPlayer())
+    if (!IsCreature() && !IsGameObject() && !IsDynamicObject())
         return;
 
-    if (IsVisibilityOverridden())
-    {
-        if (IsFarVisible())
-            GetMap()->RemoveWorldObjectFromFarVisibleMap(this);
-        else if (IsZoneWideVisible())
-            GetMap()->RemoveWorldObjectFromZoneWideVisibleMap(GetZoneId(), this);
-    }
+    // Important to remove from old visibility override containers first
+    RemoveFromMapVisibilityOverrideContainers();
 
-    if (type == VisibilityDistanceType::Large || type == VisibilityDistanceType::Gigantic)
-        GetMap()->AddWorldObjectToFarVisibleMap(this);
-    else if (type == VisibilityDistanceType::Infinite)
-        GetMap()->AddWorldObjectToZoneWideVisibleMap(GetZoneId(), this);
-
+    // Always update _visibilityDistanceOverrideType, even when not in world
     _visibilityDistanceOverrideType = type;
+
+    // Finally, add to new visibility override containers
+    AddToMapVisibilityOverrideContainers();
+}
+
+void WorldObject::RemoveFromMapVisibilityOverrideContainers()
+{
+    if (!IsVisibilityOverridden())
+        return;
+
+    if (!IsInWorld())
+        return;
+
+    if (IsFarVisible())
+        GetMap()->RemoveWorldObjectFromFarVisibleMap(this);
+    else if (IsZoneWideVisible())
+        GetMap()->RemoveWorldObjectFromZoneWideVisibleMap(_zoneId, this);
+}
+
+void WorldObject::AddToMapVisibilityOverrideContainers()
+{
+    if (!IsVisibilityOverridden())
+        return;
+
+    if (!IsInWorld())
+        return;
+
+    if (IsFarVisible())
+        GetMap()->AddWorldObjectToFarVisibleMap(this);
+    else if (IsZoneWideVisible())
+        GetMap()->AddWorldObjectToZoneWideVisibleMap(_zoneId, this);
 }
 
 void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
@@ -1186,6 +1208,9 @@ void WorldObject::AddToWorld()
     Object::AddToWorld();
     GetMap()->GetZoneAndAreaId(GetPhaseMask(), _zoneId, _areaId, GetPositionX(), GetPositionY(), GetPositionZ());
     GetMap()->AddObjectToPendingUpdateList(this);
+
+    if (IsZoneWideVisible())
+        GetMap()->AddWorldObjectToZoneWideVisibleMap(_zoneId, this);
 }
 
 void WorldObject::RemoveFromWorld()
@@ -1193,8 +1218,7 @@ void WorldObject::RemoveFromWorld()
     if (!IsInWorld())
         return;
 
-    if (IsZoneWideVisible())
-        GetMap()->RemoveWorldObjectFromZoneWideVisibleMap(GetZoneId(), this);
+    RemoveFromMapVisibilityOverrideContainers();
 
     DestroyForVisiblePlayers();
 
