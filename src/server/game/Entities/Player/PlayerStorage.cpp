@@ -3536,6 +3536,8 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     Item* pSrcItem = GetItemByPos(srcbag, srcslot);
     Item* pDstItem = GetItemByPos(dstbag, dstslot);
+	
+	bool isUnequipingItem = false;
 
     if (!pSrcItem)
         return;
@@ -3567,6 +3569,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             SendEquipError(msg, pSrcItem, pDstItem);
             return;
         }
+		isUnequipingItem = true;
     }
 
     // anti-wpe
@@ -3666,10 +3669,12 @@ void Player::SwapItem(uint16 src, uint16 dst)
             EquipItem(dest, pSrcItem, true);
             AutoUnequipOffhandIfNeed();
         }
-
+		
+		if (isUnequipingItem)
+			sScriptMgr->OnPlayerUnequip(this, pSrcItem);
         return;
     }
-
+	
     // attempt merge to / fill target item
     if (!pSrcItem->IsBag() && !pDstItem->IsBag())
     {
@@ -3718,7 +3723,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
             return;
         }
     }
-
+	
     // Remove item enchantments for now and restore it later
     // Needed for swap sanity checks
     ApplyEnchantment(pSrcItem, false);
@@ -3922,6 +3927,9 @@ void Player::SwapItem(uint16 src, uint16 dst)
             }
         }
     }
+	
+	if (isUnequipingItem)
+		sScriptMgr->OnPlayerUnequip(this, pSrcItem);
 
     AutoUnequipOffhandIfNeed();
 }

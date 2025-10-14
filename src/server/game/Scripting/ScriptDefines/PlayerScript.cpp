@@ -354,6 +354,11 @@ void ScriptMgr::OnPlayerEquip(Player* player, Item* it, uint8 bag, uint8 slot, b
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_EQUIP, script->OnPlayerEquip(player, it, bag, slot, update));
 }
 
+void ScriptMgr::OnPlayerUnequip(Player* player, Item* it/*uint8 bag, uint8 slot*/)
+{
+	CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UNEQUIP, script->OnPlayerUnequip(player, it/*, bag, slot*/));
+}
+
 void ScriptMgr::OnPlayerJoinBG(Player* player)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_JOIN_BG, script->OnPlayerJoinBG(player));
