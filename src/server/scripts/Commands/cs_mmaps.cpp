@@ -29,6 +29,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "MMapFactory.h"
+#include "MMapMgr.h"
 #include "Map.h"
 #include "PathGenerator.h"
 #include "Player.h"
@@ -136,6 +137,40 @@ public:
         GridCoord const gridCoord = Acore::ComputeGridCoord(player->GetPositionX(), player->GetPositionY());
 
         handler->PSendSysMessage("{}{}{}.mmtile", player->GetMapId(), gridCoord.x_coord, gridCoord.y_coord);
+
+        std::string fileName = Acore::StringFormat(MMAP::TILE_FILE_NAME_FORMAT, sConfigMgr->GetOption<std::string>("DataDir", "."), player->GetMapId(), gridCoord.x_coord, gridCoord.y_coord);
+        FILE* file = fopen(fileName.c_str(), "rb");
+        if (!file)
+        {
+            LOG_DEBUG("maps", "MMAP:loadMap: Could not open mmtile file '{}'", fileName);
+            return false;
+        }
+
+        // read header
+        MmapTileHeader fileHeader;
+        if (fread(&fileHeader, sizeof(MmapTileHeader), 1, file) != 1 || fileHeader.mmapMagic != MMAP_MAGIC)
+        {
+            LOG_ERROR("maps", "MMAP:loadMap: Bad header in mmap {:03}{:02}{:02}.mmtile", player->GetMapId(), gridCoord.x_coord, gridCoord.y_coord);
+            fclose(file);
+            return false;
+        }
+        fclose(file);
+        handler->PSendSysMessage("Recast config used:");
+        handler->PSendSysMessage("- walkableSlopeAngle: {}", fileHeader.recastConfig.walkableSlopeAngle);
+
+        const float cellHeight = fileHeader.recastConfig.cellSizeVertical;
+        handler->PSendSysMessage("- walkableHeight: {} ({} units)", fileHeader.recastConfig.walkableHeight * cellHeight, fileHeader.recastConfig.walkableHeight);
+        handler->PSendSysMessage("- walkableClimb: {} ({} units)", fileHeader.recastConfig.walkableClimb * cellHeight, fileHeader.recastConfig.walkableClimb);
+        handler->PSendSysMessage("- walkableRadius: {} ({} units)", fileHeader.recastConfig.walkableRadius * cellHeight, fileHeader.recastConfig.walkableRadius);
+
+        handler->PSendSysMessage("- maxSimplificationError: {}", fileHeader.recastConfig.maxSimplificationError);
+        handler->PSendSysMessage("- vertexPerMapEdge: {}", fileHeader.recastConfig.vertexPerMapEdge);
+        handler->PSendSysMessage("- vertexPerTileEdge: {}", fileHeader.recastConfig.vertexPerTileEdge);
+        handler->PSendSysMessage("- tilesPerMapEdge: {}", fileHeader.recastConfig.tilesPerMapEdge);
+        handler->PSendSysMessage("- baseUnitDim: {}", fileHeader.recastConfig.baseUnitDim);
+        handler->PSendSysMessage("- cellSizeHorizontal: {}", fileHeader.recastConfig.cellSizeHorizontal);
+        handler->PSendSysMessage("- cellSizeVertical: {}", fileHeader.recastConfig.cellSizeVertical);
+
         handler->PSendSysMessage("gridloc [{}, {}]", gridCoord.x_coord, gridCoord.y_coord);
 
         // calculate navmesh tile location
