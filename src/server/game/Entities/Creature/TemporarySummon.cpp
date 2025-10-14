@@ -288,10 +288,8 @@ void TempSummon::UnSummon(Milliseconds msTime)
 {
     if (msTime > 0ms)
     {
-        m_Events.AddEventAtOffset([this]()
-        {
-            UnSummon();
-        }, msTime);
+        ForcedUnsummonDelayEvent* pEvent = new ForcedUnsummonDelayEvent(*this);
+        m_Events.AddEventAtOffset(pEvent, msTime);
         return;
     }
 
@@ -317,6 +315,12 @@ void TempSummon::UnSummon(Milliseconds msTime)
     }
 
     AddObjectToRemoveList();
+}
+
+bool ForcedUnsummonDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    m_owner.UnSummon();
+    return true;
 }
 
 void TempSummon::RemoveFromWorld()

@@ -553,4 +553,27 @@ private:
     Creature*         m_owner;
 };
 
+class ForcedDespawnDelayEvent : public BasicEvent
+{
+public:
+    ForcedDespawnDelayEvent(Creature& owner, Seconds respawnTimer) : BasicEvent(), m_owner(owner), m_respawnTimer(respawnTimer) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+private:
+    Creature& m_owner;
+    Seconds const m_respawnTimer;
+};
+
+class TemporaryThreatModifierEvent : public BasicEvent
+{
+public:
+    TemporaryThreatModifierEvent(Creature& owner, ObjectGuid threatVictimGUID, float threatValue) : BasicEvent(), m_owner(owner), m_threatVictimGUID(threatVictimGUID), m_threatValue(threatValue) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+private:
+    Creature& m_owner;
+    ObjectGuid m_threatVictimGUID;
+    float m_threatValue;
+};
+
 #endif

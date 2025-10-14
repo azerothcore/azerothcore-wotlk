@@ -249,6 +249,26 @@ CreatureBaseStats const* CreatureBaseStats::GetBaseStats(uint8 level, uint8 unit
     return sObjectMgr->GetCreatureBaseStats(level, unitClass);
 }
 
+bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    m_owner.DespawnOrUnsummon(0s, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
+    return true;
+}
+
+bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    if (Unit* victim = ObjectAccessor::GetUnit(m_owner, m_threatVictimGUID))
+    {
+        if (m_owner.IsInCombatWith(victim))
+        {
+            m_owner.GetThreatMgr().ModifyThreatByPercent(victim, -100); // Reset threat to zero.
+            m_owner.GetThreatMgr().AddThreat(victim, m_threatValue);  // Set to the previous value it had, first before modification.
+        }
+    }
+
+    return true;
+}
+
 Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
@@ -2143,10 +2163,8 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
 {
     if (timeMSToDespawn > 0ms)
     {
-        m_Events.AddEventAtOffset([this, forceRespawnTimer]()
-        {
-            DespawnOrUnsummon(0ms, forceRespawnTimer);
-        }, timeMSToDespawn);
+        ForcedDespawnDelayEvent* pEvent = new ForcedDespawnDelayEvent(*this, forceRespawnTimer);
+        m_Events.AddEventAtOffset(pEvent, timeMSToDespawn);
         return;
     }
 
@@ -3743,18 +3761,8 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
             GetThreatMgr().ModifyThreatByPercent(victim, percent);
         }
 
-        ObjectGuid m_threatVictimGUID = victim->GetGUID();
-        m_Events.AddEventAtOffset([this, m_threatVictimGUID, currentThreat]()
-        {
-            if (Unit* victim = ObjectAccessor::GetUnit(*this, m_threatVictimGUID))
-            {
-                if (IsInCombatWith(victim))
-                {
-                    GetThreatMgr().ModifyThreatByPercent(victim, -100); // Reset threat to zero.
-                    GetThreatMgr().AddThreat(victim, currentThreat);  // Set to the previous value it had, first before modification.
-                }
-            }
-        }, duration);
+        TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);
+        m_Events.AddEventAtOffset(pEvent, duration);
     }
 }
 

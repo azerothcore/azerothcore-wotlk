@@ -19574,6 +19574,15 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     }
 }
 
+bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+{
+    Position pos = _self;
+    _self.MovePositionToFirstCollision(pos, 20.0f, M_PI);
+    _self.GetMotionMaster()->MovePoint(0, pos);
+    _self.ToCreature()->DespawnOrUnsummon(_duration);
+    return true;
+}
+
 void Unit::_ExitVehicle(Position const* exitPosition)
 {
     if (!m_vehicle)
@@ -19672,13 +19681,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             else if (vehicleBase->IsCreature())
             {
                 vehicle->Uninstall();
-                vehicleBase->m_Events.AddEventAtOffset([vehicleBase]()
-                {
-                    Position pos = *vehicleBase;
-                    vehicleBase->MovePositionToFirstCollision(pos, 20.0f, M_PI);
-                    vehicleBase->GetMotionMaster()->MovePoint(0, pos);
-                    vehicleBase->ToCreature()->DespawnOrUnsummon(2s);
-                }, 2s);
+                vehicleBase->m_Events.AddEventAtOffset(new VehicleDespawnEvent(*vehicleBase, 2s), 2s);
             }
 
             // xinef: ugly hack, no appripriate hook later to cast spell
@@ -20114,6 +20117,23 @@ private:
     AuraType _auraType;
 };
 
+class ResetToHomeOrientation : public BasicEvent
+{
+public:
+    ResetToHomeOrientation(Creature& self) : _self(self) { }
+
+    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    {
+        if (_self.IsInWorld() && _self.FindMap() && _self.IsAlive() && !_self.IsInCombat())
+            _self.SetFacingTo(_self.GetHomePosition().GetOrientation());
+
+        return true;
+    }
+
+private:
+    Creature& _self;
+};
+
 void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex)
 {
     AuraEffect* aurEff = nullptr;
@@ -20365,13 +20385,7 @@ void Unit::SetTimedFacingToObject(WorldObject* object, uint32 time)
     init.Launch();
 
     if (Creature* c = ToCreature())
-    {
-        c->m_Events.AddEventAtOffset([c]()
-        {
-            if (c->IsInWorld() && c->FindMap() && c->IsAlive() && !c->IsInCombat())
-                c->SetFacingTo(c->GetHomePosition().GetOrientation());
-        }, Milliseconds(time));
-    }
+        c->m_Events.AddEventAtOffset(new ResetToHomeOrientation(*c), Milliseconds(time));
     else
         LOG_ERROR("entities.unit", "Unit::SetTimedFacingToObject called on non-creature unit {}. This should never happen.", GetEntry());
 }
