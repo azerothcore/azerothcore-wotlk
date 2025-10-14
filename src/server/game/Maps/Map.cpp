@@ -422,7 +422,9 @@ void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
         else
             --oldZoneCount;
     }
-    ++_zonePlayerCountMap[newZone];
+
+    if (newZone != MAP_INVALID_ZONE)
+        ++_zonePlayerCountMap[newZone];
 }
 
 void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
@@ -696,8 +698,8 @@ struct ResetNotifier
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
-    // Before leaving map, update zone/area for stats
-    player->UpdateZone(MAP_INVALID_ZONE, 0);
+    UpdatePlayerZoneStats(player->GetZoneId(), MAP_INVALID_ZONE);
+
     player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     player->RemoveFromWorld();
@@ -725,8 +727,6 @@ void Map::RemoveFromMap(T* obj, bool remove)
     obj->RemoveFromWorld();
 
     obj->RemoveFromGrid();
-    if (obj->IsFarVisible())
-        RemoveWorldObjectFromFarVisibleMap(obj);
 
     obj->ResetMap();
 
