@@ -13751,8 +13751,11 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
 
         bool alreadyInCombat = IsInCombat();
 
-        SetInCombatWith(victim);
-        victim->SetInCombatWith(this);
+        if (victim->IsCreature() && this != victim)
+        {
+            SetInCombatWith(victim);
+            victim->SetInCombatWith(this);
+        }
 
         // Update leash timer when attacking creatures
         if (victim->IsCreature() && this != victim)
