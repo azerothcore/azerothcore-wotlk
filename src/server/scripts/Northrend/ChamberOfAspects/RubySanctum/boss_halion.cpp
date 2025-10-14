@@ -199,7 +199,7 @@ public:
 
         WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 4);
         data << uint32(ENCOUNTER_FRAME_REFRESH_FRAMES);
-        _owner->GetSession()->SendPacket(&data);
+        _owner->SendDirectMessage(&data);
         return true;
     }
 
