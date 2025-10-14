@@ -1010,7 +1010,8 @@ public:
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveAllAuras();
-            Start(true);
+            me->SetWalk(false);
+            Start(false);
         }
 
         void WaypointReached(uint32 waypointId) override
