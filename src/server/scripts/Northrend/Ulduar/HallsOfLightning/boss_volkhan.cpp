@@ -355,7 +355,7 @@ struct npc_molten_golem : public ScriptedAI
                 volkhan->AI()->DoAction(ACTION_DESTROYED);
 
             me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_SHATTER_H : SPELL_SHATTER_N, true);
-            me->DespawnOrUnsummon(500);
+            me->DespawnOrUnsummon(500ms);
         }
     }
 
