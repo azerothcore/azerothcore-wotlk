@@ -164,6 +164,9 @@ function comp_compile() {
           cp -v --no-clobber "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
       [[ -f "$confDir/dbimport.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
+      for f in $(ls "$confDir/modules/"*.dist); do 
+          cp -v --no-clobber "$f" "${f%.dist}";
+      done
 
       echo "Done"
       ;;
