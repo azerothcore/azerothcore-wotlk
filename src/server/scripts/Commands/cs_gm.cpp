@@ -100,8 +100,8 @@ public:
         }
         else
         {
-            canFly = handler->GetSession()->GetPlayer()->CanFly();
-            target->SetCanFly(!canFly);
+            canFly = !handler->GetSession()->GetPlayer()->CanFly();
+            target->SetCanFly(canFly);
         }
 
         handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target), canFly ? "on" : "off");
