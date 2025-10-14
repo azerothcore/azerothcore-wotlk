@@ -111,6 +111,33 @@ const Position LeftSide = { 1469.0642f, 729.5854f, 59.823853f, 4.6774f };
 const Position LandingLeftPos = { 1476.77f, 665.094f, 20.6423f };
 const Position LandingRightPos = { 1469.93f, 557.009f, 22.631699f };
 
+class CorruptTriggers : public BasicEvent
+{
+public:
+    CorruptTriggers(Unit* caster, uint8 currentLane) : _caster(caster), _currentLane(currentLane) { }
+
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
+    {
+        switch (_currentLane)
+        {
+            case 0: // top
+                _caster->CastSpell(_caster, SPELL_STRAFE_TOP, true);
+                break;
+            case 1: // middle
+                _caster->CastSpell(_caster, SPELL_STRAFE_MIDDLE, true);
+                break;
+            case 2: // bottom
+                _caster->CastSpell(_caster, SPELL_STRAFE_BOTTOM, true);
+                break;
+        }
+        return true;
+    }
+
+private:
+    Unit* _caster;
+    uint8 _currentLane;
+};
+
 struct boss_felmyst : public BossAI
 {
     boss_felmyst(Creature* creature) : BossAI(creature, DATA_FELMYST), _currentLane(0), _strafeCount(0) { }
