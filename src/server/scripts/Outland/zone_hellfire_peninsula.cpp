@@ -312,8 +312,7 @@ public:
             {
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetFaction(FACTION_ESCORTEE_H_PASSIVE);
-                me->SetWalk(false);
-                npc_escortAI::Start(false, player->GetGUID());
+                npc_escortAI::Start(true, player->GetGUID());
             }
         }
 

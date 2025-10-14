@@ -206,9 +206,8 @@ public:
             if (Creature* Mrfloppy = GetClosestCreatureWithEntry(creature, NPC_MRFLOPPY, 180.0f))
                 Mrfloppy->GetMotionMaster()->MoveFollow(creature, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-            creature->SetWalk(false);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_emily::npc_emilyAI, (creature->AI())))
-                pEscortAI->Start(false, player->GetGUID());
+                pEscortAI->Start(true, player->GetGUID());
         }
         return true;
     }

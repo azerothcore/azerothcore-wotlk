@@ -606,8 +606,7 @@ public:
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
             creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->AI()->Talk(SAY_BESSY_0);
-            creature->SetWalk(false);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }

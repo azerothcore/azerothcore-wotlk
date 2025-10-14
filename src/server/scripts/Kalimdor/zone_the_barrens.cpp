@@ -593,9 +593,8 @@ public:
         {
             creature->SetFaction(FACTION_RATCHET);
             creature->AI()->Talk(SAY_START);
-            creature->SetWalk(false);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_wizzlecrank_shredder::npc_wizzlecrank_shredderAI, creature->AI()))
-                pEscortAI->Start(false, player->GetGUID());
+                pEscortAI->Start(true, player->GetGUID());
         }
         return true;
     }

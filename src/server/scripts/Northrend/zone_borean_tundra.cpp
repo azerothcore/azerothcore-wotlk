@@ -463,9 +463,8 @@ public:
             if (GameObject* go = creature->FindNearestGameObject(GO_CAGE, 5.0f))
                 go->UseDoorOrButton();
 
-            creature->SetWalk(false);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
-                pEscortAI->Start(false, player->GetGUID());
+                pEscortAI->Start(true, player->GetGUID());
 
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
@@ -915,8 +914,7 @@ public:
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
-            creature->SetWalk(false);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }

@@ -57,7 +57,8 @@ struct npc_frosthound : public npc_escortAI
             {
                 me->SetFaction(who->GetFaction());
                 me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
-                Start(true, who->GetGUID());
+                me->SetWalk(false);
+                Start(false, who->GetGUID());
                 Talk(TALK_EMOTE_FROSTHOUND_SNIFF, me);
             }
         }
@@ -913,7 +914,10 @@ public:
             if (who->IsPlayer())
             {
                 if (apply)
-                    Start(true, who->GetGUID());
+                {
+                    me->SetWalk(false);
+                    Start(false, who->GetGUID());
+                }
             }
         }
 
