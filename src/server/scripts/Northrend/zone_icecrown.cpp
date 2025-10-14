@@ -501,7 +501,7 @@ public:
                         events.RescheduleEvent(EVENT_SOUL_COAX, 5s);
                     }
                     else
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(1ms);
                     break;
                 case EVENT_SOUL_COAX:
                     Talk(SAY_ARETE_1);
@@ -580,14 +580,14 @@ public:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
                     {
                         soul->AI()->Talk(SAY_SOUL_4);
-                        soul->DespawnOrUnsummon(2000);
+                        soul->DespawnOrUnsummon(2s);
                     }
                     events.ScheduleEvent(EVENT_SCENE_10, 3s);
                     break;
                 case EVENT_SCENE_10:
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_ARETE_6);
-                    me->DespawnOrUnsummon(60000);
+                    me->DespawnOrUnsummon(60s);
                     break;
             }
         }
@@ -796,7 +796,7 @@ public:
                                 summon->SetUInt32Value(UNIT_NPC_EMOTESTATE, param);
                                 break;
                             case ACTION_SUMMON_DESPAWN:
-                                summon->DespawnOrUnsummon(param);
+                                summon->DespawnOrUnsummon(Milliseconds(param));
                                 break;
                             case ACTION_SUMMON_ORIENTATION:
                                 summon->SetFacingTo(param / 100.0f);
@@ -1022,9 +1022,9 @@ public:
                         {
                             if (summon->GetEntry() == NPC_TIRION_LICH_KING)
                                 summon->CastSpell(summon, SPELL_LICH_KINGS_FURY, false);
-                            summon->DespawnOrUnsummon(summon->GetEntry() == NPC_TIRION_LICH_KING ? 10000 : 4000);
+                            summon->DespawnOrUnsummon(summon->GetEntry() == NPC_TIRION_LICH_KING ? 10s : 4s);
                         }
-                    me->DespawnOrUnsummon(10000);
+                    me->DespawnOrUnsummon(10s);
                     break;
             }
         }
@@ -1257,8 +1257,8 @@ public:
 
             player->CastSpell(player, SPELL_WAITING_FOR_A_BOMBER, true);
             player->CastSpell(player, SPELL_FLIGHT_ORDERS, true);
-            events.ScheduleEvent(EVENT_START_FLIGHT, 0);
-            events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3000);
+            events.ScheduleEvent(EVENT_START_FLIGHT, 0ms);
+            events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3s);
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);
@@ -1310,14 +1310,14 @@ public:
                                 turret->HandleSpellClick(owner, 0);
                                 return;
                             }
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     break;
                 case EVENT_START_FLIGHT:
                     {
                         WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
                         if (!path || path->empty())
                         {
-                            me->DespawnOrUnsummon(1);
+                            me->DespawnOrUnsummon(1ms);
                             return;
                         }
 
@@ -1342,7 +1342,7 @@ public:
                         // Check if path is finished
                         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
                         {
-                            me->DespawnOrUnsummon(1);
+                            me->DespawnOrUnsummon(1ms);
                             return;
                         }
 
@@ -1381,7 +1381,7 @@ public:
                                     station->RemoveAurasDueToSpell(SPELL_INFRA_GREEN_SHIELD);
                             }
                         if (!playerPresent)
-                            me->DespawnOrUnsummon(1);
+                            me->DespawnOrUnsummon(1ms);
                     }
                     events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 1s);
                     break;

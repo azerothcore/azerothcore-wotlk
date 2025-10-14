@@ -269,7 +269,7 @@ struct boss_kaelthas : public BossAI
 
     void AttackStart(Unit* who) override
     {
-        if (_phase == PHASE_FINAL /* check is scheduled&& events.GetNextEventTime(EVENT_GRAVITY_LAPSE_END) == 0*/)
+        if (_phase == PHASE_FINAL /* check is scheduled&& !events.HasTimeUntilEvent(EVENT_GRAVITY_LAPSE_END)*/)
             BossAI::AttackStart(who);
     }
 
@@ -364,11 +364,11 @@ struct boss_kaelthas : public BossAI
             {
                 DoCastVictim(SPELL_FIREBALL);
             }, 2400ms, 7500ms);
-            ScheduleTimedEvent(10000ms, [&]
+            ScheduleTimedEvent(10s, [&]
             {
                 DoCastRandomTarget(SPELL_FLAME_STRIKE, 0, 100.0f);
             }, 30250ms, 50650ms);
-            ScheduleTimedEvent(50000ms, [&]
+            ScheduleTimedEvent(50s, [&]
             {
                 Talk(SAY_SUMMON_PHOENIX);
                 DoCastSelf(SPELL_PHOENIX);
@@ -429,7 +429,7 @@ struct boss_kaelthas : public BossAI
             DoCastSelf(SPELL_KAEL_EXPLODES1, true);
             DoCastSelf(SPELL_KAEL_GAINING_POWER);
         }, EVENT_SCENE_2);
-        ScheduleUniqueTimedEvent(4000ms, [&]
+        ScheduleUniqueTimedEvent(4s, [&]
         {
             me->SetTarget();
             for (uint8 i = 0; i < 2; ++i)
@@ -440,7 +440,7 @@ struct boss_kaelthas : public BossAI
             me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99, true); // AnimType Movement::ToFly does not exist for Kael
             DoCastSelf(SPELL_GROW, true);
         }, EVENT_SCENE_3);
-        ScheduleUniqueTimedEvent(7000ms, [&]
+        ScheduleUniqueTimedEvent(7s, [&]
         {
             me->SetTarget();
             DoCastSelf(SPELL_GROW, true);
@@ -450,7 +450,7 @@ struct boss_kaelthas : public BossAI
                 if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i + 2], TEMPSUMMON_TIMED_DESPAWN, 60000))
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
         }, EVENT_SCENE_4);
-        ScheduleUniqueTimedEvent(10000ms, [&]
+        ScheduleUniqueTimedEvent(10s, [&]
         {
             me->SetTarget();
             DoCastSelf(SPELL_GROW, true);
@@ -460,7 +460,7 @@ struct boss_kaelthas : public BossAI
                 if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i + 4], TEMPSUMMON_TIMED_DESPAWN, 60000))
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
         }, EVENT_SCENE_5);
-        ScheduleUniqueTimedEvent(14000ms, [&]
+        ScheduleUniqueTimedEvent(14s, [&]
         {
             DoCastSelf(SPELL_GROW, true);
             DoCastSelf(SPELL_KAEL_EXPLODES4, true);
@@ -470,7 +470,7 @@ struct boss_kaelthas : public BossAI
         {
             SetRoomState(GO_STATE_ACTIVE);
         }, EVENT_SCENE_7);
-        ScheduleUniqueTimedEvent(19000ms, [&]
+        ScheduleUniqueTimedEvent(19s, [&]
         {
             summons.DespawnEntry(WORLD_TRIGGER);
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA1);
@@ -478,7 +478,7 @@ struct boss_kaelthas : public BossAI
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA3);
             DoCastSelf(SPELL_KAEL_EXPLODES5, true);
         }, EVENT_SCENE_8);
-        ScheduleUniqueTimedEvent(22000ms, [&]
+        ScheduleUniqueTimedEvent(22s, [&]
         {
             DoCastSelf(SPELL_DARK_BANISH_STATE, true);
             DoCastSelf(SPELL_ARCANE_EXPLOSION_VISUAL, true);
@@ -528,14 +528,14 @@ struct boss_kaelthas : public BossAI
             me->CastStop();
             DoCastSelf(SPELL_KAEL_FULL_POWER);
         }, EVENT_SCENE_16);
-        ScheduleUniqueTimedEvent(32000ms, [&]
+        ScheduleUniqueTimedEvent(32s, [&]
         {
             DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM6, true);
         }, EVENT_SCENE_17);
-        ScheduleUniqueTimedEvent(36000ms, [&]
+        ScheduleUniqueTimedEvent(36s, [&]
         {
             summons.DespawnEntry(WORLD_TRIGGER);
             me->CastStop();
@@ -559,7 +559,7 @@ struct boss_kaelthas : public BossAI
         switch (kaelAction)
         {
             case ACTION_START_THALADRED:
-                attackStartTimer = 7000ms;
+                attackStartTimer = 7s;
                 advisorNPCId = NPC_THALADRED;
                 break;
             case ACTION_START_SANGUINAR:
@@ -567,7 +567,7 @@ struct boss_kaelthas : public BossAI
                 advisorNPCId = NPC_LORD_SANGUINAR;
                 break;
             case ACTION_START_CAPERNIAN:
-                attackStartTimer = 9000ms;
+                attackStartTimer = 9s;
                 advisorNPCId = NPC_CAPERNIAN;
                 break;
             case ACTION_START_TELONICUS:
@@ -658,15 +658,15 @@ struct boss_kaelthas : public BossAI
                 me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
             }
         });
-        ScheduleTimedEvent(1000ms, [&]
+        ScheduleTimedEvent(1s, [&]
         {
             DoCastVictim(SPELL_FIREBALL);
         }, 2400ms, 7500ms);
-        ScheduleTimedEvent(15000ms, [&]
+        ScheduleTimedEvent(15s, [&]
         {
             DoCastRandomTarget(SPELL_FLAME_STRIKE, 0, 100.0f);
         }, 30250ms, 50650ms);
-        ScheduleTimedEvent(50000ms, [&]
+        ScheduleTimedEvent(50s, [&]
         {
             Talk(SAY_SUMMON_PHOENIX);
             DoCastSelf(SPELL_PHOENIX);
@@ -855,7 +855,7 @@ struct npc_capernian : public advisor_baseAI
                 DoCastVictim(SPELL_CAPERNIAN_FIREBALL);
             }
         }, 2500ms);
-        ScheduleTimedEvent(7000ms, 10000ms, [&]{
+        ScheduleTimedEvent(7s, 10s, [&]{
             DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 30.0f);
         }, 18500ms, 20500ms);
         ScheduleTimedEvent(3s, [&]{
@@ -893,16 +893,16 @@ struct npc_thaladred : public advisor_baseAI
                 me->AddThreat(target, 10000000.0f);
                 Talk(EMOTE_THALADRED_FIXATE, target);
             }
-        }, 10000ms);
-        ScheduleTimedEvent(4000ms, 19350ms, [&]
+        }, 10s);
+        ScheduleTimedEvent(4s, 19350ms, [&]
         {
             DoCastVictim(SPELL_PSYCHIC_BLOW);
         }, 15700ms, 48900ms);
-        ScheduleTimedEvent(3000ms, 6050ms, [&]
+        ScheduleTimedEvent(3s, 6050ms, [&]
         {
             DoCastVictim(SPELL_REND);
         }, 15700ms, 48900ms);
-        ScheduleTimedEvent(3000ms, 6050ms, [&]
+        ScheduleTimedEvent(3s, 6050ms, [&]
         {
             if (Unit* victim = me->GetVictim())
             {
@@ -1013,7 +1013,7 @@ class spell_kaelthas_flame_strike : public AuraScript
     {
         GetUnitOwner()->RemoveAllAuras();
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLAME_STRIKE_DAMAGE, true);
-        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
+        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2s);
     }
 
     void Register() override

@@ -247,7 +247,7 @@ struct npc_spark_of_ionar : public ScriptedAI
 
             me->RemoveAllAuras();
             me->CastSpell(me, SPELL_SPARK_DESPAWN, true);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 

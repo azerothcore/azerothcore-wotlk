@@ -590,77 +590,77 @@ public:
                 if (me->GetPositionY() == -2835.11f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(20000);
+                    me->DespawnOrUnsummon(20s);
                 }
                 if (me->GetPositionY() == -2981.89f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(18000);
+                    me->DespawnOrUnsummon(18s);
                 }
                 if (me->GetPositionY() == -2934.44f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(9000);
+                    me->DespawnOrUnsummon(9s);
                 }
                 if (me->GetPositionY() == -3020.99f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(22000);
+                    me->DespawnOrUnsummon(22s);
                 }
                 if (me->GetPositionY() == -2964.73f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
-                    me->DespawnOrUnsummon(15000);
+                    me->DespawnOrUnsummon(15s);
                 }
                 if (me->GetPositionY() == -2940.50f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(20000);
+                    me->DespawnOrUnsummon(20s);
                 }
                 if (me->GetPositionY() == -2847.93f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(30000);
+                    me->DespawnOrUnsummon(30s);
                 }
                 if (me->GetPositionY() == -2835.31f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(27000);
+                    me->DespawnOrUnsummon(27s);
                 }
                 if (me->GetPositionY() == -2822.20f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -2846.31f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(21000);
+                    me->DespawnOrUnsummon(21s);
                 }
                 if (me->GetPositionY() == -2897.23f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(15000);
+                    me->DespawnOrUnsummon(15s);
                 }
                 if (me->GetPositionY() == -2886.01f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -2906.89f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -3048.94f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
-                    me->DespawnOrUnsummon(30000);
+                    me->DespawnOrUnsummon(30s);
                 }
                 if (me->GetPositionY() == -2961.08f)
                 {
                     me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->DespawnOrUnsummon(25s);
                 }
                 break;
             case EVENT_CLEAVE:
@@ -871,7 +871,7 @@ public:
         {
             if (_following)
                 if (!me->HasAura(SPELL_FROG_LOVE))
-                    me->DespawnOrUnsummon(1000);
+                    me->DespawnOrUnsummon(1s);
 
             _events.Update(diff);
 
@@ -898,7 +898,7 @@ public:
                         break;
                     case EVENT_LAKEFROG_5:
                         Talk(SAY_MAIDEN_1);
-                        me->DespawnOrUnsummon(4000);
+                        me->DespawnOrUnsummon(4s);
                         break;
                     default:
                         break;
