@@ -567,6 +567,12 @@ public:
 
     virtual TeamId GetPrematureWinner();
 
+    /**
+     * @brief Updates MMR ratings for all players after a battleground match
+     * @param winner The winning team (ALLIANCE or HORDE)
+     */
+    void UpdateBattlegroundMMR(Team winner);
+
     // because BattleGrounds with different types and same level range has different m_BracketId
     [[nodiscard]] uint8 GetUniqueBracketId() const;
 
