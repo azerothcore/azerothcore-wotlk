@@ -44,6 +44,8 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
         return;
     }
 
+    i_currentNode = i_path->begin()->first;
+
     StartMoveNow(creature);
 }
 
@@ -149,7 +151,9 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             return false;
         }
 
-        i_currentNode = (i_currentNode + 1) % i_path->size();
+        ++i_currentNode;
+        if (i_path->rbegin()->first < i_currentNode)
+            i_currentNode = i_path->begin()->first;
     }
 
     // xinef: do not initialize motion if we got stunned in movementinform
