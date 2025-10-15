@@ -2366,6 +2366,137 @@ Rate.Reputation.Gain.AV = 1
 ###################################################################################################
 
 ###################################################################################################
+# BATTLEGROUND MMR SYSTEM
+
+#
+# BattleGround.MMR.Enable
+#     Description: Enable the MMR (Matchmaking Rating) system for battlegrounds.
+#                  Uses Glicko-2 algorithm for skill-based matchmaking.
+#     Default:     0 (disabled)
+#                  1 (enabled)
+
+BattleGround.MMR.Enable = 0
+
+#
+# BattleGround.MMR.StartingRating
+#     Description: Initial rating for new players.
+#     Default:     1500.0
+#     Range:       500.0 - 3000.0
+
+BattleGround.MMR.StartingRating = 1500.0
+
+#
+# BattleGround.MMR.StartingRD
+#     Description: Initial Rating Deviation (uncertainty) for new players.
+#     Default:     200.0
+#     Range:       50.0 - 350.0
+
+BattleGround.MMR.StartingRD = 200.0
+
+#
+# BattleGround.MMR.StartingVolatility
+#     Description: Initial volatility (performance consistency).
+#     Default:     0.06
+#     Range:       0.01 - 0.15
+
+BattleGround.MMR.StartingVolatility = 0.06
+
+#
+# BattleGround.MMR.SystemConstant
+#     Description: Tau - constrains volatility changes.
+#                  0.2-0.3: Conservative, prevents large swings
+#                  0.5: Balanced (recommended)
+#                  0.8-1.2: Aggressive, faster adaptation
+#     Default:     0.5
+#     Range:       0.2 - 1.2
+
+BattleGround.MMR.SystemConstant = 0.5
+
+#
+# BattleGround.MMR.MMRWeight
+#     Description: Weight for skill in team balancing (0.0 - 1.0).
+#                  Should sum to 1.0 with GearWeight.
+#     Default:     0.7 (70% skill, 30% gear)
+
+BattleGround.MMR.MMRWeight = 0.7
+
+#
+# BattleGround.MMR.GearWeight
+#     Description: Weight for gear in team balancing (0.0 - 1.0).
+#                  Should sum to 1.0 with MMRWeight.
+#     Default:     0.3
+
+BattleGround.MMR.GearWeight = 0.3
+
+#
+###################################################################################################
+# QUEUE TIME RELAXATION
+# Essential for low-population servers to ensure matches happen
+
+#
+# BattleGround.MMR.QueueRelaxation.Enable
+#     Description: Enable automatic relaxation of MMR constraints over time.
+#                  When enabled, the system gradually accepts larger MMR differences
+#                  as players wait longer, ensuring matches eventually happen even
+#                  with low population.
+#     Default:     1 (enabled - recommended for all servers)
+#                  0 (disabled - only for high-pop servers)
+
+BattleGround.MMR.QueueRelaxation.Enable = 1
+
+#
+# BattleGround.MMR.QueueRelaxation.InitialTolerance
+#     Description: Starting maximum MMR difference allowed between teams.
+#                  Lower values = stricter matching initially.
+#                  Higher values = more lenient matching from the start.
+#     Default:     200.0
+#     Range:       50.0 - 500.0
+#     Examples:    100 = Very strict (high-pop servers)
+#                  200 = Balanced (recommended)
+#                  300 = Lenient (low-pop servers)
+
+BattleGround.MMR.QueueRelaxation.InitialTolerance = 200.0
+
+#
+# BattleGround.MMR.QueueRelaxation.IntervalSeconds
+#     Description: How often (in seconds) to relax the MMR tolerance.
+#                  Every X seconds in queue, the tolerance increases.
+#     Default:     120 (2 minutes)
+#     Range:       30 - 300
+#     Examples:    60 = Relaxes quickly (very low-pop)
+#                  120 = Balanced (recommended)
+#                  180 = Relaxes slowly (medium-pop)
+
+BattleGround.MMR.QueueRelaxation.IntervalSeconds = 120
+
+#
+# BattleGround.MMR.QueueRelaxation.StepMMR
+#     Description: How much MMR tolerance to add at each interval.
+#                  Higher values = faster relaxation.
+#     Default:     100.0
+#     Range:       25.0 - 250.0
+#     Examples:    50 = Slow relaxation
+#                  100 = Balanced (recommended)
+#                  150 = Fast relaxation (low-pop)
+
+BattleGround.MMR.QueueRelaxation.StepMMR = 100.0
+
+#
+# BattleGround.MMR.QueueRelaxation.MaxSeconds
+#     Description: After this many seconds, accept ANY match regardless of MMR.
+#                  This ensures matches eventually happen even with very few players.
+#     Default:     600 (10 minutes)
+#     Range:       300 - 1800
+#     Examples:    300 = 5 minutes (very aggressive)
+#                  600 = 10 minutes (recommended)
+#                  900 = 15 minutes (patient)
+
+BattleGround.MMR.QueueRelaxation.MaxSeconds = 600
+
+#
+###################################################################################################
+
+###################################################################################################
 # EXPERIENCE
 #
 #    MaxGroupXPDistance
