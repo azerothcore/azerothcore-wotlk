@@ -32,6 +32,7 @@
 #include <unordered_map>
 
 #include "BattlegroundUtils.h"
+#include "BattlegroundMMR.h"
 
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
@@ -403,6 +404,14 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
     int32 aliFree = bg->GetFreeSlotsForTeam(TEAM_ALLIANCE);
     uint32 aliCount = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].size();
     uint32 hordeCount = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].size();
+
+    if (sBattlegroundMMRMgr->IsEnabled())
+    {
+        BalanceTeamsByMMR(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE], 
+                         bg->GetMaxPlayersPerTeam());
+        BalanceTeamsByMMR(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE], 
+                         bg->GetMaxPlayersPerTeam());
+    }
 
     // try to get even teams
     if (sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE) == BG_QUEUE_INVITATION_TYPE_EVEN)
@@ -1280,6 +1289,216 @@ void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg,
         if (bg->isArena() && bg->isRated())
             bg->ArenaLogEntries[player->GetGUID()].Fill(player->GetName(), player->GetGUID().GetCounter(), player->GetSession()->GetAccountId(), ginfo->ArenaTeamId, player->GetSession()->GetRemoteAddress());
     }
+}
+
+/*********************************************************/
+/***         BATTLEGROUND MMR BALANCING METHODS        ***/
+/*********************************************************/
+
+uint32 BattlegroundQueue::GetGroupQueueTime(GroupQueueInfo* group) const
+{
+    if (!group)
+        return 0;
+    
+    uint32 currentTime = getMSTime();
+    return (currentTime - group->JoinTime) / 1000;
+}
+
+float BattlegroundQueue::CalculateGroupAverageMMR(GroupQueueInfo* group)
+{
+    if (!group || group->Players.empty())
+        return 0.0f;
+    
+    float totalMMR = 0.0f;
+    uint32 count = 0;
+    
+    for (auto const& playerGuid : group->Players)
+    {
+        Player* player = ObjectAccessor::FindPlayer(playerGuid);
+        if (player)
+        {
+            totalMMR += sBattlegroundMMRMgr->GetPlayerMMR(player);
+            count++;
+        }
+    }
+    
+    return count > 0 ? totalMMR / count : 0.0f;
+}
+
+float BattlegroundQueue::CalculateGroupAverageGearScore(GroupQueueInfo* group)
+{
+    if (!group || group->Players.empty())
+        return 0.0f;
+    
+    float totalGearScore = 0.0f;
+    uint32 count = 0;
+    
+    for (auto const& playerGuid : group->Players)
+    {
+        Player* player = ObjectAccessor::FindPlayer(playerGuid);
+        if (player)
+        {
+            totalGearScore += sBattlegroundMMRMgr->GetPlayerGearScore(player);
+            count++;
+        }
+    }
+    
+    return count > 0 ? totalGearScore / count : 0.0f;
+}
+
+float BattlegroundQueue::TeamBalanceData::GetCombinedScore() const
+{
+    float avgMMR = GetAverageMMR();
+    float avgGear = GetAverageGearScore();
+    
+    float normalizedGear = (avgGear / 300.0f) * 1500.0f;
+    
+    float mmrWeight = sBattlegroundMMRMgr->GetMMRWeight();
+    float gearWeight = sBattlegroundMMRMgr->GetGearWeight();
+    
+    return (avgMMR * mmrWeight) + (normalizedGear * gearWeight);
+}
+
+void BattlegroundQueue::BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPlayers)
+{
+    if (!sBattlegroundMMRMgr->IsEnabled() || groups.empty())
+        return;
+    
+    // Load MMR and gear scores for all players
+    for (auto& group : groups)
+    {
+        for (auto const& playerGuid : group->Players)
+        {
+            Player* player = ObjectAccessor::FindPlayer(playerGuid);
+            if (player)
+            {
+                sBattlegroundMMRMgr->LoadPlayerMMR(player);
+                sBattlegroundMMRMgr->UpdateGearScore(player);
+            }
+        }
+    }
+    
+    // Calculate average queue time
+    uint32 totalQueueTime = 0;
+    uint32 groupCount = 0;
+    for (auto& group : groups)
+    {
+        totalQueueTime += GetGroupQueueTime(group);
+        groupCount++;
+    }
+    uint32 avgQueueTime = groupCount > 0 ? totalQueueTime / groupCount : 0;
+    
+    // Get relaxed tolerance based on average queue time
+    float maxMMRDifference = sBattlegroundMMRMgr->GetRelaxedMMRTolerance(avgQueueTime);
+    
+    TeamBalanceData team1, team2;
+    std::vector<GroupQueueInfo*> unassigned;
+    
+    for (auto& group : groups)
+        unassigned.push_back(group);
+    
+    // Sort groups by combined score (descending)
+    std::sort(unassigned.begin(), unassigned.end(), [this](GroupQueueInfo* a, GroupQueueInfo* b) {
+        float scoreA = CalculateGroupAverageMMR(a) * sBattlegroundMMRMgr->GetMMRWeight() +
+                      (CalculateGroupAverageGearScore(a) / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
+        float scoreB = CalculateGroupAverageMMR(b) * sBattlegroundMMRMgr->GetMMRWeight() +
+                      (CalculateGroupAverageGearScore(b) / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
+        return scoreA > scoreB;
+    });
+    
+    // Greedy algorithm with relaxed MMR tolerance
+    for (GroupQueueInfo* group : unassigned)
+    {
+        uint32 groupSize = static_cast<uint32>(group->Players.size());
+        float groupMMR = CalculateGroupAverageMMR(group);
+        
+        float team1ScoreIfAdded = 0.0f;
+        float team2ScoreIfAdded = 0.0f;
+        bool canAddToTeam1 = false;
+        bool canAddToTeam2 = false;
+        
+        // Check if we can add to team 1 (size and MMR tolerance)
+        if (team1.playerCount + groupSize <= maxPlayers)
+        {
+            TeamBalanceData tempTeam1 = team1;
+            tempTeam1.totalMMR += groupMMR * groupSize;
+            tempTeam1.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            tempTeam1.playerCount += groupSize;
+            team1ScoreIfAdded = tempTeam1.GetCombinedScore();
+            
+            // Check MMR difference constraint
+            if (team2.playerCount == 0 || std::abs(tempTeam1.GetAverageMMR() - team2.GetAverageMMR()) <= maxMMRDifference)
+            {
+                canAddToTeam1 = true;
+            }
+        }
+        
+        // Check if we can add to team 2 (size and MMR tolerance)
+        if (team2.playerCount + groupSize <= maxPlayers)
+        {
+            TeamBalanceData tempTeam2 = team2;
+            tempTeam2.totalMMR += groupMMR * groupSize;
+            tempTeam2.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            tempTeam2.playerCount += groupSize;
+            team2ScoreIfAdded = tempTeam2.GetCombinedScore();
+            
+            // Check MMR difference constraint
+            if (team1.playerCount == 0 || std::abs(team1.GetAverageMMR() - tempTeam2.GetAverageMMR()) <= maxMMRDifference)
+            {
+                canAddToTeam2 = true;
+            }
+        }
+        
+        // Assign to the team that maintains better balance
+        if (canAddToTeam1 && !canAddToTeam2)
+        {
+            team1.groups.push_back(group);
+            team1.totalMMR += groupMMR * groupSize;
+            team1.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            team1.playerCount += groupSize;
+            group->teamId = TEAM_ALLIANCE;
+        }
+        else if (canAddToTeam2 && !canAddToTeam1)
+        {
+            team2.groups.push_back(group);
+            team2.totalMMR += groupMMR * groupSize;
+            team2.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            team2.playerCount += groupSize;
+            group->teamId = TEAM_HORDE;
+        }
+        else if (canAddToTeam1 && canAddToTeam2)
+        {
+            // Both teams are valid, choose the one with lower score for balance
+            if (std::abs(team1ScoreIfAdded - team2.GetCombinedScore()) < 
+                std::abs(team1.GetCombinedScore() - team2ScoreIfAdded))
+            {
+                team1.groups.push_back(group);
+                team1.totalMMR += groupMMR * groupSize;
+                team1.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+                team1.playerCount += groupSize;
+                group->teamId = TEAM_ALLIANCE;
+            }
+            else
+            {
+                team2.groups.push_back(group);
+                team2.totalMMR += groupMMR * groupSize;
+                team2.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+                team2.playerCount += groupSize;
+                group->teamId = TEAM_HORDE;
+            }
+        }
+    }
+    
+    float mmrDifference = std::abs(team1.GetAverageMMR() - team2.GetAverageMMR());
+    
+    LOG_DEBUG("bg.queue", "BG MMR Balance - Queue Time: {}s, Tolerance: {:.0f}, "
+              "Team1: {} players (MMR: {:.2f}, Gear: {:.2f}), "
+              "Team2: {} players (MMR: {:.2f}, Gear: {:.2f}), "
+              "MMR Diff: {:.2f}",
+              avgQueueTime, maxMMRDifference,
+              team1.playerCount, team1.GetAverageMMR(), team1.GetAverageGearScore(),
+              team2.playerCount, team2.GetAverageMMR(), team2.GetAverageGearScore(),
+              mmrDifference);
 }
 
 /*********************************************************/
