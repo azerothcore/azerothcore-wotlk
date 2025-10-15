@@ -527,10 +527,9 @@ void MotionMaster::MovePath(uint32 path_id, ForcedMovement forcedMovement, PathS
         return;
     }
 
-    for (uint8 i = 0; i < path->size(); ++i)
+    for (auto& point : *path)
     {
-        WaypointData const& node = path->at(i);
-        points->push_back(G3D::Vector3(node.x, node.y, node.z));
+        points->push_back(G3D::Vector3(point.second.x, point.second.y, point.second.z));
     }
 
     // pass the new PointsArray* to the appropriate MoveSplinePath function
