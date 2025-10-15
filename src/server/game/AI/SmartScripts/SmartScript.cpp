@@ -1723,7 +1723,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
             break;
         }
-        case SMART_ACTION_WP_START:
+        case SMART_ACTION_ESCORT_START:
         {
             if (!IsSmart())
                 break;
@@ -1750,7 +1750,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->SetDespawnTime(DespawnTime);
             break;
         }
-        case SMART_ACTION_WP_PAUSE:
+        case SMART_ACTION_ESCORT_PAUSE:
         {
             if (!IsSmart())
                 break;
@@ -1759,7 +1759,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->PausePath(delay, e.GetEventType() == SMART_EVENT_WAYPOINT_REACHED ? false : true);
             break;
         }
-        case SMART_ACTION_WP_STOP:
+        case SMART_ACTION_ESCORT_STOP:
         {
             if (!IsSmart())
                 break;
@@ -1770,7 +1770,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->StopPath(DespawnTime, quest, fail);
             break;
         }
-        case SMART_ACTION_WP_RESUME:
+        case SMART_ACTION_ESCORT_RESUME:
         {
             if (!IsSmart())
                 break;

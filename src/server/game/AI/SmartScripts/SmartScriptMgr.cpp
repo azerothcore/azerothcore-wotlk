@@ -766,9 +766,9 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SUMMON_GO: return sizeof(SmartAction::summonGO);
             case SMART_ACTION_KILL_UNIT: return NO_PARAMS;
             case SMART_ACTION_ACTIVATE_TAXI: return sizeof(SmartAction::taxi);
-            case SMART_ACTION_WP_START: return sizeof(SmartAction::wpStart);
-            case SMART_ACTION_WP_PAUSE: return sizeof(SmartAction::wpPause);
-            case SMART_ACTION_WP_STOP: return sizeof(SmartAction::wpStop);
+            case SMART_ACTION_ESCORT_START: return sizeof(SmartAction::wpStart);
+            case SMART_ACTION_ESCORT_PAUSE: return sizeof(SmartAction::wpPause);
+            case SMART_ACTION_ESCORT_STOP: return sizeof(SmartAction::wpStop);
             case SMART_ACTION_ADD_ITEM: return sizeof(SmartAction::item);
             case SMART_ACTION_REMOVE_ITEM: return sizeof(SmartAction::item);
             case SMART_ACTION_INSTALL_AI_TEMPLATE: return sizeof(SmartAction::installTtemplate);
@@ -778,7 +778,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_TELEPORT: return sizeof(SmartAction::teleport);
             case SMART_ACTION_SET_COUNTER: return sizeof(SmartAction::setCounter);
             case SMART_ACTION_STORE_TARGET_LIST: return sizeof(SmartAction::storeTargets);
-            case SMART_ACTION_WP_RESUME: return NO_PARAMS;
+            case SMART_ACTION_ESCORT_RESUME: return NO_PARAMS;
             case SMART_ACTION_SET_ORIENTATION: return sizeof(SmartAction::orientation);
             case SMART_ACTION_CREATE_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
             case SMART_ACTION_PLAYMOVIE: return sizeof(SmartAction::movie);
@@ -1722,11 +1722,11 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 return false;
             }
             break;
-        case SMART_ACTION_WP_STOP:
+        case SMART_ACTION_ESCORT_STOP:
             if (e.action.wpStop.quest && !IsQuestValid(e, e.action.wpStop.quest))
                 return false;
             return IsSAIBoolValid(e, e.action.wpStop.fail);
-        case SMART_ACTION_WP_START:
+        case SMART_ACTION_ESCORT_START:
             {
                 if (!sSmartWaypointMgr->GetPath(e.action.wpStart.pathID))
                 {
@@ -1941,7 +1941,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_STORE_TARGET_LIST:
         case SMART_ACTION_COMBAT_STOP:
         case SMART_ACTION_DIE:
-        case SMART_ACTION_WP_RESUME:
+        case SMART_ACTION_ESCORT_RESUME:
         case SMART_ACTION_KILL_UNIT:
         case SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL:
         case SMART_ACTION_RESET_GOBJECT:
@@ -1951,7 +1951,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_SET_DATA:
         case SMART_ACTION_MOVE_FORWARD:
-        case SMART_ACTION_WP_PAUSE:
+        case SMART_ACTION_ESCORT_PAUSE:
         case SMART_ACTION_SET_FLY:
         case SMART_ACTION_FORCE_DESPAWN:
         case SMART_ACTION_SET_INGAME_PHASE_MASK:
