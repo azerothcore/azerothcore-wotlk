@@ -111,7 +111,7 @@ void BattlegroundMMRMgr::SaveToDB(Player* player, const BattlegroundPlayerMMR& d
     CharacterDatabase.Execute(stmt);
 }
 
-float BattlegroundMMRMgr::CalculateGearScore(Player* player)
+float BattlegroundMMRMgr::CalculateGearScore(Player* player) const
 {
     if (!player)
         return 0.0f;
