@@ -277,6 +277,9 @@ function restore_missing_services() {
         local service_exists=false
         
         if [ "$provider" = "pm2" ]; then
+            echo "Check if PM2 is installed..."
+            check_pm2 || { echo -e "${RED}PM2 is not installed. Cannot check service status.${NC}"; exit 1; }
+
             if pm2 describe "$name" >/dev/null 2>&1; then
                 service_exists=true
             fi
