@@ -52,13 +52,13 @@ public:
     bool IsAIControlled() const;
 
     // Start moving to the desired MovePoint
-    void StartPath(ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
-    bool LoadPath(uint32 entry);
+    void StartPath(ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr, PathSource pathSource = PathSource::SMART_WAYPOINT_MGR);
+    bool LoadPath(uint32 entry, PathSource pathSource);
     void PausePath(uint32 delay, bool forced = false);
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
     void EndPath(bool fail = false);
     void ResumePath();
-    WayPoint* GetNextWayPoint();
+    WaypointData const* GetNextWayPoint();
     void GenerateWayPointArray(Movement::PointsArray* points);
     bool HasEscortState(uint32 uiEscortState) { return (mEscortState & uiEscortState); }
     void AddEscortState(uint32 uiEscortState) { mEscortState |= uiEscortState; }
@@ -227,13 +227,13 @@ private:
     void ReturnToLastOOCPos();
     void UpdatePath(const uint32 diff);
     SmartScript mScript;
-    WPPath* mWayPoints;
+    WaypointPath const* mWayPoints;
     uint32 mEscortState;
     uint32 mCurrentWPID;
     bool mWPReached;
     bool mOOCReached;
     uint32 mWPPauseTimer;
-    WayPoint* mLastWP;
+    WaypointData const* mLastWP;
     uint32 mEscortNPCFlags;
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
     bool mCanRepeatPath;

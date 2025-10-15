@@ -26,28 +26,9 @@
 #include "Optional.h"
 #include "SpellMgr.h"
 #include <limits>
+#include "WaypointMgr.h"
 
 typedef uint32 SAIBool;
-
-struct WayPoint
-{
-    WayPoint(uint32 _id, float _x, float _y, float _z, Optional<float> _o, uint32 _delay)
-    {
-        id = _id;
-        x = _x;
-        y = _y;
-        z = _z;
-        o = _o;
-        delay = _delay;
-    }
-
-    uint32 id;
-    float x;
-    float y;
-    float z;
-    std::optional<float> o;
-    uint32 delay;
-};
 
 enum eSmartAI
 {
@@ -2010,8 +1991,6 @@ public:
     static constexpr uint32 DEFAULT_PRIORITY = std::numeric_limits<uint32>::max();
 };
 
-typedef std::unordered_map<uint32, WayPoint*> WPPath;
-
 typedef std::vector<WorldObject*> ObjectVector;
 
 class ObjectGuidVector
@@ -2059,7 +2038,7 @@ public:
 
     void LoadFromDB();
 
-    WPPath* GetPath(uint32 id)
+    WaypointPath* GetPath(uint32 id)
     {
         if (waypoint_map.find(id) != waypoint_map.end())
             return waypoint_map[id];
@@ -2067,7 +2046,7 @@ public:
     }
 
 private:
-    std::unordered_map<uint32, WPPath*> waypoint_map;
+    std::unordered_map<uint32, WaypointPath*> waypoint_map;
 };
 
 // all events for a single entry

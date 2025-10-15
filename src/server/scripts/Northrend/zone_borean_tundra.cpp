@@ -1685,7 +1685,7 @@ public:
                         // Arthas load path
                         if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
                         {
-                            arthas->GetMotionMaster()->MovePath(PATH_ARTHAS, false);
+                            arthas->GetMotionMaster()->MoveWaypoint(PATH_ARTHAS, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_3, 1s);
                         break;
@@ -1693,7 +1693,7 @@ public:
                         // Talbot load path
                         if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                         {
-                            talbot->GetMotionMaster()->MovePath(PATH_TALBOT, false);
+                            talbot->GetMotionMaster()->MoveWaypoint(PATH_TALBOT, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_4, 20s);
                         break;
@@ -1727,7 +1727,7 @@ public:
                             arlos->SetWalk(true);
                             arlos->SetImmuneToAll(true);
                             arlos->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                            arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
+                            arlos->GetMotionMaster()->MoveWaypoint(PATH_ARLOS, false);
                         }
                         if (Creature* leryssa = me->SummonCreature(NPC_LERYSSA, 3751.0986f, 3614.9219f, 473.4048f, 4.5029f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
                         {
@@ -1735,7 +1735,7 @@ public:
                             leryssa->SetWalk(true);
                             leryssa->SetImmuneToAll(true);
                             leryssa->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                            leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
+                            leryssa->GetMotionMaster()->MoveWaypoint(PATH_LERYSSA, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_7, 7s);
                         break;
@@ -1990,7 +1990,7 @@ public:
                 _playerGUID = player->GetGUID();
                 CloseGossipMenuFor(player);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
+                me->GetMotionMaster()->MoveWaypoint(PATH_THASSARIAN, false);
             }
         }
 

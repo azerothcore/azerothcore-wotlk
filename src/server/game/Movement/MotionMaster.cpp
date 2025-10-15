@@ -32,6 +32,7 @@
 #include "TargetedMovementGenerator.h"
 #include "WaypointMgr.h"
 #include "WaypointMovementGenerator.h"
+#include "SmartScriptMgr.h"
 
 inline MovementGenerator* GetIdleMovementGenerator()
 {
@@ -503,15 +504,33 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path, ForcedMovement fo
     }
 }
 
-void MotionMaster::MoveSplinePath(uint32 path_id, ForcedMovement forcedMovement)
+void MotionMaster::MovePath(uint32 path_id, ForcedMovement forcedMovement, PathSource pathSource)
 {
     // convert the path id to a Movement::PointsArray*
     Movement::PointsArray* points = new Movement::PointsArray();
-    WaypointPath const* path = sWaypointMgr->GetPath(path_id);
+    WaypointPath const* path;
+    switch (pathSource)
+    {
+        default:
+        case PathSource::WAYPOINT_MGR:
+            path = sWaypointMgr->GetPath(path_id);
+            break;
+        case PathSource::SMART_WAYPOINT_MGR:
+            path = sSmartWaypointMgr->GetPath(path_id);
+            break;
+    }
+
+    if (path == nullptr)
+    {
+        LOG_ERROR("sql.sql", "WaypointMovementGenerator::LoadPath: creature {} ({}) doesn't have waypoint path id: {} pathSource: {}",
+            _owner->GetName(), _owner->GetGUID().ToString(), path_id, pathSource);
+        return;
+    }
+
     for (uint8 i = 0; i < path->size(); ++i)
     {
-        WaypointData const* node = path->at(i);
-        points->push_back(G3D::Vector3(node->x, node->y, node->z));
+        WaypointData const& node = path->at(i);
+        points->push_back(G3D::Vector3(node.x, node.y, node.z));
     }
 
     // pass the new PointsArray* to the appropriate MoveSplinePath function
@@ -881,7 +900,7 @@ void MotionMaster::Mutate(MovementGenerator* m, MovementSlot slot)
 /**
  * @brief Move the unit following a specific path. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  */
-void MotionMaster::MovePath(uint32 path_id, bool repeatable)
+void MotionMaster::MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource)
 {
     if (!path_id)
         return;
@@ -889,20 +908,7 @@ void MotionMaster::MovePath(uint32 path_id, bool repeatable)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    //We set waypoint movement as new default movement generator
-    // clear ALL movement generators (including default)
-    /*while (!empty())
-    {
-        MovementGenerator *curr = top();
-        curr->Finalize(*_owner);
-        pop();
-        if (!isStatic(curr))
-            delete curr;
-    }*/
-
-    //_owner->IsPlayer() ?
-    //Mutate(new WaypointMovementGenerator<Player>(path_id, repeatable)):
-    Mutate(new WaypointMovementGenerator<Creature>(path_id, repeatable), MOTION_SLOT_IDLE);
+    Mutate(new WaypointMovementGenerator<Creature>(path_id, pathSource, repeatable), MOTION_SLOT_IDLE);
 
     LOG_DEBUG("movement.motionmaster", "{} ({}) start moving over path(Id:{}, repeatable: {})",
         _owner->IsPlayer() ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");

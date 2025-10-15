@@ -78,22 +78,24 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature* creature)
     creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
     m_isArrivalDone = true;
 
-    if (i_path->at(i_currentNode)->event_id && urand(0, 99) < i_path->at(i_currentNode)->event_chance)
+    auto currentNodeItr = i_path->find(i_currentNode);
+
+    if (currentNodeItr->second.event_id && urand(0, 99) < currentNodeItr->second.event_chance)
     {
         LOG_DEBUG("maps.script", "Creature movement start script {} at point {} for {}.",
-            i_path->at(i_currentNode)->event_id, i_currentNode, creature->GetGUID().ToString());
+            currentNodeItr->second.event_id, i_currentNode, creature->GetGUID().ToString());
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-        creature->GetMap()->ScriptsStart(sWaypointScripts, i_path->at(i_currentNode)->event_id, creature, nullptr);
+        creature->GetMap()->ScriptsStart(sWaypointScripts, currentNodeItr->second.event_id, creature, nullptr);
     }
 
     // Inform script
     MovementInform(creature);
     creature->UpdateWaypointID(i_currentNode);
 
-    if (i_path->at(i_currentNode)->delay)
+    if (currentNodeItr->second.delay)
     {
         creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-        Stop(i_path->at(i_currentNode)->delay);
+        Stop(currentNodeItr->second.delay);
     }
 }
 
@@ -116,9 +118,10 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         // Xinef: not true... update this at every waypoint!
         //if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
         {
-            float x = i_path->at(i_currentNode)->x;
-            float y = i_path->at(i_currentNode)->y;
-            float z = i_path->at(i_currentNode)->z;
+            auto currentNodeItr = i_path->find(i_currentNode);
+            float x = currentNodeItr->second.x;
+            float y = currentNodeItr->second.y;
+            float z = currentNodeItr->second.z;
             float o = creature->GetOrientation();
 
             if (!transportPath)
@@ -155,13 +158,14 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         return true;
     }
 
-    WaypointData const* node = i_path->at(i_currentNode);
+    auto currentNodeItr = i_path->find(i_currentNode);
+    WaypointData const& node = currentNodeItr->second;
 
     m_isArrivalDone = false;
 
     creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
 
-    Movement::Location formationDest(node->x, node->y, node->z, 0.0f);
+    Movement::Location formationDest(node.x, node.y, node.z, 0.0f);
     Movement::MoveSplineInit init(creature);
 
     //! If creature is on transport, we assume waypoints set in DB are already transport offsets
@@ -172,16 +176,16 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             trans->CalculatePassengerPosition(formationDest.x, formationDest.y, formationDest.z, &formationDest.orientation);
     }
 
-    float z = node->z;
-    creature->UpdateAllowedPositionZ(node->x, node->y, z);
+    float z = node.z;
+    creature->UpdateAllowedPositionZ(node.x, node.y, z);
     //! Do not use formationDest here, MoveTo requires transport offsets due to DisableTransportPathTransformations() call
     //! but formationDest contains global coordinates
-    init.MoveTo(node->x, node->y, z, true, true);
+    init.MoveTo(node.x, node.y, z, true, true);
 
-    if (node->orientation.has_value() && node->delay > 0)
-        init.SetFacing(*node->orientation);
+    if (node.orientation.has_value() && node.delay > 0)
+        init.SetFacing(*node.orientation);
 
-    switch (node->move_type)
+    switch (node.move_type)
     {
         case WAYPOINT_MOVE_TYPE_LAND:
             init.SetAnimation(Movement::ToGround);
@@ -203,7 +207,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
 
     //Call for creature group update
     if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-        creature->GetFormation()->LeaderMoveTo(formationDest.x, formationDest.y, formationDest.z, node->move_type);
+        creature->GetFormation()->LeaderMoveTo(formationDest.x, formationDest.y, formationDest.z, node.move_type);
 
     return true;
 }

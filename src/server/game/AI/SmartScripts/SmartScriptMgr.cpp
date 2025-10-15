@@ -48,12 +48,9 @@ void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+    for (auto itr : waypoint_map)
     {
-        for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
-            delete pathItr->second;
-
-        delete itr->second;
+        delete itr.second;
     }
 
     waypoint_map.clear();
@@ -88,7 +85,7 @@ void SmartWaypointMgr::LoadFromDB()
 
         if (last_entry != entry)
         {
-            waypoint_map[entry] = new WPPath();
+            waypoint_map[entry] = new WaypointPath();
             last_id = 1;
             count++;
         }
@@ -97,7 +94,14 @@ void SmartWaypointMgr::LoadFromDB()
             LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry {}, unexpected point id {}, expected {}.", entry, id, last_id);
 
         last_id++;
-        (*waypoint_map[entry])[id] = new WayPoint(id, x, y, z, o, delay);
+        WaypointData data;
+        data.id = id;
+        data.x = x;
+        data.y = y;
+        data.z = z;
+        data.orientation = o;
+        data.delay = delay;
+        (*waypoint_map[entry]).emplace(id, data);
 
         last_entry = entry;
         total++;
@@ -109,12 +113,9 @@ void SmartWaypointMgr::LoadFromDB()
 
 SmartWaypointMgr::~SmartWaypointMgr()
 {
-    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+    for (auto itr : waypoint_map)
     {
-        for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
-            delete pathItr->second;
-
-        delete itr->second;
+        delete itr.second;
     }
 }
 
