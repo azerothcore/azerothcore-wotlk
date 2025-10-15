@@ -204,7 +204,7 @@ public:
 
         if (me->GetEntry() == NPC_VEM)
         {
-            me->GetMotionMaster()->MovePath(VEM_WAYPOINT_PATH, true);
+            me->GetMotionMaster()->MoveWaypoint(VEM_WAYPOINT_PATH, true);
         }
     }
 

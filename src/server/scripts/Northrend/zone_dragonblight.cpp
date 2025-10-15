@@ -614,7 +614,7 @@ public:
             uint32 path = me->GetEntry() * 10 + urand(0, 4);
             if (me->GetPositionY() > -1150.0f)
                 path += 5;
-            me->GetMotionMaster()->MovePath(path, false);
+            me->GetMotionMaster()->MoveWaypoint(path, false);
         }
 
         void MovementInform(uint32 type, uint32 point) override

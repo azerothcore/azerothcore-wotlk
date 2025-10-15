@@ -127,7 +127,7 @@ struct boss_nalorakk : public BossAI
                             {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
-                                me->GetMotionMaster()->MovePath(me->GetEntry()*100+1, false);
+                                me->GetMotionMaster()->MoveWaypoint(me->GetEntry()*100+1, false);
                                 Talk(SAY_RUN_AWAY);
                                 _introScheduler.Schedule(5s, [this](TaskContext)
                                 {
@@ -153,7 +153,7 @@ struct boss_nalorakk : public BossAI
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
-                                me->GetMotionMaster()->MovePath(me->GetEntry()*100+2, false);
+                                me->GetMotionMaster()->MoveWaypoint(me->GetEntry()*100+2, false);
                                 _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);
@@ -176,7 +176,7 @@ struct boss_nalorakk : public BossAI
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
-                                me->GetMotionMaster()->MovePath(me->GetEntry() * 100 + 3, false);
+                                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 100 + 3, false);
                                 _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);

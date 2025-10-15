@@ -106,20 +106,20 @@ void SmartAI::UpdateDespawn(const uint32 diff)
         mDespawnTime -= diff;
 }
 
-WayPoint* SmartAI::GetNextWayPoint()
+WaypointData const* SmartAI::GetNextWayPoint()
 {
     if (!mWayPoints || mWayPoints->empty())
         return nullptr;
 
     mCurrentWPID++;
-    WPPath::const_iterator itr = mWayPoints->find(mCurrentWPID);
+    auto itr = mWayPoints->find(mCurrentWPID);
     if (itr != mWayPoints->end())
     {
-        mLastWP = (*itr).second;
+        mLastWP = &(*itr).second;
         if (mLastWP->id != mCurrentWPID)
             LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id {}, expected {}", mLastWP->id, mCurrentWPID);
 
-        return (*itr).second;
+        return &(*itr).second;
     }
     return nullptr;
 }
@@ -136,12 +136,15 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
         points->clear();
         points->push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
         uint32 wpCounter = mCurrentWPID;
-        WPPath::const_iterator itr;
-        while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end())
+        auto itr = mWayPoints->find(wpCounter++);
+        do
         {
-            WayPoint* wp = (*itr).second;
-            points->push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+            WaypointData const& wp = (*itr).second;
+            points->push_back(G3D::Vector3(wp.x, wp.y, wp.z));
+
+            itr = mWayPoints->find(wpCounter++);
         }
+        while (itr != mWayPoints->end());
     }
     else
     {
@@ -154,12 +157,16 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
 
             uint32 cnt = 0;
             uint32 wpCounter = mCurrentWPID;
-            WPPath::const_iterator itr;
-            while ((itr = mWayPoints->find(wpCounter++)) != mWayPoints->end() && cnt++ <= length)
+
+            auto itr = mWayPoints->find(wpCounter++);
+            do
             {
-                WayPoint* wp = (*itr).second;
-                pVector.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                WaypointData const& wp = (*itr).second;
+                pVector.push_back(G3D::Vector3(wp.x, wp.y, wp.z));
+
+                itr = mWayPoints->find(wpCounter++);
             }
+            while (itr != mWayPoints->end());
 
             if (pVector.size() > 2) // more than source + dest
             {
@@ -187,21 +194,21 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
     }
 }
 
-void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat, Unit* invoker)
+void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat, Unit* invoker, PathSource pathSource)
 {
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         StopPath();
 
     if (path)
     {
-        if (!LoadPath(path))
+        if (!LoadPath(path, pathSource))
             return;
     }
 
     if (!mWayPoints || mWayPoints->empty())
         return;
 
-    if (WayPoint* wp = GetNextWayPoint())
+    if (WaypointData const* wp = GetNextWayPoint())
     {
         AddEscortState(SMART_ESCORT_ESCORTING);
         mCanRepeatPath = repeat;
@@ -220,16 +227,33 @@ void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat,
     }
 }
 
-bool SmartAI::LoadPath(uint32 entry)
+bool SmartAI::LoadPath(uint32 entry, PathSource pathSource)
 {
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         return false;
 
-    mWayPoints = sSmartWaypointMgr->GetPath(entry);
-    if (!mWayPoints)
+    switch (pathSource)
     {
-        GetScript()->SetPathId(0);
-        return false;
+        case PathSource::SMART_WAYPOINT_MGR:
+        {
+            mWayPoints = sSmartWaypointMgr->GetPath(entry);
+            if (!mWayPoints)
+            {
+                GetScript()->SetPathId(0);
+                return false;
+            }
+            break;
+        }
+        case PathSource::WAYPOINT_MGR:
+        {
+            mWayPoints = sWaypointMgr->GetPath(entry);
+            if (!mWayPoints)
+            {
+                GetScript()->SetPathId(0);
+                return false;
+            }
+            break;
+        }
     }
 
     GetScript()->SetPathId(entry);
@@ -259,9 +283,9 @@ void SmartAI::PausePath(uint32 delay, bool forced)
         me->GetMotionMaster()->MoveIdle();//force stop
 
         auto waypoint = mWayPoints->find(mCurrentWPID);
-        if (waypoint->second->o.has_value())
+        if (waypoint->second.orientation.has_value())
         {
-            me->SetFacingTo(waypoint->second->o.has_value());
+            me->SetFacingTo(waypoint->second.orientation.has_value());
         }
     }
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_PAUSED, nullptr, mCurrentWPID, GetScript()->GetPathId());

@@ -188,7 +188,7 @@ struct boss_ossirian : public BossAI
         {
             if (Creature* vortex = me->SummonCreature(NPC_SAND_VORTEX, pos))
             {
-                vortex->GetMotionMaster()->MovePath(pathIds.front(), true);
+                vortex->GetMotionMaster()->MoveWaypoint(pathIds.front(), true);
                 pathIds.reverse();
             }
         }

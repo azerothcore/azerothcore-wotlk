@@ -539,16 +539,16 @@ public:
                     break;
                 case 3:
                     me->SetWalk(true);
-                    me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
+                    me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 100, false);
                     if (Creature* c = me->FindNearestCreature(NPC_THERON, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
+                        c->GetMotionMaster()->MoveWaypoint(c->GetEntry() * 100, false);
                     }
                     if (Creature* c = me->FindNearestCreature(NPC_AURIC, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
+                        c->GetMotionMaster()->MoveWaypoint(c->GetEntry() * 100, false);
                     }
                     break;
                 case 4:

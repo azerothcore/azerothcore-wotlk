@@ -1742,7 +1742,7 @@ public:
                             {
                                 sindragosa->setActive(true);
                                 sindragosa->SetDisableGravity(true);
-                                sindragosa->GetMotionMaster()->MovePath(NPC_SINDRAGOSA * 10, true);
+                                sindragosa->GetMotionMaster()->MoveWaypoint(NPC_SINDRAGOSA * 10, true);
 
                                 if (TempSummon* summon = sindragosa->ToTempSummon())
                                 {

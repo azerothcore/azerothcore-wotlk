@@ -437,7 +437,7 @@ public:
             {
                 if (Creature* add = instance->GetCreature(*addsAtBase.begin()))
                 {
-                    add->GetMotionMaster()->MovePath(PATH_ADDS, false);
+                    add->GetMotionMaster()->MoveWaypoint(PATH_ADDS, false);
                     movedadds.push_back(add->GetGUID());
                 }
 

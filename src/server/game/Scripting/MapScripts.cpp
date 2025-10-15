@@ -767,7 +767,7 @@ void Map::ScriptsProcess()
                     if (!sWaypointMgr->GetPath(step.script->LoadPath.PathID))
                         LOG_ERROR("maps.script", "{} source object has an invalid path ({}), skipping.", step.script->GetDebugInfo(), step.script->LoadPath.PathID);
                     else
-                        unit->GetMotionMaster()->MovePath(step.script->LoadPath.PathID, step.script->LoadPath.IsRepeatable);
+                        unit->GetMotionMaster()->MoveWaypoint(step.script->LoadPath.PathID, step.script->LoadPath.IsRepeatable);
                 }
                 break;
 
@@ -888,7 +888,7 @@ void Map::ScriptsProcess()
                             cSource->GetMotionMaster()->MoveRandom((float)step.script->Movement.MovementDistance);
                             break;
                         case WAYPOINT_MOTION_TYPE:
-                            cSource->GetMotionMaster()->MovePath(step.script->Movement.Path, false);
+                            cSource->GetMotionMaster()->MoveWaypoint(step.script->Movement.Path, false);
                             break;
                     }
                 }
