@@ -857,6 +857,9 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
         PlaySoundToAll(SOUND_HORDE_WINS); // horde wins sound
     }
 
+    if (sBattlegroundMMRMgr->IsEnabled() && !isRated() && !isArena())
+        UpdateBattlegroundMMR(winner);
+
     CharacterDatabasePreparedStatement* stmt = nullptr;
     uint64 battlegroundId = 1;
     if (isBattleground() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
@@ -974,6 +977,48 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
         SpiritOfCompetitionEvent(winnerTeamId);
 
     sScriptMgr->OnBattlegroundEnd(this, GetTeamId(winnerTeamId));
+}
+
+void Battleground::UpdateBattlegroundMMR(Team winner)
+{
+    std::vector<Player*> winningTeam;
+    std::vector<Player*> losingTeam;
+    
+    // Collect all players from both teams
+    for (auto const& itr : m_Players)
+    {
+        Player* player = ObjectAccessor::FindPlayer(itr.first);
+        if (!player || itr.second.OfflineRemoveTime)
+            continue;
+        
+        Team playerTeam = player->GetBGTeam();
+        
+        if (playerTeam == winner)
+            winningTeam.push_back(player);
+        else
+            losingTeam.push_back(player);
+    }
+    
+    // Update ratings for winning team (silently)
+    for (Player* player : winningTeam)
+    {
+        if (player && player->IsInWorld())
+        {
+            sBattlegroundMMRMgr->UpdatePlayerRating(player, true, losingTeam);
+        }
+    }
+    
+    // Update ratings for losing team (silently)
+    for (Player* player : losingTeam)
+    {
+        if (player && player->IsInWorld())
+        {
+            sBattlegroundMMRMgr->UpdatePlayerRating(player, false, winningTeam);
+        }
+    }
+    
+    LOG_INFO("bg.mmr", "Updated MMR for {} winners and {} losers in BG {}",
+             winningTeam.size(), losingTeam.size(), GetTypeID());
 }
 
 void Battleground::SpiritOfCompetitionEvent(PvPTeamId winnerTeamId) const
