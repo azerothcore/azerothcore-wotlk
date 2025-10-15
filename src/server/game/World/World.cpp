@@ -29,6 +29,7 @@
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundMgr.h"
+#include "BattlegroundMMR.h"
 #include "CalendarMgr.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
