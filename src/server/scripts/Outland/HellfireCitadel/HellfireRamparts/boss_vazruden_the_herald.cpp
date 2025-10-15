@@ -102,7 +102,7 @@ struct boss_vazruden_the_herald : public BossAI
         if (summon->GetEntry() == NPC_HELLFIRE_SENTRY && summons.size() == 0)
         {
             Talk(SAY_INTRO);
-            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 85.0f, false);
+            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 85.0f, FORCED_MOVEMENT_NONE, 0.f, false);
             _JustEngagedWith();
         }
         else if (summons.size() == 0)
@@ -163,7 +163,7 @@ struct boss_nazan : public ScriptedAI
         _scheduler.CancelAll();
         _scheduler.Schedule(5ms, GROUP_PHASE_1, [this](TaskContext context)
         {
-            me->GetMotionMaster()->MovePoint(POINT_FLIGHT, NazanPos[urand(0, 2)], false);
+            me->GetMotionMaster()->MovePoint(POINT_FLIGHT, NazanPos[urand(0, 2)], FORCED_MOVEMENT_NONE, 0.f, false);
             _scheduler.DelayAll(7s);
             context.Repeat(30s);
         }).Schedule(5s, GROUP_PHASE_1, [this](TaskContext context)
@@ -193,7 +193,7 @@ struct boss_nazan : public ScriptedAI
             Talk(EMOTE_NAZAN);
             me->SetReactState(REACT_PASSIVE);
             me->InterruptNonMeleeSpells(true);
-            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 81.2f, false);
+            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 81.2f, FORCED_MOVEMENT_NONE, 0.f, false);
         }
     }
 

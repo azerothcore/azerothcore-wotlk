@@ -552,6 +552,11 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     }
 }
 
+void ScriptedAI::SetRun(bool run)
+{
+    me->SetWalk(!run);
+}
+
 enum eNPCs
 {
     NPC_BROODLORD   = 12017,

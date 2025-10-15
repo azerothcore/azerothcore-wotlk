@@ -397,7 +397,7 @@ public:
         if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
         {
             if (npc_escortAI* pEscortAI = CAST_AI(npc_prospector_remtravel::npc_prospector_remtravelAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
+                pEscortAI->Start(false, player->GetGUID());
 
             creature->SetFaction(FACTION_ESCORTEE_A_NEUTRAL_PASSIVE);
         }

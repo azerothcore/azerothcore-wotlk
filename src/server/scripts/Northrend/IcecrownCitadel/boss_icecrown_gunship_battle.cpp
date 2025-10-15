@@ -503,7 +503,7 @@ public:
         float x, y, z, o;
         _dest.GetPosition(x, y, z, o);
         _owner->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
-        _owner->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, false);
+        _owner->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
         return true;
     }
 
@@ -915,7 +915,7 @@ public:
                         {
                             float x, y, z, o;
                             me->GetHomePosition(x, y, z, o);
-                            me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                            me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                         }
                     }
                     else
@@ -1072,7 +1072,7 @@ public:
                 {
                     float x, y, z, o;
                     me->GetHomePosition(x, y, z, o);
-                    me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                    me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
             }
         }
@@ -1251,7 +1251,7 @@ public:
                         {
                             float x, y, z, o;
                             me->GetHomePosition(x, y, z, o);
-                            me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                            me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                         }
                     }
                     else
@@ -1411,7 +1411,7 @@ public:
                 {
                     float x, y, z, o;
                     me->GetHomePosition(x, y, z, o);
-                    me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                    me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
             }
         }
@@ -1518,7 +1518,7 @@ struct gunship_npc_AI : public ScriptedAI
             me->SetTransportHomePosition(Slot->TargetPosition);
             me->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
             me->SetHomePosition(x, y, z, o);
-            me->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, false);
+            me->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
         }
     }
 

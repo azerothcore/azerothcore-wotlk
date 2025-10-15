@@ -430,7 +430,7 @@ public:
                                 Talk(SAY_RAG_SUM_2);
                                 // Next event will get triggered in MovementInform
                                 me->SetWalk(true);
-                                me->GetMotionMaster()->MovePoint(POINT_RAGNAROS_SUMMON, MajordomoMoveRagPos, true, false);
+                                me->GetMotionMaster()->MovePoint(POINT_RAGNAROS_SUMMON, MajordomoMoveRagPos, FORCED_MOVEMENT_NONE, 0.f, true, false);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_2:

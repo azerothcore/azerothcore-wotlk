@@ -170,7 +170,7 @@ public:
             if (m_uiEventId == EVENT_OZ)
                 instance->SetData(DATA_OPERA_OZ_DEATHCOUNT, IN_PROGRESS);
 
-            Start(false, false);
+            Start(false);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }

@@ -48,7 +48,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_CHASING_AME)
         {
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, false, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, player->GetGUID());
             creature->AI()->Talk(SAY_READY, player);
             creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
             // Change faction so mobs attack

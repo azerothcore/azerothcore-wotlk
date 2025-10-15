@@ -507,7 +507,7 @@ struct boss_illidan_stormrage : public BossAI
                     Talk(SAY_ILLIDAN_EYE_BLAST);
                     me->SummonCreature(NPC_ILLIDAN_DB_TARGET, eyeBeamPos[beamPosId], TEMPSUMMON_TIMED_DESPAWN, 30000);
                     if (Creature* trigger = summons.GetCreatureWithEntry(NPC_ILLIDAN_DB_TARGET))
-                        trigger->GetMotionMaster()->MovePoint(0, eyeBeamPos[beamPosId + MAX_EYE_BEAM_POS], false, true);
+                        trigger->GetMotionMaster()->MovePoint(0, eyeBeamPos[beamPosId + MAX_EYE_BEAM_POS], FORCED_MOVEMENT_NONE, 0.f, false, true);
 
                     // Reposition
                     me->m_Events.AddEventAtOffset([&] {
@@ -515,7 +515,7 @@ struct boss_illidan_stormrage : public BossAI
                         me->InterruptNonMeleeSpells(false);
                         me->SetControlled(false, UNIT_STATE_ROOT);
                         CycleBeamPos(beamPosId);
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_HOVER, airHoverPos[beamPosId], false, true);
+                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_HOVER, airHoverPos[beamPosId], FORCED_MOVEMENT_NONE, 0.f, false, true);
                     }, 20s, GROUP_PHASE_FLYING);
                 });
                 // Check for Phase Transition

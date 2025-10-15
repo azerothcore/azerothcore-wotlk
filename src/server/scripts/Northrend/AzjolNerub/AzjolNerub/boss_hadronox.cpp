@@ -232,63 +232,74 @@ struct npc_anub_ar_crusher : public ScriptedAI
                 }
     }
 
-    void JustSummoned(Creature* summon) override
-    {
-        if (summon->GetEntry() != me->GetEntry())
+        void JustSummoned(Creature* summon) override
         {
-            summon->GetMotionMaster()->MovePoint(0, *me, false);
-            summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
-        }
-        summons.Summon(summon);
-    }
-
-    void DoAction(int32 param) override
-    {
-        if (param == ACTION_DESPAWN_ADDS)
-        {
-            summons.DoAction(ACTION_DESPAWN_ADDS);
-            summons.DespawnAll();
-        }
-    }
-
-    void JustEngagedWith(Unit*) override
-    {
-        if (me->ToTempSummon())
-            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                if (summoner->GetEntry() != me->GetEntry())
-                {
-                    summoner->GetAI()->DoAction(ACTION_START_EVENT);
-                    me->SummonCreature(NPC_ANUB_AR_CRUSHER, 519.58f, 573.73f, 734.30f, 4.50f);
-                    me->SummonCreature(NPC_ANUB_AR_CRUSHER, 539.38f, 573.25f, 732.20f, 4.738f);
-                    Talk(SAY_CRUSHER_AGGRO);
-                }
-
-        scheduler.Schedule(8s, [this](TaskContext context)
-        {
-            me->CastSpell(me->GetVictim(), SPELL_SMASH, false);
-            context.Repeat(15s);
-        }).Schedule(1s, [this](TaskContext context)
-        {
-            if (me->HealthBelowPct(30))
+            if (summon->GetEntry() != me->GetEntry())
             {
-                Talk(SAY_CRUSHER_EMOTE);
-                me->CastSpell(me, SPELL_FRENZY, false);
+                summon->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false);
+                summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
             }
-            else
-                context.Repeat(1s);
-        });
-    }
+            summons.Summon(summon);
+        }
 
-    void UpdateAI(uint32 diff) override
+        void DoAction(int32 param) override
+        {
+            if (param == ACTION_DESPAWN_ADDS)
+            {
+                summons.DoAction(ACTION_DESPAWN_ADDS);
+                summons.DespawnAll();
+            }
+        }
+
+        void JustEngagedWith(Unit*) override
+        {
+            if (me->ToTempSummon())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                    if (summoner->GetEntry() != me->GetEntry())
+                    {
+                        summoner->GetAI()->DoAction(ACTION_START_EVENT);
+                        me->SummonCreature(NPC_ANUB_AR_CRUSHER, 519.58f, 573.73f, 734.30f, 4.50f);
+                        me->SummonCreature(NPC_ANUB_AR_CRUSHER, 539.38f, 573.25f, 732.20f, 4.738f);
+                        Talk(SAY_CRUSHER_AGGRO);
+                    }
+
+            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8s, 0, 0);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            switch (events.ExecuteEvent())
+            {
+                case EVENT_CRUSHER_SMASH:
+                    me->CastSpell(me->GetVictim(), SPELL_SMASH, false);
+                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15s);
+                    break;
+                case EVENT_CHECK_HEALTH:
+                    if (me->HealthBelowPct(30))
+                    {
+                        Talk(SAY_CRUSHER_EMOTE);
+                        me->CastSpell(me, SPELL_FRENZY, false);
+                        break;
+                    }
+                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
+                    break;
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
+        return GetAzjolNerubAI<npc_anub_ar_crusherAI>(creature);
     }
 };
 

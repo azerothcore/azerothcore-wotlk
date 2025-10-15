@@ -93,7 +93,7 @@ struct boss_lady_vashj : public BossAI
             scheduler.CancelAll();
             me->CastStop();
             me->SetReactState(REACT_PASSIVE);
-            me->GetMotionMaster()->MovePoint(POINT_HOME, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), true, true);
+            me->GetMotionMaster()->MovePoint(POINT_HOME, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, true, true);
         });
     }
 
