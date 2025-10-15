@@ -16,6 +16,7 @@
  */
 
 #include "Battleground.h"
+#include "BattlegroundMMR.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "BattlegroundBE.h"
