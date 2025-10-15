@@ -97,6 +97,19 @@ void WaypointMgr::Load()
         ++count;
     } while (result->NextRow());
 
+    for (auto itr = _waypointStore.begin(); itr != _waypointStore.end(); )
+    {
+        uint32 first = itr->second.begin()->first;
+        uint32 last = itr->second.rbegin()->first;
+        if (last - first + 1 != itr->second.size())
+        {
+            LOG_ERROR("sql.sql", "Waypoint {} in waypoint_data has non-contiguous pointids, skipping", itr->first);
+            itr = _waypointStore.erase(itr);
+        }
+        else
+            ++itr;
+    }
+
     LOG_INFO("server.loading", ">> Loaded {} waypoints in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
