@@ -27,6 +27,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
+#include "World.h"
 #include "Vehicle.h"
 #include "ZoneScript.h"
 #include <functional>
@@ -49,9 +50,9 @@ AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; 
  * @param WorldObject target The target of the speech, in case it has elements such as $n, where the target's name will be referrenced.
  * @param Milliseconds delay Delay until the creature says the text line. Creatures will talk immediately by default.
  */
-void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0s*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0ms*/)
 {
-    if (delay > Seconds::zero())
+    if (delay > 0ms)
     {
         ObjectGuid targetGuid;
 
@@ -364,12 +365,17 @@ void CreatureAI::MoveCircleChecks()
     if (
         !victim ||
         !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
-        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
-        (!victim->IsPlayer() && !victim->IsPet())  // only player & pets to save CPU
+        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim()
     )
     {
         return;
     }
+
+    /**
+     *  optimization, disable circling movement for NPC vs NPC combat
+     */
+    if (!sWorld->getBoolConfig(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS) && !victim->IsPlayer() && !victim->IsPet())
+        return;
 
     me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
 }
@@ -378,8 +384,13 @@ void CreatureAI::MoveBackwardsChecks()
 {
     Unit *victim = me->GetVictim();
 
-    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
-        (!victim->IsPlayer() && !victim->IsPet()))
+    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+        return;
+
+    /**
+     *  optimization, disable backwards movement for NPC vs NPC combat
+     */
+    if (!sWorld->getBoolConfig(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS) && !victim->IsPlayer() && !victim->IsPet())
     {
         return;
     }

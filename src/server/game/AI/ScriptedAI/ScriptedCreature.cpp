@@ -68,7 +68,7 @@ void SummonList::DespawnEntry(uint32 entry)
     }
 }
 
-void SummonList::DespawnAll(uint32 delay /*= 0*/)
+void SummonList::DespawnAll(Milliseconds delay /*= 0ms*/)
 {
     while (!storage_.empty())
     {
@@ -325,13 +325,13 @@ void ScriptedAI::ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax
         return;
     }
 
-    scheduler.Schedule(timerMin == 0s ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
+    scheduler.Schedule(timerMin == 0ms ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
     {
         exec();
 
         if (!uniqueId)
         {
-            repeatMax > 0s ? context.Repeat(repeatMin, repeatMax) : context.Repeat(repeatMin);
+            repeatMax > 0ms ? context.Repeat(repeatMin, repeatMax) : context.Repeat(repeatMin);
         }
     });
 
@@ -531,10 +531,6 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (loadDefault)
     {
         me->LoadEquipment(me->GetOriginalEquipmentId(), true);
-        if (me->HasWeapon(OFF_ATTACK))
-            me->SetCanDualWield(true);
-        else
-            me->SetCanDualWield(false);
         return;
     }
 
@@ -547,10 +543,6 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (offHand >= 0)
     {
         me->SetVirtualItem(1, uint32(offHand));
-        if (offHand >= 1)
-            me->SetCanDualWield(true);
-        else
-            me->SetCanDualWield(false);
     }
 
     if (ranged >= 0)
@@ -558,6 +550,11 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
         me->SetVirtualItem(2, uint32(ranged));
         me->UpdateDamagePhysical(RANGED_ATTACK);
     }
+}
+
+void ScriptedAI::SetRun(bool run)
+{
+    me->SetWalk(!run);
 }
 
 enum eNPCs
@@ -662,7 +659,7 @@ void BossAI::_JustEngagedWith()
     ScheduleTasks();
     if (callForHelpRange)
     {
-        ScheduleTimedEvent(0s, [&]
+        ScheduleTimedEvent(0ms, [&]
         {
             me->CallForHelp(callForHelpRange);
         }, 2s);
@@ -746,27 +743,39 @@ void BossAI::UpdateAI(uint32 diff)
         DoMeleeAttackIfReady();
 }
 
+void BossAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason reason)
+{
+    ScriptedAI::OnSpellCastFinished(spellInfo, reason);
+    // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
+    if (_nextHealthCheck.IsPending() && me->IsInCombat())
+    {
+        _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PROCESSED);
+        // This must be delayed because creature might still have unit state casting at this point, which might break scripts.
+        scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                context.Repeat();
+            else
+                ProcessHealthCheck();
+        });
+    }
+}
+
 void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
 {
     ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
-    if (_nextHealthCheck._valid)
+    if (!_nextHealthCheck.HasBeenProcessed())
     {
-        if (!_nextHealthCheck._allowedWhileCasting && me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
         if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
-            _nextHealthCheck._exec();
-            _nextHealthCheck._valid = false;
-
-            _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+            if (!_nextHealthCheck._allowedWhileCasting && me->HasUnitState(UNIT_STATE_CASTING))
             {
-                return data._healthPct == _nextHealthCheck._healthPct;
-            });
+                _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PENDING);
+                return;
+            }
 
-            if (!_healthCheckEvents.empty())
-                _nextHealthCheck = _healthCheckEvents.front();
+            ProcessHealthCheck();
         }
     }
 }
@@ -780,16 +789,30 @@ void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damage
  */
 void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
 {
-    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec, true, allowedWhileCasting));
+    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec, HEALTH_CHECK_SCHEDULED, allowedWhileCasting));
     _nextHealthCheck = _healthCheckEvents.front();
 };
 
 void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
 {
     for (auto const& checks : healthPct)
-        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec, true, allowedWhileCasting));
+        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec, HEALTH_CHECK_SCHEDULED, allowedWhileCasting));
 
     _nextHealthCheck = _healthCheckEvents.front();
+}
+
+void BossAI::ProcessHealthCheck()
+{
+    _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PROCESSED);
+    _nextHealthCheck._exec();
+
+    _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+    {
+        return data._healthPct == _nextHealthCheck._healthPct;
+    });
+
+    if (!_healthCheckEvents.empty())
+        _nextHealthCheck = _healthCheckEvents.front();
 }
 
 void BossAI::ScheduleEnrageTimer(uint32 spellId, Milliseconds timer, uint8 textId /*= 0*/)
