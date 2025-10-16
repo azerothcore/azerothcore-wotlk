@@ -1,3 +1,4 @@
+-- DB update 2025_10_16_00 -> 2025_10_16_01
 
 -- Set param 3 and 4 to 0.
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2889700) AND (`source_type` = 9) AND (`id` IN (1));
