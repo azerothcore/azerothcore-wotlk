@@ -674,14 +674,14 @@ public:
             switch (events.ExecuteEvent())
             {
                 case 1:
-                    me->GetMotionMaster()->MovePoint(2, PTSTyrannusWaitPos1, false);
+                    me->GetMotionMaster()->MovePoint(2, PTSTyrannusWaitPos1, FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
                 case 2:
                     me->SetFacingTo(PTSTyrannusWaitPos1.GetOrientation());
                     me->setActive(false);
                     break;
                 case 3:
-                    me->GetMotionMaster()->MovePoint(3, PTSTyrannusWaitPos2, false);
+                    me->GetMotionMaster()->MovePoint(3, PTSTyrannusWaitPos2, FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
                 case 4:
                     me->SetFacingTo(PTSTyrannusWaitPos2.GetOrientation());
@@ -690,7 +690,7 @@ public:
                     me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * std::sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
                     break;
                 case 6:
-                    me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, false);
+                    me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
                 case 30:
                     {
@@ -1355,7 +1355,7 @@ public:
             }
         }
         if (minDist < 200.0f * 200.0f)
-            _owner.GetMotionMaster()->MovePoint(0, slaveFreePos[pointId], true, false);
+            _owner.GetMotionMaster()->MovePoint(0, slaveFreePos[pointId], FORCED_MOVEMENT_NONE, 0.f, true, false);
         return true;
     }
 
