@@ -520,12 +520,20 @@ public:
     bool Execute(uint64, uint32) override
     {
         _caster->CastSpell(_caster, _spellId, true);
-        _caster->GetTransport()->ToMotionTransport()->UnloadNonStaticPassengers();
-        _caster->GetTransport()->AddObjectToRemoveList();
+
+        if (TransportBase* casterTransport = _caster->GetTransport())
+        {
+            if (MotionTransport* motionTransport = casterTransport->ToMotionTransport())
+                motionTransport->UnloadNonStaticPassengers();
+
+            casterTransport->AddObjectToRemoveList();
+        }
 
         if (Transport* transport = ObjectAccessor::GetTransport(*_caster, _otherTransport))
         {
-            transport->ToMotionTransport()->UnloadNonStaticPassengers();
+            if (MotionTransport* motionTransport = transport->ToMotionTransport())
+                motionTransport->UnloadNonStaticPassengers();
+
             transport->AddObjectToRemoveList();
         }
 
