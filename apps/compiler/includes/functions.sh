@@ -150,15 +150,15 @@ function comp_compile() {
       popd >> /dev/null || exit 1
 
       # set all aplications SUID bit
-      if [[ $IS_SUDO_ENABLED == 0 ]]; then
-        echo "Skipping root ownership and SUID changes (IS_SUDO_ENABLED=0)"
-      else
-        echo "Setting permissions on binary files"
-        find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chown root:root -- {} +
-        find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chmod u+s  -- {} +
-        $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/worldserver"
-        $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/authserver"
-      fi
+      # if [[ $IS_SUDO_ENABLED == 0 ]]; then
+      #   echo "Skipping root ownership and SUID changes (IS_SUDO_ENABLED=0)"
+      # else
+      #   echo "Setting permissions on binary files"
+      #   find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chown root:root -- {} +
+      #   find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chmod u+s  -- {} +
+      #   $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/worldserver"
+      #   $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/authserver"
+      # fi
 
       [[ -f "$confDir/worldserver.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
