@@ -514,6 +514,14 @@ public:
     void RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
     ZoneWideVisibleWorldObjectsSet const* GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const;
 
+    [[nodiscard]] uint32 GetPlayerCountInZone(uint32 zoneId) const
+    {
+        if (auto const& it = _zonePlayerCountMap.find(zoneId); it != _zonePlayerCountMap.end())
+            return it->second;
+
+        return 0;
+    };
+
 private:
 
     template<class T> void InitializeObject(T* obj);
