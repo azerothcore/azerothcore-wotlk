@@ -168,6 +168,9 @@ function comp_compile() {
           cp -v --no-clobber "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
 
       mkdir -p "$confDir/modules"
+
+      ls -al "$confDir"
+
       for f in "$confDir/modules/"*.dist
       do
           [[ -e $f ]] || break  # handle the case of no *.dist files
