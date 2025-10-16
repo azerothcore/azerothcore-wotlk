@@ -57,7 +57,8 @@ struct npc_frosthound : public npc_escortAI
             {
                 me->SetFaction(who->GetFaction());
                 me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
-                Start(false, true, who->GetGUID());
+                me->SetWalk(false);
+                Start(false, who->GetGUID());
                 Talk(TALK_EMOTE_FROSTHOUND_SNIFF, me);
             }
         }
@@ -246,7 +247,8 @@ public:
         void RollPath()
         {
             me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            Start(true, true, ObjectGuid::Empty, 0, false, true, true);
+            me->SetWalk(false);
+            Start(true, ObjectGuid::Empty, 0, false, true, true);
             SetNextWaypoint(urand(0, 250), true);
             me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
         }
@@ -912,7 +914,10 @@ public:
             if (who->IsPlayer())
             {
                 if (apply)
-                    Start(false, true, who->GetGUID());
+                {
+                    me->SetWalk(false);
+                    Start(false, who->GetGUID());
+                }
             }
         }
 
