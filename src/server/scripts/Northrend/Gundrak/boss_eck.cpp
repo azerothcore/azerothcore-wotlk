@@ -58,7 +58,7 @@ public:
         void InitializeAI() override
         {
             BossAI::InitializeAI();
-            me->GetMotionMaster()->MovePoint(POINT_START, 1638.55f, 919.76f, 104.95f, false);
+            me->GetMotionMaster()->MovePoint(POINT_START, 1638.55f, 919.76f, 104.95f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
             me->SetHomePosition(1642.712f, 934.646f, 107.205f, 0.767f);
             me->SetReactState(REACT_PASSIVE);
         }

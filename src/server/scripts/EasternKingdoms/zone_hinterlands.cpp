@@ -132,7 +132,7 @@ public:
                 if (GameObject* go = me->FindNearestGameObject(GO_RINJI_CAGE, INTERACTION_DISTANCE))
                     go->UseDoorOrButton();
 
-                npc_escortAI::Start(false, false, player->GetGUID(), quest);
+                npc_escortAI::Start(false, player->GetGUID(), quest);
             }
         }
 
@@ -156,7 +156,7 @@ public:
                 case 17:
                     Talk(SAY_RIN_COMPLETE, player);
                     player->GroupEventHappens(QUEST_RINJI_TRAPPED, me);
-                    SetRun();
+                    SetRun(true);
                     postEventCount = 1;
                     break;
             }
