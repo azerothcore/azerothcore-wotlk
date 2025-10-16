@@ -319,7 +319,7 @@ struct boss_felmyst : public BossAI
                 break;
             case POINT_LANE:
                 Talk(EMOTE_BREATH);
-                me->m_Events.AddEventAtOffset([&]()
+                me->m_Events.AddEventAtOffset([this]()
                 {
                     for (uint8 i = 0; i < 16; ++i)
                         me->m_Events.AddEventAtOffset(new CorruptTriggers(me, _currentLane), Milliseconds(i * 250));
