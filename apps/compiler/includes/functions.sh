@@ -121,7 +121,7 @@ function comp_compile() {
 
   comp_ccacheResetStats
 
-  time cmake --build . --config $CTYPE  -j $MTHREADS
+  # time cmake --build . --config $CTYPE  -j $MTHREADS
 
   comp_ccacheShowStats
 
@@ -145,7 +145,7 @@ function comp_compile() {
       mkdir -p "$confDir"
 
       echo "Cmake install..."
-      $SUDO cmake --install . --config $CTYPE
+      # $SUDO cmake --install . --config $CTYPE
 
       popd >> /dev/null || exit 1
 
