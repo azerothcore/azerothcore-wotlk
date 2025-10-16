@@ -1,3 +1,4 @@
+-- DB update 2025_10_16_01 -> 2025_10_16_02
 --
 DELETE FROM `command` WHERE `name` = "packetlog";
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
