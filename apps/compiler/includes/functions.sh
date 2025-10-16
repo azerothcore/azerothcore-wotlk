@@ -143,6 +143,7 @@ function comp_compile() {
       mkdir -p "$AC_BINPATH_FULL"
       echo "Creating $confDir..."
       mkdir -p "$confDir"
+      mkdir -p "$confDir/modules"
 
       echo "Cmake install..."
       $SUDO cmake --install . --config $CTYPE
@@ -166,6 +167,12 @@ function comp_compile() {
           cp -v --no-clobber "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
       [[ -f "$confDir/dbimport.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
+
+      for f in "$confDir/modules/"*.dist
+      do
+          [[ -e $f ]] || break  # handle the case of no *.dist files
+          cp -v --no-clobber "$f" "${f%.dist}";
+      done
 
       echo "Done"
       ;;

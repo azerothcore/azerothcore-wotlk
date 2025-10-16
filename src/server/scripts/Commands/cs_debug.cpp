@@ -100,7 +100,8 @@ public:
             { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
             { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
             { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No },
-            { "visibilitydata", HandleDebugVisibilityDataCommand,      SEC_ADMINISTRATOR, Console::No }
+            { "visibilitydata", HandleDebugVisibilityDataCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "zonestats",      HandleDebugZoneStatsCommand,           SEC_MODERATOR,     Console::Yes}
         };
         static ChatCommandTable commandTable =
         {
@@ -1432,6 +1433,31 @@ public:
         handler->PSendSysMessage("Visible Corpses: {}", objectByTypeCount[TYPEID_CORPSE]);
         handler->PSendSysMessage("Players we are visible to: {}", objectVisibilityContainer.GetVisiblePlayersMap().size());
         handler->PSendSysMessage("Zone wide visible objects in zone: {}", zoneWideVisibleObjectsInZone);
+        return true;
+    }
+
+    static bool HandleDebugZoneStatsCommand(ChatHandler* handler, Optional<PlayerIdentifier> playerTarget)
+    {
+        if (!playerTarget)
+            playerTarget = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!playerTarget)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Player* player = playerTarget->GetConnectedPlayer();
+
+        if (!player)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        uint32 zoneId = player->GetZoneId();
+        AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
+        handler->PSendSysMessage("Player count in zone {} ({}): {}.", zoneId, (zoneEntry ? zoneEntry->area_name[LOCALE_enUS] : "<unknown>"), player->GetMap()->GetPlayerCountInZone(zoneId));
         return true;
     }
 };

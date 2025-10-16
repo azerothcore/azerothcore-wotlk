@@ -1138,6 +1138,8 @@ public:                                                 // opcodes handlers
     void InitializeSession();
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
 
+    void SetPacketLogging(bool state);
+
 private:
     void ProcessQueryCallbacks();
 

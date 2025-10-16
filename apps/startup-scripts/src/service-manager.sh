@@ -131,7 +131,7 @@ function serialize_exec_definition() {
     done
 
     local args_json
-    args_json=$(printf '%s\0' "${rel_args[@]}" "__AC_SENTINEL__" | jq -R -s 'split("\u0000")[:-1]')
+    args_json=$(printf '%s\0' "${rel_args[@]}" | jq -R -s 'split("\u0000")[:-1]')
 
     jq -n --arg command "$rel_command" --argjson args "$args_json" '{command: $command, args: $args}'
 }
@@ -2291,6 +2291,9 @@ function wait_service_uptime() {
         sleep 1
         waited=$((waited + 1))
     done
+    # show service logs for debugging
+    echo -e "${YELLOW}Service logs for '$service_name':${NC}"
+    service_logs "$service_name" true
     echo -e "${RED}Timeout: $service_name did not reach ${min_seconds}s uptime within ${timeout}s${NC}" >&2
     return 1
 }
