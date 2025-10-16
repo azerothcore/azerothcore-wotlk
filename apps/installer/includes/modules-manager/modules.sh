@@ -127,9 +127,12 @@ function inst_module_help() {
     echo "  ./acore.sh module                    # Interactive menu"
     echo "  ./acore.sh module search   [terms...]"
     echo "  ./acore.sh module install  [--all | modules...]"
-    echo "  ./acore.sh module update   [--all | modules...]"
+    echo "  ./acore.sh module update   [--discard-changes] [--all | modules...]"
     echo "  ./acore.sh module remove   [modules...]"
     echo "  ./acore.sh module list              # List installed modules"
+    echo ""
+    echo "Options:"
+    echo "  --discard-changes  Reset module repositories to a clean state before updating"
     echo ""
     echo "Module Specification Syntax:"
     echo "  name                    # Simple name (e.g., mod-transmog)"
@@ -602,6 +605,37 @@ function inst_mod_is_installed() {
     return 1
 }
 
+# Discard local changes from a module repository to guarantee a clean update.
+function inst_module_reset_repo() {
+    local repo_ref="$1"
+    local dirname="$2"
+    local repo_path="$J_PATH_MODULES/$dirname"
+
+    if [ ! -d "$repo_path" ]; then
+        print_error "[$repo_ref] Cannot discard changes; path not found ($repo_path)."
+        return 1
+    fi
+
+    if [ ! -d "$repo_path/.git" ]; then
+        print_error "[$repo_ref] Cannot discard changes; $repo_path is not a git repository."
+        return 1
+    fi
+
+    print_warn "[$repo_ref] Discarding local changes (--discard-changes)."
+
+    if ! git -C "$repo_path" reset --hard >/dev/null 2>&1; then
+        print_error "[$repo_ref] Failed to reset repository at $repo_path."
+        return 1
+    fi
+
+    if ! git -C "$repo_path" clean -fd >/dev/null 2>&1; then
+        print_error "[$repo_ref] Failed to remove untracked files from $repo_path."
+        return 1
+    fi
+
+    return 0
+}
+
 # =============================================================================
 # Conflict Detection and Validation
 # =============================================================================
@@ -901,31 +935,48 @@ function inst_module_install {
 
 # Update one or more modules
 function inst_module_update {
-    # Handle help request
-    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-        inst_module_help
-        return 0
-    fi
-    
-    # Support multiple modules and the --all flag; prompt if none specified.
-    local args=("$@")
+    local modules=()
     local use_all=false
-    if [ ${#args[@]} -gt 0 ] && { [ "${args[0]}" = "--all" ] || [ "${args[0]}" = "-a" ]; }; then
-        use_all=true
-        shift || true
-    fi
+    local discard_changes=false
+    local had_errors=0
 
-    local _tmp=$PWD
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --help|-h)
+                inst_module_help
+                return 0
+                ;;
+            --all|-a)
+                use_all=true
+                ;;
+            --discard-changes|--reset|-r)
+                discard_changes=true
+                ;;
+            --)
+                shift || true
+                while [[ $# -gt 0 ]]; do
+                    modules+=("$1")
+                    shift || true
+                done
+                break
+                ;;
+            *)
+                modules+=("$1")
+                ;;
+        esac
+        shift || true
+    done
 
     if $use_all; then
-        local line repo_ref branch commit newCommit owner modname url dirname
+        local repo_ref branch commit owner modname url dirname newCommit
+        local parsed_output
         while read -r repo_ref branch commit; do
             [ -z "$repo_ref" ] && continue
-            # Skip excluded modules during update --all
             if inst_mod_is_excluded "$repo_ref"; then
                 print_warn "[$repo_ref] Excluded by MODULES_EXCLUDE_LIST (skipping)."
                 continue
             fi
+
             parsed_output=$(inst_parse_module_spec "$repo_ref")
             IFS=' ' read -r _ owner modname _ _ url dirname <<< "$parsed_output"
 
@@ -935,16 +986,23 @@ function inst_module_update {
                 continue
             fi
 
+            if $discard_changes; then
+                if ! inst_module_reset_repo "$repo_ref" "$dirname"; then
+                    had_errors=1
+                    continue
+                fi
+            fi
+
             if Joiner:upd_repo "$url" "$dirname" "$branch" ""; then
                 newCommit=$(git -C "$J_PATH_MODULES/$dirname" rev-parse HEAD 2>/dev/null || echo "")
                 inst_mod_list_upsert "$repo_ref" "$branch" "$newCommit"
                 print_success "[$repo_ref] Updated to latest commit on '$branch'."
             else
                 print_error "[$repo_ref] Cannot update"
+                had_errors=1
             fi
         done < <(inst_mod_list_read)
     else
-        local modules=("$@")
         if [ ${#modules[@]} -eq 0 ]; then
             echo "Type the name(s) of the module(s) to update"
             read -p "Insert name(s): " _line
@@ -952,6 +1010,7 @@ function inst_module_update {
         fi
 
         local spec repo_ref override_branch override_commit owner modname url dirname v b branch def newCommit
+        local parsed_output
         for spec in "${modules[@]}"; do
             [ -z "$spec" ] && continue
             parsed_output=$(inst_parse_module_spec "$spec")
@@ -959,11 +1018,10 @@ function inst_module_update {
 
             dirname="${dirname:-$modname}"
             if [ -d "$J_PATH_MODULES/$dirname/" ]; then
-                # determine preferred branch if not provided
+                b=""
                 if [ -n "$override_branch" ] && [ "$override_branch" != "-" ]; then
                     b="$override_branch"
                 else
-                    # try reading acore-module.json for this repo
                     if [[ "$url" =~ github.com ]]; then
                         read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/${owner}/${modname}/master/acore-module.json")
                     else
@@ -981,21 +1039,35 @@ function inst_module_update {
                     fi
                 fi
 
+                if $discard_changes; then
+                    if ! inst_module_reset_repo "$repo_ref" "$dirname"; then
+                        had_errors=1
+                        continue
+                    fi
+                fi
+
                 if Joiner:upd_repo "$url" "$dirname" "$b" ""; then
                     newCommit=$(git -C "$J_PATH_MODULES/$dirname" rev-parse HEAD 2>/dev/null || echo "")
                     inst_mod_list_upsert "$repo_ref" "$b" "$newCommit"
                     print_success "[$repo_ref] Done, please re-run compiling and db assembly"
                 else
                     print_error "[$repo_ref] Cannot update"
+                    had_errors=1
                 fi
             else
                 print_error "[$repo_ref] Cannot update! Path doesn't exist ($J_PATH_MODULES/$dirname/)"
+                had_errors=1
             fi
         done
     fi
 
     echo ""
     echo ""
+
+    if [ "$had_errors" -ne 0 ]; then
+        return 1
+    fi
+    return 0
 }
 
 # Remove one or more modules

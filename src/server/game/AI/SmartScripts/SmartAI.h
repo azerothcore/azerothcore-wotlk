@@ -52,7 +52,7 @@ public:
     bool IsAIControlled() const;
 
     // Start moving to the desired MovePoint
-    void StartPath(bool run = false, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
+    void StartPath(ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
     bool LoadPath(uint32 entry);
     void PausePath(uint32 delay, bool forced = false);
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
@@ -175,9 +175,6 @@ public:
     // Called at movepoint reached
     void MovepointReached(uint32 id);
 
-    // Makes the creature run/walk
-    void SetRun(bool run = true);
-
     void SetFly(bool fly = true);
 
     void SetSwim(bool swim = true);
@@ -240,7 +237,6 @@ private:
     uint32 mEscortNPCFlags;
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
     bool mCanRepeatPath;
-    bool mRun;
     bool mEvadeDisabled;
     bool mCanAutoAttack;
     bool mForcedPaused;
