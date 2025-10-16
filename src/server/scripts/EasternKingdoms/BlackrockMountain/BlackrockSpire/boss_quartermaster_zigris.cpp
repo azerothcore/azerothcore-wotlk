@@ -77,7 +77,9 @@ struct boss_quartermaster_zigris : public BossAI
         {
             if (me->IsWithinMeleeRange(me->GetVictim()))
             {
-                me->GetMotionMaster()->MoveBackwards(me->GetVictim(), 10.0f);
+                float x, y, z;
+                me->GetNearPoint(me->GetVictim(), x, y, z, me->GetVictim()->GetBoundaryRadius(), 10.0f, me->GetAngle(me->GetVictim()));
+                me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_RUN); // TODO: Implement generic distancing on npc on target root
             }
         }
     }
