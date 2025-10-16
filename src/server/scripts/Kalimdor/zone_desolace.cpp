@@ -396,7 +396,8 @@ public:
                 case EVENT_RESTART_ESCORT:
                     CheckCaravan();
                     SetDespawnAtEnd(false);
-                    Start(true, true, ObjectGuid::Empty, 0, false, false, true);
+                    SetRun(true);
+                    Start(true, ObjectGuid::Empty, 0, false, false, true);
                     break;
             }
 

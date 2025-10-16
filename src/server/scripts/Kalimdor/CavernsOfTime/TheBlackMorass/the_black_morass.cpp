@@ -118,7 +118,7 @@ struct npc_medivh_bm : public ScriptedAI
             summon->CastSpell(summon, SPELL_BLACK_CRYSTAL, true);
             Movement::MoveSplineInit init(summon);
             init.MovebyPath(_groundArray);
-            init.SetCyclic();
+            init.SetCyclic(); // TODO: Add support for cyclic paths in motion master
             init.Launch();
         }
     }
