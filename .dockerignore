@@ -1,0 +1,14 @@
+/cmake-build-debug/*
+/build*/
+/var/*
+!/var/build/.gitkeep
+!/var/ccache/.gitkeep
+/env/dist/*
+!/env/dist/.gitkeep
+/env/user/*
+/.env*
+.idea
+!.gitkeep
+
+# do not ignore the ccache folder (used by the ci)
+!/var/docker/ccache
