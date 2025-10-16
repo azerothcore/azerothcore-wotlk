@@ -1147,7 +1147,7 @@ public:
         {
             if (apply && passenger->IsPlayer())
             {
-                me->GetMotionMaster()->MovePath(NPC_PLANE, FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
+                me->GetMotionMaster()->MovePath(NPC_PLANE, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
             }
         }
 

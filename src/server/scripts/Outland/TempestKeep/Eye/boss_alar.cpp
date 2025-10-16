@@ -355,7 +355,7 @@ struct boss_alar : public BossAI
     void ConstructWaypointsAndMove()
     {
         me->StopMoving();
-        me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
+        me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
     }
 
     void UpdateAI(uint32 diff) override

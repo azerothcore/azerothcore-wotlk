@@ -1069,7 +1069,7 @@ public:
         {
             if (apply)
             {
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 100, FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 100, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetSpeed(MOVE_RUN, 6.0f);
