@@ -114,7 +114,7 @@ struct boss_murmur : public BossAI
         return true;
     }
 
-    void SetGUID(ObjectGuid guid, int32 index) override
+    void SetGUID(ObjectGuid const& guid, int32 index) override
     {
         if (index == GUID_MURMUR_NPCS)
         {

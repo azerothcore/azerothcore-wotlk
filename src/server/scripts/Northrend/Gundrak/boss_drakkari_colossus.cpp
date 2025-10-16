@@ -125,17 +125,18 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            for (uint8 i = 0; i < 5; i++)
-                me->SummonCreature(NPC_LIVING_MOJO, mojoPosition[i].GetPositionX(), mojoPosition[i].GetPositionY(), mojoPosition[i].GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
-
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-        void InitializeAI() override
-        {
-            BossAI::InitializeAI();
-            me->CastSpell(me, SPELL_FREEZE_ANIM, true);
+            if (!me->IsInEvadeMode())
+            {
+              me->CastSpell(me, SPELL_FREEZE_ANIM, true);
+              me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+              for (const auto & i : mojoPosition)
+                  me->SummonCreature(NPC_LIVING_MOJO, i.GetPositionX(), i.GetPositionY(), i.GetPositionZ(), 0, TEMPSUMMON_MANUAL_DESPAWN, 0);
+            }
+            else
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            }
         }
 
         void JustReachedHome() override
@@ -144,9 +145,9 @@ public:
             me->CastSpell(me, SPELL_FREEZE_ANIM, true);
         }
 
-        void JustEngagedWith(Unit* who) override
+        void ScheduleTasks() override
         {
-            BossAI::JustEngagedWith(who);
+            events.ScheduleEvent(EVENT_COLOSSUS_START_FIGHT, 1s);
             events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10s);
             events.ScheduleEvent(EVENT_COLOSSUS_MORTAL_STRIKE, 7s);
             events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_1, 1s);
@@ -160,7 +161,7 @@ public:
                 summon->SetRegeneratingHealth(false);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->m_Events.AddEvent(new RestoreFight(summon), summon->m_Events.CalculateTime(3000));
-                if (events.GetNextEventTime(EVENT_COLOSSUS_HEALTH_2) == 0)
+                if (!events.HasTimeUntilEvent(EVENT_COLOSSUS_HEALTH_2))
                 {
                     summon->SetHealth(summon->GetMaxHealth() / 2);
                     summon->LowerPlayerDamageReq(summon->GetMaxHealth() / 2);
@@ -183,6 +184,7 @@ public:
             summons.Despawn(summon);
             if (summon->GetEntry() == NPC_DRAKKARI_ELEMENTAL)
             {
+                me->SetHealth(me->GetMaxHealth() / 2);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->RemoveAurasDueToSpell(SPELL_FREEZE_ANIM);
                 if (me->GetVictim())
@@ -231,7 +233,7 @@ public:
                     events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_1, 1s);
                     break;
                 case EVENT_COLOSSUS_HEALTH_2:
-                    if (me->HealthBelowPct(21))
+                    if (me->HealthBelowPct(2))
                     {
                         me->CastSpell(me, SPELL_EMERGE, false);
                         me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
@@ -301,12 +303,12 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_ELEMENTAL_HEALTH:
-                    if (me->HealthBelowPct(51))
+                    if (me->HealthBelowPct(56))
                     {
                         me->CastSpell(me, SPELL_FACE_ME, true);
                         me->CastSpell(me, SPELL_SURGE_VISUAL, true);
                         me->CastSpell(me, SPELL_MERGE, false);
-                        me->DespawnOrUnsummon(2000);
+                        me->DespawnOrUnsummon(2s);
                         events.Reset();
                         break;
                     }
@@ -315,7 +317,7 @@ public:
                 case EVENT_ELEMENTAL_SURGE:
                     Talk(SAY_SURGE);
                     me->CastSpell(me, SPELL_SURGE_VISUAL, true);
-                    me->CastSpell(me->GetVictim(), SPELL_SURGE, false);
+                    DoCastRandomTarget(SPELL_SURGE, 0, 40, true, false, true);
                     events.ScheduleEvent(EVENT_ELEMENTAL_SURGE, 15s);
                     break;
                 case EVENT_ELEMENTAL_VOLLEY:
@@ -380,7 +382,7 @@ public:
             {
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->MoveCharge(1672.96f, 743.488f, 143.338f, 7.0f, POINT_MERGE);
-                me->DespawnOrUnsummon(1200);
+                me->DespawnOrUnsummon(1200ms);
             }
         }
 

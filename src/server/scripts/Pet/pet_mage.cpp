@@ -62,10 +62,18 @@ struct npc_pet_mage_mirror_image : CasterAI
     ObjectGuid _ebonGargoyleGUID;
     uint32 checktarget;
     uint32 dist = urand(1, 5);
+    bool _delayAttack;
 
     void InitializeAI() override
     {
         CasterAI::InitializeAI();
+
+        _delayAttack = true;
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            _delayAttack = false;
+        }, 1200ms);
+
         Unit* owner = me->GetOwner();
         if (!owner)
             return;
@@ -185,9 +193,10 @@ struct npc_pet_mage_mirror_image : CasterAI
 
     void UpdateAI(uint32 diff) override
     {
-        events.Update(diff);
-        if (events.GetTimer() < 1200)
+        if (_delayAttack)
             return;
+
+        events.Update(diff);
 
         if (!me->IsInCombat() || !me->GetVictim())
         {
@@ -212,7 +221,7 @@ struct npc_pet_mage_mirror_image : CasterAI
 
         if (uint32 spellId = events.ExecuteEvent())
         {
-            events.RescheduleEvent(spellId, spellId == 59637 ? 6500 : 2500);
+            events.RescheduleEvent(spellId, spellId == 59637 ? 6500ms : 2500ms);
             me->CastSpell(me->GetVictim(), spellId, false);
         }
     }

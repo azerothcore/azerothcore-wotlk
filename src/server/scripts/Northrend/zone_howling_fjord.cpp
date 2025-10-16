@@ -44,9 +44,9 @@ public:
             if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
             {
                 me->CastSpell(me, 44460, true);
-                me->DespawnOrUnsummon(10000);
+                me->DespawnOrUnsummon(10s);
                 cow->CastSpell(cow, 44460, true);
-                cow->DespawnOrUnsummon(10000);
+                cow->DespawnOrUnsummon(10s);
                 if (me->IsSummon())
                     if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                         owner->CastSpell(owner, 44463, true);
@@ -191,7 +191,7 @@ public:
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -309,7 +309,7 @@ public:
                 return;
 
             me->SetWalk(true);
-            Start(false, false, summonerGUID);
+            Start(false, summonerGUID);
         }
 
         void WaypointReached(uint32 waypointId) override
