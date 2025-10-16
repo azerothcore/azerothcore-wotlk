@@ -28,12 +28,8 @@ enum BotLogType : uint16
 class BotLogger
 {
     public:
-        template<typename... Args>
-        requires NPCBots::LoggableArguments<Args...>
-        static void Log(uint16 log_type, Creature const* bot, Args&&... params);
-        template<typename... Args>
-        requires NPCBots::LoggableArguments<Args...>
-        static void Log(uint16 log_type, uint32 entry, Args&&... params);
+        static void Log(uint16 log_type, Creature const* bot, NPCBots::LoggableArguments auto&&... params);
+        static void Log(uint16 log_type, uint32 entry, NPCBots::LoggableArguments auto&&... params);
 };
 
 #endif //BOTLOG_H_

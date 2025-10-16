@@ -5080,7 +5080,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
 #elif defined(AC_COMPILER)
                 Creature* cre = get_shield_creature(go, cList);
                 ASSERT(cre);
-                cre->DespawnOrUnsummon(1ms);
+                cre->DespawnOrUnsummon(1);
                 player->DestroyItemCount(31088, 1, true); // Tainted Core
 #endif
                 return true;
@@ -20753,7 +20753,7 @@ void bot_ai::OnBotExitVehicle(Vehicle const* vehicle)
 
             curVehStrat = BOT_VEH_STRAT_NONE;
             if (vehicle->GetBase()->IsSummon())
-                vehicle->GetBase()->ToCreature()->DespawnOrUnsummon(1ms);
+                vehicle->GetBase()->ToCreature()->DespawnOrUnsummon(1);
         }
     }
 }

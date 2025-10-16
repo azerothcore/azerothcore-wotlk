@@ -375,7 +375,6 @@ class AC_GAME_API BotMgr
 
         Player* const _owner;
         BotMap _bots;
-        std::list<ObjectGuid> _removeList;
         std::list<std::pair<ObjectGuid, BotRemoveType>> _delayedRemoveList;
         DPSTracker* const _dpstracker;
         NpcBotMgrData* _data;

@@ -39,7 +39,7 @@ template<typename T>
 concept Stringable = requires(T t) { StringConvert::ToString(t); };
 
 template<typename... Ts>
-concept LoggableCount = (sizeof...(Ts) <= MAX_BOT_LOG_PARAMS);
+concept LoggableCount = sizeof...(Ts) <= MAX_BOT_LOG_PARAMS;
 
 template<typename... Ts>
 concept LoggableArguments = LoggableCount<Ts...> && (Stringable<Ts> && ...);
