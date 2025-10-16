@@ -1,3 +1,4 @@
+-- DB update 2025_10_16_03 -> 2025_10_16_04
 --
 -- Argent Dawn Initiate
 UPDATE `creature_template` SET `gossip_menu_id` = 7230, `npcflag` = `npcflag` | 1 WHERE (`entry` = 16384);
