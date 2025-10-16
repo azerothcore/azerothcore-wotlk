@@ -267,7 +267,7 @@ namespace VMAP
                 {
                     uint32 liquidType = info.hitModel->GetLiquidType(); // entry from LiquidType.dbc
                     float liquidLevel;
-                    if (!*reqLiquidType || (GetLiquidFlagsPtr(liquidType) & *reqLiquidType))
+                    if (!reqLiquidType || (GetLiquidFlagsPtr(liquidType) & *reqLiquidType))
                         if (info.hitInstance->GetLiquidLevel(pos, info, liquidLevel))
                             data.liquidInfo.emplace(liquidType, liquidLevel);
                 }
