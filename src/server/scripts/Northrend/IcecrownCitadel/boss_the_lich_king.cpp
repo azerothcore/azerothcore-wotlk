@@ -2565,7 +2565,7 @@ public:
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->SetCanFly(false);
                     me->SetDisableGravity(false);
-                    me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, false);
+                    me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, FORCED_MOVEMENT_NONE, 0.f, false);
                     me->SetDisableGravity(true, true);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
