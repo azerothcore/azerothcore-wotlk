@@ -422,7 +422,6 @@ enum monumentEvents
     EVENT_UNFREEZE              = 20,
 };
 
-
 struct npc_hol_monument : public ScriptedAI
 {
     npc_hol_monument(Creature* creature) : ScriptedAI(creature)
