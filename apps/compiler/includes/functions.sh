@@ -121,7 +121,7 @@ function comp_compile() {
 
   comp_ccacheResetStats
 
-  # time cmake --build . --config $CTYPE  -j $MTHREADS
+  time cmake --build . --config $CTYPE  -j $MTHREADS
 
   comp_ccacheShowStats
 
@@ -143,22 +143,23 @@ function comp_compile() {
       mkdir -p "$AC_BINPATH_FULL"
       echo "Creating $confDir..."
       mkdir -p "$confDir"
+      mkdir -p "$confDir/modules"
 
       echo "Cmake install..."
-      # $SUDO cmake --install . --config $CTYPE
+      $SUDO cmake --install . --config $CTYPE
 
       popd >> /dev/null || exit 1
 
       # set all aplications SUID bit
-      # if [[ $IS_SUDO_ENABLED == 0 ]]; then
-      #   echo "Skipping root ownership and SUID changes (IS_SUDO_ENABLED=0)"
-      # else
-      #   echo "Setting permissions on binary files"
-      #   find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chown root:root -- {} +
-      #   find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chmod u+s  -- {} +
-      #   $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/worldserver"
-      #   $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/authserver"
-      # fi
+      if [[ $IS_SUDO_ENABLED == 0 ]]; then
+        echo "Skipping root ownership and SUID changes (IS_SUDO_ENABLED=0)"
+      else
+        echo "Setting permissions on binary files"
+        find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chown root:root -- {} +
+        find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chmod u+s  -- {} +
+        $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/worldserver"
+        $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/authserver"
+      fi
 
       [[ -f "$confDir/worldserver.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
@@ -166,10 +167,6 @@ function comp_compile() {
           cp -v --no-clobber "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
       [[ -f "$confDir/dbimport.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
-
-      mkdir -p "$confDir/modules"
-
-      ls -al "$confDir"
 
       for f in "$confDir/modules/"*.dist
       do
