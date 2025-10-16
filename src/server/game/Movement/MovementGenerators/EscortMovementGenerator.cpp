@@ -36,6 +36,11 @@ void EscortMovementGenerator<T>::DoInitialize(T* unit)
     else if (m_precomputedPath.size())
         init.MovebyPath(m_precomputedPath);
 
+    if (_forcedMovement == FORCED_MOVEMENT_WALK)
+        init.SetWalk(true);
+    else if (_forcedMovement == FORCED_MOVEMENT_RUN)
+        init.SetWalk(false);
+
     init.Launch();
 
     _splineId = unit->movespline->GetId();
@@ -78,6 +83,11 @@ bool EscortMovementGenerator<T>::DoUpdate(T* unit, uint32  /*diff*/)
             else if (m_precomputedPath.size() == 2)
                 init.MoveTo(m_precomputedPath[1].x, m_precomputedPath[1].y, m_precomputedPath[1].z, true);
         }
+
+        if (_forcedMovement == FORCED_MOVEMENT_WALK)
+            init.SetWalk(true);
+        else if (_forcedMovement == FORCED_MOVEMENT_RUN)
+            init.SetWalk(false);
 
         init.Launch();
         // Xinef: Override spline Id on recalculate launch
