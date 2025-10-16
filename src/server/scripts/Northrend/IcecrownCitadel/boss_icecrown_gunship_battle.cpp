@@ -545,13 +545,22 @@ public:
 
     struct npc_gunshipAI : public NullCreatureAI
     {
-        npc_gunshipAI(Creature* creature) : NullCreatureAI(creature), _instance(creature->GetInstanceScript()), _teamIdInInstance(TeamId(creature->GetInstanceScript()->GetData(DATA_TEAMID_IN_INSTANCE))), _died(false), _summonedFirstMage(false)
+        npc_gunshipAI(Creature* creature) : NullCreatureAI(creature), _instance(creature->GetInstanceScript()), _teamIdInInstance(TEAM_NEUTRAL), _died(false), _summonedFirstMage(false)
         {
+            if (_instance)
+                _teamIdInInstance = TeamId(_instance->GetData(DATA_TEAMID_IN_INSTANCE));
+
             me->SetRegeneratingHealth(false);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
+            if (!_instance)
+            {
+                damage = 0;
+                return;
+            }
+
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
             {
                 damage = 0;
@@ -581,6 +590,9 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
+            if (!_instance)
+                return;
+
             if (_died || _instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
             _died = true;
@@ -684,6 +696,9 @@ public:
             if (!sConfigMgr->GetOption<int32>("WipeGunshipBlizzlike.Enable", 1))
                 return;
 
+            if (!_instance)
+                return;
+
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
 
@@ -777,7 +792,8 @@ public:
         npc_high_overlord_saurfang_igbAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
             _events.Reset();
-            _controller.ResetSlots(TEAM_HORDE, creature->GetTransport()->ToMotionTransport());
+            if (MotionTransport* transport = creature->GetTransport() ? creature->GetTransport()->ToMotionTransport() : nullptr)
+                _controller.ResetSlots(TEAM_HORDE, transport);
             me->SetRegeneratingHealth(false);
             me->m_CombatDistance = 70.0f;
             _firstMageCooldown = GameTime::GetGameTime().count() + 45;
@@ -802,6 +818,9 @@ public:
 
         void JustEngagedWith(Unit* /*target*/) override
         {
+            if (!_instance)
+                return;
+
             if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE && !me->HasAura(SPELL_FRIENDLY_BOSS_DAMAGE_MOD))
                 me->CastSpell(me, SPELL_FRIENDLY_BOSS_DAMAGE_MOD, true);
             if (!me->HasAura(SPELL_BATTLE_FURY))
@@ -822,6 +841,9 @@ public:
 
         void DoAction(int32 action) override
         {
+            if (!_instance)
+                return;
+
             if (action == ACTION_ENEMY_GUNSHIP_TALK)
             {
                 _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, IN_PROGRESS);
@@ -905,6 +927,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!_instance)
+                return;
+
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
             {
                 if (me->GetVictim())
@@ -1079,6 +1104,9 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
+            if (!_instance)
+                return false;
+
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return false;
             if (target->GetEntry() == NPC_SKYBREAKER_MARINE || target->GetEntry() == NPC_SKYBREAKER_SERGEANT)
@@ -1112,7 +1140,8 @@ public:
         npc_muradin_bronzebeard_igbAI(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
         {
             _events.Reset();
-            _controller.ResetSlots(TEAM_ALLIANCE, creature->GetTransport()->ToMotionTransport());
+            if (MotionTransport* transport = creature->GetTransport() ? creature->GetTransport()->ToMotionTransport() : nullptr)
+                _controller.ResetSlots(TEAM_ALLIANCE, transport);
             me->SetRegeneratingHealth(false);
             me->m_CombatDistance = 70.0f;
             _firstMageCooldown = GameTime::GetGameTime().count() + 45;
@@ -1138,6 +1167,9 @@ public:
 
         void JustEngagedWith(Unit* /*target*/) override
         {
+            if (!_instance)
+                return;
+
             if (_instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE && !me->HasAura(SPELL_FRIENDLY_BOSS_DAMAGE_MOD))
                 me->CastSpell(me, SPELL_FRIENDLY_BOSS_DAMAGE_MOD, true);
             if (!me->HasAura(SPELL_BATTLE_FURY))
@@ -1158,6 +1190,9 @@ public:
 
         void DoAction(int32 action) override
         {
+            if (!_instance)
+                return;
+
             if (action == ACTION_ENEMY_GUNSHIP_TALK)
             {
                 _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, IN_PROGRESS);
@@ -1241,6 +1276,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (!_instance)
+                return;
+
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS)
             {
                 if (me->GetVictim())
@@ -1477,6 +1515,9 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
+            if (!_instance)
+                return false;
+
             return _instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() == me->GetTransport() && target->GetPositionZ() < 478.0f && (me->GetEntry() == NPC_SKYBREAKER_DECKHAND ? (target->GetPositionY() > 2042.0f) : (target->GetPositionY() < 2431.0f));
         }
     private:
@@ -1492,6 +1533,9 @@ public:
 void TriggerBurningPitch(Creature* c)
 {
     InstanceScript* i = c->GetInstanceScript();
+    if (!i)
+        return;
+
     uint32 spellId = i->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_A : SPELL_BURNING_PITCH_H;
     if (!c->HasSpellCooldown(spellId))
     {
@@ -1512,6 +1556,9 @@ struct gunship_npc_AI : public ScriptedAI
         if (type == ACTION_SET_SLOT)
         {
             SetSlotInfo(data);
+            if (!Slot)
+                return;
+
             me->SetReactState(REACT_PASSIVE);
             float x, y, z, o;
             Slot->TargetPosition.GetPosition(x, y, z, o);
@@ -1534,6 +1581,9 @@ struct gunship_npc_AI : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        if (!Instance || !Slot)
+            return;
+
         if (Slot)
             if (Creature* captain = me->FindNearestCreature(Instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_IGB_MURADIN_BRONZEBEARD : NPC_IGB_HIGH_OVERLORD_SAURFANG, 200.0f))
                 captain->AI()->SetData(ACTION_CLEAR_SLOT, Index);
@@ -1541,6 +1591,9 @@ struct gunship_npc_AI : public ScriptedAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
+        if (!Instance)
+            return;
+
         if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH && Slot)
         {
             me->SetFacingTo(Slot->TargetPosition.GetOrientation());
@@ -1554,6 +1607,12 @@ protected:
     void SetSlotInfo(uint32 index)
     {
         Index = index;
+        if (!Instance)
+        {
+            Slot = nullptr;
+            return;
+        }
+
         Slot = &((Instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SkybreakerSlotInfo : OrgrimsHammerSlotInfo)[Index]);
     }
 
@@ -1578,6 +1637,9 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         if (type == ACTION_SET_SLOT)
         {
             SetSlotInfo(data);
+            if (!Slot)
+                return;
+
             me->SetReactState(REACT_PASSIVE);
             me->m_Events.AddEvent(new DelayedMovementEvent(me, Slot->TargetPosition), me->m_Events.CalculateTime(3000 * (Index - SLOT_MARINE_1)));
         }
@@ -1605,6 +1667,9 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
+        if (!Instance)
+            return;
+
         if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH && Slot)
         {
             me->SetFacingTo(Slot->TargetPosition.GetOrientation());
@@ -1620,7 +1685,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
             if (!myTransport)
                 return;
 
-            if (Transport* transport = Instance->instance->GetTransport(Instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)))
+            if (Transport* transport = Instance->instance ? Instance->instance->GetTransport(Instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE)) : nullptr)
                 if (Transport* destTransport = transport->ToTransport())
                     destTransport->CalculatePassengerPosition(x, y, z, &o);
 
@@ -1659,6 +1724,9 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
 
     bool CanAIAttack(Unit const* target) const override
     {
+        if (!Instance)
+            return false;
+
         return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() && target->GetTransport() != me->GetTransport() && target->GetPositionZ() < 478.0f && (me->GetEntry() == NPC_SKYBREAKER_SERGEANT || me->GetEntry() == NPC_SKYBREAKER_MARINE ? (target->GetPositionY() < 2431.0f) : (target->GetPositionY() > 2042.0f));
     }
 
@@ -1666,6 +1734,12 @@ protected:
     void SetSlotInfo(uint32 index)
     {
         Index = index;
+        if (!Instance)
+        {
+            Slot = nullptr;
+            return;
+        }
+
         Slot = &((Instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SkybreakerSlotInfo : OrgrimsHammerSlotInfo)[Index]);
     }
 
@@ -1697,7 +1771,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+            if (!Instance || Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
@@ -1754,7 +1828,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+            if (!Instance || Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
@@ -1829,7 +1903,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+            if (!Instance || Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
@@ -1838,7 +1912,7 @@ public:
 
         bool CanAIAttack(Unit const*  /*target*/) const override
         {
-            return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
+            return Instance && Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
         }
     };
 
@@ -1876,7 +1950,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+            if (!Instance || Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
@@ -1912,7 +1986,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() && target->GetTransport() != me->GetTransport();
+            return Instance && Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS && target->GetTransport() && target->GetTransport() != me->GetTransport();
         }
 
     protected:
@@ -1947,7 +2021,7 @@ public:
 
         void UpdateAI(uint32 /*diff*/) override
         {
-            if (Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+            if (!Instance || Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
             if (me->GetReactState() == REACT_PASSIVE)
                 return;
@@ -1967,7 +2041,7 @@ public:
 
         bool CanAIAttack(Unit const*  /*target*/) const override
         {
-            return Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
+            return Instance && Instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) == IN_PROGRESS;
         }
     };
 
