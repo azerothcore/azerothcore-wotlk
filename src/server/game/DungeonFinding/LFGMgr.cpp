@@ -1519,7 +1519,7 @@ namespace lfg
 
         for (LfgRolesMap::iterator it = groles.begin(); it != groles.end(); ++it)
         {
-            uint8 role = it->second & ~PLAYER_ROLE_LEADER;
+            uint8 const role = it->second & ~PLAYER_ROLE_LEADER;
             if (role == PLAYER_ROLE_NONE)
                 return 0;
 
