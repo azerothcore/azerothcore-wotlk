@@ -1269,7 +1269,7 @@ class spell_chapter5_return_to_capital : public SpellScript
             if (creature)
             {
                 creature->PauseMovement(5000);
-                creature->SetTimedFacingToObject(player, 30000);
+                creature->SetFacingToObject(player, 30s);
 
                 if (roll_chance_i(30))
                 {
