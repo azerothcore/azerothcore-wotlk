@@ -131,7 +131,7 @@ function serialize_exec_definition() {
     done
 
     local args_json
-    args_json=$(printf '%s\0' "${rel_args[@]}" "__AC_SENTINEL__" | jq -R -s 'split("\u0000")[:-1]')
+    args_json=$(printf '%s\0' "${rel_args[@]}" | jq -R -s 'split("\u0000")[:-1]')
 
     jq -n --arg command "$rel_command" --argjson args "$args_json" '{command: $command, args: $args}'
 }
@@ -333,6 +333,9 @@ function restore_missing_services() {
         local -a exec_args_abs=()
         if [ -n "$exec_definition_raw" ] && [ "$exec_definition_raw" != "null" ]; then
             while IFS= read -r arg; do
+                if [ "$arg" = "__AC_SENTINEL__" ]; then
+                    continue
+                fi
                 exec_args_abs+=("$arg")
             done < <(echo "$service_resolved" | jq -r '.exec.args[]?')
         fi
@@ -699,6 +702,9 @@ function get_service_info_resolved() {
     if [ -n "$exec_args_raw_json" ] && [ "$exec_args_raw_json" != "null" ]; then
         local prev_arg=""
         while IFS= read -r arg; do
+            if [ "$arg" = "__AC_SENTINEL__" ]; then
+                continue
+            fi
             if [[ -z "$arg" ]]; then
                 exec_args_resolved+=("$arg")
             elif [ "$prev_arg" = "--config" ]; then
@@ -909,6 +915,9 @@ function sync_service_configs_from_registry() {
         local -a exec_args=()
         if [ -n "$exec_definition" ] && [ "$exec_definition" != "null" ]; then
             while IFS= read -r arg; do
+                if [ "$arg" = "__AC_SENTINEL__" ]; then
+                    continue
+                fi
                 exec_args+=("$arg")
             done < <(echo "$exec_definition" | jq -r '.args[]?')
         fi
@@ -1006,6 +1015,9 @@ function pm2_create_service() {
     local -a exec_args_abs=()
     local prev_arg=""
     while IFS= read -r arg; do
+        if [ "$arg" = "__AC_SENTINEL__" ]; then
+            continue
+        fi
         if [[ -z "$arg" ]]; then
             exec_args_abs+=("$arg")
         elif [ "$prev_arg" = "--config" ]; then
@@ -2416,6 +2428,9 @@ function normalize_registry_paths() {
         local exec_json_new="null"
         if [ -n "$exec_command_raw" ]; then
             while IFS= read -r arg; do
+                if [ "$arg" = "__AC_SENTINEL__" ]; then
+                    continue
+                fi
                 exec_args_array+=("$arg")
             done < <(echo "$entry" | jq -r '.exec.args[]?')
             exec_json_new="$(serialize_exec_definition "$exec_command_raw" "${exec_args_array[@]}")"
