@@ -160,15 +160,14 @@ function comp_compile() {
         $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/authserver"
       fi
 
-      # check the permissions and ownership
-      ls -al "$AC_BINPATH_FULL/.."
-
       [[ -f "$confDir/worldserver.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
       [[ -f "$confDir/authserver.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
       [[ -f "$confDir/dbimport.conf.dist" ]] && \
           cp -v --no-clobber "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
+
+      mkdir -p "$confDir/modules"
       for f in "$confDir/modules/"*.dist
       do
           [[ -e $f ]] || break  # handle the case of no *.dist files
