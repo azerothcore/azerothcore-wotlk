@@ -285,7 +285,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
         auto waypoint = mWayPoints->find(mCurrentWPID);
         if (waypoint->second.orientation.has_value())
         {
-            me->SetFacingTo(waypoint->second.orientation.has_value());
+            me->SetFacingTo(*waypoint->second.orientation);
         }
     }
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_PAUSED, nullptr, mCurrentWPID, GetScript()->GetPathId());
