@@ -1677,9 +1677,7 @@ public:
     void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 
     void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 TransitTime, SplineFlags sf = SPLINEFLAG_WALK_MODE); // pussywizard: need to just send packet, with no movement/spline
-    void MonsterMoveWithSpeed(float x, float y, float z, float speed);
-    //void SetFacing(float ori, WorldObject* obj = nullptr);
-    //void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 type, uint32 MovementFlags, uint32 Time, Player* player = nullptr);
+    void MonsterMoveWithSpeed(float x, float y, float z, float speed); // Not to be used outside of cinematics
 
     virtual bool SetWalk(bool enable);
     virtual bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true);
