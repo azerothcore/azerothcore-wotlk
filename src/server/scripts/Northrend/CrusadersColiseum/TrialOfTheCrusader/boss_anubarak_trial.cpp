@@ -502,7 +502,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             me->CastSpell(me, RAID_MODE(SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25, SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25), true);
-            me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
+            me->m_Events.AddEventAtOffset(new HideNpcEvent(*me), 5s);
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -710,7 +710,7 @@ public:
 
         void JustDied(Unit*  /*killer*/) override
         {
-            me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
+            me->m_Events.AddEventAtOffset(new HideNpcEvent(*me), 5s);
         }
 
         bool CanAIAttack(Unit const* target) const override
