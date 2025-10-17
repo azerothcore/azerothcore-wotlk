@@ -35,8 +35,6 @@ enum HoLBossIds
 
 enum HoLDataTypes
 {
-    DATA_LOKEN_INTRO            = 0,
-
     // GameObject data
     DATA_LOKEN_THRONE           = 0,
 
@@ -57,7 +55,7 @@ enum HoLGOs
 {
     GO_VOLKHAN_DOOR         = 191325,
     GO_IONAR_DOOR           = 191326,
-    GO_LOKEN_THRONE         = 192654,
+    GO_LOKEN_THRONE         = 192654
 };
 
 template <class AI, class T>
