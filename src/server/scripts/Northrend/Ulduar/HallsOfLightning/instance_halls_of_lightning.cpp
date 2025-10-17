@@ -64,19 +64,11 @@ public:
 
         void SetData(uint32 uiType, uint32 uiData) override
         {
-            if (uiType == DATA_LOKEN_INTRO)
-                SaveToDB();
-
             // Achievements
             if (uiType == DATA_BJARNGRIM_ACHIEVEMENT)
                 bjarngrimAchievement = (bool)uiData;
             else if (uiType == DATA_VOLKHAN_ACHIEVEMENT)
                 volkhanAchievement = (bool)uiData;
-
-            if (uiData != DONE)
-                return;
-
-            SaveToDB();
         }
 
     private:
