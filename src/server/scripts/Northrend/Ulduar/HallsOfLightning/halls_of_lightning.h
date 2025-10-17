@@ -55,10 +55,8 @@ enum HoLNPCs
 
 enum HoLGOs
 {
-    GO_BJARNGRIM_DOOR       = 191416,
     GO_VOLKHAN_DOOR         = 191325,
     GO_IONAR_DOOR           = 191326,
-    GO_LOKEN_DOOR           = 191324,
     GO_LOKEN_THRONE         = 192654,
 };
 

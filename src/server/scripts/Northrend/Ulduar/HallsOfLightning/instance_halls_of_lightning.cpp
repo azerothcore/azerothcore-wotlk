@@ -22,10 +22,8 @@
 
 DoorData const doorData[] =
 {
-    { GO_BJARNGRIM_DOOR, DATA_BJARNGRIM, DOOR_TYPE_PASSAGE },
     { GO_VOLKHAN_DOOR,   DATA_VOLKHAN,   DOOR_TYPE_PASSAGE },
     { GO_IONAR_DOOR,     DATA_IONAR,     DOOR_TYPE_PASSAGE },
-    { GO_LOKEN_DOOR,     DATA_LOKEN,     DOOR_TYPE_PASSAGE },
     { 0,                        0,       DOOR_TYPE_ROOM    }
 };
 
