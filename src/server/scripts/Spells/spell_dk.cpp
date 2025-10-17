@@ -152,7 +152,12 @@ class spell_dk_raise_ally : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        Player* unitTarget = GetHitPlayer();
+        ObjectGuid targetGuid = GetSpell()->m_targets.GetUnitTargetGUID();
+        if (!targetGuid)
+            return SPELL_FAILED_BAD_TARGETS;
+
+        Unit *target = ObjectAccessor::GetUnit(*(GetSpell()->GetCaster()), targetGuid);
+        Player *unitTarget = target ? target->ToPlayer() : nullptr;
         if (!unitTarget)
             return SPELL_FAILED_BAD_TARGETS;
 
