@@ -416,7 +416,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                     //10% chance to play special pet attack talk, else growl
                     //actually this only seems to happen on special spells, fire shield for imp, torment for voidwalker, but it's stupid to check every spell
-                    if (pet->IsPet() && pet->ToPet()->getPetType() == SUMMON_PET && pet != unit_target && roll_chance_i(10))
+                    if (pet->IsPet() && (pet->ToPet()->getPetType() == SUMMON_PET) && (pet != unit_target) && roll_chance_i(10))
                         pet->SendPetActionSound(PET_ACTION_SPECIAL_SPELL);
                     else
                     {
