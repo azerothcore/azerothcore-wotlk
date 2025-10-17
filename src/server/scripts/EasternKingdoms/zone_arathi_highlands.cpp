@@ -78,7 +78,7 @@ public:
                     break;
                 case 11:
                     Talk(SAY_PROGRESS_6, player);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
                 case 19:
                     Talk(SAY_PROGRESS_7, player);

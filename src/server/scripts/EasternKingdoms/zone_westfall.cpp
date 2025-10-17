@@ -117,7 +117,7 @@ public:
                     me->SummonCreature(NPC_DEFIAS_RAIDER, -11438.14f, 1607.6f, 70.94f, 4.38f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
                     break;
                 case 10:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 11:
                     Talk(SAY_DS_PROLOGUE);

@@ -133,7 +133,7 @@ public:
                     if (Player* player = GetPlayerForEscort())
                         player->GroupEventHappens(QUEST_TOTEM_KARDASH_H, me);
 
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
             }
         }
@@ -361,7 +361,7 @@ public:
                         if (Player* player = GetPlayerForEscort())
                             player->GroupEventHappens(QUEST_TOTEM_KARDASH_A, me);
 
-                        SetRun(true);
+                        me->SetWalk(false);
                         break;
                     }
             }

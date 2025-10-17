@@ -258,7 +258,7 @@ public:
                     case 28:
                         player->GroupEventHappens(QUEST_A_CRY_FOR_HELP, me);
                         _events.ScheduleEvent(EVENT_TALK_END, 2s);
-                        SetRun(true);
+                        me->SetWalk(false);
                         break;
                     case 29:
                         if (Creature* cowlen = me->FindNearestCreature(NPC_COWLEN, 50.0f, true))

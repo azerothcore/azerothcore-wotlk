@@ -959,7 +959,7 @@ public:
                     Talk(SAY_5);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     player->GroupEventHappens(QUEST_ESCAPING_THE_MIST, me);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
             }
         }
