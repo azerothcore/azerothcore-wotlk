@@ -62,36 +62,43 @@ enum LokenEvents
 
 struct boss_loken : public BossAI
 {
-    boss_loken(Creature* creature) : BossAI(creature, DATA_LOKEN)
-    {
-        isActive = instance->GetData(DATA_LOKEN_INTRO);
-    }
-
-    void MoveInLineOfSight(Unit*) override { }
+    boss_loken(Creature* creature) : BossAI(creature, DATA_LOKEN), _introDone(false) { }
 
     void Reset() override
     {
         _Reset();
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_TIMELY_DEATH);
 
-        HealthCheck = 75;
-        IntroTimer = 0;
         me->RemoveAllAuras();
 
-        if (!isActive)
-        {
-            me->SetControlled(true, UNIT_STATE_STUNNED);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        }
-        else
-        {
-            me->SetControlled(false, UNIT_STATE_STUNNED);
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        }
+        ScheduleHealthCheckEvent(75, [&] {
+            Talk(SAY_75HEALTH);
+        });
+
+        ScheduleHealthCheckEvent(50, [&] {
+            Talk(SAY_50HEALTH);
+        });
+
+        ScheduleHealthCheckEvent(25, [&] {
+            Talk(SAY_25HEALTH);
+        });
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        BossAI::MoveInLineOfSight(who);
+
+        if (_introDone || !who->IsPlayer() || !me->IsWithinDistInMap(who, 40.0f))
+            return;
+
+        Talk(SAY_INTRO_1);
+        Talk(SAY_INTRO_2, 10s);
+        _introDone = true;
     }
 
     void JustEngagedWith(Unit*) override
     {
+        me->m_Events.KillAllEvents(false);
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
@@ -109,27 +116,6 @@ struct boss_loken : public BossAI
         Talk(SAY_DEATH);
     }
 
-    void LokenSpeach(bool hp)
-    {
-        if (hp)
-        {
-            switch (HealthCheck)
-            {
-                case 75:
-                    Talk(SAY_75HEALTH);
-                    break;
-                case 50:
-                    Talk(SAY_50HEALTH);
-                    break;
-                case 25:
-                    Talk(SAY_25HEALTH);
-                    break;
-            }
-        }
-        else
-            Talk(SAY_NOVA);
-    }
-
     void KilledUnit(Unit* victim) override
     {
         if (!victim->IsPlayer())
@@ -140,40 +126,6 @@ struct boss_loken : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!isActive)
-        {
-            IntroTimer += diff;
-            if (IntroTimer > 5000 && IntroTimer < 10000)
-            {
-                if (SelectTargetFromPlayerList(60))
-                {
-                    Talk(SAY_INTRO_1);
-                    IntroTimer = 10000;
-                }
-                else
-                    IntroTimer = 0;
-            }
-
-            if (IntroTimer >= 30000 && IntroTimer < 40000)
-            {
-                Talk(SAY_INTRO_2);
-                IntroTimer = 40000;
-            }
-            if (IntroTimer >= 60000)
-            {
-                isActive = true;
-                instance->SetData(DATA_LOKEN_INTRO, 1);
-
-                me->SetControlled(false, UNIT_STATE_STUNNED);
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-
-                if (GameObject* globe = instance->GetGameObject(DATA_LOKEN_THRONE))
-                    globe->SetGoState(GO_STATE_ACTIVE);
-            }
-
-            return;
-        }
-
         //Return since we have no target
         if (!UpdateVictim())
             return;
@@ -185,16 +137,8 @@ struct boss_loken : public BossAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_CHECK_HEALTH:
-                if (HealthBelowPct(HealthCheck))
-                {
-                    LokenSpeach(true);
-                    HealthCheck -= 25;
-                }
-
-                events.Repeat(1s);
-                break;
             case EVENT_LIGHTNING_NOVA:
+                Talk(SAY_NOVA);
                 events.Repeat(15s);
                 me->CastSpell(me, SPELL_LIGHTNING_NOVA_VISUAL, true);
                 me->CastSpell(me, SPELL_LIGHTNING_NOVA_THUNDERS, true);
@@ -221,9 +165,7 @@ struct boss_loken : public BossAI
         DoMeleeAttackIfReady();
     }
     private:
-        bool isActive;
-        uint32 IntroTimer;
-        uint8 HealthCheck;
+        bool _introDone;
 };
 
 class spell_loken_pulsing_shockwave : public SpellScript
