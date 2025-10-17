@@ -37,7 +37,10 @@ enum HoLDataTypes
 {
     DATA_LOKEN_INTRO            = 0,
 
+    // GameObject data
     DATA_LOKEN_THRONE           = 0,
+
+    // Achievement data
     DATA_BJARNGRIM_ACHIEVEMENT  = 10,
     DATA_VOLKHAN_ACHIEVEMENT    = 11,
 };
