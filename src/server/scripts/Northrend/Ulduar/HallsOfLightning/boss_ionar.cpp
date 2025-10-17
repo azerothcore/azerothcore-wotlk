@@ -68,211 +68,191 @@ enum IonarEvents
     EVENT_RESTORE                   = 5,
 };
 
-class boss_ionar : public CreatureScript
+struct boss_ionar : public BossAI
 {
-public:
-    boss_ionar() : CreatureScript("boss_ionar") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_ionar(Creature* creature) : BossAI(creature, DATA_IONAR), summons(creature)
     {
-        return GetHallsOfLightningAI<boss_ionarAI>(creature);
+        m_pInstance = creature->GetInstanceScript();
     }
 
-    struct boss_ionarAI : public ScriptedAI
+    void Reset() override
     {
-        boss_ionarAI(Creature* creature) : ScriptedAI(creature), summons(creature)
+        HealthCheck = 50;
+        events.Reset();
+        summons.DespawnAll();
+
+        me->SetVisible(true);
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_IONAR, NOT_STARTED);
+    }
+
+    void ScheduleEvents(bool spark)
+    {
+        events.SetPhase(1);
+        if (!spark)
+            events.RescheduleEvent(EVENT_CHECK_HEALTH, 1s, 0, 1);
+
+        events.RescheduleEvent(EVENT_BALL_LIGHTNING, 10s, 0, 1);
+        events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 5s, 0, 1);
+    }
+
+    void JustEngagedWith(Unit*) override
+    {
+        me->SetInCombatWithZone();
+        Talk(SAY_AGGRO);
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_IONAR, IN_PROGRESS);
+
+        ScheduleEvents(false);
+    }
+
+    void JustDied(Unit*) override
+    {
+        Talk(SAY_DEATH);
+
+        summons.DespawnAll();
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_IONAR, DONE);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (!victim->IsPlayer())
+            return;
+
+        Talk(SAY_SLAY);
+    }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_DISPERSE)
+            Split();
+    }
+
+    void Split()
+    {
+        Talk(SAY_SPLIT);
+
+        Creature* spark;
+        for (uint8 i = 0; i < 5; ++i)
         {
-            m_pInstance = creature->GetInstanceScript();
+            if ((spark = me->SummonCreature(NPC_SPARK_OF_IONAR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000)))
+            {
+                summons.Summon(spark);
+                spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
+                spark->CastSpell(spark, SPELL_RANDOM_LIGHTNING, true);
+                spark->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                spark->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
+
+                if (Player* tgt = SelectTargetFromPlayerList(100))
+                    spark->GetMotionMaster()->MoveFollow(tgt, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+            }
         }
 
+        me->SetVisible(false);
+        me->SetControlled(true, UNIT_STATE_STUNNED);
+
+        events.SetPhase(2);
+        events.ScheduleEvent(EVENT_CALL_SPARKS, 15s, 0, 2);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_BALL_LIGHTNING:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
+
+                events.Repeat(10s, 11s);
+                break;
+            case EVENT_STATIC_OVERLOAD:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
+
+                events.Repeat(5s, 6s);
+                break;
+            case EVENT_CHECK_HEALTH:
+                if (HealthBelowPct(HealthCheck))
+                    me->CastSpell(me, SPELL_DISPERSE, false);
+
+                events.Repeat(1s);
+                return;
+            case EVENT_CALL_SPARKS:
+                {
+                    EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
+                    summons.DoAction(ACTION_CALLBACK, pred);
+                    events.ScheduleEvent(EVENT_RESTORE, 2s, 0, 2);
+                    return;
+                }
+            case EVENT_RESTORE:
+                EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
+                summons.DoAction(ACTION_SPARK_DESPAWN, pred);
+
+                me->SetVisible(true);
+                me->SetControlled(false, UNIT_STATE_STUNNED);
+                ScheduleEvents(true);
+                return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+    private:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
         uint8 HealthCheck;
-
-        void Reset() override
-        {
-            HealthCheck = 50;
-            events.Reset();
-            summons.DespawnAll();
-
-            me->SetVisible(true);
-
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_IONAR, NOT_STARTED);
-        }
-
-        void ScheduleEvents(bool spark)
-        {
-            events.SetPhase(1);
-            if (!spark)
-                events.RescheduleEvent(EVENT_CHECK_HEALTH, 1s, 0, 1);
-
-            events.RescheduleEvent(EVENT_BALL_LIGHTNING, 10s, 0, 1);
-            events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 5s, 0, 1);
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            me->SetInCombatWithZone();
-            Talk(SAY_AGGRO);
-
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_IONAR, IN_PROGRESS);
-
-            ScheduleEvents(false);
-        }
-
-        void JustDied(Unit*) override
-        {
-            Talk(SAY_DEATH);
-
-            summons.DespawnAll();
-
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_IONAR, DONE);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (!victim->IsPlayer())
-                return;
-
-            Talk(SAY_SLAY);
-        }
-
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_DISPERSE)
-                Split();
-        }
-
-        void Split()
-        {
-            Talk(SAY_SPLIT);
-
-            Creature* spark;
-            for (uint8 i = 0; i < 5; ++i)
-            {
-                if ((spark = me->SummonCreature(NPC_SPARK_OF_IONAR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000)))
-                {
-                    summons.Summon(spark);
-                    spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
-                    spark->CastSpell(spark, SPELL_RANDOM_LIGHTNING, true);
-                    spark->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                    spark->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
-
-                    if (Player* tgt = SelectTargetFromPlayerList(100))
-                        spark->GetMotionMaster()->MoveFollow(tgt, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
-                }
-            }
-
-            me->SetVisible(false);
-            me->SetControlled(true, UNIT_STATE_STUNNED);
-
-            events.SetPhase(2);
-            events.ScheduleEvent(EVENT_CALL_SPARKS, 15s, 0, 2);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_BALL_LIGHTNING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                        me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
-
-                    events.Repeat(10s, 11s);
-                    break;
-                case EVENT_STATIC_OVERLOAD:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                        me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
-
-                    events.Repeat(5s, 6s);
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (HealthBelowPct(HealthCheck))
-                        me->CastSpell(me, SPELL_DISPERSE, false);
-
-                    events.Repeat(1s);
-                    return;
-                case EVENT_CALL_SPARKS:
-                    {
-                        EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
-                        summons.DoAction(ACTION_CALLBACK, pred);
-                        events.ScheduleEvent(EVENT_RESTORE, 2s, 0, 2);
-                        return;
-                    }
-                case EVENT_RESTORE:
-                    EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
-                    summons.DoAction(ACTION_SPARK_DESPAWN, pred);
-
-                    me->SetVisible(true);
-                    me->SetControlled(false, UNIT_STATE_STUNNED);
-                    ScheduleEvents(true);
-                    return;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
 };
 
-class npc_spark_of_ionar : public CreatureScript
+struct npc_spark_of_ionar : public ScriptedAI
 {
-public:
-    npc_spark_of_ionar() : CreatureScript("npc_spark_of_ionar") { }
+    npc_spark_of_ionar(Creature* creature) : ScriptedAI(creature) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void MoveInLineOfSight(Unit*) override { }
+    void UpdateAI(uint32) override { }
+    void AttackStart(Unit*  /*who*/) override { }
+
+    void Reset() override { returning = false; }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        return GetHallsOfLightningAI<npc_spark_of_ionarAI>(creature);
+        damage = 0;
     }
 
-    struct npc_spark_of_ionarAI : public ScriptedAI
+    void DoAction(int32 param) override
     {
-        npc_spark_of_ionarAI(Creature* creature) : ScriptedAI(creature) { }
+        if (param == ACTION_CALLBACK)
+        {
+            me->SetSpeed(MOVE_RUN, 2.5f);
+            me->GetThreatMgr().ClearAllThreat();
+            me->CombatStop(true);
+            me->GetMotionMaster()->MoveTargetedHome();
+            returning = true;
+        }
+        else if (param == ACTION_SPARK_DESPAWN)
+        {
+            me->GetMotionMaster()->MoveIdle();
 
+            me->RemoveAllAuras();
+            me->CastSpell(me, SPELL_SPARK_DESPAWN, true);
+            me->DespawnOrUnsummon(1s);
+        }
+    }
+
+    private:
         bool returning;
-
-        void MoveInLineOfSight(Unit*) override { }
-        void UpdateAI(uint32) override { }
-        void AttackStart(Unit*  /*who*/) override { }
-
-        void Reset() override { returning = false; }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            damage = 0;
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_CALLBACK)
-            {
-                me->SetSpeed(MOVE_RUN, 2.5f);
-                me->GetThreatMgr().ClearAllThreat();
-                me->CombatStop(true);
-                me->GetMotionMaster()->MoveTargetedHome();
-                returning = true;
-            }
-            else if (param == ACTION_SPARK_DESPAWN)
-            {
-                me->GetMotionMaster()->MoveIdle();
-
-                me->RemoveAllAuras();
-                me->CastSpell(me, SPELL_SPARK_DESPAWN, true);
-                me->DespawnOrUnsummon(1s);
-            }
-        }
-    };
 };
 
 // 52658, 59795 - Static Overload
@@ -302,7 +282,7 @@ class spell_ionar_static_overload : public AuraScript
 
 void AddSC_boss_ionar()
 {
-    new boss_ionar();
-    new npc_spark_of_ionar();
+    RegisterHallOfLightningCreatureAI(boss_ionar);
+    RegisterHallOfLightningCreatureAI(npc_spark_of_ionar);
     RegisterSpellScript(spell_ionar_static_overload);
 }
