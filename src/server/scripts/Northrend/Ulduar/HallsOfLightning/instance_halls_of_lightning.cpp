@@ -82,7 +82,52 @@ public:
     }
 };
 
+enum TitaniumHallwaySpells
+{
+    SPELL_FREEZE_ANIM = 16245,
+    SPELL_AWAKEN      = 52875,
+};
+
+class at_hol_titanium_hallway : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_hol_titanium_hallway() : OnlyOnceAreaTriggerScript("at_hol_titanium_hallway") {}
+
+    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    {
+        std::list<Creature*> creatures;
+        player->GetCreatureListWithEntryInGrid(creatures, { NPC_TITANIUM_SIEGEBREAKER, NPC_TITANIUM_THUNDERER }, 50.0f);
+        creatures.remove_if([&](Creature const* creature) -> bool
+        {
+            return !player->IsWithinLOSInMap(creature) || !creature->HasAura(SPELL_FREEZE_ANIM);
+        });
+
+        if (creatures.empty())
+            return false;
+
+        Acore::Containers::RandomResize(creatures, urand(2, 4));
+
+        ObjectGuid target = player->GetGUID();
+
+        for (Creature* creature : creatures)
+        {
+            creature->SetHomePosition(player->GetPosition());
+            creature->AI()->DoCastSelf(SPELL_AWAKEN);
+            creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+            creature->m_Events.AddEventAtOffset([creature, target] {
+                creature->AI()->DoAction(ACTION_ACTIVATE_TITANIUM_VRYKUL);
+                if (Player* targetPlayer = ObjectAccessor::GetPlayer(*creature, target))
+                    creature->AI()->AttackStart(targetPlayer);
+            }, 5s);
+        }
+
+        return false;
+    }
+};
+
 void AddSC_instance_halls_of_lightning()
 {
     new instance_halls_of_lightning();
+    new at_hol_titanium_hallway();
 }
