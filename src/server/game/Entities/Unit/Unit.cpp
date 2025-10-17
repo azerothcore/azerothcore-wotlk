@@ -11071,7 +11071,7 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
     return gain;
 }
 
-bool RedirectSpellEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool RedirectSpellEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     if (Unit* auraOwner = ObjectAccessor::GetUnit(_self, _auraOwnerGUID))
     {
@@ -19572,7 +19572,7 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     }
 }
 
-bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool VehicleDespawnEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     Position pos = _self;
     _self.MovePositionToFirstCollision(pos, 20.0f, M_PI);
@@ -19699,7 +19699,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             setDeathState(DeathState::JustDied);
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else
-            ToTempSummon()->UnSummon(2000); // Approximation
+            ToTempSummon()->UnSummon(2s); // Approximation
     }
 
     if (player)
@@ -20086,7 +20086,7 @@ class AuraMunchingQueue : public BasicEvent
 public:
     AuraMunchingQueue(Unit& owner, ObjectGuid targetGUID, int32 basePoints, uint32 spellId, AuraEffect* aurEff, AuraType auraType) : _owner(owner), _targetGUID(targetGUID), _basePoints(basePoints), _spellId(spellId), _aurEff(aurEff), _auraType(auraType) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
         if (_owner.IsInWorld() && _owner.FindMap())
             if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
