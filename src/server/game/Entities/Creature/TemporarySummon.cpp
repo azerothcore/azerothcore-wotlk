@@ -284,13 +284,12 @@ void TempSummon::SetTempSummonType(TempSummonType type)
     m_type = type;
 }
 
-void TempSummon::UnSummon(uint32 msTime)
+void TempSummon::UnSummon(Milliseconds msTime)
 {
-    if (msTime)
+    if (msTime > 0ms)
     {
         ForcedUnsummonDelayEvent* pEvent = new ForcedUnsummonDelayEvent(*this);
-
-        m_Events.AddEvent(pEvent, m_Events.CalculateTime(msTime));
+        m_Events.AddEventAtOffset(pEvent, msTime);
         return;
     }
 

@@ -384,7 +384,7 @@ public:
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SindragosaLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
+                me->m_Events.AddEventAtOffset(new FrostwyrmLandEvent(*me, SindragosaLandPos), Milliseconds(uint32(moveTime) + 250));
                 me->GetMotionMaster()->MovePoint(POINT_FROSTWYRM_FLY_IN, SindragosaFlyInPos);
 
                 if (!instance->GetData(DATA_SINDRAGOSA_INTRO))
@@ -478,7 +478,7 @@ public:
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_FROST_BOMB)
-                summon->m_Events.AddEvent(new FrostBombExplosion(summon, me->GetGUID()), summon->m_Events.CalculateTime(5500));
+                summon->m_Events.AddEventAtOffset(new FrostBombExplosion(summon, me->GetGUID()), 5500ms);
         }
 
         void SummonedCreatureDespawn(Creature* summon) override
@@ -1079,7 +1079,7 @@ class spell_sindragosa_ice_tomb_trap_aura : public AuraScript
     void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* c = GetCaster())
-            GetTarget()->m_Events.AddEvent(new IceTombSummonEvent(GetTarget(), c->GetGUID()), GetTarget()->m_Events.CalculateTime(500));
+            GetTarget()->m_Events.AddEventAtOffset(new IceTombSummonEvent(GetTarget(), c->GetGUID()), 500ms);
     }
 
     void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1245,7 +1245,7 @@ public:
                 me->setActive(true);
                 me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&SpinestalkerFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
+                me->m_Events.AddEventAtOffset(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), Milliseconds(uint32(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();
@@ -1376,7 +1376,7 @@ public:
                 me->setActive(true);
                 me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&RimefangFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, RimefangLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
+                me->m_Events.AddEventAtOffset(new FrostwyrmLandEvent(*me, RimefangLandPos), Milliseconds(uint32(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();

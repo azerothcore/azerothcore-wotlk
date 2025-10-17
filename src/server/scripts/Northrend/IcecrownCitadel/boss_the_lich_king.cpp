@@ -552,7 +552,7 @@ public:
 
         if (--_counter)
         {
-            _owner->m_Events.AddEvent(this, _owner->m_Events.CalculateTime(3000));
+            _owner->m_Events.AddEventAtOffset(this, 3s);
             return false;
         }
 
@@ -830,8 +830,8 @@ public:
                     if (Creature* terenas = me->FindNearestCreature(NPC_TERENAS_MENETHIL_OUTRO, 50.0f))
                         terenas->DespawnOrUnsummon(1ms);
 
-                    me->m_Events.AddEvent(new LichKingDeathEvent(*me), me->m_Events.CalculateTime(2500)); // die after spinning anim is over, so death anim is visible
-                    me->m_Events.AddEvent(new LichKingMovieEvent(*me), me->m_Events.CalculateTime(11500));
+                    me->m_Events.AddEventAtOffset(new LichKingDeathEvent(*me), 2500ms); // die after spinning anim is over, so death anim is visible
+                    me->m_Events.AddEventAtOffset(new LichKingMovieEvent(*me), 11500ms);
                 }
 
                 if (!_bFordringMustFallYell && me->GetHealth() < 500000)
@@ -862,7 +862,7 @@ public:
                     summon->CastSpell(summon, SPELL_RISEN_WITCH_DOCTOR_SPAWN, true);
                     summon->SetReactState(REACT_PASSIVE);
                     summon->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                    summon->m_Events.AddEvent(new StartMovementEvent(me, summon), summon->m_Events.CalculateTime(5000));
+                    summon->m_Events.AddEventAtOffset(new StartMovementEvent(me, summon), 5s);
                     break;
                 case NPC_RAGING_SPIRIT:
                     summon->SetHomePosition(CenterPosition);
@@ -872,7 +872,7 @@ public:
                         summon->SetReactState(REACT_PASSIVE);
                         summon->GetMotionMaster()->MoveRandom(10.0f);
                         if (_phase == PHASE_THREE)
-                            summon->m_Events.AddEvent(new VileSpiritActivateEvent(summon), summon->m_Events.CalculateTime(15000));
+                            summon->m_Events.AddEventAtOffset(new VileSpiritActivateEvent(summon), 15s);
                         break;
                     }
                 case NPC_STRANGULATE_VEHICLE:
@@ -1189,7 +1189,7 @@ public:
                             if (summon->GetEntry() == NPC_VILE_SPIRIT)
                             {
                                 summon->m_Events.KillAllEvents(true);
-                                summon->m_Events.AddEvent(new VileSpiritActivateEvent(summon), summon->m_Events.CalculateTime(55000));
+                                summon->m_Events.AddEventAtOffset(new VileSpiritActivateEvent(summon), 55s);
                                 summon->GetMotionMaster()->Clear(true);
                                 summon->StopMoving();
                                 summon->SetReactState(REACT_PASSIVE);
@@ -1213,7 +1213,7 @@ public:
                         {
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_1, true);  // summons bombs randomly
                             spawner->CastSpell(spawner, SPELL_SUMMON_SPIRIT_BOMB_2, true);  // summons bombs on players
-                            spawner->m_Events.AddEvent(new TriggerWickedSpirit(spawner), spawner->m_Events.CalculateTime(3000));
+                            spawner->m_Events.AddEventAtOffset(new TriggerWickedSpirit(spawner), 3s);
                             terenas->SetImmuneToAll(true); // to avoid being healed by player trinket procs. terenas' health doesn't matter on heroic
                         }
                     }

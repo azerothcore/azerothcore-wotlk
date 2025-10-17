@@ -417,13 +417,13 @@ public:
         {
             if (summon->GetEntry() == NPC_DREAM_PORTAL_PRE_EFFECT)
             {
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_DREAM_PORTAL, me->GetGUID(), 6s), summon->m_Events.CalculateTime(15000));
-                summon->m_Events.AddEvent(new AuraRemoveEvent(summon, SPELL_DREAM_PORTAL_VISUAL_PRE), summon->m_Events.CalculateTime(15000));
+                summon->m_Events.AddEventAtOffset(new DelayedCastEvent(summon, SPELL_SUMMON_DREAM_PORTAL, me->GetGUID(), 6s), 15s);
+                summon->m_Events.AddEventAtOffset(new AuraRemoveEvent(summon, SPELL_DREAM_PORTAL_VISUAL_PRE), 15s);
             }
             else if (summon->GetEntry() == NPC_NIGHTMARE_PORTAL_PRE_EFFECT)
             {
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_NIGHTMARE_PORTAL, me->GetGUID(), 6s), summon->m_Events.CalculateTime(15000));
-                summon->m_Events.AddEvent(new AuraRemoveEvent(summon, SPELL_NIGHTMARE_PORTAL_VISUAL_PRE), summon->m_Events.CalculateTime(15000));
+                summon->m_Events.AddEventAtOffset(new DelayedCastEvent(summon, SPELL_SUMMON_NIGHTMARE_PORTAL, me->GetGUID(), 6s), 15s);
+                summon->m_Events.AddEventAtOffset(new AuraRemoveEvent(summon, SPELL_NIGHTMARE_PORTAL_VISUAL_PRE), 15s);
             }
         }
 
@@ -579,7 +579,7 @@ public:
         void DoAction(int32 action) override
         {
             if (action == ACTION_DEATH)
-                me->m_Events.AddEvent(new ValithriaDespawner(me), me->m_Events.CalculateTime(5000));
+                me->m_Events.AddEventAtOffset(new ValithriaDespawner(me), 5s);
             else if (action == ACTION_ENTER_COMBAT)
             {
                 if (!me->IsInCombat())
@@ -750,7 +750,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_COLUMN_OF_FROST)
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8s), summon->m_Events.CalculateTime(2000));
+                summon->m_Events.AddEventAtOffset(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8s), 2s);
             else if (summon->GetEntry() == NPC_MANA_VOID)
                 summon->DespawnOrUnsummon(36s);
         }

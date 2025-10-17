@@ -24,6 +24,15 @@
 
 #define HallsOfLightningScriptName "instance_halls_of_lightning"
 
+enum BossIds
+{
+    DATA_BJARNGRIM                          = 0,
+    DATA_IONAR                              = 1,
+    DATA_LOKEN                              = 2,
+    DATA_VOLKHAN                            = 3,
+    MAX_ENCOUNTERS
+};
+
 enum HoLEvents
 {
     TYPE_BJARNGRIM          = 0,
@@ -59,5 +68,7 @@ inline AI* GetHallsOfLightningAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, HallsOfLightningScriptName);
 }
+
+#define RegisterHallOfLightningCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetHallsOfLightningAI)
 
 #endif

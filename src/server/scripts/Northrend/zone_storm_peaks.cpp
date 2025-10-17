@@ -955,7 +955,7 @@ public:
                 };
 
                 if (who->IsPlayer())
-                    who->m_Events.AddEvent(new DelayedTransportPositionOffsets(who), who->m_Events.CalculateTime(500));
+                    who->m_Events.AddEventAtOffset(new DelayedTransportPositionOffsets(who), 500ms);
 
                 return;
             }

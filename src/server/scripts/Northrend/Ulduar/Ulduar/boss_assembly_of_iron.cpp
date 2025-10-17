@@ -418,7 +418,7 @@ public:
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
 
-            me->m_Events.AddEvent(new CastRunesEvent(*me), me->m_Events.CalculateTime(8000));
+            me->m_Events.AddEventAtOffset(new CastRunesEvent(*me), 8s);
         }
 
         void JustReachedHome() override
