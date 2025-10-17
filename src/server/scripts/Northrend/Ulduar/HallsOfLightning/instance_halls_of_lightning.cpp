@@ -82,7 +82,6 @@ public:
         }
 
     private:
-        ObjectGuid m_uiLokenGlobeGUID;
         bool volkhanAchievement;
         bool bjarngrimAchievement;
     };
