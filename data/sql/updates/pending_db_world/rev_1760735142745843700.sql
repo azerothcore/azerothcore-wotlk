@@ -5,9 +5,9 @@ UPDATE `creature_template_addon` SET `auras` = '' WHERE `entry` IN (28961, 28965
 
 DELETE FROM `areatrigger_scripts` WHERE `entry` IN (5082, 5083, 5084);
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
-(5082, 'at_hol_titanium_hallway'),
-(5083, 'at_hol_titanium_hallway'),
-(5084, 'at_hol_titanium_hallway');
+(5082, 'at_hol_hall_of_watchers'),
+(5083, 'at_hol_hall_of_watchers'),
+(5084, 'at_hol_hall_of_watchers');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28961;
 

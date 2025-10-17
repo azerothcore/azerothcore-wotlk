@@ -88,10 +88,10 @@ enum TitaniumHallwaySpells
     SPELL_AWAKEN      = 52875,
 };
 
-class at_hol_titanium_hallway : public OnlyOnceAreaTriggerScript
+class at_hol_hall_of_watchers : public OnlyOnceAreaTriggerScript
 {
 public:
-    at_hol_titanium_hallway() : OnlyOnceAreaTriggerScript("at_hol_titanium_hallway") {}
+    at_hol_hall_of_watchers() : OnlyOnceAreaTriggerScript("at_hol_hall_of_watchers") {}
 
     bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
@@ -129,5 +129,5 @@ public:
 void AddSC_instance_halls_of_lightning()
 {
     new instance_halls_of_lightning();
-    new at_hol_titanium_hallway();
+    new at_hol_hall_of_watchers();
 }
