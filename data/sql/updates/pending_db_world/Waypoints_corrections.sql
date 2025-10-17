@@ -1242,7 +1242,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 4252;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 4252);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (4252, 0, 0, 0, 40, 1, 10, 512, 0, 0, 0, 0, 0, 0, 87, 425203, 425204, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gnome Racer - On Point Any of Path Any Reached - Run Random Script (Phase 1)'),
-(4252, 0, 1, 0, 58, 1, 100, 512, 0, 425201, 0, 0, 0, 0, 80, 425202, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gnome Racer - On Path 425201 Finished - Run Script (Phase 1)');
+(4252, 0, 1, 0, 109, 1, 100, 512, 0, 425201, 0, 0, 0, 0, 80, 425202, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gnome Racer - On Path 425201 Finished - Run Script (Phase 1)');
 
 -- Edit Action Lists (Gnome Racer)
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (425200, 425201, 425202, 425203, 425204));
@@ -1259,6 +1259,43 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (425202, 9, 5, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gnome Racer - Actionlist - Despawn Instant'),
 (425203, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 6600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gnome Racer - Actionlist - Cast \'Salt Flats Racer Speed\''),
 (425204, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 6601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gnome Racer - Actionlist - Cast \'Salt Flats Racer Slow\'');
+
+-- Set Waypoint (Daisy)
+DELETE FROM `waypoints` WHERE (`entry` IN (450700));
+
+DELETE FROM `waypoint_data` WHERE (`id` IN (450700));
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(450700, 1, -6181.54, -3901.89, -60.0522, NULL, 0, 0, 0, 100, 0),
+(450700, 2, -6181.91, -3906.66, -60.0592, NULL, 0, 0, 0, 100, 0),
+(450700, 3, -6182.58, -3912.22, -59.9758, NULL, 0, 0, 0, 100, 0),
+(450700, 4, -6182.4, -3917.94, -58.8287, NULL, 0, 0, 0, 100, 0);
+
+-- Edit SmartAI (Daisy)
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 4507;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 4507);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(4507, 0, 0, 0, 11, 0, 100, 512, 0, 0, 0, 0, 0, 0, 80, 450700, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - On Respawn - Run Script'),
+(4507, 0, 1, 0, 38, 1, 100, 513, 1, 1, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - On Data Set 1 1 - Set Event Phase 2 (Phase 1) (No Repeat)'),
+(4507, 0, 2, 0, 38, 1, 100, 513, 1, 2, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - On Data Set 1 2 - Set Event Phase 2 (Phase 1) (No Repeat)'),
+(4507, 0, 3, 0, 66, 0, 100, 512, 2, 0, 0, 0, 0, 0, 80, 450701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - On Event Phase 2 Set - Run Script');
+
+-- Esit Action List (Daisy)
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (450700, 450701));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(450700, 9, 0, 0, 0, 0, 100, 0, 30000, 90000, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Set Active On'),
+(450700, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 425100, 2, 0, 0, 0, 0, 10, 21680, 4251, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Run Script'),
+(450700, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 425200, 2, 0, 0, 0, 0, 10, 21682, 4252, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Run Script'),
+(450700, 9, 3, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 21549, 4419, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Say Line 0'),
+(450700, 9, 4, 0, 0, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 21145, 4620, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Say Line 0'),
+(450700, 9, 5, 0, 0, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 5, 36, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Play Emote 36'),
+(450700, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 21145, 4620, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Say Line 1'),
+(450700, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 425101, 2, 0, 0, 0, 0, 10, 21680, 4251, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Run Script'),
+(450700, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 425201, 2, 0, 0, 0, 0, 10, 21682, 4252, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Run Script'),
+(450700, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Set Event Phase 1'),
+(450701, 9, 0, 0, 0, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 232, 450700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Start Path 450700'),
+(450701, 9, 1, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.60989, 'Daisy - Actionlist - Set Orientation 1.60989'),
+(450701, 9, 2, 0, 0, 0, 100, 0, 600000, 600000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Daisy - Actionlist - Despawn Instant');
 
 -- Set Waypoint (Mordenai)
 DELETE FROM `waypoints` WHERE (`entry` IN (22113));
