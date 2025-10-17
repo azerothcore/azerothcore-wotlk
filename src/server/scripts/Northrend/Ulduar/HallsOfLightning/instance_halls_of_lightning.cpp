@@ -32,35 +32,19 @@ public:
 
     struct instance_halls_of_lightning_InstanceMapScript : public InstanceScript
     {
-        instance_halls_of_lightning_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); };
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-
-        ObjectGuid m_uiGeneralBjarngrimGUID;
-        ObjectGuid m_uiIonarGUID;
-        ObjectGuid m_uiLokenGUID;
-        ObjectGuid m_uiVolkhanGUID;
-
-        ObjectGuid m_uiBjarngrimDoorGUID;
-        ObjectGuid m_uiVolkhanDoorGUID;
-        ObjectGuid m_uiIonarDoorGUID;
-        ObjectGuid m_uiLokenDoorGUID;
-        ObjectGuid m_uiLokenGlobeGUID;
-
-        bool volkhanAchievement;
-        bool bjarngrimAchievement;
-
-        void Initialize() override
+        instance_halls_of_lightning_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             SetHeaders(DataHeader);
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
+            SetBossNumber(MAX_ENCOUNTERS);
             volkhanAchievement = false;
             bjarngrimAchievement = false;
-        }
+        };
 
         bool IsEncounterInProgress() const override
         {
+            if (InstanceScript::IsEncounterInProgress())
+                return true;
+
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
                 if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_LOKEN_INTRO)
@@ -195,22 +179,22 @@ public:
             return m_auiEncounter[uiType];
         }
 
-        ObjectGuid GetGuidData(uint32 uiData) const override
-        {
-            switch (uiData)
-            {
-                case TYPE_BJARNGRIM:
-                    return m_uiGeneralBjarngrimGUID;
-                case TYPE_VOLKHAN:
-                    return m_uiVolkhanGUID;
-                case TYPE_IONAR:
-                    return m_uiIonarGUID;
-                case TYPE_LOKEN:
-                    return m_uiLokenGUID;
-            }
+    private:
+        uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-            return ObjectGuid::Empty;
-        }
+        ObjectGuid m_uiGeneralBjarngrimGUID;
+        ObjectGuid m_uiIonarGUID;
+        ObjectGuid m_uiLokenGUID;
+        ObjectGuid m_uiVolkhanGUID;
+
+        ObjectGuid m_uiBjarngrimDoorGUID;
+        ObjectGuid m_uiVolkhanDoorGUID;
+        ObjectGuid m_uiIonarDoorGUID;
+        ObjectGuid m_uiLokenDoorGUID;
+        ObjectGuid m_uiLokenGlobeGUID;
+
+        bool volkhanAchievement;
+        bool bjarngrimAchievement;
     };
 };
 

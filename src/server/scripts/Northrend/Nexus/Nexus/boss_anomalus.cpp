@@ -171,7 +171,7 @@ struct boss_anomalus : public BossAI
 
             me->CastSpell(me, SPELL_CREATE_RIFT, false);
             me->CastSpell(me, SPELL_RIFT_SHIELD, true);
-            me->m_Events.AddEvent(new ChargeRifts(me), me->m_Events.CalculateTime(1000));
+            me->m_Events.AddEventAtOffset(new ChargeRifts(me), 1s);
             events.DelayEvents(46s);
             //As we just spawned an empowered spawn a normal one
             events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);

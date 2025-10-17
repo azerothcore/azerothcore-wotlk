@@ -1669,7 +1669,7 @@ public:
             _player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_DANCESPECIAL, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
         }
 
-        _player->m_Events.AddEvent(this, RAND(_player->m_Events.CalculateTime(5000), _player->m_Events.CalculateTime(10000), _player->m_Events.CalculateTime(15000)));
+        _player->m_Events.AddEventAtOffset(this, RAND(5s, 10s, 15s));
 
         return false; // do not delete re-added event in EventProcessor::Update
     }
@@ -1690,7 +1690,7 @@ class spell_item_party_time : public AuraScript
             return;
         }
 
-        player->m_Events.AddEvent(new PartyTimeEmoteEvent(player), RAND(player->m_Events.CalculateTime(5000), player->m_Events.CalculateTime(10000), player->m_Events.CalculateTime(15000)));
+        player->m_Events.AddEventAtOffset(new PartyTimeEmoteEvent(player), RAND(5s, 10s, 15s));
     }
 
     void Register() override

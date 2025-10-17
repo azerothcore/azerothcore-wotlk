@@ -603,7 +603,7 @@ private:
     bot_pet_ai* bot_pet_AI;
     //end bot system
 
-    void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forcedRespawnTimer = 0s);
+    void ForcedDespawn(Milliseconds timeMSToDespawn = 0ms, Seconds forcedRespawnTimer = 0s);
 
     [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;
 
