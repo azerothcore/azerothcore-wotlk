@@ -56,7 +56,7 @@ Map::~Map()
 
     // Kill all scheduled events without executing them, since the map and its objects are being destroyed.
     // This prevents events from running on invalid or deleted objects during map destruction.
-    m_Events.KillAllEvents(false);
+    Events.KillAllEvents(false);
 
     sScriptMgr->OnDestroyMap(this);
 
@@ -451,7 +451,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         }
     }
 
-    m_Events.Update(t_diff);
+    Events.Update(t_diff);
 
     if (!t_diff)
     {
@@ -2762,7 +2762,7 @@ void Map::RemoveOldCorpses()
 
 void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer, Position pos)
 {
-    m_Events.AddEventAtOffset([this, creatureGuid, pos]()
+    Events.AddEventAtOffset([this, creatureGuid, pos]()
     {
         if (Creature* creature = GetCreature(creatureGuid))
             creature->Respawn();

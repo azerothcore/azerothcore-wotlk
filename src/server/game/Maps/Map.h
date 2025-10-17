@@ -172,7 +172,7 @@ public:
     // currently unused for normal maps
     bool CanUnload(uint32 diff)
     {
-        if (!m_unloadTimer || m_Events.HaveEventList())
+        if (!m_unloadTimer || Events.HaveEventList())
             return false;
 
         if (m_unloadTimer <= diff)
@@ -430,7 +430,7 @@ public:
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
     [[nodiscard]] uint32 ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const;
 
-    EventProcessor m_Events;
+    EventProcessor Events;
 
     void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/, Position pos = Position());
 
