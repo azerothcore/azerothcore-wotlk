@@ -1,3 +1,4 @@
+-- DB update 2025_10_16_02 -> 2025_10_16_03
 --
 DELETE FROM `command` WHERE `name` = 'debug zonestats';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
