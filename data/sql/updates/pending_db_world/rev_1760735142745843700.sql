@@ -20,11 +20,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28961, 0, 4, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16245, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Initialize - Cast \'Freeze Anim\''),
 (28961, 0, 5, 6, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Action 0 Done - Remove Flags Immune To Players & Immune To NPC\'s'),
 (28961, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 16245, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Action 0 Done - Remove Aura \'Freeze Anim\''),
-(28961, 0, 7, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Evade - Remove Flags Immune To Players');
+(28961, 0, 7, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Evade - Remove Flags Immune To Players'),
+(28961, 0, 8, 0, 0, 0, 100, 0, 5000, 10000, 5000, 10000, 0, 0, 11, 52898, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - In Combat - Cast \'Spell Damping\'');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28965;
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28965) AND (`source_type` = 0);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28965);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28965, 0, 0, 0, 0, 0, 100, 0, 10000, 25000, 10000, 25000, 0, 0, 11, 52904, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - In Combat - Cast \'Throw\''),
 (28965, 0, 1, 0, 0, 0, 100, 0, 15000, 30000, 15000, 30000, 0, 0, 11, 52885, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - In Combat - Cast \'Deadly Throw\''),
@@ -32,7 +33,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28965, 0, 3, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16245, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - On Initialize - Cast \'Freeze Anim\''),
 (28965, 0, 4, 5, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - On Action 0 Done - Remove Flags Immune To Players & Immune To NPC\'s'),
 (28965, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 16245, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - On Action 0 Done - Remove Aura \'Freeze Anim\''),
-(28965, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - On Evade - Remove Flags Immune To Players');
+(28965, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - On Evade - Remove Flags Immune To Players'),
+(28965, 0, 7, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52881, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Thunderer - On Aggro - Cast \'Counterattack\'');
 
 SET @CGUID := 52885;
 DELETE FROM `creature` WHERE `id1` IN (28961, 28965);
