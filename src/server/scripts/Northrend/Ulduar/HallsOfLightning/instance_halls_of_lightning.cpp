@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
