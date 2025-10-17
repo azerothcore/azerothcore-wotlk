@@ -147,9 +147,9 @@ struct boss_bjarngrim : public npc_escortAI
         me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
 
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_BJARNGRIM, NOT_STARTED);
+            m_pInstance->SetBossState(DATA_BJARNGRIM, NOT_STARTED);
 
-        me->CastSpell(me, SPELL_BATTLE_STANCE, true);
+        DoCastSelf(SPELL_BATTLE_STANCE, true);
         SetEquipmentSlots(false, EQUIP_SWORD, EQUIP_SHIELD, EQUIP_NO_CHANGE);
     }
 
@@ -179,7 +179,7 @@ struct boss_bjarngrim : public npc_escortAI
 
         if (m_pInstance)
         {
-            m_pInstance->SetData(TYPE_BJARNGRIM, IN_PROGRESS);
+            m_pInstance->SetBossState(DATA_BJARNGRIM, IN_PROGRESS);
             m_pInstance->SetData(DATA_BJARNGRIM_ACHIEVEMENT, me->HasAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE));
         }
     }
@@ -197,7 +197,7 @@ struct boss_bjarngrim : public npc_escortAI
         Talk(SAY_DEATH);
 
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_BJARNGRIM, DONE);
+            m_pInstance->SetBossState(DATA_BJARNGRIM, DONE);
     }
 
     void RemoveStanceAura(uint8 stance)
@@ -234,8 +234,8 @@ struct boss_bjarngrim : public npc_escortAI
             case STANCE_DEFENSIVE:
                 Talk(SAY_DEFENSIVE_STANCE);
 
-                me->CastSpell(me, SPELL_DEFENSIVE_STANCE, true);
-                me->CastSpell(me, SPELL_DEFENSIVE_AURA, true);
+                DoCastSelf(SPELL_DEFENSIVE_STANCE, true);
+                DoCastSelf(SPELL_DEFENSIVE_AURA, true);
 
                 events.DelayEvents(20s, STANCE_BERSERKER);
                 events.DelayEvents(20s, STANCE_BATTLE);
@@ -245,8 +245,8 @@ struct boss_bjarngrim : public npc_escortAI
             case STANCE_BERSERKER:
                 Talk(SAY_BERSERKER_STANCE);
 
-                me->CastSpell(me, SPELL_BERSERKER_STANCE, true);
-                me->CastSpell(me, SPELL_BERSERKER_AURA, true);
+                DoCastSelf(SPELL_BERSERKER_STANCE, true);
+                DoCastSelf(SPELL_BERSERKER_AURA, true);
 
                 events.DelayEvents(20s, STANCE_DEFENSIVE);
                 events.DelayEvents(20s, STANCE_BATTLE);
@@ -256,8 +256,8 @@ struct boss_bjarngrim : public npc_escortAI
             case STANCE_BATTLE:
                 Talk(SAY_BATTLE_STANCE);
 
-                me->CastSpell(me, SPELL_BATTLE_STANCE, true);
-                me->CastSpell(me, SPELL_BATTLE_AURA, true);
+                DoCastSelf(SPELL_BATTLE_STANCE, true);
+                DoCastSelf(SPELL_BATTLE_AURA, true);
 
                 events.DelayEvents(20s, STANCE_BERSERKER);
                 events.DelayEvents(20s, STANCE_DEFENSIVE);
@@ -272,7 +272,7 @@ struct boss_bjarngrim : public npc_escortAI
     void WaypointReached(uint32 Point) override
     {
         if (Point == 1 || Point == 8)
-            me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
+            DoCastSelf(SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
         else if (Point == 7 || Point == 14)
             me->RemoveAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE);
     }
@@ -303,53 +303,45 @@ struct boss_bjarngrim : public npc_escortAI
                 events.Repeat(20s);
                 break;
 
-            ///////////////////////////////////////////////////////
-            ///// DEFENSIVE STANCE
-            ///////////////////////////////////////////////////////
+            // DEFENSIVE STANCE
             case EVENT_BJARNGRIM_REFLECTION:
-                me->CastSpell(me, SPELL_BJARNGRIM_REFLETION, true);
+                DoCastSelf(SPELL_BJARNGRIM_REFLETION, true);
                 events.Repeat(8s, 9s);
                 break;
             case EVENT_BJARNGRIM_PUMMEL:
-                me->CastSpell(me->GetVictim(), SPELL_PUMMEL, false);
+                DoCastVictim(SPELL_PUMMEL);
                 events.Repeat(10s, 11s);
                 break;
             case EVENT_BJARNGRIM_KNOCK:
-                me->CastSpell(me, SPELL_KNOCK_AWAY, false);
+                DoCastAOE(SPELL_KNOCK_AWAY);
                 events.Repeat(20s, 21s);
                 break;
             case EVENT_BJARNGRIM_IRONFORM:
-                me->CastSpell(me, SPELL_IRONFORM, true);
+                DoCastSelf(SPELL_IRONFORM, true);
                 events.Repeat(18s, 23s);
                 break;
 
-            ///////////////////////////////////////////////////////
-            ///// BERSERKER STANCE
-            ///////////////////////////////////////////////////////
+            // BERSERKER STANCE
             case EVENT_BJARNGRIM_MORTAL_STRIKE:
-                me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
+                DoCastVictim(SPELL_MORTAL_STRIKE);
                 events.Repeat(10s);
                 break;
             case EVENT_BJARNGRIM_WHIRLWIND:
-                me->CastSpell(me, SPELL_WHIRLWIND, true);
+                DoCastSelf(SPELL_WHIRLWIND, true);
                 events.Repeat(25s);
                 break;
 
-            ///////////////////////////////////////////////////////
-            ///// BATTLE STANCE
-            ///////////////////////////////////////////////////////
+            // BATTLE STANCE
             case EVENT_BJARNGRIM_INTERCEPT:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    me->CastSpell(target, SPELL_INTERCEPT, true);
-
+                DoCastRandomTarget(SPELL_INTERCEPT, 0, 40.0f, false, true);
                 events.Repeat(30s);
                 break;
             case EVENT_BJARNGRIM_CLEAVE:
-                me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
+                DoCastVictim(SPELL_CLEAVE);
                 events.Repeat(25s);
                 break;
             case EVENT_BJARNGRIM_SLAM:
-                me->CastSpell(me->GetVictim(), SPELL_SLAM, false);
+                DoCastVictim(SPELL_SLAM);
                 events.Repeat(10s, 12s);
                 break;
         }
