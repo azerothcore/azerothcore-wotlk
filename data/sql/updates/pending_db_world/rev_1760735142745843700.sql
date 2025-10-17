@@ -1,5 +1,5 @@
 --
-UPDATE `creature_template` SET `unit_flags` = `unit_flags`|64|256|512|32768|33554432, `ScriptName` = '' WHERE `entry` IN (28961, 28965, 30980, 30982); 
+UPDATE `creature_template` SET `unit_flags` = `unit_flags`|64|256|512|32768|33554432, `ScriptName` = '' WHERE `entry` IN (28961, 28965, 30980, 30982);
 
 UPDATE `creature_template_addon` SET `auras` = '' WHERE `entry` IN (28961, 28965);
 
