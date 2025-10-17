@@ -64,21 +64,15 @@ struct boss_loken : public BossAI
 {
     boss_loken(Creature* creature) : BossAI(creature, DATA_LOKEN)
     {
-        m_pInstance = creature->GetInstanceScript();
-        if (m_pInstance)
-            isActive = m_pInstance->GetData(TYPE_LOKEN_INTRO);
+        isActive = instance->GetData(DATA_LOKEN_INTRO);
     }
 
     void MoveInLineOfSight(Unit*) override { }
 
     void Reset() override
     {
-        events.Reset();
-        if (m_pInstance)
-        {
-            m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_TIMELY_DEATH);
-            m_pInstance->SetData(TYPE_LOKEN, NOT_STARTED);
-        }
+        _Reset();
+        instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_TIMELY_DEATH);
 
         HealthCheck = 75;
         IntroTimer = 0;
@@ -98,28 +92,21 @@ struct boss_loken : public BossAI
 
     void JustEngagedWith(Unit*) override
     {
-        me->SetInCombatWithZone();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
 
         events.ScheduleEvent(EVENT_ARC_LIGHTNING, 10s);
         events.ScheduleEvent(EVENT_SHOCKWAVE, 3s);
         events.ScheduleEvent(EVENT_LIGHTNING_NOVA, 15s);
 
-        if (m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_LOKEN, IN_PROGRESS);
-
-            if (me->GetMap()->IsHeroic())
-                m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_TIMELY_DEATH);
-        }
+        if (IsHeroic())
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_TIMELY_DEATH);
     }
 
     void JustDied(Unit*) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_LOKEN, DONE);
     }
 
     void LokenSpeach(bool hp)
@@ -175,14 +162,13 @@ struct boss_loken : public BossAI
             if (IntroTimer >= 60000)
             {
                 isActive = true;
-                if (m_pInstance)
-                    m_pInstance->SetData(TYPE_LOKEN_INTRO, 1);
+                instance->SetData(DATA_LOKEN_INTRO, 1);
 
                 me->SetControlled(false, UNIT_STATE_STUNNED);
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
 
-                if (Player* target = SelectTargetFromPlayerList(80))
-                    AttackStart(target);
+                if (GameObject* globe = instance->GetGameObject(DATA_LOKEN_THRONE))
+                    globe->SetGoState(GO_STATE_ACTIVE);
             }
 
             return;
@@ -235,9 +221,6 @@ struct boss_loken : public BossAI
         DoMeleeAttackIfReady();
     }
     private:
-        InstanceScript* m_pInstance;
-        EventMap events;
-
         bool isActive;
         uint32 IntroTimer;
         uint8 HealthCheck;

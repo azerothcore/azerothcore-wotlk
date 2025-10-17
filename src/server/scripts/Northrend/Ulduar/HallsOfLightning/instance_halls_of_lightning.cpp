@@ -20,15 +20,25 @@
 #include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
 
+DoorData const doorData[] =
+{
+    { GO_BJARNGRIM_DOOR, DATA_BJARNGRIM, DOOR_TYPE_PASSAGE },
+    { GO_VOLKHAN_DOOR,   DATA_VOLKHAN,   DOOR_TYPE_PASSAGE },
+    { GO_IONAR_DOOR,     DATA_IONAR,     DOOR_TYPE_PASSAGE },
+    { GO_LOKEN_DOOR,     DATA_LOKEN,     DOOR_TYPE_PASSAGE },
+    { 0,                        0,       DOOR_TYPE_ROOM    }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { GO_LOKEN_THRONE, DATA_LOKEN_THRONE },
+    { 0,               0                 }
+};
+
 class instance_halls_of_lightning : public InstanceMapScript
 {
 public:
     instance_halls_of_lightning() : InstanceMapScript("instance_halls_of_lightning", MAP_HALLS_OF_LIGHTNING) { }
-
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
-    {
-        return new instance_halls_of_lightning_InstanceMapScript(pMap);
-    }
 
     struct instance_halls_of_lightning_InstanceMapScript : public InstanceScript
     {
@@ -36,77 +46,11 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadDoorData(doorData);
+            LoadObjectData(nullptr, gameObjectData);
             volkhanAchievement = false;
             bjarngrimAchievement = false;
         };
-
-        bool IsEncounterInProgress() const override
-        {
-            if (InstanceScript::IsEncounterInProgress())
-                return true;
-
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-            {
-                if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_LOKEN_INTRO)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        void OnCreatureCreate(Creature* pCreature) override
-        {
-            switch (pCreature->GetEntry())
-            {
-                case NPC_BJARNGRIM:
-                    m_uiGeneralBjarngrimGUID = pCreature->GetGUID();
-                    break;
-                case NPC_VOLKHAN:
-                    m_uiVolkhanGUID = pCreature->GetGUID();
-                    break;
-                case NPC_IONAR:
-                    m_uiIonarGUID = pCreature->GetGUID();
-                    break;
-                case NPC_LOKEN:
-                    m_uiLokenGUID = pCreature->GetGUID();
-                    break;
-            }
-        }
-
-        void OnGameObjectCreate(GameObject* pGo) override
-        {
-            switch (pGo->GetEntry())
-            {
-                case GO_BJARNGRIM_DOOR:
-                    m_uiBjarngrimDoorGUID = pGo->GetGUID();
-                    if (m_auiEncounter[TYPE_BJARNGRIM] == DONE)
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-
-                    break;
-                case GO_VOLKHAN_DOOR:
-                    m_uiVolkhanDoorGUID = pGo->GetGUID();
-                    if (m_auiEncounter[TYPE_VOLKHAN] == DONE)
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-
-                    break;
-                case GO_IONAR_DOOR:
-                    m_uiIonarDoorGUID = pGo->GetGUID();
-                    if (m_auiEncounter[TYPE_IONAR] == DONE)
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-
-                    break;
-                case GO_LOKEN_DOOR:
-                    m_uiLokenDoorGUID = pGo->GetGUID();
-                    if (m_auiEncounter[TYPE_LOKEN] == DONE)
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-
-                    break;
-                case GO_LOKEN_THRONE:
-                    m_uiLokenGlobeGUID = pGo->GetGUID();
-                    break;
-            }
-        }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
@@ -122,8 +66,7 @@ public:
 
         void SetData(uint32 uiType, uint32 uiData) override
         {
-            m_auiEncounter[uiType] = uiData;
-            if (uiType == TYPE_LOKEN_INTRO)
+            if (uiType == DATA_LOKEN_INTRO)
                 SaveToDB();
 
             // Achievements
@@ -135,67 +78,18 @@ public:
             if (uiData != DONE)
                 return;
 
-            switch (uiType)
-            {
-                case TYPE_BJARNGRIM:
-                    HandleGameObject(m_uiBjarngrimDoorGUID, true);
-                    break;
-                case TYPE_VOLKHAN:
-                    HandleGameObject(m_uiVolkhanDoorGUID, true);
-                    break;
-                case TYPE_IONAR:
-                    HandleGameObject(m_uiIonarDoorGUID, true);
-                    break;
-                case TYPE_LOKEN:
-                    HandleGameObject(m_uiLokenDoorGUID, true);
-                    //Appears to be type 5 GO with animation. Need to figure out how this work, code below only placeholder
-                    if (GameObject* pGlobe = instance->GetGameObject(m_uiLokenGlobeGUID))
-                        pGlobe->SetGoState(GO_STATE_ACTIVE);
-
-                    break;
-            }
-
             SaveToDB();
         }
 
-        void ReadSaveDataMore(std::istringstream& data) override
-        {
-            data >> m_auiEncounter[0];
-            data >> m_auiEncounter[1];
-            data >> m_auiEncounter[2];
-            data >> m_auiEncounter[3];
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << m_auiEncounter[0] << ' '
-                << m_auiEncounter[1] << ' '
-                << m_auiEncounter[2] << ' '
-                << m_auiEncounter[3] << ' ';
-        }
-
-        uint32 GetData(uint32 uiType) const override
-        {
-            return m_auiEncounter[uiType];
-        }
-
     private:
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-
-        ObjectGuid m_uiGeneralBjarngrimGUID;
-        ObjectGuid m_uiIonarGUID;
-        ObjectGuid m_uiLokenGUID;
-        ObjectGuid m_uiVolkhanGUID;
-
-        ObjectGuid m_uiBjarngrimDoorGUID;
-        ObjectGuid m_uiVolkhanDoorGUID;
-        ObjectGuid m_uiIonarDoorGUID;
-        ObjectGuid m_uiLokenDoorGUID;
-        ObjectGuid m_uiLokenGlobeGUID;
-
         bool volkhanAchievement;
         bool bjarngrimAchievement;
     };
+
+    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
+    {
+        return new instance_halls_of_lightning_InstanceMapScript(pMap);
+    }
 };
 
 void AddSC_instance_halls_of_lightning()

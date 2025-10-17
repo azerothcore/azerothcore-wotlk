@@ -80,46 +80,30 @@ enum Yells
 
 struct boss_volkhan : public BossAI
 {
-    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN), summons(creature)
-    {
-        m_pInstance = creature->GetInstanceScript();
-    }
+    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN), summons(creature) { }
 
     void Reset() override
     {
+        _Reset();
         x = y = z = PointID = ShatteredCount = 0;
         HealthCheck = 100;
-        events.Reset();
-        summons.DespawnAll();
         me->SetSpeed(MOVE_RUN, 1.2f, true);
         me->SetReactState(REACT_AGGRESSIVE);
-
-        if (m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_VOLKHAN, NOT_STARTED);
-            m_pInstance->SetData(DATA_VOLKHAN_ACHIEVEMENT, true);
-        }
+        instance->SetData(DATA_VOLKHAN_ACHIEVEMENT, true);
     }
 
     void JustEngagedWith(Unit*) override
     {
+        _JustEngagedWith();
         me->SetInCombatWithZone();
         Talk(SAY_AGGRO);
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_VOLKHAN, IN_PROGRESS);
-
         ScheduleEvents(false);
     }
 
     void JustDied(Unit*) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
-
-        summons.DespawnAll();
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_VOLKHAN, DONE);
     }
 
     void GetNextPos()
@@ -198,7 +182,7 @@ struct boss_volkhan : public BossAI
         {
             ShatteredCount++;
             if (ShatteredCount > 4)
-                m_pInstance->SetData(DATA_VOLKHAN_ACHIEVEMENT, false);
+                instance->SetData(DATA_VOLKHAN_ACHIEVEMENT, false);
         }
     }
 
@@ -300,7 +284,6 @@ struct boss_volkhan : public BossAI
     }
 
     private:
-        InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
         uint8 HealthCheck;

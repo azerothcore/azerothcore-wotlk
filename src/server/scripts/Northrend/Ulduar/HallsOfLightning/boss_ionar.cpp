@@ -70,21 +70,13 @@ enum IonarEvents
 
 struct boss_ionar : public BossAI
 {
-    boss_ionar(Creature* creature) : BossAI(creature, DATA_IONAR), summons(creature)
-    {
-        m_pInstance = creature->GetInstanceScript();
-    }
+    boss_ionar(Creature* creature) : BossAI(creature, DATA_IONAR) { }
 
     void Reset() override
     {
+        _Reset();
         HealthCheck = 50;
-        events.Reset();
-        summons.DespawnAll();
-
         me->SetVisible(true);
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_IONAR, NOT_STARTED);
     }
 
     void ScheduleEvents(bool spark)
@@ -99,23 +91,15 @@ struct boss_ionar : public BossAI
 
     void JustEngagedWith(Unit*) override
     {
-        me->SetInCombatWithZone();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_IONAR, IN_PROGRESS);
-
         ScheduleEvents(false);
     }
 
     void JustDied(Unit*) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
-
-        summons.DespawnAll();
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_IONAR, DONE);
     }
 
     void KilledUnit(Unit* victim) override
@@ -210,9 +194,6 @@ struct boss_ionar : public BossAI
     }
 
     private:
-        InstanceScript* m_pInstance;
-        EventMap events;
-        SummonList summons;
         uint8 HealthCheck;
 };
 
