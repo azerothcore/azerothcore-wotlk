@@ -50,6 +50,7 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: 'mod-playerbots/mod-playerbots'
+        ref: 'feature/core_update_10_2025' #temp
         path: 'modules/mod-playerbots'
     
     - name: Install Requirements
