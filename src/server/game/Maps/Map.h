@@ -172,7 +172,7 @@ public:
     // currently unused for normal maps
     bool CanUnload(uint32 diff)
     {
-        if (!m_unloadTimer || Events.HaveEventList())
+        if (!m_unloadTimer || Events.HasEvents())
             return false;
 
         if (m_unloadTimer <= diff)
