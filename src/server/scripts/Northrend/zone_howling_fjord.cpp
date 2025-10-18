@@ -191,6 +191,7 @@ public:
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
+            creature->SetWalk(true);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;

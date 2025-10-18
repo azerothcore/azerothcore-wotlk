@@ -980,6 +980,7 @@ public:
         {
             carGUID = who->GetVehicleBase()->GetGUID();
             InitWaypoint();
+            me->SetWalk(true);
             Start(false, who->GetGUID());
             SetDespawnAtFar(false);
         }

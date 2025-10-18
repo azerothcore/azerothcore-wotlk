@@ -207,7 +207,10 @@ public:
                 Mrfloppy->GetMotionMaster()->MoveFollow(creature, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_emily::npc_emilyAI, (creature->AI())))
+            {
+                creature->SetWalk(true);
                 pEscortAI->Start(true, player->GetGUID());
+            }
         }
         return true;
     }

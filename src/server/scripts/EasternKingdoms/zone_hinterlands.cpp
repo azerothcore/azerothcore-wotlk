@@ -132,7 +132,8 @@ public:
                 if (GameObject* go = me->FindNearestGameObject(GO_RINJI_CAGE, INTERACTION_DISTANCE))
                     go->UseDoorOrButton();
 
-                npc_escortAI::Start(false, player->GetGUID(), quest);
+                me->SetWalk(true);
+                Start(false, player->GetGUID(), quest);
             }
         }
 

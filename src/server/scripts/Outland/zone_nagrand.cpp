@@ -65,6 +65,7 @@ public:
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
                 creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE);
+                creature->SetWalk(true);
                 EscortAI->Start(true, player->GetGUID(), quest);
                 creature->AI()->Talk(SAY_MAG_START);
 
@@ -306,6 +307,7 @@ public:
         void SetGUID(ObjectGuid const& guid, int32  /*questId*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->SetWalk(true);
             Start(true, guid);
             Talk(SAY_KUR_START);
 
