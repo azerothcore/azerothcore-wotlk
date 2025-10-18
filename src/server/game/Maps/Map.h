@@ -23,6 +23,7 @@
 #include "DataMap.h"
 #include "Define.h"
 #include "DynamicTree.h"
+#include "EventProcessor.h"
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
@@ -33,7 +34,6 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
-#include "TaskScheduler.h"
 #include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
@@ -172,7 +172,7 @@ public:
     // currently unused for normal maps
     bool CanUnload(uint32 diff)
     {
-        if (!m_unloadTimer)
+        if (!m_unloadTimer || Events.HasEvents())
             return false;
 
         if (m_unloadTimer <= diff)
@@ -430,7 +430,7 @@ public:
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
     [[nodiscard]] uint32 ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const;
 
-    TaskScheduler _creatureRespawnScheduler;
+    EventProcessor Events;
 
     void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/, Position pos = Position());
 
