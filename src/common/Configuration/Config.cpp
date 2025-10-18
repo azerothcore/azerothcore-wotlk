@@ -150,9 +150,9 @@ namespace
         Optional<ConfigSeverity> defaultOverride;
 
         std::string tokenBuffer(input);
-        for (auto const& rawToken : Acore::Tokenize(tokenBuffer, ',', false))
+        for (std::string_view rawToken : Acore::Tokenize(tokenBuffer, ',', false))
         {
-            std::string token = Acore::String::Trim(rawToken, std::locale());
+            std::string token = Acore::String::Trim(std::string(rawToken), std::locale());
             if (token.empty())
                 continue;
 
