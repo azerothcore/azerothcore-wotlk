@@ -1508,7 +1508,7 @@ namespace lfg
             lockMap.clear();
     }
 
-    uint8 LFGMgr::CheckGroupRoles(LfgRolesMap& groles, bool removeLeaderFlag /*= true*/)
+    uint8 LFGMgr::CheckGroupRoles(LfgRolesMap& groles)
     {
         if (groles.empty())
             return 0;
@@ -1517,21 +1517,18 @@ namespace lfg
         uint8 tank = 0;
         uint8 healer = 0;
 
-        if (removeLeaderFlag)
-            for (LfgRolesMap::iterator it = groles.begin(); it != groles.end(); ++it)
-                it->second &= ~PLAYER_ROLE_LEADER;
-
         for (LfgRolesMap::iterator it = groles.begin(); it != groles.end(); ++it)
         {
-            if (it->second == PLAYER_ROLE_NONE)
+            uint8 const role = it->second & ~PLAYER_ROLE_LEADER;
+            if (role == PLAYER_ROLE_NONE)
                 return 0;
 
-            if (it->second & PLAYER_ROLE_DAMAGE)
+            if (role & PLAYER_ROLE_DAMAGE)
             {
-                if (it->second != PLAYER_ROLE_DAMAGE)
+                if (role != PLAYER_ROLE_DAMAGE)
                 {
                     it->second -= PLAYER_ROLE_DAMAGE;
-                    if (uint8 x = CheckGroupRoles(groles, false))
+                    if (uint8 x = CheckGroupRoles(groles))
                         return x;
                     it->second += PLAYER_ROLE_DAMAGE;
                 }
@@ -1541,12 +1538,12 @@ namespace lfg
                     damage++;
             }
 
-            if (it->second & PLAYER_ROLE_HEALER)
+            if (role & PLAYER_ROLE_HEALER)
             {
-                if (it->second != PLAYER_ROLE_HEALER)
+                if (role != PLAYER_ROLE_HEALER)
                 {
                     it->second -= PLAYER_ROLE_HEALER;
-                    if (uint8 x = CheckGroupRoles(groles, false))
+                    if (uint8 x = CheckGroupRoles(groles))
                         return x;
                     it->second += PLAYER_ROLE_HEALER;
                 }
@@ -1556,12 +1553,12 @@ namespace lfg
                     healer++;
             }
 
-            if (it->second & PLAYER_ROLE_TANK)
+            if (role & PLAYER_ROLE_TANK)
             {
-                if (it->second != PLAYER_ROLE_TANK)
+                if (role != PLAYER_ROLE_TANK)
                 {
                     it->second -= PLAYER_ROLE_TANK;
-                    if (uint8 x = CheckGroupRoles(groles, false))
+                    if (uint8 x = CheckGroupRoles(groles))
                         return x;
                     it->second += PLAYER_ROLE_TANK;
                 }

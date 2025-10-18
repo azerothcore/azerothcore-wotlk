@@ -554,7 +554,7 @@ struct boss_kiljaeden : public BossAI
             summon->SetDisableGravity(true);
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
-            summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
+            summon->m_Events.AddEventAtOffset(new CastArmageddon(summon), 6s);
             summon->DespawnOrUnsummon(randtime(8s, 10s));
         }
     }
@@ -787,8 +787,8 @@ struct npc_kalecgos_kj : public NullCreatureAI
         case EVENT_SCENE_05:
             if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
             {
-                first->m_Events.AddEvent(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), first->m_Events.CalculateTime(5000));
-                first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(12000));
+                first->m_Events.AddEventAtOffset(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), 5s);
+                first->m_Events.AddEventAtOffset(new FixOrientation(first), 12s);
                 for (uint8 i = 0; i < 9; ++i)
                     if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                         follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
@@ -798,8 +798,8 @@ struct npc_kalecgos_kj : public NullCreatureAI
         case EVENT_SCENE_06:
             if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
             {
-                first->m_Events.AddEvent(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), first->m_Events.CalculateTime(5000));
-                first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(14500));
+                first->m_Events.AddEventAtOffset(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), 5s);
+                first->m_Events.AddEventAtOffset(new FixOrientation(first), 14500ms);
                 for (uint8 i = 0; i < 9; ++i)
                     if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                         follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));

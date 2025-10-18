@@ -366,7 +366,7 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 
 void BattlegroundQueue::AddEvent(BasicEvent* Event, uint64 e_time)
 {
-    m_events.AddEvent(Event, m_events.CalculateTime(e_time));
+    m_events.AddEventAtOffset(Event, Milliseconds(e_time));
 }
 
 bool BattlegroundQueue::IsPlayerInvitedToRatedArena(ObjectGuid pl_guid)
