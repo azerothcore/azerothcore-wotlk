@@ -18,6 +18,7 @@
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "InstanceMapScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "halls_of_lightning.h"
 
