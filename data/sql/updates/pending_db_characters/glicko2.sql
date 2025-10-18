@@ -1,17 +1,15 @@
--- Add MMR columns to characters table
-ALTER TABLE `characters` 
-ADD COLUMN `bg_rating` FLOAT NOT NULL DEFAULT 1500 COMMENT 'Glicko-2 rating',
-ADD COLUMN `bg_rating_deviation` FLOAT NOT NULL DEFAULT 200 COMMENT 'Rating deviation (RD)',
-ADD COLUMN `bg_volatility` FLOAT NOT NULL DEFAULT 0.06 COMMENT 'Rating volatility',
-ADD COLUMN `bg_gear_score` FLOAT NOT NULL DEFAULT 0 COMMENT 'Cached average item level',
-ADD COLUMN `bg_matches_played` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG matches',
-ADD COLUMN `bg_wins` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG wins',
-ADD COLUMN `bg_losses` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG losses',
-ADD COLUMN `bg_last_update` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last rating update';
-
--- Add index for performance
-ALTER TABLE `characters` 
-ADD INDEX `idx_bg_rating` (`bg_rating`);
+CREATE TABLE `character_battleground_rating` (
+  `guid` INT UNSIGNED NOT NULL COMMENT 'Character GUID',
+  `rating` FLOAT NOT NULL DEFAULT 1500 COMMENT 'Glicko-2 rating',
+  `rating_deviation` FLOAT NOT NULL DEFAULT 200 COMMENT 'Rating deviation (RD)',
+  `volatility` FLOAT NOT NULL DEFAULT 0.06 COMMENT 'Rating volatility',
+  `matches_played` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG matches',
+  `wins` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG wins',
+  `losses` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG losses',
+  `last_update` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last rating update',
+  PRIMARY KEY (`guid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+COMMENT='Battleground MMR data for each character';
 
 -- Create rating history table
 CREATE TABLE `character_battleground_rating_history` (
@@ -29,4 +27,4 @@ CREATE TABLE `character_battleground_rating_history` (
   KEY `idx_guid` (`guid`),
   KEY `idx_timestamp` (`timestamp`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
-COMMENT='Tracks BG rating changes';
+COMMENT='Tracks BG rating changes over time';
