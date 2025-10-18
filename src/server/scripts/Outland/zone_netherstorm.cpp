@@ -103,7 +103,6 @@ public:
         {
             if (type == DATA_START_ENCOUNTER)
             {
-                me->SetWalk(false);
                 Start(true, playerGUID);
                 SetEscortPaused(true);
                 started = true;

@@ -208,7 +208,6 @@ public:
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_emily::npc_emilyAI, (creature->AI())))
             {
-                creature->SetWalk(true);
                 pEscortAI->Start(true, player->GetGUID());
             }
         }

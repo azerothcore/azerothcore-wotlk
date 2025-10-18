@@ -157,7 +157,7 @@ public:
                 case 17:
                     Talk(SAY_RIN_COMPLETE, player);
                     player->GroupEventHappens(QUEST_RINJI_TRAPPED, me);
-                    SetRun(true);
+                    me->SetWalk(false);
                     postEventCount = 1;
                     break;
             }

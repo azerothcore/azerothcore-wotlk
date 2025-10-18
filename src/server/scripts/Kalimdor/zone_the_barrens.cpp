@@ -502,7 +502,7 @@ public:
                     Talk(SAY_STARTUP1);
                     break;
                 case 9:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 17:
                     if (Creature* temp = me->SummonCreature(NPC_MERCENARY, 1128.489f, -3037.611f, 92.701f, 1.472f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000))
@@ -531,7 +531,7 @@ public:
                     break;
                 case 18:
                     Talk(SAY_PROGRESS_1, player);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
             }
         }
