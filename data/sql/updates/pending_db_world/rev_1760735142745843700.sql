@@ -78,8 +78,10 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+30, 28965, 602, 4272, 4272, 3, 1, 1, 1162.243896484375, -171.8046875, 52.79578399658203125, 0, 7200, 0, 0, 6285, 0, 0, 0, 0, 0, 63834);
 
 DELETE FROM `spell_proc_event` WHERE `entry` = 52881;
-INSERT INTO `spell_proc_event` (`entry`, `procEx`) VALUES
-(52881, 0x00000020);
+INSERT INTO `spell_proc_event` (`entry`, `procEx`, `Cooldown`) VALUES
+(52881, 0x00000020, 12000);
+
+UPDATE `spell_proc_event` SET `Cooldown` = 6000 WHERE `entry` = 52898;
 
 DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (52891, 52885, 52879, 52904);
 INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`, `DifficultySpellID_3`, `DifficultySpellID_4`) VALUES
