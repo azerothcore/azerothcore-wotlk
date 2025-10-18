@@ -57,61 +57,7 @@ void BattlegroundMMRMgr::LoadConfig()
     }
 }
 
-BattlegroundPlayerMMR BattlegroundMMRMgr::LoadFromDB(Player* player) const
-{
-    BattlegroundPlayerMMR mmrData;
-    
-    if (!player)
-        return mmrData;
-    
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_BG_MMR);
-    stmt->SetData(0, player->GetGUID().GetCounter());
-    PreparedQueryResult result = CharacterDatabase.Query(stmt);
-    
-    if (result)
-    {
-        Field* fields = result->Fetch();
-        mmrData.rating = fields[0].Get<float>();
-        mmrData.ratingDeviation = fields[1].Get<float>();
-        mmrData.volatility = fields[2].Get<float>();
-        mmrData.gearScore = fields[3].Get<float>();
-        mmrData.matchesPlayed = fields[4].Get<uint32>();
-        mmrData.wins = fields[5].Get<uint32>();
-        mmrData.losses = fields[6].Get<uint32>();
-    }
-    else
-    {
-        // Return defaults for new players
-        mmrData.rating = _startingRating;
-        mmrData.ratingDeviation = _startingRD;
-        mmrData.volatility = _startingVolatility;
-        mmrData.gearScore = CalculateGearScore(player);
-        mmrData.matchesPlayed = 0;
-        mmrData.wins = 0;
-        mmrData.losses = 0;
-    }
-    
-    return mmrData;
-}
-
-void BattlegroundMMRMgr::SaveToDB(Player* player, const BattlegroundPlayerMMR& data)
-{
-    if (!player)
-        return;
-    
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_BG_MMR);
-    stmt->SetData(0, data.rating);
-    stmt->SetData(1, data.ratingDeviation);
-    stmt->SetData(2, data.volatility);
-    stmt->SetData(3, data.gearScore);
-    stmt->SetData(4, data.matchesPlayed);
-    stmt->SetData(5, data.wins);
-    stmt->SetData(6, data.losses);
-    stmt->SetData(7, player->GetGUID().GetCounter());
-    CharacterDatabase.Execute(stmt);
-}
-
-float BattlegroundMMRMgr::CalculateGearScore(Player* player) const
+float BattlegroundMMRMgr::CalculateGearScore(Player* player)
 {
     if (!player)
         return 0.0f;
@@ -160,8 +106,8 @@ void BattlegroundMMRMgr::UpdatePlayerRating(Player* player, bool won, const std:
     if (!_enabled || !player || opponents.empty())
         return;
     
-    // Load current MMR from database
-    BattlegroundPlayerMMR mmrData = LoadFromDB(player);
+    // Get current rating from player object (already loaded on login)
+    BattlegroundRatingData currentRating = player->GetBGRating();
     
     // Build opponent list for Glicko-2
     std::vector<Glicko2Opponent> glickoOpponents;
@@ -172,49 +118,46 @@ void BattlegroundMMRMgr::UpdatePlayerRating(Player* player, bool won, const std:
         if (!opponent)
             continue;
         
-        BattlegroundPlayerMMR oppData = LoadFromDB(opponent);
-        glickoOpponents.emplace_back(oppData.rating, oppData.ratingDeviation, won ? 1.0f : 0.0f);
+        BattlegroundRatingData oppRating = opponent->GetBGRating();
+        glickoOpponents.emplace_back(oppRating.rating, oppRating.ratingDeviation, won ? 1.0f : 0.0f);
     }
     
     // Store old values for history
-    float oldRating = mmrData.rating;
-    float oldRD = mmrData.ratingDeviation;
-    float oldVolatility = mmrData.volatility;
+    float oldRating = currentRating.rating;
+    float oldRD = currentRating.ratingDeviation;
+    float oldVolatility = currentRating.volatility;
     
     // Update rating using Glicko-2
-    Glicko2Rating currentRating(mmrData.rating, mmrData.ratingDeviation, mmrData.volatility);
-    Glicko2Rating newRating = _glicko.UpdateRating(currentRating, glickoOpponents);
+    Glicko2Rating glickoRating(currentRating.rating, currentRating.ratingDeviation, currentRating.volatility);
+    Glicko2Rating newRating = _glicko.UpdateRating(glickoRating, glickoOpponents);
     
-    mmrData.rating = newRating.rating;
-    mmrData.ratingDeviation = newRating.ratingDeviation;
-    mmrData.volatility = newRating.volatility;
-    mmrData.matchesPlayed++;
+    currentRating.rating = newRating.rating;
+    currentRating.ratingDeviation = newRating.ratingDeviation;
+    currentRating.volatility = newRating.volatility;
+    currentRating.matchesPlayed++;
     
     if (won)
-        mmrData.wins++;
+        currentRating.wins++;
     else
-        mmrData.losses++;
+        currentRating.losses++;
     
-    // Update gear score
-    mmrData.gearScore = CalculateGearScore(player);
+    // Update player object (will be saved async on next SaveToDB)
+    player->SetBGRating(currentRating);
     
-    // Save to database
-    SaveToDB(player, mmrData);
-    
-    // Log to history table
+    // Log to history table (async)
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_BG_MMR_HISTORY);
     stmt->SetData(0, player->GetGUID().GetCounter());
     stmt->SetData(1, oldRating);
-    stmt->SetData(2, mmrData.rating);
+    stmt->SetData(2, currentRating.rating);
     stmt->SetData(3, oldRD);
-    stmt->SetData(4, mmrData.ratingDeviation);
+    stmt->SetData(4, currentRating.ratingDeviation);
     stmt->SetData(5, oldVolatility);
-    stmt->SetData(6, mmrData.volatility);
+    stmt->SetData(6, currentRating.volatility);
     stmt->SetData(7, won ? 1 : 0);
     CharacterDatabase.Execute(stmt);
     
     LOG_DEBUG("bg.mmr", "Player {} rating updated: {} -> {} (RD: {} -> {}, Result: {})",
-              player->GetName(), oldRating, mmrData.rating, oldRD, mmrData.ratingDeviation,
+              player->GetName(), oldRating, currentRating.rating, oldRD, currentRating.ratingDeviation,
               won ? "WIN" : "LOSS");
 }
 
@@ -223,8 +166,8 @@ float BattlegroundMMRMgr::GetPlayerMMR(Player* player) const
     if (!_enabled || !player)
         return _startingRating;
     
-    BattlegroundPlayerMMR mmrData = LoadFromDB(player);
-    return mmrData.rating;
+    // Read from cached player object - no DB query!
+    return player->GetBGRating().rating;
 }
 
 float BattlegroundMMRMgr::GetPlayerGearScore(Player* player)
@@ -261,4 +204,25 @@ float BattlegroundMMRMgr::GetRelaxedMMRTolerance(uint32 queueTimeSeconds) const
     float relaxedTolerance = _initialMaxMMRDifference + (intervalsElapsed * _relaxationStepMMR);
     
     return relaxedTolerance;
+}
+
+void BattlegroundMMRMgr::InitializePlayerRating(Player* player)
+{
+    if (!_enabled || !player)
+        return;
+    
+    // Only initialize if not already loaded
+    if (!player->IsBGRatingLoaded())
+    {
+        BattlegroundRatingData data;
+        data.rating = _startingRating;
+        data.ratingDeviation = _startingRD;
+        data.volatility = _startingVolatility;
+        data.matchesPlayed = 0;
+        data.wins = 0;
+        data.losses = 0;
+        data.loaded = true;
+        
+        player->SetBGRating(data);
+    }
 }
