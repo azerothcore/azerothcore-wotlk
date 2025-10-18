@@ -407,10 +407,9 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
 
     if (sBattlegroundMMRMgr->IsEnabled())
     {
-        BalanceTeamsByMMR(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE], 
-                         bg->GetMaxPlayersPerTeam());
-        BalanceTeamsByMMR(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE], 
-                         bg->GetMaxPlayersPerTeam());
+        SelectBalancedFactionPlayers(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE],
+                                     m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE],
+                                     bg->GetMaxPlayersPerTeam());
     }
 
     // try to get even teams
