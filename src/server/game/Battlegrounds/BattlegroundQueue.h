@@ -139,17 +139,17 @@ private:
     bool _queueAnnouncementCrossfactioned;
 
     // Battleground MMR
-    struct TeamBalanceData
+    struct FactionQueueStats
     {
-        std::vector<GroupQueueInfo*> groups;
         float totalMMR = 0.0f;
         float totalGearScore = 0.0f;
         uint32 playerCount = 0;
-        
+    
         float GetAverageMMR() const { return playerCount > 0 ? totalMMR / playerCount : 0.0f; }
         float GetAverageGearScore() const { return playerCount > 0 ? totalGearScore / playerCount : 0.0f; }
         float GetCombinedScore() const;
     };
+
 
     struct GroupPlayerCache
     {
@@ -159,9 +159,10 @@ private:
         uint32 playerCount = 0;
     };
 
-    uint32 GetGroupQueueTime(GroupQueueInfo* group) const;
-    GroupPlayerCache ResolveGroupPlayers(GroupQueueInfo* group);
-    void BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPlayers);
+uint32 GetGroupQueueTime(GroupQueueInfo* group) const;
+GroupPlayerCache ResolveGroupPlayers(GroupQueueInfo* group);
+void SelectBalancedFactionPlayers(GroupsQueueType& allianceQueue, GroupsQueueType& hordeQueue,
+                                  uint32 maxPlayersPerTeam, uint32 queueTime);
 };
 
 /*
