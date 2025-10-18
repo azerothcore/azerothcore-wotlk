@@ -284,7 +284,7 @@ public:
             if (type != POINT_MOTION_TYPE || id != POINT_GO_BACK)
                 return;
 
-            me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_SUFFERING), me->m_Events.CalculateTime(1500));
+            me->m_Events.AddEventAtOffset(new SuckBackEvent(*me, ACTION_ESSENCE_OF_SUFFERING), 1500ms);
             me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
@@ -392,7 +392,7 @@ public:
             if (type != POINT_MOTION_TYPE || id != POINT_GO_BACK)
                 return;
 
-            me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_DESIRE), me->m_Events.CalculateTime(1500));
+            me->m_Events.AddEventAtOffset(new SuckBackEvent(*me, ACTION_ESSENCE_OF_DESIRE), 1500ms);
             me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
