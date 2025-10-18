@@ -82,3 +82,5 @@ INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpell
 (52885, 52885, 59180, 0, 0), -- Deadly Throw
 (52879, 52879, 59181, 0, 0), -- Deflection
 (52904, 52904, 59179, 0, 0); -- Throw
+
+DELETE FROM `linked_respawn` WHERE `guid` IN (126835, 126837, 126838, 126839, 126840, 126841, 126843, 126844, 126846, 126847, 126849, 126850, 126851, 126852, 126853, 126854, 126855, 126856, 126857, 126860, 126862) AND `linkType` = 0;
