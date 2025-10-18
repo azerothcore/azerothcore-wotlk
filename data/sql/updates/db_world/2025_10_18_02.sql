@@ -1,3 +1,4 @@
+-- DB update 2025_10_18_01 -> 2025_10_18_02
 --
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|64|256|512|32768|33554432, `ScriptName` = '' WHERE `entry` IN (28961, 28965, 30980, 30982);
 
