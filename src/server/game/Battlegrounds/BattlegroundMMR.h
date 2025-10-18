@@ -22,29 +22,18 @@
 #include "Player.h"
 
 /**
- * @brief MMR data structure (used internally, not cached)
- */
-struct BattlegroundPlayerMMR
-{
-    float rating;
-    float ratingDeviation;
-    float volatility;
-    float gearScore;
-    uint32 matchesPlayed;
-    uint32 wins;
-    uint32 losses;
-    
-    BattlegroundPlayerMMR() : rating(1500.0f), ratingDeviation(200.0f), 
-                              volatility(0.06f), gearScore(0.0f), 
-                              matchesPlayed(0), wins(0), losses(0) {}
-};
-
-/**
  * @class BattlegroundMMRMgr
- * @brief Singleton manager for battleground MMR system (cache-free design)
+ * @brief Singleton manager for battleground MMR system
  * 
- * All data is queried directly from the database on demand.
- * No caching = no cache invalidation bugs = simpler and more reliable.
+ * This system uses Player object caching for optimal performance:
+ * - Rating data loaded once on login via LoginQueryHolder (async)
+ * - All queries read from Player object (zero DB queries during gameplay)
+ * - Updates saved async during Player::SaveToDB()
+ * 
+ * Benefits:
+ * - No synchronous DB queries
+ * - Minimal latency during matchmaking
+ * - Automatic persistence with player saves
  */
 class BattlegroundMMRMgr
 {
@@ -57,17 +46,18 @@ public:
     
     /**
      * @brief Updates a player's rating after a battleground match
-     * Queries current rating from DB, calculates new rating, saves to DB
+     * Reads from player object cache, calculates new rating, updates player object
+     * Rating is saved async on next Player::SaveToDB()
      */
     void UpdatePlayerRating(Player* player, bool won, const std::vector<Player*>& opponents);
     
     /**
      * @brief Calculates gear score from equipped items
      */
-    float CalculateGearScore(Player* player) const;
+    float CalculateGearScore(Player* player);
     
     /**
-     * @brief Gets player's current MMR rating from database
+     * @brief Gets player's current MMR rating from player object (no DB query)
      */
     float GetPlayerMMR(Player* player) const;
     
@@ -80,6 +70,12 @@ public:
      * @brief Gets combined matchmaking score
      */
     float GetPlayerCombinedScore(Player* player);
+    
+    /**
+     * @brief Initializes default rating for new players
+     * Called if LoginQueryHolder returns no existing record
+     */
+    void InitializePlayerRating(Player* player);
     
     // Configuration accessors
     bool IsEnabled() const { return _enabled; }
@@ -97,16 +93,6 @@ public:
     void LoadConfig();
     
 private:
-    /**
-     * @brief Loads MMR data from database (internal use)
-     */
-    BattlegroundPlayerMMR LoadFromDB(Player* player) const;
-    
-    /**
-     * @brief Saves MMR data to database (internal use)
-     */
-    void SaveToDB(Player* player, const BattlegroundPlayerMMR& data);
-    
     // Configuration
     bool _enabled;
     float _startingRating;
