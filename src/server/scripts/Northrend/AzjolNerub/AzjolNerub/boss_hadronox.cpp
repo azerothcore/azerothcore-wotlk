@@ -41,22 +41,6 @@ enum Spells
     SPELL_FRENZY                            = 53801
 };
 
-enum Events
-{
-    EVENT_HADRONOX_MOVE1        = 1,
-    EVENT_HADRONOX_MOVE2        = 2,
-    EVENT_HADRONOX_MOVE3        = 3,
-    EVENT_HADRONOX_MOVE4        = 4,
-    EVENT_HADRONOX_ACID         = 5,
-    EVENT_HADRONOX_LEECH        = 6,
-    EVENT_HADRONOX_PIERCE       = 7,
-    EVENT_HADRONOX_GRAB         = 8,
-    EVENT_HADRONOX_SUMMON       = 9,
-
-    EVENT_CRUSHER_SMASH         = 20,
-    EVENT_CHECK_HEALTH          = 21
-};
-
 enum Misc
 {
     NPC_ANUB_AR_CRUSHER         = 28922,
@@ -113,7 +97,7 @@ struct boss_hadronox : public BossAI
             {
                 Talk(SAY_HADRONOX_EMOTE);
                 me->GetMotionMaster()->MoveCharge(hadronoxSteps[3].GetPositionX(), hadronoxSteps[3].GetPositionY(), hadronoxSteps[3].GetPositionZ(), 10.0f, 0, nullptr, true);
-                me->CastSpell(me, SPELL_WEB_FRONT_DOORS, true);
+                DoCastAOE(SPELL_WEB_FRONT_DOORS, true);
             });
         }
     }
@@ -121,7 +105,7 @@ struct boss_hadronox : public BossAI
     uint32 GetData(uint32 data) const override
     {
         if (data == me->GetEntry())
-            return !me->isActiveObject() /*|| events.HasTimeUntilEvent(EVENT_HADRONOX_MOVE4)*/ ? 1 : 0;
+            return !me->isActiveObject() ? 1 : 0;
         return 0;
     }
 
@@ -156,19 +140,19 @@ struct boss_hadronox : public BossAI
         scheduler.Schedule(10s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, false))
-                me->CastSpell(target, SPELL_ACID_CLOUD, false);
+                DoCast(target, SPELL_ACID_CLOUD);
             context.Repeat(25s);
         }).Schedule(4s, [this](TaskContext context)
         {
-            me->CastSpell(me, SPELL_LEECH_POISON, false);
+            DoCastSelf(SPELL_LEECH_POISON);
             context.Repeat(12s);
         }).Schedule(1s, [this](TaskContext context)
         {
-            me->CastSpell(me->GetVictim(), SPELL_PIERCE_ARMOR, false);
+            DoCastVictim(SPELL_PIERCE_ARMOR);
             context.Repeat(8s);
         }).Schedule(15s, [this](TaskContext context)
         {
-            me->CastSpell(me, SPELL_WEB_GRAB, false);
+            DoCastVictim(SPELL_WEB_GRAB);
             context.Repeat();
         });
     }
@@ -177,8 +161,16 @@ struct boss_hadronox : public BossAI
     {
         Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
         for (auto const& itr : playerList)
-            if (me->GetDistance(itr.GetSource()) < 130.0f && itr.GetSource()->IsAlive() && !itr.GetSource()->IsGameMaster() && me->CanCreatureAttack(itr.GetSource()))
-                return true;
+        {
+            if (Player* player = itr.GetSource())
+            {
+                if (!player->IsAlive() || player->IsGameMaster())
+                    continue;
+
+                if (me->GetDistance(player) < 130.0f && me->CanCreatureAttack(player))
+                    return true;
+            }
+        }
 
         return false;
     }
@@ -190,7 +182,7 @@ struct boss_hadronox : public BossAI
             if (me->HealthBelowPctDamaged(5, damage))
                 damage = 0;
             else
-                damage *= (me->GetHealthPct() - 5.0f) / 65.0f;
+                damage = static_cast<uint32>(static_cast<float>(damage) * (me->GetHealthPct() - 5.0f) / 65.0f);
         }
     }
 
@@ -200,8 +192,6 @@ struct boss_hadronox : public BossAI
             return;
 
         scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
 
         DoMeleeAttackIfReady();
     }
@@ -214,93 +204,86 @@ struct boss_hadronox : public BossAI
 
 struct npc_anub_ar_crusher : public ScriptedAI
 {
-    explicit npc_anub_ar_crusher(Creature* c) : ScriptedAI(c), summons(me) {}
-
-    SummonList summons;
+    explicit npc_anub_ar_crusher(Creature* c) : ScriptedAI(c), _summons(me)
+    {
+        scheduler.SetValidator([&]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
-        summons.DespawnAll();
+        _summons.DespawnAll();
         scheduler.CancelAll();
 
         if (me->ToTempSummon())
             if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 if (summoner->GetEntry() == me->GetEntry())
                 {
-                    me->CastSpell(me, RAND(SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER), true);
-                    me->CastSpell(me, RAND(SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER), true);
+                    DoCastSelf(RAND(SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER), true);
+                    DoCastSelf(RAND(SPELL_SUMMON_ANUBAR_CHAMPION, SPELL_SUMMON_ANUBAR_CRYPT_FIEND, SPELL_SUMMON_ANUBAR_NECROMANCER), true);
                 }
     }
 
-        void JustSummoned(Creature* summon) override
-        {
-            if (summon->GetEntry() != me->GetEntry())
-            {
-                summon->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false);
-                summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
-            }
-            summons.Summon(summon);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_DESPAWN_ADDS)
-            {
-                summons.DoAction(ACTION_DESPAWN_ADDS);
-                summons.DespawnAll();
-            }
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            if (me->ToTempSummon())
-                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                    if (summoner->GetEntry() != me->GetEntry())
-                    {
-                        summoner->GetAI()->DoAction(ACTION_START_EVENT);
-                        me->SummonCreature(NPC_ANUB_AR_CRUSHER, 519.58f, 573.73f, 734.30f, 4.50f);
-                        me->SummonCreature(NPC_ANUB_AR_CRUSHER, 539.38f, 573.25f, 732.20f, 4.738f);
-                        Talk(SAY_CRUSHER_AGGRO);
-                    }
-
-            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8s, 0, 0);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CRUSHER_SMASH:
-                    me->CastSpell(me->GetVictim(), SPELL_SMASH, false);
-                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15s);
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(30))
-                    {
-                        Talk(SAY_CRUSHER_EMOTE);
-                        me->CastSpell(me, SPELL_FRENZY, false);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustSummoned(Creature* summon) override
     {
-        return GetAzjolNerubAI<npc_anub_ar_crusherAI>(creature);
+        if (summon->GetEntry() != me->GetEntry())
+        {
+            summon->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false);
+            summon->GetMotionMaster()->MoveFollow(me, 0.1f, std::numbers::pi_v<float> * 0.3f * static_cast<float>(_summons.size()));
+        }
+        _summons.Summon(summon);
     }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_DESPAWN_ADDS)
+        {
+            _summons.DoAction(ACTION_DESPAWN_ADDS);
+            _summons.DespawnAll();
+        }
+    }
+
+    void JustEngagedWith(Unit*) override
+    {
+        if (me->ToTempSummon())
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                if (summoner->GetEntry() != me->GetEntry())
+                {
+                    summoner->GetAI()->DoAction(ACTION_START_EVENT);
+                    me->SummonCreature(NPC_ANUB_AR_CRUSHER, 519.58f, 573.73f, 734.30f, 4.50f);
+                    me->SummonCreature(NPC_ANUB_AR_CRUSHER, 539.38f, 573.25f, 732.20f, 4.738f);
+                    Talk(SAY_CRUSHER_AGGRO);
+                }
+
+        scheduler.Schedule(8s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SMASH);
+            context.Repeat(15s);
+        }).Schedule(1s, [this](TaskContext context)
+        {
+            if (me->HealthBelowPct(30))
+            {
+                Talk(SAY_CRUSHER_EMOTE);
+                DoCastSelf(SPELL_FRENZY);
+            }
+            else
+                context.Repeat(1s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
+    }
+private:
+    SummonList _summons;
 };
 
 class spell_hadronox_summon_periodic_aura : public AuraScript
@@ -308,7 +291,7 @@ class spell_hadronox_summon_periodic_aura : public AuraScript
     PrepareAuraScript(spell_hadronox_summon_periodic_aura);
 
 public:
-    spell_hadronox_summon_periodic_aura(uint32 delay, uint32 spellEntry) : _delay(delay), _spellEntry(spellEntry) { }
+    spell_hadronox_summon_periodic_aura(int32 delay, uint32 spellEntry) : _delay(delay), _spellEntry(spellEntry) { }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
@@ -341,7 +324,7 @@ public:
     }
 
 private:
-    uint32 _delay;
+    int32 _delay;
     uint32 _spellEntry;
 };
 
@@ -387,9 +370,9 @@ void AddSC_boss_hadronox()
 {
     RegisterCreatureAI(boss_hadronox);
     RegisterCreatureAI(npc_anub_ar_crusher);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion_aura", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer_aura", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend_aura", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion_aura", 15'000, SPELL_SUMMON_ANUBAR_CHAMPION);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer_aura", 10'000, SPELL_SUMMON_ANUBAR_NECROMANCER);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend_aura", 5'000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
     RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
