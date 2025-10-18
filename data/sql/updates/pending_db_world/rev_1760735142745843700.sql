@@ -7,25 +7,27 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 (5083, 'at_hol_hall_of_watchers'),
 (5084, 'at_hol_hall_of_watchers');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28961;
-
-DELETE FROM `creature_template_addon` WHERE `entry` IN (28965, 28961);
+DELETE FROM `creature_template_addon` WHERE `entry` IN (28965, 28961, 30980, 30982);
 INSERT INTO `creature_template_addon` (`entry`,`path_id`,`bytes1`,`mount`,`auras`) VALUES
 (28965, 0, 0, 0, '52881'), -- 28965 - 16245, 52881
 (28961, 0, 0, 0, '52898'), -- 28961 - 16245, 52898
 (30980, 0, 0, 0, '52898'),
 (30982, 0, 0, 0, '52881');
 
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28961;
+
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28961);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28961, 0, 0, 0, 0, 0, 100, 0, 10000, 25000, 10000, 25000, 0, 0, 11, 23600, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - In Combat - Cast \'Piercing Howl\''),
 (28961, 0, 1, 0, 0, 0, 100, 0, 5000, 10000, 5000, 10000, 0, 0, 11, 52890, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - In Combat - Cast \'Penetrating Strike\''),
 (28961, 0, 2, 0, 0, 0, 100, 0, 12000, 12000, 12000, 12000, 0, 0, 11, 52891, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - In Combat - Cast \'Blade Turning\''),
-(28961, 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 19134, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Just Died - Cast \'Frightening Shout\''),
+(28961, 0, 3, 9, 2, 0, 100, 1, 0, 2, 1000, 1000, 0, 0, 11, 19134, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - Between 0-2% Health - Cast \'Frightening Shout\' (No Repeat)'),
 (28961, 0, 4, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 16245, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Initialize - Cast \'Freeze Anim\''),
 (28961, 0, 5, 6, 72, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Action 0 Done - Remove Flags Immune To Players & Immune To NPC\'s'),
 (28961, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 16245, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Action 0 Done - Remove Aura \'Freeze Anim\''),
-(28961, 0, 7, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Evade - Remove Flags Immune To Players');
+(28961, 0, 7, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Evade - Remove Flags Immune To Players'),
+(28961, 0, 8, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 42, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - On Reset - Set Invincibility Hp 1%'),
+(28961, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 37, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Titanium Siegebreaker - Between 0-2% Health - Kill Self (No Repeat)');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28965;
 
