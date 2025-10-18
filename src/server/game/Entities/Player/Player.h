@@ -2566,6 +2566,7 @@ public:
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
 private:
     [[nodiscard]] bool AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const;
+    BattlegroundRatingData m_bgRating;
 public:
     [[nodiscard]] uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
     void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
@@ -2662,6 +2663,12 @@ public:
     bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
     bool CanRequestSpellCast(SpellInfo const* spellInfo);
+
+    // Battleground rating accessors
+    BattlegroundRatingData const& GetBGRating() const { return m_bgRating; }
+    void SetBGRating(BattlegroundRatingData const& data) { m_bgRating = data; }
+    void SetBGRatingLoaded(bool loaded) { m_bgRating.loaded = loaded; }
+    bool IsBGRatingLoaded() const { return m_bgRating.loaded; }
 
 protected:
     // Gamemaster whisper whitelist
