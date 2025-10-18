@@ -60,15 +60,24 @@ public:
             return false;
         }
 
-        // Query directly from database (no cache)
-        float rating = sBattlegroundMMRMgr->GetPlayerMMR(target);
+        // Read from player object cache - no DB queries!
+        BattlegroundRatingData bgRating = target->GetBGRating();
         float gearScore = sBattlegroundMMRMgr->GetPlayerGearScore(target);
         float combinedScore = sBattlegroundMMRMgr->GetPlayerCombinedScore(target);
         
         handler->PSendSysMessage("Battleground MMR Info for {}:", target->GetName());
-        handler->PSendSysMessage("Rating: {:.2f}", rating);
+        handler->PSendSysMessage("Rating: {:.2f} (RD: {:.2f}, Volatility: {:.4f})", 
+                                 bgRating.rating, bgRating.ratingDeviation, bgRating.volatility);
+        handler->PSendSysMessage("Record: {} wins, {} losses ({} total matches)", 
+                                 bgRating.wins, bgRating.losses, bgRating.matchesPlayed);
         handler->PSendSysMessage("Gear Score: {:.2f}", gearScore);
         handler->PSendSysMessage("Combined Score: {:.2f}", combinedScore);
+        
+        if (bgRating.matchesPlayed > 0)
+        {
+            float winRate = (static_cast<float>(bgRating.wins) / bgRating.matchesPlayed) * 100.0f;
+            handler->PSendSysMessage("Win Rate: {:.1f}%", winRate);
+        }
         
         return true;
     }
@@ -88,16 +97,22 @@ public:
             return false;
         }
 
-        // Update database directly
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_BG_MMR);
-        stmt->SetData(0, rating);
-        stmt->SetData(1, 200.0f);  // Reset RD
-        stmt->SetData(2, 0.06f);   // Reset volatility
-        stmt->SetData(3, sBattlegroundMMRMgr->GetPlayerGearScore(target));
-        stmt->SetData(4, 0);       // Don't change matches
-        stmt->SetData(5, 0);       // Don't change wins
-        stmt->SetData(6, 0);       // Don't change losses
-        stmt->SetData(7, target->GetGUID().GetCounter());
+        // Update player object cache
+        BattlegroundRatingData bgRating = target->GetBGRating();
+        bgRating.rating = rating;
+        bgRating.ratingDeviation = 200.0f;  // Reset RD
+        bgRating.volatility = 0.06f;        // Reset volatility
+        target->SetBGRating(bgRating);
+        
+        // Force save to DB immediately
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_BG_MMR);
+        stmt->SetData(0, target->GetGUID().GetCounter());
+        stmt->SetData(1, bgRating.rating);
+        stmt->SetData(2, bgRating.ratingDeviation);
+        stmt->SetData(3, bgRating.volatility);
+        stmt->SetData(4, bgRating.matchesPlayed);
+        stmt->SetData(5, bgRating.wins);
+        stmt->SetData(6, bgRating.losses);
         CharacterDatabase.Execute(stmt);
         
         handler->PSendSysMessage("Set {}'s Battleground MMR to {:.2f}", target->GetName(), rating);
@@ -120,20 +135,22 @@ public:
             return false;
         }
 
-        float startingRating = sBattlegroundMMRMgr->GetStartingRating();
-        float startingRD = sBattlegroundMMRMgr->GetStartingRD();
-        float startingVolatility = sBattlegroundMMRMgr->GetStartingVolatility();
+        // Reset to default values in player object
+        BattlegroundRatingData bgRating;
+        bgRating.rating = sBattlegroundMMRMgr->GetStartingRating();
+        bgRating.ratingDeviation = sBattlegroundMMRMgr->GetStartingRD();
+        bgRating.volatility = sBattlegroundMMRMgr->GetStartingVolatility();
+        bgRating.matchesPlayed = 0;
+        bgRating.wins = 0;
+        bgRating.losses = 0;
+        bgRating.loaded = true;
+        target->SetBGRating(bgRating);
         
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_BG_MMR);
-        stmt->SetData(0, startingRating);
-        stmt->SetData(1, startingRD);
-        stmt->SetData(2, startingVolatility);
-        stmt->SetData(3, sBattlegroundMMRMgr->GetPlayerGearScore(target));
-        stmt->SetData(4, 0);
-        stmt->SetData(5, 0);
-        stmt->SetData(6, 0);
-        stmt->SetData(7, target->GetGUID().GetCounter());
-        CharacterDatabase.Execute(stmt);
+        // Delete from DB (will be recreated on first match if needed)
+        CharacterDatabase.Execute("DELETE FROM character_battleground_rating WHERE guid = {}", 
+                                   target->GetGUID().GetCounter());
+        CharacterDatabase.Execute("DELETE FROM character_battleground_rating_history WHERE guid = {}", 
+                                   target->GetGUID().GetCounter());
         
         handler->PSendSysMessage("Reset {}'s Battleground MMR to default values", target->GetName());
         
