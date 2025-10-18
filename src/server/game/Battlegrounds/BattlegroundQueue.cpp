@@ -1304,46 +1304,37 @@ uint32 BattlegroundQueue::GetGroupQueueTime(GroupQueueInfo* group) const
     return (currentTime - group->JoinTime) / 1000;
 }
 
-float BattlegroundQueue::CalculateGroupAverageMMR(GroupQueueInfo* group)
+BattlegroundQueue::GroupPlayerCache BattlegroundQueue::ResolveGroupPlayers(GroupQueueInfo* group)
 {
+    GroupPlayerCache cache;
+    
     if (!group || group->Players.empty())
-        return 0.0f;
+        return cache;
+    
+    cache.players.reserve(group->Players.size());
     
     float totalMMR = 0.0f;
-    uint32 count = 0;
-    
-    for (auto const& playerGuid : group->Players)
-    {
-        Player* player = ObjectAccessor::FindPlayer(playerGuid);
-        if (player)
-        {
-            totalMMR += sBattlegroundMMRMgr->GetPlayerMMR(player);
-            count++;
-        }
-    }
-    
-    return count > 0 ? totalMMR / count : 0.0f;
-}
-
-float BattlegroundQueue::CalculateGroupAverageGearScore(GroupQueueInfo* group)
-{
-    if (!group || group->Players.empty())
-        return 0.0f;
-    
     float totalGearScore = 0.0f;
     uint32 count = 0;
     
+    // Resolve all players at once and calculate stats
     for (auto const& playerGuid : group->Players)
     {
         Player* player = ObjectAccessor::FindPlayer(playerGuid);
         if (player)
         {
+            cache.players.push_back(player);
+            totalMMR += sBattlegroundMMRMgr->GetPlayerMMR(player);
             totalGearScore += sBattlegroundMMRMgr->GetPlayerGearScore(player);
             count++;
         }
     }
     
-    return count > 0 ? totalGearScore / count : 0.0f;
+    cache.playerCount = count;
+    cache.avgMMR = count > 0 ? totalMMR / count : 0.0f;
+    cache.avgGearScore = count > 0 ? totalGearScore / count : 0.0f;
+    
+    return cache;
 }
 
 float BattlegroundQueue::TeamBalanceData::GetCombinedScore() const
@@ -1364,31 +1355,20 @@ void BattlegroundQueue::BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPla
     if (!sBattlegroundMMRMgr->IsEnabled() || groups.empty())
         return;
     
-    // Load MMR and gear scores for all players
-    for (auto& group : groups)
-    {
-        for (auto const& playerGuid : group->Players)
-        {
-            Player* player = ObjectAccessor::FindPlayer(playerGuid);
-            if (player)
-            {
-                sBattlegroundMMRMgr->LoadPlayerMMR(player);
-                sBattlegroundMMRMgr->UpdateGearScore(player);
-            }
-        }
-    }
+    // Pre-resolve all players and calculate group stats - single pass through ObjectAccessor
+    std::unordered_map<GroupQueueInfo*, GroupPlayerCache> groupCache;
     
-    // Calculate average queue time
     uint32 totalQueueTime = 0;
     uint32 groupCount = 0;
+    
     for (auto& group : groups)
     {
+        groupCache[group] = ResolveGroupPlayers(group);
         totalQueueTime += GetGroupQueueTime(group);
         groupCount++;
     }
-    uint32 avgQueueTime = groupCount > 0 ? totalQueueTime / groupCount : 0;
     
-    // Get relaxed tolerance based on average queue time
+    uint32 avgQueueTime = groupCount > 0 ? totalQueueTime / groupCount : 0;
     float maxMMRDifference = sBattlegroundMMRMgr->GetRelaxedMMRTolerance(avgQueueTime);
     
     TeamBalanceData team1, team2;
@@ -1397,52 +1377,60 @@ void BattlegroundQueue::BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPla
     for (auto& group : groups)
         unassigned.push_back(group);
     
-    // Sort groups by combined score (descending)
-    std::sort(unassigned.begin(), unassigned.end(), [this](GroupQueueInfo* a, GroupQueueInfo* b) {
-        float scoreA = CalculateGroupAverageMMR(a) * sBattlegroundMMRMgr->GetMMRWeight() +
-                      (CalculateGroupAverageGearScore(a) / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
-        float scoreB = CalculateGroupAverageMMR(b) * sBattlegroundMMRMgr->GetMMRWeight() +
-                      (CalculateGroupAverageGearScore(b) / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
-        return scoreA > scoreB;
-    });
+    // Sort groups by combined score (descending) - using cached values
+    std::sort(unassigned.begin(), unassigned.end(), 
+        [&groupCache, this](GroupQueueInfo* a, GroupQueueInfo* b) {
+            auto& cacheA = groupCache[a];
+            auto& cacheB = groupCache[b];
+            
+            float scoreA = cacheA.avgMMR * sBattlegroundMMRMgr->GetMMRWeight() +
+                          (cacheA.avgGearScore / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
+            float scoreB = cacheB.avgMMR * sBattlegroundMMRMgr->GetMMRWeight() +
+                          (cacheB.avgGearScore / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
+            return scoreA > scoreB;
+        });
     
-    // Greedy algorithm with relaxed MMR tolerance
+    // Greedy algorithm with relaxed MMR tolerance - using cached values
     for (GroupQueueInfo* group : unassigned)
     {
-        uint32 groupSize = static_cast<uint32>(group->Players.size());
-        float groupMMR = CalculateGroupAverageMMR(group);
+        auto& cache = groupCache[group];
+        uint32 groupSize = cache.playerCount;
+        
+        if (groupSize == 0)
+            continue;
+        
+        float groupMMR = cache.avgMMR;
+        float groupGearScore = cache.avgGearScore;
         
         float team1ScoreIfAdded = 0.0f;
         float team2ScoreIfAdded = 0.0f;
         bool canAddToTeam1 = false;
         bool canAddToTeam2 = false;
         
-        // Check if we can add to team 1 (size and MMR tolerance)
+        // Check if we can add to team 1
         if (team1.playerCount + groupSize <= maxPlayers)
         {
             TeamBalanceData tempTeam1 = team1;
             tempTeam1.totalMMR += groupMMR * groupSize;
-            tempTeam1.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            tempTeam1.totalGearScore += groupGearScore * groupSize;
             tempTeam1.playerCount += groupSize;
             team1ScoreIfAdded = tempTeam1.GetCombinedScore();
             
-            // Check MMR difference constraint
             if (team2.playerCount == 0 || std::abs(tempTeam1.GetAverageMMR() - team2.GetAverageMMR()) <= maxMMRDifference)
             {
                 canAddToTeam1 = true;
             }
         }
         
-        // Check if we can add to team 2 (size and MMR tolerance)
+        // Check if we can add to team 2
         if (team2.playerCount + groupSize <= maxPlayers)
         {
             TeamBalanceData tempTeam2 = team2;
             tempTeam2.totalMMR += groupMMR * groupSize;
-            tempTeam2.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            tempTeam2.totalGearScore += groupGearScore * groupSize;
             tempTeam2.playerCount += groupSize;
             team2ScoreIfAdded = tempTeam2.GetCombinedScore();
             
-            // Check MMR difference constraint
             if (team1.playerCount == 0 || std::abs(team1.GetAverageMMR() - tempTeam2.GetAverageMMR()) <= maxMMRDifference)
             {
                 canAddToTeam2 = true;
@@ -1454,7 +1442,7 @@ void BattlegroundQueue::BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPla
         {
             team1.groups.push_back(group);
             team1.totalMMR += groupMMR * groupSize;
-            team1.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            team1.totalGearScore += groupGearScore * groupSize;
             team1.playerCount += groupSize;
             group->teamId = TEAM_ALLIANCE;
         }
@@ -1462,19 +1450,19 @@ void BattlegroundQueue::BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPla
         {
             team2.groups.push_back(group);
             team2.totalMMR += groupMMR * groupSize;
-            team2.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+            team2.totalGearScore += groupGearScore * groupSize;
             team2.playerCount += groupSize;
             group->teamId = TEAM_HORDE;
         }
         else if (canAddToTeam1 && canAddToTeam2)
         {
-            // Both teams are valid, choose the one with lower score for balance
+            // Both valid, choose better balance
             if (std::abs(team1ScoreIfAdded - team2.GetCombinedScore()) < 
                 std::abs(team1.GetCombinedScore() - team2ScoreIfAdded))
             {
                 team1.groups.push_back(group);
                 team1.totalMMR += groupMMR * groupSize;
-                team1.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+                team1.totalGearScore += groupGearScore * groupSize;
                 team1.playerCount += groupSize;
                 group->teamId = TEAM_ALLIANCE;
             }
@@ -1482,7 +1470,7 @@ void BattlegroundQueue::BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPla
             {
                 team2.groups.push_back(group);
                 team2.totalMMR += groupMMR * groupSize;
-                team2.totalGearScore += CalculateGroupAverageGearScore(group) * groupSize;
+                team2.totalGearScore += groupGearScore * groupSize;
                 team2.playerCount += groupSize;
                 group->teamId = TEAM_HORDE;
             }
