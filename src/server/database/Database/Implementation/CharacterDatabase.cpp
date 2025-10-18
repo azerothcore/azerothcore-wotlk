@@ -581,15 +581,15 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_PVPSTATS_BRACKET_MONTH, "SELECT character_guid, COUNT(character_guid) AS count, characters.name as character_name FROM pvpstats_players INNER JOIN pvpstats_battlegrounds ON pvpstats_players.battleground_id = pvpstats_battlegrounds.id AND bracket_id = ? AND MONTH(date) = MONTH(NOW()) AND YEAR(date) = YEAR(NOW()) INNER JOIN characters ON pvpstats_players.character_guid = characters.guid AND characters.deleteDate IS NULL WHERE pvpstats_players.winner = 1 GROUP BY character_guid ORDER BY count(character_guid) DESC LIMIT 0, ?", CONNECTION_SYNCH);
 
     // Battleground MMR
-    PrepareStatement(CHAR_SEL_CHAR_BG_MMR, 
-        "SELECT bg_rating, bg_rating_deviation, bg_volatility, bg_gear_score, bg_matches_played, bg_wins, bg_losses "
-        "FROM characters WHERE guid = ?", CONNECTION_SYNCH);
-    
-    PrepareStatement(CHAR_UPD_CHAR_BG_MMR,
-        "UPDATE characters SET bg_rating = ?, bg_rating_deviation = ?, bg_volatility = ?, "
-        "bg_gear_score = ?, bg_matches_played = ?, bg_wins = ?, bg_losses = ?, bg_last_update = NOW() "
-        "WHERE guid = ?", CONNECTION_ASYNC);
-    
+        PrepareStatement(CHAR_SEL_CHAR_BG_MMR, 
+        "SELECT rating, rating_deviation, volatility, matches_played, wins, losses "
+        "FROM character_battleground_rating WHERE guid = ?", CONNECTION_ASYNC);
+
+    PrepareStatement(CHAR_REP_CHAR_BG_MMR,
+        "REPLACE INTO character_battleground_rating "
+        "(guid, rating, rating_deviation, volatility, matches_played, wins, losses, last_update) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, NOW())", CONNECTION_ASYNC);
+
     PrepareStatement(CHAR_INS_CHAR_BG_MMR_HISTORY,
         "INSERT INTO character_battleground_rating_history "
         "(guid, old_rating, new_rating, old_rd, new_rd, old_volatility, new_volatility, match_result) "
