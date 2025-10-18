@@ -138,9 +138,7 @@ private:
     std::array<int32, MAX_BATTLEGROUND_BRACKETS> _queueAnnouncementTimer;
     bool _queueAnnouncementCrossfactioned;
 
-    /**
-     * @brief Helper structure for tracking team composition during balancing
-     */
+    // Battleground MMR
     struct TeamBalanceData
     {
         std::vector<GroupQueueInfo*> groups;
@@ -153,24 +151,17 @@ private:
         float GetCombinedScore() const;
     };
 
-    /**
-     * @brief Balances teams by MMR and gear score for fairer matches
-     */
+    struct GroupPlayerCache
+    {
+        std::vector<Player*> players;
+        float avgMMR = 0.0f;
+        float avgGearScore = 0.0f;
+        uint32 playerCount = 0;
+    };
+
     void BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPlayers);
-    
-    /**
-     * @brief Calculates average MMR for all players in a group
-     */
     float CalculateGroupAverageMMR(GroupQueueInfo* group);
-    
-    /**
-     * @brief Calculates average gear score for all players in a group
-     */
     float CalculateGroupAverageGearScore(GroupQueueInfo* group);
-    
-    /**
-     * @brief Calculates how long a group has been in queue
-     */
     uint32 GetGroupQueueTime(GroupQueueInfo* group) const;
 };
 
