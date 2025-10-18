@@ -146,7 +146,7 @@ public:
         {
             WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
             data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-            submitter->GetSession()->SendPacket(&data);
+            submitter->SendDirectMessage(&data);
             ChatHandler(submitter->GetSession()).SendSysMessage(LANG_TICKET_CLOSED);
         }
         return true;
@@ -259,7 +259,7 @@ public:
             // Force abandon ticket
             WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
             data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
         }
 
         return true;

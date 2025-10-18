@@ -670,7 +670,7 @@ void BattlegroundMgr::SendAreaSpiritHealerQueryOpcode(Player* player, Battlegrou
     if (time_ == uint32(-1))
         time_ = 0;
     data << guid << time_;
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 bool BattlegroundMgr::IsArenaType(BattlegroundTypeId bgTypeId)

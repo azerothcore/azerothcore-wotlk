@@ -908,26 +908,26 @@ void Channel::SendToAll(WorldPacket* data, ObjectGuid guid)
 {
     for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
         if (!guid || !i->second.plrPtr->GetSocial()->HasIgnore(guid))
-            i->second.plrPtr->GetSession()->SendPacket(data);
+            i->second.plrPtr->SendDirectMessage(data);
 }
 
 void Channel::SendToAllButOne(WorldPacket* data, ObjectGuid who)
 {
     for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
         if (i->first != who)
-            i->second.plrPtr->GetSession()->SendPacket(data);
+            i->second.plrPtr->SendDirectMessage(data);
 }
 
 void Channel::SendToOne(WorldPacket* data, ObjectGuid who)
 {
     if (Player* player = ObjectAccessor::FindConnectedPlayer(who))
-        player->GetSession()->SendPacket(data);
+        player->SendDirectMessage(data);
 }
 
 void Channel::SendToAllWatching(WorldPacket* data)
 {
     for (PlayersWatchingContainer::const_iterator i = playersWatchingStore.begin(); i != playersWatchingStore.end(); ++i)
-        (*i)->GetSession()->SendPacket(data);
+        (*i)->SendDirectMessage(data);
 }
 
 bool Channel::ShouldAnnouncePlayer(Player const* player) const

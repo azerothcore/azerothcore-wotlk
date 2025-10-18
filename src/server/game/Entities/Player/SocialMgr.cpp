@@ -172,7 +172,7 @@ void PlayerSocial::SendSocialList(Player* player, uint32 flags)
     }
 
     data.put<uint32>(countPos, totalCount);
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_CONTACT_LIST");
 }
 
@@ -288,7 +288,7 @@ void SocialMgr::SendFriendStatus(Player* player, FriendsResult result, ObjectGui
     if (broadcast)
         BroadcastToFriendListers(player, &data);
     else
-        player->GetSession()->SendPacket(&data);
+        player->SendDirectMessage(&data);
 }
 
 void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket* packet)
@@ -311,7 +311,7 @@ void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket* packet)
             // PLAYER see his team only and PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
             // MODERATOR, GAME MASTER, ADMINISTRATOR can see all
             if (pFriend && (!AccountMgr::IsPlayerAccount(pFriend->GetSession()->GetSecurity()) || ((pFriend->GetTeamId() == teamId || allowTwoSideWhoList) && security <= gmLevelInWhoList)) && player->IsVisibleGloballyFor(pFriend))
-                pFriend->GetSession()->SendPacket(packet);
+                pFriend->SendDirectMessage(packet);
         }
     }
 }

@@ -4612,7 +4612,7 @@ void Spell::SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 cas
     WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
     WriteCastResultInfo(data, caster, spellInfo, castCount, result, customError);
 
-    caster->GetSession()->SendPacket(&data);
+    caster->SendDirectMessage(&data);
 }
 
 void Spell::SendCastResult(SpellCastResult result)
@@ -4649,7 +4649,7 @@ void Spell::SendPetCastResult(SpellCastResult result)
     WorldPacket data(SMSG_PET_CAST_FAILED, 1 + 4 + 1);
     WriteCastResultInfo(data, player, m_spellInfo, m_cast_count, result, m_customError);
 
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 void Spell::SendSpellStart()
@@ -5184,7 +5184,7 @@ void Spell::SendResurrectRequest(Player* target)
     // override delay sent with SMSG_CORPSE_RECLAIM_DELAY, set instant resurrection for spells with this attribute
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_NO_RES_TIMER))
         data << uint32(0);
-    target->GetSession()->SendPacket(&data);
+    target->SendDirectMessage(&data);
 }
 
 void Spell::TakeCastItem()

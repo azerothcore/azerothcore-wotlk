@@ -60,7 +60,7 @@ void WorldSession::HandleGrantLevel(WorldPacket& recvData)
 
     WorldPacket data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
     data2 << _player->GetPackGUID();
-    target->GetSession()->SendPacket(&data2);
+    target->SendDirectMessage(&data2);
 }
 
 void WorldSession::HandleAcceptGrantLevel(WorldPacket& recvData)

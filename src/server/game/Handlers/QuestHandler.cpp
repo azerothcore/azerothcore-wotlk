@@ -625,7 +625,7 @@ void WorldSession::HandleQuestPushResult(WorldPacket& recvPacket)
             WorldPacket data(MSG_QUEST_PUSH_RESULT, 8 + 4 + 1);
             data << _player->GetGUID();
             data << uint8(msg);                             // valid values: 0-8
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
             _player->SetDivider();
         }
     }
