@@ -203,6 +203,26 @@ struct BattlegroundObjectInfo
     uint32      spellid{0};
 };
 
+struct TeamBalanceData
+{
+    std::vector<GroupQueueInfo*> groups;
+    float totalMMR = 0.0f;
+    float totalGearScore = 0.0f;
+    uint32 playerCount = 0;
+    
+    float GetAverageMMR() const { return playerCount > 0 ? totalMMR / playerCount : 0.0f; }
+    float GetAverageGearScore() const { return playerCount > 0 ? totalGearScore / playerCount : 0.0f; }
+    float GetCombinedScore() const;
+};
+
+struct GroupPlayerCache
+{
+    std::vector<Player*> players;
+    float avgMMR = 0.0f;
+    float avgGearScore = 0.0f;
+    uint32 playerCount = 0;
+};
+
 enum ArenaType : uint8
 {
     ARENA_TYPE_2v2                  = 2,
@@ -349,6 +369,11 @@ public:
     [[nodiscard]] PvPTeamId GetWinner() const         { return m_WinnerId; }
     [[nodiscard]] uint32 GetScriptId() const          { return ScriptId; }
     [[nodiscard]] uint32 GetBonusHonorFromKill(uint32 kills) const;
+
+    // Battleground MMR
+    uint32 GetGroupQueueTime(GroupQueueInfo* group) const;
+    GroupPlayerCache ResolveGroupPlayers(GroupQueueInfo* group);
+    void BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPlayers);
 
     // Spirit of Competition event
     void SpiritOfCompetitionEvent(PvPTeamId winnerTeamId) const;
@@ -566,12 +591,6 @@ public:
     [[nodiscard]] uint32 GetTeamScore(TeamId teamId) const;
 
     virtual TeamId GetPrematureWinner();
-
-    /**
-     * @brief Updates MMR ratings for all players after a battleground match
-     * @param winner The winning team (ALLIANCE or HORDE)
-     */
-    void UpdateBattlegroundMMR(Team winner);
 
     // because BattleGrounds with different types and same level range has different m_BracketId
     [[nodiscard]] uint8 GetUniqueBracketId() const;
