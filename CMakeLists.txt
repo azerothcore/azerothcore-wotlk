@@ -29,6 +29,18 @@ project(AzerothCore VERSION 3.0.0 LANGUAGES CXX C)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
+# Prefer a modern C++ standard for gSOAP-generated headers and code.
+# Keep this minimal and non-invasive: only set the default if not explicitly set
+if (NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+
+# Add deps/gsoap to system include directories to suppress warnings coming
+# from generated third-party headers (they are not part of the project's code).
+include_directories(SYSTEM "${CMAKE_SOURCE_DIR}/deps/gsoap")
+
 # Set RPATH-handing (CMake parameters)
 set(CMAKE_SKIP_BUILD_RPATH 0)
 set(CMAKE_BUILD_WITH_INSTALL_RPATH 0)
@@ -89,6 +101,19 @@ CU_RUN_HOOK("AFTER_LOAD_CONF")
 # build in Release-mode by default if not explicitly set
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "RelWithDebInfo")
+endif()
+
+# Add conservative release optimization flags when building in Release-like
+# configurations if not already configured by the toolchain. Keep these flags
+# minimal so they don't override user toolchain settings.
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+    if(NOT CMAKE_CXX_FLAGS_RELEASE MATCHES "-O[0-3]")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2 -flto")
+    endif()
+elseif(MSVC)
+    if(NOT CMAKE_CXX_FLAGS_RELEASE MATCHES "/O[1-3]")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2")
+    endif()
 endif()
 
 # turn off PCH totally if enabled (hidden setting, mainly for devs)

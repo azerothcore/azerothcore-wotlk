@@ -62,6 +62,14 @@ A commercial use license is available from Genivia, Inc., contact@genivia.com
 # define _GNU_SOURCE 1
 #endif
 
+/* Ensure standard C headers are included before the gSOAP header so the
+ * platform feature macros and functions (errno, _set_errno, isnan, _isnan,
+ * _finite, etc.) are available when stdsoap2.h queries them. This addresses
+ * build errors on some toolchains, particularly MSVC/Windows. */
+#include <errno.h>
+#include <math.h>
+#include <float.h>
+
 #include "stdsoap2.h"
 
 #if GSOAP_VERSION != GSOAP_LIB_VERSION
