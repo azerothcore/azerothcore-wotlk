@@ -1316,8 +1316,7 @@ BattlegroundQueue::GroupPlayerCache BattlegroundQueue::ResolveGroupPlayers(Group
     float totalMMR = 0.0f;
     float totalGearScore = 0.0f;
     uint32 count = 0;
-    
-    // Resolve all players at once and calculate stats
+
     for (auto const& playerGuid : group->Players)
     {
         Player* player = ObjectAccessor::FindPlayer(playerGuid);
@@ -1337,7 +1336,7 @@ BattlegroundQueue::GroupPlayerCache BattlegroundQueue::ResolveGroupPlayers(Group
     return cache;
 }
 
-float BattlegroundQueue::TeamBalanceData::GetCombinedScore() const
+float BattlegroundQueue::FactionQueueStats::GetCombinedScore() const
 {
     float avgMMR = GetAverageMMR();
     float avgGear = GetAverageGearScore();
@@ -1350,143 +1349,122 @@ float BattlegroundQueue::TeamBalanceData::GetCombinedScore() const
     return (avgMMR * mmrWeight) + (normalizedGear * gearWeight);
 }
 
-void BattlegroundQueue::BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPlayers)
+void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQueue, 
+                                                      GroupsQueueType& hordeQueue,
+                                                      uint32 maxPlayersPerTeam,
+                                                      uint32 queueTime)
 {
-    if (!sBattlegroundMMRMgr->IsEnabled() || groups.empty())
+    if (!sBattlegroundMMRMgr->IsEnabled() || (allianceQueue.empty() && hordeQueue.empty()))
         return;
     
-    // Pre-resolve all players and calculate group stats - single pass through ObjectAccessor
+    // Calculate stats for both factions
+    FactionQueueStats allianceStats, hordeStats;
     std::unordered_map<GroupQueueInfo*, GroupPlayerCache> groupCache;
     
-    uint32 totalQueueTime = 0;
-    uint32 groupCount = 0;
-    
-    for (auto& group : groups)
+    // Pre-resolve all players and calculate faction totals
+    for (auto& group : allianceQueue)
     {
-        groupCache[group] = ResolveGroupPlayers(group);
-        totalQueueTime += GetGroupQueueTime(group);
-        groupCount++;
+        auto cache = ResolveGroupPlayers(group);
+        groupCache[group] = cache;
+        allianceStats.totalMMR += cache.avgMMR * cache.playerCount;
+        allianceStats.totalGearScore += cache.avgGearScore * cache.playerCount;
+        allianceStats.playerCount += cache.playerCount;
     }
     
-    uint32 avgQueueTime = groupCount > 0 ? totalQueueTime / groupCount : 0;
-    float maxMMRDifference = sBattlegroundMMRMgr->GetRelaxedMMRTolerance(avgQueueTime);
+    for (auto& group : hordeQueue)
+    {
+        auto cache = ResolveGroupPlayers(group);
+        groupCache[group] = cache;
+        hordeStats.totalMMR += cache.avgMMR * cache.playerCount;
+        hordeStats.totalGearScore += cache.avgGearScore * cache.playerCount;
+        hordeStats.playerCount += cache.playerCount;
+    }
     
-    TeamBalanceData team1, team2;
-    std::vector<GroupQueueInfo*> unassigned;
+    float allianceAvgMMR = allianceStats.GetAverageMMR();
+    float hordeAvgMMR = hordeStats.GetAverageMMR();
+    float mmrDifference = std::abs(allianceAvgMMR - hordeAvgMMR);
     
-    for (auto& group : groups)
-        unassigned.push_back(group);
+    // Get relaxed tolerance based on average queue time
+    float maxMMRDifference = sBattlegroundMMRMgr->GetRelaxedMMRTolerance(queueTime);
     
-    // Sort groups by combined score (descending) - using cached values
-    std::sort(unassigned.begin(), unassigned.end(), 
-        [&groupCache, this](GroupQueueInfo* a, GroupQueueInfo* b) {
-            auto& cacheA = groupCache[a];
-            auto& cacheB = groupCache[b];
-            
-            float scoreA = cacheA.avgMMR * sBattlegroundMMRMgr->GetMMRWeight() +
-                          (cacheA.avgGearScore / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
-            float scoreB = cacheB.avgMMR * sBattlegroundMMRMgr->GetMMRWeight() +
-                          (cacheB.avgGearScore / 300.0f * 1500.0f) * sBattlegroundMMRMgr->GetGearWeight();
-            return scoreA > scoreB;
+    // If both factions are already balanced within tolerance, no need to reorder
+    if (mmrDifference <= maxMMRDifference)
+    {
+        LOG_DEBUG("bg.queue", "BG Faction Balance - Already balanced: Alliance {:.2f} vs Horde {:.2f} (Diff: {:.2f}, Tolerance: {:.2f})",
+                  allianceAvgMMR, hordeAvgMMR, mmrDifference, maxMMRDifference);
+        return;
+    }
+    
+    // If we can't balance (not enough players or difference too large), just accept it
+    // Queue relaxation will eventually allow the match
+    if (queueTime >= sBattlegroundMMRMgr->GetRelaxedMMRTolerance(queueTime))
+    {
+        LOG_DEBUG("bg.queue", "BG Faction Balance - Max queue time reached, accepting any match: "
+                  "Alliance {:.2f} vs Horde {:.2f} (Diff: {:.2f})",
+                  allianceAvgMMR, hordeAvgMMR, mmrDifference);
+        return;
+    }
+    
+    // Try to balance by prioritizing groups that reduce the imbalance
+    // If Alliance is higher MMR, prioritize lower MMR Alliance groups and higher MMR Horde groups
+    // If Horde is higher MMR, prioritize lower MMR Horde groups and higher MMR Alliance groups
+    
+    bool allianceIsHigher = allianceAvgMMR > hordeAvgMMR;
+    
+    // Sort Alliance queue (ascending if Alliance is higher, descending if Horde is higher)
+    std::sort(allianceQueue.begin(), allianceQueue.end(), 
+        [&groupCache, allianceIsHigher](GroupQueueInfo* a, GroupQueueInfo* b) {
+            float scoreA = groupCache[a].avgMMR;
+            float scoreB = groupCache[b].avgMMR;
+            return allianceIsHigher ? (scoreA < scoreB) : (scoreA > scoreB);
         });
     
-    // Greedy algorithm with relaxed MMR tolerance - using cached values
-    for (GroupQueueInfo* group : unassigned)
+    // Sort Horde queue (opposite of Alliance)
+    std::sort(hordeQueue.begin(), hordeQueue.end(), 
+        [&groupCache, allianceIsHigher](GroupQueueInfo* a, GroupQueueInfo* b) {
+            float scoreA = groupCache[a].avgMMR;
+            float scoreB = groupCache[b].avgMMR;
+            return allianceIsHigher ? (scoreA > scoreB) : (scoreA < scoreB);
+        });
+    
+    // Recalculate stats after sorting to see if it helped
+    FactionQueueStats newAllianceStats, newHordeStats;
+    uint32 allianceCount = 0, hordeCount = 0;
+    
+    for (auto& group : allianceQueue)
     {
         auto& cache = groupCache[group];
-        uint32 groupSize = cache.playerCount;
-        
-        if (groupSize == 0)
-            continue;
-        
-        float groupMMR = cache.avgMMR;
-        float groupGearScore = cache.avgGearScore;
-        
-        float team1ScoreIfAdded = 0.0f;
-        float team2ScoreIfAdded = 0.0f;
-        bool canAddToTeam1 = false;
-        bool canAddToTeam2 = false;
-        
-        // Check if we can add to team 1
-        if (team1.playerCount + groupSize <= maxPlayers)
+        if (allianceCount + cache.playerCount <= maxPlayersPerTeam)
         {
-            TeamBalanceData tempTeam1 = team1;
-            tempTeam1.totalMMR += groupMMR * groupSize;
-            tempTeam1.totalGearScore += groupGearScore * groupSize;
-            tempTeam1.playerCount += groupSize;
-            team1ScoreIfAdded = tempTeam1.GetCombinedScore();
-            
-            if (team2.playerCount == 0 || std::abs(tempTeam1.GetAverageMMR() - team2.GetAverageMMR()) <= maxMMRDifference)
-            {
-                canAddToTeam1 = true;
-            }
-        }
-        
-        // Check if we can add to team 2
-        if (team2.playerCount + groupSize <= maxPlayers)
-        {
-            TeamBalanceData tempTeam2 = team2;
-            tempTeam2.totalMMR += groupMMR * groupSize;
-            tempTeam2.totalGearScore += groupGearScore * groupSize;
-            tempTeam2.playerCount += groupSize;
-            team2ScoreIfAdded = tempTeam2.GetCombinedScore();
-            
-            if (team1.playerCount == 0 || std::abs(team1.GetAverageMMR() - tempTeam2.GetAverageMMR()) <= maxMMRDifference)
-            {
-                canAddToTeam2 = true;
-            }
-        }
-        
-        // Assign to the team that maintains better balance
-        if (canAddToTeam1 && !canAddToTeam2)
-        {
-            team1.groups.push_back(group);
-            team1.totalMMR += groupMMR * groupSize;
-            team1.totalGearScore += groupGearScore * groupSize;
-            team1.playerCount += groupSize;
-            group->teamId = TEAM_ALLIANCE;
-        }
-        else if (canAddToTeam2 && !canAddToTeam1)
-        {
-            team2.groups.push_back(group);
-            team2.totalMMR += groupMMR * groupSize;
-            team2.totalGearScore += groupGearScore * groupSize;
-            team2.playerCount += groupSize;
-            group->teamId = TEAM_HORDE;
-        }
-        else if (canAddToTeam1 && canAddToTeam2)
-        {
-            // Both valid, choose better balance
-            if (std::abs(team1ScoreIfAdded - team2.GetCombinedScore()) < 
-                std::abs(team1.GetCombinedScore() - team2ScoreIfAdded))
-            {
-                team1.groups.push_back(group);
-                team1.totalMMR += groupMMR * groupSize;
-                team1.totalGearScore += groupGearScore * groupSize;
-                team1.playerCount += groupSize;
-                group->teamId = TEAM_ALLIANCE;
-            }
-            else
-            {
-                team2.groups.push_back(group);
-                team2.totalMMR += groupMMR * groupSize;
-                team2.totalGearScore += groupGearScore * groupSize;
-                team2.playerCount += groupSize;
-                group->teamId = TEAM_HORDE;
-            }
+            newAllianceStats.totalMMR += cache.avgMMR * cache.playerCount;
+            newAllianceStats.totalGearScore += cache.avgGearScore * cache.playerCount;
+            newAllianceStats.playerCount += cache.playerCount;
+            allianceCount += cache.playerCount;
         }
     }
     
-    float mmrDifference = std::abs(team1.GetAverageMMR() - team2.GetAverageMMR());
+    for (auto& group : hordeQueue)
+    {
+        auto& cache = groupCache[group];
+        if (hordeCount + cache.playerCount <= maxPlayersPerTeam)
+        {
+            newHordeStats.totalMMR += cache.avgMMR * cache.playerCount;
+            newHordeStats.totalGearScore += cache.avgGearScore * cache.playerCount;
+            newHordeStats.playerCount += cache.playerCount;
+            hordeCount += cache.playerCount;
+        }
+    }
     
-    LOG_DEBUG("bg.queue", "BG MMR Balance - Queue Time: {}s, Tolerance: {:.0f}, "
-              "Team1: {} players (MMR: {:.2f}, Gear: {:.2f}), "
-              "Team2: {} players (MMR: {:.2f}, Gear: {:.2f}), "
+    float newMMRDiff = std::abs(newAllianceStats.GetAverageMMR() - newHordeStats.GetAverageMMR());
+    
+    LOG_DEBUG("bg.queue", "BG Faction Balance - Queue Time: {}s, Tolerance: {:.0f}, "
+              "Alliance: {} players (MMR: {:.2f}, Gear: {:.2f}), "
+              "Horde: {} players (MMR: {:.2f}, Gear: {:.2f}), "
               "MMR Diff: {:.2f}",
-              avgQueueTime, maxMMRDifference,
-              team1.playerCount, team1.GetAverageMMR(), team1.GetAverageGearScore(),
-              team2.playerCount, team2.GetAverageMMR(), team2.GetAverageGearScore(),
-              mmrDifference);
+              queueTime, maxMMRDifference,
+              newAllianceStats.playerCount, newAllianceStats.GetAverageMMR(), newAllianceStats.GetAverageGearScore(),
+              newHordeStats.playerCount, newHordeStats.GetAverageMMR(), newHordeStats.GetAverageGearScore(),
+              newMMRDiff);
 }
 
 /*********************************************************/
