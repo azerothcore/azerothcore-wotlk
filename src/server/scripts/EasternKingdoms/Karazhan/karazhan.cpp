@@ -170,6 +170,7 @@ public:
             if (m_uiEventId == EVENT_OZ)
                 instance->SetData(DATA_OPERA_OZ_DEATHCOUNT, IN_PROGRESS);
 
+            me->SetWalk(true);
             Start(false);
         }
 

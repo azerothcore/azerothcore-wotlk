@@ -316,12 +316,12 @@ public:
                     events.ScheduleEvent(EVENT_THRALL_EMOTE, 1300ms);
                     break;
                 case 9:
-                    SetRun(false);
+                    me->SetWalk(true);
                     events.ScheduleEvent(EVENT_KILL_ARMORER, 500ms);
                     events.ScheduleEvent(EVENT_TALK_KILL_ARMORER, 3s);
                     break;
                 case 10:
-                    SetRun(true);
+                    me->SetWalk(false);
                     events.ScheduleEvent(EVENT_DRESSING_KNEEL, 500ms);
                     events.ScheduleEvent(EVENT_DRESSING_ARMOR, 3s);
                     events.ScheduleEvent(EVENT_DRESSING_STAND, 4s);
@@ -374,7 +374,7 @@ public:
                     }
                     UnMountSelf();
                     _mounted = false;
-                    SetRun(false);
+                    me->SetWalk(true);
                     me->SetFacingTo(6.0388f);
                     break;
                 case 60:
@@ -386,12 +386,12 @@ public:
                     }
                     Talk(SAY_EMOTE_HORSE);
                     SetEscortPaused(true);
-                    SetRun(true);
+                    me->SetWalk(false);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     me->SetFacingTo(4.1364f);
                     break;
                 case 64:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 67:
                     events.ScheduleEvent(EVENT_LOOK_1, 1200ms);
@@ -418,12 +418,12 @@ public:
                         summon->AI()->Talk(SAY_LOOKOUT_INN);
                     break;
                 case 92:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 94:
                     summons.DespawnAll();
                     SetEscortPaused(true);
-                    SetRun(true);
+                    me->SetWalk(false);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_TARETHA_MEET);
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
@@ -664,7 +664,7 @@ public:
                     me->SetFacingTo(2.0071f);
                     break;
                 case EVENT_SUMMON_GUARDS:
-                    SetRun(true);
+                    me->SetWalk(false);
                     me->SummonCreature(NPC_TM_PROTECTOR, 2501.5708f, 699.38086f, 55.64138f, 3.8571f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     me->SummonCreature(NPC_TM_LOOKOUT, 2500.7002f, 698.26746f, 55.618248f, 3.7350f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     if (Creature* guardsman = me->SummonCreature(NPC_TM_GUARDSMAN, 2500.0908f, 699.9389f, 55.629555f, 4.2935f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
@@ -1018,7 +1018,7 @@ public:
         {
             if (waypointId == 7)
             {
-                SetRun(false);
+                me->SetWalk(true);
                 Talk(SAY_TARETHA_FREE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                 if (Creature* thrall = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THRALL_GUID)))

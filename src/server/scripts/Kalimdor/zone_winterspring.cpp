@@ -286,7 +286,10 @@ public:
             creature->SetFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
             if (npc_ranshallaAI* escortAI = dynamic_cast<npc_ranshallaAI*>(creature->AI()))
+            {
+                creature->SetWalk(true);
                 escortAI->Start(false, player->GetGUID(), quest);
+            }
 
             return true;
         }

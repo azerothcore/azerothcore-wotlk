@@ -391,7 +391,6 @@ public:
             switch (action)
             {
                 case ACTION_START_ESCORT_EVENT:
-                    me->SetWalk(false);
                     Start(false, ObjectGuid::Empty, 0, true, false);
                     Talk(SAY_BRANN_ESCORT_START);
                     me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
@@ -457,7 +456,6 @@ public:
                         door->SetGoState(GO_STATE_READY);
                     break;
                 case ACTION_OPEN_DOOR:
-                    me->SetWalk(false);
                     Start(false, ObjectGuid::Empty, 0, true, false);
                     SetNextWaypoint(34, false);
                     SetEscortPaused(false);

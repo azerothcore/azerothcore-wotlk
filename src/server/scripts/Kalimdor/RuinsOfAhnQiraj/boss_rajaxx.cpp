@@ -209,7 +209,6 @@ struct npc_general_andorov : public npc_escortAI
         _initialAttackTimer = 5 * IN_MILLISECONDS;
         _paused = false;
 
-        me->SetWalk(false);
         Start(false);
 
         me->SetImmuneToNPC(true);
