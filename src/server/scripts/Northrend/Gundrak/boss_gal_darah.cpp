@@ -90,7 +90,7 @@ struct boss_gal_darah : public BossAI
                 DoCastAOE(SPELL_STOMP);
             }, 10s, 12s);
 
-            ScheduleTimedEvent(32s, [&] {
+            me->m_Events.AddEventAtOffset([&] {
                 scheduler.CancelAll();
                 DoCastSelf(SPELL_TRANSFORM_TO_TROLL);
             }, 32s);
@@ -120,7 +120,7 @@ struct boss_gal_darah : public BossAI
             DoCastAOE(SPELL_WHIRLING_SLASH);
         }, 17s, 19s);
 
-        ScheduleTimedEvent(32s, [&] {
+        me->m_Events.AddEventAtOffset([&] {
             scheduler.CancelAll();
             DoCastSelf(SPELL_TRANSFORM_TO_RHINO);
         }, 32s);
