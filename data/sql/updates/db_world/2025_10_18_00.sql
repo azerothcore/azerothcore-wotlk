@@ -1,3 +1,4 @@
+-- DB update 2025_10_17_00 -> 2025_10_18_00
 --
 UPDATE `spell_proc_event` SET `SpellFamilyMask2` = 0x00000040 WHERE `entry` = -33191;
 
