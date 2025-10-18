@@ -25,10 +25,8 @@
 
 enum IonarSpells
 {
-    SPELL_BALL_LIGHTNING_N          = 52780,
-    SPELL_BALL_LIGHTNING_H          = 59800,
-    SPELL_STATIC_OVERLOAD_N         = 52658,
-    SPELL_STATIC_OVERLOAD_H         = 59795,
+    SPELL_BALL_LIGHTNING            = 52780,
+    SPELL_STATIC_OVERLOAD           = 52658,
     SPELL_STATIC_OVERLOAD_KNOCK     = 53337,
 
     SPELL_DISPERSE                  = 52770,
@@ -36,8 +34,7 @@ enum IonarSpells
     SPELL_SPARK_DESPAWN             = 52776,
 
     //Spark of Ionar
-    SPELL_SPARK_VISUAL_TRIGGER_N    = 52667,
-    SPELL_SPARK_VISUAL_TRIGGER_H    = 59833,
+    SPELL_SPARK_VISUAL_TRIGGER      = 52667,
     SPELL_RANDOM_LIGHTNING          = 52663,
 };
 
@@ -75,8 +72,11 @@ struct boss_ionar : public BossAI
     void Reset() override
     {
         _Reset();
-        HealthCheck = 50;
         me->SetVisible(true);
+
+        ScheduleHealthCheckEvent(50, [&] {
+            DoCastSelf(SPELL_DISPERSE);
+        });
     }
 
     void ScheduleEvents(bool spark)
@@ -120,16 +120,14 @@ struct boss_ionar : public BossAI
     {
         Talk(SAY_SPLIT);
 
-        Creature* spark;
         for (uint8 i = 0; i < 5; ++i)
         {
-            if ((spark = me->SummonCreature(NPC_SPARK_OF_IONAR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000)))
+            if (Creature* spark = me->SummonCreature(NPC_SPARK_OF_IONAR, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 20000))
             {
-                summons.Summon(spark);
-                spark->CastSpell(spark, me->GetMap()->IsHeroic() ? SPELL_SPARK_VISUAL_TRIGGER_H : SPELL_SPARK_VISUAL_TRIGGER_N, true);
+                spark->CastSpell(spark, SPELL_SPARK_VISUAL_TRIGGER, true);
                 spark->CastSpell(spark, SPELL_RANDOM_LIGHTNING, true);
                 spark->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                spark->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0);
+                spark->SetHomePosition(me->GetPosition());
 
                 if (Player* tgt = SelectTargetFromPlayerList(100))
                     spark->GetMotionMaster()->MoveFollow(tgt, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
@@ -156,23 +154,13 @@ struct boss_ionar : public BossAI
         switch (events.ExecuteEvent())
         {
             case EVENT_BALL_LIGHTNING:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_BALL_LIGHTNING_H : SPELL_BALL_LIGHTNING_N, false);
-
+                DoCastRandomTarget(SPELL_BALL_LIGHTNING, 1, 0.0f, false);
                 events.Repeat(10s, 11s);
                 break;
             case EVENT_STATIC_OVERLOAD:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    me->CastSpell(target, me->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_H : SPELL_STATIC_OVERLOAD_N, false);
-
+                DoCastRandomTarget(SPELL_STATIC_OVERLOAD);
                 events.Repeat(5s, 6s);
                 break;
-            case EVENT_CHECK_HEALTH:
-                if (HealthBelowPct(HealthCheck))
-                    me->CastSpell(me, SPELL_DISPERSE, false);
-
-                events.Repeat(1s);
-                return;
             case EVENT_CALL_SPARKS:
                 {
                     EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
@@ -192,9 +180,6 @@ struct boss_ionar : public BossAI
 
         DoMeleeAttackIfReady();
     }
-
-    private:
-        uint8 HealthCheck;
 };
 
 struct npc_spark_of_ionar : public ScriptedAI
@@ -252,7 +237,8 @@ class spell_ionar_static_overload : public AuraScript
             return;
 
         if (Unit* target = GetTarget())
-            target->CastSpell(target, SPELL_STATIC_OVERLOAD_KNOCK, true);
+            if (target->GetMap() && !target->GetMap()->IsHeroic())
+                target->CastSpell(target, SPELL_STATIC_OVERLOAD_KNOCK, true);
     }
 
     void Register() override
