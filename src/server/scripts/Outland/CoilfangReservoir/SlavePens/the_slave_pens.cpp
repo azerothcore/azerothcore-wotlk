@@ -31,7 +31,7 @@ public:
         {
             if (Creature* quagmirran = instance->GetCreature(DATA_QUAGMIRRAN))
             {
-                quagmirran->GetMotionMaster()->MovePath(quagmirran->GetEntry() * 100, true);
+                quagmirran->GetMotionMaster()->MoveWaypoint(quagmirran->GetEntry() * 100, true);
             }
         }
 

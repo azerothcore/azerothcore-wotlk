@@ -1723,7 +1723,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
             break;
         }
-        case SMART_ACTION_WP_START:
+        case SMART_ACTION_ESCORT_START:
         {
             if (!IsSmart())
                 break;
@@ -1750,7 +1750,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->SetDespawnTime(DespawnTime);
             break;
         }
-        case SMART_ACTION_WP_PAUSE:
+        case SMART_ACTION_ESCORT_PAUSE:
         {
             if (!IsSmart())
                 break;
@@ -1759,7 +1759,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->PausePath(delay, e.GetEventType() == SMART_EVENT_WAYPOINT_REACHED ? false : true);
             break;
         }
-        case SMART_ACTION_WP_STOP:
+        case SMART_ACTION_ESCORT_STOP:
         {
             if (!IsSmart())
                 break;
@@ -1770,7 +1770,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->StopPath(DespawnTime, quest, fail);
             break;
         }
-        case SMART_ACTION_WP_RESUME:
+        case SMART_ACTION_ESCORT_RESUME:
         {
             if (!IsSmart())
                 break;
@@ -2519,21 +2519,19 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
                         {
-                            WPPath* path = sSmartWaypointMgr->GetPath(wp);
+                            WaypointPath* path = sSmartWaypointMgr->GetPath(wp);
                             if (!path || path->empty())
                                 continue;
 
                             auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
-                                if (WayPoint* wpData = itrWp->second)
+                                WaypointData& wpData = itrWp->second;
+                                float distToThisPath = creature->GetExactDistSq(wpData.x, wpData.y, wpData.z);
+                                if (distToThisPath < distanceToClosest)
                                 {
-                                    float distToThisPath = creature->GetExactDistSq(wpData->x, wpData->y, wpData->z);
-                                    if (distToThisPath < distanceToClosest)
-                                    {
-                                        distanceToClosest = distToThisPath;
-                                        closestWpId = wp;
-                                    }
+                                    distanceToClosest = distToThisPath;
+                                    closestWpId = wp;
                                 }
                             }
                         }
@@ -3221,7 +3219,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
-        case SMART_ACTION_WAYPOINT_DATA_START:
+        case SMART_ACTION_WAYPOINT_START:
         {
             if (e.action.wpData.pathId)
             {
@@ -3230,7 +3228,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsCreature(target))
                     {
                         target->ToCreature()->LoadPath(e.action.wpData.pathId);
-                        target->ToCreature()->GetMotionMaster()->MovePath(e.action.wpData.pathId, e.action.wpData.repeat);
+                        target->ToCreature()->GetMotionMaster()->MoveWaypoint(e.action.wpData.pathId, e.action.wpData.repeat, e.action.wpData.pathSource);
                     }
                 }
             }
@@ -3247,7 +3245,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         uint32 path = urand(e.action.wpDataRandom.pathId1, e.action.wpDataRandom.pathId2);
                         target->ToCreature()->LoadPath(path);
-                        target->ToCreature()->GetMotionMaster()->MovePath(path, e.action.wpDataRandom.repeat);
+                        target->ToCreature()->GetMotionMaster()->MoveWaypoint(path, e.action.wpDataRandom.repeat);
                     }
                 }
             }

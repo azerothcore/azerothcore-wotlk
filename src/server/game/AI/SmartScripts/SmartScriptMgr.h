@@ -26,28 +26,9 @@
 #include "Optional.h"
 #include "SpellMgr.h"
 #include <limits>
+#include "WaypointMgr.h"
 
 typedef uint32 SAIBool;
-
-struct WayPoint
-{
-    WayPoint(uint32 _id, float _x, float _y, float _z, Optional<float> _o, uint32 _delay)
-    {
-        id = _id;
-        x = _x;
-        y = _y;
-        z = _z;
-        o = _o;
-        delay = _delay;
-    }
-
-    uint32 id;
-    float x;
-    float y;
-    float z;
-    std::optional<float> o;
-    uint32 delay;
-};
 
 enum eSmartAI
 {
@@ -608,9 +589,9 @@ enum SMART_ACTION
     SMART_ACTION_SUMMON_GO                          = 50,     // GameObjectID, DespawnTime, targetSummon, summonType (0 time or summoner dies/1 time)
     SMART_ACTION_KILL_UNIT                          = 51,     //
     SMART_ACTION_ACTIVATE_TAXI                      = 52,     // TaxiID
-    SMART_ACTION_WP_START                           = 53,     // run/walk, pathID, canRepeat, quest, despawntime, reactState
-    SMART_ACTION_WP_PAUSE                           = 54,     // time
-    SMART_ACTION_WP_STOP                            = 55,     // despawnTime, quest, fail?
+    SMART_ACTION_ESCORT_START                       = 53,     // run/walk, pathID, canRepeat, quest, despawntime, reactState
+    SMART_ACTION_ESCORT_PAUSE                       = 54,     // time
+    SMART_ACTION_ESCORT_STOP                        = 55,     // despawnTime, quest, fail?
     SMART_ACTION_ADD_ITEM                           = 56,     // itemID, count
     SMART_ACTION_REMOVE_ITEM                        = 57,     // itemID, count
     SMART_ACTION_INSTALL_AI_TEMPLATE                = 58,     // AITemplateID
@@ -620,7 +601,7 @@ enum SMART_ACTION
     SMART_ACTION_TELEPORT                           = 62,     // mapID,
     SMART_ACTION_SET_COUNTER                        = 63,     // id, value, reset (0/1)
     SMART_ACTION_STORE_TARGET_LIST                  = 64,     // varID,
-    SMART_ACTION_WP_RESUME                          = 65,     // none
+    SMART_ACTION_ESCORT_RESUME                      = 65,     // none
     SMART_ACTION_SET_ORIENTATION                    = 66,     // quick change, random orientation? (0/1), turnAngle
     SMART_ACTION_CREATE_TIMED_EVENT                 = 67,     // id, InitialMin, InitialMax, RepeatMin(only if it repeats), RepeatMax(only if it repeats), chance
     SMART_ACTION_PLAYMOVIE                          = 68,     // entry
@@ -732,7 +713,7 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
     SMART_ACTION_FOLLOW_GROUP                       = 230,    // followState, followType, dist
     SMART_ACTION_SET_ORIENTATION_TARGET             = 231,    // type, target_type, target_param1, target_param2, target_param3, target_param4
-    SMART_ACTION_WAYPOINT_DATA_START                = 232,    // pathId, repeat
+    SMART_ACTION_WAYPOINT_START                     = 232,    // pathId, repeat, pathSource
     SMART_ACTION_WAYPOINT_DATA_RANDOM               = 233,    // pathId1, pathId2, repeat
     SMART_ACTION_MOVEMENT_STOP                      = 234,    //
     SMART_ACTION_MOVEMENT_PAUSE                     = 235,    // timer
@@ -1482,6 +1463,7 @@ struct SmartAction
         {
             uint32 pathId;
             SAIBool repeat;
+            PathSource pathSource;
         } wpData;
 
         struct
@@ -2010,8 +1992,6 @@ public:
     static constexpr uint32 DEFAULT_PRIORITY = std::numeric_limits<uint32>::max();
 };
 
-typedef std::unordered_map<uint32, WayPoint*> WPPath;
-
 typedef std::vector<WorldObject*> ObjectVector;
 
 class ObjectGuidVector
@@ -2059,7 +2039,7 @@ public:
 
     void LoadFromDB();
 
-    WPPath* GetPath(uint32 id)
+    WaypointPath* GetPath(uint32 id)
     {
         if (waypoint_map.find(id) != waypoint_map.end())
             return waypoint_map[id];
@@ -2067,7 +2047,7 @@ public:
     }
 
 private:
-    std::unordered_map<uint32, WPPath*> waypoint_map;
+    std::unordered_map<uint32, WaypointPath*> waypoint_map;
 };
 
 // all events for a single entry

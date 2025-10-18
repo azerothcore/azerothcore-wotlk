@@ -60,7 +60,7 @@ struct npc_partygoer_pather : public ScriptedAI
             switch (eventId)
             {
             case EVENT_PATH:
-                me->GetMotionMaster()->MovePath(_path, false);
+                me->GetMotionMaster()->MoveWaypoint(_path, false);
                 break;
             case EVENT_RANDOM_ACTION_PATHER:
             {

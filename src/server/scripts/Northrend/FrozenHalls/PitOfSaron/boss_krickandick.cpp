@@ -369,7 +369,7 @@ public:
                     if (pInstance)
                     {
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 10, false);
+                            c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 10, false);
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_2 : SAY_SYLVANAS_KRICK_2);
                     }
@@ -440,7 +440,7 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                         {
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_3 : SAY_SYLVANAS_KRICK_3);
-                            c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 11, false);
+                            c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 11, false);
                         }
                     }
                     me->setActive(false);

@@ -108,7 +108,7 @@ public:
                 {
                     c->RemoveAura(46598);
                     c->GetMotionMaster()->Clear();
-                    c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 18, true);
+                    c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 18, true);
                 }
                 me->SetHomePosition(exitPos);
                 me->GetMotionMaster()->MoveJump(exitPos, 10.0f, 2.0f);

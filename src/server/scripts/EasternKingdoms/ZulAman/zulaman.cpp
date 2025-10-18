@@ -400,7 +400,7 @@ struct npc_harrison_jones : public ScriptedAI
             Talk(SAY_HARRISON_0);
             scheduler.Schedule(2s, [this](TaskContext /*task*/)
             {
-                me->GetMotionMaster()->MovePath(HARRISON_MOVE_1, false);
+                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_1, false);
             });
         }
     }
@@ -448,7 +448,7 @@ struct npc_harrison_jones : public ScriptedAI
             // Players are Now Saved to instance at SPECIAL (Player should be notified?)
             scheduler.Schedule(500ms, [this](TaskContext /*task*/)
             {
-                me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
+                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_2, false);
             });
         }
     }
@@ -521,7 +521,7 @@ struct npc_harrison_jones : public ScriptedAI
             {
                 DoCastSelf(SPELL_STEALTH);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
+                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_3, false);
             });
         }
     }
@@ -592,7 +592,7 @@ struct npc_amanishi_lookout : public NullCreatureAI
             Talk(SAY_INVADERS);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUnitFlag(UNIT_FLAG_RENAME);
-            me->GetMotionMaster()->MovePath(PATH_LOOKOUT, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_LOOKOUT, false);
         }
     }
 

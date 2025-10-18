@@ -126,7 +126,7 @@ public:
                 Talk(SAY_QUEST_ACCEPTED);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
-                me->GetMotionMaster()->MovePath(PATH_ESCORT, false);
+                me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
             }
         }
 
