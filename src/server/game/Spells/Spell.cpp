@@ -2392,7 +2392,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
             targetInfo.reflectResult = SPELL_MISS_PARRY;
 
         // Increase time interval for reflected spells by 1.5
-        m_caster->m_Events.AddEvent(new ReflectEvent(m_caster, targetInfo.targetGUID, m_spellInfo), m_caster->m_Events.CalculateTime(targetInfo.timeDelay));
+        m_caster->m_Events.AddEventAtOffset(new ReflectEvent(m_caster, targetInfo.targetGUID, m_spellInfo), Milliseconds(targetInfo.timeDelay));
         targetInfo.timeDelay += targetInfo.timeDelay >> 1;
 
         m_spellFlags |= SPELL_FLAG_REFLECTED;
@@ -3439,7 +3439,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     // create and add update event for this spell
     _spellEvent = new SpellEvent(this);
-    m_caster->m_Events.AddEvent(_spellEvent, m_caster->m_Events.CalculateTime(1));
+    m_caster->m_Events.AddEventAtOffset(_spellEvent, 1ms);
 
     if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_SPELL, m_spellInfo->Id, m_caster))
     {
@@ -8166,7 +8166,7 @@ bool SpellEvent::IsDeletable() const
     return m_Spell->IsDeletable();
 }
 
-bool ReflectEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool ReflectEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     Unit* target = ObjectAccessor::GetUnit(*_caster, _targetGUID);
     if (target && _caster->IsInMap(target))

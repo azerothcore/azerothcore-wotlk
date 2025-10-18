@@ -157,8 +157,8 @@ public:
                                     orc->AI()->Talk(SAY_BLACKHAND_DOOMED);
                                 }
 
-                                orc->m_Events.AddEvent(new OrcMoveEvent(orc), me->m_Events.CalculateTime(3 * IN_MILLISECONDS));
-                                orc->m_Events.AddEvent(new OrcDeathEvent(orc), me->m_Events.CalculateTime(9 * IN_MILLISECONDS));
+                                orc->m_Events.AddEventAtOffset(new OrcMoveEvent(orc), 3s);
+                                orc->m_Events.AddEventAtOffset(new OrcDeathEvent(orc), 9s);
                             }
                         }
                     }
