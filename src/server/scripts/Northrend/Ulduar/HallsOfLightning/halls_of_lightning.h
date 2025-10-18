@@ -45,11 +45,6 @@ enum HoLDataTypes
 
 enum HoLNPCs
 {
-    NPC_BJARNGRIM             = 28586,
-    NPC_VOLKHAN               = 28587,
-    NPC_IONAR                 = 28546,
-    NPC_LOKEN                 = 28923,
-
     NPC_TITANIUM_THUNDERER    = 28965,
     NPC_TITANIUM_SIEGEBREAKER = 28961
 };
