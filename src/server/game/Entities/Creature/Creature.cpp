@@ -2159,12 +2159,12 @@ void Creature::Respawn(bool force)
     }
 }
 
-void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
+void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnTimer)
 {
-    if (timeMSToDespawn)
+    if (timeMSToDespawn > 0ms)
     {
         ForcedDespawnDelayEvent* pEvent = new ForcedDespawnDelayEvent(*this, forceRespawnTimer);
-        m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
+        m_Events.AddEventAtOffset(pEvent, timeMSToDespawn);
         return;
     }
 
@@ -2182,9 +2182,9 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
 void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0ms*/, Seconds forcedRespawnTimer /*= 0s*/)
 {
     if (TempSummon* summon = this->ToTempSummon())
-        summon->UnSummon(msTimeToDespawn.count());
+        summon->UnSummon(msTimeToDespawn);
     else
-        ForcedDespawn(msTimeToDespawn.count(), forcedRespawnTimer);
+        ForcedDespawn(msTimeToDespawn, forcedRespawnTimer);
 }
 
 void Creature::DespawnOnEvade(Seconds respawnDelay)
@@ -2464,7 +2464,7 @@ void Creature::CallAssistance(Unit* target /*= nullptr*/)
                     e->AddAssistant((*assistList.begin())->GetGUID());
                     assistList.pop_front();
                 }
-                m_Events.AddEvent(e, m_Events.CalculateTime(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY)));
+                m_Events.AddEventAtOffset(e, Milliseconds(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY)));
             }
         }
     }
@@ -3762,7 +3762,7 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
         }
 
         TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);
-        m_Events.AddEvent(pEvent, m_Events.CalculateTime(duration.count()));
+        m_Events.AddEventAtOffset(pEvent, duration);
     }
 }
 

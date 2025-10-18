@@ -1383,7 +1383,7 @@ class spell_pos_slave_trigger_closest : public SpellScript
                         {
                             c->DespawnOrUnsummon(7s);
                             c->AI()->Talk(0, p);
-                            c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
+                            c->m_Events.AddEventAtOffset(new SlaveRunEvent(*c), 3s);
                         }
                     }
             }

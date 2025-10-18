@@ -193,7 +193,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
                                 duration = cooldown;
                                 aura = SPELL_AURA_POSTMAN_S + i;
                                 _state = argentPonyService[TEAM_ALLIANCE][i];
-                                me->ToTempSummon()->UnSummon(duration);
+                                me->ToTempSummon()->UnSummon(Milliseconds(duration));
                                 break;
                             }
                         }
@@ -204,7 +204,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
                                 duration = cooldown * IN_MILLISECONDS;
                                 aura = SPELL_AURA_BANK_G + i;
                                 _state = argentPonyService[TEAM_HORDE][i];
-                                me->ToTempSummon()->UnSummon(duration);
+                                me->ToTempSummon()->UnSummon(Milliseconds(duration));
                                 break;
                             }
                         }
