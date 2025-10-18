@@ -368,8 +368,8 @@ public:
 
 void AddSC_boss_hadronox()
 {
-    RegisterCreatureAI(boss_hadronox);
-    RegisterCreatureAI(npc_anub_ar_crusher);
+    RegisterAzjolNerubCreatureAI(boss_hadronox);
+    RegisterAzjolNerubCreatureAI(npc_anub_ar_crusher);
     RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion_aura", 15'000, SPELL_SUMMON_ANUBAR_CHAMPION);
     RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer_aura", 10'000, SPELL_SUMMON_ANUBAR_NECROMANCER);
     RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend_aura", 5'000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
