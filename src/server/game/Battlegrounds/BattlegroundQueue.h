@@ -159,10 +159,9 @@ private:
         uint32 playerCount = 0;
     };
 
-    void BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPlayers);
-    float CalculateGroupAverageMMR(GroupQueueInfo* group);
-    float CalculateGroupAverageGearScore(GroupQueueInfo* group);
     uint32 GetGroupQueueTime(GroupQueueInfo* group) const;
+    GroupPlayerCache ResolveGroupPlayers(GroupQueueInfo* group);
+    void BalanceTeamsByMMR(GroupsQueueType& groups, uint32 maxPlayers);
 };
 
 /*
