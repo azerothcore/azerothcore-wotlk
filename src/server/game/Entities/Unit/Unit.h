@@ -1297,6 +1297,10 @@ public:
 
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
 
+    int32 GetHighestExclusiveSameEffectSpellGroupValue(AuraEffect const* aurEff, AuraType auraType, bool checkMiscValue = false, int32 miscValue = 0) const;
+    bool IsHighestExclusiveAura(Aura const* aura, bool removeOtherAuraApplications = false);
+    bool IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType auraType, int32 effectAmount, uint8 auraEffectMask, bool removeOtherAuraApplications = false);
+
     // aura apply/remove helpers - you should better not use these
     Aura* _TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty, bool periodicReset = false);
     void _AddAura(UnitAura* aura, Unit* caster);
@@ -1306,7 +1310,7 @@ public:
     void _UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMode);
     void _UnapplyAura(AuraApplication* aurApp, AuraRemoveMode removeMode);
     void _RemoveNoStackAuraApplicationsDueToAura(Aura* aura);
-    void _RemoveNoStackAurasDueToAura(Aura* aura);
+    void _RemoveNoStackAurasDueToAura(Aura* aura, bool owned);
     bool _IsNoStackAuraDueToAura(Aura* appliedAura, Aura* existingAura) const;
     void _RegisterAuraEffect(AuraEffect* aurEff, bool apply);
 
