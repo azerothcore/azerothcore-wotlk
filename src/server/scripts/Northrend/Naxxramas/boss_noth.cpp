@@ -23,6 +23,9 @@
 
 using namespace Noth;
 
+// no custom changes has been made for mod-playerbot other then placing
+// the impl in a header file
+
 void AddSC_boss_noth()
 {
     new boss_noth();

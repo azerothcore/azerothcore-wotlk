@@ -26,6 +26,9 @@
 
 using namespace Gluth;
 
+// no custom changes has been made for mod-playerbot other then placing
+// the impl in a header file
+
 void AddSC_boss_gluth()
 {
     new boss_gluth();
