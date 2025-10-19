@@ -939,7 +939,7 @@ void MotionMaster::MoveKnockbackFromForPlayer(float srcX, float srcY, float spee
     init.SetOrientationFixed(true);
     init.SetVelocity(speedXY);
     init.Launch();
-    Mutate(new EffectMovementGenerator(0), MOTION_SLOT_CONTROLLED);
+    Mutate(new EffectMovementGenerator(init, 0), MOTION_SLOT_CONTROLLED);
 }
 
 // Similar to MovePoint except setting orientationInversed
@@ -951,12 +951,12 @@ void MotionMaster::MovePointBackwards(uint32 id, float x, float y, float z, bool
     if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) targeted point (Id: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Player>(id, x, y, z, 0.0f, orientation, nullptr, generatePath, forceDestination, ObjectGuid::Empty, true), slot);
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z,FORCED_MOVEMENT_NONE,0.0f,orientation,nullptr,generatePath,forceDestination), slot);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) targeted point (ID: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, 0.0f, orientation, nullptr, generatePath, forceDestination, ObjectGuid::Empty, true), slot);
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, FORCED_MOVEMENT_NONE, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
     }
 }
 

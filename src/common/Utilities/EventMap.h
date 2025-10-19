@@ -98,6 +98,32 @@ public:
     }
 
     /**
+    * @return Current internal time as uint32 milliseconds
+    * 
+    * was removed in core https://github.com/azerothcore/azerothcore-wotlk/pull/23121,
+    * but still required atm for mod-playerbot.
+    */
+    uint32 GetTimer() const
+    {
+        return static_cast<uint32>(duration_cast<Milliseconds>(_time.time_since_epoch()).count());
+    }
+
+    /**
+    * @return Time of found even
+    *
+    * was removed in core https://github.com/azerothcore/azerothcore-wotlk/pull/23121,
+    * but still required atm for mod-playerbot.
+    */
+    uint32 GetNextEventTime(uint16 eventId) const
+    {
+        auto timeUntil = GetTimeUntilEvent(eventId);
+        if (timeUntil == Milliseconds::max())
+            return 0;
+
+        return GetTimer() + static_cast<uint32>(timeUntil.count());
+    }
+
+    /**
     * @name SetPhase
     * @brief Sets the phase of the map (absolute).
     * @param phase Phase which should be set. Values: 1 - 8. 0 resets phase.

@@ -90,7 +90,7 @@ public:
             events.ScheduleEvent(EVENT_POISON_CLOUD, 15s);
             events.ScheduleEvent(EVENT_MUTATING_INJECTION, 20s);
             events.ScheduleEvent(EVENT_SLIME_SPRAY, 10s);
-            events.ScheduleEvent(EVENT_BERSERK, RAID_MODE(720000, 540000));
+            events.ScheduleEvent(EVENT_BERSERK, RAID_MODE(720s, 540s));
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
@@ -165,7 +165,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_MUTATING_INJECTION, false);
                     }
-                    events.RepeatEvent(6000 + uint32(120 * me->GetHealthPct()));
+                    events.Repeat(Milliseconds(6000 + uint32(120 * me->GetHealthPct())));
                     break;
             }
             DoMeleeAttackIfReady();
@@ -278,6 +278,7 @@ class spell_grobbulus_mutating_injection_aura : public AuraScript
         AfterEffectRemove += AuraEffectRemoveFn(spell_grobbulus_mutating_injection_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
+
 
 }
 

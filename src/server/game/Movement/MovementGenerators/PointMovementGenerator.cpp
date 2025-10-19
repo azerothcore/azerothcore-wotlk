@@ -48,7 +48,7 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
     i_recalculateSpeed = false;
     Movement::MoveSplineInit init(unit);
     /// Added by mod-playerbots
-    if (_orientationInversed)
+    if (_reverseOrientation)
         init.SetOrientationInversed();
     /// End added
     if (m_precomputedPath.size() > 2) // pussywizard: for charge
