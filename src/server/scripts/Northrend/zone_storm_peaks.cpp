@@ -469,7 +469,7 @@ public:
             if (startPath)
             {
                 startPath = false;
-                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
+                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
             }
             if (setCharm)
             {
@@ -841,7 +841,7 @@ public:
                             {
                                 Talk(TEXT_EMOTE, passenger);
 
-                                me->GetMotionMaster()->MovePath(NPC_DRAKE, FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
+                                me->GetMotionMaster()->MovePath(NPC_DRAKE, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
                             }
                     }
                     else

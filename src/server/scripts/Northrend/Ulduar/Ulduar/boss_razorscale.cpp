@@ -354,7 +354,7 @@ public:
             {
                 me->StopMoving();
                 startPath = false;
-                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
+                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
             }
 
             if (!UpdateVictim())
