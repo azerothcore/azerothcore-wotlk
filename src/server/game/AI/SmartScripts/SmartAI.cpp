@@ -155,7 +155,6 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
             uint32 length = (mWayPoints->size() - mCurrentWPID) * size;
 
-            uint32 cnt = 0;
             uint32 wpCounter = mCurrentWPID;
 
             auto itr = mWayPoints->find(wpCounter++);
