@@ -31,10 +31,22 @@
 
 void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
 {
-    if (!path_id)
-        path_id = creature->GetWaypointPath();
+    switch (i_pathSource)
+    {
+        case PathSource::WAYPOINT_MGR:
+        {
+            if (!path_id)
+                path_id = creature->GetWaypointPath();
 
-    i_path = sWaypointMgr->GetPath(path_id);
+            i_path = sWaypointMgr->GetPath(path_id);
+            break;
+        }
+        case PathSource::SMART_WAYPOINT_MGR:
+        {
+            i_path = sWaypointMgr->GetPath(path_id);
+            break;
+        }
+    }
 
     if (!i_path)
     {

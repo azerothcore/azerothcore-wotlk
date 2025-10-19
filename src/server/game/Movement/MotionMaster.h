@@ -91,8 +91,8 @@ enum ForcedMovement
 
 enum class PathSource
 {
-    SMART_WAYPOINT_MGR,
-    WAYPOINT_MGR,
+    WAYPOINT_MGR        = 0,
+    SMART_WAYPOINT_MGR  = 1,
 };
 
 struct ChaseRange
