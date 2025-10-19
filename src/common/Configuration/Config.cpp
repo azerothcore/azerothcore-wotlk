@@ -412,8 +412,14 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
                 LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable\n\nYour server cannot start without this option!",
                     name, _filename, name, Acore::ToString(def), envVarName);
             else
+            {
+                std::string configs = _filename;
+                if (!_moduleConfigFiles.empty())
+                    configs += " or module config";
+
                 LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
-                    name, _filename, name, Acore::ToString(def), envVarName);
+                    name, configs, name, def, envVarName);
+            }
         }
         return def;
     }
@@ -471,8 +477,14 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
                 LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.\n\nYour server cannot start without this option!",
                     name, _filename, name, def, envVarName);
             else
+            {
+                std::string configs = _filename;
+                if (!_moduleConfigFiles.empty())
+                    configs += " or module config";
+
                 LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
-                    name, _filename, name, def, envVarName);
+                    name, configs, name, def, envVarName);
+            }
         }
 
         return def;
@@ -588,38 +600,13 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
 
     // Start loading module configs
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
-    bool isExistDefaultConfig = true;
-    bool isExistDistConfig = true;
 
-    for (auto const& distFileName : _additonalFiles)
+    for (auto const& fileName : _additonalFiles)
     {
-        std::string defaultFileName = distFileName;
+        bool isExistConfig = LoadAdditionalFile(moduleConfigPath + fileName, false, isReload);
 
-        if (!defaultFileName.empty())
-        {
-            defaultFileName.erase(defaultFileName.end() - 5, defaultFileName.end());
-        }
-
-        // Load .conf.dist config
-        isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName, false, isReload);
-
-        if (!isReload && !isExistDistConfig)
-        {
-            LOG_FATAL("server.loading", "> ConfigMgr::LoadModulesConfigs: Not found original config '{}'. Stop loading", distFileName);
-            ABORT();
-        }
-
-        // Load .conf config
-        isExistDefaultConfig = LoadAdditionalFile(moduleConfigPath + defaultFileName, true, isReload);
-
-        if (isExistDefaultConfig && isExistDistConfig)
-        {
-            _moduleConfigFiles.emplace_back(defaultFileName);
-        }
-        else if (!isExistDefaultConfig && isExistDistConfig)
-        {
-            _moduleConfigFiles.emplace_back(distFileName);
-        }
+        if (isExistConfig)
+            _moduleConfigFiles.emplace_back(fileName);
     }
 
     if (isNeedPrintInfo)

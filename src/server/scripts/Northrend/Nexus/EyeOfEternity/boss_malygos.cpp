@@ -471,7 +471,7 @@ public:
                         me->SetDisableGravity(true);
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
-                        events.DelayEvents(25000, 1); // don't delay berserk (group 0)
+                        events.DelayEvents(25s, 1); // don't delay berserk (group 0)
                     }
                     break;
                 case EVENT_VORTEX_FLY_TO_CENTER:
@@ -521,7 +521,7 @@ public:
                                             }
                                             //pPlayer->ClearUnitState(UNIT_STATE_ONVEHICLE);
 
-                                            Movement::MoveSplineInit init(pPlayer);
+                                            Movement::MoveSplineInit init(pPlayer); // TODO: has to be removed and handled with vehicle exit and vehicle enter code
                                             init.MoveTo(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ());
                                             init.SetFacing(pPlayer->GetOrientation());
                                             init.SetTransportExit();
@@ -674,7 +674,7 @@ public:
                 case EVENT_CHECK_TRASH_DEAD:
                     {
                         if (me->FindNearestCreature(NPC_SCION_OF_ETERNITY, 250.0f, true) || me->FindNearestCreature(NPC_NEXUS_LORD, 250.0f, true))
-                            events.RepeatEvent(3000);
+                            events.Repeat(3s);
                         else
                         {
                             me->SendMeleeAttackStop();
@@ -727,7 +727,7 @@ public:
                                     {
                                         c->SetFaction(pPlayer->GetFaction());
                                         //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
-                                        c->m_Events.AddEvent(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), c->m_Events.CalculateTime(500));
+                                        c->m_Events.AddEventAtOffset(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), 500ms);
                                         AttackStart(c);
                                     }
                                 }
@@ -803,10 +803,10 @@ public:
             {
                 case NPC_ARCANE_OVERLOAD:
                     summon->CastSpell(summon, SPELL_ARCANE_OVERLOAD_DMG, true);
-                    summon->DespawnOrUnsummon(45000);
+                    summon->DespawnOrUnsummon(45s);
                     break;
                 case NPC_STATIC_FIELD:
-                    summon->DespawnOrUnsummon(20000);
+                    summon->DespawnOrUnsummon(20s);
                     break;
             }
         }
@@ -898,9 +898,9 @@ public:
             {
                 Player* plr = pass->ToPlayer();
                 float speed = plr->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1.0f * 0.001f);
-                plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
+                plr->SetDisableGravity(false); // packet only would lead to issues elsewhere
+                plr->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
-                plr->SetDisableGravity(false, true);
                 plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
 
                 sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
@@ -998,7 +998,7 @@ public:
                     MoveTimer = 0;
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.05f, 7.0f);
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.05f, FORCED_MOVEMENT_NONE, 7.0f);
                     break;
             }
         }
@@ -1013,12 +1013,11 @@ public:
                     MoveTimer = 0;
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 100.0f);
-                    me->SetPosition(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), me->GetOrientation());
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
                     me->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->RemoveAura(SPELL_POWER_SPARK_VISUAL);
                     me->CastSpell(me, SPELL_POWER_SPARK_GROUND_BUFF, true);
-                    me->DespawnOrUnsummon(60000);
+                    me->DespawnOrUnsummon(60s);
                 }
             }
         }
@@ -1459,14 +1458,14 @@ public:
             else if (pass && pass->IsPlayer() && me->IsAlive())
             {
                 me->SetDisplayId(11686); // prevents nasty falling animation at despawn
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             me->SetDisplayId(11686); // prevents nasty falling animation at despawn
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
     };
 };

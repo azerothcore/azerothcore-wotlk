@@ -606,7 +606,7 @@ public:
                     if (Creature* argelmach = instance->GetCreature(ArgelmachGUID))
                     {
                         argelmach->HandleEmoteCommand(EMOTE_ONESHOT_SHOUT);
-                        argelmach->m_Events.AddEvent(new RestoreAttack(argelmach), argelmach->m_Events.CalculateTime(3000));
+                        argelmach->m_Events.AddEventAtOffset(new RestoreAttack(argelmach), 3s);
 
                         for (ObjectGuid const& argelmachAddGUID : ArgelmachAdds)
                         {

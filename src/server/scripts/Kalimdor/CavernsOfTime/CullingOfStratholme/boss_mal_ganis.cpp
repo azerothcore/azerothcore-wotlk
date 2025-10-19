@@ -80,17 +80,17 @@ public:
             if (finished)
             {
                 Talk(SAY_OUTRO);
-                me->DespawnOrUnsummon(20000);
+                me->DespawnOrUnsummon(20s);
             }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SPELL_CARRION_SWARM, 6000);
-            events.ScheduleEvent(EVENT_SPELL_MIND_BLAST, 11000);
-            events.ScheduleEvent(EVENT_SPELL_SLEEP, 20000);
-            events.ScheduleEvent(EVENT_SPELL_VAMPIRIC_TOUCH, 15000);
+            events.ScheduleEvent(EVENT_SPELL_CARRION_SWARM, 6s);
+            events.ScheduleEvent(EVENT_SPELL_MIND_BLAST, 11s);
+            events.ScheduleEvent(EVENT_SPELL_SLEEP, 20s);
+            events.ScheduleEvent(EVENT_SPELL_VAMPIRIC_TOUCH, 15s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -146,22 +146,22 @@ public:
             {
                 case EVENT_SPELL_CARRION_SWARM:
                     me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_CARRION_SWARM_N, SPELL_CARRION_SWARM_H), false);
-                    events.RepeatEvent(7000);
+                    events.Repeat(7s);
                     break;
                 case EVENT_SPELL_MIND_BLAST:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_MIND_BLAST_N, SPELL_MIND_BLAST_H), false);
-                    events.RepeatEvent(6000);
+                    events.Repeat(6s);
                     break;
                 case EVENT_SPELL_SLEEP:
                     Talk(SAY_SLEEP);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, DUNGEON_MODE(SPELL_SLEEP_N, SPELL_SLEEP_H), false);
-                    events.RepeatEvent(17000);
+                    events.Repeat(17s);
                     break;
                 case EVENT_SPELL_VAMPIRIC_TOUCH:
                     me->CastSpell(me, SPELL_VAMPIRIC_TOUCH, true);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     break;
             }
 

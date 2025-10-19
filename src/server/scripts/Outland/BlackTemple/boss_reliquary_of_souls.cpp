@@ -107,7 +107,7 @@ public:
             {
                 summoner->GetAI()->DoAction(_action);
                 _owner.SetStandState(UNIT_STAND_STATE_SUBMERGED);
-                _owner.DespawnOrUnsummon(200);
+                _owner.DespawnOrUnsummon(200ms);
             }
         return true;
     }
@@ -284,7 +284,7 @@ public:
             if (type != POINT_MOTION_TYPE || id != POINT_GO_BACK)
                 return;
 
-            me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_SUFFERING), me->m_Events.CalculateTime(1500));
+            me->m_Events.AddEventAtOffset(new SuckBackEvent(*me, ACTION_ESSENCE_OF_SUFFERING), 1500ms);
             me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
@@ -301,7 +301,7 @@ public:
                     Talk(SUFF_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), false);
+                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), FORCED_MOVEMENT_NONE, 0.f, false);
                     scheduler.CancelAll();
                 }
             }
@@ -392,7 +392,7 @@ public:
             if (type != POINT_MOTION_TYPE || id != POINT_GO_BACK)
                 return;
 
-            me->m_Events.AddEvent(new SuckBackEvent(*me, ACTION_ESSENCE_OF_DESIRE), me->m_Events.CalculateTime(1500));
+            me->m_Events.AddEventAtOffset(new SuckBackEvent(*me, ACTION_ESSENCE_OF_DESIRE), 1500ms);
             me->SetTarget();
             me->SetFacingTo(M_PI / 2.0f);
         }
@@ -408,7 +408,7 @@ public:
                     Talk(DESI_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), false);
+                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), FORCED_MOVEMENT_NONE, 0.f, false);
                     scheduler.CancelAll();
                 }
             }

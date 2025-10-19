@@ -58,7 +58,7 @@ public:
                 case NPC_HIGHBORNE_SUMMONER:
                     if (_pylonsState == ALL_PYLONS_OFF)
                     {
-                        creature->DespawnOrUnsummon(5000);
+                        creature->DespawnOrUnsummon(5s);
                     }
                     else
                     {
