@@ -153,8 +153,6 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 length = (mWayPoints->size() - mCurrentWPID) * size;
-
             uint32 wpCounter = mCurrentWPID;
 
             auto itr = mWayPoints->find(wpCounter++);
