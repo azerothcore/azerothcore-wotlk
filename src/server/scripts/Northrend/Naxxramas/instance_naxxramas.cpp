@@ -745,7 +745,7 @@ public:
                     if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, entry.Start, TEMPSUMMON_TIMED_DESPAWN, entry.DespawnTime))
                     {
                         cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, entry.End, false);
+                        cr->GetMotionMaster()->MovePoint(0, entry.End, FORCED_MOVEMENT_NONE, 0.f, false);
                     }
 
                 _events.Repeat(5s);

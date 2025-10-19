@@ -26,6 +26,7 @@
 #include "ItemTemplate.h"
 #include "MotionMaster.h"
 #include "Object.h"
+#include "PetDefines.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "SpellDefines.h"
@@ -1677,9 +1678,7 @@ public:
     void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 
     void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint32 TransitTime, SplineFlags sf = SPLINEFLAG_WALK_MODE); // pussywizard: need to just send packet, with no movement/spline
-    void MonsterMoveWithSpeed(float x, float y, float z, float speed);
-    //void SetFacing(float ori, WorldObject* obj = nullptr);
-    //void SendMonsterMove(float NewPosX, float NewPosY, float NewPosZ, uint8 type, uint32 MovementFlags, uint32 Time, Player* player = nullptr);
+    void MonsterMoveWithSpeed(float x, float y, float z, float speed); // Not to be used outside of cinematics
 
     virtual bool SetWalk(bool enable);
     virtual bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true);
@@ -1921,8 +1920,8 @@ public:
 
     void SetInFront(WorldObject const* target);
     void SetFacingTo(float ori);
-    void SetFacingToObject(WorldObject* object);
-    void SetTimedFacingToObject(WorldObject* object, uint32 time); // Reset to home orientation after given time
+    // <timed>Reset to home orientation after given time
+    void SetFacingToObject(WorldObject* object, Milliseconds timed = 0ms);
 
     bool isInAccessiblePlaceFor(Creature const* c) const;
     bool isInFrontInMap(Unit const* target, float distance, float arc = M_PI) const;
@@ -1964,9 +1963,10 @@ public:
     void SendPlaySpellVisual(uint32 id);
     void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
 
-    void SendPetActionFeedback (uint8 msg);
-    void SendPetTalk (uint32 pettalk);
-    void SendPetAIReaction(ObjectGuid guid);
+    void SendPetActionFeedback(uint8 msg) const;
+    void SendPetActionSound(PetAction action) const;
+    void SendPetDismissSound() const;
+    void SendPetAIReaction(ObjectGuid guid) const;
 
     void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo);
 

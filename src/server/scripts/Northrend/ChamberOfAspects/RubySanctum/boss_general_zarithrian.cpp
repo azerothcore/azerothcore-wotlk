@@ -210,7 +210,8 @@ public:
         {
             _lavaGoutCount = 0;
             AddWaypoints();
-            Start(true, true);
+            me->SetWalk(false);
+            Start(true);
         }
 
         void JustEngagedWith(Unit* /*who*/) override

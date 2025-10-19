@@ -617,7 +617,7 @@ public:
                 {
                     case EVENT_WALK_TO_MUTTON:
                         me->SetWalk(true);
-                        me->GetMotionMaster()->MovePoint(1, x, y, z, true);
+                        me->GetMotionMaster()->MovePoint(1, x, y, z);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                         break;
