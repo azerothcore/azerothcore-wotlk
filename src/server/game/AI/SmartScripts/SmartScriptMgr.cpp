@@ -626,8 +626,8 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_CORPSE_REMOVED: return NO_PARAMS;
             case SMART_EVENT_AI_INIT: return NO_PARAMS;
             case SMART_EVENT_DATA_SET: return sizeof(SmartEvent::dataSet);
-            case SMART_EVENT_WAYPOINT_START: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_REACHED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_START: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_REACHED: return sizeof(SmartEvent::waypoint);
             case SMART_EVENT_TRANSPORT_ADDPLAYER: return NO_PARAMS;
             case SMART_EVENT_TRANSPORT_ADDCREATURE: return sizeof(SmartEvent::transportAddCreature);
             case SMART_EVENT_TRANSPORT_REMOVE_PLAYER: return NO_PARAMS;
@@ -642,10 +642,10 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_TEXT_OVER: return sizeof(SmartEvent::textOver);
             case SMART_EVENT_RECEIVE_HEAL: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_JUST_SUMMONED: return NO_PARAMS;
-            case SMART_EVENT_WAYPOINT_PAUSED: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_RESUMED: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_STOPPED: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_ENDED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_PAUSED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_RESUMED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_STOPPED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_ENDED: return sizeof(SmartEvent::waypoint);
             case SMART_EVENT_TIMED_EVENT_TRIGGERED: return sizeof(SmartEvent::timedEvent);
             case SMART_EVENT_UPDATE: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_LINK: return NO_PARAMS;
@@ -678,8 +678,8 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_AREA_RANGE: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_SUMMONED_UNIT_EVADE: return sizeof(SmartEvent::summoned);
-            case SMART_EVENT_WAYPOINT_DATA_REACHED: return sizeof(SmartEvent::wpData);
-            case SMART_EVENT_WAYPOINT_DATA_ENDED: return sizeof(SmartEvent::wpData);
+            case SMART_EVENT_WAYPOINT_REACHED: return sizeof(SmartEvent::wpData);
+            case SMART_EVENT_WAYPOINT_ENDED: return sizeof(SmartEvent::wpData);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -1417,19 +1417,19 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_QUEST_REWARDED:
             case SMART_EVENT_QUEST_FAIL:
             case SMART_EVENT_JUST_SUMMONED:
-            case SMART_EVENT_WAYPOINT_START:
-            case SMART_EVENT_WAYPOINT_REACHED:
-            case SMART_EVENT_WAYPOINT_PAUSED:
-            case SMART_EVENT_WAYPOINT_RESUMED:
-            case SMART_EVENT_WAYPOINT_STOPPED:
-            case SMART_EVENT_WAYPOINT_ENDED:
+            case SMART_EVENT_ESCORT_START:
+            case SMART_EVENT_ESCORT_REACHED:
+            case SMART_EVENT_ESCORT_PAUSED:
+            case SMART_EVENT_ESCORT_RESUMED:
+            case SMART_EVENT_ESCORT_STOPPED:
+            case SMART_EVENT_ESCORT_ENDED:
             case SMART_EVENT_GOSSIP_SELECT:
             case SMART_EVENT_GOSSIP_HELLO:
             case SMART_EVENT_JUST_CREATED:
             case SMART_EVENT_FOLLOW_COMPLETED:
             case SMART_EVENT_ON_SPELLCLICK:
-            case SMART_EVENT_WAYPOINT_DATA_REACHED:
-            case SMART_EVENT_WAYPOINT_DATA_ENDED:
+            case SMART_EVENT_WAYPOINT_REACHED:
+            case SMART_EVENT_WAYPOINT_ENDED:
                 break;
             default:
                 LOG_ERROR("sql.sql", "SmartAIMgr: Not handled event_type({}), Entry {} SourceType {} Event {} Action {}, skipped.", e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
