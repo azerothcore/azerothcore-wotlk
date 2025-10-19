@@ -28,6 +28,7 @@
 #include "Spell.h"
 #include "Transport.h"
 #include "World.h"
+#include "SmartScriptMgr.h"
 
 void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
 {
@@ -43,7 +44,7 @@ void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
         }
         case PathSource::SMART_WAYPOINT_MGR:
         {
-            i_path = sWaypointMgr->GetPath(path_id);
+            i_path = sSmartWaypointMgr->GetPath(path_id);
             break;
         }
     }

@@ -101,6 +101,7 @@ void SmartWaypointMgr::LoadFromDB()
         data.z = z;
         data.orientation = o;
         data.delay = delay;
+        data.move_type = WAYPOINT_MOVE_TYPE_MAX;
         (*waypoint_map[entry]).emplace(id, data);
 
         last_entry = entry;
