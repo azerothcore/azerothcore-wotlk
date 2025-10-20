@@ -23,9 +23,6 @@
 
 namespace MMAP
 {
-    static char const* const MAP_FILE_NAME_FORMAT = "{}/mmaps/{:03}.mmap";
-    static char const* const TILE_FILE_NAME_FORMAT = "{}/mmaps/{:03}{:02}{:02}.mmtile";
-
     // ######################## MMapMgr ########################
     MMapMgr::~MMapMgr()
     {

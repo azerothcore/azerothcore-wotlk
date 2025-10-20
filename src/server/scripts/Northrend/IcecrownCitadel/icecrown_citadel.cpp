@@ -934,7 +934,8 @@ public:
                 case EVENT_START_PATHING:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToAll(false);
-                    Start(true, true);
+                    me->SetWalk(false);
+                    Start(true);
                     break;
                 case EVENT_SCOURGE_STRIKE:
                     DoCastVictim(SPELL_SCOURGE_STRIKE);
@@ -1016,15 +1017,15 @@ public:
             if (Creature* crok = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CROK_SCOURGEBANE))) // _isEventDone = true, setActive(false)
                 crok->AI()->DoAction(ACTION_RESET_EVENT);
 
-            uint64 delay = 6000;
+            Milliseconds delay = 6s;
             for (uint32 i = 0; i < 4; ++i)
                 if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
                     if (crusader->IsAlive())
                     {
                         if (crusader->GetEntry() == crusader->GetCreatureData()->id1)
                         {
-                            crusader->m_Events.AddEvent(new CaptainSurviveTalk(*crusader), crusader->m_Events.CalculateTime(delay));
-                            delay += 6000;
+                            crusader->m_Events.AddEventAtOffset(new CaptainSurviveTalk(*crusader), delay);
+                            delay += 6s;
                         }
                         else
                             Unit::Kill(crusader, crusader);
@@ -3347,7 +3348,7 @@ public:
             if (Creature* broodling = me->SummonCreature(NPC_NERUBAR_BROODLING, me->GetPositionX() + cos(o) * dist, me->GetPositionY() + std::sin(o) * dist, 250.0f, Position::NormalizeOrientation(o - M_PI)))
             {
                 broodling->CastSpell(broodling, SPELL_WEB_BEAM2, false);
-                broodling->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, broodling->GetPositionX(), broodling->GetPositionY(), 213.03f, false);
+                broodling->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, broodling->GetPositionX(), broodling->GetPositionY(), 213.03f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
             }
         }
 

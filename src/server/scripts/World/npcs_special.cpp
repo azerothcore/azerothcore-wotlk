@@ -1421,7 +1421,8 @@ public:
                                 break;
                         }
 
-                        Start(false, true);
+                        me->SetWalk(true);
+                        Start(false);
                     }
                     else
                         EnterEvadeMode();                       //something went wrong

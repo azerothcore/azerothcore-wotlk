@@ -549,7 +549,8 @@ public:
                     return;
             }
 
-            Start(false, true);
+            me->SetWalk(false);
+            Start(false);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

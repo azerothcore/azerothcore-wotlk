@@ -1041,7 +1041,7 @@ struct SmartAction
 
         struct
         {
-            SAIBool run;
+            uint32 forcedMovement;
             uint32 pathID;
             SAIBool repeat;
             uint32 quest;
@@ -1295,7 +1295,7 @@ struct SmartAction
             uint32 pathId1;
             uint32 pathId2;
             uint32 repeat;
-            uint32 run;
+            uint32 forcedMovement;
         } startClosestWaypoint;
 
         struct

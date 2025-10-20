@@ -571,7 +571,7 @@ public:
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), true);
                     pLichKing->SetVisible(true);
 
-                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, false);
+                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, FORCED_MOVEMENT_NONE, 0.f, false);
 
                 }
 
@@ -618,7 +618,7 @@ public:
                     if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
                     {
                         pLichKing->SetVisible(true);
-                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, false);
+                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, FORCED_MOVEMENT_NONE, 0.f, false);
                     }
                 events.ScheduleEvent(EVENT_INTRO_LK_2_1, 1s);
                 break;
@@ -709,7 +709,7 @@ public:
             case EVENT_INTRO_LK_5_2:
                 if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
                 {
-                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
+                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
                 break;
 
@@ -763,11 +763,11 @@ public:
                 {
                     Talk(SAY_SYLVANAS_INTRO_END);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                    me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
+                    me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_10, 1s + 500ms);
                 break;
@@ -775,7 +775,7 @@ public:
             case EVENT_INTRO_LK_10:
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, FORCED_MOVEMENT_NONE, 0.f, false);
 
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_11, 2s);
@@ -784,7 +784,7 @@ public:
             case EVENT_INTRO_LK_11:
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_12, 5s + 500ms);
                 break;
@@ -796,7 +796,7 @@ public:
                 }
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_13, 2s);
                     break;

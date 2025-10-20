@@ -92,6 +92,8 @@ jobs:
           ./acore.sh module update --all
 
       - name: Run complete installation (deps, compile, database, client-data)
+        env:
+          AC_ENABLE_ROOT_CMAKE_INSTALL: 1
         run: |
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init

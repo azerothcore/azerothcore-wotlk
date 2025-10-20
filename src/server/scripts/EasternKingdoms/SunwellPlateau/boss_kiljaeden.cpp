@@ -554,7 +554,7 @@ struct boss_kiljaeden : public BossAI
             summon->SetDisableGravity(true);
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
-            summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
+            summon->m_Events.AddEventAtOffset(new CastArmageddon(summon), 6s);
             summon->DespawnOrUnsummon(randtime(8s, 10s));
         }
     }
@@ -729,25 +729,18 @@ struct npc_kalecgos_kj : public NullCreatureAI
         if (summon->GetEntry() == NPC_SHATTERED_SUN_RIFTWAKER)
         {
             summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
-            Movement::MoveSplineInit init(summon);
+
             if (summons.size() == 1)
-            {
-                init.MoveTo(1727.08f, 656.82f, 28.37f, false, true);
-                init.SetFacing(5.14f);
-            }
+                summon->GetMotionMaster()->MovePoint(0, 1727.08f, 656.82f, 28.37f, FORCED_MOVEMENT_NONE, 0.f, 5.14f, false, true);
             else
-            {
-                init.MoveTo(1738.84f, 627.32f, 28.26f, false, true);
-                init.SetFacing(2.0f);
-            }
-            init.Launch();
+                summon->GetMotionMaster()->MovePoint(0, 1738.84f, 627.32f, 28.26f, FORCED_MOVEMENT_NONE, 0.f, 2.0f, false, true);
         }
         else if (summon->GetEntry() == NPC_SHATTRATH_PORTAL_DUMMY)
         {
             if (Creature* riftwaker = summon->FindNearestCreature(NPC_SHATTERED_SUN_RIFTWAKER, 10.0f))
                 riftwaker->CastSpell(summon, SPELL_OPEN_PORTAL_FROM_SHATTRATH, false);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 30.0f, false, true);
+            summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 30.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
         }
         else if (summon->GetEntry() == NPC_INERT_PORTAL)
             summon->CastSpell(summon, SPELL_BOSS_ARCANE_PORTAL_STATE, true);
@@ -762,7 +755,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
         {
             summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, 1710.15f, 639.23f, 27.311f, false, true);
+            summon->GetMotionMaster()->MovePoint(0, 1710.15f, 639.23f, 27.311f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
         }
         else if (summon->GetEntry() == NPC_THE_CORE_OF_ENTROPIUS)
             summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), 30.0f);
@@ -794,8 +787,8 @@ struct npc_kalecgos_kj : public NullCreatureAI
         case EVENT_SCENE_05:
             if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
             {
-                first->m_Events.AddEvent(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), first->m_Events.CalculateTime(5000));
-                first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(12000));
+                first->m_Events.AddEventAtOffset(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), 5s);
+                first->m_Events.AddEventAtOffset(new FixOrientation(first), 12s);
                 for (uint8 i = 0; i < 9; ++i)
                     if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                         follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
@@ -805,8 +798,8 @@ struct npc_kalecgos_kj : public NullCreatureAI
         case EVENT_SCENE_06:
             if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
             {
-                first->m_Events.AddEvent(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), first->m_Events.CalculateTime(5000));
-                first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(14500));
+                first->m_Events.AddEventAtOffset(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), 5s);
+                first->m_Events.AddEventAtOffset(new FixOrientation(first), 14500ms);
                 for (uint8 i = 0; i < 9; ++i)
                     if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                         follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));

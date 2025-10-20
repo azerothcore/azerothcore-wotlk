@@ -139,7 +139,7 @@ struct boss_fathomlord_karathress : public BossAI
         if (Creature* olum = instance->GetCreature(DATA_SEER_OLUM))
         {
             olum->SetWalk(true);
-            olum->GetMotionMaster()->MovePoint(0, olumWalk, false);
+            olum->GetMotionMaster()->MovePoint(0, olumWalk, FORCED_MOVEMENT_NONE, 0.f, false);
             olum->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             olum->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }

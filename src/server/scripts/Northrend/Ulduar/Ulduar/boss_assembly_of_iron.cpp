@@ -418,7 +418,7 @@ public:
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
 
-            me->m_Events.AddEvent(new CastRunesEvent(*me), me->m_Events.CalculateTime(8000));
+            me->m_Events.AddEventAtOffset(new CastRunesEvent(*me), 8s);
         }
 
         void JustReachedHome() override
@@ -805,7 +805,7 @@ public:
                 case EVENT_LIGHTNING_LAND:
                     {
                         float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, speed);
                         events.ScheduleEvent(EVENT_LAND_LAND, 1s);
                         break;
                     }

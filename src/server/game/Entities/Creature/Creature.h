@@ -505,7 +505,7 @@ protected:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
 private:
-    void ForcedDespawn(uint32 timeMSToDespawn = 0, Seconds forcedRespawnTimer = 0s);
+    void ForcedDespawn(Milliseconds timeMSToDespawn = 0ms, Seconds forcedRespawnTimer = 0s);
 
     [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;
 

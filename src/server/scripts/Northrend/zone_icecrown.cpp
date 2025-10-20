@@ -523,11 +523,8 @@ public:
                     {
                         soul->SetCanFly(true);
                         soul->SetVisible(true);
-                        Movement::MoveSplineInit init(soul);
-                        init.MoveTo(soul->GetPositionX(), soul->GetPositionY(), soul->GetPositionZ() + 5.0f);
-                        init.SetVelocity(1.0f);
-                        init.Launch();
                         soul->CastSpell(soul, 64462, true); // Drown
+                        soul->GetMotionMaster()->MovePoint(0, soul->GetPositionX(), soul->GetPositionY(), soul->GetPositionZ() + 5.0f, FORCED_MOVEMENT_NONE, 1.f);
                     }
                     events.ScheduleEvent(EVENT_SCENE_1, 6s);
                     break;
@@ -718,7 +715,7 @@ public:
                 Talk(0);
                 events.Reset();
                 summons.DespawnAll();
-                Start(false, false);
+                Start(false);
 
                 int8 i = -1;
                 std::list<Creature*> cList;

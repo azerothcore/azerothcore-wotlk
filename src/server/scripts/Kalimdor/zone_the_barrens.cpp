@@ -55,7 +55,7 @@ public:
             creature->AI()->Talk(SAY_GIL_START, player);
 
             if (npc_giltharesAI* pEscortAI = CAST_AI(npc_gilthares::npc_giltharesAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
+                pEscortAI->Start(false, player->GetGUID(), quest);
         }
         return true;
     }
@@ -528,7 +528,7 @@ public:
                     break;
                 case 18:
                     Talk(SAY_PROGRESS_1, player);
-                    SetRun();
+                    SetRun(true);
                     break;
             }
         }
@@ -594,7 +594,7 @@ public:
             creature->SetFaction(FACTION_RATCHET);
             creature->AI()->Talk(SAY_START);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_wizzlecrank_shredder::npc_wizzlecrank_shredderAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+                pEscortAI->Start(true, player->GetGUID());
         }
         return true;
     }
