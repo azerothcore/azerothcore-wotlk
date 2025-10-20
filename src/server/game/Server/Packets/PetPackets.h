@@ -20,6 +20,7 @@
 
 #include "ObjectGuid.h"
 #include "Packet.h"
+#include "G3D/Vector3.h"
 
 namespace WorldPackets
 {
@@ -93,6 +94,30 @@ namespace WorldPackets
             RequestPetInfo(WorldPacket&& packet) : ClientPacket(CMSG_REQUEST_PET_INFO, std::move(packet)) { }
 
             void Read() override { }
+        };
+
+        class PetActionSound final : public ServerPacket
+        {
+        public:
+            PetActionSound(ObjectGuid unitGUID, int32 action)
+                : ServerPacket(SMSG_PET_ACTION_SOUND, 8 + 4), UnitGUID(unitGUID), Action(action) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid UnitGUID;
+            int32 Action = 0;
+        };
+
+        class PetDismissSound final : public ServerPacket
+        {
+        public:
+            PetDismissSound(int32 modelId, G3D::Vector3 modelPosition)
+                : ServerPacket(SMSG_PET_DISMISS_SOUND, 4 + 12), ModelId(modelId), ModelPosition(modelPosition) { }
+
+            WorldPacket const* Write() override;
+
+            int32 ModelId = 0;
+            G3D::Vector3 ModelPosition;
         };
     }
 }

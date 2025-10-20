@@ -14374,6 +14374,12 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
  */
 bool Player::AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const
 {
+    {
+        GossipMenuItemsMapBounds menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(menuId);
+        if (menuItemBounds.first == menuItemBounds.second)
+            return true;
+    }
+
     std::set<uint32> visitedMenus;
     std::queue<uint32> menusToCheck;
     menusToCheck.push(menuId);
