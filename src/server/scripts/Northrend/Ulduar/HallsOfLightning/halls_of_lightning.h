@@ -45,10 +45,8 @@ enum HoLDataTypes
 
 enum HoLNPCs
 {
-    NPC_BJARNGRIM           = 28586,
-    NPC_VOLKHAN             = 28587,
-    NPC_IONAR               = 28546,
-    NPC_LOKEN               = 28923,
+    NPC_TITANIUM_THUNDERER    = 28965,
+    NPC_TITANIUM_SIEGEBREAKER = 28961
 };
 
 enum HoLGOs
@@ -56,6 +54,11 @@ enum HoLGOs
     GO_VOLKHAN_DOOR         = 191325,
     GO_IONAR_DOOR           = 191326,
     GO_LOKEN_THRONE         = 192654
+};
+
+enum HoLActions
+{
+    ACTION_ACTIVATE_TITANIUM_VRYKUL,
 };
 
 template <class AI, class T>
