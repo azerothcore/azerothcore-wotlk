@@ -24,15 +24,21 @@
 
 #define HallsOfLightningScriptName "instance_halls_of_lightning"
 
-enum HoLEvents
+enum HoLBossIds
 {
-    TYPE_BJARNGRIM          = 0,
-    TYPE_IONAR              = 1,
-    TYPE_LOKEN              = 2,
-    TYPE_VOLKHAN            = 3,
-    TYPE_LOKEN_INTRO        = 4,
-    MAX_ENCOUNTER           = 5,
+    DATA_BJARNGRIM                          = 0,
+    DATA_IONAR                              = 1,
+    DATA_LOKEN                              = 2,
+    DATA_VOLKHAN                            = 3,
+    MAX_ENCOUNTERS
+};
 
+enum HoLDataTypes
+{
+    // GameObject data
+    DATA_LOKEN_THRONE           = 0,
+
+    // Achievement data
     DATA_BJARNGRIM_ACHIEVEMENT  = 10,
     DATA_VOLKHAN_ACHIEVEMENT    = 11,
 };
@@ -47,11 +53,9 @@ enum HoLNPCs
 
 enum HoLGOs
 {
-    GO_BJARNGRIM_DOOR       = 191416,                      //_doors10
-    GO_VOLKHAN_DOOR         = 191325,                      //_doors07
-    GO_IONAR_DOOR           = 191326,                      //_doors05
-    GO_LOKEN_DOOR           = 191324,                      //_doors02
-    GO_LOKEN_THRONE         = 192654,
+    GO_VOLKHAN_DOOR         = 191325,
+    GO_IONAR_DOOR           = 191326,
+    GO_LOKEN_THRONE         = 192654
 };
 
 template <class AI, class T>
@@ -59,5 +63,7 @@ inline AI* GetHallsOfLightningAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, HallsOfLightningScriptName);
 }
+
+#define RegisterHallOfLightningCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetHallsOfLightningAI)
 
 #endif

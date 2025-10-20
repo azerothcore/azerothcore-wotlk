@@ -26,6 +26,9 @@
 
 using namespace Sapphiron;
 
+// no custom changes has been made for mod-playerbot other then placing
+// the impl in a header file
+
 void AddSC_boss_sapphiron()
 {
     new boss_sapphiron();

@@ -170,7 +170,7 @@ public:
             if (m_uiEventId == EVENT_OZ)
                 instance->SetData(DATA_OPERA_OZ_DEATHCOUNT, IN_PROGRESS);
 
-            Start(false, false);
+            Start(false);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
@@ -523,9 +523,9 @@ public:
                         }
                     }
 
-                    me->DespawnOrUnsummon(100);
+                    me->DespawnOrUnsummon(100ms);
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->DespawnOrUnsummon(100);
+                        arca->DespawnOrUnsummon(100ms);
 
                     return 5000;
                 default:

@@ -27,6 +27,9 @@
 
 using namespace FourHorsemen;
 
+// no custom changes has been made for mod-playerbot other then placing
+// the impl in a header file
+
 void AddSC_boss_four_horsemen()
 {
     new boss_four_horsemen();

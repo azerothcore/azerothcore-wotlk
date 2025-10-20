@@ -123,6 +123,15 @@ struct boss_tenris_mirkblood : public BossAI
             return;
 
         DoCast(victim, SPELL_SUMMON_SANGUINE_SPIRIT_ON_KILL);
+
+        if (!_mirrorTarget)
+            return;
+
+        if (victim == _mirrorTarget)
+        {
+            me->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR0);
+            me->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR1);
+        }
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
@@ -281,8 +290,8 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+            if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                if (mirkblood->IsAlive() && !mirkblood->IsInCombat())
                     mirkblood->AI()->Talk(SAY_APPROACH, player);
 
         return false;
@@ -297,8 +306,8 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+            if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                if (mirkblood->IsAlive() && mirkblood->IsImmuneToPC())
                     mirkblood->SetImmuneToPC(false);
 
         return false;
