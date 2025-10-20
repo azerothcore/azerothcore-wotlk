@@ -473,7 +473,7 @@ public:
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;
 
-            me->m_Events.AddEvent(new DelayedSummonEvent(me, creature->GetEntry(), *creature), me->m_Events.CalculateTime(3000));
+            me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), *creature), 3s);
             if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
             {
                 --scourgeRemaining;
@@ -660,14 +660,14 @@ public:
                             {
                                 Position pos = LightOfDawnPos[first];
                                 summon->SetHomePosition(pos);
-                                summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, false);
+                                summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, false);
                             }
                             first = first == 0 ? 1 : 0;
                         }
                         Position pos = LightOfDawnPos[first];
                         me->SetHomePosition(pos);
                         me->SetWalk(false);
-                        me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
+                        me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, true);
                         DoCastSelf(SPELL_THE_MIGHT_OF_MOGRAINE, true);
                         break;
                     }
@@ -691,7 +691,7 @@ public:
                         {
                             orbaz->SetReactState(REACT_PASSIVE);
                             orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
-                            orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], true, true);
+                            orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], FORCED_MOVEMENT_NONE, 0.f, true, true);
                             orbaz->DespawnOrUnsummon(7s);
                         }
 
@@ -1061,7 +1061,7 @@ public:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     {
                         float o = me->GetAngle(tirion);
-                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * std::sin(o), me->GetPositionZ(), false);
+                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * std::sin(o), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         tirion->SetFaction(FACTION_FRIENDLY);
                     }
@@ -1269,7 +1269,7 @@ class spell_chapter5_return_to_capital : public SpellScript
             if (creature)
             {
                 creature->PauseMovement(5000);
-                creature->SetTimedFacingToObject(player, 30000);
+                creature->SetFacingToObject(player, 30s);
 
                 if (roll_chance_i(30))
                 {
