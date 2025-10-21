@@ -938,7 +938,6 @@ void MotionMaster::MoveKnockbackFromForPlayer(float srcX, float srcY, float spee
     init.SetParabolic(max_height, 0);
     init.SetOrientationFixed(true);
     init.SetVelocity(speedXY);
-    init.Launch();
     Mutate(new EffectMovementGenerator(init, 0), MOTION_SLOT_CONTROLLED);
 }
 
