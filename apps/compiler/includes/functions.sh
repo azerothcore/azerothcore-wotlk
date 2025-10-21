@@ -140,7 +140,6 @@ function comp_compile() {
     linux*|darwin*)
       local confDir
       confDir=${CONFDIR:-"$AC_BINPATH_FULL/../etc"}
-      confDir=$(realpath "$confDir")
 
       # create the folders before installing to
       # set the current user and permissions
@@ -149,6 +148,8 @@ function comp_compile() {
       echo "Creating $confDir..."
       mkdir -p "$confDir"
       mkdir -p "$confDir/modules"
+
+      confDir=$(realpath "$confDir")
 
       echo "Cmake install..."
       $SUDO cmake --install . --config $CTYPE
