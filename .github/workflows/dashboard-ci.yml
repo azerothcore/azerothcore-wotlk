@@ -74,15 +74,17 @@ jobs:
 
       - name: Configure AzerothCore settings
         run: |
-          # Create basic configuration
-          cp conf/dist/config.sh conf/config.sh
-          # Configure dashboard
-          sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
-          sed -i 's/CBUILD_TESTING=.*/CBUILD_TESTING="ON"/' conf/config.sh
-          sed -i 's/AC_ENABLE_ROOT_CMAKE_INSTALL=.*/AC_ENABLE_ROOT_CMAKE_INSTALL="1"/' conf/config.sh
-          sed -i 's/export AC_CONFIG_POLICY=.*/export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_ZERO_CONF/' conf/config.sh
-          sed -i 's/AC_ENABLE_CONF_COPY_ON_INSTALL=.*/AC_ENABLE_CONF_COPY_ON_INSTALL="0"/' conf/config.sh
-          cat conf/config.sh
+            touch conf/config.sh
+            echo 'MTHREADS=4' >> conf/config.sh
+            echo 'CBUILD_TESTING=ON' >> conf/config.sh
+            echo 'AC_ENABLE_ROOT_CMAKE_INSTALL=1' >> conf/config.sh
+            echo 'export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_ZERO_CONF' >> conf/config.sh
+            echo 'AC_ENABLE_CONF_COPY_ON_INSTALL=0' >> conf/config.sh
+            cat conf/config.sh
+
+            source ./conf/config.sh
+            # debug content of AC_CONFIG_POLICY
+            echo "AC_CONFIG_POLICY=$AC_CONFIG_POLICY"
 
       - name: Test module commands
         run: |
