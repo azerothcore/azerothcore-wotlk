@@ -71,6 +71,7 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
+#include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
@@ -826,9 +827,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
                 if (!IsAlive() || HasWaterBreathingAura() || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                     return DISABLED_MIRROR_TIMER;
                 int32 UnderWaterTime = sWorld->getIntConfig(CONFIG_WATER_BREATH_TIMER);
-                AuraEffectList const& mModWaterBreathing = GetAuraEffectsByType(SPELL_AURA_MOD_WATER_BREATHING);
-                for (AuraEffectList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
-                    AddPct(UnderWaterTime, (*i)->GetAmount());
+                UnderWaterTime *= GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING);
                 return UnderWaterTime;
             }
         case FIRE_TIMER:
@@ -1937,10 +1936,7 @@ void Player::Regenerate(Powers power)
     // Mana regen calculated in Player::UpdateManaRegen(), energy regen calculated in Player::UpdateEnergyRegen()
     if (power != POWER_MANA && power != POWER_ENERGY)
     {
-        AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-        for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-            if (Powers((*i)->GetMiscValue()) == power)
-                AddPct(addvalue, (*i)->GetAmount());
+        addvalue *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, power);
 
         // Butchery requires combat for this effect
         if (power != POWER_RUNIC_POWER || IsInCombat())
@@ -2023,11 +2019,7 @@ void Player::RegenerateHealth()
             addvalue *= 1.33f;
         }
 
-        AuraEffectList const& mModHealthRegenPct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
-        for (AuraEffectList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
-        {
-            AddPct(addvalue, (*i)->GetAmount());
-        }
+        addvalue *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
 
         if (!IsInCombat())
         {
@@ -7085,6 +7077,7 @@ SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*=
     return SPELL_SCHOOL_MASK_NORMAL;
 }
 
+// @todoooo
 void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply)
 {
     AuraEffectList const& auraCritList = GetAuraEffectsByType(SPELL_AURA_MOD_WEAPON_CRIT_PERCENT);

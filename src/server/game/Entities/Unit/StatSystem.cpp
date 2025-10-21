@@ -900,16 +900,11 @@ void Player::UpdateExpertise(WeaponAttackType attack)
 
     Item* weapon = GetWeaponForAttack(attack, true);
 
-    AuraEffectList const& expAuras = GetAuraEffectsByType(SPELL_AURA_MOD_EXPERTISE);
-    for (AuraEffectList::const_iterator itr = expAuras.begin(); itr != expAuras.end(); ++itr)
+    expertise += GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE, [weapon](AuraEffect const* aurEff)
     {
-        // item neutral spell
-        if ((*itr)->GetSpellInfo()->EquippedItemClass == -1)
-            expertise += (*itr)->GetAmount();
-        // item dependent spell
-        else if (weapon && weapon->IsFitToSpellRequirements((*itr)->GetSpellInfo()))
-            expertise += (*itr)->GetAmount();
-    }
+        return aurEff->GetSpellInfo()->EquippedItemClass == -1 || // item neutral spell
+            (weapon && weapon->IsFitToSpellRequirements(aurEff->GetSpellInfo())); // item dependent spell
+    });
 
     if (expertise < 0)
         expertise = 0;
