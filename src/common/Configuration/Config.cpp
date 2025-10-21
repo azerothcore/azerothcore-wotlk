@@ -273,7 +273,8 @@ namespace
         {
             ConfigSeverity severity = isOptional ? ConfigSeverity::Skip : _policy.missingFileSeverity;
             LogWithSeverity(severity, file, "> Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file);
-            return false;
+            // Treat SKIP as a successful no-op so the app can proceed
+            return severity == ConfigSeverity::Skip;
         }
 
         uint32 count = 0;
@@ -339,7 +340,8 @@ namespace
         {
             ConfigSeverity severity = isOptional ? ConfigSeverity::Skip : _policy.missingFileSeverity;
             LogWithSeverity(severity, file, "> Config::LoadFile: Empty file '{}'", file);
-            return false;
+            // Treat SKIP as a successful no-op
+            return severity == ConfigSeverity::Skip;
         }
 
         // Add correct keys if file load without errors

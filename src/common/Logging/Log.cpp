@@ -218,6 +218,9 @@ void Log::ReadLoggersFromConfig()
         Logger* serverLogger = new Logger("server", LOG_LEVEL_INFO);
         serverLogger->addAppender(appender->getId(), appender);
         loggers["server"].reset(serverLogger);
+
+        highestLogLevel = LOG_LEVEL_INFO;
+        return;
     }
 }
 
