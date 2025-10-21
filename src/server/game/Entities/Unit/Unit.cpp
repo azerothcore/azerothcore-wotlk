@@ -3789,7 +3789,7 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victi
 
     crit += victim->GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_CHANCE_FOR_CASTER, [this](AuraEffect const* aurEff)
     {
-       return GetGUID() == aurEff->GetCasterGUID(); 
+       return GetGUID() == aurEff->GetCasterGUID();
     });
 
     // reduce crit chance from Rating for players
@@ -12086,7 +12086,7 @@ int32 Unit::SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask, bool isDoT)
 {
     return GetTotalAuraModifier(SPELL_AURA_MOD_DAMAGE_TAKEN, [schoolMask, isDoT](AuraEffect const* aurEff)
     {
-        return (aurEff->GetMiscValue() & schoolMask) != 0 
+        return (aurEff->GetMiscValue() & schoolMask) != 0
             // Xinef: if we have DoT damage type and aura has charges, check if it affects DoTs
             // Xinef: required for hemorrhage & rupture / garrote
             && !(isDoT && aurEff->GetBase()->IsUsingCharges() && aurEff->GetSpellInfo()->ProcFlags & PROC_FLAG_TAKEN_PERIODIC);
@@ -12762,7 +12762,7 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     {
         TakenTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_RECEIVED, [caster, spellProto](AuraEffect const* aurEff)
         {
-           return caster->GetGUID() == aurEff->GetCasterGUID() && aurEff->IsAffectedOnSpell(spellProto); 
+           return caster->GetGUID() == aurEff->GetCasterGUID() && aurEff->IsAffectedOnSpell(spellProto);
         });
     }
 
