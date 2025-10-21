@@ -50,6 +50,7 @@
 #include "PassiveAI.h"
 #include "Pet.h"
 #include "PetAI.h"
+#include "PetPackets.h"
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -1086,12 +1087,10 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
                 victim->ToCreature()->UpdateLeashExtensionTime();
 
-            if (attacker)
+            if (attacker && attacker != victim)
             {
                 if (spellProto && victim->CanHaveThreatList() && !victim->HasUnitState(UNIT_STATE_EVADE) && !victim->IsInCombatWith(attacker))
-                {
                     victim->CombatStart(attacker, !(spellProto->AttributesEx3 & SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
-                }
 
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
             }
@@ -11073,7 +11072,7 @@ int32 Unit::DealHeal(Unit* healer, Unit* victim, uint32 addhealth)
     return gain;
 }
 
-bool RedirectSpellEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool RedirectSpellEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     if (Unit* auraOwner = ObjectAccessor::GetUnit(_self, _auraOwnerGUID))
     {
@@ -16674,7 +16673,7 @@ Player* Unit::GetSpellModOwner() const
 }
 
 ///----------Pet responses methods-----------------
-void Unit::SendPetActionFeedback(uint8 msg)
+void Unit::SendPetActionFeedback(uint8 msg) const
 {
     Unit* owner = GetOwner();
     if (!owner || !owner->IsPlayer())
@@ -16685,19 +16684,18 @@ void Unit::SendPetActionFeedback(uint8 msg)
     owner->ToPlayer()->GetSession()->SendPacket(&data);
 }
 
-void Unit::SendPetTalk(uint32 pettalk)
+void Unit::SendPetActionSound(PetAction action) const
 {
-    Unit* owner = GetOwner();
-    if (!owner || !owner->IsPlayer())
-        return;
-
-    WorldPacket data(SMSG_PET_ACTION_SOUND, 8 + 4);
-    data << GetGUID();
-    data << uint32(pettalk);
-    owner->ToPlayer()->GetSession()->SendPacket(&data);
+    SendMessageToSet(WorldPackets::Pet::PetActionSound(GetGUID(), static_cast<int32>(action)).Write(), false);
 }
 
-void Unit::SendPetAIReaction(ObjectGuid guid)
+void Unit::SendPetDismissSound() const
+{
+    if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
+        SendMessageToSet(WorldPackets::Pet::PetDismissSound(static_cast<int32>(displayInfo->ModelId), GetPosition()).Write(), false);
+}
+
+void Unit::SendPetAIReaction(ObjectGuid guid) const
 {
     Unit* owner = GetOwner();
     if (!owner || !owner->IsPlayer())
@@ -19574,7 +19572,7 @@ void Unit::ExitVehicle(Position const* /*exitPosition*/)
     }
 }
 
-bool VehicleDespawnEvent::Execute(uint64  /*e_time*/, uint32  /*p_time*/)
+bool VehicleDespawnEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
     Position pos = _self;
     _self.MovePositionToFirstCollision(pos, 20.0f, M_PI);
@@ -19701,7 +19699,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             setDeathState(DeathState::JustDied);
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else
-            ToTempSummon()->UnSummon(2000); // Approximation
+            ToTempSummon()->UnSummon(2s); // Approximation
     }
 
     if (player)
@@ -20088,7 +20086,7 @@ class AuraMunchingQueue : public BasicEvent
 public:
     AuraMunchingQueue(Unit& owner, ObjectGuid targetGUID, int32 basePoints, uint32 spellId, AuraEffect* aurEff, AuraType auraType) : _owner(owner), _targetGUID(targetGUID), _basePoints(basePoints), _spellId(spellId), _aurEff(aurEff), _auraType(auraType) { }
 
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
         if (_owner.IsInWorld() && _owner.FindMap())
             if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
@@ -20115,24 +20113,6 @@ private:
     uint32 _spellId;
     AuraEffect* _aurEff;
     AuraType _auraType;
-};
-
-class ResetToHomeOrientation : public BasicEvent
-{
-public:
-    ResetToHomeOrientation(Creature& self) : _self(self) { }
-
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-    {
-            if (_self.IsInWorld() && _self.FindMap() && _self.IsAlive() && !_self.IsInCombat())
-            {
-                _self.SetFacingTo(_self.GetHomePosition().GetOrientation());
-            }
-
-        return true;
-    }
-private:
-    Creature& _self;
 };
 
 void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex)
@@ -20360,7 +20340,7 @@ void Unit::SetFacingTo(float ori)
     init.Launch();
 }
 
-void Unit::SetFacingToObject(WorldObject* object)
+void Unit::SetFacingToObject(WorldObject* object, Milliseconds timed /*= 0ms*/)
 {
     // never face when already moving
     if (!IsStopped())
@@ -20371,24 +20351,20 @@ void Unit::SetFacingToObject(WorldObject* object)
     init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZ());
     init.SetFacing(GetAngle(object));   // when on transport, GetAngle will still return global coordinates (and angle) that needs transforming
     init.Launch();
-}
 
-void Unit::SetTimedFacingToObject(WorldObject* object, uint32 time)
-{
-    // never face when already moving
-    if (!IsStopped() || !time)
-        return;
-
-    /// @todo figure out under what conditions creature will move towards object instead of facing it where it currently is.
-    Movement::MoveSplineInit init(this);
-    init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZ());
-    init.SetFacing(GetAngle(object));   // when on transport, GetAngle will still return global coordinates (and angle) that needs transforming
-    init.Launch();
-
-    if (Creature* c = ToCreature())
-        c->m_Events.AddEvent(new ResetToHomeOrientation(*c), c->m_Events.CalculateTime(time));
-    else
-        LOG_ERROR("entities.unit", "Unit::SetTimedFacingToObject called on non-creature unit {}. This should never happen.", GetEntry());
+    if (timed > 0ms)
+    {
+        if (Creature* c = ToCreature())
+        {
+            c->m_Events.AddEventAtOffset([c]()
+            {
+                if (c->IsInWorld() && c->FindMap() && c->IsAlive() && !c->IsInCombat())
+                    c->SetFacingTo(c->GetHomePosition().GetOrientation());
+            }, timed);
+        }
+        else
+            LOG_ERROR("entities.unit", "Unit::SetFacingToObject called on non-creature unit {}. This should never happen.", GetEntry());
+    }
 }
 
 bool Unit::SetWalk(bool enable)

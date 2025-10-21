@@ -417,9 +417,7 @@ void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
     if (oldZone != MAP_INVALID_ZONE)
     {
         uint32& oldZoneCount = _zonePlayerCountMap[oldZone];
-        if (!oldZoneCount)
-            LOG_ERROR("maps", "A player left zone {} (went to {}) - but there were no players in the zone!", oldZone, newZone);
-        else
+        if (oldZoneCount)
             --oldZoneCount;
     }
 
