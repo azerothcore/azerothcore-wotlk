@@ -683,7 +683,7 @@ function inst_getVersionBranch() {
         res="none"
         # since we've the pair version,branch alternated in not associative and one-dimensional
         # array, we've to simulate the association with length/2 trick
-        for idx in `seq 0 $((${#vers[*]}/2-1))`; do
+        for idx in $(seq 0 $((${#vers[*]}/2-1))); do
             semverParseInto "${vers[idx*2]}" MODULE_MAJOR MODULE_MINOR MODULE_PATCH MODULE_SPECIAL
             if [[ $MODULE_MAJOR -eq $ACV_MAJOR && $MODULE_MINOR -le $ACV_MINOR ]]; then
                 res="${vers[idx*2+1]}"
