@@ -22,6 +22,10 @@ concurrency:
 env:
   CONTINUOUS_INTEGRATION: true
   MYSQL_ROOT_PASSWORD: root
+  AC_ENABLE_ROOT_CMAKE_INSTALL: 1
+  # use zero-conf installation
+  AC_CONFIG_POLICY: default=skip
+  AC_ENABLE_CONF_COPY_ON_INSTALL: 0
 
 jobs:
   test-bash-scripts:
@@ -92,8 +96,6 @@ jobs:
           ./acore.sh module update --all
 
       - name: Run complete installation (deps, compile, database, client-data)
-        env:
-          AC_ENABLE_ROOT_CMAKE_INSTALL: 1
         run: |
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init
