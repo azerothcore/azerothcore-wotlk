@@ -82,6 +82,7 @@ jobs:
           sed -i 's/AC_ENABLE_ROOT_CMAKE_INSTALL=.*/AC_ENABLE_ROOT_CMAKE_INSTALL="1"/' conf/config.sh
           sed -i 's/export AC_CONFIG_POLICY=.*/export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_ZERO_CONF/' conf/config.sh
           sed -i 's/AC_ENABLE_CONF_COPY_ON_INSTALL=.*/AC_ENABLE_CONF_COPY_ON_INSTALL="0"/' conf/config.sh
+          cat conf/config.sh
 
       - name: Test module commands
         run: |
