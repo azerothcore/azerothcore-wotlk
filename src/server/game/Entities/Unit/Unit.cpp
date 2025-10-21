@@ -15412,6 +15412,15 @@ void Unit::ApplyStatPercentBuffMod(Stats stat, float val, bool apply)
     ApplyModSignedFloatValue((var > 0 ? static_cast<uint16>(UNIT_FIELD_POSSTAT0) + stat : static_cast<uint16>(UNIT_FIELD_NEGSTAT0) + stat), var, apply);
 }
 
+void Unit::SetStatPercentBuffMod(Stats stat, float val)
+{
+    if (val == -100.0f)     // prevent set var to zero
+        val = -99.99f;
+    float var = GetStat(stat) * val / 100.0f;
+    //SetFloatValue(index, cur);
+    ApplyModSignedFloatValue((var > 0 ? static_cast<uint16>(UNIT_FIELD_POSSTAT0) + stat : static_cast<uint16>(UNIT_FIELD_NEGSTAT0) + stat), var, true);
+}
+
 SpellSchools Unit::GetSpellSchoolByAuraGroup(UnitMods unitMod) const
 {
     SpellSchools school = SPELL_SCHOOL_NORMAL;

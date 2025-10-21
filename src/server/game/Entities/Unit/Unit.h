@@ -1038,6 +1038,7 @@ public:
 
     void ApplyStatBuffMod(Stats stat, float val, bool apply) { ApplyModSignedFloatValue((val > 0 ? static_cast<uint16>(UNIT_FIELD_POSSTAT0) +  stat : static_cast<uint16>(UNIT_FIELD_NEGSTAT0) +  stat), val, apply); }
     void ApplyStatPercentBuffMod(Stats stat, float val, bool apply);
+    void SetStatPercentBuffMod(Stats stat, float val);
 
     // Unit level methods
     [[nodiscard]] uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }

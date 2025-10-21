@@ -208,3 +208,6 @@ INSERT INTO `spell_group_stack_rules` (`group_id`,`stack_rule`, `description`) V
 (1089,4, "Mark of the Wild"),
 (1113,4, "Thorns"),
 (1126,3, "Stamina Buffs");
+
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (18735,56247);
+INSERT INTO `spell_script_names` VALUES (18735,"spell_warl_voidwalker_pet_passive"); 

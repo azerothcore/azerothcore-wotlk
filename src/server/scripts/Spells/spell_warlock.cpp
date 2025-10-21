@@ -73,6 +73,7 @@ enum WarlockSpells
     SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083,
     SPELL_WARLOCK_PET_VOID_STAR_TALISMAN            = 37386, // Void Star Talisman
     SPELL_WARLOCK_DEMONIC_PACT_PROC                 = 48090,
+    SPELL_WARLOCK_GLYPH_OF_VOIDWALKER               = 56247,
 };
 
 enum WarlockSpellIcons
@@ -1409,42 +1410,26 @@ class spell_warl_glyph_of_felguard : public AuraScript
     }
 };
 
-class spell_warl_glyph_of_voidwalker : public AuraScript
+class spell_warl_voidwalker_pet_passive : public AuraScript
 {
-    PrepareAuraScript(spell_warl_glyph_of_voidwalker);
+    PrepareAuraScript(spell_warl_voidwalker_pet_passive);
 
-    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (Player* player = GetCaster()->ToPlayer())
-        {
-            if (Pet* pet = player->GetPet())
-            {
-                if (pet->GetEntry() == NPC_VOIDWALKER)
-                {
-                    pet->HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), true);
-                }
-            }
-        }
+        return ValidateSpellInfo({ SPELL_WARLOCK_GLYPH_OF_VOIDWALKER });
     }
 
-    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void CalculateAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (Player* player = GetCaster()->ToPlayer())
-        {
-            if (Pet* pet = player->GetPet())
-            {
-                if (pet->GetEntry() == NPC_VOIDWALKER)
-                {
-                    pet->HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), false);
-                }
-            }
-        }
+        if (Unit* pet = GetUnitOwner(); pet->IsPet())
+            if (Unit* owner = pet->ToPet()->GetOwner())
+                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_GLYPH_OF_VOIDWALKER, EFFECT_0))
+                    amount += aurEff->GetAmount();
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_warl_glyph_of_voidwalker::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_warl_glyph_of_voidwalker::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_voidwalker_pet_passive::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
     }
 };
 
@@ -1530,6 +1515,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_glyph_of_felguard);
-    RegisterSpellScript(spell_warl_glyph_of_voidwalker);
+    RegisterSpellScript(spell_warl_voidwalker_pet_passive);
     RegisterSpellScript(spell_warl_demonic_pact_aura);
 }

@@ -4575,34 +4575,23 @@ void AuraEffect::HandleModTotalPercentStat(AuraApplication const* aurApp, uint8 
     bool alive = target->IsAlive();
     float value = GetAmount();
 
-    if (GetId() == 67480) // xinef: hack fix for blessing of sanctuary stats stack with blessing of kings...
-    {
-        if (value) // not turned off
-            value = 10.0f;
-        for (int32 i = STAT_STRENGTH; i < MAX_STATS; i++)
-        {
-            if (i == STAT_STRENGTH || i == STAT_STAMINA)
-            {
-                if (apply && (target->IsPlayer() || target->IsPet()))
-                    target->ApplyStatPercentBuffMod(Stats(i), value, apply);
-
-                target->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_PCT, value, apply);
-
-                if (!apply && (target->IsPlayer() || target->IsPet()))
-                    target->ApplyStatPercentBuffMod(Stats(i), value, apply);
-            }
-        }
-        return;
-    }
-
     for (int32 i = STAT_STRENGTH; i < MAX_STATS; i++)
     {
         if (GetMiscValue() == i || GetMiscValue() == -1)
         {
+            float amount = target->GetTotalAuraMultiplier(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, [i](AuraEffect const* aurEff) -> bool
+            {
+                if (aurEff->GetMiscValue() == i || aurEff->GetMiscValue() == -1)
+                    return true;
+                return false;
+            });
+
             if (apply && (target->IsPlayer() || target->IsPet()))
                 target->ApplyStatPercentBuffMod(Stats(i), value, apply);
 
-            target->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_PCT, value, apply);
+            target->SetModifierValue(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_PCT, amount);
+            if (target->CanModifyStats())
+                target->UpdateStats(Stats(UNIT_MOD_STAT_START + i));
 
             if (!apply && (target->IsPlayer() || target->IsPet()))
                 target->ApplyStatPercentBuffMod(Stats(i), value, apply);
