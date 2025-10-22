@@ -47,7 +47,7 @@ if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
 
   # Verify
   gpg --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
-  gpg --verify mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb.asc mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb
+  gpg --verify "$VAR_PATH/mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb.asc" "$VAR_PATH/mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb"
 
   # run noninteractive install for MYSQL 8.4 LTS
   DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.34-1_all.deb"
