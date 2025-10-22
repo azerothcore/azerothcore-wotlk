@@ -83,7 +83,7 @@ jobs:
             cat conf/config.sh
 
             # debug content of AC_CONFIG_POLICY
-            ./acore.sh show-config AC_CONFIG_POLICY
+            ./acore.sh config show AC_CONFIG_POLICY
 
       - name: Test module commands
         run: |
