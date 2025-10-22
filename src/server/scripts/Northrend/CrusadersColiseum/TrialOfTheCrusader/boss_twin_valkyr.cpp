@@ -384,7 +384,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     /*
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, essenceId))
                         me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
-                    events.RepeatEvent(urand(45000,50000));
+                    events.Repeat(45s,50s);
                     */
 
                     GuidVector tList;
@@ -458,7 +458,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     if ((SpecialMask & 0xF) == 0xF )
                         SpecialMask = 0;
                     events.Repeat(45s);
-                    events.DelayEventsToMax(15000, 1); // no touch of light/darkness during special abilities!
+                    events.DelayEventsToMax(15s, 1); // no touch of light/darkness during special abilities!
                 }
                 break;
             case EVENT_REMOVE_DUAL_WIELD:
@@ -710,7 +710,7 @@ public:
                 return;
 
             if (urand(0, 2))
-                me->DespawnOrUnsummon(0);
+                me->DespawnOrUnsummon(0ms);
         }
 
         void MoveToNextPoint()
@@ -884,7 +884,7 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
                             creature->GetMotionMaster()->MoveIdle();
                             creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
                             creature->SetDisplayId(11686);
-                            creature->DespawnOrUnsummon(1500);
+                            creature->DespawnOrUnsummon(1500ms);
                         }
     }
 

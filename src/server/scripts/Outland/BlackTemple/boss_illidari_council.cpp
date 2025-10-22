@@ -262,7 +262,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_COUNCIL_SLAY);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -582,7 +582,7 @@ struct boss_veras_darkshadow : public boss_illidari_council_memberAI
             break;
         }
 
-        if (events.GetNextEventTime(EVENT_SPELL_VANISH_OUT) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_SPELL_VANISH_OUT))
             DoMeleeAttackIfReady();
     }
 };
@@ -771,7 +771,7 @@ class spell_illidari_council_deadly_strike_aura : public AuraScript
         if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
         {
             GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
-            GetUnitOwner()->m_Events.AddEvent(new VerasEnvenom(*GetUnitOwner(), target->GetGUID()), GetUnitOwner()->m_Events.CalculateTime(urand(1500, 3500)));
+            GetUnitOwner()->m_Events.AddEventAtOffset(new VerasEnvenom(*GetUnitOwner(), target->GetGUID()), randtime(1500ms, 3500ms));
         }
     }
 

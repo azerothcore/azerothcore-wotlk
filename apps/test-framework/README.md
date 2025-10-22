@@ -6,7 +6,9 @@ This is the centralized test framework for all AzerothCore bash scripts. It prov
 
 ```
 apps/test-framework/
-├── run-tests.sh           # Universal test runner (single entry point)
+├── test-main.sh           # Unified test framework entry point
+├── run-bash-tests.sh      # Bash test runner for BATS tests
+├── run-core-tests.sh      # AzerothCore unit test runner
 ├── README.md              # This documentation
 ├── bats_libs/             # Custom BATS libraries
 │   ├── acore-support.bash # Test setup and helpers
@@ -17,38 +19,74 @@ apps/test-framework/
 
 ## Quick Start
 
+### Using acore.sh (Recommended):
+```bash
+# Run the unified test framework (interactive menu)
+./acore.sh test
+
+# Run bash tests directly
+./acore.sh test bash --all
+
+# Run AzerothCore unit tests
+./acore.sh test core
+```
+
 ### From any module directory:
 ```bash
 # Run tests for current module
-../test-framework/run-tests.sh --dir .
+../test-framework/run-bash-tests.sh --dir .
 
 ```
 
 ### From test-framework directory:
 ```bash
 # Run all tests in all modules
-./run-tests.sh --all
+./run-bash-tests.sh --all
 
 # Run tests for specific module
-./run-tests.sh startup-scripts
+./run-bash-tests.sh startup-scripts
 
 # List available modules
-./run-tests.sh --list
+./run-bash-tests.sh --list
 
 # Run tests with debug info
-./run-tests.sh --all --debug
+./run-bash-tests.sh --all --debug
 ```
 
 ### From project root:
 ```bash
 # Run all tests
-apps/test-framework/run-tests.sh --all
+apps/test-framework/run-bash-tests.sh --all
 
 # Run specific module
-apps/test-framework/run-tests.sh startup-scripts
+apps/test-framework/run-bash-tests.sh startup-scripts
 
 # Run with verbose output
-apps/test-framework/run-tests.sh startup-scripts --verbose
+apps/test-framework/run-bash-tests.sh startup-scripts --verbose
+```
+
+## Test Types
+
+The framework now supports two types of tests:
+
+1. **Bash Tests** - BATS-based tests for bash scripts and functionality
+2. **Core Tests** - AzerothCore C++ unit tests
+
+### Unified Test Framework
+
+The test framework provides a unified entry point through `test-main.sh` which presents an interactive menu:
+
+- **bash**: Run BATS-based bash script tests
+- **core**: Run AzerothCore C++ unit tests
+- **quit**: Exit the test framework
+
+```bash
+# Interactive test menu
+./acore.sh test
+
+# Direct test execution
+./acore.sh test bash --all        # Run all bash tests
+./acore.sh test core              # Run core unit tests
 ```
 
 ## Usage
@@ -57,35 +95,35 @@ apps/test-framework/run-tests.sh startup-scripts --verbose
 
 ```bash
 # Run all tests
-./run-tests.sh --all
+./run-bash-tests.sh --all
 
 # Run tests for specific module
-./run-tests.sh startup-scripts
+./run-bash-tests.sh startup-scripts
 
 # Run tests matching pattern
-./run-tests.sh --filter starter
+./run-bash-tests.sh --filter starter
 
 # Run tests in specific directory
-./run-tests.sh --dir apps/docker
+./run-bash-tests.sh --dir apps/docker
 
 # Show available modules
-./run-tests.sh --list
+./run-bash-tests.sh --list
 
 # Show test count
-./run-tests.sh --count
+./run-bash-tests.sh --count
 ```
 
 ### Output Formats
 
 ```bash
 # Pretty output (default)
-./run-tests.sh --pretty
+./run-bash-tests.sh --pretty
 
 # TAP output for CI/CD
-./run-tests.sh --tap
+./run-bash-tests.sh --tap
 
 # Verbose output with debug info
-./run-tests.sh --verbose --debug
+./run-bash-tests.sh --verbose --debug
 ```
 
 ## Writing Tests
@@ -205,17 +243,17 @@ debug_on_failure
 
 From your module directory:
 ```bash
-../test-framework/run-tests.sh --dir .
+../test-framework/run-bash-tests.sh --dir .
 ```
 
 From the test framework:
 ```bash
-./run-tests.sh my-module
+./run-bash-tests.sh my-module
 ```
 
 From project root:
 ```bash
-apps/test-framework/run-tests.sh my-module
+apps/test-framework/run-bash-tests.sh my-module
 ```
 
 ## CI/CD Integration
@@ -223,37 +261,73 @@ apps/test-framework/run-tests.sh my-module
 For continuous integration, use TAP output:
 
 ```bash
-# In your CI script
+# Recommended: Use acore.sh integration
+./acore.sh test bash --tap --all > test-results.tap
+
+# Direct script usage
 cd apps/test-framework
-./run-tests.sh --all --tap > test-results.tap
+./run-bash-tests.sh --all --tap > test-results.tap
 
 # Or from project root
-apps/test-framework/run-tests.sh --all --tap > test-results.tap
+apps/test-framework/run-bash-tests.sh --all --tap > test-results.tap
+
+# Run core unit tests in CI
+./acore.sh test core
 ```
+
+## Core Tests
+
+The framework now includes support for AzerothCore's C++ unit tests through `run-core-tests.sh`:
+
+```bash
+# Run core unit tests
+./acore.sh test core
+
+# Direct script usage
+apps/test-framework/run-core-tests.sh
+```
+
+**Prerequisites for Core Tests:**
+- Project must be built with unit tests enabled (`CBUILD_TESTING="ON"` inside `conf/config.sh` that works with the acore.sh compiler)
+- Unit test binary should be available at `$BUILDPATH/src/test/unit_tests`
+
+The core test runner will:
+1. Check if the unit test binary exists
+2. Execute the AzerothCore unit tests
+3. Return appropriate exit codes for CI/CD integration
 
 ## Available Commands
 
-All functionality is available through the single `run-tests.sh` script:
+### Unified Test Framework Commands
+
+Recommended usage through `acore.sh`:
+- `./acore.sh test` - Interactive test framework menu
+- `./acore.sh test bash [options]` - Run bash tests with options
+- `./acore.sh test core` - Run AzerothCore unit tests
+
+### Bash Test Commands
+
+All bash test functionality is available through the `run-bash-tests.sh` script:
 
 ### Basic Test Execution
-- `./run-tests.sh --all` - Run all tests in all modules
-- `./run-tests.sh <module>` - Run tests for specific module
-- `./run-tests.sh --dir <path>` - Run tests in specific directory
-- `./run-tests.sh --list` - List available modules
-- `./run-tests.sh --count` - Show test count
+- `./run-bash-tests.sh --all` - Run all tests in all modules
+- `./run-bash-tests.sh <module>` - Run tests for specific module
+- `./run-bash-tests.sh --dir <path>` - Run tests in specific directory
+- `./run-bash-tests.sh --list` - List available modules
+- `./run-bash-tests.sh --count` - Show test count
 
 ### Output Control
-- `./run-tests.sh --verbose` - Verbose output with debug info
-- `./run-tests.sh --tap` - TAP output for CI/CD
-- `./run-tests.sh --debug` - Debug mode with failure details
-- `./run-tests.sh --pretty` - Pretty output (default)
+- `./run-bash-tests.sh --verbose` - Verbose output with debug info
+- `./run-bash-tests.sh --tap` - TAP output for CI/CD
+- `./run-bash-tests.sh --debug` - Debug mode with failure details
+- `./run-bash-tests.sh --pretty` - Pretty output (default)
 
 ### Test Filtering
-- `./run-tests.sh --filter <pattern>` - Run tests matching pattern
-- `./run-tests.sh <module> --filter <pattern>` - Filter within module
+- `./run-bash-tests.sh --filter <pattern>` - Run tests matching pattern
+- `./run-bash-tests.sh <module> --filter <pattern>` - Filter within module
 
 ### Utility Functions
-- `./run-tests.sh --help` - Show help message
+- `./run-bash-tests.sh --help` - Show help message
 - Install BATS: Use your system package manager (`apt install bats`, `brew install bats-core`, etc.)
 
 
@@ -264,35 +338,42 @@ All functionality is available through the single `run-tests.sh` script:
 ### Running Specific Tests
 ```bash
 # Run only starter-related tests
-./run-tests.sh --filter starter
+./run-bash-tests.sh --filter starter
 
 # Run only tests in startup-scripts module
-./run-tests.sh startup-scripts
+./run-bash-tests.sh startup-scripts
 
 # Run all tests with verbose output
-./run-tests.sh --all --verbose
+./run-bash-tests.sh --all --verbose
 
 # Run tests in specific directory with debug
-./run-tests.sh --dir apps/docker --debug
+./run-bash-tests.sh --dir apps/docker --debug
 ```
 
 ### Development Workflow
 ```bash
+# Recommended: Use acore.sh for unified testing
+./acore.sh test                    # Interactive menu
+./acore.sh test bash --all         # All bash tests
+./acore.sh test core               # Core unit tests
+
 # While developing, run tests frequently from module directory
 cd apps/my-module
-../test-framework/run-tests.sh --dir .
+../test-framework/run-bash-tests.sh --dir .
 
 # Debug failing tests
-../test-framework/run-tests.sh --dir . --debug --verbose
+../test-framework/run-bash-tests.sh --dir . --debug --verbose
 
 # Run specific test pattern
-../test-framework/run-tests.sh --dir . --filter my-feature
+../test-framework/run-bash-tests.sh --dir . --filter my-feature
 
 # From project root - run all tests
-apps/test-framework/run-tests.sh --all
+./acore.sh test bash --all         # Recommended
+apps/test-framework/run-bash-tests.sh --all  # Direct
 
 # Quick test count check
-apps/test-framework/run-tests.sh --count
+./acore.sh test bash --count       # Recommended
+apps/test-framework/run-bash-tests.sh --count  # Direct
 ```
 
 ## Benefits

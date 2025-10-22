@@ -583,7 +583,7 @@ public:
                             }
                         }
 
-                        events.RepeatEvent((below11PctReached ? urand(1400, 2000) : urand(5000, 20000)));
+                        events.Repeat((below11PctReached ? randtime(1400ms, 2s) : randtime(5s, 20s)));
                         break;
                     }
                     case EVENT_SARTHARION_BERSERK:
@@ -1086,7 +1086,7 @@ public:
                         Talk(SAY_TENEBRON_BREATH);
                     }
                     DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
+                    events.Repeat(17500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
@@ -1095,7 +1095,7 @@ public:
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
-                    events.RepeatEvent(22500);
+                    events.Repeat(22500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_OPEN_PORTAL:
@@ -1270,7 +1270,7 @@ public:
                     }
 
                     DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
+                    events.Repeat(17500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
@@ -1279,7 +1279,7 @@ public:
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
-                    events.RepeatEvent(22500);
+                    events.Repeat(22500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_OPEN_PORTAL:
@@ -1480,7 +1480,7 @@ public:
         {
             if (param == ACTION_SWITCH_PHASE)
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 

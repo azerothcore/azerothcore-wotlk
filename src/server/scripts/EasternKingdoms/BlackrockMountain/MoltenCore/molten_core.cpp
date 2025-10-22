@@ -199,7 +199,7 @@ class spell_mc_play_dead_aura : public AuraScript
         else
         {
             Unit::Kill(creatureTarget, creatureTarget);
-            creatureTarget->DespawnOrUnsummon(14000);
+            creatureTarget->DespawnOrUnsummon(14s);
         }
     }
 

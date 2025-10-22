@@ -90,9 +90,8 @@ public:
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 
-    void Start(bool isActiveAttacker = true, bool run = false, ObjectGuid playerGUID = ObjectGuid::Empty, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
+    void Start(bool isActiveAttacker = true, ObjectGuid playerGUID = ObjectGuid::Empty, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
 
-    void SetRun(bool on = true);
     void SetEscortPaused(bool on);
 
     bool HasEscortState(uint32 escortState) { return (m_uiEscortState & escortState); }
@@ -130,7 +129,6 @@ private:
     std::list<Escort_Waypoint>::iterator CurrentWP;
 
     bool m_bIsActiveAttacker;                           //obsolete, determined by faction.
-    bool m_bIsRunning;                                  //all creatures are walking by default (has flag MOVEMENTFLAG_WALK)
     bool m_bCanInstantRespawn;                          //if creature should respawn instantly after escort over (if not, database respawntime are used)
     bool m_bCanReturnToStart;                           //if creature can walk same path (loop) without despawn. Not for regular escort quests.
     bool DespawnAtEnd;

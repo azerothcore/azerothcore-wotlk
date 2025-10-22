@@ -502,7 +502,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             me->CastSpell(me, RAID_MODE(SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25, SPELL_TRAITOR_KING_10, SPELL_TRAITOR_KING_25), true);
-            me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
+            me->m_Events.AddEventAtOffset(new HideNpcEvent(*me), 5s);
         }
 
         bool CanAIAttack(Unit const* target) const override
@@ -574,7 +574,7 @@ public:
             if (spell->Id == SPELL_SPIKE_FAIL)
             {
                 me->RemoveAllAuras();
-                me->DespawnOrUnsummon(1500);
+                me->DespawnOrUnsummon(1500ms);
             }
         }
 
@@ -655,7 +655,7 @@ public:
                 me->NearTeleportTo(target->GetPositionX() + cos(o) * 5.0f, target->GetPositionY() + std::sin(o) * 5.0f, target->GetPositionZ() + 0.6f, target->GetOrientation());
                 AttackStart(target);
                 me->GetMotionMaster()->MoveChase(target);
-                events.DelayEvents(3000);
+                events.DelayEvents(3s);
             }
         }
 
@@ -710,7 +710,7 @@ public:
 
         void JustDied(Unit*  /*killer*/) override
         {
-            me->m_Events.AddEvent(new HideNpcEvent(*me), me->m_Events.CalculateTime(5000));
+            me->m_Events.AddEventAtOffset(new HideNpcEvent(*me), 5s);
         }
 
         bool CanAIAttack(Unit const* target) const override

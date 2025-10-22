@@ -121,7 +121,7 @@ public:
                             while (entry1 == entry2);
                             me->CastSpell((Unit*)nullptr, entry2, true);
                         }
-                        events.RepeatEvent(45000);
+                        events.Repeat(45s);
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5s);
                         events.RescheduleEvent(EVENT_CHECK_DISTANCE, 6s);
                     }
@@ -135,7 +135,7 @@ public:
                                     if (me->GetDistance(c) < 3.0f)
                                     {
                                         c->CastSpell(me, SPELL_ARCANE_POWER, false);
-                                        c->DespawnOrUnsummon(8000);
+                                        c->DespawnOrUnsummon(8s);
                                         found = true;
                                     }
                         if (found)

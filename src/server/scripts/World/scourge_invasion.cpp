@@ -63,14 +63,8 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
 
     void UpdateWeather(bool startEvent)
     {
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        Weather* weather = me->GetMap()->GetOrGenerateZoneDefaultWeather(me->GetZoneId());
+        if (weather)
         {
             if (startEvent)
                 weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
@@ -956,14 +950,8 @@ struct npc_pallid_horror : public ScriptedAI
 
     void UpdateWeather(bool startEvent)
     {
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        Weather* weather = me->GetMap()->GetOrGenerateZoneDefaultWeather(me->GetZoneId());
+        if (weather)
         {
             if (startEvent)
                 weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);

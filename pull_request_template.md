@@ -1,5 +1,8 @@
 <!-- First of all, THANK YOU for your contribution. -->
 
+<!-- How to title your Pull Request, Description, Co-Authors (Cherry Pick) and others, please see the link below -->
+<!-- https://www.azerothcore.org/wiki/commit-message-guidelines -->
+
 ## Changes Proposed:
 <!-- If your pull request promotes complex changes that require a detailed explanation, please describe them in detail specifying what your solution is and what is it meant to address. -->
 This PR proposes changes to:

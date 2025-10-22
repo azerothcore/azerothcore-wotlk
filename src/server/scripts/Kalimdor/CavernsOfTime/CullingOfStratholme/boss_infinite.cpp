@@ -67,7 +67,7 @@ public:
             summons.DespawnAll();
             if (InstanceScript* pInstance = me->GetInstanceScript())
                 if (pInstance->GetData(DATA_GUARDIANTIME_EVENT) == 0)
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
 
             me->SummonCreature(NPC_TIME_RIFT, 2337.6f, 1270.0f, 132.95f, 2.79f);
             me->SummonCreature(NPC_GUARDIAN_OF_TIME, 2319.3f, 1267.7f, 132.8f, 1.0f);
@@ -79,8 +79,8 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             me->InterruptNonMeleeSpells(false);
-            events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8000);
-            events.ScheduleEvent(EVENT_SPELL_CORRUPTING_BLIGHT, 12000);
+            events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8s);
+            events.ScheduleEvent(EVENT_SPELL_CORRUPTING_BLIGHT, 12s);
             Talk(SAY_AGGRO);
         }
 
@@ -93,11 +93,11 @@ public:
                 {
                     if (cr->GetEntry() == NPC_TIME_RIFT)
                     {
-                        cr->DespawnOrUnsummon(1000);
+                        cr->DespawnOrUnsummon(1s);
                     }
                     else
                     {
-                        cr->DespawnOrUnsummon(5000);
+                        cr->DespawnOrUnsummon(5s);
                         cr->RemoveAllAuras();
                         cr->AI()->Talk(SAY_THANKS);
                     }
@@ -120,7 +120,7 @@ public:
             {
                 Talk(SAY_FAIL);
                 summons.DespawnAll();
-                me->DespawnOrUnsummon(500);
+                me->DespawnOrUnsummon(500ms);
             }
         }
 
@@ -147,12 +147,12 @@ public:
             {
                 case EVENT_SPELL_VOID_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_VOID_STRIKE, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 case EVENT_SPELL_CORRUPTING_BLIGHT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_CORRUPTING_BLIGHT, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
             }
 

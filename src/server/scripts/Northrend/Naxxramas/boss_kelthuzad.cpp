@@ -451,7 +451,7 @@ public:
                         cr->AI()->Talk(SAY_ANSWER_REQUEST);
 
                     for (uint8 i = 0 ; i < RAID_MODE(2, 4); ++i)
-                        events.ScheduleEvent(EVENT_SUMMON_GUARDIAN_OF_ICECROWN, 10000 + (i * 5000));
+                        events.ScheduleEvent(EVENT_SUMMON_GUARDIAN_OF_ICECROWN, Milliseconds(10000 + (i * 5000)));
 
                     break;
                 }
@@ -507,7 +507,7 @@ public:
             {
                 if (!me->IsInCombat())
                 {
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
                 }
             }
             if (param == ACTION_GUARDIANS_OFF)

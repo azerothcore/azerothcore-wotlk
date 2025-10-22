@@ -92,7 +92,7 @@ public:
             uiFirstBoss = 0;
             uiSecondBoss = 0;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
             GateHealth = 100;
             WaveCount = 0;
             PortalLocation = 0;
@@ -666,7 +666,7 @@ public:
             EncounterStatus = NOT_STARTED;
             CLEANED = false;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
 
             data >> m_auiEncounter[0];
             data >> m_auiEncounter[1];

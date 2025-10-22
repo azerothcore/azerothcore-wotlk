@@ -780,6 +780,9 @@ private:
     //bool CanDetectStealthOf(WorldObject const* obj) const;
     bool CanDetectStealthOf(WorldObject const* obj, bool checkAlert = false) const;
 
+    void RemoveFromMapVisibilityOverrideContainers();
+    void AddToMapVisibilityOverrideContainers();
+
     GuidUnorderedSet _allowedLooters;
 
     ObjectVisibilityContainer _objectVisibilityContainer;

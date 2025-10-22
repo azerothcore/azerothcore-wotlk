@@ -206,8 +206,8 @@ public:
                     if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
                         pStorm->SetDuration(int32(_boneStormDuration));
                     events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0ms);
-                    events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
-                }
+                    events.ScheduleEvent(EVENT_END_BONE_STORM, Milliseconds(_boneStormDuration + 1));
+            }
                 break;
             case EVENT_BONE_STORM_MOVE:
                 {
@@ -397,7 +397,7 @@ public:
                     trapped->NearTeleportTo(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.GetPositionZ(), exitPos.GetOrientation(), false);
                 }
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -429,7 +429,7 @@ public:
                 summonerUnit->SetPetGUID(petGUID);
                 summonerUnit->GetMotionMaster()->Clear();
                 summonerUnit->StopMoving();
-                events.ScheduleEvent(1, 8000);
+                events.ScheduleEvent(1, 8s);
                 hasTrappedUnit = true;
             }
         }
@@ -451,13 +451,13 @@ public:
                 }
                 else
                 {
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     return;
                 }
             }
             else
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
                 return;
             }
 

@@ -26,7 +26,7 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-void AddScripts() {}
+inline void AddScripts() {}
 
 class WorldMock: public IWorld
 {

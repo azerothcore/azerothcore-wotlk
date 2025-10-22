@@ -222,7 +222,7 @@ public:
                 if (Creature* c = pInstance->instance->GetCreature(SummonedGUID))
                     c->DespawnOrUnsummon();
             }
-            me->DespawnOrUnsummon(5000);
+            me->DespawnOrUnsummon(5s);
         }
 
         void SummonedCreatureDespawn(Creature* pSummoned) override

@@ -100,12 +100,12 @@ private:
 class VehicleDespawnEvent : public BasicEvent
 {
 public:
-    VehicleDespawnEvent(Unit& self, uint32 duration) : _self(self), _duration(duration) { }
+    VehicleDespawnEvent(Unit& self, Milliseconds duration) : _self(self), _duration(duration) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
     Unit& _self;
-    uint32 _duration;
+    Milliseconds _duration;
 };
 
 #endif

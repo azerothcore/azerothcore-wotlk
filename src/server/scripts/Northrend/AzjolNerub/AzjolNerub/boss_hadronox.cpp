@@ -111,7 +111,7 @@ public:
         uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
-                return !me->isActiveObject() || events.GetNextEventTime(EVENT_HADRONOX_MOVE4) != 0;
+                return !me->isActiveObject() || events.HasTimeUntilEvent(EVENT_HADRONOX_MOVE4) ? 1 : 0;
             return 0;
         }
 
@@ -258,7 +258,7 @@ public:
         {
             if (summon->GetEntry() != me->GetEntry())
             {
-                summon->GetMotionMaster()->MovePoint(0, *me, false);
+                summon->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false);
                 summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
             }
             summons.Summon(summon);

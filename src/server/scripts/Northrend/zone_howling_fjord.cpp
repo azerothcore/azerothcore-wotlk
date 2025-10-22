@@ -44,9 +44,9 @@ public:
             if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
             {
                 me->CastSpell(me, 44460, true);
-                me->DespawnOrUnsummon(10000);
+                me->DespawnOrUnsummon(10s);
                 cow->CastSpell(cow, 44460, true);
-                cow->DespawnOrUnsummon(10000);
+                cow->DespawnOrUnsummon(10s);
                 if (me->IsSummon())
                     if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                         owner->CastSpell(owner, 44463, true);
@@ -191,7 +191,7 @@ public:
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -309,7 +309,7 @@ public:
                 return;
 
             me->SetWalk(true);
-            Start(false, false, summonerGUID);
+            Start(false, summonerGUID);
         }
 
         void WaypointReached(uint32 waypointId) override
@@ -394,6 +394,38 @@ public:
     }
 };
 
+enum RodinLightningSpells
+{
+    SPELL_RODIN_LIGHTNING_START = 44787,
+    SPELL_RODIN_LIGHTNING_END   = 44791,
+
+    NPC_RODIN                   = 24876
+};
+
+struct npc_rodin_lightning_enabler : public ScriptedAI
+{
+    npc_rodin_lightning_enabler(Creature* creature) : ScriptedAI(creature) {}
+
+    void Reset() override
+    {
+        _scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (Creature* rodin = me->FindNearestCreature(NPC_RODIN, 10.0f))
+                DoCast(rodin, urand(SPELL_RODIN_LIGHTNING_START, SPELL_RODIN_LIGHTNING_END));
+
+            context.Repeat(2s, 8s);
+        });
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        _scheduler.Update();
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 enum HawkHunting
 {
     SPELL_HAWK_HUNTING_ITEM = 44408
@@ -431,5 +463,6 @@ void AddSC_howling_fjord()
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();
+    RegisterCreatureAI(npc_rodin_lightning_enabler);
     RegisterSpellScript(spell_hawk_hunting);
 }

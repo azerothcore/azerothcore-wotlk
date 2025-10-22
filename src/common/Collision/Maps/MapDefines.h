@@ -26,7 +26,40 @@
 #define SIZE_OF_GRIDS            533.3333f
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 16
+#define MMAP_VERSION 17
+
+struct MmapTileRecastConfig
+{
+    float walkableSlopeAngle;
+
+    uint8 walkableRadius;            // 1
+    uint8 walkableHeight;            // 1
+    uint8 walkableClimb;             // 1
+    uint8 padding0{0};               // 1 → align next to 4
+
+    uint32 vertexPerMapEdge;
+    uint32 vertexPerTileEdge;
+    uint32 tilesPerMapEdge;
+    float baseUnitDim;
+    float cellSizeHorizontal;
+    float cellSizeVertical;
+    float maxSimplificationError;
+
+    bool operator==(const MmapTileRecastConfig& b) const {
+        return walkableSlopeAngle == b.walkableSlopeAngle &&
+               walkableRadius == b.walkableRadius &&
+               walkableHeight == b.walkableHeight &&
+               walkableClimb == b.walkableClimb &&
+               vertexPerMapEdge == b.vertexPerMapEdge &&
+               vertexPerTileEdge == b.vertexPerTileEdge &&
+               tilesPerMapEdge == b.tilesPerMapEdge &&
+               baseUnitDim == b.baseUnitDim &&
+               cellSizeHorizontal == b.cellSizeHorizontal &&
+               cellSizeVertical == b.cellSizeVertical &&
+               maxSimplificationError == b.maxSimplificationError;
+    }
+};
+static_assert(sizeof(MmapTileRecastConfig) == 36, "Unexpected size of MmapTileRecastConfig");
 
 struct MmapTileHeader
 {
@@ -37,17 +70,20 @@ struct MmapTileHeader
     char usesLiquids{true};
     char padding[3] {};
 
+    MmapTileRecastConfig recastConfig;
+
     MmapTileHeader() : dtVersion(DT_NAVMESH_VERSION) { }
 };
 
 // All padding fields must be handled and initialized to ensure mmaps_generator will produce binary-identical *.mmtile files
-static_assert(sizeof(MmapTileHeader) == 20, "MmapTileHeader size is not correct, adjust the padding field size");
+static_assert(sizeof(MmapTileHeader) == 56, "MmapTileHeader size is not correct, adjust the padding field size");
 static_assert(sizeof(MmapTileHeader) == (sizeof(MmapTileHeader::mmapMagic) +
               sizeof(MmapTileHeader::dtVersion) +
               sizeof(MmapTileHeader::mmapVersion) +
               sizeof(MmapTileHeader::size) +
               sizeof(MmapTileHeader::usesLiquids) +
-              sizeof(MmapTileHeader::padding)), "MmapTileHeader has uninitialized padding fields");
+              sizeof(MmapTileHeader::padding)+
+              sizeof(MmapTileRecastConfig)), "MmapTileHeader has uninitialized padding fields");
 
 enum NavTerrain
 {

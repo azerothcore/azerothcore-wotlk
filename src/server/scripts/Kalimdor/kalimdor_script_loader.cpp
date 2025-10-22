@@ -74,7 +74,6 @@ void AddSC_instance_wailing_caverns();       //Wailing caverns
 void AddSC_zulfarrak();
 void AddSC_instance_zulfarrak();             //Zul'Farrak instance script
 void AddSC_ashenvale();
-void AddSC_azshara();
 void AddSC_azuremyst_isle();
 void AddSC_bloodmyst_isle();
 void AddSC_boss_azuregos();
@@ -157,7 +156,6 @@ void AddKalimdorScripts()
     AddSC_zulfarrak();
     AddSC_instance_zulfarrak();             //Zul'Farrak instance script
     AddSC_ashenvale();
-    AddSC_azshara();
     AddSC_azuremyst_isle();
     AddSC_bloodmyst_isle();
     AddSC_boss_azuregos();

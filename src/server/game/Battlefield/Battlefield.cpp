@@ -855,7 +855,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
     return go;
 }
 
-Creature* Battlefield::GetCreature(ObjectGuid const guid)
+Creature* Battlefield::GetCreature(ObjectGuid const& guid)
 {
     if (!m_Map)
         return nullptr;
@@ -863,7 +863,7 @@ Creature* Battlefield::GetCreature(ObjectGuid const guid)
     return m_Map->GetCreature(guid);
 }
 
-GameObject* Battlefield::GetGameObject(ObjectGuid const guid)
+GameObject* Battlefield::GetGameObject(ObjectGuid const& guid)
 {
     if (!m_Map)
         return nullptr;

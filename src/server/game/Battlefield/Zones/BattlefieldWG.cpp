@@ -415,7 +415,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     {
         for (GuidUnorderedSet::const_iterator itr = m_vehicles[team].begin(); itr != m_vehicles[team].end(); ++itr)
             if (Creature* creature = GetCreature(*itr))
-                creature->DespawnOrUnsummon(1);
+                creature->DespawnOrUnsummon(1ms);
 
         m_vehicles[team].clear();
     }

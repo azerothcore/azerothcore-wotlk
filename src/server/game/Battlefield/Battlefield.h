@@ -146,6 +146,7 @@ class BfGraveyard
 {
 public:
     BfGraveyard(Battlefield* Bf);
+    virtual ~BfGraveyard() = default;
 
     // Method to changing who controls the graveyard
     void GiveControlTo(TeamId team);
@@ -302,8 +303,8 @@ public:
     Creature* SpawnCreature(uint32 entry, Position pos, TeamId teamId);
     GameObject* SpawnGameObject(uint32 entry, float x, float y, float z, float o);
 
-    Creature* GetCreature(ObjectGuid const guid);
-    GameObject* GetGameObject(ObjectGuid const guid);
+    Creature* GetCreature(ObjectGuid const& guid);
+    GameObject* GetGameObject(ObjectGuid const& guid);
 
     // Script-methods
 

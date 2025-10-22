@@ -298,7 +298,7 @@ public:
             if (a == 1)
             {
                 me->setActive(true);
-                events.RescheduleEvent(20, 0);
+                events.RescheduleEvent(20, 0ms);
             }
         }
 
@@ -404,7 +404,7 @@ public:
                 case 8:
                     Talk(SAY_OUTRO_KRICK_4);
 
-                    events.RescheduleEvent(9, 1500);
+                    events.RescheduleEvent(9, 1500ms);
                     break;
                 case 9:
                     if (pInstance)
@@ -430,7 +430,7 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_KRICK_2);
 
-                    events.RescheduleEvent(11, 9000);
+                    events.RescheduleEvent(11, 9s);
                     break;
                 case 11:
                     if (pInstance)
@@ -506,7 +506,7 @@ class spell_exploding_orb_auto_grow_aura : public AuraScript
                 target->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
                 target->RemoveAurasDueToSpell(SPELL_EXPLODING_ORB_VISUAL);
                 if (target->IsCreature())
-                    target->ToCreature()->DespawnOrUnsummon(2000);
+                    target->ToCreature()->DespawnOrUnsummon(2s);
             }
     }
 

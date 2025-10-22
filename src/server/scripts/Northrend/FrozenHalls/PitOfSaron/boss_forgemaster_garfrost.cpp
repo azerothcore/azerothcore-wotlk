@@ -112,7 +112,7 @@ public:
 
             Talk(SAY_AGGRO);
             DoZoneInCombat();
-            events.RescheduleEvent(EVENT_SPELL_THROW_SARONITE, 5000ms, 7500ms);
+            events.RescheduleEvent(EVENT_SPELL_THROW_SARONITE, 5s, 7500ms);
 
             if (pInstance)
                 pInstance->SetData(DATA_GARFROST, IN_PROGRESS);
@@ -178,7 +178,7 @@ public:
             }
             if (spell->Id == uint32(SPELL_FORGE_BLADE))
             {
-                events.RescheduleEvent(EVENT_SPELL_CHILLING_WAVE, 10000);
+                events.RescheduleEvent(EVENT_SPELL_CHILLING_WAVE, 10s);
                 SetEquipmentSlots(false, EQUIP_ID_SWORD);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetControlled(false, UNIT_STATE_ROOT);

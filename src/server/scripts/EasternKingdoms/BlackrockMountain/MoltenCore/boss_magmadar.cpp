@@ -73,13 +73,13 @@ public:
                 {
                     Talk(EMOTE_FRENZY);
                     DoCastSelf(SPELL_FRENZY);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.Repeat(15s, 20s);
                     break;
                 }
                 case EVENT_PANIC:
                 {
                     DoCastVictim(SPELL_PANIC);
-                    events.RepeatEvent(urand(31000, 38000));
+                    events.Repeat(31s, 38s);
                     break;
                 }
                 case EVENT_LAVA_BOMB:
@@ -89,7 +89,7 @@ public:
                         DoCast(target, SPELL_LAVA_BOMB);
                     }
 
-                    events.RepeatEvent(urand(12000, 15000));
+                    events.Repeat(12s, 15s);
                     break;
                 }
                 case EVENT_LAVA_BOMB_RANGED:
@@ -104,7 +104,7 @@ public:
                     {
                         DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
                     }
-                    events.RepeatEvent(urand(12000, 15000));
+                    events.Repeat(12s, 15s);
                     break;
                 }
             }

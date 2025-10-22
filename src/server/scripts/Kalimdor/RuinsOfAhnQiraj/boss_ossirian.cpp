@@ -154,7 +154,7 @@ struct boss_ossirian : public BossAI
         }
     }
 
-    void SetGUID(ObjectGuid guid, int32 action) override
+    void SetGUID(ObjectGuid const& guid, int32 action) override
     {
         if (action == ACTION_TRIGGER_WEAKNESS && guid != _firstCrystalGUID)
         {
@@ -317,7 +317,7 @@ public:
     {
         go_ossirian_crystalAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == GUID_TRIGGER_PAIR)
             {

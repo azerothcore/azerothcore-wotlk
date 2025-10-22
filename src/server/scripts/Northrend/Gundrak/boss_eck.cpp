@@ -17,6 +17,7 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellInfo.h"
 #include "gundrak.h"
 
 enum Spells
@@ -57,7 +58,7 @@ public:
         void InitializeAI() override
         {
             BossAI::InitializeAI();
-            me->GetMotionMaster()->MovePoint(POINT_START, 1638.55f, 919.76f, 104.95f, false);
+            me->GetMotionMaster()->MovePoint(POINT_START, 1638.55f, 919.76f, 104.95f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
             me->SetHomePosition(1642.712f, 934.646f, 107.205f, 0.767f);
             me->SetReactState(REACT_PASSIVE);
         }
@@ -71,6 +72,15 @@ public:
             }
         }
 
+        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+        {
+            if (spell->Id == SPELL_ECK_SPRING)
+            {
+                me->GetThreatMgr().ResetAllThreat();
+                me->AddThreat(target, 1.0f);
+            }
+        }
+
         void Reset() override
         {
             BossAI::Reset();
@@ -81,8 +91,8 @@ public:
             BossAI::JustEngagedWith(who);
             events.ScheduleEvent(EVENT_ECK_BERSERK, 60s, 90s);
             events.ScheduleEvent(EVENT_ECK_BITE, 5s);
-            events.ScheduleEvent(EVENT_ECK_SPIT, 10s);
-            events.ScheduleEvent(EVENT_ECK_SPRING, 8s);
+            events.ScheduleEvent(EVENT_ECK_SPIT, 10s, 37s);
+            events.ScheduleEvent(EVENT_ECK_SPRING, 10s, 24s);
         }
 
         void JustDied(Unit* killer) override
@@ -120,17 +130,14 @@ public:
                     break;
                 case EVENT_ECK_SPIT:
                     me->CastSpell(me->GetVictim(), SPELL_ECK_SPIT, false);
-                    events.ScheduleEvent(EVENT_ECK_SPIT, 10s);
+                    events.ScheduleEvent(EVENT_ECK_SPIT, 11s, 24s);
                     break;
                 case EVENT_ECK_SPRING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true, false))
                     {
-                        me->GetThreatMgr().ResetAllThreat();
-                        me->AddThreat(target, 500.0f);
                         me->CastSpell(target, SPELL_ECK_SPRING, false);
                     }
-
-                    events.ScheduleEvent(EVENT_ECK_SPRING, 5s, 10s);
+                    events.ScheduleEvent(EVENT_ECK_SPRING, 10s, 24s);
                     break;
             }
 

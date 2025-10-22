@@ -78,7 +78,7 @@ struct npc_forest_frog : public ScriptedAI
     void MovementInform(uint32 type, uint32 data) override
     {
         if (type == POINT_MOTION_TYPE && data == POINT_DESPAWN)
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -103,7 +103,7 @@ struct npc_forest_frog : public ScriptedAI
                     Talk(SAY_THANKS_FREED, player);
 
                 eventTimer = 2;
-                events.ScheduleEvent(eventTimer, urand(4000, 5000));
+                events.ScheduleEvent(eventTimer, 4s, 5s);
                 break;
             case 2:
                 if (me->GetEntry() != NPC_GUNTER && me->GetEntry() != NPC_KYREN) // vendors don't kneel?
@@ -140,7 +140,7 @@ struct npc_forest_frog : public ScriptedAI
                     break;
                 }
                 eventTimer = 3;
-                events.ScheduleEvent(eventTimer, urand(6000, 7000));
+                events.ScheduleEvent(eventTimer, 6s, 7s);
                 break;
             case 3:
                 me->SetStandState(EMOTE_ONESHOT_NONE);
@@ -152,9 +152,9 @@ struct npc_forest_frog : public ScriptedAI
 
                 eventTimer = 4;
                 if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
-                    events.ScheduleEvent(eventTimer, 5 * MINUTE * IN_MILLISECONDS); // vendors wait for 5 minutes before running away and despawning
+                    events.ScheduleEvent(eventTimer, 300s); // vendors wait for 5 minutes before running away and despawning
                 else
-                    events.ScheduleEvent(eventTimer, 6000);
+                    events.ScheduleEvent(eventTimer, 6s);
                 break;
             case 4:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
@@ -165,7 +165,7 @@ struct npc_forest_frog : public ScriptedAI
                     Talk(SAY_GOODBYE, player);
 
                 eventTimer = 5;
-                events.ScheduleEvent(eventTimer, 2000);
+                events.ScheduleEvent(eventTimer, 2s);
                 break;
             case 5:
 
@@ -205,7 +205,7 @@ struct npc_forest_frog : public ScriptedAI
 
         // start generic rp
         eventTimer = 1;
-        events.ScheduleEvent(eventTimer, 3000);
+        events.ScheduleEvent(eventTimer, 3s);
 
         me->UpdateEntry(cEntry);
 

@@ -184,13 +184,13 @@ void OPvPCapturePointHP::ChangeState()
             field = HP_MAP_A[m_TowerType];
             if (uint32 alliance_towers = ((OutdoorPvPHP*)_pvp)->GetAllianceTowersControlled())
                 ((OutdoorPvPHP*)_pvp)->SetAllianceTowersControlled(--alliance_towers);
-            sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_A[m_TowerType]));
+            _pvp->GetMap()->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_A[m_TowerType]).c_str());
             break;
         case OBJECTIVESTATE_HORDE:
             field = HP_MAP_H[m_TowerType];
             if (uint32 horde_towers = ((OutdoorPvPHP*)_pvp)->GetHordeTowersControlled())
                 ((OutdoorPvPHP*)_pvp)->SetHordeTowersControlled(--horde_towers);
-            sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_H[m_TowerType]));
+            _pvp->GetMap()->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_H[m_TowerType]).c_str());
             break;
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
             field = HP_MAP_N[m_TowerType];
@@ -227,7 +227,7 @@ void OPvPCapturePointHP::ChangeState()
                 uint32 alliance_towers = ((OutdoorPvPHP*)_pvp)->GetAllianceTowersControlled();
                 if (alliance_towers < 3)
                     ((OutdoorPvPHP*)_pvp)->SetAllianceTowersControlled(++alliance_towers);
-                sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_A[m_TowerType]));
+                _pvp->GetMap()->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_A[m_TowerType]).c_str());
                 break;
             }
         case OBJECTIVESTATE_HORDE:
@@ -238,7 +238,7 @@ void OPvPCapturePointHP::ChangeState()
                 uint32 horde_towers = ((OutdoorPvPHP*)_pvp)->GetHordeTowersControlled();
                 if (horde_towers < 3)
                     ((OutdoorPvPHP*)_pvp)->SetHordeTowersControlled(++horde_towers);
-                sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_H[m_TowerType]));
+                _pvp->GetMap()->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_H[m_TowerType]).c_str());
                 break;
             }
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:

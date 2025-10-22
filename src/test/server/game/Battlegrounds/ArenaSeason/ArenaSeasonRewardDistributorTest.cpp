@@ -19,6 +19,8 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include "ArenaSeasonRewardsDistributor.h"
+#include "WorldMock.h"
+#include <memory>
 
 class MockArenaSeasonTeamRewarder : public ArenaSeasonTeamRewarder
 {
@@ -31,12 +33,26 @@ class ArenaSeasonRewardDistributorTest : public ::testing::Test
 protected:
     void SetUp() override
     {
+        _previousWorld = std::move(sWorld);
+        _worldMock = new ::testing::NiceMock<WorldMock>();
+        ON_CALL(*_worldMock, getIntConfig(::testing::_)).WillByDefault(::testing::Return(0));
+        ON_CALL(*_worldMock, getIntConfig(CONFIG_LEGACY_ARENA_START_RATING)).WillByDefault(::testing::Return(1500));
+        ON_CALL(*_worldMock, getIntConfig(CONFIG_ARENA_START_RATING)).WillByDefault(::testing::Return(0));
+        sWorld.reset(_worldMock);
+
         _mockRewarder = std::make_unique<MockArenaSeasonTeamRewarder>();
         _distributor = std::make_unique<ArenaSeasonRewardDistributor>(_mockRewarder.get());
     }
 
+    void TearDown() override
+    {
+        sWorld = std::move(_previousWorld);
+    }
+
     std::unique_ptr<MockArenaSeasonTeamRewarder> _mockRewarder;
     std::unique_ptr<ArenaSeasonRewardDistributor> _distributor;
+    std::unique_ptr<IWorld> _previousWorld;
+    ::testing::NiceMock<WorldMock>* _worldMock = nullptr;
 };
 
 ArenaTeam ArenaTeamWithRating(int rating, int gamesPlayed)

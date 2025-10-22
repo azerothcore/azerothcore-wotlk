@@ -247,7 +247,7 @@ struct npc_love_in_air_snivel_real : public ScriptedAI
                     if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                         me->CastSpell(owner, SPELL_SNIVEL_GUN, true);
 
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
             }
         }
     }

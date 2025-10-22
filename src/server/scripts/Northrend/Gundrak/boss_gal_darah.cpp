@@ -133,7 +133,7 @@ public:
                 despawnTime = (summon->GetDistance(target) / 40.0f * 1000) + 500;
             }
 
-            summon->DespawnOrUnsummon(despawnTime);
+            summon->DespawnOrUnsummon(Milliseconds(despawnTime));
         }
 
         uint32 GetData(uint32  /*type*/) const override
@@ -149,7 +149,7 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_SLAY);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);

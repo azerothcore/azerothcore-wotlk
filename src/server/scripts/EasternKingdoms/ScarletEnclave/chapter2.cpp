@@ -613,7 +613,7 @@ public:
                 me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
             }
             // Schedule the first ritual after 20-30s
-            events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
+            events.ScheduleEvent(EVENT_START_RITUAL, 20s, 30s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -628,7 +628,7 @@ public:
                     {
                         if (isOnRitual) // Already performing ritual
                         {
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
 
@@ -655,7 +655,7 @@ public:
                         if (!nearestCorpse)
                         {
                             // No corpse found nearby: try again later
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
                         // Start ritual
@@ -702,7 +702,7 @@ public:
                         // Resume paused waypoint movement
                         me->ResumeMovement();
                         // Schedule next ritual in 20-30s
-                        events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
+                        events.ScheduleEvent(EVENT_START_RITUAL, 20s, 30s);
                         break;
                     }
                 }
@@ -723,9 +723,9 @@ public:
                     me->SetFacingToObject(geist);
                     geistGUID = geist->GetGUID();
                     // Geist found: schedule Ghoulplosion at +3s, then raising at +6s, then resume at +9s
-                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
-                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 6000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 9000);
+                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3s);
+                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 6s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 9s);
                 }
                 else
                 {
@@ -737,8 +737,8 @@ public:
                         me->SetFacingToObject(corpse);
                     }
 
-                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 3000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 6000);
+                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 3s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 6s);
                 }
             }
         }
@@ -800,7 +800,7 @@ public:
                 me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
             }
             // Schedule the first ritual after 50-60s
-            events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
+            events.ScheduleEvent(EVENT_START_RITUAL, 50s, 60s);
         }
         void UpdateAI(uint32 diff) override
         {
@@ -814,7 +814,7 @@ public:
                     {
                         if (isOnRitual) // Already performing ritual
                         {
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
 
@@ -841,7 +841,7 @@ public:
                         }
                         if (!nearestCorpse)
                         {
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
                         // Start ritual
@@ -894,7 +894,7 @@ public:
                         // Resume paused waypoint movement
                         me->ResumeMovement();
                         // Schedule next ritual in 50-60s
-                        events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
+                        events.ScheduleEvent(EVENT_START_RITUAL, 50s, 60s);
                         break;
                     }
                 }
@@ -923,15 +923,15 @@ public:
                     me->SetFacingToObject(geist);
                     geistGUID = geist->GetGUID();
                     // Geist present: Ghoulplosion in 3s (with SAY_GEIST), raise in 6s, resume in 9s
-                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
-                    events.ScheduleEvent(EVENT_RAISE_DEAD, 6000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 9000);
+                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3s);
+                    events.ScheduleEvent(EVENT_RAISE_DEAD, 6s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 9s);
                 }
                 else
                 {
                     // No Geist: raise in 3s, resume in 6s
-                    events.ScheduleEvent(EVENT_RAISE_DEAD, 3000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 6000);
+                    events.ScheduleEvent(EVENT_RAISE_DEAD, 3s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 6s);
                 }
             }
         }
@@ -1001,20 +1001,25 @@ class spell_chapter2_persuasive_strike : public SpellScript
             creature->AI()->Talk(SAY_PERSUADED3, 24s);
             creature->AI()->Talk(SAY_PERSUADED4, 32s);
 
-            creature->m_Events.AddEventAtOffset([creature, player]
+            ObjectGuid playerGuid = player->GetGUID();
+
+            creature->m_Events.AddEventAtOffset([creature, playerGuid]
             {
-                if (player)
-                    sCreatureTextMgr->SendChat(creature, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+                if (Player* caster = ObjectAccessor::GetPlayer(*creature, playerGuid))
+                    sCreatureTextMgr->SendChat(creature, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, caster);
             }, 40s);
 
-            creature->m_Events.AddEventAtOffset([creature, player]
+            creature->m_Events.AddEventAtOffset([creature, playerGuid]
             {
                 creature->AI()->Talk(SAY_PERSUADED6);
-                if (player)
+
+                if (Player* caster = ObjectAccessor::GetPlayer(*creature, playerGuid))
                 {
-                    Unit::Kill(player, creature);
-                    player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
+                    Unit::Kill(caster, creature);
+                    caster->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
                 }
+                else
+                    creature->KillSelf();
             }, 48s);
         }
         else

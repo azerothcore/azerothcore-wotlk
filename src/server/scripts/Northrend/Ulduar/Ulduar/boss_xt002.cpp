@@ -611,7 +611,7 @@ public:
                     if (!urand(0, 2))
                         pXT002->AI()->Talk(EMOTE_SCRAPBOT);
 
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                 }
         }
 
@@ -657,7 +657,7 @@ public:
             if (Unit* target = SelectTargetFromPlayerList(200))
                 AttackStart(target);
             else
-                me->DespawnOrUnsummon(500);
+                me->DespawnOrUnsummon(500ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -769,12 +769,12 @@ public:
             // so that can't be the issue
             // See BoomEvent class
             // Schedule 1s delayed
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
+            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
+            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

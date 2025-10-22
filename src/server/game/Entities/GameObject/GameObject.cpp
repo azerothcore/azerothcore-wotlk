@@ -929,7 +929,7 @@ void GameObject::AddUniqueUse(Player* player)
     m_unique_users.insert(player->GetGUID());
 }
 
-void GameObject::DespawnOrUnsummon(Milliseconds delay, Seconds forceRespawnTime)
+void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRespawnTime /*= 0s*/)
 {
     if (delay > 0ms)
     {
@@ -1731,34 +1731,40 @@ void GameObject::Use(Unit* user)
                             uint32 zone, subzone;
                             GetZoneAndAreaId(zone, subzone);
 
-                            int32 zone_skill = sObjectMgr->GetFishingBaseSkillLevel(subzone);
-                            if (!zone_skill)
-                                zone_skill = sObjectMgr->GetFishingBaseSkillLevel(zone);
+                            int32 zoneSkill = sObjectMgr->GetFishingBaseSkillLevel(subzone);
+                            if (!zoneSkill)
+                                zoneSkill = sObjectMgr->GetFishingBaseSkillLevel(zone);
 
                             //provide error, no fishable zone or area should be 0
-                            if (!zone_skill)
+                            if (!zoneSkill)
                                 LOG_ERROR("sql.sql", "Fishable areaId {} are not properly defined in `skill_fishing_base_level`.", subzone);
 
-                            int32 skill = player->GetSkillValue(SKILL_FISHING);
+                            // no miss skill is zone skill + 95 since at least patch 2.1
+                            int32 const noMissSkill = zoneSkill + 95;
+
+                            int32 const skill = player->GetSkillValue(SKILL_FISHING);
 
                             int32 chance;
-                            if (skill < zone_skill)
+                            // fishing pool catches are 100%
+                            //TODO: find reasonable value for fishing hole search
+                            GameObject* fishingHole = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
+                            if (fishingHole)
+                                chance = 100;
+                            else if (skill < noMissSkill)
                             {
-                                chance = int32(pow((double)skill / zone_skill, 2) * 100);
+                                chance = int32(pow((double)skill / noMissSkill, 2) * 100);
                                 if (chance < 1)
                                     chance = 1;
                             }
                             else
                                 chance = 100;
 
-                            int32 roll = irand(1, 100);
+                            int32 const roll = irand(1, 100);
 
-                            LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
+                            LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} no-miss skill: {} chance {} roll: {})", skill, zoneSkill, noMissSkill, chance, roll);
 
-                            if (sScriptMgr->OnPlayerUpdateFishingSkill(player, skill, zone_skill, chance, roll))
-                            {
+                            if (sScriptMgr->OnPlayerUpdateFishingSkill(player, skill, zoneSkill, chance, roll))
                                 player->UpdateFishingSkill();
-                            }
                             // but you will likely cause junk in areas that require a high fishing skill (not yet implemented)
                             if (chance >= roll)
                             {
@@ -1768,11 +1774,10 @@ void GameObject::Use(Unit* user)
                                 SetOwnerGUID(player->GetGUID());
                                 SetSpellId(0); // prevent removing unintended auras at Unit::RemoveGameObject
 
-                                //TODO: find reasonable value for fishing hole search
-                                GameObject* ok = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
-                                if (ok)
+                                // fishing pool catch
+                                if (fishingHole)
                                 {
-                                    ok->Use(player);
+                                    fishingHole->Use(player);
                                     SetLootState(GO_JUST_DEACTIVATED);
                                 }
                                 else
@@ -3046,13 +3051,13 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     return nullptr;
 }
 
-void GameObject::AddToSkillupList(ObjectGuid playerGuid)
+void GameObject::AddToSkillupList(ObjectGuid const& playerGuid)
 {
     int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;
     m_SkillupList[playerGuid] = timer;
 }
 
-bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
+bool GameObject::IsInSkillupList(ObjectGuid const& playerGuid) const
 {
     for (auto const& itr : m_SkillupList)
     {

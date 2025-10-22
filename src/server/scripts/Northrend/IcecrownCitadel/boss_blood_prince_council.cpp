@@ -375,7 +375,7 @@ public:
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->ForceValuesUpdateAtIndex(UNIT_NPC_FLAGS);   // was in sniff. don't ask why
-                    me->m_Events.AddEvent(new StandUpEvent(*me), me->m_Events.CalculateTime(1000));
+                    me->m_Events.AddEventAtOffset(new StandUpEvent(*me), 1s);
                     DoAction(ACTION_REMOVE_INVOCATION);
                     me->SetHealth(1);
                     break;
@@ -645,7 +645,7 @@ public:
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->ForceValuesUpdateAtIndex(UNIT_NPC_FLAGS);   // was in sniff. don't ask why
-                    me->m_Events.AddEvent(new StandUpEvent(*me), me->m_Events.CalculateTime(1000));
+                    me->m_Events.AddEventAtOffset(new StandUpEvent(*me), 1s);
                     DoAction(ACTION_REMOVE_INVOCATION);
                     me->SetHealth(1);
                     break;
@@ -889,7 +889,7 @@ public:
                     summon->CastSpell(summon, SPELL_KINETIC_BOMB, true, nullptr, nullptr, me->GetGUID());
                     break;
                 case NPC_SHOCK_VORTEX:
-                    summon->m_Events.AddEvent(new ShockVortexExplodeEvent(*summon), summon->m_Events.CalculateTime(4500));
+                    summon->m_Events.AddEventAtOffset(new ShockVortexExplodeEvent(*summon), 4500ms);
                     break;
                 default:
                     break;
@@ -939,7 +939,7 @@ public:
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->ForceValuesUpdateAtIndex(UNIT_NPC_FLAGS);   // was in sniff. don't ask why
-                    me->m_Events.AddEvent(new StandUpEvent(*me), me->m_Events.CalculateTime(1000));
+                    me->m_Events.AddEventAtOffset(new StandUpEvent(*me), 1s);
                     me->SetHealth(me->GetMaxHealth());
                     DoAction(ACTION_CAST_INVOCATION);
                     break;
@@ -1213,7 +1213,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1287,13 +1287,13 @@ public:
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->StopMoving();
                 me->CastSpell(me, SPELL_FLAMES, true);
-                me->DespawnOrUnsummon(999);
+                me->DespawnOrUnsummon(999ms);
                 me->CastSpell(me, SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
                 _exploded = true;
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*type*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*type*/) override
         {
             _chaseGUID = guid;
         }
@@ -1331,7 +1331,7 @@ public:
                 me->SetInCombatWithZone();
                 return;
             }
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
@@ -1424,7 +1424,7 @@ public:
                 case EVENT_BOMB_DESPAWN:
                     me->RemoveAllAuras();
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->DespawnOrUnsummon(exploded ? 5000 : 0);
+                    me->DespawnOrUnsummon(exploded ? 5s : 0ms);
                     break;
                 case EVENT_CONTINUE_FALLING:
                     me->GetMotionMaster()->MovementExpired(false);

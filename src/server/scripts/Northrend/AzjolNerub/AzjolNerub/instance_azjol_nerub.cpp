@@ -126,9 +126,36 @@ class spell_azjol_nerub_web_wrap_aura : public AuraScript
     }
 };
 
+enum DrainPowerSpells
+{
+    SPELL_DRAIN_POWER_AURA = 54315
+};
+
+// 54314, 59354 - Drain Power
+class spell_azjol_drain_power : public SpellScript
+{
+    PrepareSpellScript(spell_azjol_drain_power);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRAIN_POWER_AURA });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_DRAIN_POWER_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_azjol_drain_power::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+    }
+};
+
 void AddSC_instance_azjol_nerub()
 {
     new instance_azjol_nerub();
     RegisterSpellScript(spell_azjol_nerub_fixate);
     RegisterSpellScript(spell_azjol_nerub_web_wrap_aura);
+    RegisterSpellScript(spell_azjol_drain_power);
 }

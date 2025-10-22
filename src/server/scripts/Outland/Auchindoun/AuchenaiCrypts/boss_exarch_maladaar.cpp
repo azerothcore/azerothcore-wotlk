@@ -241,7 +241,7 @@ struct npc_stolen_soul : public ScriptedAI
         });
     }
 
-    void SetGUID(ObjectGuid guid, int32 /*id*/) override
+    void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
     {
         _targetGuid = guid;
     }

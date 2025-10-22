@@ -418,7 +418,7 @@ public:
                 if (Creature* mastersEye = instance->GetCreature(DATA_MASTERS_EYE))
                 {
                     mastersEye->AI()->Talk(EMOTE_MASTERS_EYE_AT, player);
-                    mastersEye->DespawnOrUnsummon(11000);
+                    mastersEye->DespawnOrUnsummon(11s);
                     mastersEye->m_Events.AddEventAtOffset([mastersEye, player]()
                         {
                             mastersEye->SetFacingToObject(player);
