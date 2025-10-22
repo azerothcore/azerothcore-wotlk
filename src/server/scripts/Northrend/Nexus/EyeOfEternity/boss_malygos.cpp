@@ -1222,10 +1222,8 @@ public:
                 v->RemoveAllPassengers();
 
             if (killer)
-            {
                 if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                     player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
-            }
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
