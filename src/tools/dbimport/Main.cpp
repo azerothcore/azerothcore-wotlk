@@ -109,8 +109,8 @@ bool StartDB()
 
     DatabaseLoader loader =
         modules.empty() ? DatabaseLoader("dbimport") :
-        (modules == "all") ? DatabaseLoader("dbimport", DatabaseLoader::DATABASE_NONE, AC_MODULES_LIST) :
-        DatabaseLoader("dbimport", DatabaseLoader::DATABASE_NONE, modules);
+        (modules == "all") ? DatabaseLoader("dbimport", DatabaseLoader::DATABASE_MASK_ALL, AC_MODULES_LIST) :
+        DatabaseLoader("dbimport", DatabaseLoader::DATABASE_MASK_ALL, modules);
 
     loader
         .AddDatabase(LoginDatabase, "Login")
