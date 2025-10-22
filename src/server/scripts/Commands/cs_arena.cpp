@@ -231,7 +231,10 @@ public:
         }
 
         if (!found)
+        {
             handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, std::string(needle));
+            return false;
+        }
 
         return true;
     }
