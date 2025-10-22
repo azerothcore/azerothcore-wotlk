@@ -259,7 +259,7 @@ struct boss_kiggler_the_crazed : public ScriptedAI
             return;
 
         if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
+            me->GetMotionMaster()->MoveChase(who, 40.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
