@@ -116,14 +116,14 @@ jobs:
 
       - name: Test authserver dry-run
         run: |
-          ./acore.sh config load
+          source ./acore.sh config load
           cd env/dist/bin
           timeout 5m ./authserver -dry-run
         continue-on-error: false
 
       - name: Test worldserver dry-run
         run: |
-          ./acore.sh config load
+          source ./acore.sh config load
           cd env/dist/bin
           timeout 5m ./worldserver -dry-run
         continue-on-error: false
