@@ -1421,10 +1421,11 @@ class spell_warl_voidwalker_pet_passive : public AuraScript
 
     void CalculateAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (Unit* pet = GetUnitOwner(); pet->IsPet())
-            if (Unit* owner = pet->ToPet()->GetOwner())
-                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_GLYPH_OF_VOIDWALKER, EFFECT_0))
-                    amount += aurEff->GetAmount();
+        if (Unit* pet = GetUnitOwner())
+            if (pet->IsPet())
+                if (Unit* owner = pet->ToPet()->GetOwner())
+                    if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_GLYPH_OF_VOIDWALKER, EFFECT_0))
+                        amount += aurEff->GetAmount();
     }
 
     void Register() override
