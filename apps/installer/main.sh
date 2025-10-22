@@ -45,6 +45,7 @@ menu_items=(
     "docker|dr|Run docker tools"
     "version|v|Show AzerothCore version"
     "service-manager|sm|Run service manager to run authserver and worldserver in background"
+    "show-config|sc|Show the value of a configuration variable (usage: show-config <VAR_NAME>)"
     "quit|q|Exit from this menu"
 )
 
@@ -99,6 +100,9 @@ function handle_menu_command() {
         "service-manager")
             bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "$@"
             exit
+            ;;
+        "show-config")
+            inst_showConfigValue "$@"
             ;;
         "quit")
             echo "Goodbye!"

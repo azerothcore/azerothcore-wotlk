@@ -211,7 +211,7 @@ void Log::ReadLoggersFromConfig()
         AppenderConsole* appender = new AppenderConsole(NextAppenderId(), "Console", LOG_LEVEL_DEBUG, APPENDER_FLAGS_NONE, {});
         appenders[appender->getId()].reset(appender);
 
-        Logger* rootLogger = new Logger(LOGGER_ROOT, LOG_LEVEL_ERROR);
+        Logger* rootLogger = new Logger(LOGGER_ROOT, LOG_LEVEL_WARN);
         rootLogger->addAppender(appender->getId(), appender);
         loggers[LOGGER_ROOT].reset(rootLogger);
 
