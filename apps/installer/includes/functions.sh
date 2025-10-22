@@ -184,12 +184,4 @@ function inst_download_client_data {
         && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
 }
 
-function inst_showConfigValue() {
-    local varName="$1"
-    local varValue="${!varName}"
-    if [ -z "$varValue" ]; then
-        echo "$varName is not set."
-    else
-        echo "$varName=$varValue"
-    fi
-}
+

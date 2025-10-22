@@ -59,7 +59,6 @@ else
     C_GREEN=''
     C_YELLOW=''
     C_BLUE=''
-    C_MAGENTA=''
     C_CYAN=''
 fi
 
@@ -174,42 +173,8 @@ function inst_module_list() {
 # Usage: ./acore.sh module <search|install|update|remove> [args...]
 #        ./acore.sh module                    # Interactive menu
 function inst_module() {
-    # If no arguments provided, start interactive menu
-    if [[ $# -eq 0 ]]; then
-        menu_run_with_items "MODULE MANAGER" handle_module_command -- "${module_menu_items[@]}" --
-        return $?
-    fi
-    
-    # Normalize arguments into an array
-    local tokens=()
-    read -r -a tokens <<< "$*"
-    local cmd="${tokens[0]}"
-    local args=("${tokens[@]:1}")
-
-    case "$cmd" in
-        ""|"help"|"-h"|"--help")
-            inst_module_help
-            ;;
-        "search"|"s")
-            inst_module_search "${args[@]}"
-            ;;
-        "install"|"i")
-            inst_module_install "${args[@]}"
-            ;;
-        "update"|"u")
-            inst_module_update "${args[@]}"
-            ;;
-        "remove"|"r")
-            inst_module_remove "${args[@]}"
-            ;;
-        "list"|"l")
-            inst_module_list "${args[@]}"
-            ;;
-        *)
-            print_error "Unknown module command: $cmd. Use 'help' to see available commands."
-            return 1
-            ;;
-    esac
+    menu_run_with_items "MODULE MANAGER" handle_module_command -- "${module_menu_items[@]}" -- "$@"
+    return $?
 }
 
 # =============================================================================
