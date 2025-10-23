@@ -1776,6 +1776,8 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         WorldObject const* viewpoint = this;
         if (Player const* thisPlayer = ToPlayer())
         {
+            viewpoint = thisPlayer->GetSeer();
+
             if (Creature const* creature = obj->ToCreature())
             {
                 if (TempSummon const* tempSummon = creature->ToTempSummon())
@@ -1815,13 +1817,8 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
                                 return false;
             }
 
-            if (thisPlayer->GetViewpoint())
-                viewpoint = thisPlayer->GetViewpoint();
-
             if (thisPlayer->GetFarSightDistance() && !thisPlayer->isInFront(obj))
-            {
                 return false;
-            }
         }
 
         // Xinef: check reversely obj vs viewpoint, object could be a gameObject which overrides _IsWithinDist function to include gameobject size
