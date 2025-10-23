@@ -1359,7 +1359,7 @@ void OpcodeTable::Initialize()
     /*0x4CC*/ DEFINE_HANDLER(CMSG_END_BATTLEFIELD_CHEAT,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x4CD*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MULTIPLE_PACKETS,                                   STATUS_NEVER);
     /*0x4CE*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_GRAVITY_DISABLE,                               STATUS_NEVER);
-    /*0x4CF*/ DEFINE_HANDLER(CMSG_MOVE_GRAVITY_DISABLE_ACK,                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x4CF*/ DEFINE_HANDLER(CMSG_MOVE_GRAVITY_DISABLE_ACK,                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::HandleMoveFlagChangeOpcode               );
     /*0x4D0*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_GRAVITY_ENABLE,                                STATUS_NEVER);
     /*0x4D1*/ DEFINE_HANDLER(CMSG_MOVE_GRAVITY_ENABLE_ACK,                                          STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x4D2*/ DEFINE_SERVER_OPCODE_HANDLER(MSG_MOVE_GRAVITY_CHNG,                                   STATUS_NEVER);

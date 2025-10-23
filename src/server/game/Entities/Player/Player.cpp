@@ -16034,24 +16034,6 @@ bool Player::IsInWhisperWhiteList(ObjectGuid guid)
     return false;
 }
 
-bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
-{
-    if (!packetOnly && !Unit::SetDisableGravity(disable))
-        return false;
-
-    WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
-    data << GetPackGUID();
-    data << GetSession()->GetOrderCounter(); // movement counter
-    SendDirectMessage(&data);
-    GetSession()->IncrementOrderCounter();
-
-    data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
 Guild* Player::GetGuild() const
 {
     uint32 guildId = GetGuildId();

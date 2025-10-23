@@ -20381,22 +20381,39 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
-bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
+void Unit::SetDisableGravity(bool enable)
 {
-    if (disable == IsLevitating())
-        return false;
+    bool isClientControlled = IsClientControlled();
 
-    if (disable)
+    if (!isClientControlled)
     {
-        AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-    }
-    else
-    {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+        if (enable)
+            m_movementInfo.AddMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+        else
+            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
     }
 
-    return true;
+    if (!IsInWorld()) // is sent on add to map
+        return;
+
+    if (isClientControlled)
+    {
+        if (Player const* player = GetClientControlling())
+        {
+            auto const counter = player->GetSession()->GetOrderCounter();
+
+            WorldPacket data(enable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, GetPackGUID().size() + 4);
+            data << GetPackGUID();
+            data << counter;
+            player->GetSession()->SendPacket(&data);
+            player->GetSession()->IncrementOrderCounter();
+            return;
+        }
+    }
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
+    data << GetPackGUID();
+    SendMessageToSet(&data, true);
 }
 
 bool Unit::SetSwim(bool enable)

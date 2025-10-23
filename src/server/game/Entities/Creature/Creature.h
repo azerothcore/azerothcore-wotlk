@@ -145,7 +145,6 @@ public:
     [[nodiscard]] CreatureAI* AI() const { return (CreatureAI*)i_AI; }
 
     bool SetWalk(bool enable) override;
-    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetSwim(bool enable) override;
     bool HasSpellFocus(Spell const* focusSpell = nullptr) const;
 

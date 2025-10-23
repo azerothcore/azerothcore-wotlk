@@ -1681,7 +1681,7 @@ public:
     void MonsterMoveWithSpeed(float x, float y, float z, float speed); // Not to be used outside of cinematics
 
     virtual bool SetWalk(bool enable);
-    virtual bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true);
+    void SetDisableGravity(bool disable);
     virtual bool SetSwim(bool enable);
     void SetCanFly(bool enable);
     void SetWaterWalking(bool enable);
