@@ -2351,6 +2351,7 @@ public:
     void SetMover(Unit* target);
 
     void SetSeer(WorldObject* target) { m_seer = target; }
+    WorldObject* GetSeer() const { return m_seer; }
     void SetViewpoint(WorldObject* target, bool apply);
     [[nodiscard]] WorldObject* GetViewpoint() const;
     void StopCastingCharm(Aura* except = nullptr);
