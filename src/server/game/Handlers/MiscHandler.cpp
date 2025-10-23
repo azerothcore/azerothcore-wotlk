@@ -1539,7 +1539,6 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     }
 
     WorldPacket data(response, 8);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     _player->m_mover->SendMessageToSet(&data, _player);
 }

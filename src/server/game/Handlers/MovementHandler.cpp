@@ -378,7 +378,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
-    movementInfo.guid = mover->GetGUID();
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, _player);
 }
@@ -664,8 +663,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     ReadMovementInfo(recvData, &movementInfo);
     recvData >> newspeed;
 
-    recvData >> guid.ReadAsPacked();
-
     Unit* mover = _player->m_mover;
 
     // pussywizard: special check, only player mover allowed here
@@ -684,7 +681,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     if (opcode == CMSG_MOVE_SET_COLLISION_HGT_ACK)
     {
         WorldPacket data(MSG_MOVE_SET_COLLISION_HGT, 18);
-        data << guid.WriteAsPacked();
         WriteMovementInfo(&data, &movementInfo);
         data << newspeed; // new collision height
         mover->SendMessageToSet(&data, _player);
@@ -718,7 +714,6 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 
     const SpeedOpcodePair& speedOpcodes = SetSpeed2Opc_table[move_type];
     WorldPacket data(speedOpcodes[2], 18);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     data << newspeed;
     mover->SendMessageToSet(&data, _player);
@@ -991,7 +986,6 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         return;
 
     WorldPacket data(recvData.GetOpcode() == CMSG_FORCE_MOVE_UNROOT_ACK ? MSG_MOVE_UNROOT : MSG_MOVE_ROOT);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, _player);
 }
