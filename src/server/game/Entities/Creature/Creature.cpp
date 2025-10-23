@@ -3385,19 +3385,21 @@ void Creature::UpdateMovementFlags()
 
     if (GetMovementTemplate().IsFlightAllowed() && isInAir && !IsFalling())
     {
-        if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly)
+        if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly && !m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
             SetCanFly(true);
-        else
+        else if (!IsLevitating())
             SetDisableGravity(true);
 
-        if (!HasHoverAura())
+        if (!HasHoverAura() && IsHovering())
             SetHover(false);
     }
     else
     {
-        SetCanFly(false);
-        SetDisableGravity(false);
-        if (IsAlive() && (CanHover() || HasHoverAura()))
+        if (m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
+            SetCanFly(false);
+        if (IsLevitating())
+            SetDisableGravity(false);
+        if (IsAlive() && (GetMovementTemplate().Ground == CreatureGroundMovementType::Hover || HasHoverAura()) && !IsHovering())
             SetHover(true);
     }
 

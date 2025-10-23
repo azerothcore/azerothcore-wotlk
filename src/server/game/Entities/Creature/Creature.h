@@ -83,7 +83,7 @@ public:
     [[nodiscard]] bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
     [[nodiscard]] bool CanSwim() const override;
     [[nodiscard]] bool CanEnterWater() const override;
-    [[nodiscard]] bool CanFly()  const override { return GetMovementTemplate().IsFlightAllowed() || IsFlying(); }
+    [[nodiscard]] bool CanFly() const override { return GetMovementTemplate().IsFlightAllowed() || IsFlying(); }
     [[nodiscard]] bool CanHover() const { return GetMovementTemplate().Ground == CreatureGroundMovementType::Hover || IsHovering(); }
     [[nodiscard]] bool IsRooted() const { return GetMovementTemplate().IsRooted(); }
 
