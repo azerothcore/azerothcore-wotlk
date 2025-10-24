@@ -1,3 +1,4 @@
+-- DB update 2025_10_24_02 -> 2025_10_24_03
 -- Add Waypoint
 DELETE FROM `waypoint_data` WHERE `id` = 2875000;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
