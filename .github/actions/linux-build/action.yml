@@ -46,11 +46,14 @@ runs:
         path: ${{ github.workspace }}/var/ccache
           # format
           # ccache:OS:CC_CXX:MODULES:GITHUB_REF:GITHUB_SHA
-        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}:${{ github.sha }}
+        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref_name }}
         restore-keys: |
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}
+          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref_name }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}
+
+    - name: reset ccache stats
+      run: ccache -z || true
 
     # This script moves sql files from "data/sql/updates/pending_$DB" to the
     # proper folder for the db
@@ -190,3 +193,6 @@ runs:
         else
           exit 0
         fi
+
+    - name: ccache stats
+      run: ccache -s || true
