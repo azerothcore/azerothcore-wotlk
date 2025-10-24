@@ -14523,12 +14523,12 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
     propagateSpeedChange();
 
-    const SpeedOpcodePair& speedOpcodes = SetSpeed2Opc_table[mtype];
+    const SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
 
     if (forced && IsClientControlled())
     {
         Player* player = const_cast<Player*>(GetClientControlling());
-        auto const counter = player->GetSession()->GetOrderCounter();
+        uint32 const counter = player->GetSession()->GetOrderCounter();
 
         // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
         // and do it only for real sent packets and use run for run/mounted as client expected
@@ -14539,6 +14539,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         data << counter;
         if (mtype == MOVE_RUN)
             data << uint8(0);                           // new 2.1.0
+
         data << GetSpeed(mtype);
         player->GetSession()->SendPacket(&data);
         player->GetSession()->IncrementOrderCounter();
@@ -14566,6 +14567,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
             if (pet && pet->IsCreature() && !pet->IsInCombat() && pet->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
                 pet->UpdateSpeed(mtype, forced);
+
             if (Unit* critter = ObjectAccessor::GetUnit(*this, GetCritterGUID()))
                 critter->UpdateSpeed(mtype, forced);
         }
@@ -18280,7 +18282,7 @@ void Unit::SendMoveRoot(bool apply)
     // Wrath+ force root: when unit is controlled by a player
     else
     {
-        auto const counter = client->GetSession()->GetOrderCounter();
+        uint32 const counter = client->GetSession()->GetOrderCounter();
 
         WorldPacket data(apply ? SMSG_FORCE_MOVE_ROOT : SMSG_FORCE_MOVE_UNROOT, guid.size() + 4);
         data << guid;
@@ -20337,7 +20339,7 @@ void Unit::SetDisableGravity(bool enable)
     {
         if (Player const* player = GetClientControlling())
         {
-            auto const counter = player->GetSession()->GetOrderCounter();
+            uint32 const counter = player->GetSession()->GetOrderCounter();
 
             WorldPacket data(enable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, GetPackGUID().size() + 4);
             data << GetPackGUID();
@@ -20397,7 +20399,7 @@ void Unit::SetCanFly(bool enable)
     {
         if (Player const* player = GetClientControlling())
         {
-            auto const counter = player->GetSession()->GetOrderCounter();
+            uint32 const counter = player->GetSession()->GetOrderCounter();
 
             WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, GetPackGUID().size() + 4);
             data << GetPackGUID();
@@ -20432,7 +20434,7 @@ void Unit::SetFeatherFall(bool enable)
     {
         if (Player const* player = GetClientControlling())
         {
-            auto const counter = player->GetSession()->GetOrderCounter();
+            uint32 const counter = player->GetSession()->GetOrderCounter();
 
             WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, GetPackGUID().size() + 4);
 
@@ -20492,7 +20494,7 @@ void Unit::SetHover(bool enable)
         {
             WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, GetPackGUID().size() + 4);
 
-            auto const counter = player->GetSession()->GetOrderCounter();
+            uint32 const counter = player->GetSession()->GetOrderCounter();
 
             data << GetPackGUID();
             data << counter;
@@ -20526,7 +20528,7 @@ void Unit::SetWaterWalking(bool enable)
     {
         if (Player const* player = GetClientControlling())
         {
-            auto const counter = player->GetSession()->GetOrderCounter();
+            uint32 const counter = player->GetSession()->GetOrderCounter();
 
             WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4);
             data << GetPackGUID();
