@@ -101,6 +101,7 @@ runs:
         EOF
 
     - name: reset ccache stats
+      shell: bash
       run: ccache -z || true
 
     - name: Configure
@@ -197,4 +198,5 @@ runs:
         fi
 
     - name: ccache stats
+      shell: bash
       run: ccache -s || true
