@@ -937,7 +937,6 @@ public:
         {
             InitWaypoint();
             Reset();
-            me->SetWalk(false);
             Start(false, ObjectGuid::Empty, nullptr, false, true);
         }
 
