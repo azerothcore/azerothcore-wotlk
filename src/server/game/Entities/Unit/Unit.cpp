@@ -14523,7 +14523,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
     propagateSpeedChange();
 
-    const SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
+    SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
 
     if (forced && IsClientControlled())
     {
