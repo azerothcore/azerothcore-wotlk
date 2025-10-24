@@ -44,14 +44,6 @@ if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
   # resolve expired key issue
   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
   DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
-
-  # Give MySQL repo higher priority
-  cat <<'EOF' | $SUDO tee /etc/apt/preferences.d/mysql.pref
-Package: *
-Pin: origin repo.mysql.com
-Pin-Priority: 1001
-EOF
-
   $SUDO apt-get update
   DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-server
 fi
