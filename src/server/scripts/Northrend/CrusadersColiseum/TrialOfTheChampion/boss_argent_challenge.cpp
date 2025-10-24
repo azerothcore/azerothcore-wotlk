@@ -125,8 +125,8 @@ public:
         void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
-            events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25000);
+            events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16s);
+            events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25s);
             Talk(SAY_EADRIC_AGGRO);
             me->CastSpell(me, SPELL_VENGEANCE, false);
             if (pInstance)
@@ -409,7 +409,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(20000);
+            me->DespawnOrUnsummon(20s);
             if (pInstance)
                 if (Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_PALETRESS)))
                     paletress->AI()->DoAction(1);
@@ -607,7 +607,8 @@ public:
                     break;
             }
 
-            Start(false, true);
+            me->SetWalk(false);
+            Start(false);
             uiWaypoint = uiType;
         }
 
@@ -722,7 +723,7 @@ public:
 
         void JustDied(Unit* /*pKiller*/) override
         {
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
             if (pInstance)
                 pInstance->SetData(DATA_ARGENT_SOLDIER_DEFEATED, 0);
         }

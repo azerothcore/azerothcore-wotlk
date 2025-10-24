@@ -63,7 +63,7 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
         GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
         owner->SetFaction(FACTION_FRIENDLY);
         owner->SetImmuneToAll(true);
-        owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+        owner->DespawnOrUnsummon(180s);
     }
 
     void Register() override
@@ -464,7 +464,10 @@ public:
                 go->UseDoorOrButton();
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(true, player->GetGUID());
+            }
 
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
@@ -609,7 +612,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
                 AttackStart(who);
             }
 
-            _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 3s, 4s);
         }
 
         void SpellHit(Unit* unit, SpellInfo const* spell) override
@@ -914,7 +917,8 @@ public:
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(true);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -959,7 +963,7 @@ public:
                     Talk(SAY_5);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     player->GroupEventHappens(QUEST_ESCAPING_THE_MIST, me);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
             }
         }
@@ -995,7 +999,7 @@ public:
         {
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, true, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -1421,7 +1425,7 @@ public:
             _playerGUID.Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*action*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1431,7 +1435,7 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                 me->SetFacingToObject(player);
 
-            _events.ScheduleEvent(EVENT_TALK, 1000);
+            _events.ScheduleEvent(EVENT_TALK, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1557,7 +1561,7 @@ public:
         void Reset() override
         {
             me->SetImmuneToAll(true);
-            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
+            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1884,7 +1888,7 @@ public:
                         if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
                         {
                             leryssa->SetWalk(false);
-                            leryssa->MonsterMoveWithSpeed(3726.751f, 3568.1633f, 477.44086f, leryssa->GetSpeed(MOVE_RUN));
+                            leryssa->GetMotionMaster()->MovePoint(0, 3726.751f, 3568.1633f, 477.44086f, FORCED_MOVEMENT_RUN);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_23, 2s);
                         break;
@@ -2143,6 +2147,34 @@ class spell_necropolis_beam: public SpellScript
     }
 };
 
+enum SoulDeflectionSpells
+{
+    SPELL_SOUL_DEFLECTION_DAMAGE = 51011
+};
+
+class spell_soul_deflection : public AuraScript
+{
+    PrepareAuraScript(spell_soul_deflection);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SOUL_DEFLECTION_DAMAGE });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        if (!eventInfo.GetDamageInfo() || !eventInfo.GetDamageInfo()->GetDamage() || !GetTarget())
+            return;
+
+        GetCaster()->CastCustomSpell(SPELL_SOUL_DEFLECTION_DAMAGE, SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_soul_deflection::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -2168,4 +2200,5 @@ void AddSC_borean_tundra()
     new npc_bloodmage_laurith();
     RegisterCreatureAI(npc_jenny);
     RegisterSpellScript(spell_necropolis_beam);
+    RegisterSpellScript(spell_soul_deflection);
 }

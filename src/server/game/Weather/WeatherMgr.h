@@ -25,19 +25,12 @@
 #include "Define.h"
 
 class Weather;
-class Player;
+struct WeatherData;
 
 namespace WeatherMgr
 {
     void LoadWeatherData();
-
-    Weather* FindWeather(uint32 id);
-    Weather* AddWeather(uint32 zone_id);
-    void RemoveWeather(uint32 zone_id);
-
-    void SendFineWeatherUpdateToPlayer(Player* player);
-
-    void Update(uint32 diff);
+    WeatherData const* GetWeatherData(uint32 zone_id);
 }
 
 #endif

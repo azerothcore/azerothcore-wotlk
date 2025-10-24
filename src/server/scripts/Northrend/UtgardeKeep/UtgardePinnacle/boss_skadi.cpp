@@ -143,10 +143,7 @@ public:
             SecondPhase = false;
             EventStarted = false;
 
-            me->RemoveAllAuras();
-            me->SetControlled(false, UNIT_STATE_ROOT);
-            me->UpdatePosition(343.02f, -507.325f, 104.567f, M_PI, true);
-            me->StopMovingOnCurrentPos();
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             if (m_pInstance)
             {
@@ -160,37 +157,37 @@ public:
 
         Creature* GetGrauf() { return ObjectAccessor::GetCreature(*me, GraufGUID); }
 
-        void JustEngagedWith(Unit*  /*pWho*/) override
-        {
-            if (!EventStarted)
-            {
-                EventStarted = true;
-                Talk(SAY_AGGRO);
-                if (m_pInstance)
-                {
-                    if (IsHeroic())
-                        m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_LODI_DODI);
-
-                    m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS, IN_PROGRESS);
-                }
-
-                me->SetControlled(true, UNIT_STATE_ROOT);
-                me->SetInCombatWithZone();
-                events.RescheduleEvent(EVENT_SKADI_START, 2s);
-            }
-        }
-
         void DoAction(int32 param) override
         {
-            if (param == ACTION_PHASE2)
+            if (param == ACTION_START_EVENT)
+            {
+                if (!EventStarted)
+                {
+                    EventStarted = true;
+                    Talk(SAY_AGGRO);
+                    if (m_pInstance)
+                    {
+                        if (IsHeroic())
+                            m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_LODI_DODI);
+
+                        m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS, IN_PROGRESS);
+                    }
+
+                    me->SetControlled(true, UNIT_STATE_ROOT);
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    events.RescheduleEvent(EVENT_SKADI_START, 2s);
+                }
+            }
+            else if (param == ACTION_PHASE2)
             {
                 SecondPhase = true;
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 events.ScheduleEvent(EVENT_SKADI_CRUSH, 8s);
                 events.ScheduleEvent(EVENT_SKADI_SPEAR, 10s);
                 events.ScheduleEvent(EVENT_SKADI_WHIRLWIND, 15s);
 
                 if (me->GetVictim())
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    me->ResumeChasingVictim();
                 else
                     me->SetInCombatWithZone();
             }
@@ -415,7 +412,7 @@ public:
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
             for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
             {
-                if (itr->GetSource()->GetPositionX() < 320.0f || itr->GetSource()->IsGameMaster() || !itr->GetSource()->IsAlive())
+                if (itr->GetSource()->GetPositionY() > -490.0f || itr->GetSource()->IsGameMaster() || !itr->GetSource()->IsAlive())
                     continue;
 
                 return;
@@ -456,7 +453,7 @@ public:
 
                         SpawnHelpers(0);
                         SpawnHelpers(0);
-                        events.ScheduleEvent(EVENT_GRAUF_MOVE, 15s);
+                        events.ScheduleEvent(EVENT_GRAUF_MOVE, 5s);
                         events.ScheduleEvent(EVENT_GRAUF_SUMMON_HELPERS, 20s);
                         break;
                     }

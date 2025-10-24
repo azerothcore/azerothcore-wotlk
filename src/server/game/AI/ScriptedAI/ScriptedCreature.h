@@ -88,7 +88,7 @@ public:
     void Summon(Creature const* summon) { storage_.push_back(summon->GetGUID()); }
     void Despawn(Creature const* summon) { storage_.remove(summon->GetGUID()); }
     void DespawnEntry(uint32 entry);
-    void DespawnAll(uint32 delay = 0);
+    void DespawnAll(Milliseconds delay = 0ms);
     bool IsAnyCreatureAlive() const;
     bool IsAnyCreatureWithEntryAlive(uint32 entry) const;
     bool IsAnyCreatureInCombat() const;
@@ -355,11 +355,11 @@ struct ScriptedAI : public CreatureAI
     void ClearUniqueTimedEventsDone() { _uniqueTimedEvents.clear(); }
 
     // Schedules a timed event using task scheduler.
-    void ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0);
-    void ScheduleTimedEvent(Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0s, uint32 uniqueId = 0) { ScheduleTimedEvent(0s, timerMax, exec, repeatMin, repeatMax, uniqueId); };
+    void ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0ms, uint32 uniqueId = 0);
+    void ScheduleTimedEvent(Milliseconds timerMax, std::function<void()> exec, Milliseconds repeatMin, Milliseconds repeatMax = 0ms, uint32 uniqueId = 0) { ScheduleTimedEvent(0ms, timerMax, exec, repeatMin, repeatMax, uniqueId); };
 
     // Schedules a timed event using task scheduler that never repeats. Requires an unique non-zero ID.
-    void ScheduleUniqueTimedEvent(Milliseconds timer, std::function<void()> exec, uint32 uniqueId) { ScheduleTimedEvent(0s, timer, exec, 0s, 0s, uniqueId); };
+    void ScheduleUniqueTimedEvent(Milliseconds timer, std::function<void()> exec, uint32 uniqueId) { ScheduleTimedEvent(0ms, timer, exec, 0ms, 0ms, uniqueId); };
 
     bool HealthBelowPct(uint32 pct) const { return me->HealthBelowPct(pct); }
     bool HealthAbovePct(uint32 pct) const { return me->HealthAbovePct(pct); }
@@ -454,13 +454,27 @@ private:
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
 
+enum HealthCheckStatus
+{
+    HEALTH_CHECK_PROCESSED,
+    HEALTH_CHECK_SCHEDULED,
+    HEALTH_CHECK_PENDING
+};
+
 struct HealthCheckEventData
 {
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, bool valid = true) : _healthPct(healthPct), _exec(exec), _valid(valid) { };
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, uint8 status = HEALTH_CHECK_SCHEDULED, bool allowedWhileCasting = true, Milliseconds Delay = 0ms) : _healthPct(healthPct), _exec(exec), _status(status), _allowedWhileCasting(allowedWhileCasting), _delay(Delay) { };
 
     uint8 _healthPct;
     std::function<void()> _exec;
-    bool _valid;
+    uint8 _status;
+    bool _allowedWhileCasting;
+    Milliseconds _delay;
+
+    [[nodiscard]] bool HasBeenProcessed() const { return _status == HEALTH_CHECK_PROCESSED; };
+    [[nodiscard]] bool IsPending() const { return _status == HEALTH_CHECK_PENDING; };
+    [[nodiscard]] Milliseconds GetDelay() const { return _delay; };
+    void UpdateStatus(uint8 status) { _status = status; };
 };
 
 class BossAI : public ScriptedAI
@@ -475,6 +489,7 @@ public:
 
     bool CanRespawn() override;
 
+    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override;
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
@@ -482,8 +497,9 @@ public:
 
     void UpdateAI(uint32 diff) override;
 
-    void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec);
-    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec);
+    void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
+    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
+    void ProcessHealthCheck();
 
     // @brief Casts the spell after the fixed time and says the text id if provided. Timer will run even if the creature is casting or out of combat.
     // @param spellId The spell to cast.

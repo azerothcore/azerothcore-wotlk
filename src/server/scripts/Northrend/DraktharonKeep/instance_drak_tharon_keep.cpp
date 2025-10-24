@@ -89,7 +89,7 @@ class spell_dtk_raise_dead_aura : public AuraScript
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1);
+        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1ms);
         GetUnitOwner()->SummonCreature(NPC_RISEN_DRAKKARI_WARRIOR, *GetUnitOwner());
     }
 
