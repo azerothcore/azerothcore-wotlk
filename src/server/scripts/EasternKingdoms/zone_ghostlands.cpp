@@ -113,7 +113,8 @@ struct npc_ranger_lilatha : public npc_escortAI
         if (quest->GetQuestId() == QUEST_ESCAPE_FROM_THE_CATACOMBS)
         {
             me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-            npc_escortAI::Start(true, player->GetGUID());
+            me->SetWalk(true);
+            Start(true, player->GetGUID());
         }
     }
 };
