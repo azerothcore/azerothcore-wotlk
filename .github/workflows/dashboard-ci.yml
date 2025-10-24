@@ -74,11 +74,16 @@ jobs:
 
       - name: Configure AzerothCore settings
         run: |
-          # Create basic configuration
-          cp conf/dist/config.sh conf/config.sh
-          # Configure dashboard
-          sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
-          sed -i 's/CBUILD_TESTING=.*/CBUILD_TESTING="ON"/' conf/config.sh
+            touch conf/config.sh
+            echo 'MTHREADS=4' >> conf/config.sh
+            echo 'CBUILD_TESTING=ON' >> conf/config.sh
+            echo 'AC_ENABLE_ROOT_CMAKE_INSTALL=1' >> conf/config.sh
+            echo 'export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_ZERO_CONF' >> conf/config.sh
+            echo 'AC_ENABLE_CONF_COPY_ON_INSTALL=0' >> conf/config.sh
+            cat conf/config.sh
+
+            # debug content of AC_CONFIG_POLICY
+            ./acore.sh config show AC_CONFIG_POLICY
 
       - name: Test module commands
         run: |
@@ -92,8 +97,6 @@ jobs:
           ./acore.sh module update --all
 
       - name: Run complete installation (deps, compile, database, client-data)
-        env:
-          AC_ENABLE_ROOT_CMAKE_INSTALL: 1
         run: |
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init
@@ -113,12 +116,14 @@ jobs:
 
       - name: Test authserver dry-run
         run: |
+          source ./acore.sh config load
           cd env/dist/bin
           timeout 5m ./authserver -dry-run
         continue-on-error: false
 
       - name: Test worldserver dry-run
         run: |
+          source ./acore.sh config load
           cd env/dist/bin
           timeout 5m ./worldserver -dry-run
         continue-on-error: false
