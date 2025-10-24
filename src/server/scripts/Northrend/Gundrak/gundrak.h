@@ -71,4 +71,6 @@ inline AI* GetGundrakAI(T* obj)
     return GetInstanceAI<AI>(obj, GundrakScriptName);
 }
 
+#define RegisterGundrakCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetGundrakAI)
+
 #endif
