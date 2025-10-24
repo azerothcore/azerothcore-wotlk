@@ -660,6 +660,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 
     recvData >> guid.ReadAsPacked();
     recvData >> counter;                                   // counter or moveEvent
+    movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
     recvData >> newspeed;
 
@@ -964,6 +965,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     MovementInfo movementInfo;
     recvData >> guid.ReadAsPacked();
     recvData >> counter;
+    movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
     Unit* mover = _player->m_mover;
