@@ -980,6 +980,7 @@ public:
         {
             carGUID = who->GetVehicleBase()->GetGUID();
             InitWaypoint();
+            me->SetWalk(true);
             Start(false, who->GetGUID());
             SetDespawnAtFar(false);
         }
@@ -998,7 +999,7 @@ public:
                         car->SetFaction(FACTION_FRIENDLY);
                     }
                     Talk(SAY_SCARLET_MINER_0);
-                    SetRun(true);
+                    me->SetWalk(false);
                     IntroTimer = 4000;
                     IntroPhase = 1;
                     break;

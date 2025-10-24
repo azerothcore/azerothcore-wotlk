@@ -241,6 +241,7 @@ private:
     bool mCanAutoAttack;
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
+    ForcedMovement mForcedMovement;
 
     bool AssistPlayerInCombatAgainst(Unit* who);
 
