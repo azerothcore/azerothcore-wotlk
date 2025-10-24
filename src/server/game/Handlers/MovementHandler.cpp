@@ -378,7 +378,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
-    movementInfo.guid = mover->GetGUID();
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, _player);
 }
@@ -655,26 +654,39 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 
     /* extract packet */
     ObjectGuid guid;
-    uint32 unk1;
+    uint32 counter;
+    MovementInfo movementInfo;
     float  newspeed;
 
     recvData >> guid.ReadAsPacked();
+    recvData >> counter;                                   // counter or moveEvent
+    movementInfo.guid = guid;
+    ReadMovementInfo(recvData, &movementInfo);
+    recvData >> newspeed;
+
+    Unit* mover = _player->m_mover;
 
     // pussywizard: special check, only player mover allowed here
-    if (guid != _player->m_mover->GetGUID() || guid != _player->GetGUID())
+    if (guid != mover->GetGUID() || guid != _player->GetGUID())
     {
         recvData.rfinish(); // prevent warnings spam
         return;
     }
 
-    // continue parse packet
-    recvData >> unk1;                                      // counter or moveEvent
+    if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
+    {
+        recvData.rfinish();                     // prevent warnings spam
+        return;
+    }
 
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    recvData >> newspeed;
+    if (opcode == CMSG_MOVE_SET_COLLISION_HGT_ACK)
+    {
+        WorldPacket data(MSG_MOVE_SET_COLLISION_HGT, 18);
+        WriteMovementInfo(&data, &movementInfo);
+        data << newspeed; // new collision height
+        mover->SendMessageToSet(&data, _player);
+        return;
+    }
 
     // client ACK send one packet for mounted/run case and need skip all except last from its
     // in other cases anti-cheat check can be fail in false case
@@ -685,48 +697,27 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 
     switch (opcode)
     {
-        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:
-            move_type = MOVE_WALK;
-            force_move_type = MOVE_WALK;
-            break;
-        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:
-            move_type = MOVE_RUN;
-            force_move_type = MOVE_RUN;
-            break;
-        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:
-            move_type = MOVE_RUN_BACK;
-            force_move_type = MOVE_RUN_BACK;
-            break;
-        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:
-            move_type = MOVE_SWIM;
-            force_move_type = MOVE_SWIM;
-            break;
-        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:
-            move_type = MOVE_SWIM_BACK;
-            force_move_type = MOVE_SWIM_BACK;
-            break;
-        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:
-            move_type = MOVE_TURN_RATE;
-            force_move_type = MOVE_TURN_RATE;
-            break;
-        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:
-            move_type = MOVE_FLIGHT;
-            force_move_type = MOVE_FLIGHT;
-            break;
-        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:
-            move_type = MOVE_FLIGHT_BACK;
-            force_move_type = MOVE_FLIGHT_BACK;
-            break;
-        case CMSG_FORCE_PITCH_RATE_CHANGE_ACK:
-            move_type = MOVE_PITCH_RATE;
-            force_move_type = MOVE_PITCH_RATE;
-            break;
+        case CMSG_FORCE_WALK_SPEED_CHANGE_ACK:          move_type = MOVE_WALK;          force_move_type = MOVE_WALK;        break;
+        case CMSG_FORCE_RUN_SPEED_CHANGE_ACK:           move_type = MOVE_RUN;           force_move_type = MOVE_RUN;         break;
+        case CMSG_FORCE_RUN_BACK_SPEED_CHANGE_ACK:      move_type = MOVE_RUN_BACK;      force_move_type = MOVE_RUN_BACK;    break;
+        case CMSG_FORCE_SWIM_SPEED_CHANGE_ACK:          move_type = MOVE_SWIM;          force_move_type = MOVE_SWIM;        break;
+        case CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK:     move_type = MOVE_SWIM_BACK;     force_move_type = MOVE_SWIM_BACK;   break;
+        case CMSG_FORCE_TURN_RATE_CHANGE_ACK:           move_type = MOVE_TURN_RATE;     force_move_type = MOVE_TURN_RATE;   break;
+        case CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK:        move_type = MOVE_FLIGHT;        force_move_type = MOVE_FLIGHT;      break;
+        case CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK:   move_type = MOVE_FLIGHT_BACK;   force_move_type = MOVE_FLIGHT_BACK; break;
+        case CMSG_FORCE_PITCH_RATE_CHANGE_ACK:          move_type = MOVE_PITCH_RATE;    force_move_type = MOVE_PITCH_RATE;  break;
         default:
             LOG_ERROR("network.opcode", "WorldSession::HandleForceSpeedChangeAck: Unknown move type opcode: {}", opcode);
             return;
     }
 
     sScriptMgr->AnticheatSetUnderACKmount(_player);
+
+    SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[move_type];
+    WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::ACK_RESPONSE)], 18);
+    WriteMovementInfo(&data, &movementInfo);
+    data << newspeed;
+    mover->SendMessageToSet(&data, _player);
 
     // skip all forced speed changes except last and unexpected
     // in run/mounted case used one ACK and it must be skipped.m_forced_speed_changes[MOVE_RUN} store both.
@@ -974,6 +965,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     MovementInfo movementInfo;
     recvData >> guid.ReadAsPacked();
     recvData >> counter;
+    movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
     Unit* mover = _player->m_mover;
@@ -996,7 +988,6 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         return;
 
     WorldPacket data(recvData.GetOpcode() == CMSG_FORCE_MOVE_UNROOT_ACK ? MSG_MOVE_UNROOT : MSG_MOVE_ROOT);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, _player);
 }
