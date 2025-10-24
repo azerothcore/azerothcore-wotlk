@@ -1,3 +1,4 @@
+-- DB update 2025_10_24_03 -> 2025_10_24_04
 DELETE FROM `creature_text` WHERE `CreatureID` = 19738;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (19738, 0, 0, 'Hahaha! We''re coming for you, little goblins!', 14, 0, 100, 0, 0, 0, 17408, 0, 'Doomclaw - On Death'),
