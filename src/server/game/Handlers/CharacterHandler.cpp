@@ -1164,8 +1164,11 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     SendPacket(&data);
 
     // Xinef: fix possible problem with flag UNIT_FLAG_STUNNED added during logout
-    if (!pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
+    if (pCurrChar->HasUnitState(UNIT_STATE_LOGOUT_TIMER))
+    {
+        pCurrChar->SetRooted(false, true, true);
         pCurrChar->RemoveUnitFlag(UNIT_FLAG_STUNNED);
+    }
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
@@ -1754,8 +1757,20 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
     std::string name;
     recvData >> name;
 
+    if (name.length() > 16) // Client limitation
+    {
+        LOG_ERROR("entities.player.cheat", "Character GUID {} tried to create equipment set {} with too long a name!", _player->GetGUID().ToString(), setGuid);
+        return;
+    }
+
     std::string iconName;
     recvData >> iconName;
+
+    if (iconName.length() > 100) // DB limitation
+    {
+        LOG_ERROR("entities.player.cheat", "Character GUID {} tried to create equipment set {} with too long an icon name!", _player->GetGUID().ToString(), setGuid);
+        return;
+    }
 
     EquipmentSet eqSet;
 

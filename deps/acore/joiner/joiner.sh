@@ -116,7 +116,21 @@ function Joiner:add_repo() (
     if [ -e "$path/.git/" ]; then
         # if exists , update
         echo "Updating $name on branch $branch..."
-        git --git-dir="$path/.git/" --work-tree="$path" rev-parse && git --git-dir="$path/.git/" --work-tree="$path" pull origin "$branch" | grep 'Already up-to-date.' && changed="no" || true
+        if ! git --git-dir="$path/.git/" --work-tree="$path" rev-parse >/dev/null 2>&1; then
+            echo "Unable to read repository at $path/.git/"
+            return $FALSE
+        fi
+
+        local pull_output
+        if ! pull_output=$(git --git-dir="$path/.git/" --work-tree="$path" pull origin "$branch" 2>&1); then
+            printf "%s\n" "$pull_output"
+            return $FALSE
+        fi
+
+        printf "%s\n" "$pull_output"
+        if echo "$pull_output" | grep -qE 'Already up[- ]to-date.'; then
+            changed="no"
+        fi
     else
         # otherwise clone
         echo "Cloning $name on branch $branch..."
@@ -440,4 +454,3 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 else
     Joiner:_checkOptions $@
 fi
-

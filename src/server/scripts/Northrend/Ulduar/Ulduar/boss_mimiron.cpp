@@ -378,8 +378,8 @@ public:
                 events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, 3s);
                 minutesTalkNum = Is25ManRaid() ? TALK_COMPUTER_TEN : TALK_COMPUTER_EIGHT;
                 for (uint32 i = 0; i < uint32(TALK_COMPUTER_ZERO - minutesTalkNum - 1); ++i)
-                    events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, (i + 1)*MINUTE * IN_MILLISECONDS);
-                events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, (TALK_COMPUTER_ZERO - minutesTalkNum)*MINUTE * IN_MILLISECONDS + 6000);
+                    events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((i + 1) * 60000));
+                events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((TALK_COMPUTER_ZERO - minutesTalkNum) * 60000));
             }
 
             // ensure LMK2 is at proper position
@@ -601,7 +601,7 @@ public:
                         {
                             me->EnterVehicle(VX001, 4);
                             float speed = ACU->GetDistance(2737.75f, 2574.22f, 381.34f) / 2.0f;
-                            ACU->MonsterMoveWithSpeed(2737.75f, 2574.22f, 381.34f, speed);
+                            ACU->GetMotionMaster()->MovePoint(0, 2737.75f, 2574.22f, 381.34f, FORCED_MOVEMENT_NONE, speed);
                             ACU->SetPosition(2737.75f, 2574.22f, 381.34f, M_PI);
                             events.ScheduleEvent(EVENT_SAY_VX001_DEAD, 2s);
                             break;
@@ -740,17 +740,17 @@ public:
                         LMK2->InterruptNonMeleeSpells(false);
                         LMK2->AttackStop();
                         LMK2->AI()->SetData(1, 0);
-                        LMK2->DespawnOrUnsummon(7000);
+                        LMK2->DespawnOrUnsummon(7s);
                         LMK2->SetReactState(REACT_PASSIVE);
                         VX001->InterruptNonMeleeSpells(false);
                         VX001->AttackStop();
                         VX001->AI()->SetData(1, 0);
-                        VX001->DespawnOrUnsummon(7000);
+                        VX001->DespawnOrUnsummon(7s);
                         VX001->SetReactState(REACT_PASSIVE);
                         ACU->InterruptNonMeleeSpells(false);
                         ACU->AttackStop();
                         ACU->AI()->SetData(1, 0);
-                        ACU->DespawnOrUnsummon(7000);
+                        ACU->DespawnOrUnsummon(7s);
                         ACU->SetReactState(REACT_PASSIVE);
 
                         Position exitPos = me->GetPosition();
@@ -1221,7 +1221,7 @@ public:
             if (p->GetEntry() == NPC_LEVIATHAN_MKII_CANNON && !apply)
             {
                 Unit::Kill(p, p);
-                p->ToCreature()->DespawnOrUnsummon(6000);
+                p->ToCreature()->DespawnOrUnsummon(6s);
             }
         }
 
@@ -1343,7 +1343,7 @@ public:
                     for (uint8 i = 0; i < 2; ++i)
                         if (Unit* r = vk->GetPassenger(5 + i))
                             if (r->IsCreature())
-                                r->ToCreature()->DespawnOrUnsummon(1);
+                                r->ToCreature()->DespawnOrUnsummon(1ms);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -1555,7 +1555,7 @@ public:
         void PassengerBoarded(Unit* p, int8  /*seat*/, bool apply) override
         {
             if (p->GetEntry() == NPC_ROCKET_VISUAL && !apply)
-                p->ToCreature()->DespawnOrUnsummon(8000);
+                p->ToCreature()->DespawnOrUnsummon(8s);
         }
 
         void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
@@ -1681,8 +1681,7 @@ public:
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
 
-                        me->MonsterMoveWithSpeed(2744.65f, 2569.46f, 381.34f, me->GetDistance(2744.65f, 2569.46f, 381.34f));
-                        me->UpdatePosition(2744.65f, 2569.46f, 381.34f, M_PI, false);
+                        me->GetMotionMaster()->MovePoint(0, 2744.65f, 2569.46f, 381.34f);
 
                         if (Creature* c = GetMimiron())
                             c->AI()->SetData(0, 3);
@@ -1740,8 +1739,7 @@ public:
                         }
 
                         float speed = me->GetExactDist(x, y, 381.34f);
-                        me->MonsterMoveWithSpeed(x, y, 381.34f, speed);
-                        me->UpdatePosition(x, y, 381.34f, me->GetAngle(victim), false);
+                        me->GetMotionMaster()->MovePoint(0, x, y, 381.34f, FORCED_MOVEMENT_NONE, speed);
                         if (mc)
                         {
                             mc->AI()->SetData(0, 0);
@@ -1793,14 +1791,12 @@ public:
                 case EVENT_MAGNETIC_CORE_PULL_DOWN:
                     me->CastSpell(me, SPELL_MAGNETIC_CORE, true);
                     me->CastSpell(me, SPELL_SPINNING, true);
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 365.34f, me->GetExactDist(me->GetPositionX(), me->GetPositionY(), 365.34f));
-                    me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 365.34f, me->GetOrientation(), false);
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 365.34f, FORCED_MOVEMENT_NONE, me->GetExactDist(me->GetPositionX(), me->GetPositionY(), 365.34f));
                     events.ScheduleEvent(EVENT_MAGNETIC_CORE_FREE, 20s);
                     break;
                 case EVENT_MAGNETIC_CORE_FREE:
                     me->RemoveAura(SPELL_SPINNING);
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 381.34f, me->GetDistance(me->GetPositionX(), me->GetPositionY(), 381.34f));
-                    me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 381.34f, me->GetOrientation(), false);
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 381.34f, FORCED_MOVEMENT_NONE, me->GetDistance(me->GetPositionX(), me->GetPositionY(), 381.34f));
                     events.ScheduleEvent(EVENT_MAGNETIC_CORE_REMOVE_IMMOBILIZE, 1s);
                     break;
                 case EVENT_MAGNETIC_CORE_REMOVE_IMMOBILIZE:
@@ -1960,7 +1956,7 @@ public:
 
         void SetData(uint32  /*id*/, uint32  /*value*/) override
         {
-            me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, false, true);
+            me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, FORCED_MOVEMENT_NONE, 0.f, false, true);
         }
 
         void UpdateAI(uint32  /*diff*/) override
@@ -2015,7 +2011,7 @@ public:
             if (despawnTimer <= diff)
             {
                 despawnTimer = 60000;
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
             else
                 despawnTimer -= diff;
@@ -2081,7 +2077,7 @@ public:
                                 bot->CastSpell(bot, SPELL_EMERGENCY_MODE, true);
                     }
 
-                me->DespawnOrUnsummon(500);
+                me->DespawnOrUnsummon(500ms);
                 timer = 99999;
             }
             else
@@ -2346,7 +2342,7 @@ public:
                                         CAST_AI(npc_ulduar_flames_initial::npc_ulduar_flames_initialAI, c->AI())->RemoveFlame(me->GetGUID());
 
                         me->RemoveAllAuras();
-                        me->DespawnOrUnsummon(2500);
+                        me->DespawnOrUnsummon(2500ms);
                     }
                     break;
                 case SPELL_VX001_FROST_BOMB:

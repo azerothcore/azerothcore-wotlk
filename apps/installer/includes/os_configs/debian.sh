@@ -32,7 +32,7 @@ $SUDO apt-get install -y gdbserver gdb unzip curl \
 VAR_PATH="$CURRENT_PATH/../../../../var"
 
 # run noninteractive install for MYSQL 8.4 LTS
-wget https://dev.mysql.com/get/mysql-apt-config_0.8.32-1_all.deb -P "$VAR_PATH"
-DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.32-1_all.deb"
+wget https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb -P "$VAR_PATH"
+DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
 $SUDO apt-get update
 DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-server libmysqlclient-dev

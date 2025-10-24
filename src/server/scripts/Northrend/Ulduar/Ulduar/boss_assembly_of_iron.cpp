@@ -355,7 +355,7 @@ public:
                 case EVENT_OVERWHELMING_POWER:
                     Talk(SAY_STEELBREAKER_POWER);
                     me->CastSpell(me->GetVictim(), SPELL_OVERWHELMING_POWER, true);
-                    events.RepeatEvent(RAID_MODE(61000, 36000));
+                    events.Repeat(RAID_MODE(61s, 36s));
                     break;
                 case EVENT_ENRAGE:
                     Talk(SAY_STEELBREAKER_BERSERK);
@@ -418,7 +418,7 @@ public:
             if (pInstance)
                 pInstance->SetData(TYPE_ASSEMBLY, NOT_STARTED);
 
-            me->m_Events.AddEvent(new CastRunesEvent(*me), me->m_Events.CalculateTime(8000));
+            me->m_Events.AddEventAtOffset(new CastRunesEvent(*me), 8s);
         }
 
         void JustReachedHome() override
@@ -579,7 +579,7 @@ public:
             if (Player* target = SelectTargetFromPlayerList(150))
                 me->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
             else
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
         }
 
         void MovementInform(uint32 type, uint32  /*id*/) override
@@ -588,7 +588,7 @@ public:
             {
                 _boomed = true;
                 me->CastSpell(me, SPELL_LIGHTNING_BLAST, true);
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
             }
         }
     };
@@ -805,7 +805,7 @@ public:
                 case EVENT_LIGHTNING_LAND:
                     {
                         float speed = me->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1000.0f * 0.001f);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, speed);
                         events.ScheduleEvent(EVENT_LAND_LAND, 1s);
                         break;
                     }
@@ -902,7 +902,7 @@ class spell_assembly_rune_of_summoning_aura : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (TempSummon* summ = GetTarget()->ToTempSummon())
-            summ->DespawnOrUnsummon(1);
+            summ->DespawnOrUnsummon(1ms);
     }
 
     void Register() override

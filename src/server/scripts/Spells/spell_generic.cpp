@@ -3706,7 +3706,7 @@ class spell_gen_despawn_self : public SpellScript
     void HandleDummy(SpellEffIndex effIndex)
     {
         if (GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_DUMMY || GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_SCRIPT_EFFECT)
-            GetCaster()->ToCreature()->DespawnOrUnsummon(1);
+            GetCaster()->ToCreature()->DespawnOrUnsummon(1ms);
     }
 
     void Register() override
@@ -5528,6 +5528,148 @@ class spell_gen_food_heart_emote : public AuraScript
     }
 };
 
+// 456 - SHOWLABEL Only OFF
+class spell_gen_showlabel_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_showlabel_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMChat(false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_showlabel_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 2765 - SHOWLABEL Only ON
+class spell_gen_showlabel_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_showlabel_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMChat(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_showlabel_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 1509 - GM Only OFF
+class spell_gen_gm_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_gm_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            player->SetGameMaster(false);
+            player->UpdateTriggerVisibility();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_gm_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 18139 - GM Only ON
+class spell_gen_gm_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_gm_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            player->SetGameMaster(true);
+            player->UpdateTriggerVisibility();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_gm_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 6147 - INVIS Only OFF
+class spell_gen_invis_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_invis_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMVisible(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_invis_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 2763 - INVIS Only ON
+class spell_gen_invis_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_invis_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMVisible(false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_invis_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 20114, 24675 - BM Only OFF
+class spell_gen_bm_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_bm_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetBeastMaster(false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_bm_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 20115, 24676 - BM Only ON
+class spell_gen_bm_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_bm_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetBeastMaster(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_bm_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5693,4 +5835,12 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
     RegisterSpellScript(spell_gen_cooldown_all);
     RegisterSpellScript(spell_gen_food_heart_emote);
+    RegisterSpellScript(spell_gen_showlabel_off);
+    RegisterSpellScript(spell_gen_showlabel_on);
+    RegisterSpellScript(spell_gen_gm_off);
+    RegisterSpellScript(spell_gen_gm_on);
+    RegisterSpellScript(spell_gen_invis_off);
+    RegisterSpellScript(spell_gen_invis_on);
+    RegisterSpellScript(spell_gen_bm_on);
+    RegisterSpellScript(spell_gen_bm_off);
 }

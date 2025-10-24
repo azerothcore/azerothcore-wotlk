@@ -72,7 +72,7 @@ public:
                 case EVENT_DEMORALIZING_SHOUT:
                 {
                     DoCastVictim(SPELL_DEMORALIZING_SHOUT);
-                    events.RepeatEvent(urand(12000, 18000));
+                    events.Repeat(12s, 18s);
                     break;
                 }
                 case EVENT_INSPIRE:
@@ -84,19 +84,19 @@ public:
                     }
 
                     DoCastSelf(SPELL_INSPIRE);
-                    events.RepeatEvent(urand(13000, 20000));
+                    events.Repeat(13s, 20s);
                     break;
                 }
                 case EVENT_KNOCKDOWN:
                 {
                     DoCastVictim(SPELL_KNOCKDOWN);
-                    events.RepeatEvent(urand(10000, 20000));
+                    events.Repeat(10s, 20s);
                     break;
                 }
                 case EVENT_FLAMESPEAR:
                 {
                     DoCastRandomTarget(SPELL_FLAMESPEAR);
-                    events.RepeatEvent(urand(12000, 16000));
+                    events.Repeat(12s, 16s);
                     break;
                 }
             }
@@ -133,7 +133,7 @@ public:
             events.ScheduleEvent(EVENT_DARK_STRIKE, 4s, 7s);
             events.ScheduleEvent(EVENT_DARK_MENDING, 15s, 30s);
             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 2s, 4s);
-            events.ScheduleEvent(EVENT_IMMOLATE, 3500ms, 6000ms);
+            events.ScheduleEvent(EVENT_IMMOLATE, 3500ms, 6s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -157,7 +157,7 @@ public:
                     case EVENT_DARK_STRIKE:
                     {
                         DoCastVictim(SPELL_DARK_STRIKE);
-                        events.RepeatEvent(urand(4000, 7000));
+                        events.Repeat(4s, 7s);
                         break;
                     }
                     case EVENT_DARK_MENDING:
@@ -169,7 +169,7 @@ public:
                                 DoCast(target, SPELL_DARK_MENDING);
                             }
                         }
-                        events.RepeatEvent(urand(15000, 20000));
+                        events.Repeat(15s, 20s);
                         break;
                     }
                     case EVENT_SHADOW_WORD_PAIN:
@@ -178,7 +178,7 @@ public:
                         {
                             DoCast(target, SPELL_SHADOW_WORD_PAIN);
                         }
-                        events.RepeatEvent(urand(2500, 5000));
+                        events.Repeat(2500ms, 5s);
                         break;
                     }
                     case EVENT_IMMOLATE:
@@ -187,7 +187,7 @@ public:
                         {
                             DoCast(target, SPELL_IMMOLATE);
                         }
-                        events.RepeatEvent(urand(5000, 7000));
+                        events.Repeat(5s, 7s);
                         break;
                     }
                 }

@@ -251,7 +251,7 @@ CreatureBaseStats const* CreatureBaseStats::GetBaseStats(uint8 level, uint8 unit
 
 bool ForcedDespawnDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 {
-    m_owner.DespawnOrUnsummon(0s, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
+    m_owner.DespawnOrUnsummon(0ms, m_respawnTimer);    // since we are here, we are not TempSummon as object type cannot change during runtime
     return true;
 }
 
@@ -2159,12 +2159,12 @@ void Creature::Respawn(bool force)
     }
 }
 
-void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
+void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnTimer)
 {
-    if (timeMSToDespawn)
+    if (timeMSToDespawn > 0ms)
     {
         ForcedDespawnDelayEvent* pEvent = new ForcedDespawnDelayEvent(*this, forceRespawnTimer);
-        m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
+        m_Events.AddEventAtOffset(pEvent, timeMSToDespawn);
         return;
     }
 
@@ -2174,17 +2174,17 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
     // Xinef: Set new respawn time, ignore corpse decay time...
     RemoveCorpse(true);
 
-    if (forceRespawnTimer > Seconds::zero())
+    if (forceRespawnTimer > 0s)
         if (GetMap())
             GetMap()->ScheduleCreatureRespawn(GetGUID(), forceRespawnTimer);
 }
 
-void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0*/, Seconds forcedRespawnTimer)
+void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0ms*/, Seconds forcedRespawnTimer /*= 0s*/)
 {
     if (TempSummon* summon = this->ToTempSummon())
-        summon->UnSummon(msTimeToDespawn.count());
+        summon->UnSummon(msTimeToDespawn);
     else
-        ForcedDespawn(msTimeToDespawn.count(), forcedRespawnTimer);
+        ForcedDespawn(msTimeToDespawn, forcedRespawnTimer);
 }
 
 void Creature::DespawnOnEvade(Seconds respawnDelay)
@@ -2204,7 +2204,7 @@ void Creature::DespawnOnEvade(Seconds respawnDelay)
         return;
     }
 
-    DespawnOrUnsummon(Milliseconds(0), respawnDelay);
+    DespawnOrUnsummon(0ms, respawnDelay);
 }
 
 void Creature::InitializeReactState()
@@ -2464,7 +2464,7 @@ void Creature::CallAssistance(Unit* target /*= nullptr*/)
                     e->AddAssistant((*assistList.begin())->GetGUID());
                     assistList.pop_front();
                 }
-                m_Events.AddEvent(e, m_Events.CalculateTime(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY)));
+                m_Events.AddEventAtOffset(e, Milliseconds(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY)));
             }
         }
     }
@@ -3713,6 +3713,33 @@ bool Creature::CanGeneratePickPocketLoot() const
     return (lootPickPocketRestoreTime == 0 || lootPickPocketRestoreTime < GameTime::GetGameTime().count());
 }
 
+void Creature::SetTextRepeatId(uint8 textGroup, uint8 id)
+{
+    CreatureTextRepeatIds& repeats = m_textRepeat[textGroup];
+    if (std::find(repeats.begin(), repeats.end(), id) == repeats.end())
+        repeats.push_back(id);
+    else
+        LOG_ERROR("sql.sql", "CreatureTextMgr: TextGroup {} for Creature({}) {}, id {} already added", uint32(textGroup), GetName(), GetGUID().ToString(), uint32(id));
+}
+
+CreatureTextRepeatIds const& Creature::GetTextRepeatGroup(uint8 textGroup)
+{
+    static CreatureTextRepeatIds const emptyIds;
+
+    CreatureTextRepeatGroup::const_iterator groupItr = m_textRepeat.find(textGroup);
+    if (groupItr != m_textRepeat.end())
+        return groupItr->second;
+
+    return emptyIds;
+}
+
+void Creature::ClearTextRepeatGroup(uint8 textGroup)
+{
+    CreatureTextRepeatGroup::iterator groupItr = m_textRepeat.find(textGroup);
+    if (groupItr != m_textRepeat.end())
+        groupItr->second.clear();
+}
+
 void Creature::SetRespawnTime(uint32 respawn)
 {
     m_respawnTime = respawn ? GameTime::GetGameTime().count() + respawn : 0;
@@ -3735,7 +3762,7 @@ void Creature::ModifyThreatPercentTemp(Unit* victim, int32 percent, Milliseconds
         }
 
         TemporaryThreatModifierEvent* pEvent = new TemporaryThreatModifierEvent(*this, victim->GetGUID(), currentThreat);
-        m_Events.AddEvent(pEvent, m_Events.CalculateTime(duration.count()));
+        m_Events.AddEventAtOffset(pEvent, duration);
     }
 }
 

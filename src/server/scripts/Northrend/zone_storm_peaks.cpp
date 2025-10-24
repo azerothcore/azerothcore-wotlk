@@ -57,7 +57,7 @@ struct npc_frosthound : public npc_escortAI
             {
                 me->SetFaction(who->GetFaction());
                 me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
-                Start(false, true, who->GetGUID());
+                Start(false, who->GetGUID());
                 Talk(TALK_EMOTE_FROSTHOUND_SNIFF, me);
             }
         }
@@ -159,7 +159,7 @@ public:
                     me->RemoveAllAurasExceptType(SPELL_AURA_MECHANIC_IMMUNITY);
                     Talk(1);
                     caster->ToPlayer()->KilledMonsterCredit(me->GetEntry());
-                    me->DespawnOrUnsummon(8000);
+                    me->DespawnOrUnsummon(8s);
                     me->GetMotionMaster()->MoveJump(8721.94f, -1955, 963, 70.0f, 30.0f);
                 }
             }
@@ -246,7 +246,7 @@ public:
         void RollPath()
         {
             me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            Start(true, true, ObjectGuid::Empty, 0, false, true, true);
+            Start(true, ObjectGuid::Empty, 0, false, true, true);
             SetNextWaypoint(urand(0, 250), true);
             me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
         }
@@ -912,7 +912,10 @@ public:
             if (who->IsPlayer())
             {
                 if (apply)
-                    Start(false, true, who->GetGUID());
+                {
+                    me->SetWalk(false);
+                    Start(false, who->GetGUID());
+                }
             }
         }
 
@@ -970,7 +973,7 @@ public:
                 };
 
                 if (who->IsPlayer())
-                    who->m_Events.AddEvent(new DelayedTransportPositionOffsets(who), who->m_Events.CalculateTime(500));
+                    who->m_Events.AddEventAtOffset(new DelayedTransportPositionOffsets(who), 500ms);
 
                 return;
             }
@@ -1149,13 +1152,13 @@ public:
                     }
                     else
                     {
-                        me->DespawnOrUnsummon(100);
+                        me->DespawnOrUnsummon(100ms);
                     }
                     break;
                 case 24:
                     if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
                     {
-                        me->DespawnOrUnsummon(100);
+                        me->DespawnOrUnsummon(100ms);
                     }
                     break;
                 default:

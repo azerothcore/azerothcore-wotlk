@@ -44,7 +44,7 @@ public:
     void Update(uint32 time) override;
     virtual void InitStats(uint32 lifetime);
     virtual void InitSummon();
-    virtual void UnSummon(uint32 msTime = 0);
+    virtual void UnSummon(Milliseconds msTime = 0ms);
     void UpdateObjectVisibilityOnCreate() override;
     void RemoveFromWorld() override;
     void SetTempSummonType(TempSummonType type);
@@ -133,4 +133,5 @@ public:
 private:
     TempSummon& m_owner;
 };
+
 #endif

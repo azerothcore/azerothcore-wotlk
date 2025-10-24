@@ -150,6 +150,7 @@ namespace WorldPackets
     {
         class MinimapPingClient;
         class RandomRollClient;
+        class Complain;
     }
 
     namespace Pet
@@ -188,6 +189,14 @@ namespace WorldPackets
         class CancelTempEnchantment;
         class ItemRefundInfo;
         class ItemRefund;
+    }
+
+    namespace Calendar
+    {
+        class GetEvent;
+        class GuildFilter;
+        class ArenaTeam;
+        class CalendarComplain;
     }
 }
 
@@ -619,7 +628,6 @@ public:                                                 // opcodes handlers
     void HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet);
 
     // new
-    void HandleMoveUnRootAck(WorldPacket& recvPacket);
     void HandleMoveRootAck(WorldPacket& recvPacket);
 
     // new inspect
@@ -1036,7 +1044,7 @@ public:                                                 // opcodes handlers
     void HandleAreaSpiritHealerQueueOpcode(WorldPacket& recvData);
     void HandleCancelMountAuraOpcode(WorldPacket& recvData);
     void HandleSelfResOpcode(WorldPacket& recvData);
-    void HandleComplainOpcode(WorldPacket& recvData);
+    void HandleComplainOpcode(WorldPackets::Misc::Complain& packet);
     void HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& packet);
 
     // Socket gem
@@ -1073,9 +1081,9 @@ public:                                                 // opcodes handlers
 
     // Calendar
     void HandleCalendarGetCalendar(WorldPacket& recvData);
-    void HandleCalendarGetEvent(WorldPacket& recvData);
-    void HandleCalendarGuildFilter(WorldPacket& recvData);
-    void HandleCalendarArenaTeam(WorldPacket& recvData);
+    void HandleCalendarGetEvent(WorldPackets::Calendar::GetEvent& packet);
+    void HandleCalendarGuildFilter(WorldPackets::Calendar::GuildFilter& packet);
+    void HandleCalendarArenaTeam(WorldPackets::Calendar::ArenaTeam& packet);
     void HandleCalendarAddEvent(WorldPacket& recvData);
     void HandleCalendarUpdateEvent(WorldPacket& recvData);
     void HandleCalendarRemoveEvent(WorldPacket& recvData);
@@ -1085,7 +1093,7 @@ public:                                                 // opcodes handlers
     void HandleCalendarEventRemoveInvite(WorldPacket& recvData);
     void HandleCalendarEventStatus(WorldPacket& recvData);
     void HandleCalendarEventModeratorStatus(WorldPacket& recvData);
-    void HandleCalendarComplain(WorldPacket& recvData);
+    void HandleCalendarComplain(WorldPackets::Calendar::CalendarComplain& packet);
     void HandleCalendarGetNumPending(WorldPacket& recvData);
     void HandleCalendarEventSignup(WorldPacket& recvData);
 
@@ -1129,6 +1137,8 @@ public:                                                 // opcodes handlers
 
     void InitializeSession();
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
+
+    void SetPacketLogging(bool state);
 
 private:
     void ProcessQueryCallbacks();
