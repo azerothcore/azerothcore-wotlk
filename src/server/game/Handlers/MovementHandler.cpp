@@ -714,7 +714,7 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
     sScriptMgr->AnticheatSetUnderACKmount(_player);
 
     const SpeedOpcodePair& speedOpcodes = SetSpeed2Opc_table[move_type];
-    WorldPacket data(speedOpcodes[2], 18);
+    WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::ACK_RESPONSE)], 18);
     WriteMovementInfo(&data, &movementInfo);
     data << newspeed;
     mover->SendMessageToSet(&data, _player);

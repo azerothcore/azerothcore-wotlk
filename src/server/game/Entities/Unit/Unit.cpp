@@ -14534,7 +14534,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         // and do it only for real sent packets and use run for run/mounted as client expected
         ++player->m_forced_speed_changes[mtype];
 
-        WorldPacket data(speedOpcodes[0], 18);
+        WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
         data << GetPackGUID();
         data << counter;
         if (mtype == MOVE_RUN)
@@ -14545,7 +14545,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
     }
     else if (forced)
     {
-        WorldPacket data(speedOpcodes[1], 12);
+        WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::NPC)], 12);
         data << GetPackGUID();
         data << float(GetSpeed(mtype));
         SendMessageToSet(&data, true);

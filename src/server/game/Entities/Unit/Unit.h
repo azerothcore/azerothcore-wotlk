@@ -624,7 +624,15 @@ typedef std::unordered_map<uint32, uint32> PacketCooldowns;
 
 struct SpellProcEventEntry;                                 // used only privately
 
-typedef const Opcodes SpeedOpcodePair[3];
+enum class SpeedOpcodeIndex : uint32
+{
+    PC,
+    NPC,
+    ACK_RESPONSE,
+    MAX
+};
+
+typedef const Opcodes SpeedOpcodePair[static_cast<size_t>(SpeedOpcodeIndex::MAX)];
 SpeedOpcodePair SetSpeed2Opc_table[MAX_MOVE_TYPE] =
 {
     {SMSG_FORCE_WALK_SPEED_CHANGE,        SMSG_SPLINE_SET_WALK_SPEED,           MSG_MOVE_SET_WALK_SPEED},
