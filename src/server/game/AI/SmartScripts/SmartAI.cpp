@@ -49,6 +49,8 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     mForcedPaused = false;
 
+    mForcedMovement = FORCED_MOVEMENT_NONE;
+
     mEscortQuestID = 0;
 
     mDespawnTime = 0;
@@ -205,6 +207,7 @@ void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat,
     {
         AddEscortState(SMART_ESCORT_ESCORTING);
         mCanRepeatPath = repeat;
+        mForcedMovement = forcedMovement;
 
         if (invoker && invoker->IsPlayer())
         {
@@ -215,7 +218,7 @@ void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat,
         Movement::PointsArray pathPoints;
         GenerateWayPointArray(&pathPoints);
 
-        me->GetMotionMaster()->MoveSplinePath(&pathPoints, forcedMovement);
+        me->GetMotionMaster()->MoveSplinePath(&pathPoints, mForcedMovement);
         GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_START, nullptr, wp->id, GetScript()->GetPathId());
     }
 }
@@ -373,7 +376,7 @@ void SmartAI::ResumePath()
         Movement::PointsArray pathPoints;
         GenerateWayPointArray(&pathPoints);
 
-        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+        me->GetMotionMaster()->MoveSplinePath(&pathPoints, mForcedMovement);
     }
 }
 
