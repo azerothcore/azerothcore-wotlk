@@ -76,12 +76,12 @@ runs:
         UBUNTU_VERSION="$(grep VERSION_ID /etc/os-release | cut -f2 -d\")"
         source /etc/os-release
         if [[ "$VERSION_CODENAME" == "jammy" ]]; then
-          if [[ "${{ inputs.cc }}" =~ "clang-" ]]; then
-            CLANG_VERSION="$(echo '${{ inputs.cc }}' | cut -f2 -d\-)"
+          if [[ "${{ inputs.CC }}" =~ "clang-" ]]; then
+            CLANG_VERSION="$(echo '${{ inputs.CC }}' | cut -f2 -d\-)"
             wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
             sudo add-apt-repository "deb http://apt.llvm.org/$VERSION_CODENAME/ llvm-toolchain-$VERSION_CODENAME-$CLANG_VERSION main"
             sudo apt-get -qq update
-            sudo apt-get -qq install '${{ inputs.cc }}'
+            sudo apt-get -qq install '${{ inputs.CC }}'
           fi
         fi
 
@@ -91,6 +91,7 @@ runs:
         CCACHE_DIR: $GITHUB_WORKSPACE/var/ccache
       run: |
         cat <<EOF >> $GITHUB_ENV
+        CCACHE_BASEDIR=${GITHUB_WORKSPACE}
         CCACHE_DIR=${{ env.CCACHE_DIR }}
         CCACHE_MAXSIZE=1000MB
         CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
@@ -110,6 +111,8 @@ runs:
         mkdir build
         cd build
         cmake "$GITHUB_WORKSPACE" \
+          -DCMAKE_C_COMPILER="${{ inputs.CC }}" \
+          -DCMAKE_CXX_COMPILER="${{ inputs.CXX }}" \
           -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/env/dist" \
           -DAPPS_BUILD="all" \
           -DTOOLS_BUILD=${{ inputs.tools }} \
@@ -119,8 +122,8 @@ runs:
           -DCMAKE_BUILD_TYPE="Release" \
           -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
-          -DCMAKE_C_FLAGS="-Werror ${{ startsWith(inputs.cc, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} " \
-          -DCMAKE_CXX_FLAGS="-Werror ${{ startsWith(inputs.cxx, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}}" \
+          -DCMAKE_C_FLAGS="-Werror ${{ startsWith(inputs.CC, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} " \
+          -DCMAKE_CXX_FLAGS="-Werror ${{ startsWith(inputs.CXX, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}}" \
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
