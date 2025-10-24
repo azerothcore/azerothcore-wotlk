@@ -45,9 +45,7 @@ if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
   DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
   $SUDO apt-get update
-
-  # Force installation from MySQL’s repo
-  DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-community-server
+  DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-server
 fi
 
 
