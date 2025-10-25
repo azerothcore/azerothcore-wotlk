@@ -98,7 +98,9 @@ public:
                     break;
                 case GO_TRIBUNAL_ACCESS_DOOR:
                     goTribunalDoorGUID = go->GetGUID();
-                    go->SetGoState(GO_STATE_READY);
+                    go->SetGoState(GO_STATE_ACTIVE);
+                    // Uncomment the line below to require both bosses to be killed before opening
+                    // go->SetGoState(GO_STATE_READY);
                     break;
                 case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
@@ -188,9 +190,9 @@ public:
         {
             switch (criteria_id)
             {
-                case 7590: // Brann Spankin' New (2154)
+                case 7590:
                     return brannAchievement;
-                case 7593: // Abuse the Ooze (2155)
+                case 7593:
                     return sjonnirAchievement;
             }
 
@@ -208,9 +210,12 @@ public:
                 isKrystalusDead = type == BOSS_KRYSTALLUS || isKrystalusDead;
             }
 
+            // Uncomment the lines below to require both bosses to be killed before opening the tribunal door
+            /*
             if (isMaidenOfGriefDead && isKrystalusDead)
                 if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
                     tribunalDoor->SetGoState(GO_STATE_ACTIVE);
+            */
 
             if (type == BOSS_TRIBUNAL_OF_AGES && data == SPECIAL)
             {
@@ -233,12 +238,10 @@ public:
                     {
                         if (pKaddrak->GetGoState() != GO_STATE_ACTIVE && pMarnak->GetGoState() != GO_STATE_ACTIVE)
                         {
-                            //Abedneum first talk
                             pAbedneum->SetGoState(GO_STATE_ACTIVE);
                         }
                         else if (pMarnak->GetGoState() == GO_STATE_ACTIVE)
                         {
-                            //Abedneum second talk
                             pAbedneum->SetGoState(GO_STATE_ACTIVE);
                             pMarnak->SetGoState(GO_STATE_READY);
                             pSkyRoomFloor->SetGoState(GO_STATE_READY);
@@ -246,7 +249,6 @@ public:
                         }
                         else
                         {
-                            //Marnak talk
                             if (pKaddrak->GetGoState() == GO_STATE_ACTIVE)
                             {
                                 pMarnak->SetGoState(GO_STATE_ACTIVE);
@@ -257,7 +259,6 @@ public:
                     }
                     else
                     {
-                        //Kaddrak talk
                         if (pKaddrak->GetGoState() != GO_STATE_ACTIVE)
                         {
                             pAbedneum->SetGoState(GO_STATE_READY);
@@ -270,7 +271,6 @@ public:
                         pSkyRoomFloor->SetGoState(GO_STATE_ACTIVE);
                 }
 
-                // Make sjonnir attackable
                 if (Creature* cSjonnir = instance->GetCreature(SjonnirGUID))
                     cSjonnir->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
