@@ -135,7 +135,7 @@ public:
                         
                         for (Unit* target : targetList)
                         {
-                            if (target && target->GetPowerType() == POWER_MANA)
+                            if (target && target->getPowerType() == POWER_MANA)
                             {
                                 me->CastSpell(target, PARTING_SORROW, false);
                                 break;
