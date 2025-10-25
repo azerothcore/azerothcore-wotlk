@@ -99,6 +99,12 @@ runs:
         CXX=${{ inputs.CXX }}
         EOF
 
+    - name: ccache config snapshot
+      shell: bash
+      run: |
+        ccache -p | egrep 'base_dir|hash_dir|compiler_check|sloppiness|max_size' || true
+        tail -n +1 "$CCACHE_DIR/cache.debug" 2>/dev/null | egrep -o 'result: .*' | sort | uniq -c | sort -nr || true
+
     - name: reset ccache stats
       shell: bash
       run: ccache -z || true
