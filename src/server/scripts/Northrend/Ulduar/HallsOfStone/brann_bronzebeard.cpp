@@ -987,7 +987,6 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.ScheduleEvent(EVENT_DRP_CHARGE, 1s);
             events.ScheduleEvent(EVENT_DRP_CLEAVE, 7s);
         }
 
@@ -1002,24 +1001,20 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_DRP_CHARGE:
-                    {
-                        if (Unit* victim = me->GetVictim())
-                        {
-                            if (!me->IsWithinMeleeRange(victim))
-                            {
-                                me->CastSpell(victim, SPELL_DRP_CHARGE, false);
-                            }
-                        }
-                        events.Repeat(2s);
-                        break;
-                    }
                 case EVENT_DRP_CLEAVE:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
                         events.Repeat(7s);
                         break;
                     }
+            }
+
+            if (Unit* victim = me->GetVictim())
+            {
+                if (!me->IsWithinMeleeRange(victim) && !me->HasUnitState(UNIT_STATE_CHARGING))
+                {
+                    me->CastSpell(victim, SPELL_DRP_CHARGE, false);
+                }
             }
 
             DoMeleeAttackIfReady();
