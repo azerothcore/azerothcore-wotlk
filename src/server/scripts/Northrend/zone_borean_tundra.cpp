@@ -464,7 +464,10 @@ public:
                 go->UseDoorOrButton();
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
+            {
+                creature->SetWalk(true);
                 pEscortAI->Start(true, player->GetGUID());
+            }
 
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
@@ -914,6 +917,7 @@ public:
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
+            creature->SetWalk(true);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
@@ -959,7 +963,7 @@ public:
                     Talk(SAY_5);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     player->GroupEventHappens(QUEST_ESCAPING_THE_MIST, me);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
             }
         }
@@ -995,7 +999,6 @@ public:
         {
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_BONKER_2, player);
-            creature->SetWalk(false);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;

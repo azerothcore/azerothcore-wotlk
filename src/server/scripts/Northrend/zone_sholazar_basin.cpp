@@ -605,6 +605,7 @@ public:
                 creature->GetMotionMaster()->MoveJumpTo(0, 0.4f, 0.4f);
                 creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
 
+                creature->SetWalk(true);
                 pEscortAI->Start(false, player->GetGUID());
                 creature->AI()->Talk(SAY_WP_1);
             }

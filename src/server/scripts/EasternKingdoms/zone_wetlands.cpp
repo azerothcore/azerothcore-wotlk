@@ -138,7 +138,10 @@ public:
                 pSlim->CastSpell(pSlim, SPELL_STEALTH, true);
 
             if (npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI* pEscortAI = CAST_AI(npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI, pSlim->AI()))
+            {
+                pSlim->SetWalk(true);
                 pEscortAI->Start(false, player->GetGUID(), quest);
+            }
         }
         return false;
     }

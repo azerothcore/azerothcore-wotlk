@@ -162,7 +162,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
 
     // Feed data to the struct
     ArenaTeamMember newMember;
-    //newMember.Name             = playerName;
+    newMember.Name             = playerName;
     newMember.Guid             = playerGuid;
     newMember.Class            = playerClass;
     newMember.SeasonGames      = 0;
@@ -249,7 +249,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         newMember.WeekWins         = fields[3].Get<uint16>();
         newMember.SeasonGames      = fields[4].Get<uint16>();
         newMember.SeasonWins       = fields[5].Get<uint16>();
-        //newMember.Name             = fields[6].Get<std::string>();
+        newMember.Name             = fields[6].Get<std::string>();
         newMember.Class            = fields[7].Get<uint8>();
         newMember.PersonalRating   = fields[8].Get<uint16>();
         newMember.MatchMakerRating = fields[9].Get<uint16>() > 0 ? fields[9].Get<uint16>() : sWorld->getIntConfig(CONFIG_ARENA_START_MATCHMAKER_RATING);
