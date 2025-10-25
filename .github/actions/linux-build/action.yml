@@ -86,15 +86,17 @@ runs:
       env:
         CCACHE_DIR: $GITHUB_WORKSPACE/var/ccache
       run: |
-        cat <<EOF >> $GITHUB_ENV
+        mkdir -p "$CCACHE_DIR"
+        cat <<EOF >> "$GITHUB_ENV"
         CCACHE_BASEDIR=${GITHUB_WORKSPACE}
         CCACHE_DIR=${{ env.CCACHE_DIR }}
+        CCACHE_HASHDIR=1
         CCACHE_MAXSIZE=5G
         CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
         CCACHE_COMPRESS=1
         CCACHE_COMPRESSLEVEL=9
         CCACHE_COMPILERCHECK=content
-        CCACHE_LOGFILE=$CCACHE_DIR/cache.debug
+        CCACHE_LOGFILE=${{ env.CCACHE_DIR }}/cache.debug
         CC=${{ inputs.CC }}
         CXX=${{ inputs.CXX }}
         EOF
@@ -102,8 +104,21 @@ runs:
     - name: ccache config snapshot
       shell: bash
       run: |
+        echo "==== Effective ccache configuration ===="
         ccache -p | egrep 'base_dir|hash_dir|compiler_check|sloppiness|max_size' || true
-        tail -n +1 "$CCACHE_DIR/cache.debug" 2>/dev/null | egrep -o 'result: .*' | sort | uniq -c | sort -nr || true
+
+        echo
+        echo "==== Compiler info ===="
+        which ${{ inputs.CC }} && ${{ inputs.CC }} --version || true
+        which ${{ inputs.CXX }} && ${{ inputs.CXX }} --version || true
+
+        echo
+        echo "==== Previous cache stats ===="
+        ccache -s || true
+
+        echo
+        echo "==== Top cache results ===="
+        grep -o 'result: .*' "$CCACHE_DIR/cache.debug" 2>/dev/null | sort | uniq -c | sort -nr | head || true
 
     - name: reset ccache stats
       shell: bash
@@ -127,8 +142,8 @@ runs:
           -DCMAKE_BUILD_TYPE="Release" \
           -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
-          -DCMAKE_C_FLAGS="-Werror ${{ startsWith(inputs.CC, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} " \
-          -DCMAKE_CXX_FLAGS="-Werror ${{ startsWith(inputs.CXX, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}}" \
+          -DCMAKE_C_FLAGS="-Werror ${{ startsWith(inputs.CC, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} -fdebug-prefix-map=${GITHUB_WORKSPACE}=." \
+          -DCMAKE_CXX_FLAGS="-Werror ${{ startsWith(inputs.CXX, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} -fdebug-prefix-map=${GITHUB_WORKSPACE}=." \
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
