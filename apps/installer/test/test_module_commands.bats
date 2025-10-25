@@ -751,5 +751,5 @@ EOF
 
     run inst_module "unknown-command"
     [ "$status" -eq 1 ]
-    [[ "$output" =~ "Unknown module command" ]]
+    [[ "$output" =~ "Invalid option" ]]
 }
