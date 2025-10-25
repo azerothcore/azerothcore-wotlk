@@ -99,8 +99,6 @@ public:
                 case GO_TRIBUNAL_ACCESS_DOOR:
                     goTribunalDoorGUID = go->GetGUID();
                     go->SetGoState(GO_STATE_ACTIVE);
-                    // Uncomment the line below to require both bosses to be killed before opening
-                    // go->SetGoState(GO_STATE_READY);
                     break;
                 case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
@@ -209,13 +207,6 @@ public:
                 isMaidenOfGriefDead = type == BOSS_MAIDEN_OF_GRIEF || isMaidenOfGriefDead;
                 isKrystalusDead = type == BOSS_KRYSTALLUS || isKrystalusDead;
             }
-
-            // Uncomment the lines below to require both bosses to be killed before opening the tribunal door
-            /*
-            if (isMaidenOfGriefDead && isKrystalusDead)
-                if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
-                    tribunalDoor->SetGoState(GO_STATE_ACTIVE);
-            */
 
             if (type == BOSS_TRIBUNAL_OF_AGES && data == SPECIAL)
             {
