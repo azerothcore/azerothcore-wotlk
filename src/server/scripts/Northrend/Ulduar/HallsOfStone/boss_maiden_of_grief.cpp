@@ -83,7 +83,8 @@ public:
             events.ScheduleEvent(EVENT_STORM, 6s, 10s);
             events.ScheduleEvent(EVENT_SHOCK, 14s, 29s);
             events.ScheduleEvent(EVENT_PILLAR, 7s, 15s);
-            events.ScheduleEvent(EVENT_PARTING, 27s, 45s);
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_PARTING, 27s, 45s);
 
             Talk(SAY_AGGRO);
             if (pInstance)
@@ -129,8 +130,17 @@ public:
                     }
                 case EVENT_PARTING:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, PARTING_SORROW, false);
+                        std::list<Unit*> targetList;
+                        SelectTargetList(targetList, 5, SelectTargetMethod::Random, 0, 50.0f, true, true);
+                        
+                        for (Unit* target : targetList)
+                        {
+                            if (target && target->GetPowerType() == POWER_MANA)
+                            {
+                                me->CastSpell(target, PARTING_SORROW, false);
+                                break;
+                            }
+                        }
 
                         events.Repeat(27s, 45s);
                         break;
