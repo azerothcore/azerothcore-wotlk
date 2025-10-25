@@ -916,7 +916,6 @@ public:
 
                 if (auto ai = CAST_AI(npc_varian_wrynn::npc_varian_wrynnAI, creature->AI()))
                 {
-                    creature->SetWalk(false);
                     ai->Start(true, player->GetGUID());
                     if (Creature* jaina = GetClosestCreatureWithEntry(creature, NPC_JAINA, 50.0f))
                         ai->jainaGUID = jaina->GetGUID();

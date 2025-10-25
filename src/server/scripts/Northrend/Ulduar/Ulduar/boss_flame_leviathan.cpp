@@ -1089,6 +1089,7 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
+            me->SetWalk(true);
             Start(false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
