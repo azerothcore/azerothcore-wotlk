@@ -51,7 +51,7 @@ public:
             { "rename",         HandleArenaRenameCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "captain",        HandleArenaCaptainCommand,  SEC_ADMINISTRATOR, Console::No  },
             { "info",           HandleArenaInfoCommand,     SEC_GAMEMASTER,    Console::Yes },
-            { "lookup",         HandleArenaLookupCommand,   SEC_GAMEMASTER,    Console::No  },
+            { "lookup",         HandleArenaLookupCommand,   SEC_GAMEMASTER,    Console::Yes },
             { "season",         arenaSeasonCommandTable  }
         };
 
@@ -209,7 +209,7 @@ public:
         handler->PSendSysMessage(LANG_ARENA_INFO_HEADER, arena->GetName(), arena->GetId(), arena->GetRating(), arena->GetType(), arena->GetType());
 
         for (auto const& itr : arena->GetMembers())
-            handler->PSendSysMessage(LANG_ARENA_INFO_MEMBERS, itr.Name, itr.Guid.ToString(), itr.PersonalRating, (arena->GetCaptain() == itr.Guid ? "- Captain" : ""));
+            handler->PSendSysMessage(LANG_ARENA_INFO_MEMBERS, itr.Name, itr.Guid.GetCounter(), itr.PersonalRating, (arena->GetCaptain() == itr.Guid ? "Captain" : ""));
 
         return true;
     }
@@ -224,17 +224,17 @@ public:
         {
             if (StringContainsStringI(team->GetName(), needle))
             {
-                if (handler->GetSession())
-                {
-                    handler->PSendSysMessage(LANG_ARENA_LOOKUP, team->GetName(), team->GetId(), team->GetType(), team->GetType());
-                    found = true;
-                    continue;
-                }
+                handler->PSendSysMessage(LANG_ARENA_LOOKUP, team->GetName(), team->GetId(), team->GetType(), team->GetType());
+                found = true;
+                continue;
             }
         }
 
         if (!found)
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, std::string(needle));
+        {
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, std::string(needle));
+            return false;
+        }
 
         return true;
     }

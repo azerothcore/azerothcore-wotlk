@@ -2351,6 +2351,7 @@ public:
     void SetMover(Unit* target);
 
     void SetSeer(WorldObject* target) { m_seer = target; }
+    WorldObject* GetSeer() const { return m_seer; }
     void SetViewpoint(WorldObject* target, bool apply);
     [[nodiscard]] WorldObject* GetViewpoint() const;
     void StopCastingCharm(Aura* except = nullptr);
@@ -2564,8 +2565,6 @@ public:
     void AddWhisperWhiteList(ObjectGuid guid) { WhisperList.push_back(guid); }
     bool IsInWhisperWhiteList(ObjectGuid guid);
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
-
-    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
 
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
