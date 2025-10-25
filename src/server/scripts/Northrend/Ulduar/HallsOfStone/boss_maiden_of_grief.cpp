@@ -132,7 +132,7 @@ public:
                     {
                         std::list<Unit*> targetList;
                         SelectTargetList(targetList, 5, SelectTargetMethod::Random, 0, 50.0f, true, true);
-                        
+
                         for (Unit* target : targetList)
                         {
                             if (target && target->getPowerType() == POWER_MANA)
