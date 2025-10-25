@@ -467,12 +467,18 @@ public:
 
     static bool HandleGMTicketResponseAppendCommand(ChatHandler* handler, uint32 ticketId, Tail res)
     {
-        return TicketResponseAppend(ticketId, false, handler, res.data());
+        if (res.empty())
+            return false;
+        else
+            return TicketResponseAppend(ticketId, false, handler, res.data());
     }
 
     static bool HandleGMTicketResponseAppendLnCommand(ChatHandler* handler, uint32 ticketId, Tail res)
     {
-        return TicketResponseAppend(ticketId, true, handler, res.data());
+        if (res.empty())
+            return false;
+        else
+            return TicketResponseAppend(ticketId, true, handler, res.data());
     }
 
     static bool HandleGMTicketResponseDeleteCommand(ChatHandler* handler, uint32 ticketId)

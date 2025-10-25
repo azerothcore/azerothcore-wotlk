@@ -2566,7 +2566,7 @@ public:
                     me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->GetMotionMaster()->MovePoint(POINT_DROP_PLAYER, _destPoint, FORCED_MOVEMENT_NONE, 0.f, false);
-                    me->SetDisableGravity(true, true);
+                    me->SetDisableGravity(true);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case EVENT_MOVE_TO_SIPHON_POS:
@@ -2732,7 +2732,7 @@ class spell_the_lich_king_valkyr_target_search : public SpellScript
         if (Unit* target = GetHitUnit())
         {
             GetCaster()->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 4.0f, 42.0f, EVENT_CHARGE);
-            GetCaster()->SetDisableGravity(true, true);
+            GetCaster()->SetDisableGravity(true);
         }
     }
 

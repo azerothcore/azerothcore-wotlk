@@ -1999,7 +1999,7 @@ void Creature::setDeathState(DeathState state, bool despawn)
 
         bool needsFalling = !despawn && (IsFlying() || IsHovering()) && !IsUnderWater();
         SetHover(false);
-        SetDisableGravity(false, false, false);
+        SetDisableGravity(false);
 
         if (needsFalling)
             GetMotionMaster()->MoveFall(0, true);
@@ -3230,47 +3230,6 @@ bool Creature::SetWalk(bool enable)
     return true;
 }
 
-/**
- * @brief Enable or disable the creature's fly mode by adding or removing: MOVEMENTFLAG_FLYING. Infom also the client
- */
-bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool updateAnimationTier /*= true*/)
-{
-    //! It's possible only a packet is sent but moveflags are not updated
-    //! Need more research on this
-    if (!packetOnly && !Unit::SetDisableGravity(disable))
-        return false;
-
-    if (m_movedByPlayer)
-    {
-        WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
-        data << GetPackGUID();
-        data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
-        m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
-        m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
-
-        data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
-        data << GetPackGUID();
-        BuildMovementPacket(&data);
-        m_movedByPlayer->ToPlayer()->SendMessageToSet(&data, false);
-        return true;
-    }
-
-    if (updateAnimationTier && IsAlive() && !HasUnitState(UNIT_STATE_ROOT) && !IsRooted())
-    {
-        if (IsLevitating())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_FLY);
-        else if (IsHovering())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_HOVER);
-        else
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
-    }
-
-    WorldPacket data(disable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, false);
-    return true;
-}
-
 bool Creature::SetSwim(bool enable)
 {
     if (!Unit::SetSwim(enable))
@@ -3385,19 +3344,23 @@ void Creature::UpdateMovementFlags()
 
     if (GetMovementTemplate().IsFlightAllowed() && isInAir && !IsFalling())
     {
-        if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly)
+        if (GetMovementTemplate().Flight == CreatureFlightMovementType::CanFly && !m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
             SetCanFly(true);
-        else
+        else if (!IsLevitating())
             SetDisableGravity(true);
 
-        if (!HasHoverAura())
+        if (!HasHoverAura() && IsHovering())
             SetHover(false);
     }
     else
     {
-        SetCanFly(false);
-        SetDisableGravity(false);
-        if (IsAlive() && (CanHover() || HasHoverAura()))
+        if (m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY))
+            SetCanFly(false);
+
+        if (IsLevitating())
+            SetDisableGravity(false);
+
+        if (IsAlive() && (GetMovementTemplate().Ground == CreatureGroundMovementType::Hover || HasHoverAura()) && !IsHovering())
             SetHover(true);
     }
 
