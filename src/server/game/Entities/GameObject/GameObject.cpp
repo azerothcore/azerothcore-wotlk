@@ -1466,7 +1466,7 @@ void GameObject::Use(Unit* user)
     // by default spell caster is user
     Unit* spellCaster = user;
     uint32 spellId = 0;
-    bool triggered = false;
+    uint32 triggeredFlags = TRIGGERED_NONE;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1485,6 +1485,10 @@ void GameObject::Use(Unit* user)
 
         m_cooldownTime = GameTime::GetGameTimeMS().count() + cooldown * IN_MILLISECONDS;
     }
+
+    if (user->IsPlayer() && GetGoType() != GAMEOBJECT_TYPE_TRAP) // workaround for GO casting
+        if (!m_goInfo->IsUsableMounted())
+            user->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     switch (GetGoType())
     {
@@ -1886,7 +1890,6 @@ void GameObject::Use(Unit* user)
                     }
                 }
 
-                user->RemoveAurasByType(SPELL_AURA_MOUNTED);
                 spellId = info->spellcaster.spellId;
                 break;
             }
@@ -2056,12 +2059,15 @@ void GameObject::Use(Unit* user)
         return;
     }
 
+    if (m_goInfo->IsUsableMounted())
+        triggeredFlags |= TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE;
+
     if (Player* player = user->ToPlayer())
         sOutdoorPvPMgr->HandleCustomSpell(player, spellId, this);
 
     if (spellCaster)
     {
-        if ((spellCaster->CastSpell(user, spellInfo, triggered) == SPELL_CAST_OK) && GetGoType() == GAMEOBJECT_TYPE_SPELLCASTER)
+        if ((spellCaster->CastSpell(user, spellInfo, TriggerCastFlags(triggeredFlags)) == SPELL_CAST_OK) && GetGoType() == GAMEOBJECT_TYPE_SPELLCASTER)
             AddUse();
     }
     else
