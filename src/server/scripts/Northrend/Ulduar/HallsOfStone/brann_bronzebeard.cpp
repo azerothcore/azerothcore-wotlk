@@ -485,6 +485,9 @@ public:
             {
                 if (!me->IsInCombat() && me->GetHealth() < me->GetMaxHealth())
                 {
+                    if (healthRegenTimer == 0)
+                        healthRegenTimer = 1000;
+                    
                     if (healthRegenTimer <= diff)
                     {
                         uint32 newHealth = me->GetHealth() + 10000;
@@ -495,6 +498,10 @@ public:
                     }
                     else
                         healthRegenTimer -= diff;
+                }
+                else if (me->IsInCombat())
+                {
+                    healthRegenTimer = 0;
                 }
             }
 
@@ -641,15 +648,8 @@ public:
                     {
                         if (!canExecuteEvents)
                             return;
-                        uint32 Time = 40000 - (2500 * WaveNum);
                         SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3, 0);
-                        if (WaveNum > 2)
-                            events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
-                        if (WaveNum > 5)
-                            events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
-
-                        WaveNum++;
-                        events.Repeat(Milliseconds(Time));
+                        events.Repeat(IsHeroic() ? 23500ms : 32500ms);
                         break;
                     }
                     case EVENT_SUMMON_STORMCALLER:
@@ -658,7 +658,7 @@ public:
                             return;
 
                         SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2, 1);
-
+                        events.Repeat(IsHeroic() ? 32s : 41500ms);
                         break;
                     }
                     case EVENT_SUMMON_CUSTODIAN:
@@ -667,7 +667,7 @@ public:
                             return;
 
                         SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1, 1);
-
+                        events.Repeat(IsHeroic() ? 32s : 45s);
                         break;
                     }
                     case EVENT_TRIBUNAL_END:
@@ -881,8 +881,9 @@ void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
     events.ScheduleEvent(EVENT_MARNAK_VISUAL, 105s);
     events.ScheduleEvent(EVENT_ABEDNEUM_VISUAL, 207s);
 
-    // Fight
-    events.ScheduleEvent(EVENT_SUMMON_MONSTERS, 47s);
+    events.ScheduleEvent(EVENT_SUMMON_MONSTERS, 52s);
+    events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, 122s);
+    events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, 228s);
     events.ScheduleEvent(EVENT_KADDRAK_HEAD, 47s);
     events.ScheduleEvent(EVENT_MARNAK_HEAD, 115s);
     events.ScheduleEvent(EVENT_ABEDNEUM_HEAD, 217s);
