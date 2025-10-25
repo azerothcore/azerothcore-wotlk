@@ -89,9 +89,8 @@ runs:
         cat <<EOF >> $GITHUB_ENV
         CCACHE_BASEDIR=${GITHUB_WORKSPACE}
         CCACHE_DIR=${{ env.CCACHE_DIR }}
-        CCACHE_MAXSIZE=1000MB
+        CCACHE_MAXSIZE=5G
         CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
-        CCACHE_CPP2=true
         CCACHE_COMPRESS=1
         CCACHE_COMPRESSLEVEL=9
         CCACHE_COMPILERCHECK=content
