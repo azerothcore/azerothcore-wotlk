@@ -260,7 +260,6 @@ public:
         bool TalkEvent;
         uint32 SpeechCount, SpeechPause;
         bool canExecuteEvents = true;
-        uint32 healthRegenTimer;
 
         void DespawnHeads()
         {
@@ -338,7 +337,6 @@ public:
             SpeechCount = 0;
             SpeechPause = 0;
             TalkEvent = false;
-            healthRegenTimer = 0;
         }
 
         void WaypointReached(uint32 id) override;
@@ -480,30 +478,6 @@ public:
         void UpdateEscortAI(uint32 diff) override
         {
             events.Update(diff);
-
-            if (pInstance && pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
-            {
-                if (!me->IsInCombat() && me->GetHealth() < me->GetMaxHealth())
-                {
-                    if (healthRegenTimer == 0)
-                        healthRegenTimer = 1000;
-                    
-                    if (healthRegenTimer <= diff)
-                    {
-                        uint32 newHealth = me->GetHealth() + 10000;
-                        if (newHealth > me->GetMaxHealth())
-                            newHealth = me->GetMaxHealth();
-                        me->SetHealth(newHealth);
-                        healthRegenTimer = 1000;
-                    }
-                    else
-                        healthRegenTimer -= diff;
-                }
-                else if (me->IsInCombat())
-                {
-                    healthRegenTimer = 0;
-                }
-            }
 
             if (uint32 eventId = events.ExecuteEvent())
             {
@@ -648,8 +622,15 @@ public:
                     {
                         if (!canExecuteEvents)
                             return;
+                        uint32 Time = 40000 - (2500 * WaveNum);
                         SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3, 0);
-                        events.Repeat(IsHeroic() ? 23500ms : 32500ms);
+                        if (WaveNum > 2)
+                            events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
+                        if (WaveNum > 5)
+                            events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
+
+                        WaveNum++;
+                        events.Repeat(Milliseconds(Time));
                         break;
                     }
                     case EVENT_SUMMON_STORMCALLER:
@@ -658,7 +639,7 @@ public:
                             return;
 
                         SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2, 1);
-                        events.Repeat(IsHeroic() ? 32s : 41500ms);
+
                         break;
                     }
                     case EVENT_SUMMON_CUSTODIAN:
@@ -667,7 +648,7 @@ public:
                             return;
 
                         SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1, 1);
-                        events.Repeat(IsHeroic() ? 32s : 45s);
+
                         break;
                     }
                     case EVENT_TRIBUNAL_END:
@@ -861,14 +842,17 @@ void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
     Creature* cr = nullptr;
     if ((cr = me->SummonCreature(NPC_KADDRAK, 923.7f, 326.9f, 219.5f, 2.1f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
+        cr->SetInCombatWithZone();
         KaddrakGUID = cr->GetGUID();
     }
     if ((cr = me->SummonCreature(NPC_MARNAK, 895.974f, 363.571f, 219.337f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
+        cr->SetInCombatWithZone();
         MarnakGUID = cr->GetGUID();
     }
     if ((cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86f, 0.6f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
+        cr->SetInCombatWithZone();
         AbedneumGUID = cr->GetGUID();
     }
 
@@ -881,9 +865,8 @@ void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
     events.ScheduleEvent(EVENT_MARNAK_VISUAL, 105s);
     events.ScheduleEvent(EVENT_ABEDNEUM_VISUAL, 207s);
 
-    events.ScheduleEvent(EVENT_SUMMON_MONSTERS, 52s);
-    events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, 122s);
-    events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, 228s);
+    // Fight
+    events.ScheduleEvent(EVENT_SUMMON_MONSTERS, 47s);
     events.ScheduleEvent(EVENT_KADDRAK_HEAD, 47s);
     events.ScheduleEvent(EVENT_MARNAK_HEAD, 115s);
     events.ScheduleEvent(EVENT_ABEDNEUM_HEAD, 217s);
@@ -1004,6 +987,7 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
+            events.ScheduleEvent(EVENT_DRP_CHARGE, 10s);
             events.ScheduleEvent(EVENT_DRP_CLEAVE, 7s);
         }
 
@@ -1018,20 +1002,20 @@ public:
 
             switch (events.ExecuteEvent())
             {
+                case EVENT_DRP_CHARGE:
+                    {
+                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
+                            me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
+
+                        events.Repeat(10s);
+                        break;
+                    }
                 case EVENT_DRP_CLEAVE:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
                         events.Repeat(7s);
                         break;
                     }
-            }
-
-            if (Unit* victim = me->GetVictim())
-            {
-                if (!me->IsWithinMeleeRange(victim) && !me->HasUnitState(UNIT_STATE_CHARGING))
-                {
-                    me->CastSpell(victim, SPELL_DRP_CHARGE, false);
-                }
             }
 
             DoMeleeAttackIfReady();
@@ -1117,7 +1101,7 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_IGC_CRUSH, 6s);
-            events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 20s);
+            events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 4s);
         }
         void UpdateAI(uint32 diff) override
         {
@@ -1139,7 +1123,7 @@ public:
                 case EVENT_IGC_GROUND_SMASH:
                     {
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_IGC_GROUND_SMASH_H : SPELL_IGC_GROUND_SMASH, false);
-                        events.Repeat(20s, 40s);
+                        events.Repeat(5s);
                         break;
                     }
             }
