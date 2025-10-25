@@ -487,7 +487,7 @@ public:
                 {
                     if (healthRegenTimer == 0)
                         healthRegenTimer = 1000;
-                    
+
                     if (healthRegenTimer <= diff)
                     {
                         uint32 newHealth = me->GetHealth() + 10000;
