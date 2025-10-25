@@ -190,9 +190,9 @@ public:
         {
             switch (criteria_id)
             {
-                case 7590:
+                case 7590: // Brann Spankin' New (2154)
                     return brannAchievement;
-                case 7593:
+                case 7593: // Abuse the Ooze (2155)
                     return sjonnirAchievement;
             }
 
@@ -238,10 +238,12 @@ public:
                     {
                         if (pKaddrak->GetGoState() != GO_STATE_ACTIVE && pMarnak->GetGoState() != GO_STATE_ACTIVE)
                         {
+                            //Abedneum first talk
                             pAbedneum->SetGoState(GO_STATE_ACTIVE);
                         }
                         else if (pMarnak->GetGoState() == GO_STATE_ACTIVE)
                         {
+                            //Abedneum second talk
                             pAbedneum->SetGoState(GO_STATE_ACTIVE);
                             pMarnak->SetGoState(GO_STATE_READY);
                             pSkyRoomFloor->SetGoState(GO_STATE_READY);
@@ -249,6 +251,7 @@ public:
                         }
                         else
                         {
+                            //Marnak talk
                             if (pKaddrak->GetGoState() == GO_STATE_ACTIVE)
                             {
                                 pMarnak->SetGoState(GO_STATE_ACTIVE);
@@ -259,6 +262,7 @@ public:
                     }
                     else
                     {
+                        //Kaddrak talk
                         if (pKaddrak->GetGoState() != GO_STATE_ACTIVE)
                         {
                             pAbedneum->SetGoState(GO_STATE_READY);
@@ -271,6 +275,7 @@ public:
                         pSkyRoomFloor->SetGoState(GO_STATE_ACTIVE);
                 }
 
+                // Make sjonnir attackable
                 if (Creature* cSjonnir = instance->GetCreature(SjonnirGUID))
                     cSjonnir->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
