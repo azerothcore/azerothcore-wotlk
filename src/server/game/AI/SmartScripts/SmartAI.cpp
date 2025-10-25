@@ -381,7 +381,7 @@ void SmartAI::EndPath(bool fail)
     if (mCanRepeatPath)
     {
         if (IsAIControlled())
-            StartPath(FORCED_MOVEMENT_NONE, GetScript()->GetPathId(), true);
+            StartPath(mForcedMovement, GetScript()->GetPathId(), true);
     }
     else
         GetScript()->SetPathId(0);
@@ -964,7 +964,7 @@ void SmartAI::OnCharmed(bool /* apply */)
     if (!charmed && !me->IsInEvadeMode())
     {
         if (mCanRepeatPath)
-            StartPath(FORCED_MOVEMENT_NONE, GetScript()->GetPathId(), true);
+            StartPath(mForcedMovement, GetScript()->GetPathId(), true);
 
         if (Unit* charmer = me->GetCharmer())
             AttackStart(charmer);
