@@ -1100,7 +1100,7 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_IGC_CRUSH, 6s);
-            events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 4s);
+            events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 20s);
         }
         void UpdateAI(uint32 diff) override
         {
@@ -1122,7 +1122,7 @@ public:
                 case EVENT_IGC_GROUND_SMASH:
                     {
                         me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_IGC_GROUND_SMASH_H : SPELL_IGC_GROUND_SMASH, false);
-                        events.Repeat(5s);
+                        events.Repeat(20s, 40s);
                         break;
                     }
             }
