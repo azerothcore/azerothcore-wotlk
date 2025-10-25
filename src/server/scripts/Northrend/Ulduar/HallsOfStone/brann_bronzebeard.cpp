@@ -260,6 +260,7 @@ public:
         bool TalkEvent;
         uint32 SpeechCount, SpeechPause;
         bool canExecuteEvents = true;
+        uint32 healthRegenTimer;
 
         void DespawnHeads()
         {
@@ -337,6 +338,7 @@ public:
             SpeechCount = 0;
             SpeechPause = 0;
             TalkEvent = false;
+            healthRegenTimer = 0;
         }
 
         void WaypointReached(uint32 id) override;
@@ -478,6 +480,23 @@ public:
         void UpdateEscortAI(uint32 diff) override
         {
             events.Update(diff);
+
+            if (pInstance && pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
+            {
+                if (!me->IsInCombat() && me->GetHealth() < me->GetMaxHealth())
+                {
+                    if (healthRegenTimer <= diff)
+                    {
+                        uint32 newHealth = me->GetHealth() + 10000;
+                        if (newHealth > me->GetMaxHealth())
+                            newHealth = me->GetMaxHealth();
+                        me->SetHealth(newHealth);
+                        healthRegenTimer = 1000;
+                    }
+                    else
+                        healthRegenTimer -= diff;
+                }
+            }
 
             if (uint32 eventId = events.ExecuteEvent())
             {
