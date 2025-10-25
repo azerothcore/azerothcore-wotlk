@@ -1573,17 +1573,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             if (oldmap)
                 oldmap->RemovePlayerFromMap(this, false);
 
-            // xinef: do this before setting fall information!
-            if (IsMounted() && (!GetMap()->GetEntry()->IsDungeon() && !GetMap()->GetEntry()->IsBattlegroundOrArena()) && !m_transport)
-            {
-                AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_MOUNTED);
-                if (!auras.empty())
-                {
-                    SetMountBlockId((*auras.begin())->GetId());
-                    RemoveAurasByType(SPELL_AURA_MOUNTED);
-                }
-            }
-
             teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
             SetFallInformation(GameTime::GetGameTime().count(), z);
             // if the player is saved before worldportack (at logout for example)

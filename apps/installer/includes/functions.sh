@@ -183,3 +183,5 @@ function inst_download_client_data {
         && echo "Remove downloaded file" && rm "$zipPath" \
         && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
 }
+
+
