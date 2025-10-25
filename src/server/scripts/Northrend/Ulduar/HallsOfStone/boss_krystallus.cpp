@@ -131,7 +131,7 @@ public:
                     }
                 case EVENT_GROUND_SPIKE:
                     {
-                        me->CastSpell(me->GetVictim(), GROUND_SPIKE_H, false); // current enemy target
+                        me->CastSpell(me->GetVictim(), GROUND_SPIKE_H, false);
                         events.Repeat(8s, 11s);
                         break;
                     }
@@ -145,6 +145,8 @@ public:
                     {
                         events.Repeat(10s, 13s);
                         me->CastSpell(me->GetVictim(), GROUND_SLAM, true);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
                         events.DelayEvents(10s);
                         events.RescheduleEvent(EVENT_SHATTER, 8s);
                         break;
@@ -154,6 +156,7 @@ public:
                         me->CastSpell((Unit*)nullptr, DUNGEON_MODE(SHATTER, SHATTER_H), false);
                         Talk(SAY_SHATTER);
                         events.RescheduleEvent(EVENT_REMOVE_STONED, 1500ms);
+                        me->SetReactState(REACT_AGGRESSIVE);
                         break;
                     }
                 case EVENT_REMOVE_STONED:
