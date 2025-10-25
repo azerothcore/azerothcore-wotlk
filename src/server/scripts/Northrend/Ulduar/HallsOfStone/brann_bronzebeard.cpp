@@ -987,7 +987,7 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.ScheduleEvent(EVENT_DRP_CHARGE, 10s);
+            events.ScheduleEvent(EVENT_DRP_CHARGE, 1s);
             events.ScheduleEvent(EVENT_DRP_CLEAVE, 7s);
         }
 
@@ -1004,10 +1004,14 @@ public:
             {
                 case EVENT_DRP_CHARGE:
                     {
-                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
-                            me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
-
-                        events.Repeat(10s);
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            if (!me->IsWithinMeleeRange(victim))
+                            {
+                                me->CastSpell(victim, SPELL_DRP_CHARGE, false);
+                            }
+                        }
+                        events.Repeat(2s);
                         break;
                     }
                 case EVENT_DRP_CLEAVE:
