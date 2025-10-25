@@ -842,17 +842,14 @@ void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
     Creature* cr = nullptr;
     if ((cr = me->SummonCreature(NPC_KADDRAK, 923.7f, 326.9f, 219.5f, 2.1f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
-        cr->SetInCombatWithZone();
         KaddrakGUID = cr->GetGUID();
     }
     if ((cr = me->SummonCreature(NPC_MARNAK, 895.974f, 363.571f, 219.337f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
-        cr->SetInCombatWithZone();
         MarnakGUID = cr->GetGUID();
     }
     if ((cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86f, 0.6f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
-        cr->SetInCombatWithZone();
         AbedneumGUID = cr->GetGUID();
     }
 
