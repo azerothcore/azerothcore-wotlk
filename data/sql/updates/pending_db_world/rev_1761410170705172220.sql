@@ -6,8 +6,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27962, 0, 2, 0, 1, 0, 100, 2, 1000, 1000, 600000, 600000, 0, 0, 11, 51776, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Rune Elementalist - Out of Combat - Cast \'Lightning Shield\' (Normal Dungeon)'),
 (27962, 0, 3, 0, 0, 0, 100, 2, 0, 0, 20000, 30000, 0, 0, 11, 51776, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Rune Elementalist - In Combat - Cast \'Lightning Shield\' (Normal Dungeon)'),
 (27962, 0, 5, 0, 1, 0, 100, 4, 1000, 1000, 600000, 600000, 0, 0, 11, 59025, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Rune Elementalist - Out of Combat - Cast \'Lightning Shield\' (Heroic Dungeon)'),
-(27962, 0, 6, 0, 0, 0, 100, 4, 0, 0, 20000, 30000, 0, 0, 11, 59025, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Rune Elementalist - In Combat - Cast \'Lightning Shield\' (Heroic Dungeon)'),
-(27962, 0, 7, 0, 0, 0, 100, 4, 0, 0, 20000, 30000, 0, 0, 11, 59025, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Rune Elementalist - In Combat - Cast \'Lightning Shield\' (Heroic Dungeon)');
+(27962, 0, 6, 0, 0, 0, 100, 4, 0, 0, 20000, 30000, 0, 0, 11, 59025, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Rune Elementalist - In Combat - Cast \'Lightning Shield\' (Heroic Dungeon)');
 -- lesser air elemental
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28384;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28384) AND (`source_type` = 0) AND (`id` IN (0));
