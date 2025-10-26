@@ -12,6 +12,10 @@ concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref_name }}, ${{ github.workflow }})
   cancel-in-progress: true
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   macos-build:
     strategy:
