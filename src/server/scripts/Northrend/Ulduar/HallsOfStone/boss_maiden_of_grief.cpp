@@ -108,13 +108,13 @@ public:
             {
                 case EVENT_STORM:
                     {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
+                        DoCastVictim(DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
                         events.Repeat(16s, 20s);
                         break;
                     }
                 case EVENT_SHOCK:
                     {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
+                        DoCastVictim(DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H));
                         Talk(SAY_STUN);
 
                         events.Repeat(19s, 33s);
@@ -122,9 +122,7 @@ public:
                     }
                 case EVENT_PILLAR:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, true))
-                            me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
-
+                        DoCastRandomTarget(DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), 0, 50.0f, true, false, true);
                         events.Repeat(8s, 31s);
                         break;
                     }
