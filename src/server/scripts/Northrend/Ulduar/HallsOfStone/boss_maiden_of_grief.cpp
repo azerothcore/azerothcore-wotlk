@@ -130,7 +130,8 @@ public:
                     }
                 case EVENT_PARTING:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, [](Unit const* target) {
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, [](Unit const* target)
+                        {
                             return target && target->ToPlayer() && target->ToPlayer()->getPowerType() != POWER_MANA;
                         }))
                         {
