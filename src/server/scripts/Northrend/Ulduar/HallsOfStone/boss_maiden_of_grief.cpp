@@ -130,18 +130,12 @@ public:
                     }
                 case EVENT_PARTING:
                     {
-                        std::list<Unit*> targetList;
-                        SelectTargetList(targetList, 5, SelectTargetMethod::Random, 0, 50.0f, true, true);
-
-                        for (Unit* target : targetList)
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, [](Unit const* target) {
+                            return target && target->ToPlayer() && target->ToPlayer()->getPowerType() != POWER_MANA;
+                        }))
                         {
-                            if (target && target->getPowerType() == POWER_MANA)
-                            {
-                                me->CastSpell(target, PARTING_SORROW, false);
-                                break;
-                            }
+                            me->CastSpell(target, PARTING_SORROW, false);
                         }
-
                         events.Repeat(27s, 45s);
                         break;
                     }
