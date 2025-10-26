@@ -64,7 +64,7 @@ enum VolkhanEvents
     EVENT_MOVE_TO_ANVIL                 = 5,
 
     // Molten Golem
-    EVENT_IMMOLATION                    = 12,
+    EVENT_IMMOLATION_STRIKE             = 12,
     EVENT_CHANGE_TARGET                 = 13,
 };
 
@@ -311,7 +311,7 @@ struct npc_molten_golem : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        events.ScheduleEvent(EVENT_IMMOLATION, 3s);
+        events.ScheduleEvent(EVENT_IMMOLATION_STRIKE, 3s);
         events.ScheduleEvent(EVENT_CHANGE_TARGET, 5s);
         DoCastSelf(SPELL_COOL_DOWN, true);
     }
