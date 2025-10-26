@@ -91,6 +91,9 @@ enum BjarngrimEvents
     // STORMFORGED LIEUTENANT
     EVENT_ARC_WELD                      = 41,
     EVENT_RENEW_STEEL                   = 42,
+
+    // CHARGE UP
+    EVENT_CHARGE_UP                     = 51,
 };
 
 enum Yells
@@ -111,20 +114,20 @@ struct boss_bjarngrim : public npc_escortAI
     boss_bjarngrim(Creature* creature) : npc_escortAI(creature), summons(creature)
     {
         m_pInstance = creature->GetInstanceScript();
-
-        // Simple 4-point patrol path (forward and backward)
-        // Forward: 1 -> 2 -> 3 -> 4
-        AddWaypoint(1, 1262.18f, 99.3f, 33.5f, 8000);
-        AddWaypoint(2, 1262.0f, -26.9f, 33.5f, 8000);
-        AddWaypoint(3, 1332.0f, -26.6f, 40.18f, 8000);
-        AddWaypoint(4, 1395.092f, 36.6425f, 49.538f, 8000);
-        // Backward: 4 -> 3 -> 2 -> 1
-        AddWaypoint(5, 1332.0f, -26.6f, 40.18f, 8000);
-        AddWaypoint(6, 1262.0f, -26.9f, 33.5f, 8000);
-        AddWaypoint(7, 1262.18f, 99.3f, 33.5f, 8000);
-
+        InitializeWaypoints();
         me->SetWalk(true);
         Start(true, ObjectGuid::Empty, nullptr, false, true);
+    }
+
+    void InitializeWaypoints()
+    {
+        AddWaypoint(1, 1262.0f, -26.9f, 33.5f, 10000);
+        AddWaypoint(2, 1262.18f, 99.3f, 33.5f, 10000);
+        AddWaypoint(3, 1262.0f, -26.9f, 33.5f, 0);
+        AddWaypoint(4, 1332.0f, -26.6f, 40.18f, 10000);
+        AddWaypoint(5, 1395.092f, 36.6425f, 50.038f, 10000);
+        AddWaypoint(6, 1332.0f, -26.6f, 40.18f, 0);
+        AddWaypoint(7, 1262.0f, -26.9f, 33.5f, 0);
     }
 
     void Reset() override
@@ -141,7 +144,6 @@ struct boss_bjarngrim : public npc_escortAI
             }
 
         me->RemoveAllAuras();
-        me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
 
         if (m_pInstance)
             m_pInstance->SetBossState(DATA_BJARNGRIM, NOT_STARTED);
@@ -268,16 +270,48 @@ struct boss_bjarngrim : public npc_escortAI
 
     void WaypointReached(uint32 Point) override
     {
-        // Add electrical charge at start points
-        if (Point == 1 || Point == 7)
-            DoCastSelf(SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
-        // Remove electrical charge at far platform
-        else if (Point == 4)
+        if (Point == 1)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+            events.ScheduleEvent(EVENT_CHARGE_UP, 2500ms, 0);
+        }
+        else if (Point == 2)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+        }
+        else if (Point == 3)
+        {
             me->RemoveAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE);
+        }
+        else if (Point == 4)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+            events.ScheduleEvent(EVENT_CHARGE_UP, 2500ms, 0);
+        }
+        else if (Point == 5)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+        }
+        else if (Point == 6)
+        {
+            me->RemoveAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE);
+        }
     }
 
     void UpdateEscortAI(uint32 diff) override
     {
+        events.Update(diff);
+
+        if (uint32 eventId = events.ExecuteEvent())
+        {
+            if (eventId == EVENT_CHARGE_UP)
+            {
+                me->CastSpell(me, SPELL_CHARGE_UP, true);
+                me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
+                return;
+            }
+        }
+
         if (!me->IsInCombat())
             return;
 
@@ -287,8 +321,6 @@ struct boss_bjarngrim : public npc_escortAI
             Reset();
             return;
         }
-
-        events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -300,6 +332,11 @@ struct boss_bjarngrim : public npc_escortAI
                 RemoveStanceAura(m_uiStance);
                 RollStance(m_uiStance);
                 events.Repeat(20s);
+                break;
+
+            case EVENT_CHARGE_UP:
+                DoCastSelf(SPELL_CHARGE_UP, true);
+                DoCastSelf(SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
                 break;
 
             // DEFENSIVE STANCE
