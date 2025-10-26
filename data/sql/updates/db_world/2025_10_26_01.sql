@@ -1,3 +1,4 @@
+-- DB update 2025_10_26_00 -> 2025_10_26_01
 -- Dark Rune Elementalist
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27962;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27962);
