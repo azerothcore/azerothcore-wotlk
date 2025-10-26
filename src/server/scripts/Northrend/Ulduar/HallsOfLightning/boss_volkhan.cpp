@@ -63,7 +63,6 @@ enum VolkhanEvents
     EVENT_MOVE_TO_ANVIL                 = 5,
 
     // Molten Golem
-    EVENT_BLAST                         = 11,
     EVENT_IMMOLATION                    = 12,
 };
 
@@ -195,7 +194,7 @@ struct boss_volkhan : public BossAI
         {
             me->SetSpeed(MOVE_RUN, 1.2f, true);
             me->SetReactState(REACT_AGGRESSIVE);
-            me->CastSpell(me, SPELL_TEMPER, false);
+            DoCastSelf(SPELL_TEMPER);
             PointID = 0;
             ScheduleEvents(true);
 
@@ -216,8 +215,8 @@ struct boss_volkhan : public BossAI
     {
         if (spellInfo->Id == SPELL_TEMPER)
         {
-            me->CastSpell(me, SPELL_SUMMON_MOLTEN_GOLEM, true);
-            me->CastSpell(me, SPELL_SUMMON_MOLTEN_GOLEM, true);
+            DoCastSelf(SPELL_SUMMON_MOLTEN_GOLEM, true);
+            DoCastSelf(SPELL_SUMMON_MOLTEN_GOLEM, true);
             me->GetMotionMaster()->MoveChase(me->GetVictim());
             me->SetControlled(false, UNIT_STATE_ROOT);
         }
@@ -252,7 +251,7 @@ struct boss_volkhan : public BossAI
         switch (events.ExecuteEvent())
         {
             case EVENT_HEAT:
-                me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_HEAT_H : SPELL_HEAT_N, true);
+                DoCastSelf(me->GetMap()->IsHeroic() ? SPELL_HEAT_H : SPELL_HEAT_N, true);
                 events.Repeat(8s);
                 break;
             case EVENT_CHECK_HEALTH:
@@ -302,7 +301,6 @@ struct npc_molten_golem : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        events.ScheduleEvent(EVENT_BLAST, 7s);
         events.ScheduleEvent(EVENT_IMMOLATION, 3s);
     }
 
@@ -316,6 +314,9 @@ struct npc_molten_golem : public ScriptedAI
 
         if (uiDamage >= me->GetHealth())
         {
+            if (me->GetMap()->IsHeroic())
+                DoCastSelf(SPELL_BLAST_WAVE, true);
+
             me->UpdateEntry(NPC_BRITTLE_GOLEM, 0, false);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetHealth(me->GetMaxHealth());
@@ -337,7 +338,7 @@ struct npc_molten_golem : public ScriptedAI
             if (Creature* volkhan = m_pInstance->GetCreature(DATA_VOLKHAN))
                 volkhan->AI()->DoAction(ACTION_DESTROYED);
 
-            me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_SHATTER_H : SPELL_SHATTER_N, true);
+            DoCastSelf(me->GetMap()->IsHeroic() ? SPELL_SHATTER_H : SPELL_SHATTER_N, true);
             me->DespawnOrUnsummon(500ms);
         }
     }
@@ -355,12 +356,8 @@ struct npc_molten_golem : public ScriptedAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_BLAST:
-                me->CastSpell(me, SPELL_BLAST_WAVE, false);
-                events.Repeat(14s);
-                break;
             case EVENT_IMMOLATION:
-                me->CastSpell(me->GetVictim(), me->GetMap()->IsHeroic() ? SPELL_IMMOLATION_STRIKE_H : SPELL_IMMOLATION_STRIKE_N, false);
+                DoCastVictim(me->GetMap()->IsHeroic() ? SPELL_IMMOLATION_STRIKE_H : SPELL_IMMOLATION_STRIKE_N);
                 events.Repeat(5s);
                 break;
         }
