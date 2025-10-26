@@ -144,22 +144,23 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/var/ccache
+          # Primary (usually absent here, but required): exact branch-specific key
           key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          # Up to 9 restore keys (limit)
           restore-keys: |
-            # Versioned compiler ids (exact shape used by other builds)
+            # Versioned compilers, with modules + PCH variants (4)
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=false:
+            # Versioned, relax PCH (2)
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:
+            # Versioned, compiler-only (1)
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:
-            # Fallback to plain compiler basenames if any cache was saved that way
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:true:pch=true:
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:false:pch=true:
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:true:pch=false:
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:false:pch=false:
+            # Unversioned (2) as last resort
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:
+            ccache:${{ runner.os }}:
 
       - name: Setup ccache env
         shell: bash
