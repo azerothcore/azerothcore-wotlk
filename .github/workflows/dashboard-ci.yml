@@ -44,13 +44,6 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Install ccache
-        shell: bash
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ccache
-          ccache --version
-
       - name: Install requirements
         run: |
           sudo apt-get update
@@ -82,6 +75,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
+
+      - name: Install ccache
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ccache
+          ccache --version
 
       # Detect the compilers that acore.sh / CMake will end up using.
       # We record both the binary name and a short version tag for the cache key.
