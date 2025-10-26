@@ -123,16 +123,13 @@ public:
             {
                 case EVENT_BOULDER:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, true))
-                            me->CastSpell(target, DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), false);
-
+                        DoCastRandomTarget(DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), 0, 50.0f, true, true);
                         events.Repeat(5s, 7s);
                         break;
                     }
                 case EVENT_GROUND_SPIKE:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, true))
-                            me->CastSpell(target, GROUND_SPIKE_H, false);
+                        DoCastRandomTarget(GROUND_SPIKE_H, 0, 50.0f, true, true);
                         events.Repeat(8s, 11s);
                         break;
                     }
