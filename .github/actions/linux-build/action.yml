@@ -41,17 +41,15 @@ runs:
   steps:
     - name: echo cache key
       shell: bash
-      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref_name }}"
+      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}"
 
     - name: Cache
       uses: actions/cache@v4
-      if: inputs.pch != 'true'
       with:
         path: ${{ github.workspace }}/var/ccache
-          # format
-          # ccache:OS:CC_CXX:MODULES:GITHUB_REF:GITHUB_SHA
-        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref_name }}
+        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}
         restore-keys: |
+          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}
 
