@@ -368,7 +368,8 @@ struct npc_molten_golem : public ScriptedAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_IMMOLATION:
+            case EVENT_IMMOLATION_STRIKE:
+            {
                 uint32 spellId = DUNGEON_MODE(SPELL_IMMOLATION_STRIKE_N, SPELL_IMMOLATION_STRIKE_H);
                 if (SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true, true, -spellId))
                 {
@@ -376,7 +377,9 @@ struct npc_molten_golem : public ScriptedAI
                 }
                 events.Repeat(5s);
                 break;
+            }
             case EVENT_CHANGE_TARGET:
+            {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                 {
                     me->GetThreatMgr().ResetAllThreat();
@@ -385,6 +388,7 @@ struct npc_molten_golem : public ScriptedAI
                 }
                 events.Repeat(5s);
                 break;
+            }
         }
 
         DoMeleeAttackIfReady();
