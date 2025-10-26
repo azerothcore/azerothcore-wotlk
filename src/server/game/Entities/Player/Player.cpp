@@ -417,6 +417,8 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
     GetObjectVisibilityContainer().InitForPlayer();
 
     sScriptMgr->OnConstructPlayer(this);
+
+    m_expectingChangeTransport = false;
 }
 
 Player::~Player()
@@ -1572,17 +1574,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // remove from old map now
             if (oldmap)
                 oldmap->RemovePlayerFromMap(this, false);
-
-            // xinef: do this before setting fall information!
-            if (IsMounted() && (!GetMap()->GetEntry()->IsDungeon() && !GetMap()->GetEntry()->IsBattlegroundOrArena()) && !m_transport)
-            {
-                AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_MOUNTED);
-                if (!auras.empty())
-                {
-                    SetMountBlockId((*auras.begin())->GetId());
-                    RemoveAurasByType(SPELL_AURA_MOUNTED);
-                }
-            }
 
             teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
             SetFallInformation(GameTime::GetGameTime().count(), z);
