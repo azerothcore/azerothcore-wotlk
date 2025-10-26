@@ -39,18 +39,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: echo cache key
-      shell: bash
-      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}"
-
     - name: Cache
       uses: actions/cache@v4
       with:
         path: ${{ github.workspace }}/var/ccache
-        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}
+        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ github.ref_name }}
         restore-keys: |
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}
 
     # This script moves sql files from "data/sql/updates/pending_$DB" to the

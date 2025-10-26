@@ -22,6 +22,13 @@ jobs:
     name: ${{ matrix.os }}
     env:
       BOOST_ROOT: C:\local\boost_1_82_0
+      AC_CCACHE: true
+      CCACHE_DIR: ${{ github.workspace }}/var/ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_HASHDIR: 1
+      CCACHE_COMPRESS: 1
+      CCACHE_COMPRESSLEVEL: 9
+      CCACHE_COMPILERCHECK: content
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
@@ -30,14 +37,34 @@ jobs:
       - uses: actions/checkout@v4
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.13
+        with:
+          key: windows:${{ github.ref_name }}
+          max-size: 5G
+      - name: Prepare ccache directory
+        shell: bash
+        run: |
+          mkdir -p "${CCACHE_DIR}" "${CCACHE_DIR}/tmp"
       - name: Configure OS
         shell: bash
         env:
           CONTINUOUS_INTEGRATION: true
         run: |
           ./acore.sh install-deps
+      - name: ccache config snapshot
+        shell: bash
+        run: |
+          echo "==== Effective ccache configuration ===="
+          ccache -p | egrep 'base_dir|hash_dir|compiler_check|sloppiness|max_size' || true
+
+          echo
+          echo "==== Previous cache stats ===="
+          ccache -s || true
       - name: Build
         shell: bash
         run: |
+          set -x
           export CTOOLS_BUILD=all
           ./acore.sh compiler build
+      - name: ccache stats
+        shell: bash
+        run: ccache -s || true

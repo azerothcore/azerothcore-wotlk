@@ -61,6 +61,20 @@ ARG CCACHE_COMPRESS=""
 ARG CCACHE_COMPRESSLEVEL="9"
 ARG CCACHE_COMPILERCHECK="content"
 ARG CCACHE_LOGFILE=""
+ARG CCACHE_BASEDIR="/azerothcore"
+ARG CCACHE_HASHDIR="1"
+
+ENV CCACHE_DIR="$CCACHE_DIR" \
+    CCACHE_TEMPDIR="$CCACHE_DIR/tmp" \
+    CCACHE_BASEDIR="$CCACHE_BASEDIR" \
+    CCACHE_HASHDIR="$CCACHE_HASHDIR" \
+    CCACHE_CPP2="$CCACHE_CPP2" \
+    CCACHE_MAXSIZE="$CCACHE_MAXSIZE" \
+    CCACHE_SLOPPINESS="$CCACHE_SLOPPINESS" \
+    CCACHE_COMPRESS="$CCACHE_COMPRESS" \
+    CCACHE_COMPRESSLEVEL="$CCACHE_COMPRESSLEVEL" \
+    CCACHE_COMPILERCHECK="$CCACHE_COMPILERCHECK" \
+    CCACHE_LOGFILE="$CCACHE_LOGFILE"
 
 RUN apt-get update                                                     \
     && apt-get install -y --no-install-recommends                         \
@@ -88,6 +102,7 @@ RUN --mount=type=cache,target=/ccache,sharing=locked \
     # of git repo into the container.
     --mount=type=bind,target=/azerothcore/.git,source=.git \
     git config --global --add safe.directory /azerothcore \
+    && mkdir -p "$CCACHE_DIR" "$CCACHE_TEMPDIR" \
     && cmake /azerothcore \
        -DCMAKE_INSTALL_PREFIX="/azerothcore/env/dist"  \
        -DAPPS_BUILD="all"                              \

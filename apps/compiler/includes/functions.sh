@@ -25,6 +25,14 @@ function comp_clean() {
 function comp_ccacheEnable() {
     [ "$AC_CCACHE" != true ] && return
 
+    local default_ccache_dir="${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}"
+
+    mkdir -p "$default_ccache_dir" "$default_ccache_dir/tmp"
+
+    export CCACHE_DIR="$default_ccache_dir"
+    export CCACHE_TEMPDIR=${CCACHE_TEMPDIR:-"$default_ccache_dir/tmp"}
+    export CCACHE_BASEDIR=${CCACHE_BASEDIR:-"$AC_PATH_ROOT"}
+    export CCACHE_HASHDIR=${CCACHE_HASHDIR:-1}
     export CCACHE_MAXSIZE=${CCACHE_MAXSIZE:-'1000MB'}
     #export CCACHE_DEPEND=true
     export CCACHE_SLOPPINESS=${CCACHE_SLOPPINESS:-pch_defines,time_macros,include_file_mtime}

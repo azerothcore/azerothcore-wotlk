@@ -27,3 +27,4 @@ choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  visualstudio2022-workloa
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  openssl --force --version=3.5.4
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  boost-msvc-14.3 --force --version=1.87.0
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  mysql --force --version=8.4.6
+choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  ccache

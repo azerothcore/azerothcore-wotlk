@@ -37,7 +37,13 @@ runs:
         push: ${{ inputs.push }}
         tags: ${{ steps.meta.outputs.tags }}
         target:  ${{ inputs.component-name }}
+        cache-from: type=gha,scope=acore-linux
+        cache-to: type=gha,scope=acore-linux,mode=max
         build-args: |
           USER_ID=1000
           GROUP_ID=1000
           DOCKER_USER=acore
+          CCACHE_COMPRESS=1
+          CCACHE_COMPRESSLEVEL=9
+          CCACHE_COMPILERCHECK=content
+          CCACHE_MAXSIZE=5G
