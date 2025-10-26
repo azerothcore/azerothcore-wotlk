@@ -39,6 +39,10 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: echo cache key
+      shell: bash
+      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref_name }}"
+
     - name: Cache
       uses: actions/cache@v4
       if: inputs.pch != 'true'
