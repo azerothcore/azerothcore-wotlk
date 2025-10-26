@@ -132,7 +132,7 @@ public:
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, [](Unit const* target)
                         {
-                            return target && target->ToPlayer() && target->ToPlayer()->getPowerType() != POWER_MANA;
+                            return target && target->IsPlayer() && target->getPowerType() != POWER_MANA;
                         }))
                         {
                             me->CastSpell(target, PARTING_SORROW, false);
