@@ -90,14 +90,47 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          CC_BIN="${CC:-}"
-          CXX_BIN="${CXX:-}"
-          # Prefer clang if present, else gcc
+          CC_BIN="${CC:-}"; CXX_BIN="${CXX:-}"
           [[ -z "$CC_BIN"  ]] && CC_BIN="$(command -v clang || command -v gcc)"
           [[ -z "$CXX_BIN" ]] && CXX_BIN="$(command -v clang++ || command -v g++)"
-          echo "cc_id=$(basename "$CC_BIN")"   >> "$GITHUB_OUTPUT"
-          echo "cxx_id=$(basename "$CXX_BIN")" >> "$GITHUB_OUTPUT"
-          echo "Detected: $CC_BIN, $CXX_BIN"
+
+          cc_base="$(basename "$CC_BIN")"
+          cxx_base="$(basename "$CXX_BIN")"
+
+          make_ver_id() {
+            local bin="$1"; local base="$(basename "$bin")"
+            case "$base" in
+              clang)
+                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "${maj:-}" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
+                [[ -n "${maj:-}" ]] && echo "clang-$maj" || echo "$base"
+                ;;
+              clang++)
+                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "${maj:-}" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
+                [[ -n "${maj:-}" ]] && echo "clang++-$maj" || echo "$base"
+                ;;
+              gcc)
+                maj="$("$bin" -dumpfullversion -dumpversion 2>/dev/null || "$bin" -dumpversion 2>/dev/null)"; maj="${maj%%.*}"
+                [[ -n "${maj:-}" ]] && echo "gcc-$maj" || echo "$base"
+                ;;
+              g++)
+                maj="$("$bin" -dumpfullversion -dumpversion 2>/dev/null || "$bin" -dumpversion 2>/dev/null)"; maj="${maj%%.*}"
+                [[ -n "${maj:-}" ]] && echo "g++-$maj" || echo "$base"
+                ;;
+              *)
+                echo "$base"
+                ;;
+            esac
+          }
+
+          cc_id="$(make_ver_id "$CC_BIN")"
+          cxx_id="$(make_ver_id "$CXX_BIN")"
+
+          echo "cc_id=$cc_id"         >> "$GITHUB_OUTPUT"
+          echo "cxx_id=$cxx_id"       >> "$GITHUB_OUTPUT"
+          echo "cc_base=$cc_base"     >> "$GITHUB_OUTPUT"
+          echo "cxx_base=$cxx_base"   >> "$GITHUB_OUTPUT"
+
+          echo "Detected: $CC_BIN -> $cc_id ; $CXX_BIN -> $cxx_id"
 
       - name: Prepare ccache dir
         shell: bash
@@ -112,8 +145,8 @@ jobs:
         with:
           path: ${{ github.workspace }}/var/ccache
           key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
-          # Try exact patterns used by other builds (modules + PCH), then relax
           restore-keys: |
+            # Versioned compiler ids (exact shape used by other builds)
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
@@ -121,6 +154,12 @@ jobs:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:
+            # Fallback to plain compiler basenames if any cache was saved that way
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:true:pch=true:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:false:pch=true:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:true:pch=false:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:false:pch=false:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_base }}_${{ steps.detect.outputs.cxx_base }}:
 
       - name: Setup ccache env
         shell: bash
