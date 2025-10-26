@@ -64,6 +64,7 @@ enum VolkhanEvents
 
     // Molten Golem
     EVENT_IMMOLATION                    = 12,
+    EVENT_CHANGE_TARGET                 = 13,
 };
 
 enum Yells
@@ -302,6 +303,7 @@ struct npc_molten_golem : public ScriptedAI
     {
         events.Reset();
         events.ScheduleEvent(EVENT_IMMOLATION, 3s);
+        events.ScheduleEvent(EVENT_CHANGE_TARGET, 5s);
     }
 
     void DamageTaken(Unit*, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
@@ -362,6 +364,15 @@ struct npc_molten_golem : public ScriptedAI
                     uint32 spellId = DUNGEON_MODE(SPELL_IMMOLATION_STRIKE_N, SPELL_IMMOLATION_STRIKE_H);
                     if (!victim->HasAura(spellId))
                         DoCastVictim(spellId);
+                }
+                events.Repeat(5s);
+                break;
+            case EVENT_CHANGE_TARGET:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                {
+                    me->GetThreatMgr().ResetAllThreat();
+                    me->AddThreat(target, 30000.0f);
+                    AttackStart(target);
                 }
                 events.Repeat(5s);
                 break;
