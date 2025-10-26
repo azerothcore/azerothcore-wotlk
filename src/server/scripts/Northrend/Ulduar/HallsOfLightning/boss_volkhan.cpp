@@ -87,7 +87,7 @@ struct boss_volkhan : public BossAI
     {
         _Reset();
         x = y = z = PointID = ShatteredCount = 0;
-        HealthCheck = 100;
+        shatteredStompCast = false;
         me->SetSpeed(MOVE_RUN, 1.2f, true);
         me->SetReactState(REACT_AGGRESSIVE);
         instance->SetData(DATA_VOLKHAN_ACHIEVEMENT, true);
@@ -98,7 +98,10 @@ struct boss_volkhan : public BossAI
         _JustEngagedWith();
         me->SetInCombatWithZone();
         Talk(SAY_AGGRO);
-        ScheduleEvents(false);
+        events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, randtime(9s, 14s));
+        events.ScheduleEvent(EVENT_HEAT, randtime(18s, 38s));
+        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
+        events.ScheduleEvent(EVENT_POSITION, 4s);
     }
 
     void JustDied(Unit*) override
@@ -156,15 +159,6 @@ struct boss_volkhan : public BossAI
         Talk(SAY_SLAY);
     }
 
-    void ScheduleEvents(bool anvil)
-    {
-        events.SetPhase(1);
-        events.RescheduleEvent(EVENT_HEAT, 8s, 0, 1);
-        events.RescheduleEvent(EVENT_SHATTER, 10s, 0, 1);
-        events.RescheduleEvent(EVENT_CHECK_HEALTH, anvil ? 1s : 6s, 0, 1);
-        events.RescheduleEvent(EVENT_POSITION, 4s, 0, 1);
-    }
-
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
@@ -187,6 +181,19 @@ struct boss_volkhan : public BossAI
         }
     }
 
+    bool HasActiveGolem()
+    {
+        for (ObjectGuid const& guid : summons)
+        {
+            if (Creature* golem = ObjectAccessor::GetCreature(*me, guid))
+            {
+                if (golem->GetEntry() == NPC_MOLTEN_GOLEM && golem->IsAlive())
+                    return true;
+            }
+        }
+        return false;
+    }
+
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type != POINT_MOTION_TYPE)
@@ -195,10 +202,8 @@ struct boss_volkhan : public BossAI
         if (id == POINT_ANVIL)
         {
             me->SetSpeed(MOVE_RUN, 1.2f, true);
-            me->SetReactState(REACT_AGGRESSIVE);
             DoCastSelf(SPELL_TEMPER);
             PointID = 0;
-            ScheduleEvents(true);
 
             // update orientation at server
             me->SetOrientation(2.19f);
@@ -210,7 +215,7 @@ struct boss_volkhan : public BossAI
             me->SetControlled(true, UNIT_STATE_ROOT);
         }
         else
-            events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0ms, 0, 2);
+            me->GetMotionMaster()->MovePoint(PointID, x, y, z);
     }
 
     void SpellHitTarget(Unit* /*who*/, SpellInfo const* spellInfo) override
@@ -219,15 +224,15 @@ struct boss_volkhan : public BossAI
         {
             DoCastSelf(SPELL_SUMMON_MOLTEN_GOLEM, true);
             DoCastSelf(SPELL_SUMMON_MOLTEN_GOLEM, true);
-            me->GetMotionMaster()->MoveChase(me->GetVictim());
             me->SetControlled(false, UNIT_STATE_ROOT);
+            me->SetReactState(REACT_AGGRESSIVE);
+            if (me->GetVictim())
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
         }
     }
 
     void GoToAnvil()
     {
-        events.SetPhase(2);
-        HealthCheck -= 20;
         me->SetSpeed(MOVE_RUN, 4.0f, true);
         me->SetReactState(REACT_PASSIVE);
 
@@ -236,7 +241,8 @@ struct boss_volkhan : public BossAI
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
             me->GetMotionMaster()->MovementExpired();
 
-        events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0ms, 0, 2);
+        GetNextPos();
+        me->GetMotionMaster()->MovePoint(PointID, x, y, z);
     }
 
     void UpdateAI(uint32 diff) override
@@ -253,31 +259,33 @@ struct boss_volkhan : public BossAI
         switch (events.ExecuteEvent())
         {
             case EVENT_HEAT:
-                DoCastSelf(DUNGEON_MODE(SPELL_HEAT_N, SPELL_HEAT_H), true);
-                events.Repeat(8s);
+                if (HasActiveGolem())
+                {
+                    DoCastSelf(DUNGEON_MODE(SPELL_HEAT_N, SPELL_HEAT_H), true);
+                    events.Repeat(randtime(9s, 24s));
+                }
+                else
+                    events.Repeat(1s);
                 break;
             case EVENT_CHECK_HEALTH:
-                if (HealthBelowPct(HealthCheck))
-                    GoToAnvil();
-
+                if (!shatteredStompCast && HealthBelowPct(25))
+                {
+                    shatteredStompCast = true;
+                    DoCastAOE(DUNGEON_MODE(SPELL_SHATTERING_STOMP_N, SPELL_SHATTERING_STOMP_H));
+                    Talk(SAY_STOMP);
+                    summons.DoAction(ACTION_SHATTER);
+                }
                 events.Repeat(1s);
                 return;
-            case EVENT_SHATTER:
-                {
-                    events.Repeat(10s);
-                    summons.DoAction(ACTION_SHATTER);
-                    break;
-                }
             case EVENT_MOVE_TO_ANVIL:
-                GetNextPos();
-                me->GetMotionMaster()->MovePoint(PointID, x, y, z);
+                GoToAnvil();
+                events.Repeat(randtime(30s, 36s));
                 return;
             case EVENT_POSITION:
                 if (me->GetDistance(1331.9f, -106, 56) > 95)
                     EnterEvadeMode();
                 else
                     events.Repeat(4s);
-
                 return;
         }
 
@@ -287,10 +295,10 @@ struct boss_volkhan : public BossAI
     private:
         EventMap events;
         SummonList summons;
-        uint8 HealthCheck;
         float x, y, z;
         uint8 PointID;
         uint8 ShatteredCount;
+        bool shatteredStompCast;
 };
 
 struct npc_molten_golem : public ScriptedAI
