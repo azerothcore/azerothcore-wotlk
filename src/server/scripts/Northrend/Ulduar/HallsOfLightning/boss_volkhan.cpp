@@ -36,6 +36,7 @@ enum VolkahnSpells
     SPELL_IMMOLATION_STRIKE_H           = 59530,
     SPELL_SHATTER_N                     = 52429,
     SPELL_SHATTER_H                     = 59527,
+    SPELL_COOL_DOWN                     = 52443,
 };
 
 enum VolkhanOther
@@ -304,6 +305,7 @@ struct npc_molten_golem : public ScriptedAI
         events.Reset();
         events.ScheduleEvent(EVENT_IMMOLATION, 3s);
         events.ScheduleEvent(EVENT_CHANGE_TARGET, 5s);
+        DoCastSelf(SPELL_COOL_DOWN, true);
     }
 
     void DamageTaken(Unit*, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
