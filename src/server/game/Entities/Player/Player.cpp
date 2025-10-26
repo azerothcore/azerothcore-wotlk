@@ -417,6 +417,8 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
     GetObjectVisibilityContainer().InitForPlayer();
 
     sScriptMgr->OnConstructPlayer(this);
+
+    m_expectingChangeTransport = false;
 }
 
 Player::~Player()
