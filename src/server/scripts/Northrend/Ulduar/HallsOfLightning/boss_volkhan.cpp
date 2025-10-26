@@ -251,7 +251,7 @@ struct boss_volkhan : public BossAI
         switch (events.ExecuteEvent())
         {
             case EVENT_HEAT:
-                DoCastSelf(me->GetMap()->IsHeroic() ? SPELL_HEAT_H : SPELL_HEAT_N, true);
+                DoCastSelf(DUNGEON_MODE(SPELL_HEAT_N, SPELL_HEAT_H), true);
                 events.Repeat(8s);
                 break;
             case EVENT_CHECK_HEALTH:
@@ -338,7 +338,7 @@ struct npc_molten_golem : public ScriptedAI
             if (Creature* volkhan = m_pInstance->GetCreature(DATA_VOLKHAN))
                 volkhan->AI()->DoAction(ACTION_DESTROYED);
 
-            DoCastSelf(me->GetMap()->IsHeroic() ? SPELL_SHATTER_H : SPELL_SHATTER_N, true);
+            DoCastSelf(DUNGEON_MODE(SPELL_SHATTER_N, SPELL_SHATTER_H), true);
             me->DespawnOrUnsummon(500ms);
         }
     }
@@ -357,7 +357,12 @@ struct npc_molten_golem : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_IMMOLATION:
-                DoCastVictim(me->GetMap()->IsHeroic() ? SPELL_IMMOLATION_STRIKE_H : SPELL_IMMOLATION_STRIKE_N);
+                if (Unit* victim = me->GetVictim())
+                {
+                    uint32 spellId = DUNGEON_MODE(SPELL_IMMOLATION_STRIKE_N, SPELL_IMMOLATION_STRIKE_H);
+                    if (!victim->HasAura(spellId))
+                        DoCastVictim(spellId);
+                }
                 events.Repeat(5s);
                 break;
         }
