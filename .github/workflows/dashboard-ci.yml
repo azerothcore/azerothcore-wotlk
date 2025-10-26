@@ -90,31 +90,29 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          CC_BIN="${CC:-}"; CXX_BIN="${CXX:-}"
+          CC_BIN="${CC:-}"
+          CXX_BIN="${CXX:-}"
           [[ -z "$CC_BIN"  ]] && CC_BIN="$(command -v clang || command -v gcc)"
           [[ -z "$CXX_BIN" ]] && CXX_BIN="$(command -v clang++ || command -v g++)"
-
-          cc_base="$(basename "$CC_BIN")"
-          cxx_base="$(basename "$CXX_BIN")"
 
           make_ver_id() {
             local bin="$1"; local base="$(basename "$bin")"
             case "$base" in
               clang)
-                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "${maj:-}" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
-                [[ -n "${maj:-}" ]] && echo "clang-$maj" || echo "$base"
+                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "$maj" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
+                echo "clang-${maj:-unknown}"
                 ;;
               clang++)
-                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "${maj:-}" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
-                [[ -n "${maj:-}" ]] && echo "clang++-$maj" || echo "$base"
+                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "$maj" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
+                echo "clang++-${maj:-unknown}"
                 ;;
               gcc)
                 maj="$("$bin" -dumpfullversion -dumpversion 2>/dev/null || "$bin" -dumpversion 2>/dev/null)"; maj="${maj%%.*}"
-                [[ -n "${maj:-}" ]] && echo "gcc-$maj" || echo "$base"
+                echo "gcc-${maj:-unknown}"
                 ;;
               g++)
                 maj="$("$bin" -dumpfullversion -dumpversion 2>/dev/null || "$bin" -dumpversion 2>/dev/null)"; maj="${maj%%.*}"
-                [[ -n "${maj:-}" ]] && echo "g++-$maj" || echo "$base"
+                echo "g++-${maj:-unknown}"
                 ;;
               *)
                 echo "$base"
@@ -122,15 +120,9 @@ jobs:
             esac
           }
 
-          cc_id="$(make_ver_id "$CC_BIN")"
-          cxx_id="$(make_ver_id "$CXX_BIN")"
-
-          echo "cc_id=$cc_id"         >> "$GITHUB_OUTPUT"
-          echo "cxx_id=$cxx_id"       >> "$GITHUB_OUTPUT"
-          echo "cc_base=$cc_base"     >> "$GITHUB_OUTPUT"
-          echo "cxx_base=$cxx_base"   >> "$GITHUB_OUTPUT"
-
-          echo "Detected: $CC_BIN -> $cc_id ; $CXX_BIN -> $cxx_id"
+          echo "cc_id=$(make_ver_id "$CC_BIN")"   >> "$GITHUB_OUTPUT"
+          echo "cxx_id=$(make_ver_id "$CXX_BIN")" >> "$GITHUB_OUTPUT"
+          echo "Detected: $CC_BIN, $CXX_BIN"
 
       - name: Prepare ccache dir
         shell: bash
@@ -141,15 +133,16 @@ jobs:
         run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}"
 
       - name: Restore ccache
+        id: restore_ccache
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/var/ccache
           key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
           restore-keys: |
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=false:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:
@@ -272,6 +265,14 @@ jobs:
           ./acore.sh sm delete authserver
         timeout-minutes: 30
         continue-on-error: false
+
+      # save only if we didn't hit the cache
+      - name: Save ccache
+        if: steps.restore_ccache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/var/ccache
+          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
 
       - name: ccache stats (after)
         shell: bash
