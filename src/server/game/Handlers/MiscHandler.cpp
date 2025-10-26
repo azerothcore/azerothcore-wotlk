@@ -1490,6 +1490,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
 {
     LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging((Opcodes)recv_data.GetOpcode()));
 
+    Opcodes opcode = (Opcodes)recv_data.GetOpcode();
+
     ObjectGuid guid;
     uint32 counter;
     uint32 isApplied;
@@ -1507,7 +1509,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
 
-    recv_data >> isApplied;
+    if (opcode != CMSG_MOVE_GRAVITY_DISABLE_ACK && opcode != CMSG_MOVE_GRAVITY_ENABLE_ACK)
+        recv_data >> isApplied;
 
     sScriptMgr->AnticheatSetCanFlybyServer(_player, movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
 
@@ -1515,6 +1518,12 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     Player* plrMover = mover->ToPlayer();
 
     mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
+
+    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
+    {
+        recv_data.rfinish();                     // prevent warnings spam
+        return;
+    }
 
     Opcodes response;
 
@@ -1524,17 +1533,12 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
         case CMSG_MOVE_FEATHER_FALL_ACK: response = MSG_MOVE_FEATHER_FALL; break;
         case CMSG_MOVE_WATER_WALK_ACK: response = MSG_MOVE_WATER_WALK; break;
         case CMSG_MOVE_SET_CAN_FLY_ACK: response = MSG_MOVE_UPDATE_CAN_FLY; break;
+        case CMSG_MOVE_GRAVITY_DISABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
+        case CMSG_MOVE_GRAVITY_ENABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
         default: return;
     }
 
-    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
-    {
-        recv_data.rfinish();                     // prevent warnings spam
-        return;
-    }
-
     WorldPacket data(response, 8);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     _player->m_mover->SendMessageToSet(&data, _player);
 }

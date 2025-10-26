@@ -528,9 +528,7 @@ public:
                                             init.Launch();
 
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
-                                            pPlayer->SetDisableGravity(true, true);
-
-                                            sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
+                                            pPlayer->SetDisableGravity(true);
 
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
                                             data << pPlayer->GetPackGUID();
@@ -941,10 +939,7 @@ public:
                             if (!bUpdatedFlying && timer)
                             {
                                 bUpdatedFlying = true;
-                                plr->SetDisableGravity(true, true);
-
-                                sScriptMgr->AnticheatSetCanFlybyServer(plr, true);
-                                sScriptMgr->AnticheatSetUnderACKmount(plr);
+                                plr->SetDisableGravity(true);
                             }
 
                             plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * std::sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
@@ -1220,8 +1215,9 @@ public:
             if (Vehicle* v = me->GetVehicle())
                 v->RemoveAllPassengers();
 
-            if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
-                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+            if (killer)
+                if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
