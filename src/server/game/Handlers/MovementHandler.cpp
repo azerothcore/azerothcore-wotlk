@@ -376,9 +376,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         return;
     }
 
-    if (opcode == CMSG_MOVE_FALL_RESET || opcode == CMSG_MOVE_CHNG_TRANSPORT)
-        return;
-
     /* process position-change */
     WorldPacket data(opcode, recvData.size());
     WriteMovementInfo(&data, &movementInfo);
@@ -519,10 +516,7 @@ bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo, Player* 
     }
 
     if (!mover->movespline->Finalized())
-    {
-        if (!mover->movespline->isBoarding() || (opcode != CMSG_FORCE_MOVE_UNROOT_ACK && opcode != CMSG_FORCE_MOVE_ROOT_ACK))
-            return false;
-    }
+        return false;
 
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (mover->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
@@ -964,8 +958,7 @@ void WorldSession::ComputeNewClockDelta()
 
 void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 {
-    Opcodes opcode = (Opcodes)recvData.GetOpcode();
-    LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging(opcode));
+    LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging((Opcodes)recvData.GetOpcode()));
 
     ObjectGuid guid;
     uint32 counter;
@@ -980,7 +973,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     if (mover->GetGUID() != guid)
         return;
 
-    if (opcode == CMSG_FORCE_MOVE_UNROOT_ACK) // unroot case
+    if (recvData.GetOpcode() == CMSG_FORCE_MOVE_UNROOT_ACK) // unroot case
     {
         if (!mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT))
             return;
@@ -994,10 +987,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
         return;
 
-    if (_player->IsExpectingChangeTransport())
-        return;
-
-    WorldPacket data(opcode == CMSG_FORCE_MOVE_UNROOT_ACK ? MSG_MOVE_UNROOT : MSG_MOVE_ROOT);
+    WorldPacket data(recvData.GetOpcode() == CMSG_FORCE_MOVE_UNROOT_ACK ? MSG_MOVE_UNROOT : MSG_MOVE_ROOT);
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, _player);
 }

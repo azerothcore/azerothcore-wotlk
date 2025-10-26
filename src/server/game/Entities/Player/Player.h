@@ -2633,9 +2633,6 @@ public:
 
     std::string GetDebugInfo() const override;
 
-    bool IsExpectingChangeTransport() const { return m_expectingChangeTransport; }
-    void SetExpectingChangeTransport(bool state) { m_expectingChangeTransport = state; }
-
     /*********************************************************/
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
@@ -3016,8 +3013,6 @@ private:
     PlayerSettingMap m_charSettingsMap;
 
     Seconds m_creationTime;
-
-    bool m_expectingChangeTransport;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
