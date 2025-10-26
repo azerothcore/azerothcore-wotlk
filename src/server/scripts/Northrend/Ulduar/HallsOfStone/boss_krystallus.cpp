@@ -123,13 +123,13 @@ public:
             {
                 case EVENT_BOULDER:
                     {
-                        DoCastRandomTarget(DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), 0, 50.0f, true, true);
+                        DoCastRandomTarget(DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), 0, 50.0f);
                         events.Repeat(5s, 7s);
                         break;
                     }
                 case EVENT_GROUND_SPIKE:
                     {
-                        DoCastRandomTarget(GROUND_SPIKE_H, 0, 50.0f, true, true);
+                        DoCastRandomTarget(GROUND_SPIKE_H, 0, 50.0f);
                         events.Repeat(8s, 11s);
                         break;
                     }
