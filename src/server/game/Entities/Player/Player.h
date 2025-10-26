@@ -2566,8 +2566,6 @@ public:
     bool IsInWhisperWhiteList(ObjectGuid guid);
     void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
 
-    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
-
     [[nodiscard]] bool CanFly() const override { return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY); }
     [[nodiscard]] bool CanEnterWater() const override { return true; }
     bool IsFreeFlying() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || HasAuraType(SPELL_AURA_FLY); }
@@ -2634,6 +2632,9 @@ public:
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
     std::string GetDebugInfo() const override;
+
+    bool IsExpectingChangeTransport() const { return m_expectingChangeTransport; }
+    void SetExpectingChangeTransport(bool state) { m_expectingChangeTransport = state; }
 
     /*********************************************************/
     /***               SPELL QUEUE SYSTEM                  ***/
@@ -3015,6 +3016,8 @@ private:
     PlayerSettingMap m_charSettingsMap;
 
     Seconds m_creationTime;
+
+    bool m_expectingChangeTransport;
 };
 
 void AddItemsSetItem(Player* player, Item* item);

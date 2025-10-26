@@ -1245,7 +1245,7 @@ void OpcodeTable::Initialize()
     /*0x45A*/ DEFINE_HANDLER(MSG_MOVE_SET_PITCH_RATE_CHEAT,                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x45B*/ DEFINE_HANDLER(MSG_MOVE_SET_PITCH_RATE,                                               STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x45C*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FORCE_PITCH_RATE_CHANGE,                            STATUS_NEVER);
-    /*0x45D*/ DEFINE_HANDLER(CMSG_FORCE_PITCH_RATE_CHANGE_ACK,                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x45D*/ DEFINE_HANDLER(CMSG_FORCE_PITCH_RATE_CHANGE_ACK,                                      STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleForceSpeedChangeAck                );
     /*0x45E*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPLINE_SET_PITCH_RATE,                              STATUS_NEVER);
     /*0x45F*/ DEFINE_HANDLER(CMSG_CALENDAR_EVENT_INVITE_NOTES,                                      STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x460*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_CALENDAR_EVENT_INVITE_NOTES,                        STATUS_NEVER);
@@ -1359,9 +1359,9 @@ void OpcodeTable::Initialize()
     /*0x4CC*/ DEFINE_HANDLER(CMSG_END_BATTLEFIELD_CHEAT,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x4CD*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MULTIPLE_PACKETS,                                   STATUS_NEVER);
     /*0x4CE*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_GRAVITY_DISABLE,                               STATUS_NEVER);
-    /*0x4CF*/ DEFINE_HANDLER(CMSG_MOVE_GRAVITY_DISABLE_ACK,                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x4CF*/ DEFINE_HANDLER(CMSG_MOVE_GRAVITY_DISABLE_ACK,                                         STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleMoveFlagChangeOpcode               );
     /*0x4D0*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_GRAVITY_ENABLE,                                STATUS_NEVER);
-    /*0x4D1*/ DEFINE_HANDLER(CMSG_MOVE_GRAVITY_ENABLE_ACK,                                          STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x4D1*/ DEFINE_HANDLER(CMSG_MOVE_GRAVITY_ENABLE_ACK,                                          STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleMoveFlagChangeOpcode               );
     /*0x4D2*/ DEFINE_SERVER_OPCODE_HANDLER(MSG_MOVE_GRAVITY_CHNG,                                   STATUS_NEVER);
     /*0x4D3*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPLINE_MOVE_GRAVITY_DISABLE,                        STATUS_NEVER);
     /*0x4D4*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SPLINE_MOVE_GRAVITY_ENABLE,                         STATUS_NEVER);
@@ -1431,7 +1431,7 @@ void OpcodeTable::Initialize()
     /*0x514*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SEND_ALL_COMBAT_LOG,                                STATUS_NEVER);
     /*0x515*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_OPEN_LFG_DUNGEON_FINDER,                            STATUS_NEVER);
     /*0x516*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_SET_COLLISION_HGT,                             STATUS_NEVER);
-    /*0x517*/ DEFINE_HANDLER(CMSG_MOVE_SET_COLLISION_HGT_ACK,                                       STATUS_UNHANDLED,  PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
+    /*0x517*/ DEFINE_HANDLER(CMSG_MOVE_SET_COLLISION_HGT_ACK,                                       STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleForceSpeedChangeAck                );
     /*0x518*/ DEFINE_HANDLER(MSG_MOVE_SET_COLLISION_HGT,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x519*/ DEFINE_HANDLER(CMSG_CLEAR_RANDOM_BG_WIN_TIME,                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x51A*/ DEFINE_HANDLER(CMSG_CLEAR_HOLIDAY_BG_WIN_TIME,                                        STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
