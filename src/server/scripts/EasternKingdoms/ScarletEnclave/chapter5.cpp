@@ -504,7 +504,7 @@ public:
                 tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25, 4s);
 
                 tirion->m_Events.AddEventAtOffset([&, tirion] {
-                    tirion->GetMotionMaster()->MovePath(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
+                    tirion->GetMotionMaster()->MoveWaypoint(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
                 }, 14s);
 
                 events.Reset();
