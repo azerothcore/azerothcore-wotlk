@@ -136,7 +136,7 @@ public:
                         {
                             me->CastSpell(target, PARTING_SORROW, false);
                         }
-                        events.Repeat(6s, 16s);
+                        events.Repeat(27s, 45s);
                         break;
                     }
             }
