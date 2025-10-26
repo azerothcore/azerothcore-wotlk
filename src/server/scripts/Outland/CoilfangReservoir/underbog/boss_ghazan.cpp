@@ -86,7 +86,7 @@ struct boss_ghazan : public BossAI
         if (type == ACTION_MOVE_TO_PLATFORM && !_movedToPlatform)
         {
             _movedToPlatform = true;
-            me->GetMotionMaster()->MovePath((me->GetSpawnId() * 10) + 1, false);
+            me->GetMotionMaster()->MoveWaypoint((me->GetSpawnId() * 10) + 1, false);
         }
     }
 
