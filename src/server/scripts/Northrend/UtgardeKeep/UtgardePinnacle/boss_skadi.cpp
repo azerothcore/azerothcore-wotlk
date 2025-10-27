@@ -181,6 +181,7 @@ public:
             else if (param == ACTION_PHASE2)
             {
                 SecondPhase = true;
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 events.ScheduleEvent(EVENT_SKADI_CRUSH, 8s);
                 events.ScheduleEvent(EVENT_SKADI_SPEAR, 10s);
                 events.ScheduleEvent(EVENT_SKADI_WHIRLWIND, 15s);

@@ -48,6 +48,7 @@ public:
     {
         if (quest->GetQuestId() == QUEST_CHASING_AME)
         {
+            creature->SetWalk(true);
             CAST_AI(npc_escortAI, (creature->AI()))->Start(false, player->GetGUID());
             creature->AI()->Talk(SAY_READY, player);
             creature->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
