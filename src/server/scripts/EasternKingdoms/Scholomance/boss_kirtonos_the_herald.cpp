@@ -139,7 +139,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case INTRO_1:
-                    me->GetMotionMaster()->MovePath(KIRTONOS_PATH, false);
+                    me->GetMotionMaster()->MoveWaypoint(KIRTONOS_PATH, false);
                     Talk(EMOTE_SUMMONED);
                     break;
                 case INTRO_2:

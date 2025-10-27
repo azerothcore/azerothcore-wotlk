@@ -794,7 +794,7 @@ struct npc_akama_illidan : public ScriptedAI
 
         if (instance->GetBossState(DATA_AKAMA_ILLIDAN) != DONE)
         {
-            me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_2, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_AKAMA_ILLIDARI_COUNCIL_2, false);
         }
         else
         {
@@ -811,7 +811,7 @@ struct npc_akama_illidan : public ScriptedAI
             {
                 me->NearTeleportTo(AkamaIllidariCouncilTeleport);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_1, false);
+                me->GetMotionMaster()->MoveWaypoint(PATH_AKAMA_ILLIDARI_COUNCIL_1, false);
             }
             break;
             case ACTION_AKAMA_MINIONS:
@@ -974,7 +974,7 @@ struct npc_akama_illidan : public ScriptedAI
                     Talk(SAY_AKAMA_SALUTE);
                 }, 56955ms); // 6275ms
                 me->m_Events.AddEventAtOffset([&] {
-                    me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_3, false);
+                    me->GetMotionMaster()->MoveWaypoint(PATH_AKAMA_ILLIDARI_COUNCIL_3, false);
                 }, 64030ms); // 7075ms
             }
             break;
@@ -1013,7 +1013,7 @@ struct npc_akama_illidan : public ScriptedAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
             }, 9530ms); // 2830ms
             me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePath(PATH_AKAMA_MINIONS, false);
+                me->GetMotionMaster()->MoveWaypoint(PATH_AKAMA_MINIONS, false);
             }, 14400ms); // 4870ms
         }
     }

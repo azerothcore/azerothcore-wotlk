@@ -551,7 +551,7 @@ public:
                         while (FBSData[i].entry)
                         {
                             if (Creature* c = me->SummonCreature(FBSData[i].entry, 688.69f + i * 1.8f, FBSSpawnPos.GetPositionY() + (float)irand(-2, 2), FBSSpawnPos.GetPositionZ(), 3 * M_PI / 2))
-                                c->GetMotionMaster()->MovePath(FBSData[i].pathId, false);
+                                c->GetMotionMaster()->MoveWaypoint(FBSData[i].pathId, false);
                             ++i;
                         }
                         events.RescheduleEvent(2, 3s);
@@ -1284,7 +1284,7 @@ public:
                     events.RescheduleEvent(8, 2s);
                     break;
                 case 8:
-                    me->GetMotionMaster()->MovePath(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);
+                    me->GetMotionMaster()->MoveWaypoint(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);
                     break;
                 case 10:
                     if (Creature* x = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
