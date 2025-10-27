@@ -343,7 +343,7 @@ public:
                         nefarian->setActive(true);
                         nefarian->SetCanFly(true);
                         nefarian->SetDisableGravity(true);
-                        nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);
+                        nefarian->GetMotionMaster()->MoveWaypoint(NEFARIAN_PATH, false);
                     }
 
                     events.Reset();
@@ -406,7 +406,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_PATH_2:
-                            me->GetMotionMaster()->MovePath(NEFARIUS_PATH_2, false);
+                            me->GetMotionMaster()->MoveWaypoint(NEFARIUS_PATH_2, false);
                             events.ScheduleEvent(EVENT_CHAOS_1, 7s);
                             break;
                         case EVENT_CHAOS_1:
@@ -438,7 +438,7 @@ public:
                             me->DespawnOrUnsummon(1s);
                             break;
                         case EVENT_PATH_3:
-                            me->GetMotionMaster()->MovePath(NEFARIUS_PATH_3, false);
+                            me->GetMotionMaster()->MoveWaypoint(NEFARIUS_PATH_3, false);
                             break;
                         case EVENT_START_EVENT:
                             BeginEvent();

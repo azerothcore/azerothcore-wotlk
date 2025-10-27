@@ -428,7 +428,7 @@ struct npc_costumed_orphan_matron : public ScriptedAI
             GetInitXYZ(x, y, z, o, path);
             if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
             {
-                cr->GetMotionMaster()->MovePath(path, true);
+                cr->GetMotionMaster()->MoveWaypoint(path, true);
                 cr->AI()->DoAction(path);
                 horseGUID = cr->GetGUID();
             }
@@ -1191,7 +1191,7 @@ struct boss_headless_horseman : public ScriptedAI
                             break;
                         case 3:
                             me->SetDisableGravity(true);
-                            me->GetMotionMaster()->MovePath(236820, false);
+                            me->GetMotionMaster()->MoveWaypoint(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
                             player->Say(TALK_PLAYER_FELT_DEATH);
                             Talk(TALK_ENTRANCE);

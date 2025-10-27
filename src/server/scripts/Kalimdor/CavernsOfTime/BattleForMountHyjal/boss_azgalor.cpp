@@ -86,7 +86,7 @@ public:
         Talk(SAY_ONSPAWN, 1200ms);
 
         if (action == DATA_AZGALOR)
-            me->GetMotionMaster()->MovePath(HORDE_BOSS_PATH, false);
+            me->GetMotionMaster()->MoveWaypoint(HORDE_BOSS_PATH, false);
     }
 
     void KilledUnit(Unit * victim) override

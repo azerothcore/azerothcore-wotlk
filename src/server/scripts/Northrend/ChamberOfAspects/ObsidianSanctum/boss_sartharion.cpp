@@ -1071,7 +1071,7 @@ public:
                 Talk(SAY_TENEBRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1254,7 +1254,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1370,7 +1370,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
