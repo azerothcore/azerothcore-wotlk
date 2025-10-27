@@ -183,7 +183,7 @@ struct boss_nightbane : public BossAI
                 me->GetMotionMaster()->MoveTakeoff(POINT_INTRO_TAKE_OFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, 13.99879f);
             }).Schedule(4s, [this](TaskContext /*context*/)
             {
-                me->GetMotionMaster()->MovePath(me->GetEntry()*10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry()*10, false);
             });
         }
      }
@@ -400,7 +400,7 @@ struct boss_nightbane : public BossAI
                 {
                     scheduler.Schedule(0s, [this](TaskContext /*context*/)
                     {
-                        me->GetMotionMaster()->MovePath(me->GetEntry()*10+1, false);
+                        me->GetMotionMaster()->MoveWaypoint(me->GetEntry()*10+1, false);
                     });
                 }
                 break;
