@@ -1321,22 +1321,22 @@ public:
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
                         allianceGuardsGUID.push_back(temp->GetGUID());
-                        temp->GetMotionMaster()->MovePath(NPC_SW_SOLDIER * 10, false);
+                        temp->GetMotionMaster()->MoveWaypoint(NPC_SW_SOLDIER * 10, false);
                     }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
                         allianceGuardsGUID.push_back(temp->GetGUID());
-                        temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 1, false);
+                        temp->GetMotionMaster()->MoveWaypoint((NPC_SW_SOLDIER * 10) + 1, false);
                     }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
                         allianceGuardsGUID.push_back(temp->GetGUID());
-                        temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 2, false);
+                        temp->GetMotionMaster()->MoveWaypoint((NPC_SW_SOLDIER * 10) + 2, false);
                     }
                     if (Unit* temp = me->SummonCreature(NPC_SW_SOLDIER, AllianceSpawn[8].x, AllianceSpawn[8].y, AllianceSpawn[8].z, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
                         allianceGuardsGUID.push_back(temp->GetGUID());
-                        temp->GetMotionMaster()->MovePath((NPC_SW_SOLDIER * 10) + 3, false);
+                        temp->GetMotionMaster()->MoveWaypoint((NPC_SW_SOLDIER * 10) + 3, false);
                     }
                     break;
                 case 8:
@@ -1348,7 +1348,7 @@ public:
                 case 10:
                     if (Unit* temp = me->SummonCreature(NPC_DREADLORD, AllianceSpawn[11].x, AllianceSpawn[11].y, AllianceSpawn[11].z, TEMPSUMMON_DEAD_DESPAWN))
                     {
-                        temp->GetMotionMaster()->MovePath(NPC_DREADLORD * 10, false);
+                        temp->GetMotionMaster()->MoveWaypoint(NPC_DREADLORD * 10, false);
                         temp->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true);
                         temp->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
                     }
@@ -1536,7 +1536,7 @@ public:
                         case 8:
                             if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                             {
-                                jaina->GetMotionMaster()->MovePath(NPC_JAINA * 10, false);
+                                jaina->GetMotionMaster()->MoveWaypoint(NPC_JAINA * 10, false);
                                 jaina->setActive(true);
                             }
                             bStepping = false;
@@ -2537,9 +2537,9 @@ public:
             {
                 case 0: // Vortex
                     if (Creature* whirlwind1 = me->SummonCreature(NPC_VORTEX, ThrallSpawn[0].x, ThrallSpawn[0].y, ThrallSpawn[0].z, ThrallSpawn[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30 * IN_MILLISECONDS))
-                        whirlwind1->GetMotionMaster()->MovePath(NPC_WHIRLWIND * 10, false);
+                        whirlwind1->GetMotionMaster()->MoveWaypoint(NPC_WHIRLWIND * 10, false);
                     if (Creature* whirlwind2 = me->SummonCreature(NPC_VORTEX, ThrallSpawn[0].x, ThrallSpawn[0].y, ThrallSpawn[0].z, ThrallSpawn[0].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 30 * IN_MILLISECONDS))
-                        whirlwind2->GetMotionMaster()->MovePath(NPC_WHIRLWIND * 100, false);
+                        whirlwind2->GetMotionMaster()->MoveWaypoint(NPC_WHIRLWIND * 100, false);
                     break;
                 case 1:
                     // BATTLING_COURTYARD Initial Spawn
@@ -2762,7 +2762,7 @@ public:
                     {
                         hordeGuardsGUID.push_back(temp->GetGUID());
                         temp->AI()->Talk(SAY_FOR_THE_HORDE);
-                        temp->GetMotionMaster()->MovePath(NPC_WARSONG_BATTLEGUARD * 100, false);
+                        temp->GetMotionMaster()->MoveWaypoint(NPC_WARSONG_BATTLEGUARD * 100, false);
                     }
                     break;
                 // Valimathras Room Preparation
@@ -2975,7 +2975,7 @@ public:
                             me->SetWalk(false);
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
                             {
-                                sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 100, false);
+                                sylvanas->GetMotionMaster()->MoveWaypoint(NPC_SYLVANAS * 100, false);
                                 sylvanas->setActive(true);
                             }
                             break;
@@ -3007,7 +3007,7 @@ public:
                                 SetEscortPaused(false);
                                 me->SetWalk(true);
                                 if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
-                                    sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 1000, false);
+                                    sylvanas->GetMotionMaster()->MoveWaypoint(NPC_SYLVANAS * 1000, false);
                                 JumpToNextStep(3 * IN_MILLISECONDS);
                                 break;
                             }

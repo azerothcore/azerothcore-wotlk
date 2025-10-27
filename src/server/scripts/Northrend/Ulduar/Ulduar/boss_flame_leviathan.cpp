@@ -1416,7 +1416,7 @@ public:
                 _startTimer -= diff;
                 if (_startTimer <= 0)
                 {
-                    me->GetMotionMaster()->MovePath(3000000 + urand(0, 11), true);
+                    me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
                     _startTimer = 0;
                 }
             }

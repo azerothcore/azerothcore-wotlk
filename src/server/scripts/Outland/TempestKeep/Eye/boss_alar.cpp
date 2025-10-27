@@ -355,17 +355,7 @@ struct boss_alar : public BossAI
     void ConstructWaypointsAndMove()
     {
         me->StopMoving();
-        if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
-        {
-            Movement::PointsArray pathPoints;
-            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            for (uint8 i = 0; i < i_path->size(); ++i)
-            {
-                WaypointData const* node = i_path->at(i);
-                pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-            }
-            me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-        }
+        me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
     }
 
     void UpdateAI(uint32 diff) override
