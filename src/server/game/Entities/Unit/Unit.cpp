@@ -15278,16 +15278,16 @@ uint32 Unit::GetCreatureType() const
 ########                         ########
 #######################################*/
 
-void Unit::HandleStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifierType, float amount, bool apply)
+bool Unit::HandleStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifierType, float amount, bool apply)
 {
     if (unitMod >= UNIT_MOD_END || modifierType >= MODIFIER_TYPE_FLAT_END)
     {
         LOG_ERROR("entities.unit", "ERROR in HandleStatModifier(): non-existing UnitMods or wrong UnitModifierType!");
-        return;
+        return false;
     }
 
     if (!amount)
-        return;
+        return false;
 
     switch (modifierType)
     {
@@ -15300,6 +15300,7 @@ void Unit::HandleStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifie
     }
 
     UpdateUnitMod(unitMod);
+    return true;
 }
 
 void Unit::ApplyStatPctModifier(UnitMods unitMod, UnitModifierPctType modifierType, float pct)

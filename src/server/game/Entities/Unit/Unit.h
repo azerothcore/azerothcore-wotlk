@@ -1055,7 +1055,7 @@ public:
         for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i) SetFloatValue(static_cast<uint16>(UNIT_FIELD_NEGSTAT0) +  i, 0);
     }
 
-    void HandleStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifierType, float amount, bool apply);
+    bool HandleStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifierType, float amount, bool apply);
     void ApplyStatPctModifier(UnitMods unitMod, UnitModifierPctType modifierType, float amount);
 
     void SetStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifierType, float val);
