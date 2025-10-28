@@ -1178,16 +1178,19 @@ void Battleground::AddPlayer(Player* player)
     sBattlegroundMgr->BuildPlayerJoinedBattlegroundPacket(&data, player);
     SendPacketToTeam(teamId, &data, player, false);
 
-    player->RemoveAurasByType(SPELL_AURA_MOUNTED);
-
     // add arena specific auras
     if (isArena())
     {
         // restore pets health before remove
-        if (Pet* pet = player->GetPet())
+        Pet* pet = player->GetPet();
+        if (pet)
             if (pet->IsAlive())
                 pet->SetHealth(pet->GetMaxHealth());
 
+        player->RemoveArenaAuras();
+        if (pet)
+            pet->RemoveArenaAuras();
+        player->RemoveArenaSpellCooldowns(true);
         player->RemoveArenaEnchantments(TEMP_ENCHANTMENT_SLOT);
         player->DestroyConjuredItems(true);
         player->UnsummonPetTemporaryIfAny();
