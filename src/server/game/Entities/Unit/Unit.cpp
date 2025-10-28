@@ -15303,6 +15303,7 @@ bool Unit::HandleStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifie
     return true;
 }
 
+// Usage outside of AuraEffect Handlers is discouraged as the value will be lost when auras change. Use an Aura instead.
 void Unit::ApplyStatPctModifier(UnitMods unitMod, UnitModifierPctType modifierType, float pct)
 {
     if (unitMod >= UNIT_MOD_END || modifierType >= MODIFIER_TYPE_PCT_END)
