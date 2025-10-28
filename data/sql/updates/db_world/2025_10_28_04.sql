@@ -1,3 +1,4 @@
+-- DB update 2025_10_28_03 -> 2025_10_28_04
 
 -- Set Waypoint (Goblin Racer)
 DELETE FROM `waypoints` WHERE (`entry` IN (425100, 425101, 425102));
