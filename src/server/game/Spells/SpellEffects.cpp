@@ -3595,7 +3595,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             unitMod = UNIT_MOD_DAMAGE_RANGED;
             break;
         }
-        float weapon_total_pct = m_caster->GetModifierValue(unitMod, TOTAL_PCT);
+        float weapon_total_pct = m_caster->GetPctModifierValue(unitMod, TOTAL_PCT);
         fixed_bonus = int32(fixed_bonus * weapon_total_pct);
         spell_bonus = int32(spell_bonus * weapon_total_pct);
     }

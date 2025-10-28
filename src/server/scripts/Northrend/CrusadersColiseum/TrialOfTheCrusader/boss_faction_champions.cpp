@@ -2037,7 +2037,7 @@ public:
         npc_toc_enh_shamanAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_MELEE)
         {
             SetEquipmentSlots(false, 51803, 48013, EQUIP_NO_CHANGE);
-            me->SetModifierValue(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
+            me->SetStatPctModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
             me->UpdateDamagePhysical(OFF_ATTACK);
 
             events.Reset();
