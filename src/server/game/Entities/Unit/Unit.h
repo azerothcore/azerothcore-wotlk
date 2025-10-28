@@ -1054,7 +1054,7 @@ public:
         for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i) SetFloatValue(static_cast<uint16>(UNIT_FIELD_POSSTAT0) +  i, 0);
         for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i) SetFloatValue(static_cast<uint16>(UNIT_FIELD_NEGSTAT0) +  i, 0);
     }
-    
+
     void HandleStatFlatModifier(UnitMods unitMod, UnitModifierFlatType modifierType, float amount, bool apply);
     void ApplyStatPctModifier(UnitMods unitMod, UnitModifierPctType modifierType, float amount);
 
@@ -1080,7 +1080,7 @@ public:
     void SetCanModifyStats(bool modifyStats) { m_canModifyStats = modifyStats; }
     [[nodiscard]] bool CanModifyStats() const { return m_canModifyStats; }
 
-    void UpdateStatBuffMod(Stats stat);    
+    void UpdateStatBuffMod(Stats stat);
 
     // Unit level methods
     [[nodiscard]] uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }

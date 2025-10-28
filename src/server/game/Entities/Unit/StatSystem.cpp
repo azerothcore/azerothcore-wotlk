@@ -680,7 +680,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
             cr = CR_CRIT_MELEE;
             break;
     }
-    
+
     // flat = bonus from crit auras, pct = bonus from agility, combat rating = mods from items
     float value = GetBaseModValue(modGroup, FLAT_MOD) + GetBaseModValue(modGroup, PCT_MOD) + GetRatingBonusValue(cr);
     // Modify crit from weapon skill and maximized defense skill of same level victim difference

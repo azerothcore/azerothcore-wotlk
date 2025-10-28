@@ -341,7 +341,6 @@ class spell_warl_generic_scaling : public AuraScript
                         amount += CalculatePct(pet->GetTotalAuraModValue(UNIT_MOD_ATTACK_POWER) - aurEff->GetAmount() + amount, glyph->GetAmount());
                     }
                 }
-                
             }
         }
     }
