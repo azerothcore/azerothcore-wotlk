@@ -51,6 +51,7 @@
 #include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "ScriptObjectFwd.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -539,7 +540,7 @@ Item* Player::GetShield(bool useable) const
     return item;
 }
 
-uint8 Player::GetAttackBySlot(uint8 slot)
+WeaponAttackType Player::GetAttackBySlot(uint8 slot)
 {
     switch (slot)
     {

@@ -78,6 +78,7 @@
 #include "TicketMgr.h"
 #include "Tokenize.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "UpdateData.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -6593,13 +6594,13 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
 
     LOG_DEBUG("entities.player", "applying mods for item {} ", item->GetGUID().ToString());
 
-    uint8 attacktype = Player::GetAttackBySlot(slot);
+    WeaponAttackType attacktype = Player::GetAttackBySlot(slot);
 
     if (item->HasSocket())                              //only (un)equipping of items with sockets can influence metagems, so no need to waste time with normal items
         CorrectMetaGemEnchants(slot, apply);
 
     if (attacktype < MAX_ATTACK)
-        _ApplyWeaponDependentAuraMods(item, WeaponAttackType(attacktype), apply);
+        _ApplyWeaponDependentAuraMods(item, attacktype, apply);
 
     _ApplyItemBonuses(proto, slot, apply);
 
@@ -6886,7 +6887,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (proto->ArcaneRes)
         HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(proto->ArcaneRes), apply);
 
-    uint8 attType = Player::GetAttackBySlot(slot);
+    WeaponAttackType attType = Player::GetAttackBySlot(slot);
     if (attType != MAX_ATTACK)
     {
         _ApplyWeaponDamage(slot, proto, ssv, apply);
@@ -6933,7 +6934,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         ssv = ScalingStatValue ? sScalingStatValuesStore.LookupEntry(ssd_level) : nullptr;
     }
 
-    uint8 attType = Player::GetAttackBySlot(slot);
+    WeaponAttackType attType = Player::GetAttackBySlot(slot);
     if (!IsInFeralForm() && apply && !CanUseAttackType(attType))
     {
         return;
@@ -6964,12 +6965,12 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
             if (minDamage > 0.f)
             {
-                SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, minDamage, i);
+                SetBaseWeaponDamage(attType, MINDAMAGE, minDamage, i);
             }
 
             if (maxDamage > 0.f)
             {
-                SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, maxDamage, i);
+                SetBaseWeaponDamage(attType, MAXDAMAGE, maxDamage, i);
             }
         }
     }
@@ -6978,8 +6979,8 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     {
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
         {
-            SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, 0.f, i);
-            SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, 0.f, i);
+            SetBaseWeaponDamage(attType, MINDAMAGE, 0.f, i);
+            SetBaseWeaponDamage(attType, MAXDAMAGE, 0.f, i);
         }
 
         if (attType == BASE_ATTACK)
@@ -7003,8 +7004,8 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     if (IsInFeralForm())
         return;
 
-    if (CanModifyStats() && (GetWeaponDamageRange(WeaponAttackType(attType), MAXDAMAGE) || proto->Delay))
-        UpdateDamagePhysical(WeaponAttackType(attType));
+    if (CanModifyStats() && (GetWeaponDamageRange(attType, MAXDAMAGE) || proto->Delay))
+        UpdateDamagePhysical(attType);
 }
 
 void Player::CastAllObtainSpells()
@@ -7597,9 +7598,9 @@ void Player::_RemoveAllItemMods()
             if (!proto)
                 continue;
 
-            uint32 attacktype = Player::GetAttackBySlot(i);
+            WeaponAttackType attacktype = Player::GetAttackBySlot(i);
             if (attacktype < MAX_ATTACK)
-                _ApplyWeaponDependentAuraMods(m_items[i], WeaponAttackType(attacktype), false);
+                _ApplyWeaponDependentAuraMods(m_items[i], attacktype, false);
 
             _ApplyItemBonuses(proto, i, false);
 
@@ -7626,9 +7627,9 @@ void Player::_ApplyAllItemMods()
             if (!proto)
                 continue;
 
-            uint32 attacktype = Player::GetAttackBySlot(i);
+            WeaponAttackType attacktype = Player::GetAttackBySlot(i);
             if (attacktype < MAX_ATTACK)
-                _ApplyWeaponDependentAuraMods(m_items[i], WeaponAttackType(attacktype), true);
+                _ApplyWeaponDependentAuraMods(m_items[i], attacktype, true);
 
             _ApplyItemBonuses(proto, i, true);
 
