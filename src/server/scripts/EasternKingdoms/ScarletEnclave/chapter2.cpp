@@ -64,12 +64,12 @@ enum Koltira
     //NPC_DEATH_KNIGHT_MOUNT        = 29201,
     MODEL_DEATH_KNIGHT_MOUNT        = 25278,
 
-    POINT_STAND_UP                  = 0,
-    POINT_BOX                       = 1,
-    POINT_ANTI_MAGIC_ZONE           = 2,
+    POINT_STAND_UP                  = 1,
+    POINT_BOX                       = 2,
+    POINT_ANTI_MAGIC_ZONE           = 3,
 
-    POINT_MOUNT                     = 0,
-    POINT_DESPAWN                   = 1
+    POINT_MOUNT                     = 1,
+    POINT_DESPAWN                   = 2
 };
 
 class npc_koltira_deathweaver : public CreatureScript
