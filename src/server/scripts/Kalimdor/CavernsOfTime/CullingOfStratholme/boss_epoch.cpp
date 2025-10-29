@@ -86,7 +86,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (sSpellMgr->GetSpellDifficultyId(spellInfo->Id) == SPELL_TIME_STEP)
+            if (spellInfo->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_TIME_STEP, me))
             {
                 if (target == me)
                     return;
