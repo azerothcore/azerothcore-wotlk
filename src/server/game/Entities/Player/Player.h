@@ -2636,6 +2636,12 @@ public:
     bool IsExpectingChangeTransport() const { return m_expectingChangeTransport; }
     void SetExpectingChangeTransport(bool state) { m_expectingChangeTransport = state; }
 
+    uint32 GetPendingFlightChange() const { return m_pendingFlightChangeCounter; }
+    void SetPendingFlightChange(uint32 counter) { m_pendingFlightChangeCounter = counter; }
+
+    void SetMapChangeOrderCounter() { m_mapChangeOrderCounter = GetSession()->GetOrderCounter(); }
+    uint32 GetMapChangeOrderCounter() { return m_mapChangeOrderCounter; }
+
     /*********************************************************/
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
@@ -3018,6 +3024,8 @@ private:
     Seconds m_creationTime;
 
     bool m_expectingChangeTransport;
+    uint32 m_pendingFlightChangeCounter;
+    uint32 m_mapChangeOrderCounter;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
