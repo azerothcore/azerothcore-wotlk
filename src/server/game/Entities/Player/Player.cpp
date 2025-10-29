@@ -418,7 +418,7 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
 
     sScriptMgr->OnConstructPlayer(this);
 
-    m_expectingChangeTransport = false;
+    _expectingChangeTransport = false;
 }
 
 Player::~Player()
