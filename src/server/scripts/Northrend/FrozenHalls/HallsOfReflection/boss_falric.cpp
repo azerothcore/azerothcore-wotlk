@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "halls_of_reflection.h"
 #include "ScriptedCreature.h"
+#include "SpellMgr.h"
 
 enum Yells
 {

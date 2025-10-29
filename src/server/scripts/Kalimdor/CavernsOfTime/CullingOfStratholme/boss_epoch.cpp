@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "culling_of_stratholme.h"
 
 enum Spells
