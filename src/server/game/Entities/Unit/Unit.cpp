@@ -1956,7 +1956,8 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             Probability = 0.65f * victim->GetLevel() + 0.5f;
 
         // victim is a druid
-        if (victim->IsPlayer() && victim->getClass() == CLASS_DRUID) {
+        if (victim->IsPlayer() && victim->getClass() == CLASS_DRUID)
+        {
             Player* player = victim->ToPlayer();
             PlayerTalentMap talentMap = player->GetTalentMap();
             uint8 activeSpecId = player->GetActiveSpec();
@@ -1967,7 +1968,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
                             : talentMap[33856] != NULL && talentMap[33856]->IsInSpec(activeSpecId) ? 22.142f //rank3
                             : 0; //unranked
         }
-        
+
         uint32 VictimDefense = victim->GetDefenseSkillValue();
         uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
 
