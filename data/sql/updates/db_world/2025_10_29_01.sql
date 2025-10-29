@@ -1,3 +1,4 @@
+-- DB update 2025_10_29_00 -> 2025_10_29_01
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=15 AND `SourceGroup`=7866 AND `SourceEntry`=2;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 7866, 2, 0, 0, 9, 0, 10098, 0, 0, 0, 0, 0, '', 'Show gossip option 2 if player has quest 10098'),
