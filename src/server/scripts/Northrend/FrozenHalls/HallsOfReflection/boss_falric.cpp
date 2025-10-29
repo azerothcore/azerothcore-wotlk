@@ -45,7 +45,6 @@ enum Events
 };
 
 const uint32 hopelessnessId[3] = { 72395, 72396, 72397 };
-const uint32 oldhopelessnessId[3][2] = { {72395, 72390}, {72396, 72391}, {72397, 72393} };
 
 class boss_falric : public CreatureScript
 {
