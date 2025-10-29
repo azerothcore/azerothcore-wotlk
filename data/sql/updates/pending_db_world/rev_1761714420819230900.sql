@@ -37,7 +37,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (58497, 58497, 3), (58497, 58563, 3), (58497, 58564, 3);
 
 DELETE FROM `creature` WHERE `guid` IN (58496,58501,58503,58786,58787);
-INSERT INTO `creature` VALUES 
+INSERT INTO `creature` VALUES
 -- Reposition oozes to be closer to group members
 (58496, 16901, 0, 0, 530, 0, 0, 1, 1, 0, 381.658, 3482.38, 61.609, 5.43889, 300, 5, 0, 4384, 0, 1, 0, 0, 0, '', 0, 0, NULL),
 (58501, 16903, 0, 0, 530, 0, 0, 1, 1, 0, 361.194, 3460.88, 60.7696, 1.22522, 300, 0, 0, 258, 0, 1, 0, 0, 0, '', NULL, 0, NULL),
