@@ -97,7 +97,7 @@ public:
         Talk(SAY_ONSPAWN, 1200ms);
 
         if (action == DATA_ANETHERON)
-            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
+            me->GetMotionMaster()->MoveWaypoint(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
     }
 
     void PathEndReached(uint32 pathId) override
@@ -109,7 +109,7 @@ public:
         case ALLIANCE_BASE_CHARGE_3:
             me->m_Events.AddEventAtOffset([this]()
                 {
-                    me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+                    me->GetMotionMaster()->MoveWaypoint(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
                 }, 1s);
             break;
         }

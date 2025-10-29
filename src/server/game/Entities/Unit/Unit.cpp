@@ -19562,6 +19562,9 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!vehicleBase)
         return;
 
+    if (IsPlayer())
+        ToPlayer()->SetExpectingChangeTransport(true);
+
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
     Position pos;

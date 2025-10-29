@@ -139,7 +139,7 @@ struct npc_enslaved_proto_drake : public ScriptedAI
             _setData = true;
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->GetMotionMaster()->MovePath(PATH_PROTODRAKE, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_PROTODRAKE, false);
         }
     }
 

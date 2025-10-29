@@ -106,7 +106,7 @@ public:
             Talk(SAY_BREAKOUT0);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }, 5s);
         }
 
@@ -167,13 +167,13 @@ public:
                             }
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.6724f, -6032.0527f, 134.82213f, 4.654973506927490234f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath(NPC_CRIMSON_ACOLYTE * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint(NPC_CRIMSON_ACOLYTE * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.0055f, -6031.893f, 134.82211f, 0.401425719261169433f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 1) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 1) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1639.7053f, -6031.7373f, 134.82213f, 2.443460941314697265f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 2) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 2) * 10, false);
                             break;
                         case 1:
                             Talk(SAY_BREAKOUT4);
@@ -182,13 +182,13 @@ public:
                                 valroth->AI()->Talk(SAY_VALROTH_WAVE2);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.7958f, -6030.307f, 134.82211f, 4.65355682373046875f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 3) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 3) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.7305f, -6030.751f, 134.82211f, 6.143558979034423828f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 4) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 4) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1639.4657f, -6030.404f, 134.82211f, 4.502949237823486328f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 5) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 5) * 10, false);
                             break;
                         case 2:
                             Talk(SAY_BREAKOUT5);
@@ -197,16 +197,16 @@ public:
                                 valroth->AI()->Talk(SAY_VALROTH_WAVE3);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.3405f, -6031.436f, 134.82211f, 4.612849712371826171f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 6) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 6) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1642.0404f, -6030.3843f, 134.82211f, 1.378810048103332519f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 7) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 7) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.1162f, -6029.7817f, 134.82211f, 5.707226753234863281f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 8) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 8) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.9948f, -6029.8027f, 134.82211f, 1.605702877044677734f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 9) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 9) * 10, false);
                             break;
                         case 3:
                             Talk(SAY_BREAKOUT6);
@@ -223,7 +223,7 @@ public:
                             {
                                 valroth->AI()->Talk(SAY_VALROTH_AGGRO);
                                 valroth->SetReactState(REACT_AGGRESSIVE);
-                                valroth->GetMotionMaster()->MovePath(NPC_HIGH_INQUISITOR_VALROTH * 10, false);
+                                valroth->GetMotionMaster()->MoveWaypoint(NPC_HIGH_INQUISITOR_VALROTH * 10, false);
                             }
                             return;
                         default:
@@ -262,7 +262,7 @@ public:
                     SetInvincibility(true);
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
-                    me->GetMotionMaster()->MovePath((me->GetEntry() + 1) * 10, false);
+                    me->GetMotionMaster()->MoveWaypoint((me->GetEntry() + 1) * 10, false);
                 });
             }
         }
@@ -610,7 +610,7 @@ public:
             // Start waypoint movement using WaypointMovementGenerator
             if (uint32 pathId = me->GetWaypointPath())
             {
-                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+                me->GetMotionMaster()->MoveWaypoint(pathId, true); // true = repeatable
             }
             // Schedule the first ritual after 20-30s
             events.ScheduleEvent(EVENT_START_RITUAL, 20s, 30s);
@@ -797,7 +797,7 @@ public:
             // Start waypoint movement using WaypointMovementGenerator
             if (uint32 pathId = me->GetWaypointPath())
             {
-                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+                me->GetMotionMaster()->MoveWaypoint(pathId, true); // true = repeatable
             }
             // Schedule the first ritual after 50-60s
             events.ScheduleEvent(EVENT_START_RITUAL, 50s, 60s);
