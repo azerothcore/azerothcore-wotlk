@@ -459,7 +459,6 @@ class spell_black_knight_ghoul_claw : public SpellScript
             {
                 caster->AddThreat(target, 100.0f);
                 caster->GetAI()->AttackStart(target);
-                LOG_INFO("server.worldserver","Adding threat to {}", target->GetName());
             }
          }
     }
@@ -477,13 +476,8 @@ class spell_black_knight_ghoul_explode : public SpellScript
     void HandleSpellHit(SpellEffIndex /*effIndex*/)
     {
         if (GetHitUnit()->IsPlayer())
-        {
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-            {
                 instance->SetData(DATA_ACHIEV_IVE_HAD_WORSE, 0);
-                LOG_INFO("server.worldserver","Achievement failed");
-            }
-        }
     }
     void Register() override
     {
