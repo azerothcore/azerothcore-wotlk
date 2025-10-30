@@ -467,7 +467,17 @@ public:
             if (startPath)
             {
                 startPath = false;
-                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+                Movement::PointsArray pathPoints;
+                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+
+                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath());
+                for (uint8 i = 0; i < i_path->size(); ++i)
+                {
+                    WaypointData const* node = i_path->at(i);
+                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                }
+
+                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
             }
             if (setCharm)
             {
@@ -839,7 +849,17 @@ public:
                             {
                                 Talk(TEXT_EMOTE, passenger);
 
-                                me->GetMotionMaster()->MovePath(NPC_DRAKE, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+                                Movement::PointsArray pathPoints;
+                                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+
+                                WaypointPath const* i_path = sWaypointMgr->GetPath(NPC_DRAKE);
+                                for (uint8 i = 0; i < i_path->size(); ++i)
+                                {
+                                    WaypointData const* node = i_path->at(i);
+                                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                                }
+
+                                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
                             }
                     }
                     else
@@ -1067,7 +1087,15 @@ public:
         {
             if (apply)
             {
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 100, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+                Movement::PointsArray pathPoints;
+                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetEntry() * 100);
+                for (uint8 i = 0; i < i_path->size(); ++i)
+                {
+                    WaypointData const* node = i_path->at(i);
+                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                }
+                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetSpeed(MOVE_RUN, 6.0f);
