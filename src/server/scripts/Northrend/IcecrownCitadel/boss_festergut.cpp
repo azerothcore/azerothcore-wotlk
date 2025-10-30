@@ -388,7 +388,7 @@ class spell_festergut_gaseous_blight : public SpellScript
             {
                 uint32 questId = map->Is25ManRaid() ? QUEST_RESIDUE_RENDEZVOUS_25 : QUEST_RESIDUE_RENDEZVOUS_10;
                 if (p->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
-                    p->CastSpell(p, SPELL_ORANGE_BLIGHT_RESIDUE, true);    
+                    p->CastSpell(p, SPELL_ORANGE_BLIGHT_RESIDUE, true);
             }
         }
     }
