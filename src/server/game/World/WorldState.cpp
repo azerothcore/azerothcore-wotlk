@@ -1778,7 +1778,7 @@ bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, c
         else
             pathID = spawnLoc == 0 ? PATH_STORMWIND_KEEP : PATH_STORMWIND_TRADE_DISTRICT;
 
-        pallid->GetMotionMaster()->MovePath(pathID, false);
+        pallid->GetMotionMaster()->MoveWaypoint(pathID, false);
 
         sWorldState->SetPallidGuid(zone.zoneId, pallid->GetGUID());
     }

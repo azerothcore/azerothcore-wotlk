@@ -23,20 +23,16 @@
 enum VolkahnSpells
 {
     // Volkhan
-    SPELL_HEAT_N                        = 52387,
-    SPELL_HEAT_H                        = 59528,
-    SPELL_SHATTERING_STOMP_N            = 52237,
-    SPELL_SHATTERING_STOMP_H            = 59529,
+    SPELL_HEAT                          = 52387,
+    SPELL_SHATTERING_STOMP              = 52237,
     SPELL_TEMPER                        = 52238,
     SPELL_SUMMON_MOLTEN_GOLEM           = 52405,
 
     //Molten Golem
     SPELL_BLAST_WAVE                    = 23113,
-    SPELL_IMMOLATION_STRIKE_N           = 52433,
-    SPELL_IMMOLATION_STRIKE_H           = 59530,
-    SPELL_SHATTER_N                     = 52429,
-    SPELL_SHATTER_H                     = 59527,
     SPELL_COOL_DOWN                     = 52443,
+    SPELL_IMMOLATION_STRIKE             = 52433,
+    SPELL_SHATTER                       = 52429,
 };
 
 enum VolkhanOther
@@ -261,11 +257,12 @@ struct boss_volkhan : public BossAI
             case EVENT_HEAT:
                 if (HasActiveGolem())
                 {
-                    DoCastSelf(DUNGEON_MODE(SPELL_HEAT_N, SPELL_HEAT_H), true);
+                    me->CastSpell(me, SPELL_HEAT, true);
                     events.Repeat(randtime(9s, 24s));
                 }
                 else
                     events.Repeat(1s);
+                events.Repeat(8s);
                 break;
             case EVENT_CHECK_HEALTH:
                 if (!shatteredStompCast && HealthBelowPct(25))
@@ -350,7 +347,7 @@ struct npc_molten_golem : public ScriptedAI
             if (Creature* volkhan = m_pInstance->GetCreature(DATA_VOLKHAN))
                 volkhan->AI()->DoAction(ACTION_DESTROYED);
 
-            DoCastSelf(DUNGEON_MODE(SPELL_SHATTER_N, SPELL_SHATTER_H), true);
+            me->CastSpell(me, SPELL_SHATTER, true);
             me->DespawnOrUnsummon(500ms);
         }
     }
@@ -386,6 +383,10 @@ struct npc_molten_golem : public ScriptedAI
                     me->AddThreat(target, 30000.0f);
                     AttackStart(target);
                 }
+                break;
+            }
+            case EVENT_IMMOLATION:
+                me->CastSpell(me->GetVictim(), SPELL_IMMOLATION_STRIKE, false);
                 events.Repeat(5s);
                 break;
             }
