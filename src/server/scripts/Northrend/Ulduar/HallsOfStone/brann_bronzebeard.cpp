@@ -391,8 +391,7 @@ public:
             switch (action)
             {
                 case ACTION_START_ESCORT_EVENT:
-                    me->SetWalk(false);
-                    Start(false, ObjectGuid::Empty, 0, true, false);
+                    Start(false, true, ObjectGuid::Empty, 0, true, false);
                     Talk(SAY_BRANN_ESCORT_START);
                     me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                     me->SetReactState(REACT_AGGRESSIVE);
@@ -457,8 +456,7 @@ public:
                         door->SetGoState(GO_STATE_READY);
                     break;
                 case ACTION_OPEN_DOOR:
-                    me->SetWalk(false);
-                    Start(false, ObjectGuid::Empty, 0, true, false);
+                    Start(false, true, ObjectGuid::Empty, 0, true, false);
                     SetNextWaypoint(34, false);
                     SetEscortPaused(false);
                     me->RemoveAura(58506);
@@ -573,7 +571,7 @@ public:
                                 if (speed < tooFarAwaySpeed)
                                     speed = tooFarAwaySpeed;
 
-                                darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), FORCED_MOVEMENT_NONE, speed);
+                                darkMatterTarget->MonsterMoveWithSpeed(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), speed);
 
                                 if (darkMatterTarget->GetDistance(plr) < 15.0f)
                                 {

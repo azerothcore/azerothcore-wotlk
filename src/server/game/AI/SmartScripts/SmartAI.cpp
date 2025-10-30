@@ -43,6 +43,9 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     mCanRepeatPath = false;
 
+    // spawn in run mode
+    // Xinef: spawn in run mode and set mRun to run... this overrides SetWalk EVERYWHERE
+    mRun = true;
     mEvadeDisabled = false;
 
     mCanAutoAttack = true;
@@ -187,7 +190,7 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
     }
 }
 
-void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat, Unit* invoker)
+void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
 {
     if (HasEscortState(SMART_ESCORT_ESCORTING))
         StopPath();
@@ -205,6 +208,7 @@ void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat,
     {
         AddEscortState(SMART_ESCORT_ESCORTING);
         mCanRepeatPath = repeat;
+        SetRun(run);
 
         if (invoker && invoker->IsPlayer())
         {
@@ -215,7 +219,7 @@ void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat,
         Movement::PointsArray pathPoints;
         GenerateWayPointArray(&pathPoints);
 
-        me->GetMotionMaster()->MoveSplinePath(&pathPoints, forcedMovement);
+        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
         GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_START, nullptr, wp->id, GetScript()->GetPathId());
     }
 }
@@ -252,6 +256,7 @@ void SmartAI::PausePath(uint32 delay, bool forced)
     if (forced && !mWPReached)
     {
         mForcedPaused = forced;
+        SetRun(mRun);
         if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == ESCORT_MOTION_TYPE)
             me->GetMotionMaster()->MovementExpired();
 
@@ -357,7 +362,7 @@ void SmartAI::EndPath(bool fail)
     if (mCanRepeatPath)
     {
         if (IsAIControlled())
-            StartPath(FORCED_MOVEMENT_NONE, GetScript()->GetPathId(), true);
+            StartPath(mRun, GetScript()->GetPathId(), true);
     }
     else
         GetScript()->SetPathId(0);
@@ -368,6 +373,8 @@ void SmartAI::EndPath(bool fail)
 
 void SmartAI::ResumePath()
 {
+    SetRun(mRun);
+
     if (mLastWP)
     {
         Movement::PointsArray pathPoints;
@@ -382,9 +389,10 @@ void SmartAI::ReturnToLastOOCPos()
     if (!IsAIControlled())
         return;
 
+    me->SetWalk(false);
     float x, y, z, o;
     me->GetHomePosition(x, y, z, o);
-    me->GetMotionMaster()->MovePoint(SMART_ESCORT_LAST_OOC_POINT, x, y, z, FORCED_MOVEMENT_RUN);
+    me->GetMotionMaster()->MovePoint(SMART_ESCORT_LAST_OOC_POINT, x, y, z);
 }
 
 void SmartAI::UpdatePath(const uint32 diff)
@@ -461,6 +469,7 @@ void SmartAI::UpdatePath(const uint32 diff)
             EndPath();
         else if (GetNextWayPoint())
         {
+            SetRun(mRun);
             // xinef: if we have reached waypoint, and there is no working spline movement it means our splitted array has ended, make new one
             if (me->movespline->Finalized())
                 ResumePath();
@@ -620,6 +629,7 @@ void SmartAI::MovepointReached(uint32 id)
             EndPath();
         else if (GetNextWayPoint())
         {
+            SetRun(mRun);
             // xinef: if we have reached waypoint, and there is no working spline movement it means our splitted array has ended, make new one
             if (me->movespline->Finalized())
                 ResumePath();
@@ -665,6 +675,7 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 
     GetScript()->ProcessEventsFor(SMART_EVENT_EVADE); //must be after aura clear so we can cast spells from db
 
+    SetRun(mRun);
     if (HasEscortState(SMART_ESCORT_ESCORTING))
     {
         AddEscortState(SMART_ESCORT_RETURNING);
@@ -839,6 +850,7 @@ void SmartAI::AttackStart(Unit* who)
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
+            SetRun(mRun);
             MovementGeneratorType type = me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE);
             if (type == ESCORT_MOTION_TYPE || type == POINT_MOTION_TYPE)
             {
@@ -940,7 +952,9 @@ void SmartAI::OnCharmed(bool /* apply */)
     if (!charmed && !me->IsInEvadeMode())
     {
         if (mCanRepeatPath)
-            StartPath(FORCED_MOVEMENT_NONE, GetScript()->GetPathId(), true);
+            StartPath(mRun, GetScript()->GetPathId(), true);
+        else
+            me->SetWalk(!mRun);
 
         if (Unit* charmer = me->GetCharmer())
             AttackStart(charmer);
@@ -986,6 +1000,12 @@ void SmartAI::SetGUID(ObjectGuid const& /*guid*/, int32 /*id*/)
 ObjectGuid SmartAI::GetGUID(int32 /*id*/) const
 {
     return ObjectGuid::Empty;
+}
+
+void SmartAI::SetRun(bool run)
+{
+    me->SetWalk(!run);
+    mRun = run;
 }
 
 void SmartAI::SetFly(bool fly)
@@ -1088,6 +1108,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
     mFollowArrivedEntry = end;
     mFollowArrivedAlive = !aliveState; // negate - 0 is alive
     mFollowCreditType = creditType;
+    SetRun(mRun);
     me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle);
 }
 

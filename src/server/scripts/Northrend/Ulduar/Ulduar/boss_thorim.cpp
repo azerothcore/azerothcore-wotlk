@@ -934,8 +934,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            me->SetWalk(false);
-            Start(false);
+            Start(false, true);
         }
 
         uint32 Timer;
@@ -1021,8 +1020,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            me->SetWalk(false);
-            Start(false);
+            Start(false, true);
             SetDespawnAtEnd(false);
         }
 

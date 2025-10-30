@@ -56,6 +56,7 @@ void WaypointMovementGenerator<Creature>::DoInitialize(Creature* creature)
 void WaypointMovementGenerator<Creature>::DoFinalize(Creature* creature)
 {
     creature->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    creature->SetWalk(false);
 }
 
 void WaypointMovementGenerator<Creature>::DoReset(Creature* creature)

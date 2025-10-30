@@ -937,8 +937,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            me->SetWalk(false);
-            Start(false, ObjectGuid::Empty, nullptr, false, true);
+            Start(false, true, ObjectGuid::Empty, nullptr, false, true);
         }
 
         uint32 _checkTimer;

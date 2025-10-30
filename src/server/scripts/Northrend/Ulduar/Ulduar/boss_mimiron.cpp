@@ -601,7 +601,7 @@ public:
                         {
                             me->EnterVehicle(VX001, 4);
                             float speed = ACU->GetDistance(2737.75f, 2574.22f, 381.34f) / 2.0f;
-                            ACU->GetMotionMaster()->MovePoint(0, 2737.75f, 2574.22f, 381.34f, FORCED_MOVEMENT_NONE, speed);
+                            ACU->MonsterMoveWithSpeed(2737.75f, 2574.22f, 381.34f, speed);
                             ACU->SetPosition(2737.75f, 2574.22f, 381.34f, M_PI);
                             events.ScheduleEvent(EVENT_SAY_VX001_DEAD, 2s);
                             break;
@@ -1681,7 +1681,8 @@ public:
                         me->InterruptNonMeleeSpells(false);
                         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
 
-                        me->GetMotionMaster()->MovePoint(0, 2744.65f, 2569.46f, 381.34f);
+                        me->MonsterMoveWithSpeed(2744.65f, 2569.46f, 381.34f, me->GetDistance(2744.65f, 2569.46f, 381.34f));
+                        me->UpdatePosition(2744.65f, 2569.46f, 381.34f, M_PI, false);
 
                         if (Creature* c = GetMimiron())
                             c->AI()->SetData(0, 3);
@@ -1739,7 +1740,8 @@ public:
                         }
 
                         float speed = me->GetExactDist(x, y, 381.34f);
-                        me->GetMotionMaster()->MovePoint(0, x, y, 381.34f, FORCED_MOVEMENT_NONE, speed);
+                        me->MonsterMoveWithSpeed(x, y, 381.34f, speed);
+                        me->UpdatePosition(x, y, 381.34f, me->GetAngle(victim), false);
                         if (mc)
                         {
                             mc->AI()->SetData(0, 0);
@@ -1791,12 +1793,14 @@ public:
                 case EVENT_MAGNETIC_CORE_PULL_DOWN:
                     me->CastSpell(me, SPELL_MAGNETIC_CORE, true);
                     me->CastSpell(me, SPELL_SPINNING, true);
-                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 365.34f, FORCED_MOVEMENT_NONE, me->GetExactDist(me->GetPositionX(), me->GetPositionY(), 365.34f));
+                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 365.34f, me->GetExactDist(me->GetPositionX(), me->GetPositionY(), 365.34f));
+                    me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 365.34f, me->GetOrientation(), false);
                     events.ScheduleEvent(EVENT_MAGNETIC_CORE_FREE, 20s);
                     break;
                 case EVENT_MAGNETIC_CORE_FREE:
                     me->RemoveAura(SPELL_SPINNING);
-                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 381.34f, FORCED_MOVEMENT_NONE, me->GetDistance(me->GetPositionX(), me->GetPositionY(), 381.34f));
+                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 381.34f, me->GetDistance(me->GetPositionX(), me->GetPositionY(), 381.34f));
+                    me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), 381.34f, me->GetOrientation(), false);
                     events.ScheduleEvent(EVENT_MAGNETIC_CORE_REMOVE_IMMOBILIZE, 1s);
                     break;
                 case EVENT_MAGNETIC_CORE_REMOVE_IMMOBILIZE:
@@ -1956,7 +1960,7 @@ public:
 
         void SetData(uint32  /*id*/, uint32  /*value*/) override
         {
-            me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, FORCED_MOVEMENT_NONE, 0.f, false, true);
+            me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 100.0f, false, true);
         }
 
         void UpdateAI(uint32  /*diff*/) override

@@ -381,7 +381,8 @@ public:
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     TurnGates(true, false);
-                    me->GetMotionMaster()->MovePoint(0, homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
+                    me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
+                    me->UpdatePosition(homePos);
                     _speakTimer = 60000;
                 }
                 else if (_speakTimer > 63500)
@@ -1089,7 +1090,7 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
-            Start(false, ObjectGuid::Empty, nullptr, false, true);
+            Start(false, false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
                 aur->SetMaxDuration(-1);

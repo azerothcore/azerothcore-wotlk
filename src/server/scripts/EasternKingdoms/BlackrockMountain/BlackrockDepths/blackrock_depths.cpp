@@ -359,7 +359,7 @@ public:
                         case 0:
                             Talk(SAY_TEXT5);
                             HandleGameObject(DATA_ARENA4, false);
-                            Start(false);
+                            Start(false, false);
                             eventTimer = 0;
                             break;
                         case 1:
@@ -604,7 +604,7 @@ public:
                 creature->CastSpell(creature, SPELL_DRUNKEN_RAGE, false);
 
                 if (npc_escortAI* escortAI = CAST_AI(npc_rocknot::npc_rocknotAI, creature->AI()))
-                    escortAI->Start(false);
+                    escortAI->Start(false, false);
             }
         }
 

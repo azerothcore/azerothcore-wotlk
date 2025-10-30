@@ -566,8 +566,7 @@ public:
                     me->SummonCreature(NPC_DURNHOLDE_MAGE, 2108.4856f, 189.93457f, 66.30494f, 2.6878f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     break;
                 case EVENT_START_WP:
-                    me->SetWalk(false);
-                    Start(true);
+                    Start(true, true);
                     SetDespawnAtEnd(false);
                     break;
                 case EVENT_SET_FACING:
@@ -810,7 +809,7 @@ public:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                     {
                         epoch->SetImmuneToAll(false);
-                        epoch->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false, true);
+                        epoch->GetMotionMaster()->MovePoint(0, *me, false, true);
                     }
                     break;
                 case EVENT_THRALL_FACE_TARETHA:
@@ -923,8 +922,7 @@ public:
 
         void ReorderInstance(uint32 data)
         {
-            me->SetWalk(false);
-            Start(true);
+            Start(true, true);
             SetEscortPaused(true);
             SetDespawnAtEnd(false);
 
@@ -1010,8 +1008,7 @@ public:
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveAllAuras();
-            me->SetWalk(false);
-            Start(false);
+            Start(false, true);
         }
 
         void WaypointReached(uint32 waypointId) override

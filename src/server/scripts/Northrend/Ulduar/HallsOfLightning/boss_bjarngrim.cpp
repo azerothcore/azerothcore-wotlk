@@ -128,7 +128,7 @@ struct boss_bjarngrim : public npc_escortAI
         AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0);
         AddWaypoint(14, 1262, -26.9f, 33.5f, 0);
 
-        Start(true, ObjectGuid::Empty, nullptr, false, true);
+        Start(true, false, ObjectGuid::Empty, nullptr, false, true);
     }
 
     void Reset() override

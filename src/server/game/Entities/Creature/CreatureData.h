@@ -99,18 +99,18 @@ enum class CreatureFlightMovementType : uint8
 
 enum class CreatureChaseMovementType : uint8
 {
-    Run         = 0,
-    CanWalk     = 1,
-    AlwaysWalk  = 2,
+    Run,
+    CanWalk,
+    AlwaysWalk,
 
     Max
 };
 
 enum class CreatureRandomMovementType : uint8
 {
-    Walk        = 0,
-    CanRun      = 1,
-    AlwaysRun   = 2,
+    Walk,
+    CanRun,
+    AlwaysRun,
 
     Max
 };
