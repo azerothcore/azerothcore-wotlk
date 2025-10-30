@@ -49,8 +49,7 @@ enum BjarngrimSpells
 
     // STORMFORGED LIEUTENANT
     SPELL_ARC_WELD                      = 59085,
-    SPELL_RENEW_STEEL_N                 = 52774,
-    SPELL_RENEW_STEEL_H                 = 59160,
+    SPELL_RENEW_STEEL                   = 52774,
 };
 
 enum BjarngrimOther
@@ -395,7 +394,7 @@ struct npc_stormforged_lieutenant : public ScriptedAI
             case EVENT_RENEW_STEEL:
                 if (Creature* bjarngrim = ObjectAccessor::GetCreature(*me, BjarngrimGUID))
                     if (bjarngrim->IsAlive())
-                        me->CastSpell(bjarngrim, me->GetMap()->IsHeroic() ? SPELL_RENEW_STEEL_H : SPELL_RENEW_STEEL_N, true);
+                        me->CastSpell(bjarngrim, SPELL_RENEW_STEEL, true);
 
                 events.Repeat(10s, 14s);
                 break;
