@@ -130,8 +130,6 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
 
     if (m_isArrivalDone)
     {
-        // Xinef: not true... update this at every waypoint!
-        //if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
         {
             auto currentNodeItr = i_path->find(i_currentNode);
             float x = currentNodeItr->second.x;
@@ -157,7 +155,8 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         }
 
         // Xinef: moved the upper IF here
-        if ((i_currentNode == i_path->size() - 1) && !repeating) // If that's our last waypoint
+        uint32 lastPoint = i_path->rbegin()->first;
+        if ((i_currentNode == lastPoint) && !repeating) // If that's our last waypoint
         {
             creature->AI()->PathEndReached(path_id);
             creature->GetMotionMaster()->Initialize();
@@ -165,7 +164,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
         }
 
         ++i_currentNode;
-        if (i_path->rbegin()->first < i_currentNode)
+        if (lastPoint < i_currentNode)
             i_currentNode = i_path->begin()->first;
     }
 
@@ -260,13 +259,7 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
     }
     else
     {
-        bool finished = creature->movespline->Finalized();
-        // xinef: code to detect pre-empetively if we should start movement to next waypoint
-        // xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
-        //if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
-        //    finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx() + 1) - creature->movespline->timePassed()) < 200;
-
-        if (finished)
+        if (creature->movespline->Finalized())
         {
             OnArrived(creature);
             return StartMove(creature);
