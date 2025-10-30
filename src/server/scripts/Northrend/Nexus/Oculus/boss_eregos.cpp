@@ -22,10 +22,8 @@
 
 enum Spells
 {
-    SPELL_ARCANE_BARRAGE_N                      = 50804,
-    SPELL_ARCANE_BARRAGE_H                      = 59381,
-    SPELL_ARCANE_VOLLEY_N                       = 51153,
-    SPELL_ARCANE_VOLLEY_H                       = 59382,
+    SPELL_ARCANE_BARRAGE                        = 50804,
+    SPELL_ARCANE_VOLLEY                         = 51153,
     SPELL_ENRAGED_ASSAULT                       = 51170,
     SPELL_PLANAR_ANOMALIES                      = 57959,
     SPELL_PLANAR_SHIFT                          = 51162,
@@ -37,9 +35,6 @@ enum Spells
 
     SPELL_DRAKE_STOP_TIME                       = 49838,
 };
-
-#define SPELL_ARCANE_BARRAGE                    DUNGEON_MODE(SPELL_ARCANE_BARRAGE_N, SPELL_ARCANE_BARRAGE_H)
-#define SPELL_ARCANE_VOLLEY                     DUNGEON_MODE(SPELL_ARCANE_VOLLEY_N, SPELL_ARCANE_VOLLEY_H)
 
 enum VarosNPCs
 {

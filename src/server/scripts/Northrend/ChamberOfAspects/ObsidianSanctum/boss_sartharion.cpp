@@ -130,9 +130,9 @@ enum Misc
     ACTION_DRAKE_DIED                           = 3,
 
     // Movement points
-    POINT_FINAL_TENEBRON                        = 8,
-    POINT_FINAL_SHADRON                         = 4,
-    POINT_FINAL_VESPERON                        = 4,
+    POINT_FINAL_TENEBRON                        = 9,
+    POINT_FINAL_SHADRON                         = 5,
+    POINT_FINAL_VESPERON                        = 5,
 
     // Lava directions. Its used to identify to which side lava was moving by last time
     LAVA_LEFT_SIDE                              = 0,
