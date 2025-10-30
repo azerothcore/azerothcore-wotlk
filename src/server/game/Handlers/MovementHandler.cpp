@@ -105,6 +105,13 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->UpdatePositionData();
 
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
+
+    if (GetPlayer()->GetPendingFlightChange() <= GetPlayer()->GetMapChangeOrderCounter())
+    {
+        if (!GetPlayer()->HasIncreaseMountedFlightSpeedAura() && !GetPlayer()->HasFlyAura())
+            GetPlayer()->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
+    }
+
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
         LOG_ERROR("network.opcode", "WORLD: failed to teleport player {} ({}) to map {} because of unknown reason!",
@@ -679,6 +686,10 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
         return;
     }
 
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
+
     if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
     {
         recvData.rfinish();                     // prevent warnings spam
@@ -990,6 +1001,10 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         if (mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT))
             return;
     }
+
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
 
     if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
         return;

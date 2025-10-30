@@ -56,7 +56,7 @@ enum Events
 enum Misc
 {
     WEAPON_KIRTONOS_STAFF             = 11365,
-    POINT_KIRTONOS_LAND               = 13,
+    POINT_KIRTONOS_LAND               = 14,
     KIRTONOS_PATH                     = 105061,
 
     EMOTE_SUMMONED                    = 0

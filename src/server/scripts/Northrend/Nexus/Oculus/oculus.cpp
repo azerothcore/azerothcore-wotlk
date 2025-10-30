@@ -38,7 +38,6 @@ enum Drakes
 
     // Centrifuge Constructs
     SPELL_EMPOWERING_BLOWS                  = 50044,
-    H_SPELL_EMPOWERING_BLOWS                = 59213,
 
     SPELL_AMBER_SHOCK_CHARGE                = 49836,
     SPELL_RUBY_EVASIVE_CHARGES              = 50241,
@@ -490,7 +489,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
+            DoCast(SPELL_EMPOWERING_BLOWS);
         }
 
         void UpdateAI(uint32 /*diff*/) override

@@ -21,13 +21,10 @@
 
 enum spells
 {
-    PARTING_SORROW          = 59723,
-    PILLAR_OF_WOE           = 50761,
-    PILLAR_OF_WOE_H         = 59727,
-    SHOCK_OF_SORROW         = 50760,
-    SHOCK_OF_SORROW_H       = 59726,
-    STORM_OF_GRIEF          = 50752,
-    STORM_OF_GRIEF_H        = 59772,
+    SPELL_PARTING_SORROW    = 59723,
+    SPELL_PILLAR_OF_WOE     = 50761,
+    SPELL_SHOCK_OF_SORROW   = 50760,
+    SPELL_STORM_OF_GRIEF    = 50752,
 
     ACHIEVEMENT_GOOD_GRIEF  = 20383,
 };
@@ -107,13 +104,13 @@ public:
             {
                 case EVENT_STORM:
                     {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
+                        me->CastSpell(me->GetVictim(), SPELL_STORM_OF_GRIEF, true);
                         events.Repeat(10s);
                         break;
                     }
                 case EVENT_SHOCK:
                     {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
+                        me->CastSpell(me->GetVictim(), SPELL_SHOCK_OF_SORROW, false);
                         Talk(SAY_STUN);
 
                         events.Repeat(16s, 22s);
@@ -122,7 +119,7 @@ public:
                 case EVENT_PILLAR:
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
+                            me->CastSpell(target, SPELL_PILLAR_OF_WOE, false);
 
                         events.Repeat(12s, 20s);
                         break;
@@ -130,7 +127,7 @@ public:
                 case EVENT_PARTING:
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, PARTING_SORROW, false);
+                            me->CastSpell(target, SPELL_PARTING_SORROW, false);
 
                         events.Repeat(6s, 16s);
                         break;

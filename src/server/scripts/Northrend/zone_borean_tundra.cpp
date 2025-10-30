@@ -1652,7 +1652,7 @@ public:
 
         void MovementInform(uint32 type, uint32 param) override
         {
-            if (type == WAYPOINT_MOTION_TYPE && param == 2)
+            if (type == WAYPOINT_MOTION_TYPE && param == 3)
             {
                 me->SetWalk(false);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
@@ -2024,7 +2024,7 @@ public:
 
         void MovementInform(uint32 type, uint32 param) override
         {
-            if (type == WAYPOINT_MOTION_TYPE && param == 2)
+            if (type == WAYPOINT_MOTION_TYPE && param == 3)
             {
                 if (me->IsSummon())
                 {

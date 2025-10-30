@@ -486,7 +486,7 @@ struct npc_harrison_jones : public ScriptedAI
     void MovementInform(uint32 type, uint32 id) override
     {
         // at gong
-        if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GONG)
+        if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GONG)
         {
             if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                 me->SetFacingToObject(gong);
@@ -503,13 +503,13 @@ struct npc_harrison_jones : public ScriptedAI
             });
         }
         // to the massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 1 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetEntry(NPC_HARRISON_JONES_1);
             Talk(SAY_HARRISON_2);
         }
         // at massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             Talk(SAY_HARRISON_3);
@@ -599,7 +599,7 @@ struct npc_amanishi_lookout : public NullCreatureAI
     void MovementInform(uint32 type, uint32 id) override
     {
         // at boss
-        if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
+        if (type == WAYPOINT_MOTION_TYPE && id == 9) // should despawn with waypoint script
             me->DespawnOrUnsummon(0s, 0s);
     }
 private:
