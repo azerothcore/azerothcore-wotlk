@@ -157,7 +157,7 @@ struct boss_felmyst : public BossAI
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->SendMovementFlagUpdate();
-            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
+            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
         }
     }
 
@@ -363,7 +363,7 @@ struct boss_felmyst : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetImmuneToPC(false);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
             }, 8500ms);
         });
     }

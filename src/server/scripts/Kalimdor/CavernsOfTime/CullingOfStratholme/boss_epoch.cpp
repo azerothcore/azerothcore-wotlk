@@ -18,17 +18,16 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "culling_of_stratholme.h"
 
 enum Spells
 {
     SPELL_CURSE_OF_EXERTION                     = 52772,
-    SPELL_WOUNDING_STRIKE_N                     = 52771,
-    SPELL_WOUNDING_STRIKE_H                     = 58830,
+    SPELL_WOUNDING_STRIKE                       = 52771,
     SPELL_TIME_STOP                             = 58848,
     SPELL_TIME_WARP                             = 52766,
-    SPELL_TIME_STEP_N                           = 52737,
-    SPELL_TIME_STEP_H                           = 58829,
+    SPELL_TIME_STEP                             = 52737,
 };
 
 enum Events
@@ -87,7 +86,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == SPELL_TIME_STEP_H || spellInfo->Id == SPELL_TIME_STEP_N)
+            if (spellInfo->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_TIME_STEP, me))
             {
                 if (target == me)
                     return;
@@ -98,7 +97,7 @@ public:
                     return;
                 }
                 warps++;
-                me->CastSpell(target, DUNGEON_MODE(SPELL_TIME_STEP_N, SPELL_TIME_STEP_H), true);
+                me->CastSpell(target, SPELL_TIME_STEP, true);
             }
         }
 
@@ -119,7 +118,7 @@ public:
                     events.Repeat(9s);
                     break;
                 case EVENT_SPELL_WOUNDING_STRIKE:
-                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_WOUNDING_STRIKE_N, SPELL_WOUNDING_STRIKE_H), false);
+                    me->CastSpell(me->GetVictim(), SPELL_WOUNDING_STRIKE, false);
                     events.Repeat(6s);
                     break;
                 case EVENT_SPELL_TIME_STOP:
@@ -130,7 +129,7 @@ public:
                     Talk(SAY_TIME_WARP);
                     me->CastSpell(me, SPELL_TIME_WARP, false);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_TIME_STEP_N, SPELL_TIME_STEP_H), true);
+                        me->CastSpell(target, SPELL_TIME_STEP, true);
 
                     events.Repeat(25s);
                     break;
