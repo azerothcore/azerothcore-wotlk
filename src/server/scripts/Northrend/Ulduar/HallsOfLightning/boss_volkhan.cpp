@@ -224,6 +224,8 @@ struct boss_volkhan : public BossAI
             me->SetReactState(REACT_AGGRESSIVE);
             if (me->GetVictim())
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
+
+            events.RescheduleEvent(EVENT_HEAT, randtime(9s, 24s));
         }
     }
 
@@ -243,7 +245,6 @@ struct boss_volkhan : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
         if (!UpdateVictim())
             return;
 
@@ -257,18 +258,15 @@ struct boss_volkhan : public BossAI
             case EVENT_HEAT:
                 if (HasActiveGolem())
                 {
-                    me->CastSpell(me, SPELL_HEAT, true);
+                    DoCastSelf(SPELL_HEAT);
                     events.Repeat(randtime(9s, 24s));
                 }
-                else
-                    events.Repeat(1s);
-                events.Repeat(8s);
                 break;
             case EVENT_CHECK_HEALTH:
                 if (!shatteredStompCast && HealthBelowPct(25))
                 {
                     shatteredStompCast = true;
-                    DoCastAOE(DUNGEON_MODE(SPELL_SHATTERING_STOMP_N, SPELL_SHATTERING_STOMP_H));
+                    DoCastAOE(SPELL_SHATTERING_STOMP);
                     Talk(SAY_STOMP);
                     summons.DoAction(ACTION_SHATTER);
                 }
@@ -366,17 +364,13 @@ struct npc_molten_golem : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_IMMOLATION_STRIKE:
-            {
-                uint32 spellId = DUNGEON_MODE(SPELL_IMMOLATION_STRIKE_N, SPELL_IMMOLATION_STRIKE_H);
-                if (SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true, true, -spellId))
+                if (SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true, true, -SPELL_IMMOLATION_STRIKE))
                 {
-                    DoCastVictim(spellId);
+                    DoCastVictim(SPELL_IMMOLATION_STRIKE);
                 }
                 events.Repeat(5s);
                 break;
-            }
             case EVENT_CHANGE_TARGET:
-            {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                 {
                     me->GetThreatMgr().ResetAllThreat();
@@ -384,12 +378,10 @@ struct npc_molten_golem : public ScriptedAI
                     AttackStart(target);
                 }
                 break;
-            }
             case EVENT_IMMOLATION:
-                me->CastSpell(me->GetVictim(), SPELL_IMMOLATION_STRIKE, false);
+                DoCastVictim(SPELL_IMMOLATION_STRIKE);
                 events.Repeat(5s);
                 break;
-            }
         }
 
         DoMeleeAttackIfReady();
