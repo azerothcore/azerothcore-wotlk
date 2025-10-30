@@ -65,7 +65,6 @@ public:
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
                 creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE);
-                creature->SetWalk(true);
                 EscortAI->Start(true, player->GetGUID(), quest);
                 creature->AI()->Talk(SAY_MAG_START);
 
@@ -134,7 +133,7 @@ public:
                     if (Player* player = GetPlayerForEscort())
                         player->GroupEventHappens(QUEST_TOTEM_KARDASH_H, me);
 
-                    me->SetWalk(false);
+                    SetRun(true);
                     break;
             }
         }
@@ -307,7 +306,6 @@ public:
         void SetGUID(ObjectGuid const& guid, int32  /*questId*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetWalk(true);
             Start(true, guid);
             Talk(SAY_KUR_START);
 
@@ -363,7 +361,7 @@ public:
                         if (Player* player = GetPlayerForEscort())
                             player->GroupEventHappens(QUEST_TOTEM_KARDASH_A, me);
 
-                        me->SetWalk(false);
+                        SetRun(true);
                         break;
                     }
             }

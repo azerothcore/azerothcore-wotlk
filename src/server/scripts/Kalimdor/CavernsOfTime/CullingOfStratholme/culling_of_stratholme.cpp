@@ -424,7 +424,7 @@ public:
             {
                 Talk(SAY_PHASE201);
                 actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2, 12s);
-                me->SetWalk(true);
+                SetRun(false);
                 eventInRun = true;
 
                 me->SummonCreature(NPC_CITY_MAN, EventPos[EVENT_SRC_TOWN_CITYMAN1]);
@@ -434,14 +434,14 @@ public:
             {
                 waveGroupId = 10;
                 eventInRun = true;
-                me->SetWalk(false);
+                SetRun(true);
                 actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2 + 9, 10s);
             }
             else if (param == ACTION_START_TOWN_HALL)
             {
                 Talk(SAY_PHASE301);
                 SetEscortPaused(false);
-                me->SetWalk(true);
+                SetRun(false);
 
                 if (Creature* cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1]))
                 {
@@ -460,13 +460,13 @@ public:
             {
                 Talk(SAY_PHASE401);
                 SetEscortPaused(false);
-                me->SetWalk(true);
+                SetRun(false);
             }
             else if (param == ACTION_START_LAST_CITY)
             {
                 Talk(SAY_PHASE404);
                 SetEscortPaused(false);
-                me->SetWalk(false);
+                SetRun(true);
             }
             else if (param == ACTION_START_MALGANIS)
             {
@@ -480,7 +480,7 @@ public:
                 }
                 Talk(SAY_PHASE501);
                 SetEscortPaused(false);
-                me->SetWalk(false);
+                SetRun(true);
             }
             else if (param == ACTION_KILLED_MALGANIS)
             {
@@ -533,7 +533,7 @@ public:
                     break;
                 // After intro, in front of bridge
                 case 3:
-                    me->SetWalk(false);
+                    SetRun(true);
                     Talk(SAY_PHASE118);
                     summons.DespawnAll(); // uther, jaina and horses
                     break;
@@ -574,7 +574,7 @@ public:
                     if (pInstance)
                         pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_REACHED_TOWN_HALL);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    me->SetWalk(true);
+                    SetRun(false);
                     SetEscortPaused(true);
                     break;
                 // Inside Town Hall first scene pos
@@ -600,7 +600,7 @@ public:
                     break;
                 // Town Hall, upper floor third fight
                 case 31:
-                    me->SetWalk(true);
+                    SetRun(false);
                     SpawnTimeRift();
                     SpawnTimeRift();
                     Talk(SAY_PHASE312);
@@ -616,14 +616,14 @@ public:
                     break;
                 // Reached book shelf
                 case 36:
-                    me->SetWalk(false);
+                    SetRun(true);
                     if (pInstance)
                         if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_SHKAF_GATE)))
                             pGate->SetGoState(GO_STATE_ACTIVE);
                     break;
                 // Behind secred passage
                 case 45:
-                    me->SetWalk(false);
+                    SetRun(true);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     if (pInstance)
@@ -631,11 +631,11 @@ public:
                     break;
                 // Some walk talk
                 case 47:
-                    me->SetWalk(true);
+                    SetRun(false);
                     Talk(SAY_PHASE405);
                     break;
                 case 48:
-                    me->SetWalk(false);
+                    SetRun(true);
                     Talk(SAY_PHASE406);
                     break;
                 case 53:
@@ -674,7 +674,7 @@ public:
                 switch (uint32 currentEvent = actionEvents.ExecuteEvent())
                 {
                     case EVENT_ACTION_PHASE1:
-                        me->SetWalk(true);
+                        SetRun(false);
                         me->SummonCreature(NPC_JAINA, EventPos[EVENT_SRC_JAINA], TEMPSUMMON_DEAD_DESPAWN, 180000);
                         if (Creature* uther = me->SummonCreature(NPC_UTHER, EventPos[EVENT_SRC_UTHER], TEMPSUMMON_DEAD_DESPAWN, 180000))
                         {
@@ -690,7 +690,6 @@ public:
                         break;
                     case EVENT_ACTION_PHASE1+1:
                         // Start Event
-                        me->SetWalk(true);
                         Start(true);
                         SetDespawnAtEnd(false);
                         SetDespawnAtFar(false);
@@ -959,7 +958,7 @@ public:
                         break;
                     // After waypoint 23
                     case EVENT_ACTION_PHASE3+3:
-                        me->SetWalk(false);
+                        SetRun(true);
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                             me->CastSpell(cr, SPELL_ARTHAS_CRUSADER_STRIKE, true);
                         ScheduleNextEvent(currentEvent, 2s);

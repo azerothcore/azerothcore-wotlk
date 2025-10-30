@@ -715,7 +715,6 @@ public:
                 Talk(0);
                 events.Reset();
                 summons.DespawnAll();
-                me->SetWalk(true);
                 Start(false);
 
                 int8 i = -1;

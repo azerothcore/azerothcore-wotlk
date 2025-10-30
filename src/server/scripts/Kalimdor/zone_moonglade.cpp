@@ -384,7 +384,6 @@ public:
                     AddWaypoint(i, Clintar_spirit_WP[i][0], Clintar_spirit_WP[i][1], Clintar_spirit_WP[i][2], (uint32)Clintar_spirit_WP[i][4]);
                 }
                 PlayerGUID = player->GetGUID();
-                me->SetWalk(true);
                 Start(true, PlayerGUID);
             }
             return;

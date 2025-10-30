@@ -372,6 +372,7 @@ struct violet_hold_trashAI : public npc_escortAI
                     break;
             }
             SetDespawnAtEnd(false);
+            me->SetWalk(false);
             Start(true);
         }
 
@@ -1111,6 +1112,7 @@ public:
                         break;
                 }
                 SetDespawnAtEnd(false);
+                me->SetWalk(false);
                 Start(true);
             }
 

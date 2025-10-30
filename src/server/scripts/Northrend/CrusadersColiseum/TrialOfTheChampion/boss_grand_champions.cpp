@@ -549,6 +549,7 @@ public:
                     return;
             }
 
+            me->SetWalk(false);
             Start(false);
         }
 

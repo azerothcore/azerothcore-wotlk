@@ -934,6 +934,7 @@ public:
         {
             InitWaypoint();
             Reset();
+            me->SetWalk(false);
             Start(false);
         }
 
@@ -1020,6 +1021,7 @@ public:
         {
             InitWaypoint();
             Reset();
+            me->SetWalk(false);
             Start(false);
             SetDespawnAtEnd(false);
         }

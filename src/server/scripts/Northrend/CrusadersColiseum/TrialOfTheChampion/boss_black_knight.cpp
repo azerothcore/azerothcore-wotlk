@@ -339,6 +339,7 @@ public:
 
         void Reset() override
         {
+            me->SetWalk(false);
             Start(false, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
