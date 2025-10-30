@@ -141,7 +141,6 @@ enum Spells
     SPELL_SOUL_REAPER                   = 69409, // instant
     SPELL_SOUL_REAPER_BUFF              = 69410,
     SPELL_SUMMON_VALKYR                 = 69037, // instant
-    SPELL_SUMMON_VALKYR_PERIODIC        = 74361,
     SPELL_WINGS_OF_THE_DAMNED           = 74352,
     SPELL_VALKYR_TARGET_SEARCH          = 69030,
     SPELL_HARVEST_SOUL_VALKYR           = 68985, // vehicle aura used by Val'kyr Shadowguard and Strangulate Vehicle
@@ -187,14 +186,6 @@ enum Spells
     SPELL_ENRAGE                        = 72143,
     SPELL_FRENZY                        = 28747,
 };
-
-#define NECROTIC_PLAGUE_LK   RAID_MODE<uint32>(70337, 73912, 73913, 73914)
-#define NECROTIC_PLAGUE_PLR  RAID_MODE<uint32>(70338, 73785, 73786, 73787)
-#define REMORSELESS_WINTER_1 RAID_MODE<uint32>(68981, 74270, 74271, 74272)
-#define REMORSELESS_WINTER_2 RAID_MODE<uint32>(72259, 74273, 74274, 74275)
-#define SUMMON_VALKYR        RAID_MODE<uint32>(69037, 74361, 69037, 74361)
-//#define HARVEST_SOUL         RAID_MODE<uint32>(68980, 74325, 74296, 74297)
-#define HARVESTED_SOUL_BUFF  RAID_MODE<uint32>(72679, 74318, 74319, 74320)
 
 enum Events
 {
@@ -915,7 +906,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
-            if (spell->Id == HARVESTED_SOUL_BUFF && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
+            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_HARVESTED_SOUL_LK_BUFF, me) && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
             {
                 _lastTalkTimeBuff = GameTime::GetGameTime().count();
                 Talk(SAY_LK_FROSTMOURNE_KILL);
@@ -924,7 +915,7 @@ public:
 
         void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
         {
-            if (spell->Id == REMORSELESS_WINTER_1 || spell->Id == REMORSELESS_WINTER_2)
+            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_REMORSELESS_WINTER_1, me) || spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_REMORSELESS_WINTER_2, me))
             {
                 me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SNOWSTORM, 5s);
                 me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_LIGHT_SNOW, 0.5f);
@@ -1064,7 +1055,7 @@ public:
                     events.ScheduleEvent(EVENT_INFEST, 22s + 500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_NECROTIC_PLAGUE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NecroticPlagueTargetCheck(me, NECROTIC_PLAGUE_LK, NECROTIC_PLAGUE_PLR)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NecroticPlagueTargetCheck(me, sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, me), sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE_JUMP, me))))
                     {
                         Talk(EMOTE_NECROTIC_PLAGUE_WARNING, target);
                         me->CastSpell(target, SPELL_NECROTIC_PLAGUE, false);
@@ -1145,7 +1136,7 @@ public:
                     {
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                         Talk(SAY_LK_SUMMON_VALKYR);
-                        me->CastSpell((Unit*)nullptr, SUMMON_VALKYR, false);
+                        me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VALKYR, false);
                         events.ScheduleEvent(EVENT_SUMMON_VALKYR, 45s, EVENT_GROUP_ABILITIES);
 
                         // schedule a defile (or reschedule it) if next defile event
@@ -2352,8 +2343,7 @@ class spell_the_lich_king_defile : public SpellScript
     {
         targets.remove_if(VehicleCheck());
         targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
-        uint32 strangulatedAura[4] = {68980, 74325, 74296, 74297};
-        targets.remove_if(Acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
+        targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_HARVEST_SOUL, GetCaster())));
     }
 
     void ChangeDamageAndGrow()

@@ -72,8 +72,6 @@ enum Spells
     SPELL_AWAKEN_PLAGUED_ZOMBIES            = 71159,
 };
 
-#define MUTATED_INFECTION RAID_MODE<int32>(69674, 71224, 73022, 73023)
-
 enum Events
 {
     EVENT_NONE,
@@ -193,7 +191,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            instance->DoRemoveAurasDueToSpellOnPlayers(MUTATED_INFECTION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(sSpellMgr->GetSpellIdForDifficulty(SPELL_MUTATED_INFECTION, me));
             _JustDied();
             Talk(SAY_DEATH);
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))

@@ -57,10 +57,6 @@ enum Spells
     SPELL_PLAGUE_STENCH         = 71805,
 };
 
-// Used for HasAura checks
-#define PUNGENT_BLIGHT_HELPER RAID_MODE<uint32>(69195, 71219, 73031, 73032)
-#define INOCULATED_HELPER     RAID_MODE<uint32>(69291, 72101, 72102, 72103)
-
 uint32 const gaseousBlight[3]        = {69157, 69162, 69164};
 uint32 const gaseousBlightVisual[3]  = {69126, 69152, 69154};
 
@@ -170,8 +166,8 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (spell->Id == PUNGENT_BLIGHT_HELPER)
-                target->RemoveAurasDueToSpell(INOCULATED_HELPER);
+            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_PUNGENT_BLIGHT, me))
+                target->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_INOCULATED, me));
             else if (Player* p = target->ToPlayer())
             {
                 // Gaseous Blight damage

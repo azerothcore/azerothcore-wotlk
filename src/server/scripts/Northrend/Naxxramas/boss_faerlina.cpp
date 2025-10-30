@@ -37,7 +37,6 @@ enum Spells
     SPELL_RAIN_OF_FIRE                  = 28794,
     SPELL_FRENZY                        = 28798,
     SPELL_WIDOWS_EMBRACE                = 28732,
-    SPELL_MINION_WIDOWS_EMBRACE         = 54097
 };
 
 enum Groups
@@ -143,7 +142,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == RAID_MODE(SPELL_WIDOWS_EMBRACE, SPELL_MINION_WIDOWS_EMBRACE))
+            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_WIDOWS_EMBRACE, me))
             {
                 Talk(EMOTE_WIDOWS_EMBRACE);
                 scheduler.RescheduleGroup(GROUP_FRENZY, 1min);
