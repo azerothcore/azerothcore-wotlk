@@ -129,7 +129,7 @@ public:
                     {
                         Unit* target = nullptr;
                         std::list<Unit*> targetList;
-                        
+
                         SelectTargetList(targetList, 10, SelectTargetMethod::Random, 0, 50.0f, true);
                         for (Unit* possibleTarget : targetList)
                         {
@@ -139,7 +139,7 @@ public:
                                 break;
                             }
                         }
-                        
+
                         if (target)
                             me->CastSpell(target, SPELL_PARTING_SORROW, false);
 
