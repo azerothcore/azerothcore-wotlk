@@ -306,7 +306,7 @@ AC_GAME_API void ArenaSpectator::SendPacketTo(Player const* player, std::string&
 {
     WorldPacket data;
     CreatePacket(data, message);
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 template<>
