@@ -51,7 +51,7 @@ enum Belnistrasz
     EVENT_FROST_NOVA             = 6,
 
     PATH_ESCORT                  = 871710,
-    POINT_REACH_IDOL             = 17,
+    POINT_REACH_IDOL             = 18,
 
     QUEST_EXTINGUISHING_THE_IDOL = 3525,
 

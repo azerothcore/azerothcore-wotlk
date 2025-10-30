@@ -1085,9 +1085,9 @@ struct boss_headless_horseman : public ScriptedAI
     {
         if (type == WAYPOINT_MOTION_TYPE)
         {
-            if (point == 0)
+            if (point == 1)
                 me->CastSpell(me, SPELL_HEAD_VISUAL, true);
-            else if (point == 11)
+            else if (point == 12)
             {
                 me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
