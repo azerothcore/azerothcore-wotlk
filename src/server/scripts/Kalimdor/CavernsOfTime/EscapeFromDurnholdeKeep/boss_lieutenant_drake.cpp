@@ -114,10 +114,10 @@ struct boss_lieutenant_drake : public BossAI
         {
             switch (point)
             {
-                case 7:
+                case 8:
                     Talk(SAY_ENTER);
                     break;
-                case 10:
+                case 11:
                     pathId = (me->GetEntry() * 10) + 1;
                     runSecondPath = true;
                     break;

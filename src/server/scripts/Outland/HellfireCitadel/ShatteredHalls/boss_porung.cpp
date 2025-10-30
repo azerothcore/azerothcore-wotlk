@@ -43,7 +43,7 @@ enum Says
 
 enum Misc
 {
-    POINT_SCOUT_WP_END       = 3,
+    POINT_SCOUT_WP_END       = 4,
 
     SET_DATA_ARBITRARY_VALUE = 1,
     SET_DATA_ENCOUNTER_DONE  = 2
