@@ -1239,7 +1239,7 @@ bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool
         maxdist += GetObjectSize();
 
     if (incTargetRadius)
-        maxdist += obj->GetObjectSize();    
+        maxdist += obj->GetObjectSize();
 
     if (m_transport && obj->GetTransport() &&  obj->GetTransport()->GetGUID() == m_transport->GetGUID())
     {
