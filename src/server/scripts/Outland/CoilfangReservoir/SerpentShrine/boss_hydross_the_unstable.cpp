@@ -81,8 +81,8 @@ enum Misc
 
 enum WaterElementalPathIds
 {
-    PATH_CENTER                     = 6,
-    PATH_END                        = 13
+    PATH_CENTER                     = 5,
+    PATH_END                        = 12
 };
 
 struct boss_hydross_the_unstable : public BossAI

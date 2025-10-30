@@ -622,7 +622,7 @@ public:
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
 
-            if (point == 9)
+            if (point == 8) // max-1
             {
                 Talk(0);
                 me->RemoveAllAuras();

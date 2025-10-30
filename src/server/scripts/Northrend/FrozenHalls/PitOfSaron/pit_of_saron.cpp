@@ -1200,16 +1200,16 @@ public:
 
             switch (id)
             {
-                case 1:
+                case 0:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_2 : SAY_SYLVANAS_OUTRO_2);
                     break;
-                case 2:
+                case 1:
                     if (me->GetEntry() == NPC_JAINA_PART2)
                     {
                         Talk(SAY_JAINA_OUTRO_3);
                     }
                     break;
-                case 7:
+                case 6:
                     me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     if (GameObject* g = me->FindNearestGameObject(GO_HOR_PORTCULLIS, 50.0f))
                         g->SetGoState(GO_STATE_ACTIVE);

@@ -234,7 +234,7 @@ public:
             {
                 switch (id)
                 {
-                    case 6:
+                    case 5:
                         events.ScheduleEvent(EVENT_TELEPORT_1, 2s);
                         break;
                 }

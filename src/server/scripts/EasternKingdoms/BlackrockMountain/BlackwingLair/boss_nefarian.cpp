@@ -592,12 +592,12 @@ struct boss_nefarian : public BossAI
             return;
         }
 
-        if (id == 4)
+        if (id == 3)
         {
             Talk(SAY_INTRO);
         }
 
-        if (id == 6)
+        if (id == 5)
         {
             DoCastAOE(SPELL_SHADOWFLAME_INITIAL);
             Talk(SAY_SHADOWFLAME);
