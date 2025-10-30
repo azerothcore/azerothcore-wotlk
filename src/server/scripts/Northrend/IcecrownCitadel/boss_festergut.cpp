@@ -19,7 +19,10 @@
 #include "CreatureScript.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
+#include "SharedDefines.h"
 #include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
 #include "SpellAuraEffects.h"
@@ -164,19 +167,6 @@ public:
                 Talk(SAY_KILL);
         }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-        {
-            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_PUNGENT_BLIGHT, me))
-                target->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_INOCULATED, me));
-            else if (Player* p = target->ToPlayer())
-            {
-                // Gaseous Blight damage
-                if (((spell->Id == 69159 || spell->Id == 70136 || spell->Id == 69161 || spell->Id == 70139 || spell->Id == 69163 || spell->Id == 70469) && p->GetQuestStatus(QUEST_RESIDUE_RENDEZVOUS_10) == QUEST_STATUS_INCOMPLETE) ||
-                        ((spell->Id == 70135 || spell->Id == 70138 || spell->Id == 70468 || spell->Id == 70137 || spell->Id == 70140 || spell->Id == 70470) && p->GetQuestStatus(QUEST_RESIDUE_RENDEZVOUS_25) == QUEST_STATUS_INCOMPLETE))
-                    p->CastSpell(p, SPELL_ORANGE_BLIGHT_RESIDUE, true);
-            }
-        }
-
         void RemoveBlight()
         {
             if (Creature* gasDummy = ObjectAccessor::GetCreature(*me, _gasDummyGUID))
@@ -309,8 +299,15 @@ class spell_festergut_pungent_blight : public SpellScript
                 professor->AI()->DoAction(ACTION_FESTERGUT_GAS);
     }
 
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_INOCULATED, GetCaster()));
+    }
+
     void Register() override
     {
+        OnEffectHitTarget += SpellEffectFn(spell_festergut_pungent_blight::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
         OnEffectHitTarget += SpellEffectFn(spell_festergut_pungent_blight::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
@@ -371,6 +368,34 @@ class spell_festergut_gastric_bloat : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_festergut_gastric_bloat::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_festergut_gaseous_blight : public SpellScript
+{
+    PrepareSpellScript(spell_festergut_gaseous_blight);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ORANGE_BLIGHT_RESIDUE });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* p = GetHitUnit()->ToPlayer())
+        {
+            if (Map* map = GetCaster()->GetMap())
+            {
+                uint32 questId = map->Is25ManRaid() ? QUEST_RESIDUE_RENDEZVOUS_25 : QUEST_RESIDUE_RENDEZVOUS_10;
+                if (p->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+                    p->CastSpell(p, SPELL_ORANGE_BLIGHT_RESIDUE, true);    
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_festergut_gaseous_blight::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -464,6 +489,7 @@ void AddSC_boss_festergut()
     RegisterSpellScript(spell_festergut_pungent_blight);
     RegisterSpellScript(spell_festergut_blighted_spores_aura);
     RegisterSpellScript(spell_festergut_gastric_bloat);
+    RegisterSpellScript(spell_festergut_gaseous_blight);
     new achievement_flu_shot_shortage();
 
     new npc_stinky_icc();

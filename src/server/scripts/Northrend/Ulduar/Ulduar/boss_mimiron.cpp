@@ -23,6 +23,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
@@ -1873,14 +1874,6 @@ public:
         void MoveInLineOfSight(Unit* /*who*/) override {}
         bool CanAIAttack(Unit const*  /*target*/) const override { return false; }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-        {
-            if (target && spell && target->IsPlayer() && spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_MINE_EXPLOSION, me))
-                if (InstanceScript* pInstance = me->GetInstanceScript())
-                    if (Creature* c = GetMimiron())
-                        c->AI()->SetData(0, 11);
-        }
-
         // MoveInLineOfSight is checked every few yards, can't use it
         void UpdateAI(uint32 diff) override
         {
@@ -1909,6 +1902,24 @@ public:
                 timer -= diff;
         }
     };
+};
+
+class spell_ulduar_mimiron_mine_explosion : public SpellScript
+{
+    PrepareSpellScript(spell_ulduar_mimiron_mine_explosion);
+
+    void HandleDamage(SpellEffIndex /*effIndex*/)
+    {
+        if (GetHitPlayer())
+            if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
+                if (Creature* mimi = pInstance->GetCreature(TYPE_MIMIRON))
+                    mimi->AI()->SetData(0, 11);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ulduar_mimiron_mine_explosion::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
 };
 
 class npc_ulduar_mimiron_rocket : public CreatureScript
@@ -2480,6 +2491,7 @@ void AddSC_boss_mimiron()
     new npc_ulduar_bot_summon_trigger();
     RegisterSpellScript(spell_mimiron_rapid_burst_aura);
     RegisterSpellScript(spell_mimiron_p3wx2_laser_barrage_aura);
+    RegisterSpellScript(spell_ulduar_mimiron_mine_explosion);
     new go_ulduar_do_not_push_this_button();
     new npc_ulduar_flames_initial();
     new npc_ulduar_flames_spread();

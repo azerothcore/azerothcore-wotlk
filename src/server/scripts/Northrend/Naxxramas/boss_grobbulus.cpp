@@ -103,14 +103,6 @@ public:
             events.ScheduleEvent(EVENT_BERSERK, RAID_MODE(720s, 540s));
         }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_SLIME_SPRAY, me) && target->IsPlayer())
-            {
-                me->SummonCreature(NPC_FALLOUT_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
-            }
-        }
-
         void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() == NPC_FALLOUT_SLIME)
@@ -289,10 +281,27 @@ class spell_grobbulus_mutating_injection_aura : public AuraScript
     }
 };
 
+class spell_grobbulus_slime_spray : public SpellScript
+{
+    PrepareSpellScript(spell_grobbulus_slime_spray);
+
+    void HandleHit()
+    {
+        if (Unit* target = GetHitUnit())
+            GetCaster()->SummonCreature(NPC_FALLOUT_SLIME, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_grobbulus_slime_spray::HandleHit);
+    }
+};
+
 void AddSC_boss_grobbulus()
 {
     new boss_grobbulus();
     new boss_grobbulus_poison_cloud();
     RegisterSpellScript(spell_grobbulus_mutating_injection_aura);
     RegisterSpellScript(spell_grobbulus_poison);
+    RegisterSpellScript(spell_grobbulus_slime_spray);
 }

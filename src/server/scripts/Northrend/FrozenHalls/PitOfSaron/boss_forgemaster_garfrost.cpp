@@ -19,6 +19,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SharedDefines.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -154,14 +155,38 @@ public:
             if (phase == 1)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
-                me->CastSpell(me, SPELL_FORGE_BLADE, false);
+                if (me->CastSpell(me, SPELL_FORGE_BLADE, false) == SPELL_CAST_OK)
+                {
+                    events.RescheduleEvent(EVENT_SPELL_CHILLING_WAVE, 10s);
+                    SetEquipmentSlots(false, EQUIP_ID_SWORD);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->DisableRotate(false);
+                    if (me->GetVictim())
+                    {
+                        AttackStart(me->GetVictim());
+                        me->SetTarget(me->GetVictim()->GetGUID());
+                    }
+                }
                 Talk(SAY_HP_66);
             }
             else if (phase == 2)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_FORGE_BLADE, me));
-                me->CastSpell(me, SPELL_FORGE_MACE, false);
+                if (me->CastSpell(me, SPELL_FORGE_MACE, false) == SPELL_CAST_OK)
+                {
+                    events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10s);
+                    SetEquipmentSlots(false, EQUIP_ID_MACE);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->DisableRotate(false);
+                    if (me->GetVictim())
+                    {
+                        AttackStart(me->GetVictim());
+                        me->SetTarget(me->GetVictim()->GetGUID());
+                    }
+                }
                 Talk(SAY_HP_33);
             }
         }
@@ -174,32 +199,6 @@ public:
                 {
                     bCanSayBoulderHit = false;
                     Talk(SAY_BOULDER_HIT);
-                }
-            }
-            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_FORGE_BLADE, me))
-            {
-                events.RescheduleEvent(EVENT_SPELL_CHILLING_WAVE, 10s);
-                SetEquipmentSlots(false, EQUIP_ID_SWORD);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                me->DisableRotate(false);
-                if (me->GetVictim())
-                {
-                    AttackStart(me->GetVictim());
-                    me->SetTarget(me->GetVictim()->GetGUID());
-                }
-            }
-            else if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_FORGE_MACE, me))
-            {
-                events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10s);
-                SetEquipmentSlots(false, EQUIP_ID_MACE);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                me->DisableRotate(false);
-                if (me->GetVictim())
-                {
-                    AttackStart(me->GetVictim());
-                    me->SetTarget(me->GetVictim()->GetGUID());
                 }
             }
         }
