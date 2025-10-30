@@ -1,4 +1,3 @@
--- DB update 2025_10_26_01 -> 2025_10_26_02
 -- `point`s had gaps causing core code needing to be extra complicated
 UPDATE `waypoint_data` SET `point`=1 WHERE `id`=1336190 AND `point`=2 AND `action`=1336191;
 UPDATE `waypoint_data` SET `point`=2 WHERE `id`=1336190 AND `point`=4 AND `action`=1336192;
