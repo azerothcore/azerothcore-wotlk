@@ -642,7 +642,7 @@ public:
             {
                 case EVENT_FURBOLG_CHAIN:
                     {
-                        me->CastSpell(me->GetVictim(),SPELL_CHAIN_LIGHTNING, false);
+                        me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
                         events.Repeat(4s, 7s);
                         break;
                     }
