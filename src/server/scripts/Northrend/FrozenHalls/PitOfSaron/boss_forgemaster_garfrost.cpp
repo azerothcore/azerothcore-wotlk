@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "SharedDefines.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "pit_of_saron.h"
