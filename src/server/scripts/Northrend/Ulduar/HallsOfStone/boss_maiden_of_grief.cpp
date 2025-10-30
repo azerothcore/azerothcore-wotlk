@@ -21,13 +21,10 @@
 
 enum spells
 {
-    PARTING_SORROW          = 59723,
-    PILLAR_OF_WOE           = 50761,
-    PILLAR_OF_WOE_H         = 59727,
-    SHOCK_OF_SORROW         = 50760,
-    SHOCK_OF_SORROW_H       = 59726,
-    STORM_OF_GRIEF          = 50752,
-    STORM_OF_GRIEF_H        = 59772,
+    SPELL_PARTING_SORROW    = 59723,
+    SPELL_PILLAR_OF_WOE     = 50761,
+    SPELL_SHOCK_OF_SORROW   = 50760,
+    SPELL_STORM_OF_GRIEF    = 50752,
 
     ACHIEVEMENT_GOOD_GRIEF  = 20383,
 };
@@ -108,13 +105,13 @@ public:
             {
                 case EVENT_STORM:
                     {
-                        DoCastVictim(DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
+                        me->CastSpell(me->GetVictim(), SPELL_STORM_OF_GRIEF, true);
                         events.Repeat(16s, 20s);
                         break;
                     }
                 case EVENT_SHOCK:
                     {
-                        DoCastVictim(DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H));
+                        me->CastSpell(me->GetVictim(), SPELL_SHOCK_OF_SORROW, false);
                         Talk(SAY_STUN);
 
                         events.Repeat(19s, 33s);
@@ -122,19 +119,30 @@ public:
                     }
                 case EVENT_PILLAR:
                     {
-                        DoCastRandomTarget(DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), 0, 50.0f, true, false, true);
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
+                            me->CastSpell(target, SPELL_PILLAR_OF_WOE, false);
+
                         events.Repeat(8s, 31s);
                         break;
                     }
                 case EVENT_PARTING:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, [](Unit const* target)
+                        Unit* target = nullptr;
+                        std::list<Unit*> targetList;
+                        
+                        SelectTargetList(targetList, 10, SelectTargetMethod::Random, 0, 50.0f, true);
+                        for (Unit* possibleTarget : targetList)
                         {
-                            return target && target->IsPlayer() && target->getPowerType() == POWER_MANA;
-                        }))
-                        {
-                            me->CastSpell(target, PARTING_SORROW, false);
+                            if (possibleTarget && possibleTarget->IsPlayer() && possibleTarget->getPowerType() == POWER_MANA)
+                            {
+                                target = possibleTarget;
+                                break;
+                            }
                         }
+                        
+                        if (target)
+                            me->CastSpell(target, SPELL_PARTING_SORROW, false);
+
                         events.Repeat(27s, 45s);
                         break;
                     }
