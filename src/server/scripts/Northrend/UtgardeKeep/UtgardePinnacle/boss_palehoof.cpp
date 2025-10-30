@@ -50,7 +50,7 @@ enum Misc
     SPELL_STOMP                             = 48131,
 
     // Ravenous Furbolg
-    SPELL_CHAIN_LIGHTING                    = 48140,
+    SPELL_CHAIN_LIGHTNING                    = 48140,
     SPELL_CRAZED                            = 48139,
     SPELL_TERRIFYING_ROAR                   = 48144,
 
@@ -642,7 +642,7 @@ public:
             {
                 case EVENT_FURBOLG_CHAIN:
                     {
-                        me->CastSpell(me->GetVictim(),SPELL_CHAIN_LIGHTING, false);
+                        me->CastSpell(me->GetVictim(),SPELL_CHAIN_LIGHTNING, false);
                         events.Repeat(4s, 7s);
                         break;
                     }

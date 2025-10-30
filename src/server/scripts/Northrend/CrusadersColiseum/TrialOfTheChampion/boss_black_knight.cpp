@@ -453,14 +453,14 @@ class spell_black_knight_ghoul_claw : public SpellScript
     void HandleSpellHit(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
-         {
+        {
             GetCaster()->GetThreatMgr().ResetAllThreat();
             if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
             {
                 caster->AddThreat(target, 100.0f);
                 caster->GetAI()->AttackStart(target);
             }
-         }
+        }
     }
     void Register() override
     {
