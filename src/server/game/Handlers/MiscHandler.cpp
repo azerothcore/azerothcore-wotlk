@@ -949,6 +949,12 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
     GetPlayer()->GetCinematicMgr()->BeginCinematic();
 }
 
+void WorldSession::HandleFeatherFallAck(WorldPacket& recv_data)
+{
+    // no used
+    recv_data.rfinish();                       // prevent warnings spam
+}
+
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)
 {
     uint8 ActionBar;
@@ -1486,13 +1492,12 @@ void WorldSession::HandleCancelMountAuraOpcode(WorldPacket& /*recv_data*/)
     _player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 }
 
-void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
+void WorldSession::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging((Opcodes)recv_data.GetOpcode()));
+    // fly mode on/off
+    LOG_DEBUG("network", "WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
 
     ObjectGuid guid;
-    uint32 counter;
-    uint32 isApplied;
     recv_data >> guid.ReadAsPacked();
 
     if (!_player)
@@ -1501,42 +1506,17 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
         return;
     }
 
-    recv_data >> counter;
+    recv_data.read_skip<uint32>();                          // unk
 
     MovementInfo movementInfo;
     movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
 
-    recv_data >> isApplied;
+    recv_data.read_skip<float>();                           // unk2
 
     sScriptMgr->AnticheatSetCanFlybyServer(_player, movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
 
-    Unit* mover = _player->m_mover;
-    Player* plrMover = mover->ToPlayer();
-
-    mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
-
-    Opcodes response;
-
-    switch (recv_data.GetOpcode())
-    {
-        case CMSG_MOVE_HOVER_ACK: response = MSG_MOVE_HOVER; break;
-        case CMSG_MOVE_FEATHER_FALL_ACK: response = MSG_MOVE_FEATHER_FALL; break;
-        case CMSG_MOVE_WATER_WALK_ACK: response = MSG_MOVE_WATER_WALK; break;
-        case CMSG_MOVE_SET_CAN_FLY_ACK: response = MSG_MOVE_UPDATE_CAN_FLY; break;
-        default: return;
-    }
-
-    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
-    {
-        recv_data.rfinish();                     // prevent warnings spam
-        return;
-    }
-
-    WorldPacket data(response, 8);
-    data << guid.WriteAsPacked();
-    WriteMovementInfo(&data, &movementInfo);
-    _player->m_mover->SendMessageToSet(&data, _player);
+    _player->m_mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
 }
 
 void WorldSession::HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& /*packet*/)

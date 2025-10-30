@@ -745,7 +745,6 @@ public:
     void SetExtraUnitMovementFlags(uint16 f) { m_movementInfo.flags2 = f; }
 
     inline bool IsCrowdControlled() const { return HasFlag(UNIT_FIELD_FLAGS, (UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_STUNNED)); }
-    inline bool IsImmobilizedState() const { return HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED); }
 
     /*********************************************************/
     /***           UNIT TYPES, CLASSES, RACES...           ***/
@@ -827,11 +826,6 @@ public:
     bool _IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, WorldObject const* obj = nullptr) const;
     bool IsValidAssistTarget(Unit const* target) const;
     bool _IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) const;
-
-    // Client controlled: check if unit currently is under client control (has active "mover"), optionally check for specific client (server-side)
-    bool IsClientControlled(Player const* exactClient = nullptr) const;
-    // Controlling client: server PoV on which client (player) controls movement of the unit at the moment, obtain "mover" (server-side)
-    Player const* GetClientControlling() const;
 
     // Combat range
     [[nodiscard]] float GetBoundaryRadius() const { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; }
@@ -1682,10 +1676,10 @@ public:
     virtual bool SetWalk(bool enable);
     virtual bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true);
     virtual bool SetSwim(bool enable);
-    void SetCanFly(bool enable);
-    void SetWaterWalking(bool enable);
-    void SetFeatherFall(bool enable);
-    void SetHover(bool enable);
+    virtual bool SetCanFly(bool enable, bool packetOnly = false);
+    virtual bool SetWaterWalking(bool enable, bool packetOnly = false);
+    virtual bool SetFeatherFall(bool enable, bool packetOnly = false);
+    virtual bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true);
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
     [[nodiscard]] const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
@@ -1712,7 +1706,6 @@ public:
     [[nodiscard]] uint8 getStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
     [[nodiscard]] bool IsSitState() const;
     [[nodiscard]] bool IsStandState() const;
-    [[nodiscard]] bool IsStandUpOnMovementState() const;
     void SetStandState(uint8 state);
 
     void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
@@ -2136,6 +2129,8 @@ protected:
     // xinef: apply resilience
     bool m_applyResilience;
     bool _instantCast;
+
+    uint32 m_rootTimes;
 
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
