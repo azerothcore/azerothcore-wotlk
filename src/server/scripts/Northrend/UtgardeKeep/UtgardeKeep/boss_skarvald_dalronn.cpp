@@ -44,8 +44,7 @@ enum eSpells
     SPELL_ENRAGE                                = 48193,
     SPELL_SUMMON_SKARVALD_GHOST                 = 48613,
     // Dalronn
-    SPELL_SHADOW_BOLT_N                         = 43649,
-    SPELL_SHADOW_BOLT_H                         = 59575,
+    SPELL_SHADOW_BOLT                           = 43649,
     SPELL_DEBILITATE                            = 43650,
     SPELL_SUMMON_SKELETONS                      = 52611,
     SPELL_SUMMON_DALRONN_GHOST                  = 48612
@@ -353,7 +352,7 @@ struct boss_dalronn_the_controller : public ScriptedAI
                 case EVENT_SHADOW_BOLT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                     {
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
+                        me->CastSpell(target, SPELL_SHADOW_BOLT, false);
                     }
                     events.Repeat(2s);
                     break;
