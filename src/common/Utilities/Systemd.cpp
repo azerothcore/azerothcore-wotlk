@@ -36,7 +36,6 @@ int get_listen_fds()
     if (fds <= 0)
         return 0;
 
-
     return fds;
 }
 #else
