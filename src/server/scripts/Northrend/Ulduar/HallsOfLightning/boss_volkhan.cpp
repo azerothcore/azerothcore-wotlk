@@ -378,7 +378,7 @@ struct npc_molten_golem : public ScriptedAI
                     AttackStart(target);
                 }
                 break;
-            case EVENT_IMMOLATION:
+            case EVENT_IMMOLATION_STRIKE:
                 DoCastVictim(SPELL_IMMOLATION_STRIKE);
                 events.Repeat(5s);
                 break;
