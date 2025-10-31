@@ -365,9 +365,7 @@ struct npc_molten_golem : public ScriptedAI
         {
             case EVENT_IMMOLATION_STRIKE:
                 if (SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true, true, -SPELL_IMMOLATION_STRIKE))
-                {
                     DoCastVictim(SPELL_IMMOLATION_STRIKE);
-                }
                 events.Repeat(5s);
                 break;
             case EVENT_CHANGE_TARGET:
@@ -377,10 +375,6 @@ struct npc_molten_golem : public ScriptedAI
                     me->AddThreat(target, 30000.0f);
                     AttackStart(target);
                 }
-                break;
-            case EVENT_IMMOLATION_STRIKE:
-                DoCastVictim(SPELL_IMMOLATION_STRIKE);
-                events.Repeat(5s);
                 break;
         }
 
