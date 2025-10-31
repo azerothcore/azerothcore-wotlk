@@ -281,6 +281,7 @@ public:
                 {
                     me->RemoveAllAuras();
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
                         if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
@@ -308,9 +309,10 @@ public:
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetControlled(false, UNIT_STATE_STUNNED);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
                     events.ScheduleEvent(EVENT_THADDIUS_CHAIN_LIGHTNING, 14s);
                     events.ScheduleEvent(EVENT_THADDIUS_BERSERK, 6min);
-                    events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 30s);
+                    events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 20s);
                     events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 5s);
                     return;
                 case EVENT_THADDIUS_BERSERK:
