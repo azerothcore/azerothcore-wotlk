@@ -45,7 +45,6 @@ public:
         ObjectGuid goSjonnirDoorGUID;
         ObjectGuid goLeftPipeGUID;
         ObjectGuid goRightPipeGUID;
-        ObjectGuid goTribunalDoorGUID;
 
         ObjectGuid SjonnirGUID;
         ObjectGuid BrannGUID;
@@ -96,10 +95,6 @@ public:
                 case GO_TRIBUNAL_CONSOLE:
                     goTribunalConsoleGUID = go->GetGUID();
                     break;
-                case GO_TRIBUNAL_ACCESS_DOOR:
-                    goTribunalDoorGUID = go->GetGUID();
-                    go->SetGoState(GO_STATE_ACTIVE);
-                    break;
                 case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
@@ -141,8 +136,6 @@ public:
             {
                 case GO_TRIBUNAL_CONSOLE:
                     return goTribunalConsoleGUID;
-                case GO_TRIBUNAL_ACCESS_DOOR:
-                    return goTribunalDoorGUID;
                 case GO_SJONNIR_CONSOLE:
                     return goSjonnirConsoleGUID;
                 case GO_SJONNIR_DOOR:

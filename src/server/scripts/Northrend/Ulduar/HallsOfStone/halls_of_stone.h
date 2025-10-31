@@ -58,7 +58,6 @@ enum Encounter
 enum gobjects
 {
     GO_TRIBUNAL_CONSOLE         = 193907,
-    GO_TRIBUNAL_ACCESS_DOOR     = 191295,
     GO_KADDRAK                  = 191671,
     GO_MARNAK                   = 191670,
     GO_ABEDNEUM                 = 191669,
