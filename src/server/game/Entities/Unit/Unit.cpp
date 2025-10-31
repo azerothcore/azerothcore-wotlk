@@ -1955,25 +1955,12 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         if (victim->GetLevel() < 30)
             Probability = 0.65f * victim->GetLevel() + 0.5f;
 
-        // victim is a druid
-        if (victim->IsPlayer() && victim->getClass() == CLASS_DRUID)
-        {
-            Player* player = victim->ToPlayer();
-            PlayerTalentMap talentMap = player->GetTalentMap();
-            uint8 activeSpecId = player->GetActiveSpec();
-
-            //apply survival of the fittest fix
-            Probability -= talentMap[33853] != NULL && talentMap[33853]->IsInSpec(activeSpecId) ? 7.38f //rank1
-                            : talentMap[33855] != NULL && talentMap[33855]->IsInSpec(activeSpecId) ? 14.761f //rank2
-                            : talentMap[33856] != NULL && talentMap[33856]->IsInSpec(activeSpecId) ? 22.142f //rank3
-                            : 0; //unranked
-        }
-
         uint32 VictimDefense = victim->GetDefenseSkillValue();
         uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
 
         // xinef: fix daze mechanics
-        Probability -= ((float)VictimDefense - AttackerMeleeSkill) * 0.1428f;
+        float chanceToCrit = GetUnitCriticalChance(BASE_ATTACK, victim);
+        Probability += chanceToCrit * 3.57 - 20;
 
         if (Probability > 40.0f)
             Probability = 40.0f;
