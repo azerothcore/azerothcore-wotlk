@@ -9,7 +9,7 @@ on:
       - synchronize
 
 concurrency:
-  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  group: ${{ github.head_ref }} || concat(${{ github.ref_name }}, ${{ github.workflow }})
   cancel-in-progress: true
 
 env:
@@ -115,6 +115,6 @@ jobs:
           event-type: azerothcore-new-images
           client-payload: >
             {
-              "ref": "${{ github.ref }}",
+              "ref": "${{ github.ref_name }}",
               "sha": "${{ github.sha }}"
             }

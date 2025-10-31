@@ -39,16 +39,17 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: echo cache key
+      shell: bash
+      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}"
+
     - name: Cache
       uses: actions/cache@v4
-      if: inputs.pch != 'true'
       with:
         path: ${{ github.workspace }}/var/ccache
-          # format
-          # ccache:OS:CC_CXX:MODULES:GITHUB_REF:GITHUB_SHA
-        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}:${{ github.sha }}
+        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}
         restore-keys: |
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:${{ github.ref }}
+          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}
 
@@ -73,12 +74,12 @@ runs:
         UBUNTU_VERSION="$(grep VERSION_ID /etc/os-release | cut -f2 -d\")"
         source /etc/os-release
         if [[ "$VERSION_CODENAME" == "jammy" ]]; then
-          if [[ "${{ inputs.cc }}" =~ "clang-" ]]; then
-            CLANG_VERSION="$(echo '${{ inputs.cc }}' | cut -f2 -d\-)"
+          if [[ "${{ inputs.CC }}" =~ "clang-" ]]; then
+            CLANG_VERSION="$(echo '${{ inputs.CC }}' | cut -f2 -d\-)"
             wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
             sudo add-apt-repository "deb http://apt.llvm.org/$VERSION_CODENAME/ llvm-toolchain-$VERSION_CODENAME-$CLANG_VERSION main"
             sudo apt-get -qq update
-            sudo apt-get -qq install '${{ inputs.cc }}'
+            sudo apt-get -qq install '${{ inputs.CC }}'
           fi
         fi
 
@@ -87,18 +88,43 @@ runs:
       env:
         CCACHE_DIR: $GITHUB_WORKSPACE/var/ccache
       run: |
-        cat <<EOF >> $GITHUB_ENV
+        mkdir -p "$CCACHE_DIR"
+        cat <<EOF >> "$GITHUB_ENV"
+        CCACHE_BASEDIR=${GITHUB_WORKSPACE}
         CCACHE_DIR=${{ env.CCACHE_DIR }}
-        CCACHE_MAXSIZE=1000MB
+        CCACHE_HASHDIR=1
+        CCACHE_MAXSIZE=5G
         CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
-        CCACHE_CPP2=true
         CCACHE_COMPRESS=1
         CCACHE_COMPRESSLEVEL=9
         CCACHE_COMPILERCHECK=content
-        CCACHE_LOGFILE=$CCACHE_DIR/cache.debug
+        CCACHE_LOGFILE=${{ env.CCACHE_DIR }}/cache.debug
         CC=${{ inputs.CC }}
         CXX=${{ inputs.CXX }}
         EOF
+
+    - name: ccache config snapshot
+      shell: bash
+      run: |
+        echo "==== Effective ccache configuration ===="
+        ccache -p | egrep 'base_dir|hash_dir|compiler_check|sloppiness|max_size' || true
+
+        echo
+        echo "==== Compiler info ===="
+        which ${{ inputs.CC }} && ${{ inputs.CC }} --version || true
+        which ${{ inputs.CXX }} && ${{ inputs.CXX }} --version || true
+
+        echo
+        echo "==== Previous cache stats ===="
+        ccache -s || true
+
+        echo
+        echo "==== Top cache results ===="
+        grep -o 'result: .*' "$CCACHE_DIR/cache.debug" 2>/dev/null | sort | uniq -c | sort -nr | head || true
+
+    - name: reset ccache stats
+      shell: bash
+      run: ccache -z || true
 
     - name: Configure
       shell: bash
@@ -107,6 +133,8 @@ runs:
         mkdir build
         cd build
         cmake "$GITHUB_WORKSPACE" \
+          -DCMAKE_C_COMPILER="${{ inputs.CC }}" \
+          -DCMAKE_CXX_COMPILER="${{ inputs.CXX }}" \
           -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/env/dist" \
           -DAPPS_BUILD="all" \
           -DTOOLS_BUILD=${{ inputs.tools }} \
@@ -116,8 +144,8 @@ runs:
           -DCMAKE_BUILD_TYPE="Release" \
           -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
-          -DCMAKE_C_FLAGS="-Werror ${{ startsWith(inputs.cc, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} " \
-          -DCMAKE_CXX_FLAGS="-Werror ${{ startsWith(inputs.cxx, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}}" \
+          -DCMAKE_C_FLAGS="-Werror ${{ startsWith(inputs.CC, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} -fdebug-prefix-map=${GITHUB_WORKSPACE}=." \
+          -DCMAKE_CXX_FLAGS="-Werror ${{ startsWith(inputs.CXX, 'clang') && '-ferror-limit=' || '-fmax-errors=' }}${{inputs.maxerrors}} -fdebug-prefix-map=${GITHUB_WORKSPACE}=." \
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
@@ -190,3 +218,7 @@ runs:
         else
           exit 0
         fi
+
+    - name: ccache stats
+      shell: bash
+      run: ccache -s || true
