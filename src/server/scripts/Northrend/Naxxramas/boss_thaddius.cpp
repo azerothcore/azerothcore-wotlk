@@ -59,20 +59,17 @@ enum Spells
     SPELL_SHOCK_VISUAL                  = 28159,
 
     // Stalagg
-    SPELL_POWER_SURGE_10                = 54529,
-    SPELL_POWER_SURGE_25                = 28134,
+    SPELL_POWER_SURGE                   = 54529,
     SPELL_STALAGG_CHAIN                 = 28096,
 
     // Feugen
-    SPELL_STATIC_FIELD_10               = 28135,
-    SPELL_STATIC_FIELD_25               = 54528,
+    SPELL_STATIC_FIELD                  = 28135,
     SPELL_FEUGEN_CHAIN                  = 28111,
 
     // Thaddius
     SPELL_POLARITY_SHIFT                = 28089,
     SPELL_BALL_LIGHTNING                = 28299,
-    SPELL_CHAIN_LIGHTNING_10            = 28167,
-    SPELL_CHAIN_LIGHTNING_25            = 54531,
+    SPELL_CHAIN_LIGHTNING               = 28167,
     SPELL_BERSERK                       = 27680,
     SPELL_THADDIUS_VISUAL_LIGHTNING     = 28136,
     SPELL_THADDIUS_SPAWN_STUN           = 28160,
@@ -318,7 +315,7 @@ public:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_THADDIUS_CHAIN_LIGHTNING:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25), false);
+                    me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
                     events.Repeat(15s);
                     break;
                 case EVENT_THADDIUS_POLARITY_SHIFT:
@@ -498,11 +495,11 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_MINION_POWER_SURGE:
-                    me->CastSpell(me, RAID_MODE(SPELL_POWER_SURGE_10, SPELL_POWER_SURGE_25), false);
+                    me->CastSpell(me, SPELL_POWER_SURGE, false);
                     events.Repeat(19s);
                     break;
                 case EVENT_MINION_STATIC_FIELD:
-                    me->CastSpell(me, RAID_MODE(SPELL_STATIC_FIELD_10, SPELL_STATIC_FIELD_25), false);
+                    me->CastSpell(me, SPELL_STATIC_FIELD, false);
                     events.Repeat(3s);
                     break;
                 case EVENT_MINION_MAGNETIC_PULL:

@@ -79,7 +79,11 @@ enum UldSpells
     SPELL_SIMPLE_TELEPORT       = 12980,
     SPELL_KEEPER_TELEPORT       = 62940,
     SPELL_SNOW_MOUND_PARTICLES  = 64615,
-    SPELL_ENERGY_SAP_10         = 64740
+    SPELL_ENERGY_SAP_10         = 64740,
+
+    // Arachnopod Destroyer
+    SPELL_FLAME_SPRAY           = 64717,
+    SPELL_MACHINE_GUN           = 64776,
 };
 
 class npc_ulduar_keeper : public CreatureScript
@@ -473,11 +477,11 @@ public:
                     case 0:
                         break;
                     case 1:
-                        me->CastSpell(me->GetVictim(), RAID_MODE(64717, 65241), false);
+                        me->CastSpell(me->GetVictim(), SPELL_FLAME_SPRAY, false);
                         events.Repeat(15s, 25s);
                         break;
                     case 2:
-                        me->CastSpell(me->GetVictim(), RAID_MODE(64776, 65240), false);
+                        me->CastSpell(me->GetVictim(), SPELL_MACHINE_GUN, false);
                         events.Repeat(10s, 15s);
                         break;
                     case 3:
