@@ -115,9 +115,7 @@ namespace VMAP
 
         bool processCommand(char* /*command*/) override { return false; } // for debug and extensions
 
-        bool GetAreaInfo(uint32 pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
-        bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 reqLiquidType, float& level, float& floor, uint32& type, uint32& mogpFlags) const override;
-        void GetAreaAndLiquidData(uint32 mapId, float x, float y, float z, uint8 reqLiquidType, AreaAndLiquidData& data) const override;
+        bool GetAreaAndLiquidData(uint32 mapId, float x, float y, float z, Optional<uint8> reqLiquidType, AreaAndLiquidData& data) const override;
 
         WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename, uint32 flags);
         void releaseModelInstance(const std::string& filename);

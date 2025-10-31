@@ -19,6 +19,7 @@
 #define _DYNTREE_H
 
 #include "Define.h"
+#include "Optional.h"
 
 namespace G3D
 {
@@ -47,8 +48,7 @@ public:
 
     bool GetIntersectionTime(uint32 phasemask, const G3D::Ray& ray, const G3D::Vector3& endPos, float& maxDist) const;
 
-    bool GetAreaInfo(float x, float y, float& z, uint32 phasemask, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
-    void GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, uint8 reqLiquidType, VMAP::AreaAndLiquidData& data) const;
+    bool GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, Optional<uint8> reqLiquidType, VMAP::AreaAndLiquidData& data) const;
 
     bool GetObjectHitPos(uint32 phasemask, const G3D::Vector3& pPos1,
                          const G3D::Vector3& pPos2, G3D::Vector3& pResultHitPos,
