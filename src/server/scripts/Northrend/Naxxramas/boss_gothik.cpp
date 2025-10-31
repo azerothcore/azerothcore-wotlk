@@ -266,7 +266,7 @@ public:
                 std::vector<Player*> tList;
                 for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                 {
-                    if (!me->IsWithinDistInMap(itr->GetSource(), 200.0f, true, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+                    if (!me->IsWithinDistInMap(itr->GetSource(), 200.0f, true, false, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     {
                         continue;
                     }
