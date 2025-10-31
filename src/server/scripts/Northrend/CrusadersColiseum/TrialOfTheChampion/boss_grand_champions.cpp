@@ -196,7 +196,7 @@ public:
             data << uint32(VEHICLE_SPELL_RIDE_HARDCODED);
             data << uint8(SPELL_FAILED_CUSTOM_ERROR);
             data << uint32(SPELL_CUSTOM_ERROR_MUST_HAVE_LANCE_EQUIPPED);
-            clicker->ToPlayer()->GetSession()->SendPacket(&data);
+            clicker->ToPlayer()->SendDirectMessage(&data);
             return false;
         }
     };
