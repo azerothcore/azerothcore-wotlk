@@ -141,8 +141,7 @@ enum Spells
 {
     // Combat spells
     SPELL_ARTHAS_AURA                       = 52442,
-    SPELL_ARTHAS_EXORCISM_N                 = 52445,
-    SPELL_ARTHAS_EXORCISM_H                 = 58822,
+    SPELL_ARTHAS_EXORCISM                   = 52445,
     SPELL_ARTHAS_HOLY_LIGHT                 = 52444,
 
     // Visuals
@@ -1178,7 +1177,7 @@ public:
             {
                 case EVENT_COMBAT_EXORCISM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_ARTHAS_EXORCISM_N, SPELL_ARTHAS_EXORCISM_H), false);
+                        me->CastSpell(target, SPELL_ARTHAS_EXORCISM, false);
 
                     combatEvents.Repeat(7300ms);
                     break;

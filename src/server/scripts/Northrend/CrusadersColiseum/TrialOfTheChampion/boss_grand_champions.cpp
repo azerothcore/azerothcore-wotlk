@@ -56,38 +56,30 @@ enum MountSpells
 enum ChampionSpells
 {
     // Mage (Ambrose Boltspark, Eressea Dawnsinger)
-    SPELL_FIREBALL_N                        = 66042,
-    SPELL_FIREBALL_H                        = 68310,
-    SPELL_BLAST_WAVE_N                      = 66044,
-    SPELL_BLAST_WAVE_H                      = 68312,
+    SPELL_FIREBALL                          = 66042,
+    SPELL_BLAST_WAVE                        = 66044,
     SPELL_HASTE                             = 66045,
-    SPELL_POLYMORPH_N                       = 66043,
-    SPELL_POLYMORPH_H                       = 68311,
+    SPELL_POLYMORPH                         = 66043,
 
     // Shaman (Colosos, Runok Wildmane)
-    SPELL_CHAIN_LIGHTNING_N                 = 67529,
-    SPELL_CHAIN_LIGHTNING_H                 = 68319,
+    SPELL_CHAIN_LIGHTNING                   = 67529,
     SPELL_EARTH_SHIELD                      = 67530,
-    SPELL_HEALING_WAVE_N                    = 67528,
-    SPELL_HEALING_WAVE_H                    = 68318,
+    SPELL_HEALING_WAVE                      = 67528,
     SPELL_HEX_OF_MENDING                    = 67534,
 
     // Hunter (Jaelyne Evensong, Zul'tore)
     SPELL_DISENGAGE                         = 68339,
     SPELL_LIGHTNING_ARROWS                  = 66083,
     SPELL_MULTI_SHOT                        = 66081,
-    SPELL_SHOOT_N                           = 65868,
-    SPELL_SHOOT_H                           = 67988,
+    SPELL_SHOOT                             = 65868,
 
     // Rogue (Lana Stouthammer Evensong, Deathstalker Visceri)
-    SPELL_EVISCERATE_N                      = 67709,
-    SPELL_EVISCERATE_H                      = 68317,
+    SPELL_EVISCERATE                        = 67709,
     SPELL_FAN_OF_KNIVES                     = 67706,
     SPELL_POISON_BOTTLE                     = 67701,
 
     // Warrior (Marshal Jacob Alerius, Mokra the Skullcrusher)
-    SPELL_MORTAL_STRIKE_N                   = 68783,
-    SPELL_MORTAL_STRIKE_H                   = 68784,
+    SPELL_MORTAL_STRIKE                     = 68783,
     SPELL_BLADESTORM                        = 63784,
     SPELL_INTERCEPT                         = 67540,
     SPELL_ROLLING_THROW                     = 67546, // not implemented yet!
@@ -97,15 +89,6 @@ enum Texts
 {
     SAY_TRAMPLED                            = 0,
 };
-
-#define SPELL_FIREBALL                      DUNGEON_MODE(SPELL_FIREBALL_N, SPELL_FIREBALL_H)
-#define SPELL_BLAST_WAVE                    DUNGEON_MODE(SPELL_BLAST_WAVE_N, SPELL_BLAST_WAVE_H)
-#define SPELL_POLYMORPH                     DUNGEON_MODE(SPELL_POLYMORPH_N, SPELL_POLYMORPH_H)
-#define SPELL_CHAIN_LIGHTNING               DUNGEON_MODE(SPELL_CHAIN_LIGHTNING_N, SPELL_CHAIN_LIGHTNING_H)
-#define SPELL_HEALING_WAVE                  DUNGEON_MODE(SPELL_HEALING_WAVE_N, SPELL_HEALING_WAVE_H)
-#define SPELL_SHOOT                         DUNGEON_MODE(SPELL_SHOOT_N, SPELL_SHOOT_H)
-#define SPELL_EVISCERATE                    DUNGEON_MODE(SPELL_EVISCERATE_N, SPELL_EVISCERATE_H)
-#define SPELL_MORTAL_STRIKE                 DUNGEON_MODE(SPELL_MORTAL_STRIKE_N, SPELL_MORTAL_STRIKE_H)
 
 enum MountEvents
 {
@@ -213,7 +196,7 @@ public:
             data << uint32(VEHICLE_SPELL_RIDE_HARDCODED);
             data << uint8(SPELL_FAILED_CUSTOM_ERROR);
             data << uint32(SPELL_CUSTOM_ERROR_MUST_HAVE_LANCE_EQUIPPED);
-            clicker->ToPlayer()->GetSession()->SendPacket(&data);
+            clicker->ToPlayer()->SendDirectMessage(&data);
             return false;
         }
     };

@@ -149,13 +149,13 @@ struct npc_sentinel_leader : public ScriptedAI
         {
             switch (id)
             {
-            case 1:
-            case 4:
-            case 7:
+            case 2:
+            case 5:
             case 8:
-            case 13:
+            case 9:
             case 14:
-            case 17:
+            case 15:
+            case 18:
                 Creature* SentinelSpy = me->FindNearestCreature(NPC_SENTINEL_SPY, 2.0f, true);
                 if (SentinelSpy)
                 {
@@ -282,10 +282,10 @@ struct npc_sentinel_infiltrator : public ScriptedAI
             case PATH_ONE:
                 switch (id)
                 {
-                    case 5:
-                    case 8:
-                    case 14:
-                    case 18:
+                    case 6:
+                    case 9:
+                    case 15:
+                    case 19:
                         Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
                         if (SentinelInfiltrator)
                         {
@@ -299,10 +299,10 @@ struct npc_sentinel_infiltrator : public ScriptedAI
             case PATH_TWO:
                 switch (id)
                 {
-                    case 5:
-                    case 7:
-                    case 14:
-                    case 17:
+                    case 6:
+                    case 8:
+                    case 15:
+                    case 18:
                         Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
                         if (SentinelInfiltrator)
                         {

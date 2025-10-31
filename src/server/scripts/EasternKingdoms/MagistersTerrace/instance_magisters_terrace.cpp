@@ -80,7 +80,7 @@ public:
                     {
                         if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
                         {
-                            kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
+                            kalecgos->GetMotionMaster()->MoveWaypoint(PATH_KALECGOS_FLIGHT, false);
                             kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
                         }
                     });
