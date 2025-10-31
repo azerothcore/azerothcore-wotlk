@@ -24,14 +24,11 @@
 
 enum spells
 {
-    GROUND_SPIKE_H              = 59750,
-    BOULDER_TOSS                = 50843,
-    BOULDER_TOSS_H              = 59742,
-    SHATTER                     = 50810,
-    SHATTER_H                   = 61546,
-    STOMP                       = 50868,
-    STOMP_H                     = 59744,
-    GROUND_SLAM                 = 50827,
+    SPELL_GROUND_SPIKE          = 59750,
+    SPELL_BOULDER_TOSS          = 50843,
+    SPELL_SHATTER               = 50810,
+    SPELL_STOMP                 = 50868,
+    SPELL_GROUND_SLAM           = 50827,
     GROUND_SLAM_STONED_EFFECT   = 50812,
     SPELL_SHATTER_EFFECT        = 50811,
 };
@@ -123,26 +120,26 @@ public:
             {
                 case EVENT_BOULDER:
                     {
-                        DoCastRandomTarget(DUNGEON_MODE(BOULDER_TOSS, BOULDER_TOSS_H), 0, 50.0f);
+                        DoCastRandomTarget(SPELL_BOULDER_TOSS, 0, 50.0f);
                         events.Repeat(5s, 7s);
                         break;
                     }
                 case EVENT_GROUND_SPIKE:
                     {
-                        DoCastRandomTarget(GROUND_SPIKE_H, 0, 50.0f);
+                        DoCastRandomTarget(SPELL_GROUND_SPIKE, 0, 50.0f);
                         events.Repeat(8s, 11s);
                         break;
                     }
                 case EVENT_STOMP:
                     {
-                        me->CastSpell(me, DUNGEON_MODE(STOMP, STOMP_H), false);
+                        me->CastSpell(me, SPELL_STOMP, false);
                         events.Repeat(13s, 18s);
                         break;
                     }
                 case EVENT_GROUND_SLAM:
                     {
                         events.Repeat(10s, 13s);
-                        me->CastSpell(me->GetVictim(), GROUND_SLAM, true);
+                        me->CastSpell(me->GetVictim(), SPELL_GROUND_SLAM, true);
                         me->SetReactState(REACT_PASSIVE);
                         me->AttackStop();
                         events.DelayEvents(10s);
@@ -151,7 +148,7 @@ public:
                     }
                 case EVENT_SHATTER:
                     {
-                        me->CastSpell((Unit*)nullptr, DUNGEON_MODE(SHATTER, SHATTER_H), false);
+                        me->CastSpell((Unit*)nullptr, SPELL_SHATTER, false);
                         Talk(SAY_SHATTER);
                         events.RescheduleEvent(EVENT_REMOVE_STONED, 1500ms);
                         me->SetReactState(REACT_AGGRESSIVE);
