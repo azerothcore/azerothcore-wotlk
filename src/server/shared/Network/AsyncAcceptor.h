@@ -139,7 +139,7 @@ private:
     tcp::socket _socket;
     std::atomic<bool> _closed;
     std::function<std::pair<tcp::socket*, uint32>()> _socketFactory;
-    bool _supportSocketActivation = false;
+    bool _supportSocketActivation;
 };
 
 template<class T>

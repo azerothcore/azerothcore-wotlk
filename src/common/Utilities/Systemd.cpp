@@ -23,8 +23,8 @@
 
 int get_listen_fds()
 {
-    const char* listen_pid = std::getenv("LISTEN_PID");
-    const char* listen_fds = std::getenv("LISTEN_FDS");
+    char* const listen_pid = std::getenv("LISTEN_PID");
+    char* const listen_fds = std::getenv("LISTEN_FDS");
     if (!listen_pid || !listen_fds)
         return 0;
 
@@ -32,10 +32,12 @@ int get_listen_fds()
     if (pid != getpid())
         return 0;
 
-    if (Acore::StringTo<int>(listen_fds).value_or(0) <= 0)
+    int fds = Acore::StringTo<int>(listen_fds).value_or(0);
+    if (fds <= 0)
         return 0;
 
-    return 3;
+
+    return fds;
 }
 #else
 // On non-Linux systems, just return 0 (no socket activation)
