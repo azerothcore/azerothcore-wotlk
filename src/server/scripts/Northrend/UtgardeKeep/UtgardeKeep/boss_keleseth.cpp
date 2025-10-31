@@ -45,11 +45,8 @@ enum eSpells
     SPELL_FROST_TOMB_SUMMON             = 42714,
     SPELL_FROST_TOMB_AURA               = 48400,
 
-    SPELL_SHADOWBOLT_N                  = 43667,
-    SPELL_SHADOWBOLT_H                  = 59389,
+    SPELL_SHADOWBOLT                    = 43667,
 };
-
-#define SPELL_SHADOWBOLT                DUNGEON_MODE(SPELL_SHADOWBOLT_N, SPELL_SHADOWBOLT_H)
 
 struct npc_frost_tomb : public NullCreatureAI
 {
@@ -80,7 +77,7 @@ struct npc_frost_tomb : public NullCreatureAI
         if (PrisonerGUID)
             if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 p->RemoveAurasDueToSpell(SPELL_FROST_TOMB_AURA);
-        me->DespawnOrUnsummon(5000);
+        me->DespawnOrUnsummon(5s);
     }
 
     void UpdateAI(uint32  /*diff*/) override

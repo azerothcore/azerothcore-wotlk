@@ -21,10 +21,8 @@
 
 enum Spells
 {
-    SPELL_CONSTRICTING_CHAINS_N                 = 52696,
-    SPELL_CONSTRICTING_CHAINS_H                 = 58823,
-    SPELL_DISEASE_EXPULSION_N                   = 52666,
-    SPELL_DISEASE_EXPULSION_H                   = 58824,
+    SPELL_CONSTRICTING_CHAINS                   = 52696,
+    SPELL_DISEASE_EXPULSION                     = 52666,
     SPELL_FRENZY                                = 58841,
 };
 
@@ -66,9 +64,9 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
-            events.RescheduleEvent(EVENT_SPELL_CONSTRICTING_CHAINS, 15000);
-            events.RescheduleEvent(EVENT_SPELL_DISEASE_EXPULSION, 4000);
-            events.RescheduleEvent(EVENT_SPELL_FRENZY, 20000);
+            events.RescheduleEvent(EVENT_SPELL_CONSTRICTING_CHAINS, 15s);
+            events.RescheduleEvent(EVENT_SPELL_DISEASE_EXPULSION, 4s);
+            events.RescheduleEvent(EVENT_SPELL_FRENZY, 20s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -97,17 +95,17 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_DISEASE_EXPULSION:
-                    me->CastSpell(me, DUNGEON_MODE(SPELL_DISEASE_EXPULSION_N, SPELL_DISEASE_EXPULSION_H), false);
-                    events.RepeatEvent(6000);
+                    me->CastSpell(me, SPELL_DISEASE_EXPULSION, false);
+                    events.Repeat(6s);
                     break;
                 case EVENT_SPELL_FRENZY:
                     me->CastSpell(me, SPELL_FRENZY, false);
-                    events.RepeatEvent(20000);
+                    events.Repeat(20s);
                     break;
                 case EVENT_SPELL_CONSTRICTING_CHAINS:
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinThreat, 0, 50.0f, true))
-                        me->CastSpell(pTarget, DUNGEON_MODE(SPELL_CONSTRICTING_CHAINS_N, SPELL_CONSTRICTING_CHAINS_H), false);
-                    events.RepeatEvent(14000);
+                        me->CastSpell(pTarget, SPELL_CONSTRICTING_CHAINS, false);
+                    events.Repeat(14s);
                     break;
             }
 

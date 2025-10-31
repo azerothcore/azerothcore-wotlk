@@ -1289,13 +1289,9 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea, bool force)
         return;
 
     if (sWorld->getBoolConfig(CONFIG_WEATHER))
-    {
-        if (Weather* weather = WeatherMgr::FindWeather(zone->ID))
-            weather->SendWeatherUpdateToPlayer(this);
-        else if (!WeatherMgr::AddWeather(zone->ID))
-            // send fine weather packet to remove old zone's weather
-            WeatherMgr::SendFineWeatherUpdateToPlayer(this);
-    }
+        GetMap()->GetOrGenerateZoneDefaultWeather(newZone);
+
+    GetMap()->SendZoneDynamicInfo(newZone, this);
 
     sScriptMgr->OnPlayerUpdateZone(this, newZone, newArea);
 
@@ -1405,7 +1401,7 @@ void Player::UpdateHomebindTime(uint32 time)
             WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
             data << uint32(0);
             data << uint32(0);
-            GetSession()->SendPacket(&data);
+            SendDirectMessage(&data);
         }
         // instance is valid, reset homebind timer
         m_HomebindTimer = 0;
@@ -1428,7 +1424,7 @@ void Player::UpdateHomebindTime(uint32 time)
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
         data << uint32(m_HomebindTimer);
         data << uint32(1);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
         LOG_DEBUG(
             "maps",
             "PLAYER: Player '{}' ({}) will be teleported to homebind in 60 "
@@ -1594,21 +1590,12 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     // After added to map seer must be a player - there is no possibility to
     // still have different seer (all charm auras must be already removed)
     if (mapChange && m_seer != this)
-    {
         m_seer = this;
-    }
 
-    Acore::VisibleNotifier notifierNoLarge(
-        *this, mapChange,
-        false); // visit only objects which are not large; default distance
-    Cell::VisitObjects(m_seer, notifierNoLarge,
-                          GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-    notifierNoLarge.SendToSelf();
-
-    Acore::VisibleNotifier notifierLarge(
-        *this, mapChange, true); // visit only large objects; maximum distance
-    Cell::VisitObjects(m_seer, notifierLarge, GetSightRange());
-    notifierLarge.SendToSelf();
+    Acore::VisibleNotifier notifier(*this, mapChange);
+    Cell::VisitObjects(m_seer, notifier, GetSightRange());
+    Cell::VisitFarVisibleObjects(m_seer, notifier, VISIBILITY_DISTANCE_GIGANTIC);
+    notifier.SendToSelf();
 
     if (mapChange)
         m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
@@ -1784,7 +1771,7 @@ void Player::UpdateTriggerVisibility()
 
     WorldPacket packet;
     udata.BuildPacket(packet);
-    GetSession()->SendPacket(&packet);
+    SendDirectMessage(&packet);
 }
 
 void Player::UpdateForQuestWorldObjects()
@@ -1837,7 +1824,7 @@ void Player::UpdateForQuestWorldObjects()
 
     WorldPacket packet;
     udata.BuildPacket(packet);
-    GetSession()->SendPacket(&packet);
+    SendDirectMessage(&packet);
 }
 
 void Player::UpdateTitansGrip()

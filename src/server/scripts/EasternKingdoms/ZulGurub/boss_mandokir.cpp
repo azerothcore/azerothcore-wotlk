@@ -80,7 +80,7 @@ enum Misc
 
     MODEL_OHGAN_MOUNT         = 15271,
     PATH_MANDOKIR             = 492861,
-    POINT_MANDOKIR_END        = 24,
+    POINT_MANDOKIR_END        = 25,
     CHAINED_SPIRIT_COUNT      = 20,
     ACTION_CHARGE             = 1
 };
@@ -156,7 +156,7 @@ public:
             killCount = 0;
             if (me->GetPositionZ() > 140.0f)
             {
-                events.ScheduleEvent(EVENT_CHECK_START, 1000);
+                events.ScheduleEvent(EVENT_CHECK_START, 1s);
                 if (Creature* speaker = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_VILEBRANCH_SPEAKER)))
                 {
                     if (!speaker->IsAlive())
@@ -250,7 +250,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid const guid, int32 type) override
+        void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == ACTION_CHARGE)
             {
@@ -564,7 +564,7 @@ public:
             RevivePlayer(victim, reviveGUID);
         }
 
-        void SetGUID(ObjectGuid const guid, int32 /*type = 0 */) override
+        void SetGUID(ObjectGuid const& guid, int32 /*type = 0 */) override
         {
             reviveGUID = guid;
         }
@@ -612,7 +612,7 @@ public:
         revivePlayerGUID.Clear();
     }
 
-    void SetGUID(ObjectGuid const guid, int32 /*id*/) override
+    void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
     {
         revivePlayerGUID = guid;
     }
@@ -641,7 +641,7 @@ public:
             {
                 DoCast(target, SPELL_REVIVE);
             }
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 

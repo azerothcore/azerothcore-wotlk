@@ -151,7 +151,7 @@ struct boss_shade_of_aran : public BossAI
         return me->GetDistance2d(roomCenter.GetPositionX(), roomCenter.GetPositionY()) < 45.0f;
     }
 
-    void SetGUID(ObjectGuid guid, int32 id) override
+    void SetGUID(ObjectGuid const& guid, int32 id) override
     {
         if (id == ACTION_ATIESH_REACT && !_atieshReaction)
         {

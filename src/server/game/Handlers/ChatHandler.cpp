@@ -803,7 +803,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, _player, _player, GetPlayer()->GetName());
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)

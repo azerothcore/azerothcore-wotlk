@@ -255,6 +255,8 @@ public:
     void SetBattlefieldGroup(Battlefield* bf);
     GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
+    void DoMinimapPing(ObjectGuid sourceGuid, float mapX, float mapY);
+
     void ChangeMembersGroup(ObjectGuid guid, uint8 group);
     void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
     void SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag);

@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ahnkahet.h"
@@ -38,10 +39,9 @@ enum Spells
     SPELL_BEAM_VISUAL                       = 60342,
     SPELL_VANISH                            = 55964,
     SPELL_SHADOWSTEP                        = 55966,
-    SPELL_HOVER_FALL                        = 60425
+    SPELL_HOVER_FALL                        = 60425,
+    SPELL_EMBRACE_OF_THE_VAMPYR             = 55959,
 };
-
-#define SPELL_EMBRACE_OF_THE_VAMPYR         DUNGEON_MODE(55959, 59513)
 
 enum Spheres
 {
@@ -291,7 +291,7 @@ struct boss_taldaram : public BossAI
     {
         BossAI::DamageTaken(attacker, damage, damageType, school);
 
-        if (me->FindCurrentSpellBySpellId(SPELL_EMBRACE_OF_THE_VAMPYR))
+        if (me->FindCurrentSpellBySpellId(sSpellMgr->GetSpellIdForDifficulty(SPELL_EMBRACE_OF_THE_VAMPYR, me)))
         {
             vanishDamage += damage;
             if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))

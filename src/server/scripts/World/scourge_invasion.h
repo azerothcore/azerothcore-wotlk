@@ -137,10 +137,7 @@ enum ScourgeInvasionSpells
                                                              */
 
     // Shadow of Doom
-    SPELL_SPAWN_SMOKE                           = 10389, // Spawning Visual.
     SPELL_ZAP_CRYSTAL_CORPSE                    = 28056, // Casted on Shard if Shadow of Doom dies.
-    SPELL_MINDFLAY                              = 16568,
-    SPELL_FEAR                                  = 12542,
 
     // Pallid Horror - Patchwerk Terror (also uses: 28315)
     SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL       = 28424, // Alliance.
@@ -336,7 +333,6 @@ enum ScourgeInvasionTalk
     HERALD_OF_THE_LICH_KING_SAY_ATTACK_END      = 1,
     HERALD_OF_THE_LICH_KING_SAY_ATTACK_RANDOM   = 2,
     PALLID_HORROR_SAY_RANDOM_YELL               = 0,
-    SHADOW_OF_DOOM_SAY_AGGRO                    = 0,
     SYLVANAS_SAY_ATTACK_END                     = 3,
     VARIAN_SAY_ATTACK_END                       = 3
 };

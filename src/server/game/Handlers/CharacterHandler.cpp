@@ -668,51 +668,46 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
-    m_playerLoading = true;
+    if (!sWorld->getBoolConfig(CONFIG_REALM_LOGIN_ENABLED))
+    {
+        SendCharLoginFailed(LoginFailureReason::NoWorld);
+        return;
+    }
+
+    if (PlayerLoading() || GetPlayer() != nullptr)
+    {
+        LOG_ERROR("network", "Player tried to login again, AccountId = {}", GetAccountId());
+        KickPlayer("WorldSession::HandlePlayerLoginOpcode Another client logging in");
+        return;
+    }
+
     ObjectGuid playerGuid;
     recvData >> playerGuid;
 
-    if (PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
-    {
-        // limit player interaction with the world
-        if (!sWorld->getBoolConfig(CONFIG_REALM_LOGIN_ENABLED))
-        {
-            WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
-            // see LoginFailureReason enum for more reasons
-            data << uint8(LoginFailureReason::NoWorld);
-            SendPacket(&data);
-            return;
-        }
-    }
-
-    if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
+    if (!IsLegitCharacterForAccount(playerGuid))
     {
         LOG_ERROR("network", "Account ({}) can't login with that character ({}).", GetAccountId(), playerGuid.ToString());
         KickPlayer("Account can't login with this character");
         return;
     }
 
-    auto SendCharLogin = [&](ResponseCodes result)
-    {
-        WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
-        data << uint8(result);
-        SendPacket(&data);
-    };
-
     // pussywizard:
     if (WorldSession* sess = sWorldSessionMgr->FindOfflineSessionForCharacterGUID(playerGuid.GetCounter()))
+    {
         if (sess->GetAccountId() != GetAccountId())
         {
-            SendCharLogin(CHAR_LOGIN_DUPLICATE_CHARACTER);
+            SendCharLoginFailed(LoginFailureReason::DuplicateCharacter);
             return;
         }
+    }
+
     // pussywizard:
     if (WorldSession* sess = sWorldSessionMgr->FindOfflineSession(GetAccountId()))
     {
         Player* p = sess->GetPlayer();
         if (!p || sess->IsKicked())
         {
-            SendCharLogin(CHAR_LOGIN_DUPLICATE_CHARACTER);
+            SendCharLoginFailed(LoginFailureReason::DuplicateCharacter);
             return;
         }
 
@@ -723,7 +718,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
             // pussywizard: players stay ingame no matter what (prevent abuse), but allow to turn it off to stop crashing
             if (!sWorld->getBoolConfig(CONFIG_ENABLE_LOGIN_AFTER_DC))
             {
-                SendCharLogin(CHAR_LOGIN_DUPLICATE_CHARACTER);
+                SendCharLoginFailed(LoginFailureReason::DuplicateCharacter);
                 return;
             }
 
@@ -765,7 +760,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
             }
             if (!p->FindMap() || !p->IsInWorld() || sess->IsKicked())
             {
-                SendCharLogin(CHAR_LOGIN_DUPLICATE_CHARACTER);
+                SendCharLoginFailed(LoginFailureReason::DuplicateCharacter);
                 return;
             }
 
@@ -781,11 +776,9 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
     std::shared_ptr<LoginQueryHolder> holder = std::make_shared<LoginQueryHolder>(GetAccountId(), playerGuid);
     if (!holder->Initialize())
-    {
-        m_playerLoading = false;
         return;
-    }
 
+    m_playerLoading = true;
     AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(holder)).AfterComplete([this](SQLQueryHolderBase const& holder)
     {
         HandlePlayerLoginFromDB(static_cast<LoginQueryHolder const&>(holder));
@@ -1171,15 +1164,17 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     SendPacket(&data);
 
     // Xinef: fix possible problem with flag UNIT_FLAG_STUNNED added during logout
-    if (!pCurrChar->HasUnitState(UNIT_STATE_STUNNED))
+    if (pCurrChar->HasUnitState(UNIT_STATE_LOGOUT_TIMER))
+    {
+        pCurrChar->SetRooted(false, true, true);
         pCurrChar->RemoveUnitFlag(UNIT_FLAG_STUNNED);
+    }
 
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
     // necessary actions from AddPlayerToMap:
     pCurrChar->GetMap()->SendInitTransports(pCurrChar);
     pCurrChar->GetMap()->SendInitSelf(pCurrChar);
-    pCurrChar->GetMap()->SendZoneDynamicInfo(pCurrChar);
 
     // If we are logging into an existing player, simply clear visibility references
     // so player will receive a fresh list of new objects on the next vis update.
@@ -1762,8 +1757,20 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
     std::string name;
     recvData >> name;
 
+    if (name.length() > 16) // Client limitation
+    {
+        LOG_ERROR("entities.player.cheat", "Character GUID {} tried to create equipment set {} with too long a name!", _player->GetGUID().ToString(), setGuid);
+        return;
+    }
+
     std::string iconName;
     recvData >> iconName;
+
+    if (iconName.length() > 100) // DB limitation
+    {
+        LOG_ERROR("entities.player.cheat", "Character GUID {} tried to create equipment set {} with too long an icon name!", _player->GetGUID().ToString(), setGuid);
+        return;
+    }
 
     EquipmentSet eqSet;
 
@@ -2575,6 +2582,13 @@ void WorldSession::SendCharDelete(ResponseCodes result)
     data << uint8(result);
     SendPacket(&data);
 }
+
+void WorldSession::SendCharLoginFailed(LoginFailureReason reason)
+{
+    WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
+    data << uint8(reason);
+    SendPacket(&data);
+};
 
 void WorldSession::SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo)
 {

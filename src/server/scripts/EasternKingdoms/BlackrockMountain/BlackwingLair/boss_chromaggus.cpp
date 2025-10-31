@@ -118,7 +118,7 @@ public:
             return !victim->HasAura(SPELL_TIMELAPSE);
         }
 
-        void SetGUID(ObjectGuid guid, int32 id) override
+        void SetGUID(ObjectGuid const& guid, int32 id) override
         {
             if (id == GUID_LEVER_USER)
             {
@@ -244,7 +244,7 @@ class go_chromaggus_lever : public GameObjectScript
                         if (Creature* creature = _instance->GetCreature(DATA_CHROMAGGUS))
                         {
                             creature->SetHomePosition(homePos);
-                            creature->GetMotionMaster()->MovePath(creature->GetEntry() * 10, false);
+                            creature->GetMotionMaster()->MoveWaypoint(creature->GetEntry() * 10, false);
                             creature->AI()->SetGUID(player->GetGUID(), GUID_LEVER_USER);
                         }
 

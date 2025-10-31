@@ -397,7 +397,10 @@ public:
         if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
         {
             if (npc_escortAI* pEscortAI = CAST_AI(npc_prospector_remtravel::npc_prospector_remtravelAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(false, player->GetGUID());
+            }
 
             creature->SetFaction(FACTION_ESCORTEE_A_NEUTRAL_PASSIVE);
         }
@@ -463,7 +466,7 @@ public:
                             _events.Reset();
                             _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1s);
                             player->KilledMonsterCredit(NPC_CAPTURED_RABID_THISTLE_BEAR);
-                            me->DespawnOrUnsummon(240000);
+                            me->DespawnOrUnsummon(240s);
                         }
                     }
                 }
@@ -552,7 +555,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid /*guid*/, int32 type) override
+        void SetGUID(ObjectGuid const& /*guid*/, int32 type) override
         {
             if (type == GUID_SCRIPT_INVOKER && _scriptRunning == false)
             {

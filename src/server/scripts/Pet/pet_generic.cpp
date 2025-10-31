@@ -49,7 +49,7 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
     npc_pet_gen_soul_trader_beacon(Creature* c) : ScriptedAI(c)
     {
         events.Reset();
-        events.ScheduleEvent(EVENT_INITIAL_TALK, 0);
+        events.ScheduleEvent(EVENT_INITIAL_TALK, 0ms);
         if (me->ToTempSummon())
             if (Unit* owner = me->ToTempSummon()->GetOwner())
             {
@@ -65,7 +65,7 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
         if (spellInfo->Id == SPELL_STEAL_ESSENCE_VISUAL && target == me)
         {
             Talk(1);
-            events.ScheduleEvent(EVENT_ADD_TOKEN, 3000);
+            events.ScheduleEvent(EVENT_ADD_TOKEN, 3s);
             me->CastSpell(me, SPELL_EMOTE_STATE_SWIM_RUN, true);
         }
     }
@@ -160,7 +160,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
         if (Unit* owner = me->GetCharmerOrOwner())
         {
             me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, MINI_PET_FOLLOW_ANGLE, MOTION_SLOT_ACTIVE);
         }
     }
 
@@ -193,7 +193,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
                                 duration = cooldown;
                                 aura = SPELL_AURA_POSTMAN_S + i;
                                 _state = argentPonyService[TEAM_ALLIANCE][i];
-                                me->ToTempSummon()->UnSummon(duration);
+                                me->ToTempSummon()->UnSummon(Milliseconds(duration));
                                 break;
                             }
                         }
@@ -204,7 +204,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
                                 duration = cooldown * IN_MILLISECONDS;
                                 aura = SPELL_AURA_BANK_G + i;
                                 _state = argentPonyService[TEAM_HORDE][i];
-                                me->ToTempSummon()->UnSummon(duration);
+                                me->ToTempSummon()->UnSummon(Milliseconds(duration));
                                 break;
                             }
                         }
@@ -327,7 +327,7 @@ struct npc_pet_gen_argent_pony_bridle : public ScriptedAI
             creature->CastSpell(creature, spellId, true);
             player->AddSpellCooldown(spellId, 0, 3 * MINUTE * IN_MILLISECONDS);
             player->AddSpellCooldown(player->GetTeamId(true) ? SPELL_AURA_TIRED_G : SPELL_AURA_TIRED_S, 0, 3 * MINUTE * IN_MILLISECONDS + 4 * HOUR * IN_MILLISECONDS);
-            creature->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+            creature->DespawnOrUnsummon(180s);
         }
         return true;
     }
@@ -388,7 +388,7 @@ struct npc_pet_gen_target_following_bomb : public NullCreatureAI
                 if (me->GetDistance(target) < 3.0f)
                 {
                     me->CastSpell(me, bombSpellId, false);
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
                 }
             }
             else if (!me->HasUnitState(UNIT_STATE_FOLLOW))
@@ -557,7 +557,7 @@ struct npc_pet_gen_imp_in_a_bottle : public NullCreatureAI
         if (_talkTimer >= 5000)
         {
             _talkTimer = 0;
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             if (!_hasParty)
                 Talk(0, ObjectAccessor::GetPlayer(*me, _ownerGUID));
             else if (Player* player = ObjectAccessor::GetPlayer(*me, _ownerGUID))
@@ -567,9 +567,9 @@ struct npc_pet_gen_imp_in_a_bottle : public NullCreatureAI
                     for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != nullptr && limit < 4; itr = itr->next(), ++limit)
                         if (Player* groupPlayer = itr->GetSource())
                             if (groupPlayer != player)
-                                groupPlayer->GetSession()->SendPacket(&_data);
+                                groupPlayer->SendDirectMessage(&_data);
 
-                player->GetSession()->SendPacket(&_data);
+                player->SendDirectMessage(&_data);
             }
         }
     }
@@ -709,7 +709,7 @@ struct npc_pet_gen_toxic_wasteling : public PassiveAI
                 if (Unit* owner = me->GetCharmerOrOwner())
                 {
                     me->GetMotionMaster()->Clear(false);
-                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+                    me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, MINI_PET_FOLLOW_ANGLE, MOTION_SLOT_ACTIVE);
                 }
                 me->AddAura(71854, me); // Growth
                 checkTimer = 0;

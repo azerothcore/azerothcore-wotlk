@@ -1970,7 +1970,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
             {
                 WorldPacket data;
                 player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 7744, GetSpellInfo()->CategoryRecoveryTime); // Will of the forsaken
-                player->GetSession()->SendPacket(&data);
+                player->SendDirectMessage(&data);
             }
             else
             {
@@ -1983,11 +1983,11 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
                 data << uint16(GetSpellInfo()->GetCategory());                   // spell category
                 data << uint32(0);
                 data << uint32(GetSpellInfo()->CategoryRecoveryTime);
-                player->GetSession()->SendPacket(&data);
+                player->SendDirectMessage(&data);
 
                 WorldPacket data2;
                 player->BuildCooldownPacket(data2, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, SPELL_PVP_TRINKET, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
-                player->GetSession()->SendPacket(&data2);
+                player->SendDirectMessage(&data2);
             }
         }
     }
@@ -2650,7 +2650,7 @@ class spell_gen_spirit_healer_res : public SpellScript
         {
             WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
             data << target->GetGUID();
-            originalCaster->GetSession()->SendPacket(&data);
+            originalCaster->SendDirectMessage(&data);
         }
     }
 
@@ -3706,7 +3706,7 @@ class spell_gen_despawn_self : public SpellScript
     void HandleDummy(SpellEffIndex effIndex)
     {
         if (GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_DUMMY || GetSpellInfo()->Effects[effIndex].Effect == SPELL_EFFECT_SCRIPT_EFFECT)
-            GetCaster()->ToCreature()->DespawnOrUnsummon(1);
+            GetCaster()->ToCreature()->DespawnOrUnsummon(1ms);
     }
 
     void Register() override
@@ -5492,6 +5492,184 @@ class spell_gen_cooldown_all : public SpellScript
     }
 };
 
+// 29007 - Drink (Freshly-Squeezed Lemonade)
+// 29008 - Food (Friendship Bread)
+enum HeartFood
+{
+    SPELL_VISUAL_KIT_HEART_EMOTE = 6552
+};
+
+class spell_gen_food_heart_emote : public AuraScript
+{
+    PrepareAuraScript(spell_gen_food_heart_emote);
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = 5 * IN_MILLISECONDS;
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_VISUAL_KIT_HEART_EMOTE);
+    }
+
+    void HandleUpdatePeriodic(AuraEffect* /*aurEff*/)
+    {
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_VISUAL_KIT_HEART_EMOTE);
+    }
+
+    void Register() override
+    {
+        AuraType effName = (m_scriptSpellId == 29007) ? SPELL_AURA_MOD_POWER_REGEN : SPELL_AURA_MOD_REGEN;
+        OnEffectApply += AuraEffectApplyFn(spell_gen_food_heart_emote::OnApply, EFFECT_0, effName, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_food_heart_emote::CalcPeriodic, EFFECT_0, effName);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_food_heart_emote::HandleUpdatePeriodic, EFFECT_0, effName);
+    }
+};
+
+// 456 - SHOWLABEL Only OFF
+class spell_gen_showlabel_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_showlabel_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMChat(false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_showlabel_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 2765 - SHOWLABEL Only ON
+class spell_gen_showlabel_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_showlabel_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMChat(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_showlabel_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 1509 - GM Only OFF
+class spell_gen_gm_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_gm_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            player->SetGameMaster(false);
+            player->UpdateTriggerVisibility();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_gm_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 18139 - GM Only ON
+class spell_gen_gm_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_gm_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            player->SetGameMaster(true);
+            player->UpdateTriggerVisibility();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_gm_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 6147 - INVIS Only OFF
+class spell_gen_invis_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_invis_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMVisible(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_invis_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 2763 - INVIS Only ON
+class spell_gen_invis_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_invis_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetGMVisible(false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_invis_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 20114, 24675 - BM Only OFF
+class spell_gen_bm_off : public SpellScript
+{
+    PrepareSpellScript(spell_gen_bm_off)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetBeastMaster(false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_bm_off::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 20115, 24676 - BM Only ON
+class spell_gen_bm_on : public SpellScript
+{
+    PrepareSpellScript(spell_gen_bm_on)
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->SetBeastMaster(true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_bm_on::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5656,4 +5834,13 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_down", SPELL_TRANSLOCATION_DOWN);
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
     RegisterSpellScript(spell_gen_cooldown_all);
+    RegisterSpellScript(spell_gen_food_heart_emote);
+    RegisterSpellScript(spell_gen_showlabel_off);
+    RegisterSpellScript(spell_gen_showlabel_on);
+    RegisterSpellScript(spell_gen_gm_off);
+    RegisterSpellScript(spell_gen_gm_on);
+    RegisterSpellScript(spell_gen_invis_off);
+    RegisterSpellScript(spell_gen_invis_on);
+    RegisterSpellScript(spell_gen_bm_on);
+    RegisterSpellScript(spell_gen_bm_off);
 }

@@ -238,7 +238,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             mLastTextID = e.action.talk.textGroupID;
             mTextTimer = e.action.talk.duration;
             mUseTextTimer = true;
-            sCreatureTextMgr->SendChat(talker, uint8(e.action.talk.textGroupID), talkTarget);
+
+            talker->AI()->Talk(e.action.talk.textGroupID, talkTarget, Milliseconds(e.action.talk.delay));
             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_TALK: talker: {} ({}), textId: {}", talker->GetName(), talker->GetGUID().ToString(), mLastTextID);
             break;
         }
@@ -639,7 +640,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             Unit* caster = me;
             // Areatrigger Cast!
-            if (e.GetScriptType() == SMART_SCRIPT_TYPE_AREATRIGGER)
+            if (e.IsAreatriggerScript())
                 caster = unit->SummonTrigger(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetOrientation(), 5000);
 
             if (e.action.cast.targetsLimit)
@@ -685,7 +686,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     float spellMinRange = me->GetSpellMinRangeForTarget(target->ToUnit(), spellInfo);
                     float meleeRange = me->GetMeleeRange(target->ToUnit());
 
-                    bool isWithinLOSInMap = me->IsWithinLOSInMap(target->ToUnit());
+                    bool isWithinLOSInMap = me->IsWithinLOSInMap(target->ToUnit(), VMAP::ModelIgnoreFlags::M2);
                     bool isWithinMeleeRange = distanceToTarget <= meleeRange;
                     bool isRangedAttack = spellMaxRange > NOMINAL_MELEE_RANGE;
                     bool isTargetRooted = target->ToUnit()->HasUnitState(UNIT_STATE_ROOT);
@@ -702,7 +703,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             continue;
 
                         float minDistance = std::max(meleeRange, spellMinRange) - distanceToTarget + NOMINAL_MELEE_RANGE;
-                        CAST_AI(SmartAI, me->AI())->MoveAway(std::min(minDistance, spellMaxRange));
+                        CAST_AI(SmartAI, me->AI())->DistanceYourself(std::min(minDistance, spellMaxRange));
                         continue;
                     }
 
@@ -714,7 +715,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (me->IsRooted()) // Rooted inhabit type, never move/reposition
                             continue;
 
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
@@ -724,7 +725,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (me->IsRooted()) // Rooted inhabit type, never move/reposition
                             continue;
 
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
+                        CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, 0.f);
+                        if (e.action.cast.castFlags & SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS)
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
                         continue;
                     }
 
@@ -742,18 +745,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
-                        CAST_AI(SmartAI, me->AI())->SetChaseOnInterrupt(true);
-
-                        if (!me->isMoving()) // Don't try to reposition while we are moving
-                        {
-                            // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
-                            if (result == SPELL_FAILED_OUT_OF_RANGE)
-                                // if we are just out of range, we only chase until we are back in spell range.
-                                CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
-                            else
-                                // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
-                                CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
-                        }
+                        // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
+                        if (result == SPELL_FAILED_OUT_OF_RANGE || result == SPELL_CAST_OK)
+                            // if we are just out of range, we only chase until we are back in spell range.
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        else // move into melee on any other fail
+                            // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
                     }
 
                     if (spellCastFailed)
@@ -895,7 +893,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         go->SetLootState(GO_READY);
                     }
 
-                    go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
+                    go->UseDoorOrButton(0, e.action.activateObject.alternative, unit);
                     LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject {} activated", go->GetGUID().ToString());
                 }
             }
@@ -988,7 +986,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
 
             bool move = e.action.combatMove.move;
-            CAST_AI(SmartAI, me->AI())->SetCombatMove(move);
+            CAST_AI(SmartAI, me->AI())->SetCombatMovement(move, true);
             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ALLOW_COMBAT_MOVEMENT: Creature {} bool on = {}",
                            me->GetGUID().ToString(), e.action.combatMove.move);
             break;
@@ -1485,14 +1483,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetVisible(!!e.action.visibility.state);
+                    target->ToUnit()->SetVisible(e.action.visibility.state);
 
             break;
         }
         case SMART_ACTION_SET_ACTIVE:
         {
             for (WorldObject* target : targets)
-                target->setActive(!!e.action.setActive.state);
+                target->setActive(e.action.setActive.state);
             break;
         }
         case SMART_ACTION_ATTACK_START:
@@ -1685,10 +1683,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsCreature(target))
                 {
-                    if (IsSmart(target->ToCreature()))
-                        CAST_AI(SmartAI, target->ToCreature()->AI())->SetRun(e.action.setRun.run);
-                    else
-                        target->ToCreature()->SetWalk(e.action.setRun.run ? false : true); // Xinef: reversed
+                    target->ToCreature()->SetWalk(e.action.setRun.run ? false : true);
                 }
             }
 
@@ -1728,12 +1723,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 StoreCounter(e.action.setCounter.counterId, e.action.setCounter.value, e.action.setCounter.reset, e.action.setCounter.subtract);
             break;
         }
-        case SMART_ACTION_WP_START:
+        case SMART_ACTION_ESCORT_START:
         {
             if (!IsSmart())
                 break;
 
-            bool run = e.action.wpStart.run != 0;
+            ForcedMovement forcedMovement = static_cast<ForcedMovement>(e.action.wpStart.forcedMovement);
             uint32 entry = e.action.wpStart.pathID;
             bool repeat = e.action.wpStart.repeat != 0;
 
@@ -1747,7 +1742,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
 
             me->SetReactState((ReactStates)e.action.wpStart.reactState);
-            CAST_AI(SmartAI, me->AI())->StartPath(run, entry, repeat, unit);
+            CAST_AI(SmartAI, me->AI())->StartPath(forcedMovement, entry, repeat, unit);
 
             uint32 quest = e.action.wpStart.quest;
             uint32 DespawnTime = e.action.wpStart.despawnTime;
@@ -1755,16 +1750,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->SetDespawnTime(DespawnTime);
             break;
         }
-        case SMART_ACTION_WP_PAUSE:
+        case SMART_ACTION_ESCORT_PAUSE:
         {
             if (!IsSmart())
                 break;
 
             uint32 delay = e.action.wpPause.delay;
-            CAST_AI(SmartAI, me->AI())->PausePath(delay, e.GetEventType() == SMART_EVENT_WAYPOINT_REACHED ? false : true);
+            CAST_AI(SmartAI, me->AI())->PausePath(delay, e.GetEventType() == SMART_EVENT_ESCORT_REACHED ? false : true);
             break;
         }
-        case SMART_ACTION_WP_STOP:
+        case SMART_ACTION_ESCORT_STOP:
         {
             if (!IsSmart())
                 break;
@@ -1775,7 +1770,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             CAST_AI(SmartAI, me->AI())->StopPath(DespawnTime, quest, fail);
             break;
         }
-        case SMART_ACTION_WP_RESUME:
+        case SMART_ACTION_ESCORT_RESUME:
         {
             if (!IsSmart())
                 break;
@@ -1845,6 +1840,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             WorldObject* target = nullptr;
 
+            SAIBool isForced = !e.action.moveToPos.disableForceDestination;
+
             switch (e.GetTargetType())
             {
                 case SMART_TARGET_POSITION:
@@ -1854,8 +1851,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (TransportBase* trans = me->GetDirectTransport())
                             trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
 
-                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, true,
-                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, FORCED_MOVEMENT_NONE,
+                        0.f, e.target.o, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
 
                     break;
                 }
@@ -1871,9 +1868,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             randomPoint.m_positionX,
                             randomPoint.m_positionY,
                             randomPoint.m_positionZ,
-                            true,
-                            true,
-                            isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
+                            FORCED_MOVEMENT_NONE,
+                            0.f, 0.f, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
                         );
 
                     }
@@ -1897,7 +1893,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     else if (e.action.moveToPos.ContactDistance)
                         target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
 
-                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, FORCED_MOVEMENT_NONE,
+                        0.f, 0.f, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
 
                     break;
                 }
@@ -1911,8 +1908,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsCreature(target))
                 {
+                    SAIBool isForced = !e.action.moveToPosTarget.disableForceDestination;
+
                     Creature* ctarget = target->ToCreature();
-                    ctarget->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, e.target.x, e.target.y, e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    ctarget->GetMotionMaster()->MovePoint(e.action.moveToPosTarget.pointId, e.target.x, e.target.y, e.target.z, FORCED_MOVEMENT_NONE,
+                        0.f, 0.f, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
                 }
             }
 
@@ -2056,7 +2056,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             for (WorldObject* target : targets)
                 if (Creature* creature = target->ToCreature())
                     if (IsSmart(creature) && creature->GetVictim())
-                        if (CAST_AI(SmartAI, creature->AI())->CanCombatMove())
+                        if (!creature->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
                             creature->GetMotionMaster()->MoveChase(creature->GetVictim(), attackDistance, attackAngle);
 
             break;
@@ -2519,21 +2519,19 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
                         {
-                            WPPath* path = sSmartWaypointMgr->GetPath(wp);
+                            WaypointPath* path = sSmartWaypointMgr->GetPath(wp);
                             if (!path || path->empty())
                                 continue;
 
                             auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
-                                if (WayPoint* wpData = itrWp->second)
+                                WaypointData& wpData = itrWp->second;
+                                float distToThisPath = creature->GetExactDistSq(wpData.x, wpData.y, wpData.z);
+                                if (distToThisPath < distanceToClosest)
                                 {
-                                    float distToThisPath = creature->GetExactDistSq(wpData->x, wpData->y, wpData->z);
-                                    if (distToThisPath < distanceToClosest)
-                                    {
-                                        distanceToClosest = distToThisPath;
-                                        closestWpId = wp;
-                                    }
+                                    distanceToClosest = distToThisPath;
+                                    closestWpId = wp;
                                 }
                             }
                         }
@@ -2541,9 +2539,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (closestWpId)
                         {
                             bool repeat = e.action.startClosestWaypoint.repeat;
-                            bool run = e.action.startClosestWaypoint.run;
+                            ForcedMovement forcedMovement = static_cast<ForcedMovement>(e.action.startClosestWaypoint.forcedMovement);
 
-                            CAST_AI(SmartAI, creature->AI())->StartPath(repeat, closestWpId, run);
+                            CAST_AI(SmartAI, creature->AI())->StartPath(forcedMovement, closestWpId, repeat);
                         }
                     }
                 }
@@ -2725,26 +2723,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         me->InterruptNonMeleeSpells(false);
                     }
 
-                    if (e.action.castCustom.flags & SMARTCAST_COMBAT_MOVE)
-                    {
-                        // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed
-                        // unless target is outside spell range, out of mana, or LOS.
-
-                        bool _allowMove = false;
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.castCustom.spell); // AssertSpellInfo?
-                        int32 mana = me->GetPower(POWER_MANA);
-
-                        if (me->GetDistance(target->ToUnit()) > spellInfo->GetMaxRange(true) ||
-                            me->GetDistance(target->ToUnit()) < spellInfo->GetMinRange(true) ||
-                            !me->IsWithinLOSInMap(target->ToUnit()) ||
-                            mana < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
-                            _allowMove = true;
-
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(_allowMove);
-                    }
-
                     if (!(e.action.castCustom.flags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.castCustom.spell))
                     {
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.castCustom.spell);
                         CustomSpellValues values;
                         if (e.action.castCustom.bp1)
                             values.AddSpellMod(SPELLVALUE_BASE_POINT0, e.action.castCustom.bp1);
@@ -2752,7 +2733,19 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             values.AddSpellMod(SPELLVALUE_BASE_POINT1, e.action.castCustom.bp2);
                         if (e.action.castCustom.bp3)
                             values.AddSpellMod(SPELLVALUE_BASE_POINT2, e.action.castCustom.bp3);
-                        me->CastCustomSpell(e.action.castCustom.spell, values, target->ToUnit(), (e.action.castCustom.flags & SMARTCAST_TRIGGERED) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
+                        SpellCastResult result = me->CastCustomSpell(spellInfo, values, target->ToUnit(), (e.action.castCustom.flags & SMARTCAST_TRIGGERED) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
+
+                        float spellMaxRange = me->GetSpellMaxRangeForTarget(target->ToUnit(), spellInfo);
+                        if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
+                        {
+                            // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
+                            if (result == SPELL_FAILED_OUT_OF_RANGE || result == SPELL_CAST_OK)
+                                // if we are just out of range, we only chase until we are back in spell range.
+                                CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                            else // move into melee on any other fail
+                                // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
+                                CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
+                        }
                     }
                 }
             }
@@ -3226,7 +3219,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
-        case SMART_ACTION_WAYPOINT_DATA_START:
+        case SMART_ACTION_WAYPOINT_START:
         {
             if (e.action.wpData.pathId)
             {
@@ -3235,7 +3228,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (IsCreature(target))
                     {
                         target->ToCreature()->LoadPath(e.action.wpData.pathId);
-                        target->ToCreature()->GetMotionMaster()->MovePath(e.action.wpData.pathId, e.action.wpData.repeat);
+                        target->ToCreature()->GetMotionMaster()->MoveWaypoint(e.action.wpData.pathId, e.action.wpData.repeat, e.action.wpData.pathSource);
                     }
                 }
             }
@@ -3252,7 +3245,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         uint32 path = urand(e.action.wpDataRandom.pathId1, e.action.wpDataRandom.pathId2);
                         target->ToCreature()->LoadPath(path);
-                        target->ToCreature()->GetMotionMaster()->MovePath(path, e.action.wpDataRandom.repeat);
+                        target->ToCreature()->GetMotionMaster()->MoveWaypoint(path, e.action.wpDataRandom.repeat);
                     }
                 }
             }
@@ -3834,19 +3827,20 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 {
                     targets.clear();
 
-                    if (owner->ToCreature())
+                    if (IsCreature(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToCreature()->GetCharmerOrOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
                     }
-                    else
+                    else if (IsGameObject(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToGameObject()->GetOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
+                    }
+                    else if (IsPlayer(owner))
+                    {
+                        if (Unit* base = owner->ToPlayer()->GetCharmerOrOwner())
+                            targets.push_back(base);
                     }
                 }
             }
@@ -3992,27 +3986,29 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         }
         case SMART_TARGET_INSTANCE_STORAGE:
         {
-            if (InstanceScript* instance = GetBaseObject()->GetInstanceScript())
-            {
-                if (e.target.instanceStorage.type == 1)
-                {
-                    if (Creature* creature = instance->GetCreature(e.target.instanceStorage.index))
-                    {
-                        targets.push_back(creature);
-                    }
-                }
-                else if (e.target.instanceStorage.type == 2)
-                {
-                    if (GameObject* go = instance->GetGameObject(e.target.instanceStorage.index))
-                    {
-                        targets.push_back(go);
-                    }
-                }
-            }
+            InstanceScript* instance = nullptr;
+
+            if (e.IsAreatriggerScript() && scriptTrigger)
+                instance = scriptTrigger->GetInstanceScript();
             else
+                instance = GetBaseObject()->GetInstanceScript();
+
+            if (!instance)
             {
                 LOG_ERROR("scripts.ai.sai", "SMART_TARGET_INSTANCE_STORAGE: Entry {} SourceType {} Event {} Action {} Target {} called outside an instance map.",
                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
+                return;
+            }
+
+            if (e.target.instanceStorage.type == 1)
+            {
+                if (Creature* creature = instance->GetCreature(e.target.instanceStorage.index))
+                    targets.push_back(creature);
+            }
+            else if (e.target.instanceStorage.type == 2)
+            {
+                if (GameObject* go = instance->GetGameObject(e.target.instanceStorage.index))
+                    targets.push_back(go);
             }
 
             break;
@@ -4400,22 +4396,24 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if ((e.event.movementInform.type && var0 != e.event.movementInform.type) || (e.event.movementInform.id && var1 != e.event.movementInform.id))
                     return;
+                if (e.event.movementInform.pathId != 0 && e.event.movementInform.pathId != me->GetWaypointPath())
+                    return;
                 ProcessAction(e, unit, var0, var1);
                 break;
             }
         case SMART_EVENT_TRANSPORT_RELOCATE:
-        case SMART_EVENT_WAYPOINT_START:
+        case SMART_EVENT_ESCORT_START:
             {
                 if (e.event.waypoint.pathID && var0 != e.event.waypoint.pathID)
                     return;
                 ProcessAction(e, unit, var0);
                 break;
             }
-        case SMART_EVENT_WAYPOINT_REACHED:
-        case SMART_EVENT_WAYPOINT_RESUMED:
-        case SMART_EVENT_WAYPOINT_PAUSED:
-        case SMART_EVENT_WAYPOINT_STOPPED:
-        case SMART_EVENT_WAYPOINT_ENDED:
+        case SMART_EVENT_ESCORT_REACHED:
+        case SMART_EVENT_ESCORT_RESUMED:
+        case SMART_EVENT_ESCORT_PAUSED:
+        case SMART_EVENT_ESCORT_STOPPED:
+        case SMART_EVENT_ESCORT_ENDED:
             {
                 if (!me || (e.event.waypoint.pointID && var0 != e.event.waypoint.pointID) || (e.event.waypoint.pathID && GetPathId() != e.event.waypoint.pathID))
                     return;
@@ -4809,8 +4807,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             RecalcTimer(e, 1200, 1200);
             break;
         }
-        case SMART_EVENT_WAYPOINT_DATA_REACHED:
-        case SMART_EVENT_WAYPOINT_DATA_ENDED:
+        case SMART_EVENT_WAYPOINT_REACHED:
+        case SMART_EVENT_WAYPOINT_ENDED:
         {
             if (!me || (e.event.wpData.pointId && var0 != e.event.wpData.pointId) || (e.event.wpData.pathId && me->GetWaypointPath() != e.event.wpData.pathId))
                 return;

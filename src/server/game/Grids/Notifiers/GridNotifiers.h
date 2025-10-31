@@ -45,16 +45,16 @@ namespace Acore
         Player& i_player;
         std::vector<Unit*>& i_visibleNow;
         bool i_gobjOnly;
-        bool i_largeOnly;
         UpdateData i_data;
 
-        VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
-            i_player(player), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
+        VisibleNotifier(Player& player, bool gobjOnly) :
+            i_player(player), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly)
         {
             i_visibleNow.clear();
         }
 
         void Visit(GameObjectMapType&);
+        template<class T> void Visit(std::vector<T>& m);
         template<class T> void Visit(GridRefMgr<T>& m);
         void SendToSelf(void);
     };
@@ -72,8 +72,9 @@ namespace Acore
 
     struct PlayerRelocationNotifier : public VisibleNotifier
     {
-        PlayerRelocationNotifier(Player& player, bool largeOnly): VisibleNotifier(player, false, largeOnly) { }
+        PlayerRelocationNotifier(Player& player): VisibleNotifier(player, false) { }
 
+        template<class T> void Visit(std::vector<T>& m) { VisibleNotifier::Visit(m); }
         template<class T> void Visit(GridRefMgr<T>& m) { VisibleNotifier::Visit(m); }
         void Visit(PlayerMapType&);
     };
@@ -125,7 +126,7 @@ namespace Acore
             if (!player->HaveAtClient(i_source))
                 return;
 
-            player->GetSession()->SendPacket(i_message);
+            player->SendDirectMessage(i_message);
         }
     };
 
@@ -150,7 +151,7 @@ namespace Acore
             if (player == i_source || !player->HaveAtClient(i_source) || player->IsFriendlyTo(i_source))
                 return;
 
-            player->GetSession()->SendPacket(i_message);
+            player->SendDirectMessage(i_message);
         }
     };
 
@@ -1091,10 +1092,9 @@ namespace Acore
                 {
                     return false;
                 }
-
             }
 
-            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->IsDynamicObject() ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range,true,false))
+            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->IsDynamicObject() ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range,true,false, true))
 
                 return true;
 
@@ -1156,7 +1156,11 @@ namespace Acore
                 return;
 
             if (u->AI())
+            {
+                u->SetNoCallForHelp(true); // avoid recursive call for help causing stack overflow
                 u->AI()->AttackStart(i_enemy);
+                u->SetNoCallForHelp(false);
+            }
         }
     private:
         Unit* const i_funit;
@@ -1187,7 +1191,7 @@ namespace Acore
         }
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range, true, false))
+            if (!me->IsWithinDistInMap(u, m_range, true, false, false))
                 return false;
 
             if (!me->IsValidAttackTarget(u))
@@ -1213,7 +1217,7 @@ namespace Acore
         explicit NearestHostileUnitInAttackDistanceCheck(Creature const* creature, float dist) : me(creature), m_range(dist) {}
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range, true, false))
+            if (!me->IsWithinDistInMap(u, m_range, true, false, false))
                 return false;
 
             if (!me->CanStartAttack(u))

@@ -60,7 +60,8 @@ enum WarriorSpells
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
     SPELL_WARRIOR_WHIRLWIND_MAIN                    = 50622,
-    SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949
+    SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949,
+    SPELL_WARRIOR_EXECUTE_R1                        = 5308,
 };
 
 enum WarriorSpellIcons
@@ -959,6 +960,26 @@ class spell_warr_heroic_strike : public SpellScript
     }
 };
 
+class spell_war_sudden_death_aura : public AuraScript
+{   PrepareAuraScript(spell_war_sudden_death_aura);
+
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
+    {
+        // Check PROC_SPELL_PHASE_FINISH only for Execute
+        if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_FINISH)
+            return isTriggeredAtSpellProcEvent;
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+            if (procSpell->GetSpellInfo()->GetFirstRankSpell()->Id == SPELL_WARRIOR_EXECUTE_R1)
+                return isTriggeredAtSpellProcEvent;
+        return false;
+    }
+
+    void Register() override
+    {
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_war_sudden_death_aura::AfterCheckProc);
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     RegisterSpellScript(spell_warr_mocking_blow);
@@ -986,4 +1007,5 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_vigilance_trigger);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
     RegisterSpellScript(spell_warr_heroic_strike);
+    RegisterSpellScript(spell_war_sudden_death_aura);
 }

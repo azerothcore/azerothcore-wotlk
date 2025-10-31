@@ -27,6 +27,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
+#include "World.h"
 #include "Vehicle.h"
 #include "ZoneScript.h"
 #include <functional>
@@ -49,19 +50,23 @@ AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; 
  * @param WorldObject target The target of the speech, in case it has elements such as $n, where the target's name will be referrenced.
  * @param Milliseconds delay Delay until the creature says the text line. Creatures will talk immediately by default.
  */
-void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0s*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0ms*/)
 {
-    if (delay > Seconds::zero())
+    if (delay > 0ms)
     {
-        me->m_Events.AddEventAtOffset([this, id, target]()
+        ObjectGuid targetGuid;
+
+        if (target)
+            targetGuid = target->GetGUID();
+
+        me->m_Events.AddEventAtOffset([this, id, targetGuid]()
         {
-            sCreatureTextMgr->SendChat(me, id, target);
+            // Target can be nullptr here, it will be handled inside the function.
+            sCreatureTextMgr->SendChat(me, id, ObjectAccessor::GetUnit(*me, targetGuid));
         }, delay);
     }
     else
-    {
         sCreatureTextMgr->SendChat(me, id, target);
-    }
 }
 
 /**
@@ -177,7 +182,7 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
     if (me->IsMoveInLineOfSightDisabled())
         if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET ||      // nothing more to do, return
                 !who->IsInCombat() ||                                         // if not in combat, nothing more to do
-                !me->IsWithinDist(who, ATTACK_DISTANCE, true, false))                      // if in combat and in dist - neutral to all can actually assist other creatures
+                !me->IsWithinDist(who, ATTACK_DISTANCE, true, false, false))                      // if in combat and in dist - neutral to all can actually assist other creatures
             return;
 
     if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
@@ -360,12 +365,17 @@ void CreatureAI::MoveCircleChecks()
     if (
         !victim ||
         !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
-        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
-        (!victim->IsPlayer() && !victim->IsPet())  // only player & pets to save CPU
+        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim()
     )
     {
         return;
     }
+
+    /**
+     *  optimization, disable circling movement for NPC vs NPC combat
+     */
+    if (!sWorld->getBoolConfig(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS) && !victim->IsPlayer() && !victim->IsPet())
+        return;
 
     me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
 }
@@ -374,8 +384,13 @@ void CreatureAI::MoveBackwardsChecks()
 {
     Unit *victim = me->GetVictim();
 
-    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
-        (!victim->IsPlayer() && !victim->IsPet()))
+    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+        return;
+
+    /**
+     *  optimization, disable backwards movement for NPC vs NPC combat
+     */
+    if (!sWorld->getBoolConfig(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS) && !victim->IsPlayer() && !victim->IsPet())
     {
         return;
     }

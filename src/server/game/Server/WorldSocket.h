@@ -85,6 +85,9 @@ public:
 
     void SetSendBufferSize(std::size_t sendBufferSize) { _sendBufferSize = sendBufferSize; }
 
+    bool IsLoggingPackets() const { return _loggingPackets; }
+    void SetPacketLogging(bool state) { _loggingPackets = state; }
+
 protected:
     void OnClose() override;
     void ReadHandler() override;
@@ -133,6 +136,8 @@ private:
 
     QueryCallbackProcessor _queryProcessor;
     std::string _ipCountry;
+
+    bool _loggingPackets;
 };
 
 #endif

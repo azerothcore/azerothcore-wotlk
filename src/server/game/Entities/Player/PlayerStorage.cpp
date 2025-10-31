@@ -1536,7 +1536,7 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& des
 }
 
 //////////////////////////////////////////////////////////////////////////
-InventoryResult Player::CanStoreItems(Item** pItems, int count) const
+InventoryResult Player::CanStoreItems(Item** pItems, int32 count) const
 {
     Item* pItem2;
 
@@ -2577,8 +2577,6 @@ Item* Player::StoreItem(ItemPosCountVec const& dest, Item* pItem, bool update)
         return nullptr;
 
     Item* lastItem = pItem;
-    ItemTemplate const* proto = pItem->GetTemplate();
-
     for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end();)
     {
         uint16 pos = itr->pos;
@@ -2594,13 +2592,6 @@ Item* Player::StoreItem(ItemPosCountVec const& dest, Item* pItem, bool update)
 
         lastItem = _StoreItem(pos, pItem, count, true, update);
     }
-
-    // cast after item storing - some checks in checkcast requires item to be present!!
-    if (lastItem)
-        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-            if (proto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE && proto->Spells[i].SpellId > 0) // On obtain trigger
-                if (!HasAura(proto->Spells[i].SpellId))
-                    CastSpell(this, proto->Spells[i].SpellId, true, lastItem);
 
     return lastItem;
 }
@@ -2663,6 +2654,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         AddEnchantmentDurations(pItem);
         AddItemDurations(pItem);
+        UpdateItemObtainSpells(pItem, bag, slot);
 
         return pItem;
     }
@@ -2699,6 +2691,8 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
         AddEnchantmentDurations(pItem2);
 
         pItem2->SetState(ITEM_CHANGED, this);
+
+        UpdateItemObtainSpells(pItem2, bag, slot);
 
         return pItem2;
     }
@@ -2763,7 +2757,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
                     WorldPacket data;
                     BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, cooldownSpell, 0);
-                    GetSession()->SendPacket(&data);
+                    SendDirectMessage(&data);
                 }
             }
         }
@@ -2911,6 +2905,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
         RemoveEnchantmentDurations(pItem);
         RemoveItemDurations(pItem);
         RemoveTradeableItem(pItem);
+        ApplyItemObtainSpells(pItem, false);
 
         if (bag == INVENTORY_SLOT_BAG_0)
         {
@@ -3046,10 +3041,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
         pItem->ClearSoulboundTradeable(this);
         RemoveTradeableItem(pItem);
 
-        ItemTemplate const* proto = pItem->GetTemplate();
-        for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
-            if (proto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE && proto->Spells[i].SpellId > 0) // On obtain trigger
-                RemoveAurasDueToSpell(proto->Spells[i].SpellId);
+        ApplyItemObtainSpells(pItem, false);
 
         ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
 
@@ -3102,8 +3094,9 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             pBag->RemoveItem(slot, update);
 
         // Xinef: item is removed, remove loot from storage if any
-        if (proto->HasFlag(ITEM_FLAG_HAS_LOOT))
-            sLootItemStorage->RemoveStoredLoot(pItem->GetGUID());
+        if (ItemTemplate const* proto = pItem->GetTemplate())
+            if (proto->HasFlag(ITEM_FLAG_HAS_LOOT))
+                sLootItemStorage->RemoveStoredLoot(pItem->GetGUID());
 
         if (IsInWorld() && update)
         {
@@ -4058,7 +4051,7 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
                 break;
         }
     }
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param)
@@ -4070,7 +4063,7 @@ void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32
     if (param > 0)
         data << uint32(param);
     data << uint8(msg);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param)
@@ -4082,7 +4075,7 @@ void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, 
     if (param > 0)
         data << uint32(param);
     data << uint8(msg);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRADE_CANCELED*/)
@@ -4777,7 +4770,7 @@ void Player::SendNewItem(Item* item, uint32 count, bool received, bool created, 
     if (broadcast && GetGroup())
         GetGroup()->BroadcastPacket(&data, true);
     else
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
 }
 
 /*********************************************************/
@@ -6527,7 +6520,7 @@ void Player::BindToInstance()
 
     WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
     data << uint32(0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
     sInstanceSaveMgr->PlayerBindToInstance(this->GetGUID(), mapSave, true, this);
 }
 
@@ -6562,7 +6555,7 @@ void Player::SendRaidInfo()
         }
     }
     data.put<uint32>(p_counter, counter);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 /*
@@ -6589,7 +6582,7 @@ void Player::SendSavedInstances()
     //Send opcode 811. true or false means, whether you have current raid/heroic instances
     data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP);
     data << uint32(hasBeenSaved);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     if (!hasBeenSaved)
         return;
@@ -6603,7 +6596,7 @@ void Player::SendSavedInstances()
             {
                 data.Initialize(SMSG_UPDATE_LAST_INSTANCE);
                 data << uint32(itr->second.save->GetMapId());
-                GetSession()->SendPacket(&data);
+                SendDirectMessage(&data);
             }
         }
     }
@@ -6840,7 +6833,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
             || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
-            if (!sScriptMgr->OnPlayerNotAvoidSatisfy(partyLeader, ar, target_map, report))
+            if (!sScriptMgr->OnPlayerNotAvoidSatisfy(this, ar, target_map, report))
                 return true;
 
             if (report)
