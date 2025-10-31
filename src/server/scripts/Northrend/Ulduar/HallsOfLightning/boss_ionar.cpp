@@ -63,6 +63,7 @@ enum IonarEvents
     EVENT_CHECK_HEALTH              = 3,
     EVENT_CALL_SPARKS               = 4,
     EVENT_RESTORE                   = 5,
+    EVENT_CHANGE_TARGET             = 6,
 };
 
 struct boss_ionar : public BossAI
@@ -187,20 +188,47 @@ struct npc_spark_of_ionar : public ScriptedAI
     npc_spark_of_ionar(Creature* creature) : ScriptedAI(creature) { }
 
     void MoveInLineOfSight(Unit*) override { }
-    void UpdateAI(uint32) override { }
     void AttackStart(Unit*  /*who*/) override { }
 
-    void Reset() override { returning = false; }
+    void Reset() override
+    {
+        returning = false;
+        _events.ScheduleEvent(EVENT_CHANGE_TARGET, 3s);
+    }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         damage = 0;
     }
 
+    void UpdateAI(uint32 diff) override
+    {
+        if (returning)
+            return;
+
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_CHANGE_TARGET:
+                    if (Player* tgt = SelectTargetFromPlayerList(100))
+                    {
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveFollow(tgt, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+                    }
+                    _events.Repeat(3s);
+                    break;
+            }
+        }
+    }
+
     void DoAction(int32 param) override
     {
         if (param == ACTION_CALLBACK)
         {
+            _events.Reset();
             me->SetSpeed(MOVE_RUN, 2.5f);
             me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
@@ -218,6 +246,7 @@ struct npc_spark_of_ionar : public ScriptedAI
     }
 
     private:
+        EventMap _events;
         bool returning;
 };
 
