@@ -174,8 +174,8 @@ class spell_dk_raise_ally : public SpellScript
                 if (pInfo)                                      // exist in DB
                 {
                     ghoul->SetCreateHealth(pInfo->health);
-                    ghoul->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, pInfo->health);
-                    ghoul->SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
+                    ghoul->SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, pInfo->health);
+                    ghoul->SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
                     for (uint8 stat = 0; stat < MAX_STATS; ++stat)
                         ghoul->SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
                 }
@@ -194,9 +194,9 @@ class spell_dk_raise_ally : public SpellScript
 
                 // DK Ghoul haste refresh
                 float val = (GetCaster()->m_modAttackSpeedPct[BASE_ATTACK] - 1.0f) * 100.0f;
+                val *= 2000.0f + 2000.0f * ((100.0f + val) / 100.0f);
                 ghoul->m_modAttackSpeedPct[BASE_ATTACK] = GetCaster()->m_modAttackSpeedPct[BASE_ATTACK];
-                ghoul->SetFloatValue(UNIT_FIELD_BASEATTACKTIME, 2000.0f);
-                ghoul->ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME, val, true); // we want to reduce attack time
+                ghoul->SetFloatValue(UNIT_FIELD_BASEATTACKTIME, val);
 
                 // Strength + Stamina
                 for (uint8 i = STAT_STRENGTH; i <= STAT_STAMINA; ++i)
@@ -223,20 +223,20 @@ class spell_dk_raise_ally : public SpellScript
                     value = float(GetCaster()->GetStat(stat)) * mod;
                     value = ghoul->GetTotalStatValue(stat, value);
                     ghoul->SetStat(stat, int32(value));
-                    ghoul->ApplyStatBuffMod(stat, value, true);
+                    ghoul->UpdateStatBuffMod(stat);
                 }
 
                 // Attack Power
-                ghoul->SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, 589 + ghoul->GetStat(STAT_STRENGTH) + ghoul->GetStat(STAT_AGILITY));
-                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER, (int32)ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE) * ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_PCT));
-                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS, (int32)ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE));
-                ghoul->SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT) - 1.0f);
+                ghoul->SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, 589 + ghoul->GetStat(STAT_STRENGTH) + ghoul->GetStat(STAT_AGILITY));
+                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER, (int32)ghoul->GetFlatModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE) * ghoul->GetPctModifierValue(UNIT_MOD_ATTACK_POWER, BASE_PCT));
+                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS, (int32)ghoul->GetFlatModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE));
+                ghoul->SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, ghoul->GetPctModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT) - 1.0f);
 
                 // Health
-                ghoul->SetModifierValue(UNIT_MOD_HEALTH, TOTAL_VALUE, (ghoul->GetStat(STAT_STAMINA) - ghoul->GetCreateStat(STAT_STAMINA)) * 10.0f);
+                ghoul->SetStatFlatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, (ghoul->GetStat(STAT_STAMINA) - ghoul->GetCreateStat(STAT_STAMINA)) * 10.0f);
 
                 // Power Energy
-                ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
+                ghoul->SetStatFlatModifier(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
                 ghoul->UpdateAllStats();
                 ghoul->SetFullHealth();
 
