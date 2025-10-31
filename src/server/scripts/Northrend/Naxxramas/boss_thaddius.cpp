@@ -281,7 +281,6 @@ public:
                 {
                     me->RemoveAllAuras();
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                     {
                         if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
