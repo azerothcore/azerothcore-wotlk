@@ -26,14 +26,10 @@
 
 enum Spells
 {
-    SPELL_WEB_SPRAY_10                  = 29484,
-    SPELL_WEB_SPRAY_25                  = 54125,
-    SPELL_POISON_SHOCK_10               = 28741,
-    SPELL_POISON_SHOCK_25               = 54122,
-    SPELL_NECROTIC_POISON_10            = 54121,
-    SPELL_NECROTIC_POISON_25            = 28776,
-    SPELL_FRENZY_10                     = 54123,
-    SPELL_FRENZY_25                     = 54124,
+    SPELL_WEB_SPRAY                     = 29484,
+    SPELL_POISON_SHOCK                  = 28741,
+    SPELL_NECROTIC_POISON               = 54121,
+    SPELL_FRENZY                        = 54123,
     SPELL_WEB_WRAP_STUN                 = 28622,
     SPELL_WEB_WRAP_SUMMON               = 28627,
     SPELL_WEB_WRAP_KILL_WEBS            = 52512,
@@ -231,15 +227,15 @@ public:
             {
                 case EVENT_WEB_SPRAY:
                     Talk(EMOTE_WEB_SPRAY);
-                    me->CastSpell(me, RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25), true);
+                    me->CastSpell(me, SPELL_WEB_SPRAY, true);
                     events.Repeat(40s);
                     break;
                 case EVENT_POISON_SHOCK:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_POISON_SHOCK_10, SPELL_POISON_SHOCK_25), false);
+                    me->CastSpell(me->GetVictim(), SPELL_POISON_SHOCK, false);
                     events.Repeat(10s);
                     break;
                 case EVENT_NECROTIC_POISON:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_NECROTIC_POISON_10, SPELL_NECROTIC_POISON_25), false);
+                    me->CastSpell(me->GetVictim(), SPELL_NECROTIC_POISON, false);
                     events.Repeat(30s);
                     break;
                 case EVENT_SUMMON_SPIDERLINGS:
@@ -253,7 +249,7 @@ public:
                 case EVENT_HEALTH_CHECK:
                     if (me->GetHealthPct() < 30)
                     {
-                        me->CastSpell(me, RAID_MODE(SPELL_FRENZY_10, SPELL_FRENZY_25), true);
+                        me->CastSpell(me, SPELL_FRENZY, true);
                         break;
                     }
                     events.Repeat(1s);

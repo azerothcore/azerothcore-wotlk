@@ -1092,10 +1092,9 @@ namespace Acore
                 {
                     return false;
                 }
-
             }
 
-            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->IsDynamicObject() ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range,true,false))
+            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->IsDynamicObject() ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range,true,false, true))
 
                 return true;
 
@@ -1192,7 +1191,7 @@ namespace Acore
         }
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range, true, false))
+            if (!me->IsWithinDistInMap(u, m_range, true, false, false))
                 return false;
 
             if (!me->IsValidAttackTarget(u))
@@ -1218,7 +1217,7 @@ namespace Acore
         explicit NearestHostileUnitInAttackDistanceCheck(Creature const* creature, float dist) : me(creature), m_range(dist) {}
         bool operator()(Unit* u)
         {
-            if (!me->IsWithinDistInMap(u, m_range, true, false))
+            if (!me->IsWithinDistInMap(u, m_range, true, false, false))
                 return false;
 
             if (!me->CanStartAttack(u))
