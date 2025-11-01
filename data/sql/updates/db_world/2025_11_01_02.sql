@@ -1,3 +1,4 @@
+-- DB update 2025_11_01_01 -> 2025_11_01_02
 
 -- Spelldifficulty
 DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (50378);
