@@ -1956,10 +1956,11 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             Probability = 0.65f * victim->GetLevel() + 0.5f;
 
         uint32 VictimDefense = victim->GetDefenseSkillValue();
+        uint32 VictimAuraDefense = -victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_CHANCE) * 25;
         uint32 AttackerMeleeSkill = GetUnitMeleeSkill();
 
         // xinef: fix daze mechanics
-        Probability -= ((float)VictimDefense - AttackerMeleeSkill) * 0.1428f;
+        Probability -= ((float)VictimDefense + (float)VictimAuraDefense - AttackerMeleeSkill) * 0.1428f;
 
         if (Probability > 40.0f)
             Probability = 40.0f;
