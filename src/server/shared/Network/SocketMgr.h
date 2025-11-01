@@ -43,7 +43,7 @@ public:
         std::unique_ptr<AsyncAcceptor> acceptor;
         try
         {
-            bool supportSocketActivation = sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false, true);
+            bool supportSocketActivation = sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false);
             acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port, supportSocketActivation);
         }
         catch (boost::system::system_error const& err)

@@ -407,7 +407,7 @@ int main(int argc, char** argv)
     sScriptMgr->OnShutdown();
 
     // set server offline
-    if (get_listen_fds() == 0)
+    if (!sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false))
         LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
 
     LOG_INFO("server.worldserver", "Halting process...");

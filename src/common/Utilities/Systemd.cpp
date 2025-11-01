@@ -16,6 +16,7 @@
  */
 
 #if defined(__linux__)
+#include "Log.h"
 #include "StringConvert.h"
 #include <cstdlib>
 #include <unistd.h>
@@ -36,7 +37,10 @@ int get_listen_fds()
     if (fds <= 0)
         return 0;
 
-    return fds;
+    if (fds > 1)
+        LOG_WARNING("network", "Multiple file descriptors received from systemd socket activation, only the first will be used");
+
+    return 3;
 }
 #else
 // On non-Linux systems, just return 0 (no socket activation)
