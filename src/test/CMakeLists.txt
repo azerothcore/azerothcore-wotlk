@@ -14,6 +14,10 @@ CollectSourceFiles(
         PRIVATE_SOURCES
 )
 
+list(APPEND PRIVATE_SOURCES
+    "server/game/Spells/SpellEffectsTest.cpp"
+)
+
 include_directories(
         "mocks"
 )
