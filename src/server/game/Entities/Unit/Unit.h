@@ -967,7 +967,7 @@ public:
     inline bool HasMainhandWeaponForAttack() const { return HasWeaponForAttack(BASE_ATTACK); }
     inline bool HasOffhandWeaponForAttack() const { return HasWeaponForAttack(OFF_ATTACK); }
     inline bool HasRangedWeaponForAttack() const { return HasWeaponForAttack(RANGED_ATTACK); }
-    [[nodiscard]] bool CanUseAttackType(uint8 attacktype) const
+    [[nodiscard]] bool CanUseAttackType(WeaponAttackType attacktype) const
     {
         switch (attacktype)
         {
