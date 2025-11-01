@@ -89,6 +89,12 @@ enum ForcedMovement
     FORCED_MOVEMENT_MAX
 };
 
+enum class PathSource
+{
+    WAYPOINT_MGR        = 0,
+    SMART_WAYPOINT_MGR  = 1,
+};
+
 struct ChaseRange
 {
     ChaseRange(float range);
@@ -223,7 +229,7 @@ public:
     { MovePoint(id, pos.m_positionX, pos.m_positionY, pos.m_positionZ, forcedMovement, speed, pos.GetOrientation(), generatePath, forceDestination, MOTION_SLOT_ACTIVE); }
     void MovePoint(uint32 id, float x, float y, float z, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, float speed = 0.f, float orientation = 0.0f, bool generatePath = true, bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE);
     void MoveSplinePath(Movement::PointsArray* path, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE);
-    void MoveSplinePath(uint32 path_id, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE);
+    void MovePath(uint32 path_id, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, PathSource pathSource = PathSource::WAYPOINT_MGR);
 
     // These two movement types should only be used with creatures having landing/takeoff animations
     void MoveLand(uint32 id, Position const& pos, float speed = 0.0f);
@@ -244,7 +250,7 @@ public:
     void MoveSeekAssistanceDistract(uint32 timer);
     void MoveTaxiFlight(uint32 path, uint32 pathnode);
     void MoveDistract(uint32 time);
-    void MovePath(uint32 path_id, bool repeatable);
+    void MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource = PathSource::WAYPOINT_MGR);
     void MoveRotate(uint32 time, RotateDirection direction);
 
     [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;

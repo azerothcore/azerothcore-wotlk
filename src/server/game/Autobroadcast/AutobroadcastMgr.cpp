@@ -203,6 +203,6 @@ void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
         data << localizedMessage;
 
         // Send packet to the player
-        player->GetSession()->SendPacket(&data);
+        player->SendDirectMessage(&data);
     });
 }

@@ -309,7 +309,7 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* 
                     if (!target || !target->IsPlayer())
                         return;
 
-                    target->ToPlayer()->GetSession()->SendPacket(data);
+                    target->ToPlayer()->SendDirectMessage(data);
                     return;
                 }
                 break;
@@ -326,7 +326,7 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* 
                 Map::PlayerList const& players = source->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     if (itr->GetSource()->GetAreaId() == areaId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        itr->GetSource()->GetSession()->SendPacket(data);
+                        itr->GetSource()->SendDirectMessage(data);
                 return;
             }
         case TEXT_RANGE_ZONE:
@@ -335,7 +335,7 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* 
                 Map::PlayerList const& players = source->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     if (itr->GetSource()->GetZoneId() == zoneId && (teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        itr->GetSource()->GetSession()->SendPacket(data);
+                        itr->GetSource()->SendDirectMessage(data);
                 return;
             }
         case TEXT_RANGE_MAP:
@@ -343,7 +343,7 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* 
                 Map::PlayerList const& players = source->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     if ((teamId == TEAM_NEUTRAL || itr->GetSource()->GetTeamId() == teamId) && (!gmOnly || itr->GetSource()->IsGameMaster()))
-                        itr->GetSource()->GetSession()->SendPacket(data);
+                        itr->GetSource()->SendDirectMessage(data);
                 return;
             }
         case TEXT_RANGE_WORLD:
@@ -352,7 +352,7 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* 
                 for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
                     if (Player* player = itr->second->GetPlayer())
                         if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
-                            player->GetSession()->SendPacket(data);
+                            player->SendDirectMessage(data);
                 return;
             }
         case TEXT_RANGE_NORMAL:
