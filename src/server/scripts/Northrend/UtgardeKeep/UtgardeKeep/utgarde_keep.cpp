@@ -95,7 +95,7 @@ enum EnslavedProtoDrake
     SPELL_FLAME_BREATH      = 50653,
     SPELL_KNOCK_AWAY        = 49722,
 
-    POINT_LAST              = 5,
+    POINT_LAST              = 6,
 };
 
 const Position protodrakeCheckPos = {206.24f, -190.28f, 200.11f, 0.f};
@@ -139,7 +139,7 @@ struct npc_enslaved_proto_drake : public ScriptedAI
             _setData = true;
             me->SetCanFly(true);
             me->SetDisableGravity(true);
-            me->GetMotionMaster()->MovePath(PATH_PROTODRAKE, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_PROTODRAKE, false);
         }
     }
 

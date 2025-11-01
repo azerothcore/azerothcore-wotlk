@@ -541,8 +541,8 @@ public:
     [[nodiscard]] bool IsWithinDist2d(float x, float y, float dist) const;
     bool IsWithinDist2d(const Position* pos, float dist) const;
     // use only if you will sure about placing both object at same map
-    bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
-    bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
+    bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
+    bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
     [[nodiscard]] bool IsWithinLOS(float x, float y, float z, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
     [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS, Optional<float> collisionHeight = { }, Optional<float> combatReach = { }) const;
     [[nodiscard]] Position GetHitSpherePointFor(Position const& dest, Optional<float> collisionHeight = { }, Optional<float> combatReach = { }) const;
@@ -770,7 +770,7 @@ private:
     uint16 m_notifyflags;
     uint16 m_executed_notifies;
 
-    virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius = true) const;
+    virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius = true, bool incTargetRadius = true) const;
 
     bool CanNeverSee(WorldObject const* obj) const;
     virtual bool CanAlwaysSee(WorldObject const* /*obj*/) const { return false; }

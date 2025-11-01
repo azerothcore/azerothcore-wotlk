@@ -34,8 +34,7 @@ enum Says
 enum Spells
 {
     SPELL_UNBALANCING_STRIKE        = 26613,
-    SPELL_DISRUPTING_SHOUT_10       = 55543,
-    SPELL_DISRUPTING_SHOUT_25       = 29107,
+    SPELL_DISRUPTING_SHOUT          = 55543,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
     SPELL_TAUNT                     = 29060
@@ -267,7 +266,7 @@ public:
                     events.Repeat(20s);
                     break;
                 case EVENT_DISRUPTING_SHOUT:
-                    me->CastSpell(me, RAID_MODE(SPELL_DISRUPTING_SHOUT_10, SPELL_DISRUPTING_SHOUT_25), false);
+                    me->CastSpell(me, SPELL_DISRUPTING_SHOUT, false);
                     events.Repeat(15s);
                     break;
                 case EVENT_JAGGED_KNIFE:

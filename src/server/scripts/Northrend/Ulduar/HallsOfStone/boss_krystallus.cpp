@@ -24,13 +24,13 @@
 
 enum spells
 {
-    SPELL_GROUND_SPIKE          = 59750,
-    SPELL_BOULDER_TOSS          = 50843,
-    SPELL_SHATTER               = 50810,
-    SPELL_STOMP                 = 50868,
-    SPELL_GROUND_SLAM           = 50827,
-    GROUND_SLAM_STONED_EFFECT   = 50812,
-    SPELL_SHATTER_EFFECT        = 50811,
+    SPELL_GROUND_SPIKE                = 59750,
+    SPELL_BOULDER_TOSS                = 50843,
+    SPELL_SHATTER                     = 50810,
+    SPELL_STOMP                       = 50868,
+    SPELL_GROUND_SLAM                 = 50827,
+    SPELL_GROUND_SLAM_STONED_EFFECT   = 50812,
+    SPELL_SHATTER_EFFECT              = 50811,
 };
 
 enum events
@@ -102,7 +102,7 @@ public:
                 Map::PlayerList const& players = map->GetPlayers();
                 for(Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     if (itr->GetSource()->IsAlive())
-                        itr->GetSource()->RemoveAura(GROUND_SLAM_STONED_EFFECT);
+                        itr->GetSource()->RemoveAura(SPELL_GROUND_SLAM_STONED_EFFECT);
             }
         }
 
@@ -191,7 +191,7 @@ class spell_krystallus_shatter : public SpellScript
     {
         if (Unit* target = GetHitUnit())
         {
-            target->RemoveAurasDueToSpell(GROUND_SLAM_STONED_EFFECT);
+            target->RemoveAurasDueToSpell(SPELL_GROUND_SLAM_STONED_EFFECT);
             target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
         }
     }
