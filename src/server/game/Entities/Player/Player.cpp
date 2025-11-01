@@ -1535,7 +1535,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             CombatStop();
 
             // remove pet on map change
-            if (pet)
+            if (pet && !(options & TELE_TO_NOT_UNSUMMON_PET))
                 UnsummonPetTemporaryIfAny();
 
             // remove all dyn objects
