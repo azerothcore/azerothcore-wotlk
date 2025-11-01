@@ -39,7 +39,7 @@ public:
         _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); }),
         _supportSocketActivation(supportSocketActivation)
     {
-        int const listen_fd = get_listen_fds();
+        int const listen_fd = get_listen_fd();
         if (_supportSocketActivation && listen_fd > 0)
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");

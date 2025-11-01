@@ -18,6 +18,6 @@
  #ifndef _SYSTEMD_H_
  #define _SYSTEMD_H_
 
-int get_listen_fds();
+int get_listen_fd();
 
 #endif

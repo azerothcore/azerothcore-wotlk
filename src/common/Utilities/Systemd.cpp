@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <string>
 
-int get_listen_fds()
+int get_listen_fd()
 {
     char* const listen_pid = std::getenv("LISTEN_PID");
     char* const listen_fds = std::getenv("LISTEN_FDS");
@@ -44,7 +44,7 @@ int get_listen_fds()
 }
 #else
 // On non-Linux systems, just return 0 (no socket activation)
-int get_listen_fds()
+int get_listen_fd()
 {
     return 0;
 }
