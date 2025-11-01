@@ -112,9 +112,11 @@ public:
             instance = creature->GetInstanceScript();
             Started = false;
             ArthasGUID.Clear();
+            lastBrazierGUID.Clear();
         }
 
         ObjectGuid ArthasGUID;
+        ObjectGuid lastBrazierGUID;
         bool Started;
         InstanceScript* instance;
         EventMap events;
@@ -132,13 +134,20 @@ public:
             summons.DespawnAll();
             events.Reset();
             events2.Reset();
+            lastBrazierGUID.Clear();
+
             if (!Started)
+            {
                 me->SetImmuneToAll(true);
+                me->SetHover(false);
+                me->SetDisableGravity(false);
+            }
             else
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
                 me->SetHover(true);
+                me->SetDisableGravity(true);
             }
         }
 
@@ -229,6 +238,7 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
+                    me->SetDisableGravity(true);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
                     me->SetHover(true);
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
@@ -279,6 +289,7 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
+                    me->SetDisableGravity(false);
                     me->GetMotionMaster()->MoveFall(0, true);
                     events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
                     break;
@@ -309,20 +320,38 @@ public:
                     summons.DespawnAll();
                     me->CastSpell(me, SPELL_CALL_FLAMES, false);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 500ms);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 1s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 2500ms);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 4500ms);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 8s, 12s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
+                {
+                    std::list<Creature*> braziers;
+                    me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
+                    if (!braziers.empty())
                     {
-                        std::list<Creature*> braziers;
-                        me->GetCreaturesWithEntryInRange(braziers, 100.0f, NPC_FLAME_BRAZIER);
-                        if (!braziers.empty())
+                        std::vector<Creature*> availableBraziers;
+
+                        for (Creature* brazier : braziers)
                         {
-                            for (std::list<Creature*>::const_iterator itr = braziers.begin(); itr != braziers.end(); ++itr)
-                                (*itr)->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, (*itr), true);
+                            if (brazier->GetGUID() != lastBrazierGUID)
+                                availableBraziers.push_back(brazier);
                         }
-                        break;
+
+                        if (availableBraziers.empty())
+                            availableBraziers.assign(braziers.begin(), braziers.end());
+
+                        uint32 randomIndex = urand(0, availableBraziers.size() - 1);
+                        Creature* selectedBrazier = availableBraziers[randomIndex];
+
+                        if (selectedBrazier)
+                        {
+                            selectedBrazier->CastCustomSpell(SPELL_BALL_OF_FLAME, SPELLVALUE_MAX_TARGETS, 1, nullptr, false);
+                            lastBrazierGUID = selectedBrazier->GetGUID();
+                        }
                     }
+                    break;
+                }
                 case EVENT_SORROWGRAVE_RITUAL:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
@@ -336,6 +365,7 @@ public:
                         DoTeleportPlayer(target, 296.632f, -346.075f, 90.63f, 4.6f);
                         me->NearTeleportTo(296.632f, -346.075f, 110.0f, 4.6f, false);
                         me->SetControlled(true, UNIT_STATE_ROOT);
+                        me->SetDisableGravity(true);
                     }
 
                     events.DelayEvents(25001ms); // +1 just to be sure
@@ -349,8 +379,11 @@ public:
                 case EVENT_SORROWGRAVE_FINISH_RITUAL:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->SetDisableGravity(false);
+                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
+
                     AttackStart(me->GetVictim());
-                    me->GetMotionMaster()->MoveFall(0, true);
+                    me->GetMotionMaster()->MoveChase(me->GetVictim());
                     summons.DespawnAll();
                     break;
             }
