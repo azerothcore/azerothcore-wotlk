@@ -4,4 +4,3 @@ INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpell
 -- Ground Spike : Heroic only
 DELETE FROM `spelldifficulty_dbc` WHERE `ID` = 59750;
 INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`, `DifficultySpellID_3`, `DifficultySpellID_4`) VALUES (59750, 59750, 59750, 0, 0);
-
