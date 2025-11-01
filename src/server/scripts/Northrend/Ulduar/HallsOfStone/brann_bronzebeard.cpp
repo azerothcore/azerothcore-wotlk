@@ -1106,7 +1106,7 @@ public:
                     }
                 case EVENT_IGC_GROUND_SMASH:
                     {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_IGC_GROUND_SMASH_H : SPELL_IGC_GROUND_SMASH, false);
+                        me->CastSpell(me->GetVictim(), SPELL_IGC_GROUND_SMASH, false);
                         events.Repeat(20s, 40s);
                         break;
                     }
