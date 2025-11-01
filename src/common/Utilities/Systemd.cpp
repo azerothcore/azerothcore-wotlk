@@ -38,7 +38,7 @@ int get_listen_fd()
         return 0;
 
     if (fds > 1)
-        LOG_WARNING("network", "Multiple file descriptors received from systemd socket activation, only the first will be used");
+        LOG_WARN("network", "Multiple file descriptors received from systemd socket activation, only the first will be used");
 
     return 3;
 }
