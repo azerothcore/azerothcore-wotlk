@@ -8,7 +8,7 @@ CREATE TABLE `character_battleground_rating` (
   `losses` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG losses',
   `last_update` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last rating update',
   PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Battleground MMR data for each character';
 
 -- Create rating history table
@@ -26,5 +26,5 @@ CREATE TABLE `character_battleground_rating_history` (
   PRIMARY KEY (`id`),
   KEY `idx_guid` (`guid`),
   KEY `idx_timestamp` (`timestamp`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci 
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 COMMENT='Tracks BG rating changes over time';
