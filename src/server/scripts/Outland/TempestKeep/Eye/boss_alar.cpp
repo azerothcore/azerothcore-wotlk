@@ -355,17 +355,7 @@ struct boss_alar : public BossAI
     void ConstructWaypointsAndMove()
     {
         me->StopMoving();
-        if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
-        {
-            Movement::PointsArray pathPoints;
-            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            for (uint8 i = 0; i < i_path->size(); ++i)
-            {
-                WaypointData const* node = i_path->at(i);
-                pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-            }
-            me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-        }
+        me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
     }
 
     void UpdateAI(uint32 diff) override
@@ -452,10 +442,10 @@ class spell_alar_flame_quills : public AuraScript
 
         // 24 spells in total
         for (uint8 i = 0; i < 21; ++i)
-            GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_1 + i), GetUnitOwner()->m_Events.CalculateTime(i * 40));
-        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 0), GetUnitOwner()->m_Events.CalculateTime(22 * 40));
-        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 1), GetUnitOwner()->m_Events.CalculateTime(23 * 40));
-        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 2), GetUnitOwner()->m_Events.CalculateTime(24 * 40));
+            GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_1 + i), Milliseconds(i * 40));
+        GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 0), Milliseconds(22 * 40));
+        GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 1), Milliseconds(23 * 40));
+        GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 2), Milliseconds(24 * 40));
     }
 
     void Register() override

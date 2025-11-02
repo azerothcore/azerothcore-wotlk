@@ -57,7 +57,6 @@ struct npc_frosthound : public npc_escortAI
             {
                 me->SetFaction(who->GetFaction());
                 me->CastSpell(me, SPELL_SUMMON_PURSUERS_PERIODIC, true);
-                me->SetWalk(false);
                 Start(false, who->GetGUID());
                 Talk(TALK_EMOTE_FROSTHOUND_SNIFF, me);
             }
@@ -247,7 +246,6 @@ public:
         void RollPath()
         {
             me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            me->SetWalk(false);
             Start(true, ObjectGuid::Empty, 0, false, true, true);
             SetNextWaypoint(urand(0, 250), true);
             me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
@@ -469,17 +467,7 @@ public:
             if (startPath)
             {
                 startPath = false;
-                Movement::PointsArray pathPoints;
-                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath());
-                for (uint8 i = 0; i < i_path->size(); ++i)
-                {
-                    WaypointData const* node = i_path->at(i);
-                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                }
-
-                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
             }
             if (setCharm)
             {
@@ -851,17 +839,7 @@ public:
                             {
                                 Talk(TEXT_EMOTE, passenger);
 
-                                Movement::PointsArray pathPoints;
-                                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                                WaypointPath const* i_path = sWaypointMgr->GetPath(NPC_DRAKE);
-                                for (uint8 i = 0; i < i_path->size(); ++i)
-                                {
-                                    WaypointData const* node = i_path->at(i);
-                                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                                }
-
-                                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                                me->GetMotionMaster()->MovePath(NPC_DRAKE, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
                             }
                     }
                     else
@@ -975,7 +953,7 @@ public:
                 };
 
                 if (who->IsPlayer())
-                    who->m_Events.AddEvent(new DelayedTransportPositionOffsets(who), who->m_Events.CalculateTime(500));
+                    who->m_Events.AddEventAtOffset(new DelayedTransportPositionOffsets(who), 500ms);
 
                 return;
             }
@@ -1089,15 +1067,7 @@ public:
         {
             if (apply)
             {
-                Movement::PointsArray pathPoints;
-                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetEntry() * 100);
-                for (uint8 i = 0; i < i_path->size(); ++i)
-                {
-                    WaypointData const* node = i_path->at(i);
-                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                }
-                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 100, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetSpeed(MOVE_RUN, 6.0f);

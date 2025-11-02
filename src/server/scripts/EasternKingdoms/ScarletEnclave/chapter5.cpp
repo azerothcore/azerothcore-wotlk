@@ -473,7 +473,7 @@ public:
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;
 
-            me->m_Events.AddEvent(new DelayedSummonEvent(me, creature->GetEntry(), *creature), me->m_Events.CalculateTime(3000));
+            me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), *creature), 3s);
             if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
             {
                 --scourgeRemaining;
@@ -504,7 +504,7 @@ public:
                 tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25, 4s);
 
                 tirion->m_Events.AddEventAtOffset([&, tirion] {
-                    tirion->GetMotionMaster()->MovePath(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
+                    tirion->GetMotionMaster()->MoveWaypoint(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
                 }, 14s);
 
                 events.Reset();
@@ -1269,7 +1269,7 @@ class spell_chapter5_return_to_capital : public SpellScript
             if (creature)
             {
                 creature->PauseMovement(5000);
-                creature->SetTimedFacingToObject(player, 30000);
+                creature->SetFacingToObject(player, 30s);
 
                 if (roll_chance_i(30))
                 {

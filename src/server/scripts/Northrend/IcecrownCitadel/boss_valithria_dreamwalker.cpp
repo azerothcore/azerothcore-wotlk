@@ -52,8 +52,8 @@ enum Spells
     SPELL_NIGHTMARE_PORTAL_VISUAL_PRE   = 71986,
     SPELL_NIGHTMARE_CLOUD               = 71970,
     SPELL_NIGHTMARE_CLOUD_VISUAL        = 71939,
-    SPELL_PRE_SUMMON_DREAM_PORTAL       = 72224,
-    SPELL_PRE_SUMMON_NIGHTMARE_PORTAL   = 72480,
+    SPELL_PRE_SUMMON_DREAM_PORTAL       = 72224, // normal
+    SPELL_PRE_SUMMON_NIGHTMARE_PORTAL   = 72480, // heroic
     SPELL_SUMMON_DREAM_PORTAL           = 71305,
     SPELL_SUMMON_NIGHTMARE_PORTAL       = 71987,
     SPELL_DREAMWALKERS_RAGE             = 71189,
@@ -94,15 +94,12 @@ enum Spells
     SPELL_GUT_SPRAY                     = 70633,
     SPELL_ROT_WORM_SPAWNER              = 70675,
 
-    // Dream Cloud
+    // Dream Cloud (normal)
     SPELL_EMERALD_VIGOR                 = 70873,
 
-    // Nightmare Cloud
+    // Nightmare Cloud (heroic)
     SPELL_TWISTED_NIGHTMARE             = 71941,
 };
-
-#define SUMMON_PORTAL RAID_MODE<uint32>(SPELL_PRE_SUMMON_DREAM_PORTAL, SPELL_PRE_SUMMON_DREAM_PORTAL, SPELL_PRE_SUMMON_NIGHTMARE_PORTAL, SPELL_PRE_SUMMON_NIGHTMARE_PORTAL)
-#define EMERALD_VIGOR RAID_MODE<uint32>(SPELL_EMERALD_VIGOR, SPELL_EMERALD_VIGOR, SPELL_TWISTED_NIGHTMARE, SPELL_TWISTED_NIGHTMARE)
 
 enum Events
 {
@@ -417,13 +414,13 @@ public:
         {
             if (summon->GetEntry() == NPC_DREAM_PORTAL_PRE_EFFECT)
             {
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_DREAM_PORTAL, me->GetGUID(), 6s), summon->m_Events.CalculateTime(15000));
-                summon->m_Events.AddEvent(new AuraRemoveEvent(summon, SPELL_DREAM_PORTAL_VISUAL_PRE), summon->m_Events.CalculateTime(15000));
+                summon->m_Events.AddEventAtOffset(new DelayedCastEvent(summon, SPELL_SUMMON_DREAM_PORTAL, me->GetGUID(), 6s), 15s);
+                summon->m_Events.AddEventAtOffset(new AuraRemoveEvent(summon, SPELL_DREAM_PORTAL_VISUAL_PRE), 15s);
             }
             else if (summon->GetEntry() == NPC_NIGHTMARE_PORTAL_PRE_EFFECT)
             {
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_SUMMON_NIGHTMARE_PORTAL, me->GetGUID(), 6s), summon->m_Events.CalculateTime(15000));
-                summon->m_Events.AddEvent(new AuraRemoveEvent(summon, SPELL_NIGHTMARE_PORTAL_VISUAL_PRE), summon->m_Events.CalculateTime(15000));
+                summon->m_Events.AddEventAtOffset(new DelayedCastEvent(summon, SPELL_SUMMON_NIGHTMARE_PORTAL, me->GetGUID(), 6s), 15s);
+                summon->m_Events.AddEventAtOffset(new AuraRemoveEvent(summon, SPELL_NIGHTMARE_PORTAL_VISUAL_PRE), 15s);
             }
         }
 
@@ -462,7 +459,7 @@ public:
                     if (!IsHeroic())
                         Talk(SAY_VALITHRIA_DREAM_PORTAL);
                     for (uint32 i = 0; i < _portalCount; ++i)
-                        me->CastSpell(me, SUMMON_PORTAL, false);
+                        me->CastSpell(me, SPELL_PRE_SUMMON_DREAM_PORTAL, false);
                     _events.ScheduleEvent(EVENT_DREAM_PORTAL, 45s, 48s);
                     break;
                 case EVENT_DREAM_SLIP:
@@ -579,7 +576,7 @@ public:
         void DoAction(int32 action) override
         {
             if (action == ACTION_DEATH)
-                me->m_Events.AddEvent(new ValithriaDespawner(me), me->m_Events.CalculateTime(5000));
+                me->m_Events.AddEventAtOffset(new ValithriaDespawner(me), 5s);
             else if (action == ACTION_ENTER_COMBAT)
             {
                 if (!me->IsInCombat())
@@ -750,7 +747,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             if (summon->GetEntry() == NPC_COLUMN_OF_FROST)
-                summon->m_Events.AddEvent(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8s), summon->m_Events.CalculateTime(2000));
+                summon->m_Events.AddEventAtOffset(new DelayedCastEvent(summon, SPELL_COLUMN_OF_FROST_DAMAGE, ObjectGuid::Empty, 8s), 2s);
             else if (summon->GetEntry() == NPC_MANA_VOID)
                 summon->DespawnOrUnsummon(36s);
         }
@@ -885,7 +882,7 @@ public:
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
                     // must use originalCaster the same for all clouds to allow stacking
-                    me->CastSpell(me, EMERALD_VIGOR, false, nullptr, nullptr, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
+                    me->CastSpell(me, SPELL_EMERALD_VIGOR, false, nullptr, nullptr, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
                     me->DespawnOrUnsummon(1s);
                     break;
                 default:

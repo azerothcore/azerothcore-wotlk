@@ -307,7 +307,7 @@ void BattlegroundSA::StartShips()
             WorldPacket pkt;
             GetBGObject(i)->BuildValuesUpdateBlockForPlayer(&data, itr->second);
             data.BuildPacket(pkt);
-            itr->second->GetSession()->SendPacket(&pkt);
+            itr->second->SendDirectMessage(&pkt);
         }
     }
     ShipsStarted = true;
@@ -1141,7 +1141,7 @@ void BattlegroundSA::SendTransportInit(Player* player)
             GetBGObject(BG_SA_BOAT_TWO)->BuildCreateUpdateBlockForPlayer(&transData, player);
         WorldPacket packet;
         transData.BuildPacket(packet);
-        player->GetSession()->SendPacket(&packet);
+        player->SendDirectMessage(&packet);
     }
 }
 
@@ -1156,7 +1156,7 @@ void BattlegroundSA::SendTransportsRemove(Player* player)
             GetBGObject(BG_SA_BOAT_TWO)->BuildOutOfRangeUpdateBlock(&transData);
         WorldPacket packet;
         transData.BuildPacket(packet);
-        player->GetSession()->SendPacket(&packet);
+        player->SendDirectMessage(&packet);
     }
 }
 

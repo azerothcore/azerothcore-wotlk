@@ -63,7 +63,7 @@ repo[:dirname][@branch[:commit]]
 ./acore.sh module install https://github.com/azerothcore/mod-transmog.git@main
 
 # Install multiple modules
-./acore.sh module install mod-transmog mod-eluna:custom-eluna
+./acore.sh module install mod-transmog mod-ale:custom-eluna
 
 # Install all modules from list
 ./acore.sh module install --all
@@ -92,7 +92,7 @@ repo[:dirname][@branch[:commit]]
 ./acore.sh module remove https://github.com/azerothcore/mod-transmog.git
 
 # Remove multiple modules
-./acore.sh module remove mod-transmog mod-eluna
+./acore.sh module remove mod-transmog mod-ale
 ```
 
 ### Searching Modules
@@ -232,7 +232,7 @@ repo_reference branch commit
 # Examples:
 azerothcore/mod-transmog master abc123def456
 https://github.com/custom/mod-custom.git develop def456abc789
-mod-eluna:custom-eluna-dir main 789abc123def
+mod-ale:custom-eluna-dir main 789abc123def
 ```
 
 The list maintains:

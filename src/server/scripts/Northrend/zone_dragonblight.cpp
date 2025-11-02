@@ -614,7 +614,7 @@ public:
             uint32 path = me->GetEntry() * 10 + urand(0, 4);
             if (me->GetPositionY() > -1150.0f)
                 path += 5;
-            me->GetMotionMaster()->MovePath(path, false);
+            me->GetMotionMaster()->MoveWaypoint(path, false);
         }
 
         void MovementInform(uint32 type, uint32 point) override
@@ -622,7 +622,7 @@ public:
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
 
-            if (point == 8) // max-1
+            if (point == 9)
             {
                 Talk(0);
                 me->RemoveAllAuras();
@@ -1439,7 +1439,7 @@ public:
         {
             me->SetDisplayId(me->GetNativeDisplayId());
             me->CastSpell(me, SPELL_SAC_EMERGE, true);
-            me->m_Events.AddEvent(new SACActivateEvent(me), me->m_Events.CalculateTime(4000));
+            me->m_Events.AddEventAtOffset(new SACActivateEvent(me), 4s);
         }
 
         void Deactivate()
@@ -1452,7 +1452,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             me->RemoveAurasDueToSpell(SPELL_SAC_GHOUL_AREA_AURA);
-            me->m_Events.AddEvent(new SACDeactivateEvent(me), me->m_Events.CalculateTime(4000));
+            me->m_Events.AddEventAtOffset(new SACDeactivateEvent(me), 4s);
         }
 
         void JustRespawned() override
