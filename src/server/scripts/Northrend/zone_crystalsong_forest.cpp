@@ -41,25 +41,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
 
     void InitializeAI() override
     {
-        WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-        if (!path || path->empty())
-        {
-            me->DespawnOrUnsummon(1ms);
-            return;
-        }
-
-        Movement::PointsArray pathPoints;
-        pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-        uint32 wpCounter = 1;
-        WPPath::const_iterator itr;
-        while ((itr = path->find(wpCounter++)) != path->end())
-        {
-            WayPoint* wp = itr->second;
-            pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
-        }
-
-        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+        me->GetMotionMaster()->MovePath(me->GetEntry(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
 
         NullCreatureAI::InitializeAI();
         pointId = 0;
@@ -117,7 +99,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
                                 }
                         }
                         else
-                            me->GetMotionMaster()->MovePoint(0, x, y, z, false, false);
+                            me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, false);
                         break;
                     }
                 }

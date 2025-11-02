@@ -110,7 +110,7 @@ public:
 
             if (_beastReached)
             {
-                me->GetMotionMaster()->MovePath(BEAST_MOVEMENT_ID, true);
+                me->GetMotionMaster()->MoveWaypoint(BEAST_MOVEMENT_ID, true);
             }
         }
 
@@ -157,8 +157,8 @@ public:
                                     orc->AI()->Talk(SAY_BLACKHAND_DOOMED);
                                 }
 
-                                orc->m_Events.AddEvent(new OrcMoveEvent(orc), me->m_Events.CalculateTime(3 * IN_MILLISECONDS));
-                                orc->m_Events.AddEvent(new OrcDeathEvent(orc), me->m_Events.CalculateTime(9 * IN_MILLISECONDS));
+                                orc->m_Events.AddEventAtOffset(new OrcMoveEvent(orc), 3s);
+                                orc->m_Events.AddEventAtOffset(new OrcDeathEvent(orc), 9s);
                             }
                         }
                     }
@@ -169,7 +169,7 @@ public:
                     if (!_beastReached)
                     {
                         _beastReached = true;
-                        me->GetMotionMaster()->MovePath(BEAST_MOVEMENT_ID, true);
+                        me->GetMotionMaster()->MoveWaypoint(BEAST_MOVEMENT_ID, true);
 
                         // There is a chance player logged in between areatriggers (realm crash or restart)
                         // executing part of script which happens when player enters boss room

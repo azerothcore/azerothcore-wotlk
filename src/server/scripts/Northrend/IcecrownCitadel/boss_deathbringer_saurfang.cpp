@@ -118,9 +118,6 @@ enum Spells
     SPELL_ACHIEVEMENT                   = 72928,
 };
 
-// Helper to get id of the aura on different modes (HasAura(baseId) wont work)
-#define BOILING_BLOOD_HELPER RAID_MODE<int32>(72385, 72441, 72442, 72443)
-
 enum EventTypes
 {
     EVENT_INTRO_ALLIANCE_1      = 1,
@@ -583,7 +580,7 @@ public:
                     {
                         me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
                         me->SetDisableGravity(false);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 539.2917f, FORCED_MOVEMENT_NONE, 10.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->DoAction(ACTION_DESPAWN);
 
@@ -845,7 +842,7 @@ public:
                     {
                         me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
                         me->SetDisableGravity(false);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 539.2917f, FORCED_MOVEMENT_NONE, 10.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->DoAction(ACTION_DESPAWN);
 
