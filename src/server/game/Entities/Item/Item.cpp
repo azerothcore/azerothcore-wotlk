@@ -28,6 +28,7 @@
 #include "StringConvert.h"
 #include "Tokenize.h"
 #include "WorldPacket.h"
+#include "ItemGuidMap.h"
 
 void AddItemsSetItem(Player* player, Item* item)
 {
@@ -374,7 +375,12 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_DURABILITY));
                 stmt->SetData(++index, GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME));
                 stmt->SetData(++index, m_text);
-                stmt->SetData(++index, guid);
+                if (m_dbGuid == 0)
+                {
+                    m_dbGuid = sItemGuidMap->AcquireDbGuid();
+                    sItemGuidMap->Bind(m_dbGuid, guid);
+                }
+                stmt->SetData(++index, static_cast<uint64>(m_dbGuid));
 
                 trans->Append(stmt);
 
@@ -382,7 +388,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GIFT_OWNER);
                     stmt->SetData(0, GetOwnerGUID().GetCounter());
-                    stmt->SetData(1, guid);
+                    stmt->SetData(1, static_cast<uint64>(m_dbGuid));
                     trans->Append(stmt);
                 }
                 break;
@@ -390,19 +396,21 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
         case ITEM_REMOVED:
             {
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-                stmt->SetData(0, guid);
+                stmt->SetData(0, static_cast<uint64>(m_dbGuid));
                 trans->Append(stmt);
 
                 if (IsWrapped())
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
-                    stmt->SetData(0, guid);
+                    stmt->SetData(0, static_cast<uint64>(m_dbGuid));
                     trans->Append(stmt);
                 }
 
                 if (!isInTransaction)
                     CharacterDatabase.CommitTransaction(trans);
 
+                if (m_dbGuid)
+                    sItemGuidMap->Release(m_dbGuid);
                 delete this;
                 return;
             }
@@ -514,12 +522,105 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     return true;
 }
 
+bool Item::LoadFromDB64(uint64 dbGuid, ObjectGuid owner_guid, Field* fields, uint32 entry)
+{
+    uint32 low = sItemGuidMap->Acquire(dbGuid);
+    Object::_Create(low, 0, HighGuid::Item);
+    m_dbGuid = dbGuid;
+
+    SetEntry(entry);
+    SetObjectScale(1.0f);
+
+    ItemTemplate const* proto = GetTemplate();
+    if (!proto)
+    {
+        LOG_ERROR("entities.item", "Invalid entry {} for item {}. Refusing to load.", GetEntry(), GetGUID().ToString());
+        return false;
+    }
+
+    if (owner_guid)
+        SetOwnerGUID(owner_guid);
+
+    bool need_save = false;
+    SetGuidValue(ITEM_FIELD_CREATOR,      ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()));
+    SetGuidValue(ITEM_FIELD_GIFTCREATOR,  ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>()));
+    SetCount(                            fields[2].Get<uint32>());
+
+    // Duration
+    uint32 duration = fields[3].Get<uint32>();
+    SetUInt32Value(ITEM_FIELD_DURATION, duration);
+    if ((proto->Duration == 0) != (duration == 0))
+    {
+        SetUInt32Value(ITEM_FIELD_DURATION, proto->Duration);
+        need_save = true;
+    }
+
+    // Charges
+    {
+        std::vector<std::string_view> tokens = Acore::Tokenize(fields[4].Get<std::string_view>(), ' ', false);
+        if (tokens.size() == MAX_ITEM_PROTO_SPELLS)
+        {
+            for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+            {
+                if (Optional<int32> charges = Acore::StringTo<int32>(tokens[i]))
+                    SetSpellCharges(i, *charges);
+                else
+                    LOG_ERROR("entities.item", "Invalid charge info '{}' for item {}, charge data not loaded.", tokens.at(i), GetGUID().ToString());
+            }
+        }
+    }
+
+    // Flags
+    SetUInt32Value(ITEM_FIELD_FLAGS, fields[5].Get<uint32>());
+    if (IsSoulBound() && proto->Bonding == NO_BIND && sScriptMgr->CanApplySoulboundFlag(this, proto))
+    {
+        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, false);
+        need_save = true;
+    }
+
+    // Enchantments
+    if (!_LoadIntoDataField(fields[6].Get<std::string>(), ITEM_FIELD_ENCHANTMENT_1_1, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET))
+    {
+        LOG_WARN("entities.item", "Invalid enchantment data '{}' for item {}. Forcing partial load.", fields[6].Get<std::string>(), GetGUID().ToString());
+    }
+
+    // Random properties
+    SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].Get<int16>());
+    if (GetItemRandomPropertyId() < 0)
+        UpdateItemSuffixFactor();
+
+    // Durability
+    uint32 durability = fields[8].Get<uint16>();
+    SetUInt32Value(ITEM_FIELD_DURABILITY, durability);
+    SetUInt32Value(ITEM_FIELD_MAXDURABILITY, proto->MaxDurability);
+    if (durability > proto->MaxDurability && !IsWrapped())
+    {
+        SetUInt32Value(ITEM_FIELD_DURABILITY, proto->MaxDurability);
+        need_save = true;
+    }
+
+    SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, fields[9].Get<uint32>());
+    SetText(fields[10].Get<std::string>());
+
+    if (need_save)
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_INSTANCE_ON_LOAD);
+        stmt->SetData(0, GetUInt32Value(ITEM_FIELD_DURATION));
+        stmt->SetData(1, GetUInt32Value(ITEM_FIELD_FLAGS));
+        stmt->SetData(2, GetUInt32Value(ITEM_FIELD_DURABILITY));
+        stmt->SetData(3, static_cast<uint64>(m_dbGuid));
+        CharacterDatabase.Execute(stmt);
+    }
+
+    return true;
+}
+
 /*static*/
 void Item::DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
 {
     sScriptMgr->OnGlobalItemDelFromDB(trans, itemGuid);
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-    stmt->SetData(0, itemGuid);
+    stmt->SetData(0, static_cast<uint64>(itemGuid));
     trans->Append(stmt);
 }
 
@@ -532,7 +633,7 @@ void Item::DeleteFromDB(CharacterDatabaseTransaction trans)
 void Item::DeleteFromInventoryDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-    stmt->SetData(0, itemGuid);
+    stmt->SetData(0, static_cast<uint64>(itemGuid));
     trans->Append(stmt);
 }
 
@@ -1098,8 +1199,9 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clo
         ASSERT_NODEBUGINFO(count != 0 && "pProto->Stackable == 0 but checked at loading already");
 
         Item* pItem = NewItemOrBag(pProto);
-        if (pItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), item, player))
-        {
+        uint32 newLow = sItemGuidMap->AcquireForNew();
+        if (pItem->Create(newLow, item, player))
+            {
             pItem->SetCount(count);
             if (!clone)
                 pItem->SetItemRandomProperties(randomPropertyId ? randomPropertyId : Item::GenerateItemRandomPropertyId(item));
@@ -1174,11 +1276,11 @@ void Item::SaveRefundDataToDB()
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, static_cast<uint64>(GetDbGuid()));
     trans->Append(stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_REFUND_INSTANCE);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, static_cast<uint64>(GetDbGuid()));
     stmt->SetData(1, GetRefundRecipient());
     stmt->SetData(2, GetPaidMoney());
     stmt->SetData(3, uint16(GetPaidExtendedCost()));
@@ -1192,7 +1294,7 @@ void Item::DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans)
     if (trans)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, static_cast<uint64>(GetDbGuid()));
         (*trans)->Append(stmt);
     }
 }
@@ -1270,7 +1372,7 @@ void Item::ClearSoulboundTradeable(Player* currentOwner)
     allowedGUIDs.clear();
     SetState(ITEM_CHANGED, currentOwner);
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_BOP_TRADE);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, static_cast<uint64>(GetDbGuid()));
     CharacterDatabase.Execute(stmt);
 }
 
