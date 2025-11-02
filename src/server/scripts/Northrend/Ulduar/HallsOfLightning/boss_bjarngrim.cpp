@@ -90,6 +90,9 @@ enum BjarngrimEvents
     // STORMFORGED LIEUTENANT
     EVENT_ARC_WELD                      = 41,
     EVENT_RENEW_STEEL                   = 42,
+
+    // CHARGE UP
+    EVENT_CHARGE_UP                     = 51,
 };
 
 enum Yells
@@ -110,25 +113,20 @@ struct boss_bjarngrim : public npc_escortAI
     boss_bjarngrim(Creature* creature) : npc_escortAI(creature), summons(creature)
     {
         m_pInstance = creature->GetInstanceScript();
-
-        // Init waypoints
-        AddWaypoint(1, 1262.18f, 99.3f, 33.5f, 0);
-        AddWaypoint(2, 1281.6f, 99.5f, 33.5f, 0);
-        AddWaypoint(3, 1311.7f, 99.4f, 40.1f, 0);
-        AddWaypoint(4, 1332.5f, 99.7f, 40.18f, 0);
-        AddWaypoint(5, 1311.7f, 99.4f, 40.1f, 0);
-        AddWaypoint(6, 1281.6f, 99.5f, 33.5f, 0);
-        AddWaypoint(7, 1262.18f, 99.3f, 33.5f, 0);
-        AddWaypoint(8, 1262, -26.9f, 33.5f, 0);
-        AddWaypoint(9, 1281.2f, -26.8f, 33.5f, 0);
-        AddWaypoint(10, 1311.3f, -26.9f, 40.03f, 0);
-        AddWaypoint(11, 1332, -26.6f, 40.18f, 0);
-        AddWaypoint(12, 1311.3f, -26.9f, 40.03f, 0);
-        AddWaypoint(13, 1281.2f, -26.8f, 33.5f, 0);
-        AddWaypoint(14, 1262, -26.9f, 33.5f, 0);
-
+        InitializeWaypoints();
         me->SetWalk(true);
         Start(true, ObjectGuid::Empty, nullptr, false, true);
+    }
+
+    void InitializeWaypoints()
+    {
+        AddWaypoint(1, 1262.0f, -26.9f, 33.5f, 10000);
+        AddWaypoint(2, 1262.18f, 99.3f, 33.5f, 10000);
+        AddWaypoint(3, 1262.0f, -26.9f, 33.5f, 0);
+        AddWaypoint(4, 1332.0f, -26.6f, 40.18f, 10000);
+        AddWaypoint(5, 1395.092f, 36.6425f, 50.038f, 10000);
+        AddWaypoint(6, 1332.0f, -26.6f, 40.18f, 0);
+        AddWaypoint(7, 1262.0f, -26.9f, 33.5f, 0);
     }
 
     void Reset() override
@@ -139,12 +137,12 @@ struct boss_bjarngrim : public npc_escortAI
         for (uint8 i = 0; i < 2; ++i)
             if (Creature* dwarf = me->SummonCreature(NPC_STORMFORGED_LIEUTENANT, me->GetPositionX() + urand(4, 12), me->GetPositionY() + urand(4, 12), me->GetPositionZ()))
             {
-                dwarf->GetMotionMaster()->MoveFollow(me, 3, rand_norm() * 2 * 3.14f);
+                float angle = i == 0 ? 2.5f : 3.78f;
+                dwarf->GetMotionMaster()->MoveFollow(me, 3, angle);
                 summons.Summon(dwarf);
             }
 
         me->RemoveAllAuras();
-        me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
 
         if (m_pInstance)
             m_pInstance->SetBossState(DATA_BJARNGRIM, NOT_STARTED);
@@ -271,14 +269,48 @@ struct boss_bjarngrim : public npc_escortAI
 
     void WaypointReached(uint32 Point) override
     {
-        if (Point == 1 || Point == 8)
-            DoCastSelf(SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
-        else if (Point == 7 || Point == 14)
+        if (Point == 1)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+            events.ScheduleEvent(EVENT_CHARGE_UP, 2500ms, 0);
+        }
+        else if (Point == 2)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+        }
+        else if (Point == 3)
+        {
             me->RemoveAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE);
+        }
+        else if (Point == 4)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+            events.ScheduleEvent(EVENT_CHARGE_UP, 2500ms, 0);
+        }
+        else if (Point == 5)
+        {
+            events.CancelEvent(EVENT_CHARGE_UP);
+        }
+        else if (Point == 6)
+        {
+            me->RemoveAura(SPELL_TEMPORARY_ELECTRICAL_CHARGE);
+        }
     }
 
     void UpdateEscortAI(uint32 diff) override
     {
+        events.Update(diff);
+
+        if (uint32 eventId = events.ExecuteEvent())
+        {
+            if (eventId == EVENT_CHARGE_UP)
+            {
+                me->CastSpell(me, SPELL_CHARGE_UP, true);
+                me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
+                return;
+            }
+        }
+
         if (!me->IsInCombat())
             return;
 
@@ -288,8 +320,6 @@ struct boss_bjarngrim : public npc_escortAI
             Reset();
             return;
         }
-
-        events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -301,6 +331,11 @@ struct boss_bjarngrim : public npc_escortAI
                 RemoveStanceAura(m_uiStance);
                 RollStance(m_uiStance);
                 events.Repeat(20s);
+                break;
+
+            case EVENT_CHARGE_UP:
+                DoCastSelf(SPELL_CHARGE_UP, true);
+                DoCastSelf(SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
                 break;
 
             // DEFENSIVE STANCE
