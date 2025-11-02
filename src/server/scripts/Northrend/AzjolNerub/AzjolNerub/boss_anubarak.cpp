@@ -156,18 +156,18 @@ struct boss_anub_arak : public BossAI
             case SUBMERGE_75:
                 events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 9s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
 
                 _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 2 : 1;
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 22s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 42s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
                 break;
             case SUBMERGE_50:
                 events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 9s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
 
                 events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, 0, PHASE_SUBMERGED);
                 if (IsHeroic())
@@ -175,14 +175,14 @@ struct boss_anub_arak : public BossAI
 
                 _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 4 : 2;
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 22s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 42s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
                 break;
             case SUBMERGE_25:
                 events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 9s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
 
                 events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, 0, PHASE_SUBMERGED);
                 if (IsHeroic())
@@ -190,18 +190,18 @@ struct boss_anub_arak : public BossAI
 
                 _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 4 : 2;
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 2s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 4s, 0, PHASE_SUBMERGED);
 
                 events.ScheduleEvent(EVENT_SUMMON_DARTER, 12s, 0, PHASE_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 22s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 22s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 26s, 0, PHASE_SUBMERGED);
 
                 events.ScheduleEvent(EVENT_SUMMON_DARTER, 32s, 0, PHASE_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 42s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 42s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 45s, 0, PHASE_SUBMERGED);
                 break;
             default:
                 break;
