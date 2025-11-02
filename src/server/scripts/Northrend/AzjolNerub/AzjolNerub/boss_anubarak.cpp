@@ -354,17 +354,18 @@ struct boss_anub_arak : public BossAI
                     trigger->CastSpell(trigger, SPELL_SUMMON_VENOMANCER, true, nullptr, nullptr, me->GetGUID());
                 break;
             case EVENT_SUMMON_DARTER:
+            {
+                std::list<Creature*> triggers;
+                me->GetCreatureListWithEntryInGrid(triggers, NPC_WORLD_TRIGGER, 150.0f);
+                triggers.remove_if([](Creature* const trigger)
                 {
-                    std::list<Creature*> triggers;
-                    me->GetCreatureListWithEntryInGrid(triggers, NPC_WORLD_TRIGGER, 150.0f);
-                    if (!triggers.empty())
-                    {
-                        Creature* trigger = Acore::Containers::SelectRandomContainerElement(triggers);
-                        trigger->CastSpell(trigger, SPELL_SUMMON_DARTER, true, nullptr, nullptr, me->GetGUID());
-                    }
-                    break;
-                }
+                    return trigger->GetPositionZ() < 250.0f;
+                });
+
+                if (Creature* trigger = Acore::Containers::SelectRandomContainerElement(triggers))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_DARTER, true, nullptr, nullptr, me->GetGUID());
                 break;
+            }
             case EVENT_SUMMON_ASSASSINS:
                 if (Creature* trigger = ObjectAccessor::GetCreature(*me, _assassinTriggerGUID))
                 {
