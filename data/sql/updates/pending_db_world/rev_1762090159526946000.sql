@@ -1,6 +1,6 @@
 -- fix appearances of newly added 'Winter Reveler's
 -- assign correct model to creature 15792 `Troll Male Winter Reveler` used by spell 26252 `Winter Reveler - Troll Male`
-UPDATE `creature_template_model` SET `CreatureDisplayID` = 18809 WHERE (`CreatureID` = 15792) AND (`Idx` = 0);
+UPDATE `creature_template_model` SET `CreatureDisplayID` = 18809, `VerifiedBuild` = 0 WHERE (`CreatureID` = 15792) AND (`Idx` = 0);
 
 -- assign costume auras
 DELETE FROM `creature_addon` WHERE (`guid` BETWEEN 66801 AND 66898);
