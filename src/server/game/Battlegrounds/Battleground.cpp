@@ -831,12 +831,17 @@ void Battleground::UpdateWorldState(uint32 variable, uint32 value)
 
 void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 {
+    LOG_DEBUG("bg.mmr", "EndBattleground called - Winner: {}, Current Status: {}", winnerTeamId, GetStatus());
+
     // xinef: if this is true, it means that endbattleground is called second time
     // skip to avoid double rating reduce / add
     // can bug out due to multithreading ?
     // set as fast as possible
     if (GetStatus() == STATUS_WAIT_LEAVE)
+    {
+        LOG_DEBUG("bg.mmr", "EndBattleground early return - status already WAIT_LEAVE");
         return;
+    }
 
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
@@ -858,7 +863,16 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
     }
 
     if (sBattlegroundMMRMgr->IsEnabled() && !isRated() && !isArena())
-        UpdateBattlegroundMMR(winner);
+    {
+        LOG_DEBUG("bg.mmr", "BG ended, calling UpdateBattlegroundMMR (BG: {}, Winner: {})",
+                  GetBgTypeID(), winnerTeamId);
+        UpdateBattlegroundMMR(GetTeamId(winnerTeamId));
+    }
+    else
+    {
+        LOG_DEBUG("bg.mmr", "BG MMR update skipped - Enabled: {}, isRated: {}, isArena: {}",
+                  sBattlegroundMMRMgr->IsEnabled(), isRated(), isArena());
+    }
 
     CharacterDatabasePreparedStatement* stmt = nullptr;
     uint64 battlegroundId = 1;
@@ -979,26 +993,26 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
     sScriptMgr->OnBattlegroundEnd(this, GetTeamId(winnerTeamId));
 }
 
-void Battleground::UpdateBattlegroundMMR(Team winner)
+void Battleground::UpdateBattlegroundMMR(TeamId winner)
 {
     std::vector<Player*> winningTeam;
     std::vector<Player*> losingTeam;
-    
+
     // Collect all players from both teams
     for (auto const& itr : m_Players)
     {
-        Player* player = ObjectAccessor::FindPlayer(itr.first);
-        if (!player || itr.second.OfflineRemoveTime)
+        Player* player = itr.second;
+        if (!player || !player->IsInWorld())
             continue;
-        
-        Team playerTeam = player->GetBGTeam();
-        
+
+        TeamId playerTeam = player->GetBgTeamId();
+
         if (playerTeam == winner)
             winningTeam.push_back(player);
         else
             losingTeam.push_back(player);
     }
-    
+
     // Update ratings for winning team (silently)
     for (Player* player : winningTeam)
     {
@@ -1007,7 +1021,7 @@ void Battleground::UpdateBattlegroundMMR(Team winner)
             sBattlegroundMMRMgr->UpdatePlayerRating(player, true, losingTeam);
         }
     }
-    
+
     // Update ratings for losing team (silently)
     for (Player* player : losingTeam)
     {
@@ -1016,9 +1030,9 @@ void Battleground::UpdateBattlegroundMMR(Team winner)
             sBattlegroundMMRMgr->UpdatePlayerRating(player, false, winningTeam);
         }
     }
-    
+
     LOG_INFO("bg.mmr", "Updated MMR for {} winners and {} losers in BG {}",
-             winningTeam.size(), losingTeam.size(), GetTypeID());
+             winningTeam.size(), losingTeam.size(), GetBgTypeID());
 }
 
 void Battleground::SpiritOfCompetitionEvent(PvPTeamId winnerTeamId) const

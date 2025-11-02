@@ -104,10 +104,17 @@ float BattlegroundMMRMgr::CalculateGearScore(Player* player)
 void BattlegroundMMRMgr::UpdatePlayerRating(Player* player, bool won, const std::vector<Player*>& opponents)
 {
     if (!_enabled || !player || opponents.empty())
+    {
+        LOG_DEBUG("bg.mmr", "UpdatePlayerRating early return - Enabled: {}, Player: {}, Opponents: {}",
+                  _enabled, (player != nullptr), opponents.size());
         return;
-    
+    }
+
     // Get current rating from player object (already loaded on login)
     BattlegroundRatingData currentRating = player->GetBGRating();
+
+    LOG_DEBUG("bg.mmr", "UpdatePlayerRating called for {} - Current rating: {:.2f}, Loaded: {}",
+              player->GetName(), currentRating.rating, currentRating.loaded);
     
     // Build opponent list for Glicko-2
     std::vector<Glicko2Opponent> glickoOpponents;

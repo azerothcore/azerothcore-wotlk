@@ -29,6 +29,7 @@
 #include "Battleground.h"
 #include "BattlegroundAV.h"
 #include "BattlegroundMgr.h"
+#include "BattlegroundMMR.h"
 #include "CellImpl.h"
 #include "CharmInfo.h"
 #include "Channel.h"
@@ -15835,6 +15836,29 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
 {
     if (result)
         m_IsBGRandomWinner = true;
+}
+
+void Player::_LoadBGRating(PreparedQueryResult result)
+{
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        BattlegroundRatingData data;
+        data.rating = fields[0].Get<float>();
+        data.ratingDeviation = fields[1].Get<float>();
+        data.volatility = fields[2].Get<float>();
+        data.matchesPlayed = fields[3].Get<uint32>();
+        data.wins = fields[4].Get<uint32>();
+        data.losses = fields[5].Get<uint32>();
+        data.loaded = true;
+
+        SetBGRating(data);
+    }
+    else
+    {
+        // No existing data, initialize with defaults
+        sBattlegroundMMRMgr->InitializePlayerRating(this);
+    }
 }
 
 float Player::GetAverageItemLevel()

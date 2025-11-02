@@ -183,6 +183,7 @@ void World::LoadConfigSettings(bool reload)
 
     // load update time related configs
     sWorldUpdateTime.LoadFromConfig();
+    sBattlegroundMMRMgr->LoadConfig();
 
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)

@@ -5448,6 +5448,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     _LoadSeasonalQuestStatus(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS));
     _LoadMonthlyQuestStatus(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS));
     _LoadRandomBGStatus(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG));
+    _LoadBGRating(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_BG_RATING));
 
     // Extra Bonus Talent Points
     m_extraBonusTalentCount = fields[73].Get<uint8>();
@@ -7114,6 +7115,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     _SaveGlyphs(trans);
     _SaveInstanceTimeRestrictions(trans);
     _SavePlayerSettings(trans);
+    _SaveBGRating(trans);
 
     // check if stats should only be saved on logout
     // save stats can be out of transaction
@@ -7784,6 +7786,24 @@ void Player::_SaveStats(CharacterDatabaseTransaction trans)
     stmt->SetData(index++, GetBaseSpellPowerBonus());
     stmt->SetData(index++, GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_TAKEN_SPELL)));
 
+    trans->Append(stmt);
+}
+
+void Player::_SaveBGRating(CharacterDatabaseTransaction trans)
+{
+    if (!IsBGRatingLoaded())
+        return;
+
+    BattlegroundRatingData const& rating = GetBGRating();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_BG_MMR);
+    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(1, rating.rating);
+    stmt->SetData(2, rating.ratingDeviation);
+    stmt->SetData(3, rating.volatility);
+    stmt->SetData(4, rating.matchesPlayed);
+    stmt->SetData(5, rating.wins);
+    stmt->SetData(6, rating.losses);
     trans->Append(stmt);
 }
 

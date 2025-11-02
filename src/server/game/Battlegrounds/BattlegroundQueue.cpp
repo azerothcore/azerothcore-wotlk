@@ -407,9 +407,28 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
 
     if (sBattlegroundMMRMgr->IsEnabled())
     {
+        // Calculate average queue time for MMR relaxation
+        uint32 avgQueueTime = 0;
+        uint32 groupCount = 0;
+
+        for (auto const& group : m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE])
+        {
+            avgQueueTime += GetGroupQueueTime(group);
+            groupCount++;
+        }
+        for (auto const& group : m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE])
+        {
+            avgQueueTime += GetGroupQueueTime(group);
+            groupCount++;
+        }
+
+        if (groupCount > 0)
+            avgQueueTime /= groupCount;
+
         SelectBalancedFactionPlayers(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE],
                                      m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE],
-                                     bg->GetMaxPlayersPerTeam());
+                                     bg->GetMaxPlayersPerTeam(),
+                                     avgQueueTime);
     }
 
     // try to get even teams
@@ -1407,24 +1426,22 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
     // Try to balance by prioritizing groups that reduce the imbalance
     // If Alliance is higher MMR, prioritize lower MMR Alliance groups and higher MMR Horde groups
     // If Horde is higher MMR, prioritize lower MMR Horde groups and higher MMR Alliance groups
-    
+
     bool allianceIsHigher = allianceAvgMMR > hordeAvgMMR;
-    
+
     // Sort Alliance queue (ascending if Alliance is higher, descending if Horde is higher)
-    std::sort(allianceQueue.begin(), allianceQueue.end(), 
-        [&groupCache, allianceIsHigher](GroupQueueInfo* a, GroupQueueInfo* b) {
-            float scoreA = groupCache[a].avgMMR;
-            float scoreB = groupCache[b].avgMMR;
-            return allianceIsHigher ? (scoreA < scoreB) : (scoreA > scoreB);
-        });
-    
+    allianceQueue.sort([&groupCache, allianceIsHigher](GroupQueueInfo* a, GroupQueueInfo* b) {
+        float scoreA = groupCache[a].avgMMR;
+        float scoreB = groupCache[b].avgMMR;
+        return allianceIsHigher ? (scoreA < scoreB) : (scoreA > scoreB);
+    });
+
     // Sort Horde queue (opposite of Alliance)
-    std::sort(hordeQueue.begin(), hordeQueue.end(), 
-        [&groupCache, allianceIsHigher](GroupQueueInfo* a, GroupQueueInfo* b) {
-            float scoreA = groupCache[a].avgMMR;
-            float scoreB = groupCache[b].avgMMR;
-            return allianceIsHigher ? (scoreA > scoreB) : (scoreA < scoreB);
-        });
+    hordeQueue.sort([&groupCache, allianceIsHigher](GroupQueueInfo* a, GroupQueueInfo* b) {
+        float scoreA = groupCache[a].avgMMR;
+        float scoreB = groupCache[b].avgMMR;
+        return allianceIsHigher ? (scoreA > scoreB) : (scoreA < scoreB);
+    });
     
     // Recalculate stats after sorting to see if it helped
     FactionQueueStats newAllianceStats, newHordeStats;

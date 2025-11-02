@@ -585,7 +585,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
         "SELECT rating, rating_deviation, volatility, matches_played, wins, losses "
         "FROM character_battleground_rating WHERE guid = ?", CONNECTION_ASYNC);
 
-    PrepareStatement(CHAR_REP_CHAR_BG_MMR,
+    PrepareStatement(CHAR_UPD_CHAR_BG_MMR,
         "REPLACE INTO character_battleground_rating "
         "(guid, rating, rating_deviation, volatility, matches_played, wins, losses, last_update) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, NOW())", CONNECTION_ASYNC);

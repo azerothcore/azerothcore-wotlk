@@ -105,7 +105,7 @@ public:
         target->SetBGRating(bgRating);
         
         // Force save to DB immediately
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_BG_MMR);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_BG_MMR);
         stmt->SetData(0, target->GetGUID().GetCounter());
         stmt->SetData(1, bgRating.rating);
         stmt->SetData(2, bgRating.ratingDeviation);
