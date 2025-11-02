@@ -96,13 +96,14 @@ enum SubPhase : uint8
 
 enum SummonGroups
 {
-    SUMMON_GROUP_WORLD_TRIGGER_GUARDIAN = 1
+    SUMMON_GROUP_WORLD_TRIGGER_GUARDIAN = 1,
+    SUMMON_GROUP_WORLD_TRIGGER_BALCONY = 2
 };
 
 struct boss_anub_arak : public BossAI
 {
-    explicit boss_anub_arak(Creature* creature) : BossAI(creature, DATA_ANUBARAK),
-    _intro(false), _submergePhase(SUBMERGE_NONE), _remainingLargeSummonsBeforeEmerge(0)
+    explicit boss_anub_arak(Creature* creature) : BossAI(creature, DATA_ANUBARAK), _intro(false),
+    _submergePhase(SUBMERGE_NONE), _remainingLargeSummonsBeforeEmerge(0), _balconySummons(me)
     {
         me->m_SightDistance = 120.0f;
     }
@@ -229,13 +230,16 @@ struct boss_anub_arak : public BossAI
         TempSummon* guardianTrigger = summoned.front();
         _guardianTriggerGUID = guardianTrigger->GetGUID();
 
-        if (Creature* trigger = DoSummon(NPC_WORLD_TRIGGER, me->GetPosition(), 0, TEMPSUMMON_MANUAL_DESPAWN))
-            _assassinTriggerGUID = trigger->GetGUID();
-        else
+        summoned.clear();
+        _balconySummons.clear();
+        me->SummonCreatureGroup(SUMMON_GROUP_WORLD_TRIGGER_BALCONY, &summoned);
+        if (summoned.empty())
         {
             EnterEvadeMode(EVADE_REASON_OTHER);
             return;
         }
+        for (auto const& summon : summoned)
+            _balconySummons.Summon(summon);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -354,24 +358,14 @@ struct boss_anub_arak : public BossAI
                     trigger->CastSpell(trigger, SPELL_SUMMON_VENOMANCER, true, nullptr, nullptr, me->GetGUID());
                 break;
             case EVENT_SUMMON_DARTER:
-            {
-                std::list<Creature*> triggers;
-                me->GetCreatureListWithEntryInGrid(triggers, NPC_WORLD_TRIGGER, 150.0f);
-                triggers.remove_if([](Creature* const trigger)
-                {
-                    return trigger->GetPositionZ() < 250.0f;
-                });
-
-                if (Creature* trigger = Acore::Containers::SelectRandomContainerElement(triggers))
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(_balconySummons)))
                     trigger->CastSpell(trigger, SPELL_SUMMON_DARTER, true, nullptr, nullptr, me->GetGUID());
                 break;
-            }
             case EVENT_SUMMON_ASSASSINS:
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _assassinTriggerGUID))
-                {
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(_balconySummons)))
                     trigger->CastSpell(trigger, SPELL_SUMMON_ASSASSIN, true, nullptr, nullptr, me->GetGUID());
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(_balconySummons)))
                     trigger->CastSpell(trigger, SPELL_SUMMON_ASSASSIN, true, nullptr, nullptr, me->GetGUID());
-                }
                 break;
             default:
                 break;
@@ -394,7 +388,7 @@ struct boss_anub_arak : public BossAI
         uint8 _submergePhase;
         uint8 _remainingLargeSummonsBeforeEmerge;
         ObjectGuid _guardianTriggerGUID;
-        ObjectGuid _assassinTriggerGUID;
+        SummonList _balconySummons;
 };
 
 class spell_azjol_nerub_carrion_beetles : public AuraScript
