@@ -400,8 +400,8 @@ struct BattlegroundRatingData
     uint32 wins;
     uint32 losses;
     bool loaded;
-    
-    BattlegroundRatingData() 
+
+    BattlegroundRatingData()
         : rating(1500.0f), ratingDeviation(200.0f), volatility(0.06f),
           matchesPlayed(0), wins(0), losses(0), loaded(false) {}
 };

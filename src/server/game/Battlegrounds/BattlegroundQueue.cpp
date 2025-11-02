@@ -1317,7 +1317,7 @@ uint32 BattlegroundQueue::GetGroupQueueTime(GroupQueueInfo* group) const
 {
     if (!group)
         return 0;
-    
+
     uint32 currentTime = getMSTime();
     return (currentTime - group->JoinTime) / 1000;
 }
@@ -1325,12 +1325,12 @@ uint32 BattlegroundQueue::GetGroupQueueTime(GroupQueueInfo* group) const
 BattlegroundQueue::GroupPlayerCache BattlegroundQueue::ResolveGroupPlayers(GroupQueueInfo* group)
 {
     GroupPlayerCache cache;
-    
+
     if (!group || group->Players.empty())
         return cache;
-    
+
     cache.players.reserve(group->Players.size());
-    
+
     float totalMMR = 0.0f;
     float totalGearScore = 0.0f;
     uint32 count = 0;
@@ -1346,11 +1346,11 @@ BattlegroundQueue::GroupPlayerCache BattlegroundQueue::ResolveGroupPlayers(Group
             count++;
         }
     }
-    
+
     cache.playerCount = count;
     cache.avgMMR = count > 0 ? totalMMR / count : 0.0f;
     cache.avgGearScore = count > 0 ? totalGearScore / count : 0.0f;
-    
+
     return cache;
 }
 
@@ -1358,27 +1358,27 @@ float BattlegroundQueue::FactionQueueStats::GetCombinedScore() const
 {
     float avgMMR = GetAverageMMR();
     float avgGear = GetAverageGearScore();
-    
+
     float normalizedGear = (avgGear / 300.0f) * 1500.0f;
-    
+
     float mmrWeight = sBattlegroundMMRMgr->GetMMRWeight();
     float gearWeight = sBattlegroundMMRMgr->GetGearWeight();
-    
+
     return (avgMMR * mmrWeight) + (normalizedGear * gearWeight);
 }
 
-void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQueue, 
+void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQueue,
                                                       GroupsQueueType& hordeQueue,
                                                       uint32 maxPlayersPerTeam,
                                                       uint32 queueTime)
 {
     if (!sBattlegroundMMRMgr->IsEnabled() || (allianceQueue.empty() && hordeQueue.empty()))
         return;
-    
+
     // Calculate stats for both factions
     FactionQueueStats allianceStats, hordeStats;
     std::unordered_map<GroupQueueInfo*, GroupPlayerCache> groupCache;
-    
+
     // Pre-resolve all players and calculate faction totals
     for (auto& group : allianceQueue)
     {
@@ -1388,7 +1388,7 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
         allianceStats.totalGearScore += cache.avgGearScore * cache.playerCount;
         allianceStats.playerCount += cache.playerCount;
     }
-    
+
     for (auto& group : hordeQueue)
     {
         auto cache = ResolveGroupPlayers(group);
@@ -1397,14 +1397,14 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
         hordeStats.totalGearScore += cache.avgGearScore * cache.playerCount;
         hordeStats.playerCount += cache.playerCount;
     }
-    
+
     float allianceAvgMMR = allianceStats.GetAverageMMR();
     float hordeAvgMMR = hordeStats.GetAverageMMR();
     float mmrDifference = std::abs(allianceAvgMMR - hordeAvgMMR);
-    
+
     // Get relaxed tolerance based on average queue time
     float maxMMRDifference = sBattlegroundMMRMgr->GetRelaxedMMRTolerance(queueTime);
-    
+
     // If both factions are already balanced within tolerance, no need to reorder
     if (mmrDifference <= maxMMRDifference)
     {
@@ -1412,7 +1412,7 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
                   allianceAvgMMR, hordeAvgMMR, mmrDifference, maxMMRDifference);
         return;
     }
-    
+
     // If we can't balance (not enough players or difference too large), just accept it
     // Queue relaxation will eventually allow the match
     if (queueTime >= sBattlegroundMMRMgr->GetRelaxedMMRTolerance(queueTime))
@@ -1422,7 +1422,7 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
                   allianceAvgMMR, hordeAvgMMR, mmrDifference);
         return;
     }
-    
+
     // Try to balance by prioritizing groups that reduce the imbalance
     // If Alliance is higher MMR, prioritize lower MMR Alliance groups and higher MMR Horde groups
     // If Horde is higher MMR, prioritize lower MMR Horde groups and higher MMR Alliance groups
@@ -1442,11 +1442,11 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
         float scoreB = groupCache[b].avgMMR;
         return allianceIsHigher ? (scoreA > scoreB) : (scoreA < scoreB);
     });
-    
+
     // Recalculate stats after sorting to see if it helped
     FactionQueueStats newAllianceStats, newHordeStats;
     uint32 allianceCount = 0, hordeCount = 0;
-    
+
     for (auto& group : allianceQueue)
     {
         auto& cache = groupCache[group];
@@ -1458,7 +1458,7 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
             allianceCount += cache.playerCount;
         }
     }
-    
+
     for (auto& group : hordeQueue)
     {
         auto& cache = groupCache[group];
@@ -1470,9 +1470,9 @@ void BattlegroundQueue::SelectBalancedFactionPlayers(GroupsQueueType& allianceQu
             hordeCount += cache.playerCount;
         }
     }
-    
+
     float newMMRDiff = std::abs(newAllianceStats.GetAverageMMR() - newHordeStats.GetAverageMMR());
-    
+
     LOG_DEBUG("bg.queue", "BG Faction Balance - Queue Time: {}s, Tolerance: {:.0f}, "
               "Alliance: {} players (MMR: {:.2f}, Gear: {:.2f}), "
               "Horde: {} players (MMR: {:.2f}, Gear: {:.2f}), "

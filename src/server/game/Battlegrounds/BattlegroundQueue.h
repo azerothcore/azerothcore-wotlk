@@ -144,12 +144,11 @@ private:
         float totalMMR = 0.0f;
         float totalGearScore = 0.0f;
         uint32 playerCount = 0;
-    
+
         float GetAverageMMR() const { return playerCount > 0 ? totalMMR / playerCount : 0.0f; }
         float GetAverageGearScore() const { return playerCount > 0 ? totalGearScore / playerCount : 0.0f; }
         float GetCombinedScore() const;
     };
-
 
     struct GroupPlayerCache
     {

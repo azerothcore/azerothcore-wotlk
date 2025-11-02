@@ -64,21 +64,21 @@ public:
         BattlegroundRatingData bgRating = target->GetBGRating();
         float gearScore = sBattlegroundMMRMgr->GetPlayerGearScore(target);
         float combinedScore = sBattlegroundMMRMgr->GetPlayerCombinedScore(target);
-        
+
         handler->PSendSysMessage("Battleground MMR Info for {}:", target->GetName());
-        handler->PSendSysMessage("Rating: {:.2f} (RD: {:.2f}, Volatility: {:.4f})", 
+        handler->PSendSysMessage("Rating: {:.2f} (RD: {:.2f}, Volatility: {:.4f})",
                                  bgRating.rating, bgRating.ratingDeviation, bgRating.volatility);
-        handler->PSendSysMessage("Record: {} wins, {} losses ({} total matches)", 
+        handler->PSendSysMessage("Record: {} wins, {} losses ({} total matches)",
                                  bgRating.wins, bgRating.losses, bgRating.matchesPlayed);
         handler->PSendSysMessage("Gear Score: {:.2f}", gearScore);
         handler->PSendSysMessage("Combined Score: {:.2f}", combinedScore);
-        
+
         if (bgRating.matchesPlayed > 0)
         {
             float winRate = (static_cast<float>(bgRating.wins) / bgRating.matchesPlayed) * 100.0f;
             handler->PSendSysMessage("Win Rate: {:.1f}%", winRate);
         }
-        
+
         return true;
     }
 
@@ -103,7 +103,7 @@ public:
         bgRating.ratingDeviation = 200.0f;  // Reset RD
         bgRating.volatility = 0.06f;        // Reset volatility
         target->SetBGRating(bgRating);
-        
+
         // Force save to DB immediately
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_BG_MMR);
         stmt->SetData(0, target->GetGUID().GetCounter());
@@ -114,9 +114,9 @@ public:
         stmt->SetData(5, bgRating.wins);
         stmt->SetData(6, bgRating.losses);
         CharacterDatabase.Execute(stmt);
-        
+
         handler->PSendSysMessage("Set {}'s Battleground MMR to {:.2f}", target->GetName(), rating);
-        
+
         return true;
     }
 
@@ -145,15 +145,15 @@ public:
         bgRating.losses = 0;
         bgRating.loaded = true;
         target->SetBGRating(bgRating);
-        
+
         // Delete from DB (will be recreated on first match if needed)
-        CharacterDatabase.Execute("DELETE FROM character_battleground_rating WHERE guid = {}", 
+        CharacterDatabase.Execute("DELETE FROM character_battleground_rating WHERE guid = {}",
                                    target->GetGUID().GetCounter());
-        CharacterDatabase.Execute("DELETE FROM character_battleground_rating_history WHERE guid = {}", 
+        CharacterDatabase.Execute("DELETE FROM character_battleground_rating_history WHERE guid = {}",
                                    target->GetGUID().GetCounter());
-        
+
         handler->PSendSysMessage("Reset {}'s Battleground MMR to default values", target->GetName());
-        
+
         return true;
     }
 };

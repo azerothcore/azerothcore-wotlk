@@ -581,7 +581,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_PVPSTATS_BRACKET_MONTH, "SELECT character_guid, COUNT(character_guid) AS count, characters.name as character_name FROM pvpstats_players INNER JOIN pvpstats_battlegrounds ON pvpstats_players.battleground_id = pvpstats_battlegrounds.id AND bracket_id = ? AND MONTH(date) = MONTH(NOW()) AND YEAR(date) = YEAR(NOW()) INNER JOIN characters ON pvpstats_players.character_guid = characters.guid AND characters.deleteDate IS NULL WHERE pvpstats_players.winner = 1 GROUP BY character_guid ORDER BY count(character_guid) DESC LIMIT 0, ?", CONNECTION_SYNCH);
 
     // Battleground MMR
-        PrepareStatement(CHAR_SEL_CHAR_BG_MMR, 
+        PrepareStatement(CHAR_SEL_CHAR_BG_MMR,
         "SELECT rating, rating_deviation, volatility, matches_played, wins, losses "
         "FROM character_battleground_rating WHERE guid = ?", CONNECTION_ASYNC);
 
