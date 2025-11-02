@@ -120,15 +120,13 @@ public:
             {
                 case EVENT_BOULDER:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, SPELL_BOULDER_TOSS, false);
-
+                        DoCastRandomTarget(SPELL_BOULDER_TOSS, 0, 50.0f);
                         events.Repeat(5s, 7s);
                         break;
                     }
                 case EVENT_GROUND_SPIKE:
                     {
-                        me->CastSpell(me->GetVictim(), SPELL_GROUND_SPIKE, false); // current enemy target
+                        DoCastRandomTarget(SPELL_GROUND_SPIKE, 0, 50.0f);
                         events.Repeat(8s, 11s);
                         break;
                     }
@@ -142,6 +140,8 @@ public:
                     {
                         events.Repeat(10s, 13s);
                         me->CastSpell(me->GetVictim(), SPELL_GROUND_SLAM, true);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
                         events.DelayEvents(10s);
                         events.RescheduleEvent(EVENT_SHATTER, 8s);
                         break;
@@ -151,6 +151,7 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_SHATTER, false);
                         Talk(SAY_SHATTER);
                         events.RescheduleEvent(EVENT_REMOVE_STONED, 1500ms);
+                        me->SetReactState(REACT_AGGRESSIVE);
                         break;
                     }
                 case EVENT_REMOVE_STONED:
