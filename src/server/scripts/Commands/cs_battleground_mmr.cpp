@@ -32,7 +32,7 @@ public:
     {
         static ChatCommandTable bgMMRCommandTable =
         {
-            { "info",    HandleBGMMRInfoCommand,    SEC_PLAYER, Console::No },
+            { "info",    HandleBGMMRInfoCommand,    SEC_GAMEMASTER, Console::No },
             { "set",     HandleBGMMRSetCommand,     SEC_ADMINISTRATOR, Console::No },
             { "reset",   HandleBGMMRResetCommand,   SEC_ADMINISTRATOR, Console::No },
         };
