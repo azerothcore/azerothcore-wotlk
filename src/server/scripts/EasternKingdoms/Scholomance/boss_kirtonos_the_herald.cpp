@@ -56,7 +56,7 @@ enum Events
 enum Misc
 {
     WEAPON_KIRTONOS_STAFF             = 11365,
-    POINT_KIRTONOS_LAND               = 13,
+    POINT_KIRTONOS_LAND               = 14,
     KIRTONOS_PATH                     = 105061,
 
     EMOTE_SUMMONED                    = 0
@@ -139,7 +139,7 @@ public:
             switch (events2.ExecuteEvent())
             {
                 case INTRO_1:
-                    me->GetMotionMaster()->MovePath(KIRTONOS_PATH, false);
+                    me->GetMotionMaster()->MoveWaypoint(KIRTONOS_PATH, false);
                     Talk(EMOTE_SUMMONED);
                     break;
                 case INTRO_2:

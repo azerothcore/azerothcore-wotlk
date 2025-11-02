@@ -29,14 +29,9 @@ enum Spells
     SPELL_TELEPORT                              = 51112,
 
     SPELL_FROSTBOMB                             = 51103,
-    SPELL_TIME_BOMB_N                           = 51121,
-    SPELL_TIME_BOMB_H                           = 59376,
-    SPELL_EMPOWERED_ARCANE_EXPLOSION_N          = 51110,
-    SPELL_EMPOWERED_ARCANE_EXPLOSION_H          = 59377,
+    SPELL_TIME_BOMB                             = 51121,
+    SPELL_EMPOWERED_ARCANE_EXPLOSION            = 51110,
 };
-
-#define SPELL_EMPOWERED_ARCANE_EXPLOSION        DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H)
-//#define SPELL_TIME_BOMB                         DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H)
 
 enum UromNPCs
 {
@@ -298,7 +293,7 @@ public:
 
                     //At this point we are still in casting state so we need to clear it for DoCastAOE not to fail
                     me->ClearUnitState(UNIT_STATE_CASTING);
-                    DoCastAOE(DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H));
+                    DoCastAOE(SPELL_EMPOWERED_ARCANE_EXPLOSION);
                     me->AddUnitState(UNIT_STATE_CASTING);
                     events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9s, 7s));
                 default:
@@ -347,7 +342,7 @@ public:
                     break;
                 case EVENT_TIME_BOMB:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                        DoCast(target, DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H));
+                        DoCast(target, SPELL_TIME_BOMB);
                     events.Repeat(20s, 25s);
                     break;
                 case EVENT_TELEPORT_TO_CENTER:
