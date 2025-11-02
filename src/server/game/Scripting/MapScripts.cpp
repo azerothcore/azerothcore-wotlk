@@ -442,7 +442,7 @@ void Map::ScriptsProcess()
                     if (step.script->MoveTo.TravelTime != 0)
                     {
                         float speed = unit->GetDistance(step.script->MoveTo.DestX, step.script->MoveTo.DestY, step.script->MoveTo.DestZ) / ((float)step.script->MoveTo.TravelTime * 0.001f);
-                        unit->MonsterMoveWithSpeed(step.script->MoveTo.DestX, step.script->MoveTo.DestY, step.script->MoveTo.DestZ, speed);
+                        unit->GetMotionMaster()->MovePoint(0, step.script->MoveTo.DestX, step.script->MoveTo.DestY, step.script->MoveTo.DestZ, FORCED_MOVEMENT_NONE, speed);
                     }
                     else
                         unit->NearTeleportTo(step.script->MoveTo.DestX, step.script->MoveTo.DestY, step.script->MoveTo.DestZ, unit->GetOrientation());
@@ -757,7 +757,7 @@ void Map::ScriptsProcess()
             case SCRIPT_COMMAND_DESPAWN_SELF:
                 // Target or source must be Creature.
                 if (Creature* cSource = _GetScriptCreatureSourceOrTarget(source, target, step.script, true))
-                    cSource->DespawnOrUnsummon(step.script->DespawnSelf.DespawnDelay);
+                    cSource->DespawnOrUnsummon(Milliseconds(step.script->DespawnSelf.DespawnDelay));
                 break;
 
             case SCRIPT_COMMAND_LOAD_PATH:
@@ -767,7 +767,7 @@ void Map::ScriptsProcess()
                     if (!sWaypointMgr->GetPath(step.script->LoadPath.PathID))
                         LOG_ERROR("maps.script", "{} source object has an invalid path ({}), skipping.", step.script->GetDebugInfo(), step.script->LoadPath.PathID);
                     else
-                        unit->GetMotionMaster()->MovePath(step.script->LoadPath.PathID, step.script->LoadPath.IsRepeatable);
+                        unit->GetMotionMaster()->MoveWaypoint(step.script->LoadPath.PathID, step.script->LoadPath.IsRepeatable);
                 }
                 break;
 
@@ -880,7 +880,6 @@ void Map::ScriptsProcess()
                     if (!cSource->IsAlive())
                         return;
 
-                    cSource->GetMotionMaster()->MovementExpired();
                     cSource->GetMotionMaster()->MoveIdle();
 
                     switch (step.script->Movement.MovementType)
@@ -889,7 +888,7 @@ void Map::ScriptsProcess()
                             cSource->GetMotionMaster()->MoveRandom((float)step.script->Movement.MovementDistance);
                             break;
                         case WAYPOINT_MOTION_TYPE:
-                            cSource->GetMotionMaster()->MovePath(step.script->Movement.Path, false);
+                            cSource->GetMotionMaster()->MoveWaypoint(step.script->Movement.Path, false);
                             break;
                     }
                 }

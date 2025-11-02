@@ -140,7 +140,7 @@ public:
             {
                 for (int8 i = 0; outroPositions[i].entry[GetTeamIdInInstance()] != 0; ++i)
                     if (Creature* summon = instance->SummonCreature(outroPositions[i].entry[GetTeamIdInInstance()], outroPositions[i].startPosition))
-                        summon->GetMotionMaster()->MovePath(outroPositions[i].pathId, false);
+                        summon->GetMotionMaster()->MoveWaypoint(outroPositions[i].pathId, false);
             }
         }
 

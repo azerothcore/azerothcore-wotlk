@@ -852,7 +852,7 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
         if (!initial)
         {
             std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
-            for (ObjectGuid& guid : m_sunsReachData.m_sunsReachReclamationPlayers)
+            for (ObjectGuid const& guid : m_sunsReachData.m_sunsReachReclamationPlayers)
                 if (Player* player = ObjectAccessor::FindPlayer(guid))
                 {
                     if (start)
@@ -1778,7 +1778,7 @@ bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, c
         else
             pathID = spawnLoc == 0 ? PATH_STORMWIND_KEEP : PATH_STORMWIND_TRADE_DISTRICT;
 
-        pallid->GetMotionMaster()->MovePath(pathID, false);
+        pallid->GetMotionMaster()->MoveWaypoint(pathID, false);
 
         sWorldState->SetPallidGuid(zone.zoneId, pallid->GetGUID());
     }

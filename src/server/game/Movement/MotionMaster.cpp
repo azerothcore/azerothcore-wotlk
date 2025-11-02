@@ -32,6 +32,7 @@
 #include "TargetedMovementGenerator.h"
 #include "WaypointMgr.h"
 #include "WaypointMovementGenerator.h"
+#include "SmartScriptMgr.h"
 
 inline MovementGenerator* GetIdleMovementGenerator()
 {
@@ -387,6 +388,7 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(point.x, point.y, point.z, false);
+    init.SetWalk(true);
     init.SetFacing(target);
     init.SetOrientationInversed();
     init.Launch();
@@ -469,7 +471,7 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
  *
  * For transition movement between the ground and the air, use MoveLand or MoveTakeoff instead.
  */
-void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generatePath, bool forceDestination, MovementSlot slot, float orientation /* = 0.0f*/)
+void MotionMaster::MovePoint(uint32 id, float x, float y, float z, ForcedMovement forcedMovement, float speed, float orientation, bool generatePath, bool forceDestination, MovementSlot slot)
 {
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
@@ -477,16 +479,16 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generate
     if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) targeted point (Id: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Player>(id, x, y, z, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination), slot);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) targeted point (ID: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination), slot);
     }
 }
 
-void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
+void MotionMaster::MoveSplinePath(Movement::PointsArray* path, ForcedMovement forcedMovement)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
@@ -494,27 +496,43 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
 
     if (_owner->IsPlayer())
     {
-        Mutate(new EscortMovementGenerator<Player>(path), MOTION_SLOT_ACTIVE);
+        Mutate(new EscortMovementGenerator<Player>(forcedMovement, path), MOTION_SLOT_ACTIVE);
     }
     else
     {
-        Mutate(new EscortMovementGenerator<Creature>(path), MOTION_SLOT_ACTIVE);
+        Mutate(new EscortMovementGenerator<Creature>(forcedMovement, path), MOTION_SLOT_ACTIVE);
     }
 }
 
-void MotionMaster::MoveSplinePath(uint32 path_id)
+void MotionMaster::MovePath(uint32 path_id, ForcedMovement forcedMovement, PathSource pathSource)
 {
-    // convert the path id to a Movement::PointsArray*
-    Movement::PointsArray* points = new Movement::PointsArray();
-    WaypointPath const* path = sWaypointMgr->GetPath(path_id);
-    for (uint8 i = 0; i < path->size(); ++i)
+    WaypointPath const* path;
+    switch (pathSource)
     {
-        WaypointData const* node = path->at(i);
-        points->push_back(G3D::Vector3(node->x, node->y, node->z));
+        default:
+        case PathSource::WAYPOINT_MGR:
+            path = sWaypointMgr->GetPath(path_id);
+            break;
+        case PathSource::SMART_WAYPOINT_MGR:
+            path = sSmartWaypointMgr->GetPath(path_id);
+            break;
+    }
+
+    if (path == nullptr)
+    {
+        LOG_ERROR("sql.sql", "WaypointMovementGenerator::LoadPath: creature {} ({}) doesn't have waypoint path id: {} pathSource: {}",
+            _owner->GetName(), _owner->GetGUID().ToString(), path_id, pathSource);
+        return;
+    }
+
+    Movement::PointsArray points;
+    for (auto& point : *path)
+    {
+        points.push_back(G3D::Vector3(point.second.x, point.second.y, point.second.z));
     }
 
     // pass the new PointsArray* to the appropriate MoveSplinePath function
-    MoveSplinePath(points);
+    MoveSplinePath(&points, forcedMovement);
 }
 
 /**
@@ -539,8 +557,8 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0
     }
 
     init.SetAnimation(Movement::ToGround);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_ACTIVE);
 }
 
 /**
@@ -569,16 +587,12 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 
     init.MoveTo(x, y, z);
 
     if (speed > 0.0f)
-    {
         init.SetVelocity(speed);
-    }
 
     if (!skipAnimation)
-    {
         init.SetAnimation(Movement::ToFly);
-    }
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_ACTIVE);
 }
 
 /**
@@ -612,8 +626,8 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     init.SetParabolic(max_height, 0);
     init.SetOrientationFixed(true);
     init.SetVelocity(speedXY);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(0), MOTION_SLOT_CONTROLLED);
+
+    Mutate(new EffectMovementGenerator(init, 0), MOTION_SLOT_CONTROLLED);
 }
 
 /**
@@ -652,8 +666,8 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
     init.SetVelocity(speedXY);
     if (target)
         init.SetFacing(target);
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_CONTROLLED);
 }
 
 /**
@@ -695,8 +709,8 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(_owner->GetPositionX(), _owner->GetPositionY(), tz + _owner->GetHoverHeight());
     init.SetFall();
-    init.Launch();
-    Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
+
+    Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_CONTROLLED);
 }
 
 /**
@@ -713,12 +727,12 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) charge point (X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), x, y, z);
-        Mutate(new PointMovementGenerator<Player>(id, x, y, z, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, FORCED_MOVEMENT_NONE, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) charge point (X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), x, y, z);
-        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, FORCED_MOVEMENT_NONE, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
     }
 }
 
@@ -884,7 +898,7 @@ void MotionMaster::Mutate(MovementGenerator* m, MovementSlot slot)
 /**
  * @brief Move the unit following a specific path. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  */
-void MotionMaster::MovePath(uint32 path_id, bool repeatable)
+void MotionMaster::MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource)
 {
     if (!path_id)
         return;
@@ -892,20 +906,7 @@ void MotionMaster::MovePath(uint32 path_id, bool repeatable)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    //We set waypoint movement as new default movement generator
-    // clear ALL movement generators (including default)
-    /*while (!empty())
-    {
-        MovementGenerator *curr = top();
-        curr->Finalize(*_owner);
-        pop();
-        if (!isStatic(curr))
-            delete curr;
-    }*/
-
-    //_owner->IsPlayer() ?
-    //Mutate(new WaypointMovementGenerator<Player>(path_id, repeatable)):
-    Mutate(new WaypointMovementGenerator<Creature>(path_id, repeatable), MOTION_SLOT_IDLE);
+    Mutate(new WaypointMovementGenerator<Creature>(path_id, pathSource, repeatable), MOTION_SLOT_IDLE);
 
     LOG_DEBUG("movement.motionmaster", "{} ({}) start moving over path(Id:{}, repeatable: {})",
         _owner->IsPlayer() ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");

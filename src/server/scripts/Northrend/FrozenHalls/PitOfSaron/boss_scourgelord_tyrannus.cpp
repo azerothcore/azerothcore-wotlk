@@ -108,7 +108,7 @@ public:
                 {
                     c->RemoveAura(46598);
                     c->GetMotionMaster()->Clear();
-                    c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 18, true);
+                    c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 18, true);
                 }
                 me->SetHomePosition(exitPos);
                 me->GetMotionMaster()->MoveJump(exitPos, 10.0f, 2.0f);
@@ -161,7 +161,7 @@ public:
                         events.RescheduleEvent(EVENT_SPELL_UNHOLY_POWER, 1s);
                         break;
                     }
-                    events.RepeatEvent(3000);
+                    events.Repeat(3s);
                     break;
                 case EVENT_SPELL_UNHOLY_POWER:
                     Talk(SAY_DARK_MIGHT);

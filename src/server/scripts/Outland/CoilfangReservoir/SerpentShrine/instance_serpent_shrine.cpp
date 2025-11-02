@@ -234,7 +234,7 @@ class spell_serpentshrine_cavern_serpentshrine_parasite_trigger : public SpellSc
     {
         PreventHitDefaultEffect(effIndex);
         if (Creature* target = GetHitCreature())
-            target->DespawnOrUnsummon(1);
+            target->DespawnOrUnsummon(1ms);
     }
 
     void Register() override

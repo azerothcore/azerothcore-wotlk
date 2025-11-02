@@ -132,7 +132,7 @@ struct boss_magus_telestra : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_KILL);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -150,7 +150,7 @@ struct boss_magus_telestra : public BossAI
         if (spellInfo->Id >= SPELL_FIRE_MAGUS_DEATH && spellInfo->Id <= SPELL_ARCANE_MAGUS_DEATH && caster->ToCreature())
         {
             events.ScheduleEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT, 5s);
-            caster->ToCreature()->DespawnOrUnsummon(1000);
+            caster->ToCreature()->DespawnOrUnsummon(1s);
 
             if (++copiesDied >= 3)
             {

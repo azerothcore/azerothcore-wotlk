@@ -68,7 +68,7 @@ void SummonList::DespawnEntry(uint32 entry)
     }
 }
 
-void SummonList::DespawnAll(uint32 delay /*= 0*/)
+void SummonList::DespawnAll(Milliseconds delay /*= 0ms*/)
 {
     while (!storage_.empty())
     {
@@ -325,13 +325,13 @@ void ScriptedAI::ScheduleTimedEvent(Milliseconds timerMin, Milliseconds timerMax
         return;
     }
 
-    scheduler.Schedule(timerMin == 0s ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
+    scheduler.Schedule(timerMin == 0ms ? timerMax : timerMin, timerMax, [exec, repeatMin, repeatMax, uniqueId](TaskContext context)
     {
         exec();
 
         if (!uniqueId)
         {
-            repeatMax > 0s ? context.Repeat(repeatMin, repeatMax) : context.Repeat(repeatMin);
+            repeatMax > 0ms ? context.Repeat(repeatMin, repeatMax) : context.Repeat(repeatMin);
         }
     });
 
@@ -531,10 +531,6 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (loadDefault)
     {
         me->LoadEquipment(me->GetOriginalEquipmentId(), true);
-        if (me->HasWeapon(OFF_ATTACK))
-            me->SetCanDualWield(true);
-        else
-            me->SetCanDualWield(false);
         return;
     }
 
@@ -547,10 +543,6 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (offHand >= 0)
     {
         me->SetVirtualItem(1, uint32(offHand));
-        if (offHand >= 1)
-            me->SetCanDualWield(true);
-        else
-            me->SetCanDualWield(false);
     }
 
     if (ranged >= 0)
@@ -574,7 +566,7 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
     std::vector<Player*> tList;
     for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
     {
-        if (!me->IsWithinDistInMap(itr->GetSource(), maxdist, true, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+        if (!me->IsWithinDistInMap(itr->GetSource(), maxdist, true, false, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
             continue;
         if (excludeAura && itr->GetSource()->HasAura(excludeAura))
             continue;
@@ -662,7 +654,7 @@ void BossAI::_JustEngagedWith()
     ScheduleTasks();
     if (callForHelpRange)
     {
-        ScheduleTimedEvent(0s, [&]
+        ScheduleTimedEvent(0ms, [&]
         {
             me->CallForHelp(callForHelpRange);
         }, 2s);

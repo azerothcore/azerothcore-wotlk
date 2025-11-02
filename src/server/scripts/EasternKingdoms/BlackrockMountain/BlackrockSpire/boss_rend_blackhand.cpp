@@ -222,7 +222,7 @@ public:
                     if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 50.0f))
                         waveDoorGUID = portcullis->GetGUID();
 
-                    events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                    events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                     events.ScheduleEvent(EVENT_START_1, 1s);
                 }
             }
@@ -234,7 +234,7 @@ public:
             {
                 switch (id)
                 {
-                    case 5:
+                    case 6:
                         events.ScheduleEvent(EVENT_TELEPORT_1, 2s);
                         break;
                 }
@@ -264,7 +264,7 @@ public:
                             events.ScheduleEvent(EVENT_START_2, 4s);
                             break;
                         case EVENT_START_2:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                             events.ScheduleEvent(EVENT_START_3, 4s);
@@ -314,14 +314,14 @@ public:
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_TEXT_2:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_3);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_TEXT_3:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_4);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
@@ -334,14 +334,14 @@ public:
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_TEXT_5:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_5);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_COMPLETE_TEXT_1:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_6);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
@@ -362,10 +362,10 @@ public:
                             break;
                         case EVENT_PATH_NEFARIUS:
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
-                                victor->GetMotionMaster()->MovePath(NEFARIUS_PATH_1, true);
+                                victor->GetMotionMaster()->MoveWaypoint(NEFARIUS_PATH_1, true);
                             break;
                         case EVENT_PATH_REND:
-                            me->GetMotionMaster()->MovePath(REND_PATH_1, false);
+                            me->GetMotionMaster()->MoveWaypoint(REND_PATH_1, false);
                             break;
                         case EVENT_TELEPORT_1:
                             me->NearTeleportTo(194.2993f, -474.0814f, 121.4505f, -0.01225555f);

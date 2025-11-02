@@ -1824,7 +1824,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
                         {
                             if (Player const* player = unitTarget->ToPlayer())
                             {
-                                if (player->GetWeaponForAttack(WeaponAttackType(BASE_ATTACK + i), true))
+                                if (player->GetWeaponForAttack(WeaponAttackType(i), true))
                                 {
                                     valid = true;
                                     break;
