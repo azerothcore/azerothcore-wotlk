@@ -1,30 +1,48 @@
+DROP TABLE IF EXISTS `character_battleground_rating`;
 CREATE TABLE `character_battleground_rating` (
-  `guid` INT UNSIGNED NOT NULL COMMENT 'Character GUID',
-  `rating` FLOAT NOT NULL DEFAULT 1500 COMMENT 'Glicko-2 rating',
-  `rating_deviation` FLOAT NOT NULL DEFAULT 200 COMMENT 'Rating deviation (RD)',
-  `volatility` FLOAT NOT NULL DEFAULT 0.06 COMMENT 'Rating volatility',
-  `matches_played` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG matches',
-  `wins` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG wins',
-  `losses` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG losses',
-  `last_update` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last rating update',
-  PRIMARY KEY (`guid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Battleground MMR data for each character';
+  `Guid` INT UNSIGNED NOT NULL COMMENT 'Character GUID',
+  `Rating` FLOAT NOT NULL DEFAULT 1500 COMMENT 'Glicko-2 rating',
+  `RatingDeviation` FLOAT NOT NULL DEFAULT 200 COMMENT 'Rating deviation (RD)',
+  `Volatility` FLOAT NOT NULL DEFAULT 0.06 COMMENT 'Rating volatility',
+  `MatchesPlayed` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG matches',
+  `Wins` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG wins',
+  `Losses` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'Total BG losses',
+  `LastUpdate` TIMESTAMP NULL DEFAULT NULL COMMENT 'Last rating update',
+  PRIMARY KEY (`Guid`),
+  CONSTRAINT `character_battleground_rating_chk_1` CHECK (`Guid` >= 0),
+  CONSTRAINT `character_battleground_rating_chk_2` CHECK (`MatchesPlayed` >= 0),
+  CONSTRAINT `character_battleground_rating_chk_3` CHECK (`Wins` >= 0),
+  CONSTRAINT `character_battleground_rating_chk_4` CHECK (`Losses` >= 0)
+)
+COMMENT = 'Battleground MMR data for each character'
+CHARSET = utf8mb4
+COLLATE = utf8mb4_unicode_ci
+ENGINE = InnoDB
+ROW_FORMAT = DEFAULT
+;
 
--- Create rating history table
+DROP TABLE IF EXISTS `character_battleground_rating_history`;
 CREATE TABLE `character_battleground_rating_history` (
-  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `guid` INT UNSIGNED NOT NULL COMMENT 'Character GUID',
-  `old_rating` FLOAT NOT NULL,
-  `new_rating` FLOAT NOT NULL,
-  `old_rd` FLOAT NOT NULL,
-  `new_rd` FLOAT NOT NULL,
-  `old_volatility` FLOAT NOT NULL,
-  `new_volatility` FLOAT NOT NULL,
-  `match_result` TINYINT NOT NULL COMMENT '1=win, 0=loss',
-  `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `idx_guid` (`guid`),
-  KEY `idx_timestamp` (`timestamp`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-COMMENT='Tracks BG rating changes over time';
+  `Id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `Guid` INT UNSIGNED NOT NULL COMMENT 'Character GUID',
+  `OldRating` FLOAT NOT NULL,
+  `NewRating` FLOAT NOT NULL,
+  `OldRD` FLOAT NOT NULL,
+  `NewRD` FLOAT NOT NULL,
+  `OldVolatility` FLOAT NOT NULL,
+  `NewVolatility` FLOAT NOT NULL,
+  `MatchResult` TINYINT NOT NULL COMMENT '1=win, 0=loss',
+  `Timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Id`),
+  KEY `idx_guid` (`Guid`),
+  KEY `idx_timestamp` (`Timestamp`),
+  CONSTRAINT `character_battleground_rating_history_chk_1` CHECK (`Id` >= 0),
+  CONSTRAINT `character_battleground_rating_history_chk_2` CHECK (`Guid` >= 0),
+  CONSTRAINT `character_battleground_rating_history_chk_3` CHECK (`MatchResult` IN (0, 1))
+)
+COMMENT = 'Tracks BG rating changes over time'
+CHARSET = utf8mb4
+COLLATE = utf8mb4_unicode_ci
+ENGINE = InnoDB
+ROW_FORMAT = DEFAULT
+;
