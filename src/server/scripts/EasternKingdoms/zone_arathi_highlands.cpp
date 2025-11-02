@@ -124,7 +124,105 @@ public:
     }
 };
 
+enum Spells
+{
+    SPELL_FIREBALL = 34083,
+    SPELL_FROSTNOVA = 38033,
+    SPELL_LIGHTNING_SHIELD = 12550,
+    SPELL_VISUAL_TRANSFORMATION = 24085
+};
+
+// Fire, Air, Water, earth model displayId (same as the elemental in the zone)
+uint32_t elements_display[] = {2172, 5490, 5561, 9587};
+class npc_prismatic_exile : public CreatureScript
+{
+public:
+    npc_prismatic_exile() : CreatureScript("npc_prismatic_exile") {}
+
+    struct npc_prismatic_exileAI : public ScriptedAI
+    {
+        uint32 changeElementTimer;
+        uint32 currentElement;
+        uint32 frostNovaTimer;
+        bool hasLightningShield;
+
+        npc_prismatic_exileAI(Creature* creature) : ScriptedAI(creature) {
+            currentElement = 3;
+            hasLightningShield = false;
+            frostNovaTimer = urand(1400, 7300); // Got those values from smart_script of 2761
+            changeElementTimer = urand(6 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
+        }
+
+        void InitializeAI() override
+        {
+            ScriptedAI::InitializeAI();
+
+            // Get the target from Myzrael
+            Unit* owner = me->GetOwner();
+            if (!owner)
+                return;
+
+            Unit* target = owner->GetVictim();
+            if (target) 
+                SetGazeOn(target);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            // Change Element
+            if (changeElementTimer <= diff)
+            {
+                uint32 _rand = urand(1, 3);
+                me->CastStop();
+                me->CastSpell(me, SPELL_VISUAL_TRANSFORMATION, true);
+                currentElement = (currentElement + _rand) % 4; // Change to a new element different from actual one
+                me->SetDisplayId(elements_display[currentElement]);
+                changeElementTimer = urand(6 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
+            }
+            else changeElementTimer -= diff;
+
+
+            if (!me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                // Cast spell depending on the current element
+                switch (currentElement) {
+                case 0: // FIRE
+                    // Always cast fire ball
+                    me->CastSpell(me->GetVictim(), SPELL_FIREBALL, false);
+                    return;
+                case 1: // AIR
+                    // Can only cast lightning shield once
+                    if (!hasLightningShield) {
+                        me->CastSpell(me, SPELL_LIGHTNING_SHIELD, false);
+                        hasLightningShield = true;
+                    }
+                    break;
+                case 2: // WATER
+                    // Can only case frostnova if is in range and timer is done
+                    Unit * target = me->GetVictim();
+                    if (target && me->IsInRange(target, 0.0f, 10.0f) && frostNovaTimer <= diff)
+                    {
+                        me->CastSpell((Unit*)nullptr, SPELL_FROSTNOVA, false);
+                        frostNovaTimer = urand(1400, 7300);
+                    }
+                    else frostNovaTimer -= diff;
+                    break;
+                }
+
+                // By default, melee attack
+                DoMeleeAttackIfReady();
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_prismatic_exileAI(creature);
+    }
+};
+
 void AddSC_arathi_highlands()
 {
+    new npc_prismatic_exile();
     new npc_professor_phizzlethorpe();
 }
