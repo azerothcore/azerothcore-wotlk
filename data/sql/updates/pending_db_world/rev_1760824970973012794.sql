@@ -10,17 +10,24 @@ DELETE FROM `creature_summon_groups` WHERE `summonerId` = 29120 AND `groupId` = 
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
 (29120, 0, 1, 22515, 549.622, 352.047, 240.8899, 3.45575, 8, 0, 'Anub''arak - Group 1 - World Trigger');
 
+-- Position where Anub'ar Guardian and Anub'ar Venomancer run to after spawning
+SET @POS_X := 551.0095;
+SET @POS_Y := 274.026;
+SET @POS_Z := 223.89513;
+
 -- Update comments, spelldifficulty_dbc
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 29216);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (29216, 0, 0, 0, 0, 0, 100, 0, 5000, 8000, 6000, 6000, 0, 0, 11, 53618, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anub\'ar Guardian - In Combat - Cast \'Sunder Armor\''),
-(29216, 0, 1, 0, 0, 0, 100, 0, 2000, 3000, 8000, 8000, 0, 0, 11, 52532, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anub\'ar Guardian - In Combat - Cast \'Strike\'');
+(29216, 0, 1, 0, 0, 0, 100, 0, 2000, 3000, 8000, 8000, 0, 0, 11, 52532, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anub\'ar Guardian - In Combat - Cast \'Strike\''),
+(29216, 0, 2, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 1, 0, 0, 0, 8, 0, 0, 0, 0, @POS_X, @POS_Y, @POS_Z, 0, 'Anub\'ar Guardian - On Just Summoned - Move To Position');
 
 -- Update comments, spelldifficulty_dbc
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 29217);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (29217, 0, 0, 0, 0, 0, 100, 0, 5000, 8000, 18000, 22000, 0, 0, 11, 53616, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anub\'ar Venomancer - In Combat - Cast \'Poison Bolt Volley\''),
-(29217, 0, 1, 0, 0, 0, 100, 0, 2000, 3000, 7000, 7000, 0, 0, 11, 53617, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anub\'ar Venomancer - In Combat - Cast \'Poison Bolt\'');
+(29217, 0, 1, 0, 0, 0, 100, 0, 2000, 3000, 7000, 7000, 0, 0, 11, 53617, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Anub\'ar Venomancer - In Combat - Cast \'Poison Bolt\''),
+(29217, 0, 2, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 1, 0, 0, 0, 8, 0, 0, 0, 0, @POS_X, @POS_Y, @POS_Z, 0, 'Anub\'ar Venomancer - On Just Summoned - Move To Position');
 
 SET @CGUID := 127529;
 DELETE FROM `creature` WHERE (`id1` = 22515) AND (`guid` BETWEEN @CGUID+0 AND @CGUID+7);
