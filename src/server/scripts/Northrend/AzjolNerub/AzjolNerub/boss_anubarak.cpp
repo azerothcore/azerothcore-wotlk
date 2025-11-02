@@ -361,7 +361,6 @@ struct boss_anub_arak : public BossAI
                     {
                         Creature* trigger = Acore::Containers::SelectRandomContainerElement(triggers);
                         trigger->CastSpell(trigger, SPELL_SUMMON_DARTER, true, nullptr, nullptr, me->GetGUID());
-                        events.Repeat(11s);
                     }
                     break;
                 }
