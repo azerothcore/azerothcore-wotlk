@@ -1257,7 +1257,7 @@ public:
     bool HasWeapon(WeaponAttackType type) const override { return GetWeaponForAttack(type, false); }
     bool HasWeaponForAttack(WeaponAttackType type) const override { return (Unit::HasWeaponForAttack(type) && GetWeaponForAttack(type, true)); }
     [[nodiscard]] Item* GetShield(bool useable = false) const;
-    static uint8 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
+    static WeaponAttackType GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
     std::vector<Item*>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
     static bool IsInventoryPos(uint16 pos) { return IsInventoryPos(pos >> 8, pos & 255); }
     static bool IsInventoryPos(uint8 bag, uint8 slot);
