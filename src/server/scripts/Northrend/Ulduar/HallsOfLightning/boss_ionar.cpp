@@ -63,6 +63,7 @@ enum IonarEvents
     EVENT_CHECK_HEALTH              = 3,
     EVENT_CALL_SPARKS               = 4,
     EVENT_RESTORE                   = 5,
+    EVENT_CHANGE_TARGET             = 6,
 };
 
 struct boss_ionar : public BossAI
@@ -85,8 +86,8 @@ struct boss_ionar : public BossAI
         if (!spark)
             events.RescheduleEvent(EVENT_CHECK_HEALTH, 1s, 0, 1);
 
-        events.RescheduleEvent(EVENT_BALL_LIGHTNING, 10s, 0, 1);
-        events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 5s, 0, 1);
+        events.RescheduleEvent(EVENT_BALL_LIGHTNING, 7s, 11s, 0, 1);
+        events.RescheduleEvent(EVENT_STATIC_OVERLOAD, 6s, 12s, 0, 1);
     }
 
     void JustEngagedWith(Unit*) override
@@ -138,7 +139,7 @@ struct boss_ionar : public BossAI
         me->SetControlled(true, UNIT_STATE_STUNNED);
 
         events.SetPhase(2);
-        events.ScheduleEvent(EVENT_CALL_SPARKS, 15s, 0, 2);
+        events.ScheduleEvent(EVENT_CALL_SPARKS, 20s, 0, 2);
     }
 
     void UpdateAI(uint32 diff) override
@@ -155,17 +156,17 @@ struct boss_ionar : public BossAI
         {
             case EVENT_BALL_LIGHTNING:
                 DoCastRandomTarget(SPELL_BALL_LIGHTNING, 1, 0.0f, false);
-                events.Repeat(10s, 11s);
+                events.Repeat(8s, 18s);
                 break;
             case EVENT_STATIC_OVERLOAD:
                 DoCastRandomTarget(SPELL_STATIC_OVERLOAD);
-                events.Repeat(5s, 6s);
+                events.Repeat(9s, 14s);
                 break;
             case EVENT_CALL_SPARKS:
                 {
                     EntryCheckPredicate pred(NPC_SPARK_OF_IONAR);
                     summons.DoAction(ACTION_CALLBACK, pred);
-                    events.ScheduleEvent(EVENT_RESTORE, 2s, 0, 2);
+                    events.ScheduleEvent(EVENT_RESTORE, 5s, 0, 2);
                     return;
                 }
             case EVENT_RESTORE:
@@ -187,20 +188,47 @@ struct npc_spark_of_ionar : public ScriptedAI
     npc_spark_of_ionar(Creature* creature) : ScriptedAI(creature) { }
 
     void MoveInLineOfSight(Unit*) override { }
-    void UpdateAI(uint32) override { }
     void AttackStart(Unit*  /*who*/) override { }
 
-    void Reset() override { returning = false; }
+    void Reset() override
+    {
+        returning = false;
+        _events.ScheduleEvent(EVENT_CHANGE_TARGET, 3s);
+    }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         damage = 0;
     }
 
+    void UpdateAI(uint32 diff) override
+    {
+        if (returning)
+            return;
+
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_CHANGE_TARGET:
+                    if (Player* tgt = SelectTargetFromPlayerList(100))
+                    {
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveFollow(tgt, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+                    }
+                    _events.Repeat(3s);
+                    break;
+            }
+        }
+    }
+
     void DoAction(int32 param) override
     {
         if (param == ACTION_CALLBACK)
         {
+            _events.Reset();
             me->SetSpeed(MOVE_RUN, 2.5f);
             me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
@@ -218,6 +246,7 @@ struct npc_spark_of_ionar : public ScriptedAI
     }
 
     private:
+        EventMap _events;
         bool returning;
 };
 

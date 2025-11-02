@@ -1089,6 +1089,7 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
+            me->SetWalk(true);
             Start(false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
@@ -1415,7 +1416,7 @@ public:
                 _startTimer -= diff;
                 if (_startTimer <= 0)
                 {
-                    me->GetMotionMaster()->MovePath(3000000 + urand(0, 11), true);
+                    me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
                     _startTimer = 0;
                 }
             }
