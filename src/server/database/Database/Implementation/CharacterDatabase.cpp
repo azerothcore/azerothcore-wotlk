@@ -592,7 +592,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
 
     PrepareStatement(CHAR_INS_CHAR_BG_MMR_HISTORY,
         "INSERT INTO `character_battleground_rating_history` "
-        "(`Guid`, `OldRating`, `NewRating`, `OldRD`, `NewRD`, `OldVolatility`, `NewVolatility`, `MatchResult`) "
+        "(`Guid`, `OldRating`, `NewRating`, `OldRatingDeviation`, `NewRatingDeviation`, `OldVolatility`, `NewVolatility`, `MatchResult`) "
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // Deserter tracker
