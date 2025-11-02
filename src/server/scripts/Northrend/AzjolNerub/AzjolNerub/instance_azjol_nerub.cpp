@@ -54,7 +54,7 @@ BossBoundaryData const boundaries =
 {
     { DATA_KRIKTHIR, new RectangleBoundary(400.0f, 580.0f, 623.5f, 810.0f) },
     { DATA_HADRONOX, new ZRangeBoundary(666.0f, 776.0f) },
-    { DATA_ANUBARAK, new CircleBoundary(Position(550.6178f, 253.5917f), 26.0f) }
+    { DATA_ANUBARAK, new CircleBoundary(Position(550.6178f, 253.5917f), 32.0f) }
 };
 
 class instance_azjol_nerub : public InstanceMapScript
