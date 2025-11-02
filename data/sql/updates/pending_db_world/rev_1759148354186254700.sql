@@ -7,6 +7,8 @@ DELETE FROM `gameobject` WHERE `id` = 186959 AND `guid` IN (264459, 264460, 2644
 
 -- Add missing aura. Usage is unknown
 DELETE FROM `creature_template_addon` WHERE (`entry` = 24825);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(24825, 0, 0, 0, 0, 0, 0, '44652');
 
 -- Disable flying vehicle, but causes camera stuttering on rocket jump
 UPDATE `creature_template_movement` SET `Flight` = 0 WHERE (`CreatureId` = 24825);
