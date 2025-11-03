@@ -194,19 +194,14 @@ void ItemIdentificationSystem::LoadIdentificationTemplates()
         Field* fields = result->Fetch();
         IdentificationTemplate tmpl;
 
-        // 根据实际数据库表结构读取字段
-        // 字段顺序：注释(0), id(1), 组(2), 等级(3), 随机几率(4),
-        //          物品成长_系统_组_多个随机逗号隔开(5), 物品强化_系统_组_多个随机逗号隔开(6),
-        //          物品属性_模板_组_基础属性(7), 基础属性最小数量(8), 基础属性最大数量(9),
-        //          基础最小属性值(10), 基础最大属性值(11), 基础属性允许重复(12),
-        //          物品属性_模板_组_极品属性(13), 极品分配方式(14), 极品最小属性值(15), 极品最大属性值(16),
-        //          极品最小属性百分比(17), 极品最大属性百分比(18),
-        //          物品属性_模板_组_追加属性_多个逗号隔开(19), 追加属性最小数量(20), 追加属性最大数量(21),
-        //          追加属性最小值(22), 追加属性最大值(23), 追加属性允许重复(24),
-        //          物品技能_模板_组_追加技能_多个逗号隔开(25), 追加技能最小数量(26), 追加技能最大数量(27),
-        //          追加技能允许重复(28), 鉴定品质显示(29), 物品名字前缀(30), 物品名字后缀(31),
-        //          物品名字颜色_多个逗号隔开(32), 物品底部描述(33), 需求_模板(34), 符文系统_符文(35),
-        //          符文凹槽最小数量(36), 符文凹槽最大数量(37), 技能模板_套装_组_多个随机逗号隔开(38), 公告模板(39)
+        // 字段顺序对应CREATE TABLE的实际顺序
+        // 0:注释, 1:id, 2:组, 3:等级, 4:随机几率,
+        // 5:物品成长_系统, 6:物品强化_系统, 7:物品属性_模板,
+        // 8:基础属性最小数量, 9:基础属性最大数量, 10:基础最小属性值, 11:基础最大属性值, 12:基础属性允许重复,
+        // 13:物品属性_模板_组, 14:追加属性最小数量, 15:追加属性最大数量, 16:追加属性最小值, 17:追加属性最大值, 18:追加属性允许重复,
+        // 19:物品技能_模板_组, 20:追加技能最小数量, 21:追加技能最大数量, 22:追加技能允许重复,
+        // 23:鉴定品质显示, 24:物品名字前缀, 25:物品名字后缀, 26:物品名字颜色, 27:物品底部描述,
+        // 28:需求_模板, 29:符文系统_符文, 30:符文凹槽最小数量, 31:符文凹槽最大数量, 32:技能模板_套装_组, 33:公告模板
 
         tmpl.comment = fields[0].Get<std::string>();
         tmpl.id = fields[1].Get<uint32>();
@@ -215,11 +210,9 @@ void ItemIdentificationSystem::LoadIdentificationTemplates()
         tmpl.randomChance = fields[4].Get<uint32>();
 
         // 模块关联字段
-        tmpl.itemGrowthGroups = fields[5].Get<std::string>();                    // 物品成长_系统_组_多个随机逗号隔开
-        tmpl.itemEnhancementGroups = fields[6].Get<std::string>();              // 物品强化_系统_组_多个随机逗号隔开
-        tmpl.itemAttributesGroups = std::to_string(fields[7].Get<uint32>());    // 物品属性_模板_组_基础属性
-        tmpl.itemAttributesAdditionalGroups = fields[19].Get<std::string>();    // 物品属性_模板_组_追加属性_多个逗号隔开
-        tmpl.itemSkillsGroups = fields[25].Get<std::string>();                  // 物品技能_模板_组_追加技能_多个逗号隔开
+        tmpl.itemGrowthGroups = fields[5].Get<std::string>();                    // 物品成长_系统
+        tmpl.itemEnhancementGroups = fields[6].Get<std::string>();              // 物品强化_系统
+        tmpl.itemAttributesGroups = fields[7].Get<std::string>();               // 物品属性_模板（基础属性）
 
         // 基础属性配置
         tmpl.baseAttrMinCount = fields[8].Get<uint32>();                        // 基础属性最小数量
@@ -229,33 +222,39 @@ void ItemIdentificationSystem::LoadIdentificationTemplates()
         tmpl.baseAttrAllowDuplicate = fields[12].Get<uint32>() == 0;            // 基础属性允许重复
 
         // 追加属性配置
-        tmpl.additionalAttrMinCount = fields[20].Get<uint32>();                 // 追加属性最小数量
-        tmpl.additionalAttrMaxCount = fields[21].Get<uint32>();                 // 追加属性最大数量
-        tmpl.additionalAttrMinValue = fields[22].Get<uint32>();                 // 追加属性最小值
-        tmpl.additionalAttrMaxValue = fields[23].Get<uint32>();                 // 追加属性最大值
-        tmpl.additionalAttrAllowDuplicate = fields[24].Get<uint32>() == 0;      // 追加属性允许重复
+        tmpl.itemAttributesAdditionalGroups = fields[13].Get<std::string>();    // 物品属性_模板_组（追加属性）
+        tmpl.additionalAttrMinCount = fields[14].Get<uint32>();                 // 追加属性最小数量
+        tmpl.additionalAttrMaxCount = fields[15].Get<uint32>();                 // 追加属性最大数量
+        tmpl.additionalAttrMinValue = fields[16].Get<uint32>();                 // 追加属性最小值
+        tmpl.additionalAttrMaxValue = fields[17].Get<uint32>();                 // 追加属性最大值
+        tmpl.additionalAttrAllowDuplicate = fields[18].Get<uint32>() == 0;      // 追加属性允许重复
 
         // 追加技能配置
-        tmpl.additionalSkillMinCount = fields[26].Get<uint32>();                // 追加技能最小数量
-        tmpl.additionalSkillMaxCount = fields[27].Get<uint32>();                // 追加技能最大数量
-        tmpl.additionalSkillAllowDuplicate = fields[28].Get<uint32>() == 0;     // 追加技能允许重复
-
-        // 符文配置
-        tmpl.runeSystemGroups = std::to_string(fields[35].Get<uint32>());       // 符文系统_符文
-        tmpl.runeSlotMinCount = fields[36].Get<uint32>();                       // 符文凹槽最小数量
-        tmpl.runeSlotMaxCount = fields[37].Get<uint32>();                       // 符文凹槽最大数量
-        tmpl.skillSetGroups = fields[38].Get<std::string>();                    // 技能模板_套装_组_多个随机逗号隔开
+        tmpl.itemSkillsGroups = fields[19].Get<std::string>();                  // 物品技能_模板_组
+        tmpl.additionalSkillMinCount = fields[20].Get<uint32>();                // 追加技能最小数量
+        tmpl.additionalSkillMaxCount = fields[21].Get<uint32>();                // 追加技能最大数量
+        tmpl.additionalSkillAllowDuplicate = fields[22].Get<uint32>() == 0;     // 追加技能允许重复
 
         // 显示配置
-        tmpl.qualityDisplay = fields[29].Get<std::string>();                    // 鉴定品质显示
-        tmpl.namePrefix = fields[30].Get<std::string>();                        // 物品名字前缀
-        tmpl.nameSuffix = fields[31].Get<std::string>();                        // 物品名字后缀
-        tmpl.nameColors = fields[32].Get<std::string>();                        // 物品名字颜色_多个逗号隔开
-        tmpl.bottomDescription = fields[33].Get<std::string>();                 // 物品底部描述
+        tmpl.qualityDisplay = fields[23].Get<std::string>();                    // 鉴定品质显示
+        tmpl.namePrefix = fields[24].Get<std::string>();                        // 物品名字前缀
+        tmpl.nameSuffix = fields[25].Get<std::string>();                        // 物品名字后缀
+        tmpl.nameColors = fields[26].Get<std::string>();                        // 物品名字颜色
+        tmpl.bottomDescription = fields[27].Get<std::string>();                 // 物品底部描述
 
         // 其他配置
-        tmpl.requirementTemplate = fields[34].Get<uint32>();                    // 需求_模板
-        tmpl.announcementTemplate = fields[39].Get<uint32>();                   // 公告模板
+        tmpl.requirementTemplate = fields[28].Get<uint32>();                    // 需求_模板
+
+        // 符文配置
+        tmpl.runeSystemGroups = fields[29].Get<std::string>();                  // 符文系统_符文
+        tmpl.runeSlotMinCount = fields[30].Get<uint32>();                       // 符文凹槽最小数量
+        tmpl.runeSlotMaxCount = fields[31].Get<uint32>();                       // 符文凹槽最大数量
+
+        // 套装配置
+        tmpl.skillSetGroups = fields[32].Get<std::string>();                    // 技能模板_套装_组
+
+        // 公告配置
+        tmpl.announcementTemplate = fields[33].Get<uint32>();                   // 公告模板
 
         _identificationTemplates[tmpl.id] = tmpl;
         groups.insert(tmpl.group);
