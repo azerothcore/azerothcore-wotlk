@@ -1,3 +1,4 @@
+-- DB update 2025_11_03_00 -> 2025_11_03_01
 
 DELETE FROM `areatrigger_scripts` WHERE `entry` = 5338;
 
