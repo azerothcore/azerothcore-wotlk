@@ -19,7 +19,9 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SharedDefines.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "pit_of_saron.h"
@@ -54,11 +56,11 @@ enum Spells
 
     SPELL_CHILLING_WAVE             = 68778,
     SPELL_DEEP_FREEZE               = 70381,
-};
 
-#define SPELL_FORGE_BLADE           RAID_MODE(68774, 70334)
-#define SPELL_FORGE_MACE            RAID_MODE(68785, 70335)
-#define SPELL_SARONITE_TRIGGERED    RAID_MODE(68789, 70851)
+    SPELL_FORGE_BLADE               = 68774,
+    SPELL_FORGE_MACE                = 68785,
+    SPELL_SARONITE_TRIGGERED        = 68789,
+};
 
 enum Events
 {
@@ -154,52 +156,50 @@ public:
             if (phase == 1)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
-                me->CastSpell(me, SPELL_FORGE_BLADE, false);
+                if (me->CastSpell(me, SPELL_FORGE_BLADE, false) == SPELL_CAST_OK)
+                {
+                    events.RescheduleEvent(EVENT_SPELL_CHILLING_WAVE, 10s);
+                    SetEquipmentSlots(false, EQUIP_ID_SWORD);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->DisableRotate(false);
+                    if (me->GetVictim())
+                    {
+                        AttackStart(me->GetVictim());
+                        me->SetTarget(me->GetVictim()->GetGUID());
+                    }
+                }
                 Talk(SAY_HP_66);
             }
             else if (phase == 2)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
-                me->RemoveAurasDueToSpell(SPELL_FORGE_BLADE);
-                me->CastSpell(me, SPELL_FORGE_MACE, false);
+                me->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_FORGE_BLADE, me));
+                if (me->CastSpell(me, SPELL_FORGE_MACE, false) == SPELL_CAST_OK)
+                {
+                    events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10s);
+                    SetEquipmentSlots(false, EQUIP_ID_MACE);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->DisableRotate(false);
+                    if (me->GetVictim())
+                    {
+                        AttackStart(me->GetVictim());
+                        me->SetTarget(me->GetVictim()->GetGUID());
+                    }
+                }
                 Talk(SAY_HP_33);
             }
         }
 
         void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
-            if (spell->Id == uint32(SPELL_SARONITE_TRIGGERED))
+            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_SARONITE_TRIGGERED, me))
             {
                 if (bCanSayBoulderHit)
                 {
                     bCanSayBoulderHit = false;
                     Talk(SAY_BOULDER_HIT);
-                }
-            }
-            if (spell->Id == uint32(SPELL_FORGE_BLADE))
-            {
-                events.RescheduleEvent(EVENT_SPELL_CHILLING_WAVE, 10s);
-                SetEquipmentSlots(false, EQUIP_ID_SWORD);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                me->DisableRotate(false);
-                if (me->GetVictim())
-                {
-                    AttackStart(me->GetVictim());
-                    me->SetTarget(me->GetVictim()->GetGUID());
-                }
-            }
-            else if (spell->Id == uint32(SPELL_FORGE_MACE))
-            {
-                events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10s);
-                SetEquipmentSlots(false, EQUIP_ID_MACE);
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                me->DisableRotate(false);
-                if (me->GetVictim())
-                {
-                    AttackStart(me->GetVictim());
-                    me->SetTarget(me->GetVictim()->GetGUID());
                 }
             }
         }
