@@ -163,7 +163,7 @@ public:
                 return;
 
             Unit* target = owner->GetVictim();
-            if (target) 
+            if (target)
                 SetGazeOn(target);
         }
 
@@ -181,7 +181,6 @@ public:
             }
             else changeElementTimer -= diff;
 
-
             if (!me->HasUnitState(UNIT_STATE_CASTING))
             {
                 // Cast spell depending on the current element
@@ -192,7 +191,8 @@ public:
                     return;
                 case 1: // AIR
                     // Can only cast lightning shield once
-                    if (!hasLightningShield) {
+                    if (!hasLightningShield)
+                    {
                         me->CastSpell(me, SPELL_LIGHTNING_SHIELD, false);
                         hasLightningShield = true;
                     }
