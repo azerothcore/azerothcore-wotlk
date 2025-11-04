@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- #ifndef _SYSTEMD_H_
- #define _SYSTEMD_H_
+#ifndef _SYSTEMD_H_
+#define _SYSTEMD_H_
 
 int get_listen_fd();
 
