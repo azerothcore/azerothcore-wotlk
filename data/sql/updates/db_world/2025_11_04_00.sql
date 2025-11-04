@@ -1,3 +1,4 @@
+-- DB update 2025_11_03_01 -> 2025_11_04_00
 -- fix appearances of newly added 'Winter Reveler's
 -- assign correct model to creature 15792 `Troll Male Winter Reveler` used by spell 26252 `Winter Reveler - Troll Male`
 UPDATE `creature_template_model` SET `CreatureDisplayID` = 18809, `VerifiedBuild` = 0 WHERE (`CreatureID` = 15792) AND (`Idx` = 0);
