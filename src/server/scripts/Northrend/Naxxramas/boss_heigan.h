@@ -23,8 +23,7 @@ enum Says
 enum Spells
 {
     SPELL_SPELL_DISRUPTION          = 29310,
-    SPELL_DECREPIT_FEVER_10         = 29998,
-    SPELL_DECREPIT_FEVER_25         = 55011,
+    SPELL_DECREPIT_FEVER            = 29998,
     SPELL_PLAGUE_CLOUD              = 29350,
     SPELL_TELEPORT_SELF             = 30211
 };
@@ -157,7 +156,7 @@ public:
                     events.Repeat(10s);
                     break;
                 case EVENT_DECEPIT_FEVER:
-                    me->CastSpell(me, RAID_MODE(SPELL_DECREPIT_FEVER_10, SPELL_DECREPIT_FEVER_25), false);
+                    me->CastSpell(me, SPELL_DECREPIT_FEVER, false);
                     events.Repeat(22s, 25s);
                     break;
                 case EVENT_PLAGUE_CLOUD:
