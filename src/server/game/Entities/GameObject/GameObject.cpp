@@ -517,7 +517,7 @@ void GameObject::Update(uint32 diff)
                                     WorldPacket packet;
                                     BuildValuesUpdateBlockForPlayer(&udata, caster->ToPlayer());
                                     udata.BuildPacket(packet);
-                                    caster->ToPlayer()->GetSession()->SendPacket(&packet);
+                                    caster->ToPlayer()->SendDirectMessage(&packet);
 
                                     SendCustomAnim(GetGoAnimProgress());
                                 }
@@ -637,7 +637,7 @@ void GameObject::Update(uint32 diff)
                                         caster->ToPlayer()->RemoveGameObject(this, false);
 
                                         WorldPacket data(SMSG_FISH_ESCAPED, 0);
-                                        caster->ToPlayer()->GetSession()->SendPacket(&data);
+                                        caster->ToPlayer()->SendDirectMessage(&data);
                                     }
                                     // can be delete
                                     m_lootState = GO_JUST_DEACTIVATED;
@@ -1628,7 +1628,7 @@ void GameObject::Use(Unit* user)
                     {
                         WorldPacket data(SMSG_GAMEOBJECT_PAGETEXT, 8);
                         data << GetGUID();
-                        player->GetSession()->SendPacket(&data);
+                        player->SendDirectMessage(&data);
                     }
                     else if (info->goober.gossipID)
                     {
@@ -1798,7 +1798,7 @@ void GameObject::Use(Unit* user)
                             SetLootState(GO_JUST_DEACTIVATED);
 
                             WorldPacket data(SMSG_FISH_NOT_HOOKED, 0);
-                            player->GetSession()->SendPacket(&data);
+                            player->SendDirectMessage(&data);
                             break;
                         }
                 }
@@ -2034,7 +2034,7 @@ void GameObject::Use(Unit* user)
                 player->TeleportTo(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
 
                 WorldPacket data(SMSG_ENABLE_BARBER_SHOP, 0);
-                player->GetSession()->SendPacket(&data);
+                player->SendDirectMessage(&data);
 
                 player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR + info->barberChair.chairheight);
                 return;
@@ -2311,7 +2311,7 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
         data << uint32(-change);                    // change  < 0 triggers SPELL_BUILDING_HEAL combat log event
         // change >= 0 triggers SPELL_BUILDING_DAMAGE event
         data << uint32(spellId);
-        player->GetSession()->SendPacket(&data);
+        player->SendDirectMessage(&data);
     }
 
     GameObjectDestructibleState newState = GetDestructibleState();

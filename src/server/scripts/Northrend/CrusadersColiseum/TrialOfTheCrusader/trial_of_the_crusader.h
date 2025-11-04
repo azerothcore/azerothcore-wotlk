@@ -351,8 +351,7 @@ enum EventSpells
     SPELL_JORMUNGAR_ACHIEV                          = 68523,
     SPELL_FACTION_CHAMPIONS_KILL_CREDIT             = 68184,
     SPELL_RESILIENCE_WILL_FIX_IT_CREDIT             = 68620,
-    SPELL_TRAITOR_KING_10                           = 68186,
-    SPELL_TRAITOR_KING_25                           = 68515,
+    SPELL_TRAITOR_KING                              = 68186,
     SPELL_PORTAL_TO_DALARAN                         = 53142,
 };
 

@@ -30,12 +30,10 @@
 enum Spells
 {
     // Razorscale
-    SPELL_FLAMEBUFFET_10                    = 64016,
-    SPELL_FLAMEBUFFET_25                    = 64023,
+    SPELL_FLAMEBUFFET                       = 64016,
     SPELL_FIREBALL                          = 63815,
     SPELL_WINGBUFFET                        = 62666,
-    SPELL_FLAMEBREATH_10                    = 63317,
-    SPELL_FLAMEBREATH_25                    = 64021,
+    SPELL_FLAMEBREATH                       = 63317,
     SPELL_FUSEARMOR                         = 64771,
     SPELL_FUSED_ARMOR                       = 64774, // Applied on 5th stack of SPELL_FUSEARMOR
     SPELL_DEVOURINGFLAME                    = 63236,
@@ -50,25 +48,17 @@ enum Spells
 
     // Dark Rune Sentinel
     SPELL_WHIRLWIND                         = 63808,
-    SPELL_BATTLE_SHOUT_10                   = 46763,
-    SPELL_BATTLE_SHOUT_25                   = 64062,
+    SPELL_BATTLE_SHOUT                      = 46763,
 
     // Dark Rune Guardian
     SPELL_STORMSTRIKE_DMG                   = 65971,
     SPELL_STORMSTRIKE_DEBUFF                = 64757,
 
     // Dark Rune Watcher
-    SPELL_LIGHTINGBOLT_10                   = 63809,
-    SPELL_LIGHTINGBOLT_25                   = 64696,
-    SPELL_CHAINLIGHTNING_10                 = 64758,
-    SPELL_CHAINLIGHTNING_25                 = 64759,
+    SPELL_LIGHTINGBOLT                      = 63809,
+    SPELL_CHAINLIGHTNING                    = 64758,
 };
 
-#define SPELL_FLAMEBUFFET                   RAID_MODE(SPELL_FLAMEBUFFET_10, SPELL_FLAMEBUFFET_25)
-#define SPELL_FLAMEBREATH                   RAID_MODE(SPELL_FLAMEBREATH_10, SPELL_FLAMEBREATH_25)
-#define SPELL_BATTLE_SHOUT                  RAID_MODE(SPELL_BATTLE_SHOUT_10, SPELL_BATTLE_SHOUT_25)
-#define SPELL_LIGHTINGBOLT                  RAID_MODE(SPELL_LIGHTINGBOLT_10, SPELL_LIGHTINGBOLT_25)
-#define SPELL_CHAINLIGHTNING                RAID_MODE(SPELL_CHAINLIGHTNING_10, SPELL_CHAINLIGHTNING_25)
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
 enum NPCs

@@ -2272,7 +2272,7 @@ class spell_igb_overheat_aura : public AuraScript
                     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
                     data << GetUnitOwner()->GetPackGUID();
                     data << uint8(value);
-                    player->GetSession()->SendPacket(&data);
+                    player->SendDirectMessage(&data);
                 }
             }
         }

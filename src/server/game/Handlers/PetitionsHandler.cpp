@@ -496,7 +496,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 
         // update for owner if online
         if (Player* owner = ObjectAccessor::FindConnectedPlayer(petition->ownerGuid))
-            owner->GetSession()->SendPacket(&data);
+            owner->SendDirectMessage(&data);
         return;
     }
 
@@ -529,7 +529,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket& recvData)
 
     // update for owner if online
     if (Player* owner = ObjectAccessor::FindConnectedPlayer(petition->ownerGuid))
-        owner->GetSession()->SendPacket(&data);
+        owner->SendDirectMessage(&data);
 }
 
 void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
@@ -549,7 +549,7 @@ void WorldSession::HandlePetitionDeclineOpcode(WorldPacket& recvData)
     {
         WorldPacket data(MSG_PETITION_DECLINE, 8);
         data << _player->GetGUID();
-        owner->GetSession()->SendPacket(&data);
+        owner->SendDirectMessage(&data);
     }
 }
 
@@ -641,7 +641,7 @@ void WorldSession::HandleOfferPetitionOpcode(WorldPacket& recvData)
             data << uint32(0);                                  // there 0 ...
         }
 
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)

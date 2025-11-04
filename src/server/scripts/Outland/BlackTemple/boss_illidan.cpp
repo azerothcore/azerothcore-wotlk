@@ -904,7 +904,7 @@ struct npc_akama_illidan : public ScriptedAI
         else if (type == WAYPOINT_MOTION_TYPE)
         {
             if (me->GetCurrentWaypointID() == PATH_AKAMA_MINIONS)
-                if (id == 2)
+                if (id == 3)
                     DoCastSelf(SPELL_AKAMA_TELEPORT);
         }
     }
