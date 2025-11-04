@@ -10963,7 +10963,11 @@ void Unit::SetCharm(Unit* charm, bool apply)
             charm->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         }
         else
+        {
             charm->m_ControlledByPlayer = false;
+            if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+                charm->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+        }
 
         // PvP, FFAPvP
         charm->SetByteValue(UNIT_FIELD_BYTES_2, 1, GetByteValue(UNIT_FIELD_BYTES_2, 1));
