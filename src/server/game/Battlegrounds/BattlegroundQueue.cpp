@@ -434,15 +434,39 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
 
     //index to queue which group is current
     uint32 aliIndex = 0;
-    for (; aliIndex < aliCount && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree); aliIndex++)
+    for (; aliIndex < aliCount; aliIndex++)
+    {
+        // Allow modules to filter groups based on custom criteria (e.g., MMR)
+        if (!sScriptMgr->CanAddGroupToMatchingPool(this, (*Ali_itr), m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount(), bg, bracket_id))
+        {
+            ++Ali_itr;
+            continue;
+        }
+
+        if (!m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), aliFree))
+            break;
+
         ++Ali_itr;
+    }
 
     //the same thing for horde
     GroupsQueueType::const_iterator Horde_itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin();
 
     uint32 hordeIndex = 0;
-    for (; hordeIndex < hordeCount && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), hordeFree); hordeIndex++)
+    for (; hordeIndex < hordeCount; hordeIndex++)
+    {
+        // Allow modules to filter groups based on custom criteria (e.g., MMR)
+        if (!sScriptMgr->CanAddGroupToMatchingPool(this, (*Horde_itr), m_SelectionPools[TEAM_HORDE].GetPlayerCount(), bg, bracket_id))
+        {
+            ++Horde_itr;
+            continue;
+        }
+
+        if (!m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), hordeFree))
+            break;
+
         ++Horde_itr;
+    }
 
     //if ofc like BG queue invitation is set in config, then we are happy
     if (sWorld->getIntConfig(CONFIG_BATTLEGROUND_INVITATION_TYPE) == BG_QUEUE_INVITATION_TYPE_NO_BALANCE)
@@ -468,8 +492,19 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
             //kick alliance group, add to pool new group if needed
             if (m_SelectionPools[TEAM_ALLIANCE].KickGroup(diffHorde - diffAli))
             {
-                for (; aliIndex < aliCount && m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), (aliFree >= diffHorde) ? aliFree - diffHorde : 0); aliIndex++)
+                for (; aliIndex < aliCount; aliIndex++)
+                {
+                    if (!sScriptMgr->CanAddGroupToMatchingPool(this, (*Ali_itr), m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount(), bg, bracket_id))
+                    {
+                        ++Ali_itr;
+                        continue;
+                    }
+
+                    if (!m_SelectionPools[TEAM_ALLIANCE].AddGroup((*Ali_itr), (aliFree >= diffHorde) ? aliFree - diffHorde : 0))
+                        break;
+
                     ++Ali_itr;
+                }
             }
 
             //if ali selection is already empty, then kick horde group, but if there are less horde than ali in bg - break;
@@ -486,8 +521,19 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
             //kick horde group, add to pool new group if needed
             if (m_SelectionPools[TEAM_HORDE].KickGroup(diffAli - diffHorde))
             {
-                for (; hordeIndex < hordeCount && m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), (hordeFree >= diffAli) ? hordeFree - diffAli : 0); hordeIndex++)
+                for (; hordeIndex < hordeCount; hordeIndex++)
+                {
+                    if (!sScriptMgr->CanAddGroupToMatchingPool(this, (*Horde_itr), m_SelectionPools[TEAM_HORDE].GetPlayerCount(), bg, bracket_id))
+                    {
+                        ++Horde_itr;
+                        continue;
+                    }
+
+                    if (!m_SelectionPools[TEAM_HORDE].AddGroup((*Horde_itr), (hordeFree >= diffAli) ? hordeFree - diffAli : 0))
+                        break;
+
                     ++Horde_itr;
+                }
             }
 
             if (!m_SelectionPools[TEAM_HORDE].GetPlayerCount())
@@ -596,9 +642,13 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
         {
             if (!(*(itr_team[i]))->IsInvitedToBGInstanceGUID)
             {
-                m_SelectionPools[i].AddGroup(*(itr_team[i]), maxPlayers);
-                if (m_SelectionPools[i].GetPlayerCount() >= minPlayers)
-                    break;
+                // Allow modules to filter groups based on custom criteria (e.g., MMR)
+                if (sScriptMgr->CanAddGroupToMatchingPool(this, *(itr_team[i]), m_SelectionPools[i].GetPlayerCount(), bgTemplate, bracket_id))
+                {
+                    m_SelectionPools[i].AddGroup(*(itr_team[i]), maxPlayers);
+                    if (m_SelectionPools[i].GetPlayerCount() >= minPlayers)
+                        break;
+                }
             }
         }
     }
@@ -616,8 +666,14 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
         for (; itr_team[j] != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + j].end(); ++(itr_team[j]))
         {
             if (!(*(itr_team[j]))->IsInvitedToBGInstanceGUID)
+            {
+                // Allow modules to filter groups based on custom criteria (e.g., MMR)
+                if (!sScriptMgr->CanAddGroupToMatchingPool(this, *(itr_team[j]), m_SelectionPools[j].GetPlayerCount(), bgTemplate, bracket_id))
+                    continue;
+
                 if (!m_SelectionPools[j].AddGroup(*(itr_team[j]), m_SelectionPools[(j + 1) % PVP_TEAMS_COUNT].GetPlayerCount()))
                     break;
+            }
         }
 
         // do not allow to start bg with more than 2 players more on 1 faction
