@@ -10963,7 +10963,11 @@ void Unit::SetCharm(Unit* charm, bool apply)
             charm->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         }
         else
+        {
             charm->m_ControlledByPlayer = false;
+            if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+                charm->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+        }
 
         // PvP, FFAPvP
         charm->SetByteValue(UNIT_FIELD_BYTES_2, 1, GetByteValue(UNIT_FIELD_BYTES_2, 1));
@@ -16709,6 +16713,13 @@ void Unit::StopMovingOnCurrentPos()
 
 void Unit::SendMovementFlagUpdate(bool self /* = false */)
 {
+    if (IsRooted())
+    {
+        // each case where this occurs has to be examined and reported and dealt with.
+        LOG_ERROR("Unit", "Attempted sending heartbeat with root flag for guid {}", GetGUID().ToString());
+        return;
+    }
+
     WorldPacket data;
     BuildHeartBeatMsg(&data);
     SendMessageToSet(&data, self);
