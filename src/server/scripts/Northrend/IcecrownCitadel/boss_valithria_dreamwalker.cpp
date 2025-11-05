@@ -52,8 +52,8 @@ enum Spells
     SPELL_NIGHTMARE_PORTAL_VISUAL_PRE   = 71986,
     SPELL_NIGHTMARE_CLOUD               = 71970,
     SPELL_NIGHTMARE_CLOUD_VISUAL        = 71939,
-    SPELL_PRE_SUMMON_DREAM_PORTAL       = 72224,
-    SPELL_PRE_SUMMON_NIGHTMARE_PORTAL   = 72480,
+    SPELL_PRE_SUMMON_DREAM_PORTAL       = 72224, // normal
+    SPELL_PRE_SUMMON_NIGHTMARE_PORTAL   = 72480, // heroic
     SPELL_SUMMON_DREAM_PORTAL           = 71305,
     SPELL_SUMMON_NIGHTMARE_PORTAL       = 71987,
     SPELL_DREAMWALKERS_RAGE             = 71189,
@@ -94,15 +94,12 @@ enum Spells
     SPELL_GUT_SPRAY                     = 70633,
     SPELL_ROT_WORM_SPAWNER              = 70675,
 
-    // Dream Cloud
+    // Dream Cloud (normal)
     SPELL_EMERALD_VIGOR                 = 70873,
 
-    // Nightmare Cloud
+    // Nightmare Cloud (heroic)
     SPELL_TWISTED_NIGHTMARE             = 71941,
 };
-
-#define SUMMON_PORTAL RAID_MODE<uint32>(SPELL_PRE_SUMMON_DREAM_PORTAL, SPELL_PRE_SUMMON_DREAM_PORTAL, SPELL_PRE_SUMMON_NIGHTMARE_PORTAL, SPELL_PRE_SUMMON_NIGHTMARE_PORTAL)
-#define EMERALD_VIGOR RAID_MODE<uint32>(SPELL_EMERALD_VIGOR, SPELL_EMERALD_VIGOR, SPELL_TWISTED_NIGHTMARE, SPELL_TWISTED_NIGHTMARE)
 
 enum Events
 {
@@ -462,7 +459,7 @@ public:
                     if (!IsHeroic())
                         Talk(SAY_VALITHRIA_DREAM_PORTAL);
                     for (uint32 i = 0; i < _portalCount; ++i)
-                        me->CastSpell(me, SUMMON_PORTAL, false);
+                        me->CastSpell(me, SPELL_PRE_SUMMON_DREAM_PORTAL, false);
                     _events.ScheduleEvent(EVENT_DREAM_PORTAL, 45s, 48s);
                     break;
                 case EVENT_DREAM_SLIP:
@@ -885,7 +882,7 @@ public:
                     me->GetMotionMaster()->Clear(false);
                     me->GetMotionMaster()->MoveIdle();
                     // must use originalCaster the same for all clouds to allow stacking
-                    me->CastSpell(me, EMERALD_VIGOR, false, nullptr, nullptr, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
+                    me->CastSpell(me, SPELL_EMERALD_VIGOR, false, nullptr, nullptr, _instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
                     me->DespawnOrUnsummon(1s);
                     break;
                 default:

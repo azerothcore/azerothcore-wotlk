@@ -55,223 +55,347 @@ enum Yells
 enum Misc
 {
     ACHIEV_TIMED_START_EVENT            = 20381,
+};
 
-    EVENT_CARRION_BEETELS               = 1,
+enum Events
+{
+    EVENT_CARRION_BEETLES               = 1,
     EVENT_LEECHING_SWARM                = 2,
     EVENT_IMPALE                        = 3,
     EVENT_POUND                         = 4,
-    EVENT_CLOSE_DOORS                   = 5,
-    EVENT_EMERGE                        = 6,
-    EVENT_SUMMON_VENOMANCER             = 7,
-    EVENT_SUMMON_DARTER                 = 8,
-    EVENT_SUMMON_GUARDIAN               = 9,
-    EVENT_SUMMON_ASSASSINS              = 10,
-    EVENT_ENABLE_ROTATE                 = 11,
+    EVENT_ENABLE_ROTATE                 = 5,
+    EVENT_CLOSE_DOORS                   = 6,
+    EVENT_EMERGE                        = 7,
+    EVENT_SUMMON_GUARDIAN               = 8,
+    EVENT_SUMMON_VENOMANCER             = 9,
+    EVENT_SUMMON_DARTER                 = 10,
+    EVENT_SUMMON_ASSASSINS              = 11,
     EVENT_KILL_TALK                     = 12
 };
 
-enum ANAnubarakNpcs
+enum CreatureIds
 {
+    NPC_WORLD_TRIGGER                   = 22515,
     NPC_ANUBAR_GUARDIAN                 = 29216,
-    NPC_ANUBAR_VENOMANCER               = 29217
+    NPC_ANUBAR_VENOMANCER               = 29217,
 };
 
-class boss_anub_arak : public CreatureScript
+enum Phases : uint8
 {
-    public:
-        boss_anub_arak() : CreatureScript("boss_anub_arak") { }
+    PHASE_EMERGED = 1,
+    PHASE_SUBMERGED
+};
 
-        struct boss_anub_arakAI : public BossAI
+enum SubPhase : uint8
+{
+    SUBMERGE_NONE = 0,
+    SUBMERGE_75 = 1,
+    SUBMERGE_50 = 2,
+    SUBMERGE_25 = 3,
+};
+
+enum SummonGroups
+{
+    SUMMON_GROUP_WORLD_TRIGGER_GUARDIAN = 1,
+    SUMMON_GROUP_WORLD_TRIGGER_BALCONY = 2
+};
+
+struct boss_anub_arak : public BossAI
+{
+    explicit boss_anub_arak(Creature* creature) : BossAI(creature, DATA_ANUBARAK), _intro(false),
+    _submergePhase(SUBMERGE_NONE), _remainingLargeSummonsBeforeEmerge(0), _balconySummons(me)
+    {
+        me->m_SightDistance = 120.0f;
+    }
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+        _remainingLargeSummonsBeforeEmerge = 0;
+        _submergePhase = SUBMERGE_NONE;
+
+        ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
+            events.Reset();
+            Talk(SAY_SUBMERGE);
+            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
+            DoCastSelf(SPELL_SUBMERGE, false);
+        }, false);
+    }
+
+    void SpellHitTarget(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_SUBMERGE)
         {
-            boss_anub_arakAI(Creature* creature) : BossAI(creature, DATA_ANUBARAK_EVENT)
-            {
-                me->m_SightDistance = 120.0f;
-                _intro = false;
-                _summonedMinions = false;
-            }
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveAurasDueToSpell(SPELL_LEECHING_SWARM);
+            DoCastSelf(SPELL_IMPALE_PERIODIC, true);
 
-            void EnterEvadeMode(EvadeReason why) override
-            {
-                me->DisableRotate(false);
-                BossAI::EnterEvadeMode(why);
-            }
-
-            void MoveInLineOfSight(Unit* who) override
-            {
-                if (!_intro && who->IsPlayer())
-                {
-                    _intro = true;
-                    Talk(SAY_INTRO);
-                }
-                BossAI::MoveInLineOfSight(who);
-            }
-
-            void JustDied(Unit* killer) override
-            {
-                Talk(SAY_DEATH);
-                BossAI::JustDied(killer);
-            }
-
-            void KilledUnit(Unit*  /*victim*/) override
-            {
-                if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-                {
-                    Talk(SAY_SLAY);
-                    events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-                }
-            }
-
-            void JustSummoned(Creature* summon) override
-            {
-                summons.Summon(summon);
-                if (!summon->IsTrigger())
-                    summon->SetInCombatWithZone();
-            }
-
-            void Reset() override
-            {
-                BossAI::Reset();
-                _summonedMinions = false;
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-
-                ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
-                    Talk(SAY_SUBMERGE);
-                    _summonedMinions = false;
-                    DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-                    DoCastSelf(SPELL_SUBMERGE, false);
-
-                    me->m_Events.AddEventAtOffset([this] {
-                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                        DoCastSelf(SPELL_IMPALE_PERIODIC, true);
-                    }, 2s);
-
-                    events.Reset();
-                    events.ScheduleEvent(EVENT_EMERGE, 60s);
-                    events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2s);
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s);
-                    events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 15s);
-                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20s);
-                    events.ScheduleEvent(EVENT_SUMMON_DARTER, 30s);
-                    events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35s);
-                }, false);
-            }
-
-            void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
-            {
-                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-                    return;
-
-                if (_summonedMinions && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_GUARDIAN) && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_VENOMANCER))
-                {
-                    events.Reset();
-                    events.ScheduleEvent(EVENT_EMERGE, 5s);
-                }
-            }
-
-            void JustEngagedWith(Unit* ) override
-            {
-                Talk(SAY_AGGRO);
-                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
-
-                events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500ms);
-                events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s);
-                events.ScheduleEvent(EVENT_POUND, 15s);
-                events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s);
-            }
-
-            void SummonHelpers(float x, float y, float z, uint32 spellId)
-            {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-            }
-
-            void UpdateAI(uint32 diff) override
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-                scheduler.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                switch (events.ExecuteEvent())
-                {
-                    case EVENT_CLOSE_DOORS:
-                        _JustEngagedWith();
-                        break;
-                    case EVENT_CARRION_BEETELS:
-                        me->CastSpell(me, SPELL_CARRION_BEETLES, false);
-                        events.ScheduleEvent(EVENT_CARRION_BEETELS, 25s);
-                        break;
-                    case EVENT_LEECHING_SWARM:
-                        Talk(SAY_LOCUST);
-                        me->CastSpell(me, SPELL_LEECHING_SWARM, false);
-                        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s);
-                        break;
-                    case EVENT_POUND:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
-                        {
-                            me->CastSpell(me, SPELL_SELF_ROOT, true);
-                            me->DisableRotate(true);
-                            me->SendMovementFlagUpdate();
-                            events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms);
-                            me->CastSpell(target, SPELL_POUND, false);
-                        }
-                        events.ScheduleEvent(EVENT_POUND, 18s);
-                        break;
-                    case EVENT_ENABLE_ROTATE:
-                        me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
-                        me->DisableRotate(false);
-                        break;
-                    case EVENT_EMERGE:
-                        me->CastSpell(me, SPELL_EMERGE, true);
-                        me->RemoveAura(SPELL_SUBMERGE);
-                        me->RemoveAura(SPELL_IMPALE_PERIODIC);
-                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-                        events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500ms);
-                        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s);
-                        events.ScheduleEvent(EVENT_POUND, 15s);
-                        break;
-                    case EVENT_SUMMON_ASSASSINS:
-                        SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_ASSASSIN);
-                        SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_ASSASSIN);
-                        break;
-                    case EVENT_SUMMON_DARTER:
-                        SummonHelpers(509.32f, 247.42f, 239.48f, SPELL_SUMMON_DARTER);
-                        SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_DARTER);
-                        break;
-                    case EVENT_SUMMON_GUARDIAN:
-                        SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_GUARDIAN);
-                        break;
-                    case EVENT_SUMMON_VENOMANCER:
-                        _summonedMinions = true;
-                        SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_VENOMANCER);
-                        break;
-                }
-
-                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-                    DoMeleeAttackIfReady();
-            }
-
-            private:
-                bool _intro;
-                bool _summonedMinions;
-        };
-
-        CreatureAI* GetAI(Creature* creature) const override
-        {
-            return GetAzjolNerubAI<boss_anub_arakAI>(creature);
+            ++_submergePhase;
+            ScheduleSubmerged();
         }
+    }
+
+    void ScheduleEmerged()
+    {
+        events.Reset();
+        events.SetPhase(PHASE_EMERGED);
+        events.ScheduleEvent(EVENT_CARRION_BEETLES, 6500ms, 0, PHASE_EMERGED);
+        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, 0, PHASE_EMERGED);
+        events.ScheduleEvent(EVENT_POUND, 15s, 0, PHASE_EMERGED);
+    };
+
+    void ScheduleSubmerged()
+    {
+        events.Reset();
+        events.SetPhase(PHASE_SUBMERGED);
+        events.ScheduleEvent(EVENT_EMERGE, 60s, 0, PHASE_SUBMERGED);
+
+        switch (_submergePhase)
+        {
+            case SUBMERGE_75:
+                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
+                if (IsHeroic())
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
+
+                _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 2 : 1;
+
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
+                break;
+            case SUBMERGE_50:
+                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
+                if (IsHeroic())
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
+
+                events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, 0, PHASE_SUBMERGED);
+                if (IsHeroic())
+                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 29s, 0, PHASE_SUBMERGED);
+
+                _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 4 : 2;
+
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
+                break;
+            case SUBMERGE_25:
+                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
+                if (IsHeroic())
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
+
+                events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, 0, PHASE_SUBMERGED);
+                if (IsHeroic())
+                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 29s, 0, PHASE_SUBMERGED);
+
+                _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 4 : 2;
+
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 4s, 0, PHASE_SUBMERGED);
+
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 12s, 0, PHASE_SUBMERGED);
+
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 26s, 0, PHASE_SUBMERGED);
+
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 32s, 0, PHASE_SUBMERGED);
+
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 45s, 0, PHASE_SUBMERGED);
+                break;
+            default:
+                break;
+        }
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+
+        events.SetPhase(PHASE_EMERGED);
+        events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s);
+        ScheduleEmerged();
+
+        // set up world triggers
+        std::list<TempSummon*> summoned;
+        me->SummonCreatureGroup(SUMMON_GROUP_WORLD_TRIGGER_GUARDIAN, &summoned);
+        if (summoned.empty())
+        {
+            EnterEvadeMode(EVADE_REASON_OTHER);
+            return;
+        }
+        TempSummon* guardianTrigger = summoned.front();
+        _guardianTriggerGUID = guardianTrigger->GetGUID();
+
+        summoned.clear();
+        _balconySummons.clear();
+        me->SummonCreatureGroup(SUMMON_GROUP_WORLD_TRIGGER_BALCONY, &summoned);
+        if (summoned.empty())
+        {
+            EnterEvadeMode(EVADE_REASON_OTHER);
+            return;
+        }
+        for (auto const& summon : summoned)
+            _balconySummons.Summon(summon);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->DisableRotate(false);
+        BossAI::EnterEvadeMode(why);
+        summons.DespawnAll();
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_intro && who->IsPlayer())
+        {
+            _intro = true;
+            Talk(SAY_INTRO);
+        }
+        BossAI::MoveInLineOfSight(who);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
+        {
+            Talk(SAY_SLAY);
+            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
+        }
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            return;
+
+        switch (summon->GetEntry())
+        {
+            case NPC_ANUBAR_GUARDIAN:
+            case NPC_ANUBAR_VENOMANCER:
+            {
+                --_remainingLargeSummonsBeforeEmerge;
+                if (_remainingLargeSummonsBeforeEmerge == 0)
+                {
+                        events.Reset();
+                        events.ScheduleEvent(EVENT_EMERGE, 5s);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    void SummonedCreatureEvade(Creature* /*summon*/) override
+    {
+        EnterEvadeMode(EVADE_REASON_OTHER);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        scheduler.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_CLOSE_DOORS:
+                BossAI::_JustEngagedWith();
+                break;
+            case EVENT_CARRION_BEETLES:
+                DoCastSelf(SPELL_CARRION_BEETLES);
+                events.ScheduleEvent(EVENT_CARRION_BEETLES, 25s, 0, PHASE_EMERGED);
+                break;
+            case EVENT_LEECHING_SWARM:
+                Talk(SAY_LOCUST);
+                DoCastSelf(SPELL_LEECHING_SWARM);
+                events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, 0, PHASE_EMERGED);
+                break;
+            case EVENT_POUND:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
+                {
+                    DoCastSelf(SPELL_SELF_ROOT, true);
+                    me->DisableRotate(true);
+                    me->SendMovementFlagUpdate();
+                    events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms);
+                    DoCast(target, SPELL_POUND);
+                }
+                events.ScheduleEvent(EVENT_POUND, 18s);
+                break;
+            case EVENT_ENABLE_ROTATE:
+                me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
+                me->DisableRotate(false);
+                break;
+            case EVENT_EMERGE:
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE);
+                me->RemoveAurasDueToSpell(SPELL_IMPALE_PERIODIC);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                DoCastSelf(SPELL_EMERGE);
+                ScheduleEmerged();
+                break;
+            case EVENT_SUMMON_GUARDIAN:
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _guardianTriggerGUID))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_GUARDIAN, true, nullptr, nullptr, me->GetGUID());
+                break;
+            case EVENT_SUMMON_VENOMANCER:
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _guardianTriggerGUID))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_VENOMANCER, true, nullptr, nullptr, me->GetGUID());
+                break;
+            case EVENT_SUMMON_DARTER:
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(_balconySummons)))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_DARTER, true, nullptr, nullptr, me->GetGUID());
+                break;
+            case EVENT_SUMMON_ASSASSINS:
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(_balconySummons)))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_ASSASSIN, true, nullptr, nullptr, me->GetGUID());
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(_balconySummons)))
+                    trigger->CastSpell(trigger, SPELL_SUMMON_ASSASSIN, true, nullptr, nullptr, me->GetGUID());
+                break;
+            default:
+                break;
+        }
+
+        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            DoMeleeAttackIfReady();
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
+    {
+        if (me->HasAura(SPELL_SUBMERGE) && damage >= me->GetHealth())
+            damage = me->GetHealth() - 1;
+
+        BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
+    }
+
+    private:
+        bool _intro;
+        uint8 _submergePhase;
+        uint8 _remainingLargeSummonsBeforeEmerge;
+        ObjectGuid _guardianTriggerGUID;
+        SummonList _balconySummons;
 };
 
-class spell_azjol_nerub_carrion_beetels : public AuraScript
+class spell_azjol_nerub_carrion_beetles : public AuraScript
 {
-    PrepareAuraScript(spell_azjol_nerub_carrion_beetels)
+    PrepareAuraScript(spell_azjol_nerub_carrion_beetles)
 
-    void HandleEffectPeriodic(AuraEffect const*  /*aurEff*/)
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
         // Xinef: 2 each second
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
@@ -280,7 +404,7 @@ class spell_azjol_nerub_carrion_beetels : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_azjol_nerub_carrion_beetels::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_azjol_nerub_carrion_beetles::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -288,7 +412,7 @@ class spell_azjol_nerub_pound : public SpellScript
 {
     PrepareSpellScript(spell_azjol_nerub_pound);
 
-    void HandleApplyAura(SpellEffIndex  /*effIndex*/)
+    void HandleApplyAura(SpellEffIndex /*effIndex*/)
     {
         if (Unit* unitTarget = GetHitUnit())
             GetCaster()->CastSpell(unitTarget, SPELL_POUND_DAMAGE, true);
@@ -320,8 +444,8 @@ class spell_azjol_nerub_impale_summon : public SpellScript
 
 void AddSC_boss_anub_arak()
 {
-    new boss_anub_arak();
-    RegisterSpellScript(spell_azjol_nerub_carrion_beetels);
+    RegisterAzjolNerubCreatureAI(boss_anub_arak);
+    RegisterSpellScript(spell_azjol_nerub_carrion_beetles);
     RegisterSpellScript(spell_azjol_nerub_pound);
     RegisterSpellScript(spell_azjol_nerub_impale_summon);
 }
