@@ -436,7 +436,6 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
     uint32 aliIndex = 0;
     for (; aliIndex < aliCount; aliIndex++)
     {
-        // Allow modules to filter groups based on custom criteria (e.g., MMR)
         if (!sScriptMgr->CanAddGroupToMatchingPool(this, (*Ali_itr), m_SelectionPools[TEAM_ALLIANCE].GetPlayerCount(), bg, bracket_id))
         {
             ++Ali_itr;
@@ -455,7 +454,6 @@ void BattlegroundQueue::FillPlayersToBG(Battleground* bg, BattlegroundBracketId 
     uint32 hordeIndex = 0;
     for (; hordeIndex < hordeCount; hordeIndex++)
     {
-        // Allow modules to filter groups based on custom criteria (e.g., MMR)
         if (!sScriptMgr->CanAddGroupToMatchingPool(this, (*Horde_itr), m_SelectionPools[TEAM_HORDE].GetPlayerCount(), bg, bracket_id))
         {
             ++Horde_itr;
@@ -649,7 +647,6 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
         {
             if (!(*(itr_team[i]))->IsInvitedToBGInstanceGUID)
             {
-                // Allow modules to filter groups based on custom criteria (e.g., MMR)
                 if (sScriptMgr->CanAddGroupToMatchingPool(this, *(itr_team[i]), m_SelectionPools[i].GetPlayerCount(), bgTemplate, bracket_id))
                 {
                     m_SelectionPools[i].AddGroup(*(itr_team[i]), maxPlayers);
@@ -674,7 +671,6 @@ bool BattlegroundQueue::CheckNormalMatch(Battleground* bgTemplate, BattlegroundB
         {
             if (!(*(itr_team[j]))->IsInvitedToBGInstanceGUID)
             {
-                // Allow modules to filter groups based on custom criteria (e.g., MMR)
                 if (!sScriptMgr->CanAddGroupToMatchingPool(this, *(itr_team[j]), m_SelectionPools[j].GetPlayerCount(), bgTemplate, bracket_id))
                     continue;
 
