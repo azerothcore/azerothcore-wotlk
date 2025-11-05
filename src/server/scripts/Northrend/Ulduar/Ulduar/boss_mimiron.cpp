@@ -23,6 +23,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
@@ -35,18 +36,15 @@ enum SpellData
     SPELL_BERSERK                                   = 64238,
 
     // PHASE 1:
-    SPELL_NAPALM_SHELL_25                           = 65026,
-    SPELL_NAPALM_SHELL_10                           = 63666,
+    SPELL_NAPALM_SHELL                              = 63666,
 
-    SPELL_PLASMA_BLAST_25                           = 64529,
-    SPELL_PLASMA_BLAST_10                           = 62997,
+    SPELL_PLASMA_BLAST                              = 62997,
 
     SPELL_SHOCK_BLAST                               = 63631,
 
     SPELL_PROXIMITY_MINES                           = 63027,
     NPC_PROXIMITY_MINE                              = 34362,
-    SPELL_MINE_EXPLOSION_25                         = 63009,
-    SPELL_MINE_EXPLOSION_10                         = 66351,
+    SPELL_MINE_EXPLOSION                            = 66351,
     SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
     // PHASE 2:
@@ -57,17 +55,14 @@ enum SpellData
     NPC_ROCKET_STRIKE_N                             = 34047,
 
     SPELL_RAPID_BURST                               = 63382,
-    SPELL_RAPID_BURST_DAMAGE_25_1                   = 64531,
-    SPELL_RAPID_BURST_DAMAGE_25_2                   = 64532,
-    SPELL_RAPID_BURST_DAMAGE_10_1                   = 63387,
-    SPELL_RAPID_BURST_DAMAGE_10_2                   = 64019,
+    SPELL_RAPID_BURST_DAMAGE_1                      = 63387,
+    SPELL_RAPID_BURST_DAMAGE_2                      = 64019,
     SPELL_SUMMON_BURST_TARGET                       = 64840,
 
     SPELL_SPINNING_UP                               = 63414,
 
     // PHASE 3:
-    SPELL_PLASMA_BALL_25                            = 64535,
-    SPELL_PLASMA_BALL_10                            = 63689,
+    SPELL_PLASMA_BALL                               = 63689,
 
     SPELL_MAGNETIC_CORE                             = 64436,
     SPELL_SPINNING                                  = 64438,
@@ -80,10 +75,8 @@ enum SpellData
     SPELL_BEAM_BLUE                                 = 63294,
 
     // PHASE 4:
-    SPELL_HAND_PULSE_10_R                           = 64352,
-    SPELL_HAND_PULSE_25_R                           = 64537,
-    SPELL_HAND_PULSE_10_L                           = 64348,
-    SPELL_HAND_PULSE_25_L                           = 64536,
+    SPELL_HAND_PULSE_R                              = 64352,
+    SPELL_HAND_PULSE_L                              = 64348,
 
     SPELL_SELF_REPAIR                               = 64383,
     SPELL_SLEEP_VISUAL_1                            = 64393,
@@ -218,14 +211,6 @@ enum EVENTS
     EVENT_EMERGENCY_BOT_CHECK                       = 69,
     EVENT_EMERGENCY_BOT_ATTACK                      = 70,
 };
-
-#define SPELL_NAPALM_SHELL                          RAID_MODE(SPELL_NAPALM_SHELL_10, SPELL_NAPALM_SHELL_25)
-#define SPELL_PLASMA_BLAST                          RAID_MODE(SPELL_PLASMA_BLAST_10, SPELL_PLASMA_BLAST_25)
-#define SPELL_MINE_EXPLOSION                        RAID_MODE(SPELL_MINE_EXPLOSION_10, SPELL_MINE_EXPLOSION_25)
-#define SPELL_PLASMA_BALL                           RAID_MODE(SPELL_PLASMA_BALL_10, SPELL_PLASMA_BALL_25)
-#define SPELL_HAND_PULSE_R                          RAID_MODE(SPELL_HAND_PULSE_10_R, SPELL_HAND_PULSE_25_R)
-#define SPELL_HAND_PULSE_L                          RAID_MODE(SPELL_HAND_PULSE_10_L, SPELL_HAND_PULSE_25_L)
-#define SPELL_FROST_BOMB_EXPLOSION                  RAID_MODE(SPELL_FROST_BOMB_EXPLOSION_10, SPELL_FROST_BOMB_EXPLOSION_25)
 
 enum Texts
 {
@@ -1889,14 +1874,6 @@ public:
         void MoveInLineOfSight(Unit* /*who*/) override {}
         bool CanAIAttack(Unit const*  /*target*/) const override { return false; }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-        {
-            if (target && spell && target->IsPlayer() && spell->Id == SPELL_MINE_EXPLOSION)
-                if (InstanceScript* pInstance = me->GetInstanceScript())
-                    if (Creature* c = GetMimiron())
-                        c->AI()->SetData(0, 11);
-        }
-
         // MoveInLineOfSight is checked every few yards, can't use it
         void UpdateAI(uint32 diff) override
         {
@@ -1925,6 +1902,24 @@ public:
                 timer -= diff;
         }
     };
+};
+
+class spell_ulduar_mimiron_mine_explosion : public SpellScript
+{
+    PrepareSpellScript(spell_ulduar_mimiron_mine_explosion);
+
+    void HandleDamage(SpellEffIndex /*effIndex*/)
+    {
+        if (GetHitPlayer())
+            if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
+                if (Creature* mimi = pInstance->GetCreature(TYPE_MIMIRON))
+                    mimi->AI()->SetData(0, 11);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ulduar_mimiron_mine_explosion::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
 };
 
 class npc_ulduar_mimiron_rocket : public CreatureScript
@@ -2094,10 +2089,8 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     {
         return ValidateSpellInfo(
             {
-                SPELL_RAPID_BURST_DAMAGE_10_1,
-                SPELL_RAPID_BURST_DAMAGE_10_2,
-                SPELL_RAPID_BURST_DAMAGE_25_1,
-                SPELL_RAPID_BURST_DAMAGE_25_2
+                SPELL_RAPID_BURST_DAMAGE_1,
+                SPELL_RAPID_BURST_DAMAGE_2,
             });
     }
 
@@ -2105,7 +2098,7 @@ class spell_mimiron_rapid_burst_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            uint32 id = (caster->GetMap()->Is25ManRaid() ? ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_25_2 : SPELL_RAPID_BURST_DAMAGE_25_1) : ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_10_2 : SPELL_RAPID_BURST_DAMAGE_10_1));
+            uint32 id = (aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_2 : SPELL_RAPID_BURST_DAMAGE_1;
             caster->CastSpell((Unit*)nullptr, id, true);
         }
     }
@@ -2498,6 +2491,7 @@ void AddSC_boss_mimiron()
     new npc_ulduar_bot_summon_trigger();
     RegisterSpellScript(spell_mimiron_rapid_burst_aura);
     RegisterSpellScript(spell_mimiron_p3wx2_laser_barrage_aura);
+    RegisterSpellScript(spell_ulduar_mimiron_mine_explosion);
     new go_ulduar_do_not_push_this_button();
     new npc_ulduar_flames_initial();
     new npc_ulduar_flames_spread();

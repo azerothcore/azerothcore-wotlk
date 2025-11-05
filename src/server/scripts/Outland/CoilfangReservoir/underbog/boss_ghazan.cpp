@@ -92,7 +92,7 @@ struct boss_ghazan : public BossAI
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
-        if (!_movedToPlatform || type != WAYPOINT_MOTION_TYPE || pointId != 19)
+        if (!_movedToPlatform || type != WAYPOINT_MOTION_TYPE || pointId != 20)
         {
             return;
         }

@@ -53,7 +53,7 @@ enum Spells
     SPELL_FAERIE_DRAGON_FORM = 27546,
     SPELL_ARCANE_EXPLOSION   = 22271,
     SPELL_REFLECTION         = 27564,
-    SPELL_CHAIN_LIGHTING     = 27567,
+    SPELL_CHAIN_LIGHTNING     = 27567,
     SPELL_SLEEP              = 20663 // Guessed
 };
 
@@ -68,7 +68,7 @@ enum Phases
 std::vector<uint32> catSpells = { SPELL_SHRED, SPELL_RAKE, SPELL_FEROCIOUS_BITE };
 std::vector<uint32> humanSpells = { SPELL_HURRICANE, SPELL_MOONFIRE, SPELL_SHOCK, SPELL_HEALING_TOUCH, SPELL_REJUVENATION };
 std::vector<uint32> bearSpells = { SPELL_DEMORALIZING_ROAR, SPELL_MAUL, SPELL_SWIPE };
-std::vector<uint32> faerieSpells = { SPELL_ARCANE_EXPLOSION, SPELL_REFLECTION, SPELL_CHAIN_LIGHTING, SPELL_SLEEP };
+std::vector<uint32> faerieSpells = { SPELL_ARCANE_EXPLOSION, SPELL_REFLECTION, SPELL_CHAIN_LIGHTNING, SPELL_SLEEP };
 
 struct boss_mor_grayhoof : public BossAI
 {

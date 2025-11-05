@@ -70,7 +70,7 @@ enum Emotes
 enum Points
 {
     POINT_AIR                               = 0,
-    POINT_GROUND                            = 2,
+    POINT_GROUND                            = 3,
     POINT_PARALYZE                          = 2
 };
 
