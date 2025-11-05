@@ -1,3 +1,4 @@
+-- DB update 2025_11_04_01 -> 2025_11_05_00
 
 -- Change Spawn Point
 UPDATE `creature` SET `position_x` = 532.0706, `position_y` = 1473.9459, `position_z` = 109.76107, `orientation` = 5.4972 WHERE (`id1` = 6497) AND (`guid` IN (44738));
