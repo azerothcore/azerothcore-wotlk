@@ -586,9 +586,14 @@ bool BattlegroundQueue::CheckPremadeMatch(BattlegroundBracketId bracket_id, uint
             {
                 for (itr = m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + i].begin(); itr != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + i].end(); ++itr)
                 {
-                    //if itr can join BG and player count is less that maxPlayers, then add group to selectionpool
-                    if (!(*itr)->IsInvitedToBGInstanceGUID && !m_SelectionPools[i].AddGroup((*itr), maxPlayers))
-                        break;
+                    if (!(*itr)->IsInvitedToBGInstanceGUID)
+                    {
+                        if (!sScriptMgr->CanAddGroupToMatchingPool(this, (*itr), m_SelectionPools[i].GetPlayerCount(), nullptr, bracket_id))
+                            continue;
+
+                        if (!m_SelectionPools[i].AddGroup((*itr), maxPlayers))
+                            break;
+                    }
                 }
             }
 
