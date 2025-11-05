@@ -1971,10 +1971,7 @@ void Player::UpdateCharmedAI()
 
     Unit* target = GetVictim();
     if (target)
-    {
         SetInFront(target);
-        SendMovementFlagUpdate(true);
-    }
 
     if (HasUnitState(UNIT_STATE_CASTING))
         return;
