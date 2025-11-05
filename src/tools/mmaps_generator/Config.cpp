@@ -25,7 +25,7 @@ namespace MMAP
 {
     float ComputeBaseUnitDim(int vertexPerMapEdge)
     {
-        return GRID_SIZE / static_cast<float>(vertexPerMapEdge - 1);
+        return GRID_SIZE / static_cast<float>(vertexPerMapEdge);
     }
 
     std::pair<uint32, uint32> MakeTileKey(uint32 x, uint32 y)
