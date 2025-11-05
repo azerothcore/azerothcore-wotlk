@@ -50,7 +50,6 @@ enum BattlegroundTypeId : uint8;
 enum TeamId : uint8;
 
 class BattlegroundQueue;
-class ObjectGuid;
 struct GroupQueueInfo;
 
 class AllBattlegroundScript : public ScriptObject
