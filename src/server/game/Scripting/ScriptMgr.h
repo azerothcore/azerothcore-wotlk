@@ -660,6 +660,8 @@ public: /* ArenaScript */
     bool CanSaveToDB(ArenaTeam* team);
     bool OnBeforeArenaCheckWinConditions(Battleground* const bg);
     void OnArenaStart(Battleground* const bg);
+    bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* team, Player* player, bool won, uint32 opponentMatchmakerRating, int32 matchmakerChange);
+    bool CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGuid);
 
 public: /* MiscScript */
 
