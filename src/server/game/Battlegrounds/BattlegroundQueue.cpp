@@ -722,7 +722,6 @@ bool BattlegroundQueue::CheckSkirmishForSameFaction(BattlegroundBracketId bracke
     //invite players to other selection pool
     for (; itr_team2 != m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE + static_cast<uint8>(teamIndex)].end(); ++itr_team2)
     {
-        // Allow modules to filter other arena matches based on custom criteria (e.g., MMR)
         if (!(*itr_team2)->IsInvitedToBGInstanceGUID)
         {
             if (!sScriptMgr->CanAddGroupToMatchingPool(this, *itr_team2, m_SelectionPools[otherTeam].GetPlayerCount(), nullptr, bracket_id))
