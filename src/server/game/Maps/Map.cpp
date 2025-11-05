@@ -1691,7 +1691,7 @@ void Map::SendInitTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(packet);
-    player->GetSession()->SendPacket(&packet);
+    player->SendDirectMessage(&packet);
 }
 
 void Map::SendRemoveTransports(Player* player)
@@ -1710,7 +1710,7 @@ void Map::SendRemoveTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(packet);
-    player->GetSession()->SendPacket(&packet);
+    player->SendDirectMessage(&packet);
 }
 
 void Map::SendObjectUpdates()
@@ -1730,7 +1730,7 @@ void Map::SendObjectUpdates()
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
         iter->second.BuildPacket(packet);
-        iter->first->GetSession()->SendPacket(&packet);
+        iter->first->SendDirectMessage(&packet);
         packet.clear();                                     // clean the string
     }
 }
@@ -1850,7 +1850,7 @@ uint32 Map::GetPlayersCountExceptGMs() const
 void Map::SendToPlayers(WorldPacket const* data) const
 {
     for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
-        itr->GetSource()->GetSession()->SendPacket(data);
+        itr->GetSource()->SendDirectMessage(data);
 }
 
 template bool Map::AddToMap(Corpse*, bool);
@@ -2055,7 +2055,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             data << uint32(60000);
             data << uint32(instance_data ? instance_data->GetCompletedEncounterMask() : 0);
             data << uint8(0);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
             player->SetPendingBind(mapSave->GetInstanceId(), 60000);
         }
     }
@@ -2227,7 +2227,7 @@ void InstanceMap::PermBindAllPlayers()
         {
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
             sInstanceSaveMgr->PlayerBindToInstance(player->GetGUID(), save, true, player);
         }
 
