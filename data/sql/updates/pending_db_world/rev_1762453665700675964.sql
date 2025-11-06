@@ -48,6 +48,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Squelette Os-vermoulus' WHERE `l
 UPDATE `creature_template_locale` SET `Name` = 'Squelette infernal' WHERE `locale` = 'frFR' AND `entry` = 202;
 -- OLD name : Thornton Fellwood, subname : Woodcrafter
 -- Source : https://www.wowhead.com/wotlk/fr/npc=230
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 230;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (230, 'frFR','Thornton Boichu','Charpentier');
 -- OLD name : Maréchal Gryan Roidemantel, subname : Brigade de la marche de l'Ouest
 -- Source : https://www.wowhead.com/wotlk/fr/npc=234
@@ -246,6 +247,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Adjoint Willem' WHERE `locale` =
 UPDATE `creature_template_locale` SET `Name` = 'Diable de poussière' WHERE `locale` = 'frFR' AND `entry` = 832;
 -- OLD subname : Woodcrafting Supplies
 -- Source : https://www.wowhead.com/wotlk/fr/npc=841
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 841;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (841, 'frFR',NULL,'Fournitures de charpentier');
 -- OLD name : Jeune traqueur de la jungle (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/fr/npc=854
@@ -289,7 +291,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Bibliothécaire' WHERE `locale`
 -- OLD name : Eric Dodds troisième du nom
 -- Source : https://www.wowhead.com/wotlk/fr/npc=996
 UPDATE `creature_template_locale` SET `Name` = 'Maître Tailleur' WHERE `locale` = 'frFR' AND `entry` = 996;
--- OLD name : Mannequin de test intuable, subname : 
+-- OLD name : Mannequin de test intuable, subname : NONE
 -- Source : https://www.wowhead.com/wotlk/fr/npc=1000
 UPDATE `creature_template_locale` SET `Name` = 'Gardien Blomberg',`Title` = 'Les Veilleurs' WHERE `locale` = 'frFR' AND `entry` = 1000;
 -- OLD name : Gnoll poil-moussu (CASE ONLY)
@@ -828,6 +830,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Sentinelle de Hautebrande' WHERE
 UPDATE `creature_template_locale` SET `Name` = 'Régent Serres-de-corbeau' WHERE `locale` = 'frFR' AND `entry` = 2283;
 -- OLD name : Bow Guy
 -- Source : https://www.wowhead.com/wotlk/fr/npc=2286
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 2286;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (2286, 'frFR','Archer',NULL);
 -- OLD name : Combattant cassecrête (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/fr/npc=2287
@@ -1050,6 +1053,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Implorateur fânécorce' WHERE `
 UPDATE `creature_template_locale` SET `Name` = 'Limace verte' WHERE `locale` = 'frFR' AND `entry` = 2655;
 -- OLD name : Port Master Szik, subname : Boat Vendor
 -- Source : https://www.wowhead.com/wotlk/fr/npc=2662
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 2662;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (2662, 'frFR','Maître portuaire Szik','Marchand de bateaux');
 -- OLD subname : Fournitures d’ingénieur
 -- Source : https://www.wowhead.com/wotlk/fr/npc=2682
@@ -1170,6 +1174,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Mystique Crache-poussières' WHE
 UPDATE `creature_template_locale` SET `Title` = 'Entraîneur d''ours' WHERE `locale` = 'frFR' AND `entry` = 2938;
 -- OLD subname : Boar Trainer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=2939
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 2939;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (2939, 'frFR',NULL,'Entraîneur de sangliers');
 -- OLD subname : Wolf Trainer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=2942
@@ -1656,6 +1661,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Laer Cours-les-steppes' WHERE `l
 UPDATE `creature_template_locale` SET `Name` = 'Kar Chante-l''orage' WHERE `locale` = 'frFR' AND `entry` = 3690;
 -- OLD name : Kyln Longclaw, subname : Boar Trainer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=3697
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 3697;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (3697, 'frFR','Kyln Longuegriffe','Entraîneur de sangliers');
 -- OLD subname : Pet Trainer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=3698
@@ -1863,6 +1869,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Maître des cartographes' WHERE
 UPDATE `creature_template_locale` SET `Title` = 'Marchand de robes' WHERE `locale` = 'frFR' AND `entry` = 4172;
 -- OLD subname : Arrow Merchant
 -- Source : https://www.wowhead.com/wotlk/fr/npc=4174
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 4174;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (4174, 'frFR',NULL,'Marchande de flèches');
 -- OLD name : Essaim silithide
 -- Source : https://www.wowhead.com/wotlk/fr/npc=4196
@@ -1878,6 +1885,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Entraîneur de loups' WHERE `lo
 UPDATE `creature_template_locale` SET `Title` = 'Fournitures d''herboriste' WHERE `locale` = 'frFR' AND `entry` = 4216;
 -- OLD subname : Cartography Supplies
 -- Source : https://www.wowhead.com/wotlk/fr/npc=4224
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 4224;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (4224, 'frFR',NULL,'Fournitures de cartographe');
 -- OLD subname : Fournitures d’enchanteur
 -- Source : https://www.wowhead.com/wotlk/fr/npc=4228
@@ -1953,6 +1961,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Maître des courses Kronkenfourc
 UPDATE `creature_template_locale` SET `Name` = 'Protecteur de Darnassus' WHERE `locale` = 'frFR' AND `entry` = 4423;
 -- OLD subname : Totem Merchent
 -- Source : https://www.wowhead.com/wotlk/fr/npc=4443
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 4443;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (4443, 'frFR',NULL,'Marchande de totems');
 -- OLD subname : Marchand de course
 -- Source : https://www.wowhead.com/wotlk/fr/npc=4445
@@ -2184,6 +2193,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Maître des familiers loups' WH
 UPDATE `creature_template_locale` SET `Title` = 'Maître des familiers oiseaux' WHERE `locale` = 'frFR' AND `entry` = 5001;
 -- OLD name : World Boar Trainer, subname : Boar Pet Trainer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=5002
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 5002;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (5002, 'frFR','Entraîneur de sangliers universel','Maître des familiers sangliers');
 -- OLD subname : Cat Pet Trainer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=5003
@@ -2194,7 +2204,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Maître des familiers clampants
 -- OLD subname : Crocodile Pet Trainer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=5005
 UPDATE `creature_template_locale` SET `Title` = 'Maître des familiers crocodiles' WHERE `locale` = 'frFR' AND `entry` = 5005;
--- OLD name : Maître des démons universel - ancien, subname : 
+-- OLD name : Maître des démons universel - ancien, subname : NONE
 -- Source : https://www.wowhead.com/wotlk/fr/npc=5006
 UPDATE `creature_template_locale` SET `Name` = 'Maître des démons universel',`Title` = 'Maître des démons' WHERE `locale` = 'frFR' AND `entry` = 5006;
 -- OLD subname : Gorilla Pet Trainer
@@ -3075,9 +3085,11 @@ UPDATE `creature_template_locale` SET `Name` = 'Maître des travailleurs du cuir
 UPDATE `creature_template_locale` SET `Name` = 'Jeune dragonnet d''émeraude' WHERE `locale` = 'frFR' AND `entry` = 7545;
 -- OLD name : Cottontail Rabbit
 -- Source : https://www.wowhead.com/wotlk/fr/npc=7558
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 7558;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (7558, 'frFR','Lapin',NULL);
 -- OLD name : Spotted Rabbit
 -- Source : https://www.wowhead.com/wotlk/fr/npc=7559
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 7559;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (7559, 'frFR','Lapin tacheté',NULL);
 -- OLD name : Oro Crève-Oeil (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/fr/npc=7606
@@ -4675,10 +4687,10 @@ UPDATE `creature_template_locale` SET `Name` = 'Bor Crin-sauvage' WHERE `locale`
 -- OLD name : Prophète du Crépuscule (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/fr/npc=15308
 UPDATE `creature_template_locale` SET `Name` = 'Prophète du crépuscule' WHERE `locale` = 'frFR' AND `entry` = 15308;
--- OLD name : Dirigeable télécommandé, subname : 
+-- OLD name : Dirigeable télécommandé, subname : NONE
 -- Source : https://www.wowhead.com/wotlk/fr/npc=15349
 UPDATE `creature_template_locale` SET `Name` = 'RC Blimp',`Title` = 'PH' WHERE `locale` = 'frFR' AND `entry` = 15349;
--- OLD name : Char mortier télécommandé, subname : 
+-- OLD name : Char mortier télécommandé, subname : NONE
 -- Source : https://www.wowhead.com/wotlk/fr/npc=15364
 UPDATE `creature_template_locale` SET `Name` = 'RC Mortar Tank',`Title` = 'PH' WHERE `locale` = 'frFR' AND `entry` = 15364;
 -- OLD name : Gardien de Haut-Soleil (CASE ONLY)
@@ -4863,6 +4875,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Kindnappeur Sombrefer' WHERE `lo
 UPDATE `creature_template_locale` SET `Name` = 'Renne de l''Hiver' WHERE `locale` = 'frFR' AND `entry` = 15706;
 -- OLD name : Blue Qiraji Battle Tank
 -- Source : https://www.wowhead.com/wotlk/fr/npc=15713
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 15713;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (15713, 'frFR','Char d''assaut qiraji bleu',NULL);
 -- OLD name : Fêtard des Pitons-du-Tonnerre
 -- Source : https://www.wowhead.com/wotlk/fr/npc=15719
@@ -5059,7 +5072,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Maître de guerre du bassin d''
 -- OLD subname : Maître des cuisiniers
 -- Source : https://www.wowhead.com/wotlk/fr/npc=16719
 UPDATE `creature_template_locale` SET `Title` = 'Cuisinière' WHERE `locale` = 'frFR' AND `entry` = 16719;
--- OLD subname : 
+-- OLD subname : NONE
 -- Source : https://www.wowhead.com/wotlk/fr/npc=16720
 UPDATE `creature_template_locale` SET `Title` = 'Maître des démons' WHERE `locale` = 'frFR' AND `entry` = 16720;
 -- OLD subname : Fournitures d’enchanteur
@@ -5292,6 +5305,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Transformation de l''ancêtre Ca
 UPDATE `creature_template_locale` SET `Name` = 'Belluaire Mâche-les-os' WHERE `locale` = 'frFR' AND `entry` = 17455;
 -- OLD subname : Mistress of Breadcrumbs
 -- Source : https://www.wowhead.com/wotlk/fr/npc=17515
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 17515;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (17515, 'frFR',NULL,'Maîtresse des miettes de pain');
 -- OLD name : Factionnaire des Flammes infernales
 -- Source : https://www.wowhead.com/wotlk/fr/npc=17517
@@ -5712,6 +5726,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Coeur-noir le Séditieux' WHERE 
 UPDATE `creature_template_locale` SET `Name` = 'Coeur-noir le Séditieux' WHERE `locale` = 'frFR' AND `entry` = 19304;
 -- OLD name : Barnu Cragcrush, subname : Stable Master
 -- Source : https://www.wowhead.com/wotlk/fr/npc=19325
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 19325;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (19325, 'frFR','Barnu Cassecombe','Maître des écuries');
 -- OLD subname : Maître des forgerons
 -- Source : https://www.wowhead.com/wotlk/fr/npc=19341
@@ -6123,6 +6138,7 @@ UPDATE `creature_template_locale` SET `Title` = 'Munitions' WHERE `locale` = 'fr
 UPDATE `creature_template_locale` SET `Title` = 'Munitions' WHERE `locale` = 'frFR' AND `entry` = 21488;
 -- OLD name : Forest Strider
 -- Source : https://www.wowhead.com/wotlk/fr/npc=21634
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 21634;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (21634, 'frFR','Trotteur des forêts',NULL);
 -- OLD name : Oronok Cœur-Fendu
 -- Source : https://www.wowhead.com/wotlk/fr/npc=21685
@@ -6436,7 +6452,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Contremaître Gueule-de-dragon' 
 -- OLD subname : Mailles et plaques classiques de l’Alliance
 -- Source : https://www.wowhead.com/wotlk/fr/npc=23396
 UPDATE `creature_template_locale` SET `Title` = 'Vendeur de l''arène' WHERE `locale` = 'frFR' AND `entry` = 23396;
--- OLD subname : 
+-- OLD subname : NONE
 -- Source : https://www.wowhead.com/wotlk/fr/npc=23405
 UPDATE `creature_template_locale` SET `Title` = 'Vendeur de consommables du RPT' WHERE `locale` = 'frFR' AND `entry` = 23405;
 -- OLD name : Brise-ciel gueule-de-dragon (CASE ONLY)
@@ -7392,6 +7408,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Larva]' WHERE `locale
 UPDATE `creature_template_locale` SET `Name` = '[Cel]',`Title` = '[Reagent and Poison Vendor]' WHERE `locale` = 'frFR' AND `entry` = 25312;
 -- OLD subname : Software Engineer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=25323
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 25323;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (25323, 'frFR',NULL,'Ingénieur logiciel');
 -- OLD name : Gorge le Broyeur de cadavres
 -- Source : https://www.wowhead.com/wotlk/fr/npc=25329
@@ -7458,9 +7475,11 @@ UPDATE `creature_template_locale` SET `Name` = '[En''kilah Hatchling (2)]' WHERE
 UPDATE `creature_template_locale` SET `Name` = '[Elder Yakone]' WHERE `locale` = 'frFR' AND `entry` = 25400;
 -- OLD subname : Software Engineer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=25406
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 25406;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (25406, 'frFR',NULL,'Ingénieur logiciel');
 -- OLD subname : Software Engineer
 -- Source : https://www.wowhead.com/wotlk/fr/npc=25411
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 25411;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (25411, 'frFR',NULL,'Ingénieur logiciel');
 -- OLD name : Ancien esprit rohart
 -- Source : https://www.wowhead.com/wotlk/fr/npc=25436
@@ -7515,6 +7534,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Worker - Orc Fema
 UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Worker - Troll Male Transform]' WHERE `locale` = 'frFR' AND `entry` = 25533;
 -- OLD name : Craig's Test Human A
 -- Source : https://www.wowhead.com/wotlk/fr/npc=25537
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 25537;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (25537, 'frFR','Craig''s Test Human',NULL);
 -- OLD name : It Was The Orcs, Honest! Kill Credit Bunny
 -- Source : https://www.wowhead.com/wotlk/fr/npc=25581
@@ -7707,6 +7727,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Déguisement masculin du solstic
 UPDATE `creature_template_locale` SET `Name` = 'Trésorier-payeur' WHERE `locale` = 'frFR' AND `entry` = 26075;
 -- OLD name : Craig's Test Human B
 -- Source : https://www.wowhead.com/wotlk/fr/npc=26080
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 26080;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (26080, 'frFR','[Craig''s Test Human B]',NULL);
 -- OLD name : Amiralissime « Shelly » Jorrik, subname : En retraite
 -- Source : https://www.wowhead.com/wotlk/fr/npc=26081
@@ -7830,6 +7851,7 @@ UPDATE `creature_template_locale` SET `Name` = '[(PH) Wildlife Test Bear]' WHERE
 UPDATE `creature_template_locale` SET `Name` = '[(PH) Grizzly Test Low Aggro Worg]' WHERE `locale` = 'frFR' AND `entry` = 26372;
 -- OLD name : Test - Brutallus Craig
 -- Source : https://www.wowhead.com/wotlk/fr/npc=26376
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 26376;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (26376, 'frFR','[Test - Brutallus Craig]',NULL);
 -- OLD name : Trappeur transformé
 -- Source : https://www.wowhead.com/wotlk/fr/npc=26390
@@ -8004,6 +8026,7 @@ UPDATE `creature_template_locale` SET `Name` = '[The Focus on the Beach Kill Cre
 UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Dummy]' WHERE `locale` = 'frFR' AND `entry` = 26784;
 -- OLD subname : Thug Life
 -- Source : https://www.wowhead.com/wotlk/fr/npc=26791
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 26791;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (26791, 'frFR',NULL,'Vie de nervi');
 -- OLD name : Ormorok le Sculpte-Arbre (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/fr/npc=26794
@@ -8553,6 +8576,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Inn Rat]' WHERE `locale` = 'frF
 UPDATE `creature_template_locale` SET `Name` = '[White Armored Gryphon]' WHERE `locale` = 'frFR' AND `entry` = 27526;
 -- OLD name : Clayton Dubin - TEST COPY DATA, subname : Quality Assured
 -- Source : https://www.wowhead.com/wotlk/fr/npc=27527
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 27527;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (27527, 'frFR','[Clayton Dubin - TEST COPY DATA]','[Quality Assured]');
 -- OLD name : Pingouin, Norfendre
 -- Source : https://www.wowhead.com/wotlk/fr/npc=27548
@@ -9120,6 +9144,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Blood Vat Corpse]' WHERE `local
 UPDATE `creature_template_locale` SET `Name` = '[Sindragosa]',`Title` = '[Queen of the Frostbrood]' WHERE `locale` = 'frFR' AND `entry` = 28499;
 -- OLD name : Ronakada, subname : Blademaster
 -- Source : https://www.wowhead.com/wotlk/fr/npc=28501
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 28501;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (28501, 'frFR','[Ronakada]','[Blademaster]');
 -- OLD name : Summon Vision Test - LAB
 -- Source : https://www.wowhead.com/wotlk/fr/npc=28507
@@ -10335,6 +10360,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Thorim Talk KC Bunny]' WHERE `l
 UPDATE `creature_template_locale` SET `Name` = '[Witness the Reckoning Credit]' WHERE `locale` = 'frFR' AND `entry` = 30515;
 -- OLD name : Training Dummy
 -- Source : https://www.wowhead.com/wotlk/fr/npc=30527
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 30527;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (30527, 'frFR','[Training Dummy]',NULL);
 -- OLD name : Ancien Nurgen
 -- Source : https://www.wowhead.com/wotlk/fr/npc=30533
@@ -10405,8 +10431,9 @@ UPDATE `creature_template_locale` SET `Name` = '[Spike Target 2]' WHERE `locale`
 -- OLD name : Leurre de test de Dan (pas véhicule)
 -- Source : https://www.wowhead.com/wotlk/fr/npc=30615
 UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Dummy (Non Vehicle)]' WHERE `locale` = 'frFR' AND `entry` = 30615;
--- OLD name : 
+-- OLD name : NONE
 -- Source : https://www.wowhead.com/wotlk/fr/npc=30618
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 30618;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (30618, 'frFR','[]',NULL);
 -- OLD name : Péon de Joug-d’Hiver
 -- Source : https://www.wowhead.com/wotlk/fr/npc=30619
@@ -10620,6 +10647,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Totem Langue de feu VIII' WHERE 
 UPDATE `creature_template_locale` SET `Name` = '[Decaying Wight]' WHERE `locale` = 'frFR' AND `entry` = 31141;
 -- OLD name : Reinforced Training Dummy
 -- Source : https://www.wowhead.com/wotlk/fr/npc=31143
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 31143;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (31143, 'frFR','[Reinforced Training Dummy]',NULL);
 -- OLD name : Mannequin d'entraînement
 -- Source : https://www.wowhead.com/wotlk/fr/npc=31144
@@ -10863,6 +10891,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Wrath Gate Dummy]' WHERE `local
 UPDATE `creature_template_locale` SET `Name` = 'Rôdeur sans visage' WHERE `locale` = 'frFR' AND `entry` = 31691;
 -- OLD name : Bronze Drake
 -- Source : https://www.wowhead.com/wotlk/fr/npc=31696
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 31696;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (31696, 'frFR','[Bronze Drake]',NULL);
 -- OLD name : Drake du Crépuscule
 -- Source : https://www.wowhead.com/wotlk/fr/npc=31698
@@ -11493,6 +11522,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Coeur du déconstructeur' WHERE 
 UPDATE `creature_template_locale` SET `Name` = 'Ambrose Étinceboulon' WHERE `locale` = 'frFR' AND `entry` = 33335;
 -- OLD name : Morgan Test
 -- Source : https://www.wowhead.com/wotlk/fr/npc=33351
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 33351;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (33351, 'frFR','[Morgan Test]',NULL);
 -- OLD name : « Tigre spectral »
 -- Source : https://www.wowhead.com/wotlk/fr/npc=33357
@@ -12255,6 +12285,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Roo]' WHERE `locale` = 'frFR' A
 UPDATE `creature_template_locale` SET `Name` = '[Kekek]' WHERE `locale` = 'frFR' AND `entry` = 34532;
 -- OLD name : ScottM Test Creature
 -- Source : https://www.wowhead.com/wotlk/fr/npc=34533
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 34533;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (34533, 'frFR','[ScottM Test Creature]',NULL);
 -- OLD name : Raptor violet rapide
 -- Source : https://www.wowhead.com/wotlk/fr/npc=34549
@@ -12897,6 +12928,7 @@ UPDATE `creature_template_locale` SET `Name` = '[Troll Druid]' WHERE `locale` = 
 UPDATE `creature_template_locale` SET `Name` = '[Undead Hunter]' WHERE `locale` = 'frFR' AND `entry` = 36867;
 -- OLD name : Gryphon Hatchling 3.3.0
 -- Source : https://www.wowhead.com/wotlk/fr/npc=36904
+DELETE FROM `creature_template_locale` WHERE `locale` = 'frFR' AND `entry` = 36904;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (36904, 'frFR','[Gryphon Hatchling 3.3.0]',NULL);
 -- OLD name : Bébé griffon
 -- Source : https://www.wowhead.com/wotlk/fr/npc=36908
