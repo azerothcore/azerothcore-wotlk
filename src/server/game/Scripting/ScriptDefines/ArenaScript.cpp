@@ -46,7 +46,7 @@ void ScriptMgr::OnArenaStart(Battleground* bg)
 
 bool ScriptMgr::OnBeforeArenaTeamMemberUpdate(ArenaTeam* team, Player* player, bool won, uint32 opponentMatchmakerRating, int32 matchmakerChange)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(ArenaScript, ARENAHOOK_ON_BEFORE_TEAM_MEMBER_UPDATE, script->OnBeforeArenaTeamMemberUpdate(team, player, won, opponentMatchmakerRating, matchmakerChange));
+    CALL_ENABLED_BOOLEAN_HOOKS(ArenaScript, ARENAHOOK_ON_BEFORE_TEAM_MEMBER_UPDATE, !script->OnBeforeArenaTeamMemberUpdate(team, player, won, opponentMatchmakerRating, matchmakerChange));
 }
 
 bool ScriptMgr::CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGuid)
