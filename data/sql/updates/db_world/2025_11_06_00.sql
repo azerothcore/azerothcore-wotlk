@@ -1,3 +1,4 @@
+-- DB update 2025_11_05_00 -> 2025_11_06_00
 
 -- Remove NPC Flag, Unit Flag and set RegenHealth
 UPDATE `creature_template` SET `npcflag` = `npcflag` &~ 16777216, `unit_flags` = `unit_flags` &~ 2, `RegenHealth` = 1 WHERE (`entry` = 28782);
