@@ -18,6 +18,7 @@
 #ifndef SCRIPT_OBJECT_ALL_BATTLEGROUND_SCRIPT_H_
 #define SCRIPT_OBJECT_ALL_BATTLEGROUND_SCRIPT_H_
 
+#include "ObjectGuid.h"
 #include "ScriptObject.h"
 #include <vector>
 
