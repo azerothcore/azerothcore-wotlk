@@ -89,27 +89,23 @@ const std::array<uint32, MAX_INSANITY_TARGETS> InsanitySpells = { SPELL_INSANITY
 struct boss_volazj : public BossAI
 {
     boss_volazj(Creature* pCreature) : BossAI(pCreature, DATA_HERALD_VOLAZJ),
-        insanityTimes(0),
         insanityPhase(false)
         { }
-
-    void InitializeAI() override
-    {
-        BossAI::InitializeAI();
-        // Visible for all players in insanity
-        me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
-    }
 
     void Reset() override
     {
         _Reset();
-        insanityTimes = 0;
         insanityPhase = false;
 
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetControlled(false, UNIT_STATE_STUNNED);
         ResetPlayersPhaseMask();
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
+        me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
+
+        ScheduleHealthCheckEvent({ 66, 33 }, [&]{
+            DoCastSelf(SPELL_INSANITY);
+        }, false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -184,29 +180,6 @@ struct boss_volazj : public BossAI
         }
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        // Do not perform insanity recast if boss is casting Insanity already
-        if (me->FindCurrentSpellBySpellId(SPELL_INSANITY))
-        {
-            return;
-        }
-
-        // First insanity
-        if (insanityTimes == 0 && me->HealthBelowPctDamaged(66, damage))
-        {
-            DoCastSelf(SPELL_INSANITY, false);
-            ++insanityTimes;
-        }
-        // Second insanity
-        else if (insanityTimes == 1 && me->HealthBelowPctDamaged(33, damage))
-        {
-            me->InterruptNonMeleeSpells(false);
-            DoCastSelf(SPELL_INSANITY, false);
-            ++insanityTimes;
-        }
-    }
-
     void UpdateAI(uint32 diff) override
     {
         //Return since we have no target
@@ -272,7 +245,6 @@ struct boss_volazj : public BossAI
     }
 
 private:
-    uint8 insanityTimes;
     bool insanityPhase;     // Indicates if boss enter to insanity phase
 
     uint32 GetPlrInsanityAuraId(uint32 phaseMask) const
@@ -312,6 +284,7 @@ private:
     bool CheckPhaseMinions()
     {
         summons.RemoveNotExisting();
+
         if (summons.empty())
         {
             ResetPlayersPhaseMask();
