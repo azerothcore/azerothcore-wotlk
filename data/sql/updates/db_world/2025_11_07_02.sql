@@ -1,3 +1,4 @@
+-- DB update 2025_11_07_01 -> 2025_11_07_02
 
 -- Add Waypoints (Scarlet Miner)
 DELETE FROM `waypoint_data` WHERE (`id` IN (2884100, 2884101));
