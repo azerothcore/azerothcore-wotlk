@@ -77,13 +77,6 @@ enum Misc
     DATA_SET_INSANITY_PHASE                 = 1,
 };
 
-enum Events
-{
-    EVENT_HERALD_MIND_FLAY                  = 1,
-    EVENT_HERALD_SHADOW,
-    EVENT_HERALD_SHIVER,
-};
-
 const std::array<uint32, MAX_INSANITY_TARGETS> InsanitySpells = { SPELL_INSANITY_PHASING_1, SPELL_INSANITY_PHASING_2, SPELL_INSANITY_PHASING_3, SPELL_INSANITY_PHASING_4, SPELL_INSANITY_PHASING_5 };
 
 struct boss_volazj : public BossAI
@@ -104,20 +97,32 @@ struct boss_volazj : public BossAI
         me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
 
         ScheduleHealthCheckEvent({ 66, 33 }, [&]{
+            scheduler.CancelAll();
             DoCastSelf(SPELL_INSANITY);
         }, false);
+    }
+
+    void ScheduleTasks() override
+    {
+        ScheduleTimedEvent(8s, [&] {
+            DoCastVictim(SPELL_MIND_FLAY);
+        }, 20s);
+
+        ScheduleTimedEvent(5s, [&] {
+            DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY);
+        }, 5s);
+
+        ScheduleTimedEvent(15s, [&] {
+            DoCastRandomTarget(SPELL_SHIVER);
+        }, 15s);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8s);
-        events.ScheduleEvent(EVENT_HERALD_SHADOW, 5s);
-        events.ScheduleEvent(EVENT_HERALD_SHIVER, 15s);
         Talk(SAY_AGGRO);
         DoCastSelf(SPELL_WHISPER_AGGRO);
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
-        me->SetInCombatWithZone();
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -184,9 +189,9 @@ struct boss_volazj : public BossAI
     {
         //Return since we have no target
         if (!UpdateVictim())
-        {
             return;
-        }
+
+        scheduler.Update(diff);
 
         if (insanityPhase)
         {
@@ -199,46 +204,7 @@ struct boss_volazj : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             me->RemoveAurasDueToSpell(INSANITY_VISUAL);
-        }
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
-            return;
-        }
-
-        while (uint32 const eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_HERALD_MIND_FLAY:
-                {
-                    DoCastVictim(SPELL_MIND_FLAY, false);
-                    events.Repeat(20s);
-                    break;
-                }
-                case EVENT_HERALD_SHADOW:
-                {
-                    DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY, false);
-                    events.Repeat(5s);
-                    break;
-                }
-                case EVENT_HERALD_SHIVER:
-                {
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                    {
-                        DoCast(pTarget, SPELL_SHIVER, false);
-                    }
-
-                    events.Repeat(15s);
-                    break;
-                }
-            }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
+            ScheduleTasks();
         }
 
         DoMeleeAttackIfReady();
