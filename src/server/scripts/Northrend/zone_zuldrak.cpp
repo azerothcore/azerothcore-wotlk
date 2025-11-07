@@ -238,8 +238,10 @@ enum overlordDrakuru
 {
     SPELL_SHADOW_BOLT                   = 54113,
     SPELL_SCOURGE_DISGUISE_EXPIRING     = 52010,
+    SPELL_DROP_DISGUISE                 = 54089,
     SPELL_THROW_BRIGHT_CRYSTAL          = 54087,
     SPELL_TELEPORT_EFFECT               = 52096,
+    SPELL_SCOURGE_SPOTLIGHT             = 53104,
     SPELL_SCOURGE_DISGUISE              = 51966,
     SPELL_SCOURGE_DISGUISE_INSTANT_CAST = 52192,
     SPELL_BLIGHT_FOG                    = 54104,
@@ -248,17 +250,25 @@ enum overlordDrakuru
     SPELL_TOUCH_OF_DEATH                = 54236,
     SPELL_DRAKURU_DEATH                 = 54248,
     SPELL_SUMMON_SKULL                  = 54253,
+    SPELL_BLOATED_ABOMINATION_FEIGN_DEATH = 52593,
+    SPELL_EXPLODE_ABOMINATION_BLOODY_MEAT = 52523,
+    SPELL_EXPLODE_ABOMINATION_MEAT       = 52520,
+    SPELL_DRAKURUS_SKULL_MISSILE         = 54250,
+    SPELL_BURST_AT_THE_SEAMS_BONE        = 52516,
 
     QUEST_BETRAYAL                      = 12713,
 
     NPC_BLIGHTBLOOD_TROLL               = 28931,
     NPC_LICH_KING                       = 28498,
+    NPC_TOTALLY_GENERIC_BUNNY           = 29100,
 
     EVENT_BETRAYAL_1                    = 1,
     EVENT_BETRAYAL_2                    = 2,
     EVENT_BETRAYAL_3                    = 3,
+    EVENT_BETRAYAL_3a                   = 24,
     EVENT_BETRAYAL_4                    = 4,
     EVENT_BETRAYAL_5                    = 5,
+    EVENT_BETRAYAL_5b                   = 25,
     EVENT_BETRAYAL_6                    = 6,
     EVENT_BETRAYAL_7                    = 7,
     EVENT_BETRAYAL_8                    = 8,
@@ -288,243 +298,271 @@ enum overlordDrakuru
     SAY_LICH_12                         = 12,
 };
 
-class npc_overlord_drakuru_betrayal : public CreatureScript
+struct npc_overlord_drakuru_betrayal : public ScriptedAI
 {
-public:
-    npc_overlord_drakuru_betrayal() : CreatureScript("npc_overlord_drakuru_betrayal") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    npc_overlord_drakuru_betrayal(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
-        return new npc_overlord_drakuru_betrayalAI(creature);
+        me->SetCombatMovement(false);
     }
 
-    struct npc_overlord_drakuru_betrayalAI : public ScriptedAI
+    void EnterEvadeMode(EvadeReason why) override
     {
-        npc_overlord_drakuru_betrayalAI(Creature* creature) : ScriptedAI(creature), summons(me)
-        {
-        }
+        if (_playerGUID)
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                if (player->IsWithinDistInMap(me, 80))
+                    return;
+        me->SetFaction(FACTION_UNDEAD_SCOURGE);
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        ScriptedAI::EnterEvadeMode(why);
+    }
 
-        EventMap events;
-        SummonList summons;
-        ObjectGuid playerGUID;
-        ObjectGuid lichGUID;
+    void Reset() override
+    {
+        events.Reset();
+        _events.Reset();
+        _summons.DespawnAll();
+        _playerGUID.Clear();
+        _lichGUID.Clear();
+        me->SetFaction(FACTION_UNDEAD_SCOURGE);
+        me->SetVisible(false);
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetImmuneToPC(true);
+    }
 
-        void EnterEvadeMode(EvadeReason why) override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->IsPlayer())
         {
-            if (playerGUID)
-                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                    if (player->IsWithinDistInMap(me, 80))
-                        return;
-            me->SetFaction(FACTION_UNDEAD_SCOURGE);
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            ScriptedAI::EnterEvadeMode(why);
-        }
-
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-            playerGUID.Clear();
-            lichGUID.Clear();
-            me->SetFaction(FACTION_UNDEAD_SCOURGE);
-            me->SetVisible(false);
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who->IsPlayer())
+            if (_playerGUID)
             {
-                if (playerGUID)
+                if (who->GetGUID() != _playerGUID)
                 {
-                    if (who->GetGUID() != playerGUID)
-                    {
-                        Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-                        if (player && player->IsWithinDistInMap(me, 80))
-                            who->ToPlayer()->NearTeleportTo(6143.76f, -1969.7f, 417.57f, 2.08f);
-                        else
-                        {
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            return;
-                        }
-                    }
+                    Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID);
+                    if (player && player->IsWithinDistInMap(me, 80))
+                        who->ToPlayer()->NearTeleportTo(6143.76f, -1969.7f, 417.57f, 2.08f);
                     else
-                        ScriptedAI::MoveInLineOfSight(who);
+                    {
+                        EnterEvadeMode(EVADE_REASON_OTHER);
+                        return;
+                    }
                 }
-                else if (who->ToPlayer()->GetQuestStatus(QUEST_BETRAYAL) == QUEST_STATUS_INCOMPLETE && who->HasAura(SPELL_SCOURGE_DISGUISE))
+                else
+                    ScriptedAI::MoveInLineOfSight(who);
+            }
+            else if (who->ToPlayer()->GetQuestStatus(QUEST_BETRAYAL) == QUEST_STATUS_INCOMPLETE && who->HasAura(SPELL_SCOURGE_DISGUISE))
+            {
+                me->SetVisible(true);
+                _playerGUID = who->GetGUID();
+                events.ScheduleEvent(EVENT_BETRAYAL_1, 6s);
+            }
+        }
+        else
+            ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        _summons.Summon(summon);
+        if (summon->GetEntry() == NPC_BLIGHTBLOOD_TROLL)
+        {
+            if (Creature* target = summon->FindNearestCreature(NPC_TOTALLY_GENERIC_BUNNY, 10.0f, true))
+            {
+                target->CastSpell(target, SPELL_TELEPORT_EFFECT, true);
+                // target->CastSpell(target, SPELL_SCOURGE_SPOTLIGHT, true);
+            }
+        }
+        else
+        {
+            me->SetFacingToObject(summon);
+            _lichGUID = summon->GetGUID();
+            float o = me->GetAngle(summon);
+            summon->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(o) * 6.0f, me->GetPositionY() + std::sin(o) * 6.0f, me->GetPositionZ());
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _events.ScheduleEvent(EVENT_BETRAYAL_SHADOW_BOLT, 0s);
+        _events.ScheduleEvent(EVENT_BETRAYAL_CRYSTAL, 5s);
+        _events.ScheduleEvent(EVENT_BETRAYAL_COMBAT_TALK, 20s);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+    {
+        if (damage >= me->GetHealth() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+        {
+            damage = 0;
+            me->RemoveAllAuras();
+            me->CombatStop();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFaction(2082);
+            me->SetImmuneToPC(true);
+            events.Reset();
+            events.ScheduleEvent(EVENT_BETRAYAL_4, 4200ms);
+        }
+    }
+
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_THROW_PORTAL_CRYSTAL)
+            if (Aura* aura = target->AddAura(SPELL_ARTHAS_PORTAL, target))
+                aura->SetDuration(48000);
+    }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_TOUCH_OF_DEATH)
+        {
+            DoCastSelf(SPELL_BLOATED_ABOMINATION_FEIGN_DEATH, true);
+            DoCastAOE(SPELL_DRAKURUS_SKULL_MISSILE, true);
+            DoCastSelf(SPELL_BURST_AT_THE_SEAMS_BONE, true);
+            DoCastSelf(SPELL_BURST_AT_THE_SEAMS_BONE, true);
+            DoCastSelf(SPELL_BURST_AT_THE_SEAMS_BONE, true);
+            DoCastSelf(SPELL_EXPLODE_ABOMINATION_MEAT, true);
+            DoCastSelf(SPELL_EXPLODE_ABOMINATION_BLOODY_MEAT, true);
+            DoCastSelf(SPELL_EXPLODE_ABOMINATION_BLOODY_MEAT, true);
+            DoCastSelf(SPELL_EXPLODE_ABOMINATION_BLOODY_MEAT, true);
+            DoCastSelf(SPELL_DRAKURU_DEATH, true);
+            me->SetImmuneToPC(true);
+            // me->CastSpell(me, SPELL_SUMMON_SKULL, true);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_BETRAYAL_1:
+                Talk(SAY_DRAKURU_0);
+                events.ScheduleEvent(EVENT_BETRAYAL_2, 4s);
+                events.ScheduleEvent(EVENT_BETRAYAL_3, 6600ms);
+                break;
+            case EVENT_BETRAYAL_2:
+                me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6184.1f, -1969.9f, 586.76f, 4.5f);
+                me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6222.9f, -2026.5f, 586.76f, 2.9f);
+                me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6166.2f, -2065.4f, 586.76f, 1.4f);
+                me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6127.5f, -2008.7f, 586.76f, 0.0f);
+                break;
+            case EVENT_BETRAYAL_3:
+                Talk(SAY_DRAKURU_1);
+                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                    player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
+                events.ScheduleEvent(EVENT_BETRAYAL_3a, 9600ms);
+                break;
+            case EVENT_BETRAYAL_3a:
+            {
+                Talk(SAY_DRAKURU_2);
+                Talk(SAY_DRAKURU_3);
+                if (Aura* aur = me->AddAura(SPELL_BLIGHT_FOG, me))
+                    aur->SetDuration(22000); // TODO: should be infinite
+                me->SetImmuneToPC(false);
+                std::list<Creature*> creatures;
+                me->GetCreatureListWithEntryInGrid(creatures, NPC_TOTALLY_GENERIC_BUNNY, 55.0f);
+                for (Creature* creature : creatures)
+                    creature->CastSpell(creature, SPELL_SCOURGE_SPOTLIGHT, true);
+                break;
+            }
+            case EVENT_BETRAYAL_4:
+            {
+                Talk(SAY_DRAKURU_5);
+                events.ScheduleEvent(EVENT_BETRAYAL_5, 4800ms);
+                std::list<Creature*> creatures;
+                me->GetCreatureListWithEntryInGrid(creatures, NPC_TOTALLY_GENERIC_BUNNY, 55.0f);
+                for (Creature* creature : creatures)
+                    creature->RemoveAurasDueToSpell(SPELL_SCOURGE_SPOTLIGHT);
+                break;
+            }
+            case EVENT_BETRAYAL_5:
+                Talk(SAY_DRAKURU_6);
+                events.ScheduleEvent(EVENT_BETRAYAL_5b, 1800ms);
+                break;
+            case EVENT_BETRAYAL_5b:
+                DoCastSelf(SPELL_THROW_PORTAL_CRYSTAL, true);
+                events.ScheduleEvent(EVENT_BETRAYAL_6, 3600ms);
+                break;
+            case EVENT_BETRAYAL_6:
+                me->SummonCreature(NPC_LICH_KING, 6140.4233, -2010.9938, 589.1911, 6.126106, TEMPSUMMON_TIMED_DESPAWN, 41000);
+                events.ScheduleEvent(EVENT_BETRAYAL_7, 8400ms);
+                break;
+            case EVENT_BETRAYAL_7:
+                Talk(SAY_DRAKURU_7);
+                events.ScheduleEvent(EVENT_BETRAYAL_8, 9600ms);
+                break;
+            case EVENT_BETRAYAL_8:
+                if (Creature* lich = ObjectAccessor::GetCreature(*me, _lichGUID))
                 {
-                    me->SetVisible(true);
-                    playerGUID = who->GetGUID();
-                    events.ScheduleEvent(EVENT_BETRAYAL_1, 5s);
+                    lich->AI()->Talk(SAY_LICH_7);
+                    lich->AI()->Talk(SAY_LICH_8, 5400ms);
                 }
-            }
-            else
-                ScriptedAI::MoveInLineOfSight(who);
+                events.ScheduleEvent(EVENT_BETRAYAL_9, 7800ms);
+                break;
+            case EVENT_BETRAYAL_9:
+                if (Creature* lich = ObjectAccessor::GetCreature(*me, _lichGUID))
+                    lich->CastSpell(me, SPELL_TOUCH_OF_DEATH, false);
+                events.ScheduleEvent(EVENT_BETRAYAL_10, 4200ms);
+                break;
+            case EVENT_BETRAYAL_10:
+                me->SetVisible(false);
+                if (Creature* lich = ObjectAccessor::GetCreature(*me, _lichGUID))
+                {
+                    lich->AI()->Talk(SAY_LICH_9, 3600ms);
+                    lich->AI()->Talk(SAY_LICH_10, 8400ms);
+                    lich->AI()->Talk(SAY_LICH_11, 22800ms);
+                    lich->AI()->Talk(SAY_LICH_12, 27600ms);
+                }
+                events.ScheduleEvent(EVENT_BETRAYAL_11, 32600ms);
+                events.ScheduleEvent(EVENT_BETRAYAL_12, 37200ms);
+                break;
+            case EVENT_BETRAYAL_11:
+                if (Creature* lich = ObjectAccessor::GetCreature(*me, _lichGUID))
+                    lich->GetMotionMaster()->MovePoint(0, 6141.2393, -2011.2728, 589.8653);
+                break;
+            case EVENT_BETRAYAL_12:
+                _playerGUID.Clear();
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_BETRAYAL_13:
+                break;
+            case EVENT_BETRAYAL_14:
+                _playerGUID.Clear();
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
         }
 
-        void JustSummoned(Creature* cr) override
+        if (me->GetFaction() == FACTION_FRIENDLY || me->GetFaction() == 2082 || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
+            return;
+
+        if (!UpdateVictim())
+            return;
+
+        _events.Update(diff);
+        switch (_events.ExecuteEvent())
         {
-            summons.Summon(cr);
-            if (cr->GetEntry() == NPC_BLIGHTBLOOD_TROLL)
-                cr->CastSpell(cr, SPELL_TELEPORT_EFFECT, true);
-            else
-            {
-                me->SetFacingToObject(cr);
-                lichGUID = cr->GetGUID();
-                float o = me->GetAngle(cr);
-                cr->GetMotionMaster()->MovePoint(0, me->GetPositionX() + cos(o) * 6.0f, me->GetPositionY() + std::sin(o) * 6.0f, me->GetPositionZ());
-            }
+            case EVENT_BETRAYAL_SHADOW_BOLT:
+                if (!me->IsWithinMeleeRange(me->GetVictim()))
+                    DoCastVictim(SPELL_SHADOW_BOLT);
+                _events.Repeat(2s);
+                break;
+            case EVENT_BETRAYAL_CRYSTAL:
+                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                    DoCast(player, SPELL_THROW_BRIGHT_CRYSTAL);
+                _events.Repeat(6s, 15s);
+                break;
+            case EVENT_BETRAYAL_COMBAT_TALK:
+                Talk(SAY_DRAKURU_4);
+                _events.Repeat(20s);
+                break;
         }
 
-        void JustEngagedWith(Unit*) override
-        {
-            Talk(SAY_DRAKURU_3);
-            events.ScheduleEvent(EVENT_BETRAYAL_SHADOW_BOLT, 2s);
-            events.ScheduleEvent(EVENT_BETRAYAL_CRYSTAL, 5s);
-            events.ScheduleEvent(EVENT_BETRAYAL_COMBAT_TALK, 20s);
-        }
+        DoMeleeAttackIfReady();
+    }
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth() && !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-            {
-                damage = 0;
-                me->RemoveAllAuras();
-                me->CombatStop();
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetFaction(FACTION_FRIENDLY);
-                events.Reset();
-                events.ScheduleEvent(EVENT_BETRAYAL_4, 1s);
-            }
-        }
-
-        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->Id == SPELL_THROW_PORTAL_CRYSTAL)
-                if (Aura* aura = target->AddAura(SPELL_ARTHAS_PORTAL, target))
-                    aura->SetDuration(48000);
-        }
-
-        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->Id == SPELL_TOUCH_OF_DEATH)
-            {
-                me->CastSpell(me, SPELL_DRAKURU_DEATH, true);
-                me->CastSpell(me, SPELL_SUMMON_SKULL, true);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_BETRAYAL_1:
-                    Talk(SAY_DRAKURU_0);
-                    events.ScheduleEvent(EVENT_BETRAYAL_2, 5s);
-                    break;
-                case EVENT_BETRAYAL_2:
-                    me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6184.1f, -1969.9f, 586.76f, 4.5f);
-                    me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6222.9f, -2026.5f, 586.76f, 2.9f);
-                    me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6166.2f, -2065.4f, 586.76f, 1.4f);
-                    me->SummonCreature(NPC_BLIGHTBLOOD_TROLL, 6127.5f, -2008.7f, 586.76f, 0.0f);
-                    events.ScheduleEvent(EVENT_BETRAYAL_3, 5s);
-                    break;
-                case EVENT_BETRAYAL_3:
-                    Talk(SAY_DRAKURU_1);
-                    Talk(SAY_DRAKURU_2);
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                        player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
-                    if (Aura* aur = me->AddAura(SPELL_BLIGHT_FOG, me))
-                        aur->SetDuration(22000);
-                    break;
-                case EVENT_BETRAYAL_4:
-                    Talk(SAY_DRAKURU_5);
-                    events.ScheduleEvent(EVENT_BETRAYAL_5, 6s);
-                    break;
-                case EVENT_BETRAYAL_5:
-                    Talk(SAY_DRAKURU_6);
-                    me->CastSpell(me, SPELL_THROW_PORTAL_CRYSTAL, true);
-                    events.ScheduleEvent(EVENT_BETRAYAL_6, 8s);
-                    break;
-                case EVENT_BETRAYAL_6:
-                    me->SummonCreature(NPC_LICH_KING, 6142.9f, -2011.6f, 590.86f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 41000);
-                    events.ScheduleEvent(EVENT_BETRAYAL_7, 8s);
-                    break;
-                case EVENT_BETRAYAL_7:
-                    Talk(SAY_DRAKURU_7);
-                    events.ScheduleEvent(EVENT_BETRAYAL_8, 5s);
-                    break;
-                case EVENT_BETRAYAL_8:
-                    if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
-                        lich->AI()->Talk(SAY_LICH_7);
-                    events.ScheduleEvent(EVENT_BETRAYAL_9, 6s);
-                    break;
-                case EVENT_BETRAYAL_9:
-                    if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
-                    {
-                        lich->AI()->Talk(SAY_LICH_8);
-                        lich->CastSpell(me, SPELL_TOUCH_OF_DEATH, false);
-                    }
-                    events.ScheduleEvent(EVENT_BETRAYAL_10, 4s);
-                    break;
-                case EVENT_BETRAYAL_10:
-                    me->SetVisible(false);
-                    if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
-                        lich->AI()->Talk(SAY_LICH_9);
-                    events.ScheduleEvent(EVENT_BETRAYAL_11, 4s);
-                    break;
-                case EVENT_BETRAYAL_11:
-                    if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
-                        lich->AI()->Talk(SAY_LICH_10);
-                    events.ScheduleEvent(EVENT_BETRAYAL_12, 6s);
-                    break;
-                case EVENT_BETRAYAL_12:
-                    if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
-                        lich->AI()->Talk(SAY_LICH_11);
-                    events.ScheduleEvent(EVENT_BETRAYAL_13, 3s);
-                    break;
-                case EVENT_BETRAYAL_13:
-                    if (Creature* lich = ObjectAccessor::GetCreature(*me, lichGUID))
-                    {
-                        lich->AI()->Talk(SAY_LICH_12);
-                        lich->GetMotionMaster()->MovePoint(0, 6143.8f, -2011.5f, 590.9f);
-                    }
-                    events.ScheduleEvent(EVENT_BETRAYAL_14, 7s);
-                    break;
-                case EVENT_BETRAYAL_14:
-                    playerGUID.Clear();
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-            }
-
-            if (me->GetFaction() == FACTION_FRIENDLY || me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
-                return;
-
-            if (!UpdateVictim())
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_BETRAYAL_SHADOW_BOLT:
-                    if (!me->IsWithinMeleeRange(me->GetVictim()))
-                        me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
-                    events.Repeat(2s);
-                    break;
-                case EVENT_BETRAYAL_CRYSTAL:
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                        me->CastSpell(player, SPELL_THROW_BRIGHT_CRYSTAL, true);
-                    events.Repeat(6s, 15s);
-                    break;
-                case EVENT_BETRAYAL_COMBAT_TALK:
-                    Talk(SAY_DRAKURU_4);
-                    events.Repeat(20s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+private:
+    EventMap _events;
+    SummonList _summons;
+    ObjectGuid _playerGUID;
+    ObjectGuid _lichGUID;
 };
 
 /*####
@@ -868,7 +906,7 @@ void AddSC_zuldrak()
 {
     new npc_finklestein();
     new go_finklestein_cauldron();
-    new npc_overlord_drakuru_betrayal();
+    RegisterCreatureAI(npc_overlord_drakuru_betrayal);
     new npc_drakuru_shackles();
     new npc_captured_rageclaw();
     new npc_released_offspring_harkoa();
