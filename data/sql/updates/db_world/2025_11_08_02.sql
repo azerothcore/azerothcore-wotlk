@@ -1,3 +1,4 @@
+-- DB update 2025_11_08_01 -> 2025_11_08_02
 SET @BossXPMod = 7.5,
     @FinalBossXPMod = 10;
 
