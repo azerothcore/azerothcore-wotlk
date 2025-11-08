@@ -288,6 +288,7 @@ struct boss_anub_arak : public BossAI
                 if (_remainingLargeSummonsBeforeEmerge == 0)
                 {
                         events.Reset();
+                        events.SetPhase(PHASE_SUBMERGED);
                         events.ScheduleEvent(EVENT_EMERGE, 5s, 0, PHASE_SUBMERGED);
                 }
                 break;
