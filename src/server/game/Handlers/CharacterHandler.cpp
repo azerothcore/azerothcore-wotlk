@@ -1170,6 +1170,12 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         pCurrChar->RemoveUnitFlag(UNIT_FLAG_STUNNED);
     }
 
+    if (pCurrChar->GetPendingFlightChange() <= pCurrChar->GetMapChangeOrderCounter())
+    {
+        if (!pCurrChar->HasIncreaseMountedFlightSpeedAura() && !pCurrChar->HasFlyAura())
+            pCurrChar->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
+    }
+
     pCurrChar->SendInitialPacketsBeforeAddToMap();
 
     // necessary actions from AddPlayerToMap:
