@@ -143,7 +143,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CURSE_OF_LIFE:
-                    DoCastRandomTarget(SPELL_CURSE_OF_LIFE, 0.0f, 30.0f, false);
+                    DoCastRandomTarget(SPELL_CURSE_OF_LIFE, 0, 30.0f, false);
                     events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13s);
                     break;
                 case EVENT_SPELL_SHADOW_VOLLEY:
