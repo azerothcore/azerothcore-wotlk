@@ -47,11 +47,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Drakuru's Last Wish
 UPDATE `gameobject_template_addon` SET `flags` = 32 WHERE (`entry` = 202357);
 
--- TESTING: 60s respawn
-DELETE FROM `creature` WHERE (`id1` = 28998) AND (`guid` IN (1974609));
-INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `Comment`, `VerifiedBuild`) VALUES
-(1974609, 28998, 0, 0, 571, 0, 0, 1, 1, 0, 6175.25, -2017.65, 590.961, 3.00197, 60, 0, 0, 550001, 0, 0, 0, 0, 0, '', NULL, 63906);
-
 -- Skull and Portal spells target 'Totally Generic Bunny (JSB)'
 DELETE FROM `creature` WHERE (`id1` = 28960) and `guid` IN (98914, 98920);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `Comment`, `VerifiedBuild`) VALUES
