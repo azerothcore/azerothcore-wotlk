@@ -133,13 +133,13 @@ struct boss_anub_arak : public BossAI
             DoCastSelf(SPELL_IMPALE_PERIODIC, true);
 
             ++_submergePhase;
+            events.Reset();
             ScheduleSubmerged();
         }
     }
 
     void ScheduleEmerged()
     {
-        events.Reset();
         events.SetPhase(PHASE_EMERGED);
         events.ScheduleEvent(EVENT_CARRION_BEETLES, 6500ms, 0, PHASE_EMERGED);
         events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, 0, PHASE_EMERGED);
@@ -148,7 +148,6 @@ struct boss_anub_arak : public BossAI
 
     void ScheduleSubmerged()
     {
-        events.Reset();
         events.SetPhase(PHASE_SUBMERGED);
         events.ScheduleEvent(EVENT_EMERGE, 60s, 0, PHASE_SUBMERGED);
 
@@ -209,9 +208,8 @@ struct boss_anub_arak : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
 
