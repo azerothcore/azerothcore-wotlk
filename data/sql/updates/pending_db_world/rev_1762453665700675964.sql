@@ -1,3 +1,4 @@
+-- Update frFR ; from WowHead WOTLK
 -- OLD name : Nervi de pacotille
 -- Source : https://www.wowhead.com/wotlk/fr/npc=38
 UPDATE `creature_template_locale` SET `Name` = 'Nervi défias' WHERE `locale` = 'frFR' AND `entry` = 38;
