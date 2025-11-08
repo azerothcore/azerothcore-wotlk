@@ -1,3 +1,4 @@
+-- DB update 2025_11_07_02 -> 2025_11_08_00
 /* We are updating XP modifiers across the board.
 These lists are creature entries that are rank higher than 0 and in instances.
 They are separated by their expansion value, sorted by entry ID.
