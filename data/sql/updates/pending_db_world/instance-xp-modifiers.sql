@@ -1,13 +1,13 @@
 /* We are updating XP modifiers across the board.
 These lists are creature entries that are rank higher than 0 and in instances.
 They are separated by their expansion value, sorted by entry ID.
-I am setting them to 1.75 for now to match the current multiplier from AC's formula,
-but that is likely wrong, will confirm with others as to what a good baseline is.
+AC's current formula would have these set to 1.35, but that is almost certainly wrong.
+There are absolutely exceptions to the values shown in these updates, but they will need to be assessed pretty individually.
 Do note that the double XP modifier from elites is still in place.
 */
 
 -- Expansion 0 (Vanilla) creatures
-UPDATE `creature_template` SET `ExperienceModifier` = 1.75 WHERE `entry` IN (
+UPDATE `creature_template` SET `ExperienceModifier` = 1.25 WHERE `entry` IN (
 622,
 634,
 636,
