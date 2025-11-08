@@ -39,8 +39,8 @@ UPDATE `creature_template` SET `ExperienceModifier` = @BossXPMod WHERE `entry` I
 31362,
 26631, -- Novos the Summoner
 31350,
-27483, -- King Dred
-31349,
+-- 27483, -- King Dred, observed to not give as much experience as this
+-- 31349,
 -- The Violet Hold
 29315, -- Erekem
 31507,
@@ -57,8 +57,8 @@ UPDATE `creature_template` SET `ExperienceModifier` = @BossXPMod WHERE `entry` I
 -- Gundrak
 29304, -- Slad'ran
 31370,
-29573, -- Drakkari Elemental
-31367,
+-- 29573, -- Drakkari Elemental, observed to not give as much experience as this
+-- 31367,
 29305, -- Moorabi
 30530,
 29932, -- Eck the Ferocious
