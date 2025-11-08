@@ -1519,11 +1519,18 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
 
     mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
 
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
+
     if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
     {
         recv_data.rfinish();                     // prevent warnings spam
         return;
     }
+
+    if (_player->GetPendingFlightChange() == counter && opcode == CMSG_MOVE_SET_CAN_FLY_ACK)
+        _player->SetPendingFlightChange(false);
 
     Opcodes response;
 

@@ -66,7 +66,7 @@ struct boss_ambassador_hellmaw : public BossAI
         }
         else
         {
-            me->GetMotionMaster()->MovePath(PATH_ID_START, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_ID_START, false);
         }
     }
 
@@ -88,7 +88,7 @@ struct boss_ambassador_hellmaw : public BossAI
         DoPlaySoundToSet(me, SOUND_INTRO);
         isBanished = false;
         me->SetImmuneToAll(false);
-        me->GetMotionMaster()->MovePath(PATH_ID_START, false);
+        me->GetMotionMaster()->MoveWaypoint(PATH_ID_START, false);
     }
 
     void JustEngagedWith(Unit*) override
@@ -142,7 +142,7 @@ struct boss_ambassador_hellmaw : public BossAI
         {
             me->m_Events.AddEventAtOffset([this]()
             {
-                me->GetMotionMaster()->MovePath(PATH_ID_PATHING, true);
+                me->GetMotionMaster()->MoveWaypoint(PATH_ID_PATHING, true);
             }, 20s);
         }
     }
