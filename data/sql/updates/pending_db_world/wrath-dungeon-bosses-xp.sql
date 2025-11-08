@@ -137,7 +137,6 @@ UPDATE `creature_template` SET `ExperienceModifier` = @BossXPMod WHERE `entry` I
 38603
 );
 
-
 UPDATE `creature_template` SET `ExperienceModifier` = @FinalBossXPMod WHERE `entry` IN (
 23954, -- Ingvar the Plunderer, Utgarde Keep
 31673,
