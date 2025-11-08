@@ -216,7 +216,7 @@ struct boss_anub_arak : public BossAI
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
 
         events.SetPhase(PHASE_EMERGED);
-        events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s);
+        events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s, 0, PHASE_EMERGED);
         ScheduleEmerged();
 
         // set up world triggers
@@ -288,7 +288,7 @@ struct boss_anub_arak : public BossAI
                 if (_remainingLargeSummonsBeforeEmerge == 0)
                 {
                         events.Reset();
-                        events.ScheduleEvent(EVENT_EMERGE, 5s);
+                        events.ScheduleEvent(EVENT_EMERGE, 5s, 0, PHASE_SUBMERGED);
                 }
                 break;
             }
@@ -333,10 +333,10 @@ struct boss_anub_arak : public BossAI
                     DoCastSelf(SPELL_SELF_ROOT, true);
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
-                    events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms);
+                    events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms, 0, PHASE_EMERGED);
                     DoCast(target, SPELL_POUND);
                 }
-                events.ScheduleEvent(EVENT_POUND, 18s);
+                events.ScheduleEvent(EVENT_POUND, 18s, 0, PHASE_EMERGED);
                 break;
             case EVENT_ENABLE_ROTATE:
                 me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
