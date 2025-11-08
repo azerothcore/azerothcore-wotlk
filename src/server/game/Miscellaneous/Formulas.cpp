@@ -84,14 +84,9 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
         if (gain && creature)
         {
             if (creature->isElite())
-            {
-                // Elites in instances have a 2.75x XP bonus instead of the regular 2x world bonus.
-                if (unit->GetMap() && unit->GetMap()->IsDungeon())
-                    xpMod *= 2.75f;
-                else
-                    xpMod *= 2.0f;
-            }
+                xpMod *= 2.0f;
 
+            // Instanced mobs (particularly bosses) oftentimes have higher bonuses, especially in later content levels
             xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 
