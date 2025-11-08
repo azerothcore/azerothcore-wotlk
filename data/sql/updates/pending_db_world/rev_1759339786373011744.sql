@@ -6,6 +6,12 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 
 UPDATE `creature_template` SET `ArmorModifier` = 0 WHERE (`entry` = 32227);
 
+-- Disable Gravity, allows Parachute on exit
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` IN (31884, 32227));
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(31884, 0, 0, 1, 0, 0, 0, 0),
+(32227, 0, 0, 1, 0, 0, 0, 0);
+
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 18) AND (`SourceGroup` IN (31884, 32227)) AND (`SourceEntry` = 46598) AND (`SourceId` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (18, 31884, 46598, 0, 0, 9, 0, 13310, 0, 0, 0, 0, 0, '', 'Kor\'kron Suppression Turret requires player to be on quest Assault by Air'),
