@@ -44,7 +44,7 @@ public:
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");
             boost::system::error_code errorCode;
-            _acceptor.assign(_endpoint.protocol(), listen_fd, errorCode);
+            _acceptor.assign(boost::asio::ip::tcp::v4(), listen_fd, errorCode);
             if (errorCode)
                 LOG_WARN("network", "Failed to assign socket {}", errorCode.message());
         }
