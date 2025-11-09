@@ -1,3 +1,4 @@
+-- DB update 2025_11_09_02 -> 2025_11_09_03
 --
 -- Fixes "Bluff", Set `allowOverride` of action list
 UPDATE `smart_scripts` SET `action_param3` = 1 WHERE (`entryorguid` IN (23672, 23673, 23675, 24271)) AND (`source_type` = 0) AND (`event_type` = 8) AND (`event_param1` = 44609);
