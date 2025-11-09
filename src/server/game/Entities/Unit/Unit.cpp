@@ -19586,12 +19586,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
 
         sScriptMgr->AnticheatSetUnderACKmount(player);
     }
-    else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
-    {
-        WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-        data << GetPackGUID();
-        SendMessageToSet(&data, false);
-    }
 
     // xinef: hack for flameleviathan seat vehicle
     VehicleEntry const* vehicleInfo = vehicle->GetVehicleInfo();
