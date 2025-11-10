@@ -308,6 +308,76 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
     }
 }
 
+static inline bool _finiteF(float v) { return std::isfinite(v); }
+namespace { constexpr float INV_SQRT2 = 0.70710678118654752440f; }
+
+float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSearchDist, uint32 phasemask,
+                                        float radius, float yaw, float blend, float clamp, float sampleDelta) const
+{
+    auto sample = [&](float sx, float sy) -> float
+    {
+        G3D::Vector3 v(sx, sy, z);
+        G3D::Ray r(v, G3D::Vector3(0, 0, -1));
+        float dist = maxSearchDist;
+        DynamicTreeIntersectionCallback cb(phasemask, VMAP::ModelIgnoreFlags::Nothing);
+        impl->intersectZAllignedRay(r, cb, dist);
+        if (cb.didHit())
+            return z - dist;
+        return std::numeric_limits<float>::quiet_NaN();
+    };
+
+    const float h0 = sample(x, y);
+    if (!_finiteF(h0))
+        return -G3D::finf();
+
+    if (radius <= 0.0f)
+        return h0;
+
+    const float d = (sampleDelta > 0.0f) ? sampleDelta
+                                         : std::max(0.05f, std::min(0.5f, radius * 0.5f));
+
+    const float hx1 = sample(x + d, y);
+    const float hx2 = sample(x - d, y);
+    const float hy1 = sample(x, y + d);
+    const float hy2 = sample(x, y - d);
+
+    auto diff = [&](float p, float m) -> float
+    {
+        if (_finiteF(p) && _finiteF(m)) return (p - m) / (2.0f * d);
+        if (_finiteF(p))               return (p - h0) / d;
+        if (_finiteF(m))               return (h0 - m) / d;
+        return 0.0f;
+    };
+
+    float gx = diff(hx1, hx2); // dz/dx
+    float gy = diff(hy1, hy2); // dz/dy
+
+    if (clamp > 0.0f)
+    {
+        const float g2 = gx*gx + gy*gy;
+        const float c2 = clamp*clamp;
+        if (g2 > c2)
+        {
+            const float s = clamp / std::sqrt(g2);
+            gx *= s; gy *= s;
+        }
+    }
+
+    const float slopeL2 = std::sqrt(std::max(0.0f, gx*gx + gy*gy));
+    float totalSlope = slopeL2;
+
+    if (blend < 1.0f)
+    {
+        float c = std::cos(yaw), s = std::sin(yaw);
+        float rx =  gx * c + gy * s;
+        float ry = -gx * s + gy * c;
+        float slopeL1 = std::abs(rx) + std::abs(ry);
+        totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
+    }
+
+    return h0 + radius * totalSlope;
+}
+
 bool DynamicMapTree::GetAreaInfo(float x, float y, float& z, uint32 phasemask, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
 {
     G3D::Vector3 v(x, y, z + 0.5f);
