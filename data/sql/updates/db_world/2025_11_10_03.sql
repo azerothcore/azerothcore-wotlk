@@ -1,3 +1,4 @@
+-- DB update 2025_11_10_02 -> 2025_11_10_03
 --
 -- Increase grid searches to 60 from 40
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2572900) AND (`source_type` = 9) AND (`id` IN (2, 5));
