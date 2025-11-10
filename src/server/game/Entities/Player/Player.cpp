@@ -4466,7 +4466,6 @@ void Player::BuildPlayerRepop()
     }
     GetMap()->AddToMap(corpse);
     SetHealth(1); // convert player body to ghost
-    SetMovement(MOVE_WATER_WALK);
     SetWaterWalking(true);
 
     if (!IsImmobilizedState())
