@@ -41,6 +41,7 @@ enum VolkhanOther
     NPC_VOLKHAN_ANVIL                   = 28823,
     NPC_MOLTEN_GOLEM                    = 28695,
     NPC_BRITTLE_GOLEM                   = 28681,
+    NPC_SLAG                            = 28585,
 
     // Misc
     ACTION_SHATTER                      = 1,
@@ -77,7 +78,7 @@ enum Yells
 
 struct boss_volkhan : public BossAI
 {
-    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN), summons(creature) { }
+    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN) { }
 
     void Reset() override
     {
@@ -104,6 +105,18 @@ struct boss_volkhan : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
+
+        std::list<Creature*> slags;
+        GetCreatureListWithEntryInGrid(slags, me, NPC_SLAG, 100.0f);
+
+        if (!slags.empty())
+        {
+            for (Creature* slag : slags)
+            {
+                if (slag)
+                    slag->DespawnOrUnsummon();
+            }
+        }
     }
 
     void GetNextPos()
@@ -286,8 +299,6 @@ struct boss_volkhan : public BossAI
     }
 
     private:
-        EventMap events;
-        SummonList summons;
         float x, y, z;
         uint8 PointID;
         uint8 ShatteredCount;
