@@ -160,9 +160,9 @@ public:
             LOG_INFO("chat.channel." + channelName, "Player {} tells channel {}: {}",
                 player->GetName(), channelName, msg);
         }
-    }
 
-    return true;
+        return true;
+    }
 };
 
 void AddSC_chat_log()
