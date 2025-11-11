@@ -4104,7 +4104,7 @@ void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRAD
     }
 }
 
-void Player::UpdateSoulboundTradeItems() // -- saw
+void Player::UpdateSoulboundTradeItems()
 {
     std::lock_guard<std::mutex> guard(m_soulboundTradableLock);
     if (m_itemSoulboundTradeable.empty())
