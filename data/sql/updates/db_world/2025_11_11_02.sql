@@ -1,3 +1,4 @@
+-- DB update 2025_11_11_01 -> 2025_11_11_02
 -- Update gameobject 'Wild Mustard' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (192827)) AND (`guid` IN (100121, 100244, 100245, 100246, 100247, 100248, 100249, 100411, 100412, 57471, 57472, 57473, 57475, 57476, 57477, 57478, 57479, 57480, 57481, 57482, 57483));
