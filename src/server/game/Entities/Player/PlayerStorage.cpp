@@ -4104,7 +4104,7 @@ void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRAD
     }
 }
 
-void Player::UpdateSoulboundTradeItems()
+void Player::UpdateSoulboundTradeItems() // -- saw
 {
     std::lock_guard<std::mutex> guard(m_soulboundTradableLock);
     if (m_itemSoulboundTradeable.empty())
@@ -4113,17 +4113,28 @@ void Player::UpdateSoulboundTradeItems()
     // also checks for garbage data
     for (ItemDurationList::iterator itr = m_itemSoulboundTradeable.begin(); itr != m_itemSoulboundTradeable.end();)
     {
-        ASSERT(*itr);
-        if ((*itr)->GetOwnerGUID() != GetGUID())
+        Item* item = *itr;
+        if (!item)
         {
-            m_itemSoulboundTradeable.erase(itr++);
+            itr = m_itemSoulboundTradeable.erase(itr);
             continue;
         }
-        if ((*itr)->CheckSoulboundTradeExpire())
+
+        // Sanity check — make sure the object still exists and is ours
+        if (item->IsInWorld() && item->GetOwnerGUID() == GetGUID())
         {
-            m_itemSoulboundTradeable.erase(itr++);
+            if (item->CheckSoulboundTradeExpire())
+            {
+                itr = m_itemSoulboundTradeable.erase(itr);
+                continue;
+            }
+        }
+        else
+        {
+            itr = m_itemSoulboundTradeable.erase(itr);
             continue;
         }
+
         ++itr;
     }
 }
