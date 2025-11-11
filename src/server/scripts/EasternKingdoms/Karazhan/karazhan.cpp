@@ -219,24 +219,21 @@ public:
             {
                 case EVENT_OZ:
                     text = OzDialogue[count].textid;
-                    if (OzDialogue[count].timer)
-                        TalkTimer = OzDialogue[count].timer;
+                    TalkTimer = OzDialogue[count].timer;
                     break;
-
                 case EVENT_HOOD:
                     text = HoodDialogue[count].textid;
-                    if (HoodDialogue[count].timer)
-                        TalkTimer = HoodDialogue[count].timer;
+                    TalkTimer = HoodDialogue[count].timer;
                     break;
-
                 case EVENT_RAJ:
                     text = RAJDialogue[count].textid;
-                    if (RAJDialogue[count].timer)
-                        TalkTimer = RAJDialogue[count].timer;
+                    TalkTimer = RAJDialogue[count].timer;
                     break;
+                default:
+                    return;
             }
 
-                CreatureAI::Talk(text);
+            CreatureAI::Talk(text);
         }
 
         void PrepareEncounter()
