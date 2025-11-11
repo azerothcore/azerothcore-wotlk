@@ -51,6 +51,7 @@
 #include "QuestDef.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "ScriptObjectFwd.h"
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
@@ -539,7 +540,7 @@ Item* Player::GetShield(bool useable) const
     return item;
 }
 
-uint8 Player::GetAttackBySlot(uint8 slot)
+WeaponAttackType Player::GetAttackBySlot(uint8 slot)
 {
     switch (slot)
     {
@@ -1847,8 +1848,13 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
                             return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
                 }
 
-                if (IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer != 0)
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;         // maybe exist better err
+                if (IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC))
+                {
+                    uint32 cooldownSpell = IsClass(CLASS_ROGUE, CLASS_CONTEXT_WEAPON_SWAP) ? 6123 : 6119;
+                    uint32 startRecoveryTime = sSpellMgr->GetSpellInfo(cooldownSpell)->StartRecoveryTime;
+                    if (m_weaponChangeTimer != 0 && m_weaponChangeTimer != startRecoveryTime)
+                        return EQUIP_ERR_CANT_DO_RIGHT_NOW;         // maybe exist better err
+                }
 
                 if (IsNonMeleeSpellCast(false))
                     return EQUIP_ERR_CANT_DO_RIGHT_NOW;
