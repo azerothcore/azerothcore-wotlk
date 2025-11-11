@@ -604,9 +604,9 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
     else
         return nullptr;
 }
+
 void ScriptedAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason reason)
 {
-    ScriptedAI::OnSpellCastFinished(spellInfo, reason);
     // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
     if (_nextHealthCheck.IsPending() && me->IsInCombat())
     {
