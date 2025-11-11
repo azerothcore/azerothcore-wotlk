@@ -190,7 +190,8 @@ bool SummonList::IsAnyCreatureInCombat() const
 }
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
-    me(creature)
+    me(creature),
+    _nextHealthCheck(0, { }, false)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -215,6 +216,16 @@ void ScriptedAI::AttackStart(Unit* who)
         AttackStartNoMove(who);
 }
 
+void ScriptedAI::Reset()
+{
+    _healthCheckEvents.clear();
+}
+
+void ScriptedAI::JustDied(Unit* /*killer*/)
+{
+    _healthCheckEvents.clear();
+}
+
 void ScriptedAI::UpdateAI(uint32 /*diff*/)
 {
     //Check if we have a current target
@@ -229,6 +240,20 @@ void ScriptedAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectTyp
 {
     if (IsInvincible() && damage >= me->GetHealth())
         damage = me->GetHealth() - 1;
+
+    if (!_nextHealthCheck.HasBeenProcessed())
+    {
+        if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
+        {
+            if (!_nextHealthCheck._allowedWhileCasting && me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PENDING);
+                return;
+            }
+
+            ProcessHealthCheck();
+        }
+    }
 }
 
 void ScriptedAI::DoStartMovement(Unit* victim, float distance, float angle)
@@ -579,14 +604,65 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
     else
         return nullptr;
 }
+void ScriptedAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason reason)
+{
+    ScriptedAI::OnSpellCastFinished(spellInfo, reason);
+    // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
+    if (_nextHealthCheck.IsPending() && me->IsInCombat())
+    {
+        _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PROCESSED);
+        // This must be delayed because creature might still have unit state casting at this point, which might break scripts.
+        scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                 context.Repeat();
+            else
+                ProcessHealthCheck();
+        });
+    }
+}
+
+/**
+ * @brief Executes a function once the creature reaches the defined health point percent.
+ *
+ * @param healthPct The health percent at which the code will be executed.
+ * @param exec The fuction to be executed.
+ * @param allowedWhileCasting If false, the event will not be checked while the creature is casting.
+ */
+void ScriptedAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
+{
+    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec, HEALTH_CHECK_SCHEDULED, allowedWhileCasting));
+    _nextHealthCheck = _healthCheckEvents.front();
+};
+
+void ScriptedAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
+{
+    for (auto const& checks : healthPct)
+        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec, HEALTH_CHECK_SCHEDULED, allowedWhileCasting));
+
+    _nextHealthCheck = _healthCheckEvents.front();
+}
+
+void ScriptedAI::ProcessHealthCheck()
+{
+    _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PROCESSED);
+    _nextHealthCheck._exec();
+
+    _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+    {
+        return data._healthPct == _nextHealthCheck._healthPct;
+    });
+
+    if (!_healthCheckEvents.empty())
+        _nextHealthCheck = _healthCheckEvents.front();
+}
 
 // BossAI - for instanced bosses
 
 BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     instance(creature->GetInstanceScript()),
     summons(creature),
-    _bossId(bossId),
-    _nextHealthCheck(0, { }, false)
+    _bossId(bossId)
 {
     callForHelpRange = 0.0f;
     if (instance)
@@ -628,7 +704,7 @@ void BossAI::_Reset()
     me->m_Events.KillAllEvents(false);
     summons.DespawnAll();
     ClearUniqueTimedEventsDone();
-    _healthCheckEvents.clear();
+    ScriptedAI::Reset();
     if (instance)
         instance->SetBossState(_bossId, NOT_STARTED);
 }
@@ -638,7 +714,7 @@ void BossAI::_JustDied()
     events.Reset();
     scheduler.CancelAll();
     summons.DespawnAll();
-    _healthCheckEvents.clear();
+    ScriptedAI::JustDied(nullptr);
     if (instance)
     {
         instance->SetBossState(_bossId, DONE);
@@ -736,78 +812,6 @@ void BossAI::UpdateAI(uint32 diff)
 
     if (IsAutoAttackAllowed())
         DoMeleeAttackIfReady();
-}
-
-void BossAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason reason)
-{
-    ScriptedAI::OnSpellCastFinished(spellInfo, reason);
-    // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
-    if (_nextHealthCheck.IsPending() && me->IsInCombat())
-    {
-        _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PROCESSED);
-        // This must be delayed because creature might still have unit state casting at this point, which might break scripts.
-        scheduler.Schedule(1s, [this](TaskContext context)
-        {
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                context.Repeat();
-            else
-                ProcessHealthCheck();
-        });
-    }
-}
-
-void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
-{
-    ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
-
-    if (!_nextHealthCheck.HasBeenProcessed())
-    {
-        if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
-        {
-            if (!_nextHealthCheck._allowedWhileCasting && me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PENDING);
-                return;
-            }
-
-            ProcessHealthCheck();
-        }
-    }
-}
-
-/**
- * @brief Executes a function once the creature reaches the defined health point percent.
- *
- * @param healthPct The health percent at which the code will be executed.
- * @param exec The fuction to be executed.
- * @param allowedWhileCasting If false, the event will not be checked while the creature is casting.
- */
-void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
-{
-    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec, HEALTH_CHECK_SCHEDULED, allowedWhileCasting));
-    _nextHealthCheck = _healthCheckEvents.front();
-};
-
-void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
-{
-    for (auto const& checks : healthPct)
-        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec, HEALTH_CHECK_SCHEDULED, allowedWhileCasting));
-
-    _nextHealthCheck = _healthCheckEvents.front();
-}
-
-void BossAI::ProcessHealthCheck()
-{
-    _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PROCESSED);
-    _nextHealthCheck._exec();
-
-    _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
-    {
-        return data._healthPct == _nextHealthCheck._healthPct;
-    });
-
-    if (!_healthCheckEvents.empty())
-        _nextHealthCheck = _healthCheckEvents.front();
 }
 
 void BossAI::ScheduleEnrageTimer(uint32 spellId, Milliseconds timer, uint8 textId /*= 0*/)

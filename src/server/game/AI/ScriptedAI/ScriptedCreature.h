@@ -186,6 +186,29 @@ public:
     }
 };
 
+enum HealthCheckStatus
+{
+    HEALTH_CHECK_PROCESSED,
+    HEALTH_CHECK_SCHEDULED,
+    HEALTH_CHECK_PENDING
+};
+
+struct HealthCheckEventData
+{
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, uint8 status = HEALTH_CHECK_SCHEDULED, bool allowedWhileCasting = true, Milliseconds Delay = 0ms) : _healthPct(healthPct), _exec(exec), _status(status), _allowedWhileCasting(allowedWhileCasting), _delay(Delay) {};
+
+    uint8 _healthPct;
+    std::function<void()> _exec;
+    uint8 _status;
+    bool _allowedWhileCasting;
+    Milliseconds _delay;
+
+    [[nodiscard]] bool HasBeenProcessed() const { return _status == HEALTH_CHECK_PROCESSED; };
+    [[nodiscard]] bool IsPending() const { return _status == HEALTH_CHECK_PENDING; };
+    [[nodiscard]] Milliseconds GetDelay() const { return _delay; };
+    void UpdateStatus(uint8 status) { _status = status; };
+};
+
 struct ScriptedAI : public CreatureAI
 {
     explicit ScriptedAI(Creature* creature);
@@ -204,7 +227,7 @@ struct ScriptedAI : public CreatureAI
     void UpdateAI(uint32 diff) override;
 
     //Called at creature death
-    void JustDied(Unit* /*killer*/) override {}
+    void JustDied(Unit* /*killer*/) override;
 
     //Called at creature killing another unit
     void KilledUnit(Unit* /*victim*/) override {}
@@ -284,7 +307,7 @@ struct ScriptedAI : public CreatureAI
     // *************
 
     //Called at creature reset either by death or evade
-    void Reset() override {}
+    void Reset() override;
 
     //Called at creature aggro either by MoveInLOS or Attack Start
     void JustEngagedWith(Unit* /*who*/) override {}
@@ -438,6 +461,11 @@ struct ScriptedAI : public CreatureAI
 
     Player* SelectTargetFromPlayerList(float maxdist, uint32 excludeAura = 0, bool mustBeInLOS = false) const;
 
+    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override;
+    void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
+    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
+    void ProcessHealthCheck();
+
     // Allows dropping to 1 HP but prevents creature from dying.
     void SetInvincibility(bool apply) { _invincible = apply; };
     [[nodiscard]] bool IsInvincible() const { return _invincible; };
@@ -452,29 +480,8 @@ private:
     bool _invincible;
     bool _canAutoAttack;
     std::unordered_set<uint32> _uniqueTimedEvents;
-};
-
-enum HealthCheckStatus
-{
-    HEALTH_CHECK_PROCESSED,
-    HEALTH_CHECK_SCHEDULED,
-    HEALTH_CHECK_PENDING
-};
-
-struct HealthCheckEventData
-{
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, uint8 status = HEALTH_CHECK_SCHEDULED, bool allowedWhileCasting = true, Milliseconds Delay = 0ms) : _healthPct(healthPct), _exec(exec), _status(status), _allowedWhileCasting(allowedWhileCasting), _delay(Delay) { };
-
-    uint8 _healthPct;
-    std::function<void()> _exec;
-    uint8 _status;
-    bool _allowedWhileCasting;
-    Milliseconds _delay;
-
-    [[nodiscard]] bool HasBeenProcessed() const { return _status == HEALTH_CHECK_PROCESSED; };
-    [[nodiscard]] bool IsPending() const { return _status == HEALTH_CHECK_PENDING; };
-    [[nodiscard]] Milliseconds GetDelay() const { return _delay; };
-    void UpdateStatus(uint8 status) { _status = status; };
+    std::list<HealthCheckEventData> _healthCheckEvents;
+    HealthCheckEventData _nextHealthCheck;
 };
 
 class BossAI : public ScriptedAI
@@ -489,17 +496,11 @@ public:
 
     bool CanRespawn() override;
 
-    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override;
-    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
     void SummonedCreatureDespawnAll() override;
 
     void UpdateAI(uint32 diff) override;
-
-    void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
-    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
-    void ProcessHealthCheck();
 
     // @brief Casts the spell after the fixed time and says the text id if provided. Timer will run even if the creature is casting or out of combat.
     // @param spellId The spell to cast.
@@ -534,8 +535,6 @@ protected:
 
 private:
     uint32 const _bossId;
-    std::list<HealthCheckEventData> _healthCheckEvents;
-    HealthCheckEventData _nextHealthCheck;
 };
 
 class WorldBossAI : public ScriptedAI
