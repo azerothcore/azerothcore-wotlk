@@ -5,6 +5,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Rohling der Defias' WHERE `local
 -- OLD name : Niederer Sukkubus
 -- Source : https://www.wowhead.com/wotlk/de/npc=49
 UPDATE `creature_template_locale` SET `Name` = 'Geringer Sukkubus' WHERE `locale` = 'deDE' AND `entry` = 49;
+-- OLD name : [UNUSED] Lower Class Citizen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=70
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 70;
+-- OLD name : Level 20 Unkillable Test Dummy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=72
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 72;
+-- OLD name : [UNUSED] Vashaum Nightwither (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=75
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 75;
+-- OLD name : [UNUSED] Luglar the Clogger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=81
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 81;
 -- OLD name : Taschendieb
 -- Source : https://www.wowhead.com/wotlk/de/npc=94
 UPDATE `creature_template_locale` SET `Name` = 'Taschendieb der Defias' WHERE `locale` = 'deDE' AND `entry` = 94;
@@ -14,12 +26,36 @@ UPDATE `creature_template_locale` SET `Name` = 'Kodobestie' WHERE `locale` = 'de
 -- OLD name : Bandit
 -- Source : https://www.wowhead.com/wotlk/de/npc=116
 UPDATE `creature_template_locale` SET `Name` = 'Bandit der Defias' WHERE `locale` = 'deDE' AND `entry` = 116;
+-- OLD name : [UNUSED] Small Black Dragon Whelp (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=149
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 149;
+-- OLD name : [UNUSED] Ander the Monk (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=161
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 161;
+-- OLD name : [UNUSED] Destitute Farmer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=163
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 163;
+-- OLD name : [UNUSED] Small Child (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=165
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 165;
 -- OLD subname : Magierlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=198
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = 'deDE' AND `entry` = 198;
 -- OLD name : Verrottender Schrecken
 -- Source : https://www.wowhead.com/wotlk/de/npc=202
 UPDATE `creature_template_locale` SET `Name` = 'Skelettschrecken' WHERE `locale` = 'deDE' AND `entry` = 202;
+-- OLD name : [UNUSED] Cackle Flamebone (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=204
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 204;
+-- OLD name : [UNUSED] Riverpaw Hideflayer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=207
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 207;
+-- OLD name : [UNUSED] Riverpaw Pack Warder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=208
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 208;
+-- OLD name : [UNUSED] Riverpaw Bone Chanter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=209
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 209;
 -- OLD name : Thornton Fellwood, subname : Woodcrafter
 -- Source : https://www.wowhead.com/wotlk/de/npc=230
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 230;
@@ -27,15 +63,27 @@ INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALU
 -- OLD name : Marschall Gryan Starkmantel, subname : Die Westfallbrigade
 -- Source : https://www.wowhead.com/wotlk/de/npc=234
 UPDATE `creature_template_locale` SET `Name` = 'Gryan Starkmantel',`Title` = 'Die Volksmiliz' WHERE `locale` = 'deDE' AND `entry` = 234;
+-- OLD name : [UNUSED] Greeby Mudwhisker TEST (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=243
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 243;
+-- OLD name : [UNUSED] Elwynn Tower Guard (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=260
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 260;
 -- OLD name : [DND] Wounded Lion's Footman
 -- Source : https://www.wowhead.com/wotlk/de/npc=262
 UPDATE `creature_template_locale` SET `Name` = 'Ein halb aufgefressener Körper' WHERE `locale` = 'deDE' AND `entry` = 262;
 -- OLD name : Koboldpanzer
 -- Source : https://www.wowhead.com/wotlk/de/npc=281
 UPDATE `creature_template_locale` SET `Name` = 'Koboldtank' WHERE `locale` = 'deDE' AND `entry` = 281;
+-- OLD name : [UNUSED] Goodmother Jans (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=296
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 296;
 -- OLD name : Junger Wolf
 -- Source : https://www.wowhead.com/wotlk/de/npc=299
 UPDATE `creature_template_locale` SET `Name` = 'Erkrankter junger Wolf' WHERE `locale` = 'deDE' AND `entry` = 299;
+-- OLD name : [UNUSED] Brog'Mud (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=301
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 301;
 -- OLD name : Schimmel
 -- Source : https://www.wowhead.com/wotlk/de/npc=305
 UPDATE `creature_template_locale` SET `Name` = 'Reitpferd (Schimmel)' WHERE `locale` = 'deDE' AND `entry` = 305;
@@ -45,12 +93,45 @@ UPDATE `creature_template_locale` SET `Name` = 'Reitpferd (Palomino)' WHERE `loc
 -- OLD name : "Buried Upside-Down" Vehicle
 -- Source : https://www.wowhead.com/wotlk/de/npc=309
 UPDATE `creature_template_locale` SET `Name` = 'Rolfs Leichnam' WHERE `locale` = 'deDE' AND `entry` = 309;
+-- OLD name : [UNUSED] Brother Akil (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=318
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 318;
+-- OLD name : [UNUSED] Brother Benthas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=319
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 319;
+-- OLD name : [UNUSED] Brother Cryus (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=320
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 320;
+-- OLD name : [UNUSED] Brother Deros (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=321
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 321;
+-- OLD name : [UNUSED] Brother Enoch (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=322
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 322;
+-- OLD name : [UNUSED] Brother Heller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=323
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 323;
+-- OLD name : [UNUSED] Brother Greishan (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=324
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 324;
+-- OLD name : [UNUSED] Brother Ictharin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=326
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 326;
 -- OLD subname : Magierlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=328
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = 'deDE' AND `entry` = 328;
 -- OLD subname : Anführer des SI:7
 -- Source : https://www.wowhead.com/wotlk/de/npc=332
 UPDATE `creature_template_locale` SET `Title` = 'Anführer von SI:7' WHERE `locale` = 'deDE' AND `entry` = 332;
+-- OLD name : [UNUSED] Edwardo the Jester (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=333
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 333;
+-- OLD name : [UNUSED] Rin Tal'Vara (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=336
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 336;
+-- OLD name : [UNUSED] Helgor the Pugilist (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=339
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 339;
 -- OLD name : Winterwolf
 -- Source : https://www.wowhead.com/wotlk/de/npc=359
 UPDATE `creature_template_locale` SET `Name` = 'Reitwolf (Winter)' WHERE `locale` = 'deDE' AND `entry` = 359;
@@ -60,6 +141,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Marek Winterborn' WHERE `locale`
 -- OLD subname : Waitress
 -- Source : https://www.wowhead.com/wotlk/de/npc=379
 UPDATE `creature_template_locale` SET `Title` = 'Kellnerin' WHERE `locale` = 'deDE' AND `entry` = 379;
+-- OLD name : [UNUSED] Waldin Thorbatt (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=380
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 380;
 -- OLD name : Katie Weidmann
 -- Source : https://www.wowhead.com/wotlk/de/npc=384
 UPDATE `creature_template_locale` SET `Name` = 'Katie Waidmann' WHERE `locale` = 'deDE' AND `entry` = 384;
@@ -69,9 +153,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Geringer Leerwandler' WHERE `loc
 -- OLD name : Champion des Schwarzfels
 -- Source : https://www.wowhead.com/wotlk/de/npc=435
 UPDATE `creature_template_locale` SET `Name` = 'Held des Schwarzfels' WHERE `locale` = 'deDE' AND `entry` = 435;
+-- OLD name : Pausbacke (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=444
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 444;
 -- OLD name : Wachhauptmann Parker
 -- Source : https://www.wowhead.com/wotlk/de/npc=464
 UPDATE `creature_template_locale` SET `Name` = 'Wache Parker' WHERE `locale` = 'deDE' AND `entry` = 464;
+-- OLD name : [UNUSED] Scribe Colburg (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=470
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 470;
 -- OLD name : Abtrünniger Hexer
 -- Source : https://www.wowhead.com/wotlk/de/npc=474
 UPDATE `creature_template_locale` SET `Name` = 'Abtrünniger Hexer der Defias' WHERE `locale` = 'deDE' AND `entry` = 474;
@@ -87,9 +177,66 @@ UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz' WHERE `locale` 
 -- OLD name : Beschützerin Gariel, subname : Die Westfallbrigade
 -- Source : https://www.wowhead.com/wotlk/de/npc=490
 UPDATE `creature_template_locale` SET `Name` = 'Beschützer Gariel',`Title` = 'Die Volksmiliz' WHERE `locale` = 'deDE' AND `entry` = 490;
+-- OLD name : [UNUSED] Watcher Kleeman (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=496
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 496;
+-- OLD name : [UNUSED] Watcher Benjamin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=497
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 497;
+-- OLD name : [UNUSED] Watcher Larsen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=498
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 498;
+-- OLD name : [UNUSED] Long Fang (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=509
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 509;
+-- OLD name : [UNUSED] Riverpaw Hunter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=516
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 516;
+-- OLD name : [UNUSED] Savar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=535
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 535;
+-- OLD name : [UNUSED] Rhal'Del (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=536
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 536;
+-- OLD name : [UNUSED] Buk'Cha (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=538
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 538;
 -- OLD name : Wegelagerer
 -- Source : https://www.wowhead.com/wotlk/de/npc=583
 UPDATE `creature_template_locale` SET `Name` = 'Wegelagerer der Defias' WHERE `locale` = 'deDE' AND `entry` = 583;
+-- OLD name : [UNUSED] Watcher Kern (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=586
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 586;
+-- OLD name : [UNUSED] Brandstifter der Defias (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=592
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 592;
+-- OLD name : [UNUSED] Mr. Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=605
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 605;
+-- OLD name : [UNUSED] Mrs. Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=606
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 606;
+-- OLD name : [UNUSED] Johnny Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=607
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 607;
+-- OLD name : [UNUSED] Grandpa Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=609
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 609;
+-- OLD name : [UNUSED] Rabid Gina Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=610
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 610;
+-- OLD name : [UNUSED] Rabid Mr. Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=611
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 611;
+-- OLD name : [UNUSED] Rabid Mrs. Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=612
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 612;
+-- OLD name : [UNUSED] Rabid Johnny Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=613
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 613;
+-- OLD name : [UNUSED] Rabid Grandpa Whipple (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=614
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 614;
 -- OLD name : Geschriebene Worte, subname : Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=693
 UPDATE `creature_template_locale` SET `Name` = 'Lehrer für sekundäre Fertigkeiten',`Title` = 'Lehrer' WHERE `locale` = 'deDE' AND `entry` = 693;
@@ -102,9 +249,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Trogg der Felsenkiefer' WHERE `l
 -- OLD name : Bulliger Felsenkiefertrogg
 -- Source : https://www.wowhead.com/wotlk/de/npc=724
 UPDATE `creature_template_locale` SET `Name` = 'Bulliger Trogg der Felsenkiefer' WHERE `locale` = 'deDE' AND `entry` = 724;
+-- OLD name : [UNUSED] Skeletal Enforcer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=725
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 725;
 -- OLD name : Unteroffizierin Yohwa
 -- Source : https://www.wowhead.com/wotlk/de/npc=733
 UPDATE `creature_template_locale` SET `Name` = 'Unteroffizier Yohwa' WHERE `locale` = 'deDE' AND `entry` = 733;
+-- OLD name : [UNUSED] Rebel Soldier (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=753
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 753;
 -- OLD name : Matschwirbler der Verirrten
 -- Source : https://www.wowhead.com/wotlk/de/npc=760
 UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Verirrten' WHERE `locale` = 'deDE' AND `entry` = 760;
@@ -145,6 +298,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz' WHERE `locale` 
 -- OLD subname : Die Westfallbrigade
 -- Source : https://www.wowhead.com/wotlk/de/npc=878
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz' WHERE `locale` = 'deDE' AND `entry` = 878;
+-- OLD name : Niederer Arachnid (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=924
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 924;
 -- OLD subname : Magierlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=944
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = 'deDE' AND `entry` = 944;
@@ -160,6 +316,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Behüter Blomberg',`Title` = 'Di
 -- OLD name : Matschwirbler der Blaukiemen
 -- Source : https://www.wowhead.com/wotlk/de/npc=1028
 UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Blaukiemen' WHERE `locale` = 'deDE' AND `entry` = 1028;
+-- OLD name : [UNUSED] Truek (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=1058
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 1058;
 -- OLD name : Schädelhauer der Felsenkiefertroggs
 -- Source : https://www.wowhead.com/wotlk/de/npc=1115
 UPDATE `creature_template_locale` SET `Name` = 'Schädelhauer der Felsenkiefer' WHERE `locale` = 'deDE' AND `entry` = 1115;
@@ -199,12 +358,19 @@ UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstunge
 -- OLD subname : Händler für Kettenrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=1349
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 1349;
+-- OLD name : [UNUSED] Kern the Enforcer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=1361
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 1361;
 -- OLD subname : Kochkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=1382
 UPDATE `creature_template_locale` SET `Title` = 'Überragender Koch' WHERE `locale` = 'deDE' AND `entry` = 1382;
 -- OLD subname : Kochkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=1430
 UPDATE `creature_template_locale` SET `Title` = 'Koch' WHERE `locale` = 'deDE' AND `entry` = 1430;
+-- OLD subname : Fletching Supplies
+-- Source : https://www.wowhead.com/wotlk/de/npc=1455
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 1455;
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (1455, 'deDE',NULL,'Pfeilmacherbedarf');
 -- OLD subname : Bogenmacherin
 -- Source : https://www.wowhead.com/wotlk/de/npc=1462
 UPDATE `creature_template_locale` SET `Title` = 'Pfeilmacherin' WHERE `locale` = 'deDE' AND `entry` = 1462;
@@ -217,9 +383,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Finsterflosse
 -- OLD name : Slims Testschurke
 -- Source : https://www.wowhead.com/wotlk/de/npc=1601
 UPDATE `creature_template_locale` SET `Name` = 'Rogue 40' WHERE `locale` = 'deDE' AND `entry` = 1601;
+-- OLD name : [UNUSED] Elwynn Guard (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=1643
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 1643;
+-- OLD name : Wache des Rotkammgebirges (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=1644
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 1644;
 -- OLD name : Novizin Elreth
 -- Source : https://www.wowhead.com/wotlk/de/npc=1661
 UPDATE `creature_template_locale` SET `Name` = 'Novize Elreth' WHERE `locale` = 'deDE' AND `entry` = 1661;
+-- OLD subname : Cook
+-- Source : https://www.wowhead.com/wotlk/de/npc=1677
+UPDATE `creature_template_locale` SET `Title` = 'Koch' WHERE `locale` = 'deDE' AND `entry` = 1677;
 -- OLD subname : Lederrüstungshändlerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=1695
 UPDATE `creature_template_locale` SET `Title` = 'Lederrüstungshändler' WHERE `locale` = 'deDE' AND `entry` = 1695;
@@ -289,12 +464,30 @@ UPDATE `creature_template_locale` SET `Name` = 'Athridas Bärenpelz' WHERE `loca
 -- OLD name : Ilthalaine
 -- Source : https://www.wowhead.com/wotlk/de/npc=2079
 UPDATE `creature_template_locale` SET `Name` = 'Konservator Ilthalaine' WHERE `locale` = 'deDE' AND `entry` = 2079;
+-- OLD name : Bürger von Mühlenbern (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2087
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2087;
 -- OLD subname : Magierlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=2124
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin' WHERE `locale` = 'deDE' AND `entry` = 2124;
 -- OLD subname : Magierlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=2128
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = 'deDE' AND `entry` = 2128;
+-- OLD name : [UNUSED] Crier Kirton (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2197
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2197;
+-- OLD name : [UNUSED] Crier Backus (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2199
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2199;
+-- OLD name : [UNUSED] Crier Pierce (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2200
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2200;
+-- OLD subname : Blacksmith Trainer
+-- Source : https://www.wowhead.com/wotlk/de/npc=2220
+UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstlehrer' WHERE `locale` = 'deDE' AND `entry` = 2220;
+-- OLD subname : Cooking Trainer
+-- Source : https://www.wowhead.com/wotlk/de/npc=2223
+UPDATE `creature_template_locale` SET `Title` = 'Kochkunstlehrer' WHERE `locale` = 'deDE' AND `entry` = 2223;
 -- OLD name : Maggarrak
 -- Source : https://www.wowhead.com/wotlk/de/npc=2258
 UPDATE `creature_template_locale` SET `Name` = 'Steinwüter' WHERE `locale` = 'deDE' AND `entry` = 2258;
@@ -302,6 +495,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Steinwüter' WHERE `locale` = 'd
 -- Source : https://www.wowhead.com/wotlk/de/npc=2286
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2286;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (2286, 'deDE','Bogenträger',NULL);
+-- OLD name : [UNUSED] Kir'Nazz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2313
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2313;
 -- OLD subname : Lehrer für Erste Hilfe
 -- Source : https://www.wowhead.com/wotlk/de/npc=2326
 UPDATE `creature_template_locale` SET `Title` = 'Arzt' WHERE `locale` = 'deDE' AND `entry` = 2326;
@@ -332,6 +528,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Wilder Berglöwe' WHERE `locale`
 -- OLD name : Wächter der Allianz
 -- Source : https://www.wowhead.com/wotlk/de/npc=2386
 UPDATE `creature_template_locale` SET `Name` = 'Wache von Süderstade' WHERE `locale` = 'deDE' AND `entry` = 2386;
+-- OLD name : Bürger von Süderstade (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2441
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2441;
 -- OLD name : Gosh-Haldir
 -- Source : https://www.wowhead.com/wotlk/de/npc=2476
 UPDATE `creature_template_locale` SET `Name` = 'Großer Lochkrokilisk' WHERE `locale` = 'deDE' AND `entry` = 2476;
@@ -359,6 +558,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Sänger' WHERE `locale` = 'deDE'
 -- OLD name : Kommandantin Amaren
 -- Source : https://www.wowhead.com/wotlk/de/npc=2608
 UPDATE `creature_template_locale` SET `Name` = 'Kommandant Amaren' WHERE `locale` = 'deDE' AND `entry` = 2608;
+-- OLD name : [UNUSED] Archmage Detrae (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2617
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2617;
 -- OLD name : Alter Schnappkieferkrokilisk
 -- Source : https://www.wowhead.com/wotlk/de/npc=2635
 UPDATE `creature_template_locale` SET `Name` = 'Alter Salzwasserkrokilisk' WHERE `locale` = 'deDE' AND `entry` = 2635;
@@ -375,12 +577,30 @@ UPDATE `creature_template_locale` SET `Name` = 'Bussard' WHERE `locale` = 'deDE'
 -- OLD subname : Klingenhändlerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=2843
 UPDATE `creature_template_locale` SET `Title` = 'Klingentrödlerin' WHERE `locale` = 'deDE' AND `entry` = 2843;
+-- OLD name : [PH] Weitschreiterausbilder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2871
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2871;
+-- OLD name : [PH] Raptorenausbilder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2873
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2873;
+-- OLD name : [PH] Pferdeausbilder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2874
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2874;
+-- OLD name : [PH] Gorillaausbilder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2875
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2875;
 -- OLD subname : Crocilisk Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=2876
 UPDATE `creature_template_locale` SET `Title` = 'Krokiliskenausbilder' WHERE `locale` = 'deDE' AND `entry` = 2876;
+-- OLD name : [PH] Kriecherausbilder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=2877
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 2877;
 -- OLD subname : Ranged Skills Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=2886
 UPDATE `creature_template_locale` SET `Title` = 'Fertigkeitenlehrer für Distanzwaffen' WHERE `locale` = 'deDE' AND `entry` = 2886;
+-- OLD subname : NONE
+-- Source : https://www.wowhead.com/wotlk/de/npc=2935
+UPDATE `creature_template_locale` SET `Title` = 'Dämonenausbilder' WHERE `locale` = 'deDE' AND `entry` = 2935;
 -- OLD name : Aldric Weidmann, subname : Bear Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=2938
 UPDATE `creature_template_locale` SET `Name` = 'Aldric Waidmann',`Title` = 'Bärenausbilder' WHERE `locale` = 'deDE' AND `entry` = 2938;
@@ -418,6 +638,15 @@ UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = '
 -- OLD subname : Kochkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=3067
 UPDATE `creature_template_locale` SET `Title` = 'Koch' WHERE `locale` = 'deDE' AND `entry` = 3067;
+-- OLD subname : Geselle des Alchemiehandwerks
+-- Source : https://www.wowhead.com/wotlk/de/npc=3070
+UPDATE `creature_template_locale` SET `Title` = 'Alchimist <Needs Model>' WHERE `locale` = 'deDE' AND `entry` = 3070;
+-- OLD subname : Kräuterkundelehrer
+-- Source : https://www.wowhead.com/wotlk/de/npc=3071
+UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundiger <Needs Model>' WHERE `locale` = 'deDE' AND `entry` = 3071;
+-- OLD name : [UNUSED] Narache Guard (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=3082
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 3082;
 -- OLD subname : Händlerin für Kettenrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=3095
 UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 3095;
@@ -472,12 +701,24 @@ UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundebedarf' WHERE `loc
 -- OLD name : Lebende Flamme
 -- Source : https://www.wowhead.com/wotlk/de/npc=3417
 UPDATE `creature_template_locale` SET `Name` = 'Lebendige Flamme' WHERE `locale` = 'deDE' AND `entry` = 3417;
+-- OLD name : [UNUSED] Ancestral Watcher (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=3420
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 3420;
+-- OLD name : [UNUSED] Kendur (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=3427
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 3427;
+-- OLD name : [UNUSED] Ancestral Sage (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=3440
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 3440;
 -- OLD subname : Unabhängiger Vertragspartner
 -- Source : https://www.wowhead.com/wotlk/de/npc=3442
 UPDATE `creature_template_locale` SET `Title` = 'Tüftlerverband' WHERE `locale` = 'deDE' AND `entry` = 3442;
 -- OLD subname : Händler für Leder- & Kettenrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=3483
 UPDATE `creature_template_locale` SET `Title` = 'Händler für Leder- & schwere Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 3483;
+-- OLD subname : Gifte
+-- Source : https://www.wowhead.com/wotlk/de/npc=3558
+UPDATE `creature_template_locale` SET `Title` = 'Giftreagenzien' WHERE `locale` = 'deDE' AND `entry` = 3558;
 -- OLD name : Temp Giftmischereibedarfsverkäufer Zwerg, subname : Gifte
 -- Source : https://www.wowhead.com/wotlk/de/npc=3559
 UPDATE `creature_template_locale` SET `Name` = 'Temp Giftmischereibedarfverkäufer Zwerg',`Title` = 'Giftreagenzien' WHERE `locale` = 'deDE' AND `entry` = 3559;
@@ -487,6 +728,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Braumeister von Dalaran' WHERE `
 -- OLD name : Minenarbeiter von Mühlenbern
 -- Source : https://www.wowhead.com/wotlk/de/npc=3578
 UPDATE `creature_template_locale` SET `Name` = 'Minenarbeiter von Dalaran' WHERE `locale` = 'deDE' AND `entry` = 3578;
+-- OLD name : [UNUSED] Kolkar Observer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=3651
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 3651;
 -- OLD subname : Kult des Dunklen Strangs (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=3660
 UPDATE `creature_template_locale` SET `Title` = 'Kult des dunklen Strangs' WHERE `locale` = 'deDE' AND `entry` = 3660;
@@ -503,6 +747,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Tierausbilder' WHERE `locale` =
 -- OLD subname : Cat Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=3699
 UPDATE `creature_template_locale` SET `Title` = 'Katzenausbilderin' WHERE `locale` = 'deDE' AND `entry` = 3699;
+-- OLD name : Gezeitenprinzessin der Rächerflossen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=3718
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 3718;
 -- OLD name : Nebelpeitscherhydra
 -- Source : https://www.wowhead.com/wotlk/de/npc=3721
 UPDATE `creature_template_locale` SET `Name` = 'Mythosschuppenhydra' WHERE `locale` = 'deDE' AND `entry` = 3721;
@@ -574,7 +821,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Ätzblutsaftbestie' WHERE `local
 UPDATE `creature_template_locale` SET `Name` = 'Geschwärzter Basilisk' WHERE `locale` = 'deDE' AND `entry` = 4044;
 -- OLD name : JEFF CHOW TEST
 -- Source : https://www.wowhead.com/wotlk/de/npc=4045
-UPDATE `creature_template_locale` SET `Name` = '[UNUSED] JEFF CHOW TEST' WHERE `locale` = 'deDE' AND `entry` = 4045;
+UPDATE `creature_template_locale` SET `Name` = NULL WHERE `locale` = 'deDE' AND `entry` = 4045;
 -- OLD name : Steilhangwyvern
 -- Source : https://www.wowhead.com/wotlk/de/npc=4107
 UPDATE `creature_template_locale` SET `Name` = 'Steilhangflügeldrache' WHERE `locale` = 'deDE' AND `entry` = 4107;
@@ -625,6 +872,12 @@ UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Held' WHERE `loca
 -- OLD name : Scharlachroter Folterer
 -- Source : https://www.wowhead.com/wotlk/de/npc=4306
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Folterknecht' WHERE `locale` = 'deDE' AND `entry` = 4306;
+-- OLD name : [UNUSED] [PH] Ambassador Saylaton Grabeshuf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=4313
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 4313;
+-- OLD name : [UNUSED] Guthrin Grabeshuf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=4315
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 4315;
 -- OLD name : Matschwirbler der Schlammflossen
 -- Source : https://www.wowhead.com/wotlk/de/npc=4361
 UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Schlammflossen' WHERE `locale` = 'deDE' AND `entry` = 4361;
@@ -640,6 +893,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Wallender Sumpfbrühschlammer' W
 -- OLD name : Rennmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=4419
 UPDATE `creature_template_locale` SET `Name` = 'Rennmeister Kronkreiter' WHERE `locale` = 'deDE' AND `entry` = 4419;
+-- OLD name : Volieber (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=4439
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 4439;
 -- OLD subname : Totem Merchent
 -- Source : https://www.wowhead.com/wotlk/de/npc=4443
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 4443;
@@ -665,6 +921,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin' WHERE `locale` =
 -- OLD subname : Schneiderlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=4578
 UPDATE `creature_template_locale` SET `Title` = 'Schattengewebeschneidermeisterin' WHERE `locale` = 'deDE' AND `entry` = 4578;
+-- OLD subname : Cartography Trainer
+-- Source : https://www.wowhead.com/wotlk/de/npc=4579
+UPDATE `creature_template_locale` SET `Title` = 'Kartografielehrer' WHERE `locale` = 'deDE' AND `entry` = 4579;
 -- OLD subname : Raptor Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=4621
 UPDATE `creature_template_locale` SET `Title` = 'Raptorausbilder' WHERE `locale` = 'deDE' AND `entry` = 4621;
@@ -834,12 +1093,87 @@ UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin' WHERE `locale` =
 -- OLD subname : Tallstrider Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=5507
 UPDATE `creature_template_locale` SET `Title` = 'Weitschreiterausbilder' WHERE `locale` = 'deDE' AND `entry` = 5507;
+-- OLD name : Yuriv Adhem (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5544
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5544;
+-- OLD name : Minenboss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5548
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5548;
+-- OLD name : Minenwache (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5549
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5549;
+-- OLD name : [PH] SGS Arbeiter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5550
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5550;
+-- OLD name : Karawanenwache (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5551
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5551;
+-- OLD name : [PH] SGS Peon (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5552
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5552;
+-- OLD name : Karawanenspäher (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5553
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5553;
+-- OLD name : [PH] SGS Tierwelt (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5554
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5554;
+-- OLD name : Packpferd einer Ogerkarawane (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5555
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5555;
+-- OLD name : Kommandant der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5556
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5556;
+-- OLD name : Kommandant der Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5557
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5557;
+-- OLD name : Wache der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5558
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5558;
+-- OLD name : Wache der Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5559
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5559;
+-- OLD name : Räuber der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5560
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5560;
+-- OLD name : Räuber der Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5561
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5561;
+-- OLD name : Bogenschütze der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5562
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5562;
+-- OLD name : Bogenschütze der Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5563
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5563;
+-- OLD name : [PH] Minenboss der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5587
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5587;
+-- OLD name : [PH] Minenwache der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5588
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5588;
+-- OLD name : Minenboss der Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5589
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5589;
+-- OLD name : Minenwache der Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5590
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5590;
 -- OLD name : Grunzerin Mojka
 -- Source : https://www.wowhead.com/wotlk/de/npc=5603
 UPDATE `creature_template_locale` SET `Name` = 'Grunzer Mojka' WHERE `locale` = 'deDE' AND `entry` = 5603;
+-- OLD name : [UNUSED] [PH] Orcish Barfly (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5604
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5604;
 -- OLD name : Trainingsattrappe von Unterstadt
 -- Source : https://www.wowhead.com/wotlk/de/npc=5652
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe von Unterstadt' WHERE `locale` = 'deDE' AND `entry` = 5652;
+-- OLD name : [UNUSED] Lawrence Sägner (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5671
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5671;
+-- OLD name : [UNUSED] Charles Brewton (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5672
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5672;
+-- OLD name : [UNUSED] Todespirscher Vincent DEBUGGEN (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5678
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5678;
 -- OLD name : Comar Villard
 -- Source : https://www.wowhead.com/wotlk/de/npc=5683
 UPDATE `creature_template_locale` SET `Name` = 'Corma Villard' WHERE `locale` = 'deDE' AND `entry` = 5683;
@@ -852,6 +1186,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Gerards Experiment' WHERE `loca
 -- OLD name : Wächter von Blizzard
 -- Source : https://www.wowhead.com/wotlk/de/npc=5764
 UPDATE `creature_template_locale` SET `Name` = 'Blizzardwächter' WHERE `locale` = 'deDE' AND `entry` = 5764;
+-- OLD name : [PH] Party-Bot (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5801
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5801;
 -- OLD name : Unteroffizier Curtis
 -- Source : https://www.wowhead.com/wotlk/de/npc=5809
 UPDATE `creature_template_locale` SET `Name` = 'Wachkommandant Zalaphil' WHERE `locale` = 'deDE' AND `entry` = 5809;
@@ -879,6 +1216,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin' WHERE `locale` =
 -- OLD subname : Magierlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=5885
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin' WHERE `locale` = 'deDE' AND `entry` = 5885;
+-- OLD name : [UNUSED] Hurll Kans (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=5904
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 5904;
 -- OLD name : Totem der Läuterung
 -- Source : https://www.wowhead.com/wotlk/de/npc=5924
 UPDATE `creature_template_locale` SET `Name` = 'Totem der Reinigung' WHERE `locale` = 'deDE' AND `entry` = 5924;
@@ -897,9 +1237,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Kultist der Schattenanbeter' WHE
 -- OLD subname : Händler für Kettenrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=6028
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 6028;
+-- OLD name : [UNUSED] Gozwin Vilesprocket (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=6046
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 6046;
 -- OLD name : Totem des Erdgriffs
 -- Source : https://www.wowhead.com/wotlk/de/npc=6066
 UPDATE `creature_template_locale` SET `Name` = 'Totem des Erdengriffs' WHERE `locale` = 'deDE' AND `entry` = 6066;
+-- OLD name : [UNUSED] Meritt Herrion (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=6067
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 6067;
 -- OLD name : Drakonischer Magierlord
 -- Source : https://www.wowhead.com/wotlk/de/npc=6129
 UPDATE `creature_template_locale` SET `Name` = 'Drachischer Magierlord' WHERE `locale` = 'deDE' AND `entry` = 6129;
@@ -912,6 +1258,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Arkkoranmatschkrabbler' WHERE `l
 -- OLD name : Sohn von Arkkoroc
 -- Source : https://www.wowhead.com/wotlk/de/npc=6144
 UPDATE `creature_template_locale` SET `Name` = 'Arkkorocs Sohn' WHERE `locale` = 'deDE' AND `entry` = 6144;
+-- OLD name : [UNUSED] Briton Kilras (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=6183
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 6183;
 -- OLD name : Zauberin der Grollflossen
 -- Source : https://www.wowhead.com/wotlk/de/npc=6197
 UPDATE `creature_template_locale` SET `Name` = 'Zauberhexerin der Grollflossen' WHERE `locale` = 'deDE' AND `entry` = 6197;
@@ -936,6 +1285,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Eisenherz Johnson' WHERE `locale
 -- OLD name : "Hahnentritt" Johnsons Menschengestalt
 -- Source : https://www.wowhead.com/wotlk/de/npc=6666
 UPDATE `creature_template_locale` SET `Name` = 'Eisenherz Johnsons Menschengestalt' WHERE `locale` = 'deDE' AND `entry` = 6666;
+-- OLD name : [UNUSED] Lorek Belm (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=6783
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 6783;
 -- OLD name : Strandkrebs
 -- Source : https://www.wowhead.com/wotlk/de/npc=6827
 UPDATE `creature_template_locale` SET `Name` = 'Krebs' WHERE `locale` = 'deDE' AND `entry` = 6827;
@@ -975,6 +1327,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedelehrer' WHERE `lo
 -- OLD subname : Schmiedekunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=7232
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedelehrer' WHERE `locale` = 'deDE' AND `entry` = 7232;
+-- OLD name : [UNUSED] Drayl (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=7293
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 7293;
 -- OLD name : Aufklärer der Venture Co.
 -- Source : https://www.wowhead.com/wotlk/de/npc=7307
 UPDATE `creature_template_locale` SET `Name` = 'Ausguck der Venture Co.' WHERE `locale` = 'deDE' AND `entry` = 7307;
@@ -993,6 +1348,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Frostsäblerjunges' WHERE `local
 -- OLD subname : Magierlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=7488
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin' WHERE `locale` = 'deDE' AND `entry` = 7488;
+-- OLD name : Braune Natter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=7507
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 7507;
+-- OLD name : Schwarze Königsnatter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=7508
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 7508;
+-- OLD name : Purpurrote Natter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=7509
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 7509;
 -- OLD subname : Lederverarbeitungslehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=7525
 UPDATE `creature_template_locale` SET `Title` = 'Drachenlederverarbeitungslehrerin' WHERE `locale` = 'deDE' AND `entry` = 7525;
@@ -1133,9 +1497,15 @@ UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis' WHERE `locale` = 
 -- OLD subname : Der Smaragdkreis
 -- Source : https://www.wowhead.com/wotlk/de/npc=9529
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis' WHERE `locale` = 'deDE' AND `entry` = 9529;
+-- OLD name : [UNUSED] dun garok test (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=9557
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 9557;
 -- OLD subname : Zeppelinmeister, Orgrimmar
 -- Source : https://www.wowhead.com/wotlk/de/npc=9566
 UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, Durotar' WHERE `locale` = 'deDE' AND `entry` = 9566;
+-- OLD name : [UNUSED] Gorilla Test (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=9577
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 9577;
 -- OLD subname : Talentmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=9578
 UPDATE `creature_template_locale` SET `Title` = 'Talentmeisterin' WHERE `locale` = 'deDE' AND `entry` = 9578;
@@ -1148,12 +1518,24 @@ UPDATE `creature_template_locale` SET `Title` = 'Talentmeisterin' WHERE `locale`
 -- OLD subname : Schneiderlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=9584
 UPDATE `creature_template_locale` SET `Title` = 'Schattengewebeschneidermeisterin' WHERE `locale` = 'deDE' AND `entry` = 9584;
+-- OLD name : [UNUSED] Eyan Mulcom (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=9617
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 9617;
+-- OLD name : [PH] TESTTAUREN (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=9686
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 9686;
 -- OLD subname : Blutaxtlegion
 -- Source : https://www.wowhead.com/wotlk/de/npc=9696
 UPDATE `creature_template_locale` SET `Title` = 'Schmetterschildlegion' WHERE `locale` = 'deDE' AND `entry` = 9696;
+-- OLD name : [UNUSED] [PH] Cheese Servant Floh (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=9820
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 9820;
 -- OLD subname : Ehemaliger Stallmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=9983
 UPDATE `creature_template_locale` SET `Title` = 'Stallmeister' WHERE `locale` = 'deDE' AND `entry` = 9983;
+-- OLD name : [PH] Alex's Raid Testing Peon (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=10044
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 10044;
 -- OLD subname : Stallmeisterin
 -- Source : https://www.wowhead.com/wotlk/de/npc=10046
 UPDATE `creature_template_locale` SET `Title` = 'Stallmeister' WHERE `locale` = 'deDE' AND `entry` = 10046;
@@ -1166,6 +1548,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (Leuchtendgrü
 -- OLD name : Weißer Roboschreiter Mod. B
 -- Source : https://www.wowhead.com/wotlk/de/npc=10179
 UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (schwarz)' WHERE `locale` = 'deDE' AND `entry` = 10179;
+-- OLD subname : NONE
+-- Source : https://www.wowhead.com/wotlk/de/npc=10237
+UPDATE `creature_template_locale` SET `Title` = 'UNUSED' WHERE `locale` = 'deDE' AND `entry` = 10237;
 -- OLD subname : Dagger Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=10292
 UPDATE `creature_template_locale` SET `Title` = 'Dolchlehrer' WHERE `locale` = 'deDE' AND `entry` = 10292;
@@ -1193,6 +1578,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Reittiger (orange)' WHERE `local
 -- OLD name : Goldfarbene Säblerkatze
 -- Source : https://www.wowhead.com/wotlk/de/npc=10338
 UPDATE `creature_template_locale` SET `Name` = 'Reittiger (goldfarben)' WHERE `locale` = 'deDE' AND `entry` = 10338;
+-- OLD name : [UNUSED] Xur'gyl (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=10370
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 10370;
+-- OLD name : [UNUSED] Thuzadin Shadow Lord (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=10401
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 10401;
+-- OLD name : [UNUSED] Cannibal Wight (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=10402
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 10402;
+-- OLD name : [UNUSED] Devouring Wight (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=10403
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 10403;
 -- OLD name : Auferstandener Gardist
 -- Source : https://www.wowhead.com/wotlk/de/npc=10418
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Gardist' WHERE `locale` = 'deDE' AND `entry` = 10418;
@@ -1220,6 +1617,12 @@ UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Kampfmagier' WHERE `
 -- OLD name : Auferstandener Inquisitor
 -- Source : https://www.wowhead.com/wotlk/de/npc=10426
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Inquisitor' WHERE `locale` = 'deDE' AND `entry` = 10426;
+-- OLD subname : Crossbow Trainer
+-- Source : https://www.wowhead.com/wotlk/de/npc=10446
+UPDATE `creature_template_locale` SET `Title` = 'Armbrustlehrer' WHERE `locale` = 'deDE' AND `entry` = 10446;
+-- OLD subname : Crossbow Trainer
+-- Source : https://www.wowhead.com/wotlk/de/npc=10450
+UPDATE `creature_template_locale` SET `Title` = 'Armbrustlehrer' WHERE `locale` = 'deDE' AND `entry` = 10450;
 -- OLD subname : Mace Trainer
 -- Source : https://www.wowhead.com/wotlk/de/npc=10452
 UPDATE `creature_template_locale` SET `Title` = 'Streitkolbenlehrer' WHERE `locale` = 'deDE' AND `entry` = 10452;
@@ -1241,9 +1644,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Auferstandener Zauberhexer' WHER
 -- OLD name : Verseuchter Schleim
 -- Source : https://www.wowhead.com/wotlk/de/npc=10510
 UPDATE `creature_template_locale` SET `Name` = 'Verseuchter Brühschleimer' WHERE `locale` = 'deDE' AND `entry` = 10510;
+-- OLD name : [UNUSED] Siralnaya (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=10607
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 10607;
 -- OLD name : Finkle Einhorn
 -- Source : https://www.wowhead.com/wotlk/de/npc=10776
 UPDATE `creature_template_locale` SET `Name` = 'Pip Flitzwitz' WHERE `locale` = 'deDE' AND `entry` = 10776;
+-- OLD name : [UNUSED] Deathcaller Majestis (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=10810
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 10810;
 -- OLD name : Instrukteur Galford
 -- Source : https://www.wowhead.com/wotlk/de/npc=10811
 UPDATE `creature_template_locale` SET `Name` = 'Archivar Galford' WHERE `locale` = 'deDE' AND `entry` = 10811;
@@ -1313,6 +1722,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Ezra Grimm' WHERE `locale` = 'de
 -- OLD subname : Der Argentumkreuzzug
 -- Source : https://www.wowhead.com/wotlk/de/npc=11063
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung' WHERE `locale` = 'deDE' AND `entry` = 11063;
+-- OLD name : [PH[ Combat Tester (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11080
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11080;
 -- OLD subname : Der Argentumkreuzzug
 -- Source : https://www.wowhead.com/wotlk/de/npc=11102
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung' WHERE `locale` = 'deDE' AND `entry` = 11102;
@@ -1346,21 +1758,111 @@ UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung' WHERE `
 -- OLD name : Todesstreitross
 -- Source : https://www.wowhead.com/wotlk/de/npc=11195
 UPDATE `creature_template_locale` SET `Name` = 'Schwarzes Skelettschlachtross' WHERE `locale` = 'deDE' AND `entry` = 11195;
+-- OLD name : Axtwerfer von Hakkar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11337
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11337;
+-- OLD name : Berserker von Hakkar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11341
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11341;
+-- OLD name : Krieger von Hakkar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11342
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11342;
+-- OLD name : Kriegsherr von Hakkar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11343
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11343;
+-- OLD name : Bluttrinker von Hakkar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11344
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11344;
+-- OLD name : Kopfjäger von Hakkar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11345
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11345;
+-- OLD name : Balgabzieher der Gurubashi (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11349
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11349;
+-- OLD name : Kriegsherr der Gurubashi (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11354
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11354;
+-- OLD name : Tochter von Hakkar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11358
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11358;
+-- OLD name : Zulianische Tigerin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11364
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11364;
+-- OLD name : Zulianische Matriarchin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11366
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11366;
+-- OLD name : Zulianischer Patriarch (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11367
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11367;
+-- OLD name : Verborgener Blutsucher (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11369
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11369;
+-- OLD name : Zath (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11375
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11375;
+-- OLD name : Lor'khan (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11376
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11376;
+-- OLD name : Hak'tharr der Gehirnjäger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11377
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11377;
+-- OLD name : Nik'reesh (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11379
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11379;
+-- OLD name : Älteste T'kashra (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11384
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11384;
+-- OLD name : Mogwhi der Ruchlose (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11385
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11385;
+-- OLD name : Janook die Wutklinge (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11386
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11386;
+-- OLD name : Kampfmagier der Gordok (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11449
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11449;
+-- OLD name : [UNUSED] Warpwood-Scharrer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11463
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11463;
 -- OLD name : Hochgeborener Beschwörer, subname : Haus Shen'dralar
 -- Source : https://www.wowhead.com/wotlk/de/npc=11466
 UPDATE `creature_template_locale` SET `Name` = 'Hochgeborenenbeschwörer',`Title` = '' WHERE `locale` = 'deDE' AND `entry` = 11466;
+-- OLD name : [UNUSED] Eldreth-Lichling (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11468
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11468;
 -- OLD name : Versenger der Eldreth
 -- Source : https://www.wowhead.com/wotlk/de/npc=11469
 UPDATE `creature_template_locale` SET `Name` = 'Schnauber der Eldreth' WHERE `locale` = 'deDE' AND `entry` = 11469;
+-- OLD name : [UNUSED] Manabestie (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11478
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11478;
+-- OLD name : [UNUSED] Arkaner Schrecken (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11481
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11481;
 -- OLD subname : Gebieter der Shen'dralar
 -- Source : https://www.wowhead.com/wotlk/de/npc=11486
 UPDATE `creature_template_locale` SET `Title` = '' WHERE `locale` = 'deDE' AND `entry` = 11486;
+-- OLD name : [UNUSED] Sentius (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11493
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11493;
+-- OLD name : [UNUSED] Avidus (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11495
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11495;
 -- OLD name : Skarr der Gebrochene
 -- Source : https://www.wowhead.com/wotlk/de/npc=11498
 UPDATE `creature_template_locale` SET `Name` = 'Skarr der Unbezwingbare' WHERE `locale` = 'deDE' AND `entry` = 11498;
+-- OLD name : [UNUSED] Kommandant Gormaul (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11499
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11499;
+-- OLD name : [UNUSED] Majordomus Bagrosh (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11500
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11500;
 -- OLD name : Rüstmeisterin Miranda Knackschloss, subname : Der Argentumkreuzzug
 -- Source : https://www.wowhead.com/wotlk/de/npc=11536
 UPDATE `creature_template_locale` SET `Name` = 'Rüstmeisterin Miranda Breechlock',`Title` = 'Die Argentumdämmerung' WHERE `locale` = 'deDE' AND `entry` = 11536;
+-- OLD name : [UNUSED] Molten Colossus (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11660
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11660;
 -- OLD name : Flammenschürer
 -- Source : https://www.wowhead.com/wotlk/de/npc=11661
 UPDATE `creature_template_locale` SET `Name` = 'Feuerschuppe' WHERE `locale` = 'deDE' AND `entry` = 11661;
@@ -1373,6 +1875,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Feuerschuppenheiler' WHERE `loca
 -- OLD name : Elite der Flammenschürer
 -- Source : https://www.wowhead.com/wotlk/de/npc=11664
 UPDATE `creature_template_locale` SET `Name` = 'Feuerschuppenelite' WHERE `locale` = 'deDE' AND `entry` = 11664;
+-- OLD name : [UNUSED] Flame Shrieker (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11670
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11670;
 -- OLD name : Kernhund
 -- Source : https://www.wowhead.com/wotlk/de/npc=11673
 UPDATE `creature_template_locale` SET `Name` = 'Uralter Kernhund' WHERE `locale` = 'deDE' AND `entry` = 11673;
@@ -1421,6 +1926,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Geomant der Gogger' WHERE `local
 -- OLD name : Steinschlagsteinklopfer
 -- Source : https://www.wowhead.com/wotlk/de/npc=11918
 UPDATE `creature_template_locale` SET `Name` = 'Steinklopfer der Gogger' WHERE `locale` = 'deDE' AND `entry` = 11918;
+-- OLD name : [PH] Northshire Gift Dispenser (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11926
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11926;
+-- OLD name : Obsidianbehüter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11959
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11959;
+-- OLD name : Neltharion (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=11978
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 11978;
 -- OLD name : Alchemielehrer der Mondlichtung, subname : Alchemielehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=12020
 UPDATE `creature_template_locale` SET `Name` = 'Alchimielehrer der Mondlichtung',`Title` = 'Alchimiefachmann' WHERE `locale` = 'deDE' AND `entry` = 12020;
@@ -1478,9 +1992,27 @@ UPDATE `creature_template_locale` SET `Name` = 'Großer böser Brühschleimer' W
 -- OLD name : Verdammniswachenkommandant
 -- Source : https://www.wowhead.com/wotlk/de/npc=12396
 UPDATE `creature_template_locale` SET `Name` = 'Kommandant der Verdammniswache' WHERE `locale` = 'deDE' AND `entry` = 12396;
+-- OLD name : Todeskrallenwelpe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=12417
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 12417;
+-- OLD name : Auftragsmörder der Pechschwingen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=12421
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 12421;
+-- OLD name : [NOT USED] Kriegsherr der Pechschwingen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=12462
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 12462;
+-- OLD name : Bannschuppe der Todeskrallen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=12466
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 12466;
 -- OLD name : Hauptmann der Todeskrallen
 -- Source : https://www.wowhead.com/wotlk/de/npc=12467
 UPDATE `creature_template_locale` SET `Name` = 'Captain der Todeskrallen' WHERE `locale` = 'deDE' AND `entry` = 12467;
+-- OLD name : Erderschütterer der Todeskrallen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=12469
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 12469;
+-- OLD name : Feuerzunge der Todeskrallen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=12470
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 12470;
 -- OLD subname : Windreitermeisterin
 -- Source : https://www.wowhead.com/wotlk/de/npc=12616
 UPDATE `creature_template_locale` SET `Title` = 'Windreitermeister' WHERE `locale` = 'deDE' AND `entry` = 12616;
@@ -1496,6 +2028,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Häuptling Erdenbund' WHERE `loc
 -- OLD name : Grunzerin Bek'rah
 -- Source : https://www.wowhead.com/wotlk/de/npc=12798
 UPDATE `creature_template_locale` SET `Name` = 'Grunzer Bek''rah' WHERE `locale` = 'deDE' AND `entry` = 12798;
+-- OLD name : [PH] TEST Feuergott (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=12804
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 12804;
 -- OLD subname : Lehrer für Erste Hilfe
 -- Source : https://www.wowhead.com/wotlk/de/npc=12939
 UPDATE `creature_template_locale` SET `Title` = 'Traumachirurg' WHERE `locale` = 'deDE' AND `entry` = 12939;
@@ -1541,6 +2076,12 @@ UPDATE `creature_template_locale` SET `Title` = 'Der zweite Khan' WHERE `locale`
 -- OLD subname : Der Erste Khan (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=13742
 UPDATE `creature_template_locale` SET `Title` = 'Der erste Khan' WHERE `locale` = 'deDE' AND `entry` = 13742;
+-- OLD name : Friedhofsherold (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14181
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14181;
+-- OLD name : [UNUSED] Sid Stuco (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14201
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14201;
 -- OLD name : Der Große Samras
 -- Source : https://www.wowhead.com/wotlk/de/npc=14280
 UPDATE `creature_template_locale` SET `Name` = 'Samras' WHERE `locale` = 'deDE' AND `entry` = 14280;
@@ -1589,18 +2130,36 @@ UPDATE `creature_template_locale` SET `Name` = 'Ausguck der Thoriumbruderschaft'
 -- OLD name : Aufklärerhauptmann Lolo Langhieb
 -- Source : https://www.wowhead.com/wotlk/de/npc=14634
 UPDATE `creature_template_locale` SET `Name` = 'Hauptmann des Ausgucks Lolo Langhieb' WHERE `locale` = 'deDE' AND `entry` = 14634;
+-- OLD name : [PH] Horde spell thrower (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14641
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14641;
+-- OLD name : [PH] Alliance Spell thrower (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14642
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14642;
+-- OLD name : [PH] Alliance Herald (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14643
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14643;
+-- OLD name : [PH] Horde Herald (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14644
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14644;
 -- OLD name : Verdorbenes Totem des heilendes Flusses V
 -- Source : https://www.wowhead.com/wotlk/de/npc=14664
 UPDATE `creature_template_locale` SET `Name` = 'Verderbtes Totem des heilenden Flusses V' WHERE `locale` = 'deDE' AND `entry` = 14664;
 -- OLD name : Geflügelter Schrecken
 -- Source : https://www.wowhead.com/wotlk/de/npc=14714
 UPDATE `creature_template_locale` SET `Name` = 'Geflügelter Horror' WHERE `locale` = 'deDE' AND `entry` = 14714;
+-- OLD name : [PH] Turmleutnant der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14719
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14719;
 -- OLD name : Feldmarschall Afrasiabi
 -- Source : https://www.wowhead.com/wotlk/de/npc=14721
 UPDATE `creature_template_locale` SET `Name` = 'Feldmarschall Steinsteg' WHERE `locale` = 'deDE' AND `entry` = 14721;
 -- OLD subname : Stoffrüstmeisterin der Allianz
 -- Source : https://www.wowhead.com/wotlk/de/npc=14723
 UPDATE `creature_template_locale` SET `Title` = 'Stoffrüstmeister der Allianz' WHERE `locale` = 'deDE' AND `entry` = 14723;
+-- OLD name : [PH] Turmleutnant der Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=14746
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 14746;
 -- OLD name : Entführer der Blutfratzen
 -- Source : https://www.wowhead.com/wotlk/de/npc=14748
 UPDATE `creature_template_locale` SET `Name` = 'Kidnapper der Blutfratzen' WHERE `locale` = 'deDE' AND `entry` = 14748;
@@ -1637,6 +2196,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Abgesandter des Kriegshymnenklan
 -- OLD name : Gesandter der Frostwölfe
 -- Source : https://www.wowhead.com/wotlk/de/npc=15106
 UPDATE `creature_template_locale` SET `Name` = 'Abgesandter der Frostwölfe' WHERE `locale` = 'deDE' AND `entry` = 15106;
+-- OLD name : Luis Test NPC (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15167
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15167;
 -- OLD name : Infanterist der Burg Cenarius
 -- Source : https://www.wowhead.com/wotlk/de/npc=15184
 UPDATE `creature_template_locale` SET `Name` = 'Soldat der Burg Cenarius' WHERE `locale` = 'deDE' AND `entry` = 15184;
@@ -1658,6 +2220,69 @@ UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan' WHERE `loca
 -- OLD name : Trick - Kleintier
 -- Source : https://www.wowhead.com/wotlk/de/npc=15219
 UPDATE `creature_template_locale` SET `Name` = 'Trick - Tierchen' WHERE `locale` = 'deDE' AND `entry` = 15219;
+-- OLD name : Erbauer der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15226
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15226;
+-- OLD name : Schwarmformer der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15227
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15227;
+-- OLD name : Tunnelgräber der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15228
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15228;
+-- OLD name : Patrolleur der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15231
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15231;
+-- OLD name : Vernichter der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15232
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15232;
+-- OLD name : Schwärmer der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15234
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15234;
+-- OLD name : Wutstachel der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15237
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15237;
+-- OLD name : Schwarmhäscher der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15238
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15238;
+-- OLD name : Schwarmlauerer der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15239
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15239;
+-- OLD name : Wespenreiter der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15243
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15243;
+-- OLD name : Schwarmräuber der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15244
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15244;
+-- OLD name : Wespenwache der Vekniss (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15245
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15245;
+-- OLD name : Seelenbeuger der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15248
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15248;
+-- OLD name : Schlächter der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15251
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15251;
+-- OLD name : Champion der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15253
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15253;
+-- OLD name : Hauptmann der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15254
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15254;
+-- OLD name : Offizier der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15255
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15255;
+-- OLD name : Kommandant der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15256
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15256;
+-- OLD name : Ehrenwache der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15257
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15257;
+-- OLD name : Prätorianer der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15258
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15258;
+-- OLD name : Imperator der Qiraji Imperator (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15259
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15259;
 -- OLD subname : Magierlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=15279
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin' WHERE `locale` = 'deDE' AND `entry` = 15279;
@@ -1670,9 +2295,42 @@ UPDATE `creature_template_locale` SET `Title` = 'Kanonier des Dunkelmond-Jahrmar
 -- OLD subname : Schattenhammer
 -- Source : https://www.wowhead.com/wotlk/de/npc=15308
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan' WHERE `locale` = 'deDE' AND `entry` = 15308;
+-- OLD name : Wegelagerer des Zaraschwarms (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15322
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15322;
+-- OLD name : Schwärmer des Zaraschwarms (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15326
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15326;
 -- OLD name : Dunkelmond-Dampfpanzer
 -- Source : https://www.wowhead.com/wotlk/de/npc=15328
 UPDATE `creature_template_locale` SET `Name` = 'Dunkelmonddampfpanzer' WHERE `locale` = 'deDE' AND `entry` = 15328;
+-- OLD name : Späher des Zaraschwarms (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15329
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15329;
+-- OLD name : Sandbohrer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15330
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15330;
+-- OLD name : Dünentunnelgräber (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15331
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15331;
+-- OLD name : Kristallspeiser (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15332
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15332;
+-- OLD name : Sandwandler (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15337
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15337;
+-- OLD name : Sphinx (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15342
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15342;
+-- OLD name : Tochter von Hecate (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15345
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15345;
+-- OLD name : Wespenreiter der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15346
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15346;
+-- OLD name : Wespenlord der Qiraji (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15347
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15347;
 -- OLD name : RC Blimp <PH>, subname : NONE
 -- Source : https://www.wowhead.com/wotlk/de/npc=15349
 UPDATE `creature_template_locale` SET `Name` = 'RC Blimp',`Title` = 'PH' WHERE `locale` = 'deDE' AND `entry` = 15349;
@@ -1682,9 +2340,15 @@ UPDATE `creature_template_locale` SET `Name` = 'RC Mortar Tank',`Title` = 'PH' W
 -- OLD name : Ayamiss die Jägerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=15369
 UPDATE `creature_template_locale` SET `Name` = 'Ayamiss der Jäger' WHERE `locale` = 'deDE' AND `entry` = 15369;
+-- OLD name : [UNUSED] Ruins Qiraji Gladiator Named 7 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15393
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15393;
 -- OLD name : Welt Juwelierskunstlehrer, subname : Juwelierskunstlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=15465
 UPDATE `creature_template_locale` SET `Name` = 'Welt Juwelenschleiferlehrer',`Title` = 'Juwelenschleiferlehrerin' WHERE `locale` = 'deDE' AND `entry` = 15465;
+-- OLD name : Tiefenschlamm (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15472
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15472;
 -- OLD name : Skorpid
 -- Source : https://www.wowhead.com/wotlk/de/npc=15476
 UPDATE `creature_template_locale` SET `Name` = 'Skorpion' WHERE `locale` = 'deDE' AND `entry` = 15476;
@@ -1709,6 +2373,12 @@ UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan' WHERE `loca
 -- OLD name : Zwielichtverderber
 -- Source : https://www.wowhead.com/wotlk/de/npc=15625
 UPDATE `creature_template_locale` SET `Name` = 'Seelenverderber des Zwielichts' WHERE `locale` = 'deDE' AND `entry` = 15625;
+-- OLD name : Manasauger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15646
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15646;
+-- OLD name : Auktionator (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15672
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15672;
 -- OLD name : Blue Qiraji Battle Tank
 -- Source : https://www.wowhead.com/wotlk/de/npc=15713
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15713;
@@ -1728,9 +2398,21 @@ UPDATE `creature_template_locale` SET `Name` = 'Fürst August Feindhammer' WHERE
 -- OLD subname : Sammlerin für Münzen der Urahnen
 -- Source : https://www.wowhead.com/wotlk/de/npc=15909
 UPDATE `creature_template_locale` SET `Title` = 'Sammler für Münzen der Urahnen' WHERE `locale` = 'deDE' AND `entry` = 15909;
+-- OLD name : Valentinsfeiernder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15982
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15982;
+-- OLD name : Valentinsfeiernde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=15983
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 15983;
 -- OLD subname : Haus Shen'dralar
 -- Source : https://www.wowhead.com/wotlk/de/npc=16032
 UPDATE `creature_template_locale` SET `Title` = '' WHERE `locale` = 'deDE' AND `entry` = 16032;
+-- OLD name : Sumpfbiest
+-- Source : https://www.wowhead.com/wotlk/de/npc=16035
+UPDATE `creature_template_locale` SET `Name` = 'Bog Beast B [PH]' WHERE `locale` = 'deDE' AND `entry` = 16035;
+-- OLD name : Alex' Test DPS Mob (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=16077
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 16077;
 -- OLD name : Kreuzzugskommandant Korfax
 -- Source : https://www.wowhead.com/wotlk/de/npc=16112
 UPDATE `creature_template_locale` SET `Name` = 'Korfax, Held des Lichts' WHERE `locale` = 'deDE' AND `entry` = 16112;
@@ -1740,9 +2422,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Kommandant Marjha
 -- OLD name : Kreuzzugskommandant Eligor Morgenbringer
 -- Source : https://www.wowhead.com/wotlk/de/npc=16115
 UPDATE `creature_template_locale` SET `Name` = 'Kommandant Eligor Morgenbringer' WHERE `locale` = 'deDE' AND `entry` = 16115;
+-- OLD name : Wächter der Geißel (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=16138
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 16138;
+-- OLD name : Nekropolenkristallsäule (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=16140
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 16140;
 -- OLD subname : Stallmeisterin
 -- Source : https://www.wowhead.com/wotlk/de/npc=16185
 UPDATE `creature_template_locale` SET `Title` = 'Stallmeister' WHERE `locale` = 'deDE' AND `entry` = 16185;
+-- OLD name : Nekropolenkristallsäule (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=16188
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 16188;
 -- OLD subname : Magierlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=16269
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = 'deDE' AND `entry` = 16269;
@@ -1761,6 +2452,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Flickwerkschrecker' WHERE `local
 -- OLD name : Sie Nummer Eins, subname : Botschafterin von CocaCola
 -- Source : https://www.wowhead.com/wotlk/de/npc=16450
 UPDATE `creature_template_locale` SET `Name` = 'S.H.E. Nummer Eins',`Title` = 'Botschafterin von Coca-Cola' WHERE `locale` = 'deDE' AND `entry` = 16450;
+-- OLD name : Verteidiger der Todesritter
+-- Source : https://www.wowhead.com/wotlk/de/npc=16451
+UPDATE `creature_template_locale` SET `Name` = 'Vollstrecker der Todesritter' WHERE `locale` = 'deDE' AND `entry` = 16451;
 -- OLD name : Sie Nummer Zwei, subname : Botschafterin von CocaCola
 -- Source : https://www.wowhead.com/wotlk/de/npc=16454
 UPDATE `creature_template_locale` SET `Name` = 'S.H.E. Nummer Zwei',`Title` = 'Botschafterin von Coca-Cola' WHERE `locale` = 'deDE' AND `entry` = 16454;
@@ -1800,6 +2494,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Wolfreiter von Thrallmar' WHERE 
 -- OLD name : Bris Testcharakter
 -- Source : https://www.wowhead.com/wotlk/de/npc=16605
 UPDATE `creature_template_locale` SET `Name` = 'Brianna Schneider' WHERE `locale` = 'deDE' AND `entry` = 16605;
+-- OLD name : Wilder Goblin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=16608
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 16608;
 -- OLD subname : Waffenverkäufer
 -- Source : https://www.wowhead.com/wotlk/de/npc=16622
 UPDATE `creature_template_locale` SET `Title` = 'Waffenhändler' WHERE `locale` = 'deDE' AND `entry` = 16622;
@@ -1878,9 +2575,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Neophyt des Lachenden Schädels'
 -- OLD name : Wolfsreiter der Knochenmalmer
 -- Source : https://www.wowhead.com/wotlk/de/npc=16877
 UPDATE `creature_template_locale` SET `Name` = 'Wolfreiter der Knochenmalmer' WHERE `locale` = 'deDE' AND `entry` = 16877;
+-- OLD name : Abbild eines plündernden Krustenbohrers (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=16914
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 16914;
+-- OLD name : Maid der Trauer
+-- Source : https://www.wowhead.com/wotlk/de/npc=16961
+UPDATE `creature_template_locale` SET `Name` = 'Maid der Seelenpein' WHERE `locale` = 'deDE' AND `entry` = 16961;
 -- OLD name : Sonnenwendhändlerkostüm der Allianz
 -- Source : https://www.wowhead.com/wotlk/de/npc=16986
 UPDATE `creature_template_locale` SET `Name` = 'Sonnenwendhändlerkostüm der Alliant' WHERE `locale` = 'deDE' AND `entry` = 16986;
+-- OLD name : Abbild eines Krustenbohrers (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17001
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17001;
 -- OLD name : Soldat des Schattenhammerklans
 -- Source : https://www.wowhead.com/wotlk/de/npc=17022
 UPDATE `creature_template_locale` SET `Name` = 'Soldat des Schattenhammers' WHERE `locale` = 'deDE' AND `entry` = 17022;
@@ -1896,21 +2602,30 @@ UPDATE `creature_template_locale` SET `Title` = 'Magierlehrerin' WHERE `locale` 
 -- OLD name : Erdenruferin Ryga
 -- Source : https://www.wowhead.com/wotlk/de/npc=17123
 UPDATE `creature_template_locale` SET `Name` = 'Erdruferin Ryga' WHERE `locale` = 'deDE' AND `entry` = 17123;
--- OLD name : Wasserelementar
+-- OLD name : Wasserelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=17165
-UPDATE `creature_template_locale` SET `Name` = '(NPC #17165)' WHERE `locale` = 'deDE' AND `entry` = 17165;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17165;
 -- OLD name : Scharfseher Nobundo
 -- Source : https://www.wowhead.com/wotlk/de/npc=17204
 UPDATE `creature_template_locale` SET `Name` = 'Weissager Nobundo' WHERE `locale` = 'deDE' AND `entry` = 17204;
 -- OLD subname : Spektralgreifenmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=17209
 UPDATE `creature_template_locale` SET `Title` = 'Spektraler Greifenmeister' WHERE `locale` = 'deDE' AND `entry` = 17209;
+-- OLD name : Tunnelgräber (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17234
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17234;
+-- OLD name : Herold der Pestländer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17239
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17239;
 -- OLD name : Slims untötbarer Testdummy
 -- Source : https://www.wowhead.com/wotlk/de/npc=17313
 UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy Spammer' WHERE `locale` = 'deDE' AND `entry` = 17313;
 -- OLD name : Zauberer des Schattenmondklans
 -- Source : https://www.wowhead.com/wotlk/de/npc=17396
 UPDATE `creature_template_locale` SET `Name` = 'Zauberhexer des Schattenmondklans' WHERE `locale` = 'deDE' AND `entry` = 17396;
+-- OLD name : Brandschatzer des Schattenmondklans (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17463
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17463;
 -- OLD subname : Kriegerlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=17480
 UPDATE `creature_template_locale` SET `Title` = 'Kriegerlehrer' WHERE `locale` = 'deDE' AND `entry` = 17480;
@@ -1933,15 +2648,18 @@ UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = '
 -- Source : https://www.wowhead.com/wotlk/de/npc=17515
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17515;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (17515, 'deDE',NULL,'Herrin der Brotkrumen');
--- OLD name : Testmonster
+-- OLD name : Testmonster (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=17582
-UPDATE `creature_template_locale` SET `Name` = '(NPC #17582)' WHERE `locale` = 'deDE' AND `entry` = 17582;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17582;
 -- OLD name : Junger Draenei
 -- Source : https://www.wowhead.com/wotlk/de/npc=17587
 UPDATE `creature_template_locale` SET `Name` = 'Draeneijüngling' WHERE `locale` = 'deDE' AND `entry` = 17587;
 -- OLD name : Höllenfeuerwolfsreiter
 -- Source : https://www.wowhead.com/wotlk/de/npc=17593
 UPDATE `creature_template_locale` SET `Name` = 'Höllenfeuerwolfreiter' WHERE `locale` = 'deDE' AND `entry` = 17593;
+-- OLD name : Hauptmann Offensichtlich Jr. (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17597
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17597;
 -- OLD subname : Ammunition Vendor
 -- Source : https://www.wowhead.com/wotlk/de/npc=17598
 UPDATE `creature_template_locale` SET `Title` = 'Munitionsverkäufer' WHERE `locale` = 'deDE' AND `entry` = 17598;
@@ -1972,9 +2690,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Bergriese der Scherbenwelt, Zang
 -- OLD name : Hydromantin Thespia
 -- Source : https://www.wowhead.com/wotlk/de/npc=17797
 UPDATE `creature_template_locale` SET `Name` = 'Wasserbeschwörerin Thespia' WHERE `locale` = 'deDE' AND `entry` = 17797;
+-- OLD name : Verirrter Goblin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17813
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17813;
 -- OLD name : Wahnsinniger Worgen
 -- Source : https://www.wowhead.com/wotlk/de/npc=17823
 UPDATE `creature_template_locale` SET `Name` = 'Verrückter Worgen' WHERE `locale` = 'deDE' AND `entry` = 17823;
+-- OLD name : Behüter des Echsenkessels (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17939
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17939;
+-- OLD name : Action Trigger Test Creature For Kyle (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=17966
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 17966;
 -- OLD name : Kommandantin Sarannis
 -- Source : https://www.wowhead.com/wotlk/de/npc=17976
 UPDATE `creature_template_locale` SET `Name` = 'Kommandant Sarannis' WHERE `locale` = 'deDE' AND `entry` = 17976;
@@ -2011,12 +2738,21 @@ UPDATE `creature_template_locale` SET `Name` = 'Läuterer der Finsterblut' WHERE
 -- OLD name : Scharfseher von Garadar
 -- Source : https://www.wowhead.com/wotlk/de/npc=18228
 UPDATE `creature_template_locale` SET `Name` = 'Ereignisaufseher von Garadar' WHERE `locale` = 'deDE' AND `entry` = 18228;
+-- OLD name : Magierlord der Sethekk (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18329
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18329;
 -- OLD name : Reitwyvern
 -- Source : https://www.wowhead.com/wotlk/de/npc=18345
 UPDATE `creature_template_locale` SET `Name` = 'Reitflügeldrache' WHERE `locale` = 'deDE' AND `entry` = 18345;
+-- OLD name : [UNUSED] Dusty Skeleton [PH] (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18355
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18355;
 -- OLD name : Lohfarbener Windreiter
 -- Source : https://www.wowhead.com/wotlk/de/npc=18363
 UPDATE `creature_template_locale` SET `Name` = 'Gelbbrauner Windreiter' WHERE `locale` = 'deDE' AND `entry` = 18363;
+-- OLD name : Draeneigeist (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18367
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18367;
 -- OLD name : Trainingsattrappe von Silbermond
 -- Source : https://www.wowhead.com/wotlk/de/npc=18504
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe von Silbermond' WHERE `locale` = 'deDE' AND `entry` = 18504;
@@ -2026,12 +2762,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Silbermond Weltenwanderer' WHERE
 -- OLD name : Orcischer Gefangener
 -- Source : https://www.wowhead.com/wotlk/de/npc=18598
 UPDATE `creature_template_locale` SET `Name` = 'Orcgefangener' WHERE `locale` = 'deDE' AND `entry` = 18598;
+-- OLD name : Vernichter der Teufelswache (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18604
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18604;
 -- OLD name : Ausbilderin Cel
 -- Source : https://www.wowhead.com/wotlk/de/npc=18629
 UPDATE `creature_template_locale` SET `Name` = 'Ausbilder Cel' WHERE `locale` = 'deDE' AND `entry` = 18629;
 -- OLD name : Unterwerferin Vaz'shir
 -- Source : https://www.wowhead.com/wotlk/de/npc=18660
 UPDATE `creature_template_locale` SET `Name` = 'Unterwerfer Vaz''shir' WHERE `locale` = 'deDE' AND `entry` = 18660;
+-- OLD name : Anachoret Lyteera (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18674
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18674;
 -- OLD name : Abgesandte des Echsenkessels
 -- Source : https://www.wowhead.com/wotlk/de/npc=18681
 UPDATE `creature_template_locale` SET `Name` = 'Abgesandter des Echsenkessels' WHERE `locale` = 'deDE' AND `entry` = 18681;
@@ -2098,6 +2840,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Sumpfrattenwache' WHERE `locale`
 -- OLD subname : Angellehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=18911
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Angelns' WHERE `locale` = 'deDE' AND `entry` = 18911;
+-- OLD name : [PH] Gossip NPC, Human Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18935
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18935;
+-- OLD name : [PH] Gossip NPC, Human Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18936
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18936;
+-- OLD name : [PH] Gossip NPC, Human, Specific Look (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=18941
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 18941;
 -- OLD subname : Kochkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=18987
 UPDATE `creature_template_locale` SET `Title` = 'Küchenchef' WHERE `locale` = 'deDE' AND `entry` = 18987;
@@ -2116,6 +2867,18 @@ UPDATE `creature_template_locale` SET `Title` = 'Kochbedarf' WHERE `locale` = 'd
 -- OLD subname : Alchemielehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=19052
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer' WHERE `locale` = 'deDE' AND `entry` = 19052;
+-- OLD name : [PH] Gossip NPC Human Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19057
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19057;
+-- OLD name : [PH] Gossip NPC Human Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19058
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19058;
+-- OLD name : [PH] Gossip NPC Human Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19059
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19059;
+-- OLD name : [PH] Gossip NPC Human Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19060
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19060;
 -- OLD subname : Juwelierskunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=19063
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleifermeisterlehrer' WHERE `locale` = 'deDE' AND `entry` = 19063;
@@ -2125,6 +2888,168 @@ UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf' WHERE `
 -- OLD name : Wolfsreiter von Garadar
 -- Source : https://www.wowhead.com/wotlk/de/npc=19068
 UPDATE `creature_template_locale` SET `Name` = 'Wolfreiter von Garadar' WHERE `locale` = 'deDE' AND `entry` = 19068;
+-- OLD name : [PH] Gossip NPC Dwarf Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19078
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19078;
+-- OLD name : [PH] Gossip NPC Dwarf Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19079
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19079;
+-- OLD name : [PH] Gossip NPC Night Elf Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19080
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19080;
+-- OLD name : [PH] Gossip NPC Night Elf Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19081
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19081;
+-- OLD name : [PH] Gossip NPC Draenei Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19082
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19082;
+-- OLD name : [PH] Gossip NPC Draenei Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19083
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19083;
+-- OLD name : [PH] Gossip NPC Blood Elf Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19084
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19084;
+-- OLD name : [PH] Gossip NPC Blood Elf Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19085
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19085;
+-- OLD name : [PH] Gossip NPC Orc Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19086
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19086;
+-- OLD name : [PH] Gossip NPC Orc Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19087
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19087;
+-- OLD name : [PH] Gossip NPC Tauren Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19088
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19088;
+-- OLD name : [PH] Gossip NPC Tauren Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19089
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19089;
+-- OLD name : [PH] Gossip NPC Undead Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19090
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19090;
+-- OLD name : [PH] Gossip NPC Undead Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19091
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19091;
+-- OLD name : [PH] Gossip NPC Dwarf Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19092
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19092;
+-- OLD name : [PH] Gossip NPC Night Elf Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19093
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19093;
+-- OLD name : [PH] Gossip NPC Draenei Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19094
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19094;
+-- OLD name : [PH] Gossip NPC Blood Elf Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19095
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19095;
+-- OLD name : [PH] Gossip NPC Orc Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19096
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19096;
+-- OLD name : [PH] Gossip NPC Tauren Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19097
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19097;
+-- OLD name : [PH] Gossip NPC Undead Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19098
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19098;
+-- OLD name : [PH] Gossip NPC Blood Elf Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19099
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19099;
+-- OLD name : [PH] Gossip NPC Draenei Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19100
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19100;
+-- OLD name : [PH] Gossip NPC Dwarf Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19101
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19101;
+-- OLD name : [PH] Gossip NPC Night Elf Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19102
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19102;
+-- OLD name : [PH] Gossip NPC Orc Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19103
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19103;
+-- OLD name : [PH] Gossip NPC Tauren Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19104
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19104;
+-- OLD name : [PH] Gossip NPC Undead Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19105
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19105;
+-- OLD name : [PH] Gossip NPC, Blood Elf Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19106
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19106;
+-- OLD name : [PH] Gossip NPC, Draenei Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19107
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19107;
+-- OLD name : [PH] Gossip NPC, Dwarf Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19108
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19108;
+-- OLD name : [PH] Gossip NPC, Orc Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19109
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19109;
+-- OLD name : [PH] Gossip NPC, Undead Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19110
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19110;
+-- OLD name : [PH] Gossip NPC, Tauren Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19111
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19111;
+-- OLD name : [PH] Gossip NPC, Night Elf Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19112
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19112;
+-- OLD name : [PH] Gossip NPC, Blood Elf Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19113
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19113;
+-- OLD name : [PH] Gossip NPC, Draenei Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19114
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19114;
+-- OLD name : [PH] Gossip NPC, Dwarf Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19115
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19115;
+-- OLD name : [PH] Gossip NPC, Night Elf Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19116
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19116;
+-- OLD name : [PH] Gossip NPC, Orc Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19117
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19117;
+-- OLD name : [PH] Gossip NPC, Tauren Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19118
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19118;
+-- OLD name : [PH] Gossip NPC, Undead Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19119
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19119;
+-- OLD name : [PH] Gossip NPC, Gnome Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19121
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19121;
+-- OLD name : [PH] Gossip NPC, Gnome Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19122
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19122;
+-- OLD name : [PH] Gossip NPC, Troll Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19123
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19123;
+-- OLD name : [PH] Gossip NPC, Troll Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19124
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19124;
+-- OLD name : [PH] Gossip NPC Gnome Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19125
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19125;
+-- OLD name : [PH] Gossip NPC Gnome Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19126
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19126;
+-- OLD name : [PH] Gossip NPC Troll Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19127
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19127;
+-- OLD name : [PH] Gossip NPC Troll Male, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19128
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19128;
+-- OLD name : [PH] Gossip NPC Gnome Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19129
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19129;
+-- OLD name : [PH] Gossip NPC Troll Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19130
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19130;
+-- OLD name : [PH] Gossip NPC Gnome Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19131
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19131;
+-- OLD name : [PH] Gossip NPC Troll Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19132
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19132;
 -- OLD name : Wichtel der Flammenschürer
 -- Source : https://www.wowhead.com/wotlk/de/npc=19136
 UPDATE `creature_template_locale` SET `Name` = 'Flammenschürerwichtel' WHERE `locale` = 'deDE' AND `entry` = 19136;
@@ -2204,6 +3129,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Verzauberkunstmeisterlehrer' WH
 -- OLD subname : Ingenieurskunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=19576
 UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer' WHERE `locale` = 'deDE' AND `entry` = 19576;
+-- OLD name : Zauberer des Sonnenzorns - Sonnenzornposten (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19650
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19650;
 -- OLD subname : Juwelierskunstlehrling
 -- Source : https://www.wowhead.com/wotlk/de/npc=19774
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling' WHERE `locale` = 'deDE' AND `entry` = 19774;
@@ -2216,6 +3144,12 @@ UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling' WHERE
 -- OLD subname : Juwelierskunstlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=19778
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrerin' WHERE `locale` = 'deDE' AND `entry` = 19778;
+-- OLD name : Aufseher der Illidari (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19819
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19819;
+-- OLD name : Horngeist (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=19846
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 19846;
 -- OLD name : Bild von Kommandantin Sarannis
 -- Source : https://www.wowhead.com/wotlk/de/npc=19938
 UPDATE `creature_template_locale` SET `Name` = 'Bild von Kommandant Sarannis' WHERE `locale` = 'deDE' AND `entry` = 19938;
@@ -2225,6 +3159,21 @@ UPDATE `creature_template_locale` SET `Name` = 'Astromantenlord' WHERE `locale` 
 -- OLD name : Versuchsobjekt: Wachposten von Lodaeron
 -- Source : https://www.wowhead.com/wotlk/de/npc=20053
 UPDATE `creature_template_locale` SET `Name` = 'Versuchsobjekt: Wachposten von Lordaeron' WHERE `locale` = 'deDE' AND `entry` = 20053;
+-- OLD name : [PH] Gossip NPC Goblin Female, Christmas (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20103
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20103;
+-- OLD name : [PH] Gossip NPC, Goblin Female (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20104
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20104;
+-- OLD name : [PH] Gossip NPC Goblin Female, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20105
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20105;
+-- OLD name : [PH] Gossip NPC Goblin Male, Lunar Festival (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20106
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20106;
+-- OLD name : [PH] Gossip NPC, Goblin Male (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20107
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20107;
 -- OLD subname : Schmiedekunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=20124
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedelehrer' WHERE `locale` = 'deDE' AND `entry` = 20124;
@@ -2237,6 +3186,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Blutdurstiger Marschenfänger' W
 -- OLD subname : Überholte Arenarüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=20278
 UPDATE `creature_template_locale` SET `Title` = 'Brutaler Arenaverkäufer' WHERE `locale` = 'deDE' AND `entry` = 20278;
+-- OLD name : Mönch der Auchenai (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20299
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20299;
 -- OLD name : Käpt'n Sanders
 -- Source : https://www.wowhead.com/wotlk/de/npc=20351
 UPDATE `creature_template_locale` SET `Name` = 'Kapitän Sanders' WHERE `locale` = 'deDE' AND `entry` = 20351;
@@ -2273,9 +3225,33 @@ UPDATE `creature_template_locale` SET `Title` = 'Reitlehrer' WHERE `locale` = 'd
 -- OLD subname : Fluglehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=20511
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrerin' WHERE `locale` = 'deDE' AND `entry` = 20511;
+-- OLD name : Kapitän Skarloc (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20521
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20521;
+-- OLD name : Epochenjäger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20531
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20531;
+-- OLD name : Thrall (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20548
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20548;
 -- OLD name : Aragas Junges
 -- Source : https://www.wowhead.com/wotlk/de/npc=20615
 UPDATE `creature_template_locale` SET `Name` = 'Dunkeltatzenjunges' WHERE `locale` = 'deDE' AND `entry` = 20615;
+-- OLD name : Zauberhexerin des Echsenkessels (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20625
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20625;
+-- OLD name : Kriegsherr Kalithresh (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20633
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20633;
+-- OLD name : Botschafter Höllenschlund (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20636
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20636;
+-- OLD name : Dunkelfalke der Federschwingen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20686
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20686;
+-- OLD name : Kobaltblaue Schlange (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20688
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20688;
 -- OLD name : Feendrache
 -- Source : https://www.wowhead.com/wotlk/de/npc=20713
 UPDATE `creature_template_locale` SET `Name` = 'Siechdrache' WHERE `locale` = 'deDE' AND `entry` = 20713;
@@ -2288,9 +3264,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Erstarrter Schrecken der Leere' 
 -- OLD name : Akkiris-Blitzrufer
 -- Source : https://www.wowhead.com/wotlk/de/npc=20908
 UPDATE `creature_template_locale` SET `Name` = 'Akkiris Blitzrufer' WHERE `locale` = 'deDE' AND `entry` = 20908;
+-- OLD name : Blutwache Porung (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=20992
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 20992;
 -- OLD name : QA Test Dummy 73 Raid Debuff (High Armor)
 -- Source : https://www.wowhead.com/wotlk/de/npc=21003
 UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy 73 Raid Debuffed Warrior' WHERE `locale` = 'deDE' AND `entry` = 21003;
+-- OLD name : Arkanwächter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21031
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21031;
 -- OLD name : Verteidiger des Lebenden Hains (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=21072
 UPDATE `creature_template_locale` SET `Name` = 'Verteidiger des lebenden Hains' WHERE `locale` = 'deDE' AND `entry` = 21072;
@@ -2312,6 +3294,12 @@ UPDATE `creature_template_locale` SET `Name` = 'Wasserbeschwörer der Gezeitenwa
 -- OLD name : Sickernder Schlamm
 -- Source : https://www.wowhead.com/wotlk/de/npc=21264
 UPDATE `creature_template_locale` SET `Name` = 'Sickernder Brühschlammer' WHERE `locale` = 'deDE' AND `entry` = 21264;
+-- OLD name : [PH]Test Skunk (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21333
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21333;
+-- OLD name : Testnetherwelpe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21378
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21378;
 -- OLD name : Gesandter Icarius
 -- Source : https://www.wowhead.com/wotlk/de/npc=21409
 UPDATE `creature_template_locale` SET `Name` = 'Entsandter Icarius' WHERE `locale` = 'deDE' AND `entry` = 21409;
@@ -2319,12 +3307,21 @@ UPDATE `creature_template_locale` SET `Name` = 'Entsandter Icarius' WHERE `local
 -- Source : https://www.wowhead.com/wotlk/de/npc=21444
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21444;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (21444, 'deDE','Tempixx Feinagler',NULL);
+-- OLD name : Abbild eines großen Kurstenbohrers (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21457
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21457;
 -- OLD subname : Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=21483
 UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deDE' AND `entry` = 21483;
 -- OLD subname : Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=21488
 UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deDE' AND `entry` = 21488;
+-- OLD name : Kaliriaura (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21511
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21511;
+-- OLD name : Drakonaar der Pechschwingen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21588
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21588;
 -- OLD name : Forest Strider
 -- Source : https://www.wowhead.com/wotlk/de/npc=21634
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21634;
@@ -2335,6 +3332,21 @@ UPDATE `creature_template_locale` SET `Title` = 'Reagenzien & Giftreagenzien' WH
 -- OLD subname : Rüstmeister des Unteren Viertels (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=21655
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister des unteren Viertels' WHERE `locale` = 'deDE' AND `entry` = 21655;
+-- OLD name : Rechte Hand des Todes (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21658
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21658;
+-- OLD name : [DND]Mok'Nathal Wand 1 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21713
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21713;
+-- OLD name : [DND]Mok'Nathal Wand 2 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21714
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21714;
+-- OLD name : [DND]Mok'Nathal Wand 3 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21715
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21715;
+-- OLD name : [DND]Mok'Nathal Wand 4 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21716
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21716;
 -- OLD name : Orcnekrolyt
 -- Source : https://www.wowhead.com/wotlk/de/npc=21747
 UPDATE `creature_template_locale` SET `Name` = 'Orcnekrolyth' WHERE `locale` = 'deDE' AND `entry` = 21747;
@@ -2344,9 +3356,24 @@ UPDATE `creature_template_locale` SET `Name` = 'Sturm der Leere des singenden Be
 -- OLD name : Massive Zephyriumladung
 -- Source : https://www.wowhead.com/wotlk/de/npc=21848
 UPDATE `creature_template_locale` SET `Name` = 'ZZOLD - Bone Burster Visual[PH]' WHERE `locale` = 'deDE' AND `entry` = 21848;
+-- OLD name : Reißer der Federschwingen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21989
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21989;
+-- OLD name : Kriegsfalke der Federschwingen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=21990
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 21990;
 -- OLD name : Gesandter vom Auge des Sturms
 -- Source : https://www.wowhead.com/wotlk/de/npc=22015
 UPDATE `creature_template_locale` SET `Name` = 'Entsandter vom Auge des Sturms' WHERE `locale` = 'deDE' AND `entry` = 22015;
+-- OLD name : Bleiche Eidechse (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22039
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22039;
+-- OLD name : Höhlenfledermaus (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22040
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22040;
+-- OLD name : Höhlenfledermaus (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22046
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22046;
 -- OLD name : Arenawerber
 -- Source : https://www.wowhead.com/wotlk/de/npc=22101
 UPDATE `creature_template_locale` SET `Name` = 'Arenapromoter' WHERE `locale` = 'deDE' AND `entry` = 22101;
@@ -2371,12 +3398,27 @@ UPDATE `creature_template_locale` SET `Title` = 'Botschafterin von Coca-Cola' WH
 -- OLD subname : Botschafterin von CocaCola
 -- Source : https://www.wowhead.com/wotlk/de/npc=22249
 UPDATE `creature_template_locale` SET `Title` = 'Botschafterin von Coca-Cola' WHERE `locale` = 'deDE' AND `entry` = 22249;
+-- OLD name : Zorniger Grollhuf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22284
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22284;
 -- OLD name : Schildwache der Thronwache
 -- Source : https://www.wowhead.com/wotlk/de/npc=22301
 UPDATE `creature_template_locale` SET `Name` = 'Späher der Thronwache' WHERE `locale` = 'deDE' AND `entry` = 22301;
 -- OLD name : Herz der Bebenden Erde
 -- Source : https://www.wowhead.com/wotlk/de/npc=22313
 UPDATE `creature_template_locale` SET `Name` = 'Rumpelndes Erdherz' WHERE `locale` = 'deDE' AND `entry` = 22313;
+-- OLD name : Fässchen mit Grüntröpfelgrog (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22356
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22356;
+-- OLD name : Blutschlägergeschwätz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22383
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22383;
+-- OLD name : Altar der Schatten (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22395
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22395;
+-- OLD name : Altar der Schatten (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22417
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22417;
 -- OLD name : Druide des Ewigen Hains (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=22423
 UPDATE `creature_template_locale` SET `Name` = 'Druide des ewigen Hains' WHERE `locale` = 'deDE' AND `entry` = 22423;
@@ -2386,18 +3428,51 @@ UPDATE `creature_template_locale` SET `Name` = 'Druide des ewigen Hains' WHERE `
 -- OLD name : Druide des Ewigen Hains (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=22426
 UPDATE `creature_template_locale` SET `Name` = 'Druide des ewigen Hains' WHERE `locale` = 'deDE' AND `entry` = 22426;
+-- OLD name : Ogerlanze aufgestellt (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22434
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22434;
+-- OLD name : Rexxars Wyvern (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22435
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22435;
 -- OLD name : Urtum des Ewigen Hains (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=22478
 UPDATE `creature_template_locale` SET `Name` = 'Urtum des ewigen Hains' WHERE `locale` = 'deDE' AND `entry` = 22478;
 -- OLD subname : Forscherliga
 -- Source : https://www.wowhead.com/wotlk/de/npc=22481
 UPDATE `creature_template_locale` SET `Title` = 'Expeditionsleiter' WHERE `locale` = 'deDE' AND `entry` = 22481;
+-- OLD name : Schildwache der Allianz (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22645
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22645;
+-- OLD name : Leutnant Largent (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22702
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22702;
+-- OLD name : Alteracwidder (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22727
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22727;
+-- OLD name : Unteroffizier Yazra Murrblut (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22760
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22760;
+-- OLD name : [DND]Prophecy 1 Quest Credit (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22798
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22798;
+-- OLD name : [DND]Prophecy 2 Quest Credit (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22799
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22799;
+-- OLD name : [DND]Prophecy 3 Quest Credit (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22800
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22800;
+-- OLD name : [DND]Prophecy 4 Quest Credit (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22801
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22801;
 -- OLD name : Gorgolon der Allsehende
 -- Source : https://www.wowhead.com/wotlk/de/npc=22827
 UPDATE `creature_template_locale` SET `Name` = 'Gorgolon der Allessehende' WHERE `locale` = 'deDE' AND `entry` = 22827;
 -- OLD name : Tempelkonkubine
 -- Source : https://www.wowhead.com/wotlk/de/npc=22939
 UPDATE `creature_template_locale` SET `Name` = 'Tempelakolyth' WHERE `locale` = 'deDE' AND `entry` = 22939;
+-- OLD name : Hund der Illidari (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=22944
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 22944;
 -- OLD name : Bezaubernde Kurtisane
 -- Source : https://www.wowhead.com/wotlk/de/npc=22955
 UPDATE `creature_template_locale` SET `Name` = 'Bezaubernder Besucher' WHERE `locale` = 'deDE' AND `entry` = 22955;
@@ -2419,18 +3494,21 @@ UPDATE `creature_template_locale` SET `Name` = 'Priesterin der Wonne' WHERE `loc
 -- OLD name : Versklavter Diener
 -- Source : https://www.wowhead.com/wotlk/de/npc=22965
 UPDATE `creature_template_locale` SET `Name` = 'Ergebener Diener' WHERE `locale` = 'deDE' AND `entry` = 22965;
--- OLD name : Inselelekk
+-- OLD name : Inselelekk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23013
-UPDATE `creature_template_locale` SET `Name` = '[Designer Island Elekk]' WHERE `locale` = 'deDE' AND `entry` = 23013;
--- OLD name : Inselsäbler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23013;
+-- OLD name : Inselsäbler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23014
-UPDATE `creature_template_locale` SET `Name` = '[Designer Island Sabercat]' WHERE `locale` = 'deDE' AND `entry` = 23014;
--- OLD name : TEST Iceberg
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23014;
+-- OLD name : TEST Iceberg (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23041
-UPDATE `creature_template_locale` SET `Name` = '[TEST Iceberg]' WHERE `locale` = 'deDE' AND `entry` = 23041;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23041;
 -- OLD name : Zerrütter der Teufelwache
 -- Source : https://www.wowhead.com/wotlk/de/npc=23055
 UPDATE `creature_template_locale` SET `Name` = 'Zerrütter der Teufelswache' WHERE `locale` = 'deDE' AND `entry` = 23055;
+-- OLD name : [PH]Knockdown Fel Cannon Dummy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23077
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23077;
 -- OLD subname : Magierlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=23103
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer' WHERE `locale` = 'deDE' AND `entry` = 23103;
@@ -2443,6 +3521,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Dunstschemen der Gronn' WHERE `l
 -- OLD name : Scharfseher Javad
 -- Source : https://www.wowhead.com/wotlk/de/npc=23127
 UPDATE `creature_template_locale` SET `Name` = 'Weissager Javad' WHERE `locale` = 'deDE' AND `entry` = 23127;
+-- OLD name : Teufelshund (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23138
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23138;
 -- OLD name : Manaschuldensklave
 -- Source : https://www.wowhead.com/wotlk/de/npc=23154
 UPDATE `creature_template_locale` SET `Name` = 'Manasüchtiger Sklave' WHERE `locale` = 'deDE' AND `entry` = 23154;
@@ -2458,9 +3539,24 @@ UPDATE `creature_template_locale` SET `Name` = 'Schwarzer Drache' WHERE `locale`
 -- OLD name : Assassine der Shivarra
 -- Source : https://www.wowhead.com/wotlk/de/npc=23220
 UPDATE `creature_template_locale` SET `Name` = 'Assassine der Shivan' WHERE `locale` = 'deDE' AND `entry` = 23220;
+-- OLD name : Mutantenkommandant (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23238
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23238;
+-- OLD name : Wuthund der Eredar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23276
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23276;
 -- OLD name : Wahnsinniger Vorarbeiter der Finsterblut
 -- Source : https://www.wowhead.com/wotlk/de/npc=23305
 UPDATE `creature_template_locale` SET `Name` = 'Verrückter Großknecht der Finsterblut' WHERE `locale` = 'deDE' AND `entry` = 23305;
+-- OLD name : [PH] PvP Cannon (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23314
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23314;
+-- OLD name : [PH] PvP Cannon Shot Target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23315
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23315;
+-- OLD name : [PH] PvP Cannon Targetting Reticle (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23317
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23317;
 -- OLD name : Wahnsinniger Minenarbeiter der Finsterblut
 -- Source : https://www.wowhead.com/wotlk/de/npc=23324
 UPDATE `creature_template_locale` SET `Name` = 'Verrückter Minenarbeiter der Finsterblut' WHERE `locale` = 'deDE' AND `entry` = 23324;
@@ -2479,78 +3575,138 @@ UPDATE `creature_template_locale` SET `Title` = 'PTR-Verbrauchsgüter' WHERE `lo
 -- OLD name : Stellvertreter der Gordunni
 -- Source : https://www.wowhead.com/wotlk/de/npc=23450
 UPDATE `creature_template_locale` SET `Name` = 'Fernmelder der Gordunni' WHERE `locale` = 'deDE' AND `entry` = 23450;
--- OLD name : Nordendyeti (blau)
+-- OLD name : Zwergischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23479
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23479;
+-- OLD name : Menschlicher Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23480
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23480;
+-- OLD name : Nordendyeti (blau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23513
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Yeti (Blue)]' WHERE `locale` = 'deDE' AND `entry` = 23513;
--- OLD name : Nordendyeti (braun)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23513;
+-- OLD name : Nordendyeti (braun) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23514
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Yeti (Brown)]' WHERE `locale` = 'deDE' AND `entry` = 23514;
--- OLD name : Nordendyeti (gelb)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23514;
+-- OLD name : UNUSED Nordendyeti (rot) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23515
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23515;
+-- OLD name : Nordendyeti (gelb) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23516
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Yeti (Yellow)]' WHERE `locale` = 'deDE' AND `entry` = 23516;
--- OLD name : Nordendyeti (weiß)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23516;
+-- OLD name : Nordendyeti (weiß) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23517
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Yeti (White)]' WHERE `locale` = 'deDE' AND `entry` = 23517;
--- OLD name : Taurenkanu
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23517;
+-- OLD name : Taurenkanu (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23518
-UPDATE `creature_template_locale` SET `Name` = '[Tauren Canoe (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 23518;
--- OLD name : Jimmy Zweikanu
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23518;
+-- OLD name : Jimmy Zweikanu (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23520
-UPDATE `creature_template_locale` SET `Name` = '[Jimmy Two-Canoes]' WHERE `locale` = 'deDE' AND `entry` = 23520;
--- OLD name : Roter Nordenddrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23520;
+-- OLD name : Verkäufer des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23532
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23532;
+-- OLD name : Roter Nordenddrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23538
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Red Dragon]' WHERE `locale` = 'deDE' AND `entry` = 23538;
--- OLD name : Roter Nordendgroßdrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23538;
+-- OLD name : Roter Nordendgroßdrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23539
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Red Drake]' WHERE `locale` = 'deDE' AND `entry` = 23539;
--- OLD name : Vrykul (Northrend Size Model)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23539;
+-- OLD name : Goblinischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23540
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23540;
+-- OLD name : Vrykul (Northrend Size Model) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23553
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul (Northrend Size Model)]' WHERE `locale` = 'deDE' AND `entry` = 23553;
--- OLD name : Protodrachenreittier der Vrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23553;
+-- OLD name : Protodrachenreittier der Vrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23556
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul Proto-dragon Mount]' WHERE `locale` = 'deDE' AND `entry` = 23556;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23556;
 -- OLD name : Budd
 -- Source : https://www.wowhead.com/wotlk/de/npc=23559
 UPDATE `creature_template_locale` SET `Name` = 'Budd Winterhäldler' WHERE `locale` = 'deDE' AND `entry` = 23559;
 -- OLD name : Braufestwidder
 -- Source : https://www.wowhead.com/wotlk/de/npc=23588
 UPDATE `creature_template_locale` SET `Name` = 'Widder des Braufests' WHERE `locale` = 'deDE' AND `entry` = 23588;
--- OLD name : Stammesangehöriger der Langhauer
+-- OLD name : Neuer NSC des Hinterlands (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23599
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23599;
+-- OLD name : Orcischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23607
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23607;
+-- OLD name : Taurischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23608
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23608;
+-- OLD name : Trollischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23609
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23609;
+-- OLD name : Blutelfischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23610
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23610;
+-- OLD name : Untoter Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23611
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23611;
+-- OLD name : Draenischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23613
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23613;
+-- OLD name : Gnomischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23614
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23614;
+-- OLD name : Nachtelfischer Feiernder des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23615
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23615;
+-- OLD name : [PH] Darkmoon Carnie APPEARANCE A (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23629
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23629;
+-- OLD name : [PH] Darkmoon Carnie APPEARANCE B (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23630
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23630;
+-- OLD name : [PH] Darkmoon Carnie APPEARANCE C (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23631
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23631;
+-- OLD name : [PH] Darkmoon Carnie APPEARANCE D (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23632
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23632;
+-- OLD name : [PH] Darkmoon Carnie APPEARANCE E (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23633
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23633;
+-- OLD name : [PH] Darkmoon Carnie APPEARANCE F (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23634
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23634;
+-- OLD name : Stammesangehöriger der Langhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23639
-UPDATE `creature_template_locale` SET `Name` = '[Longtusk Tribesman]' WHERE `locale` = 'deDE' AND `entry` = 23639;
--- OLD name : Harpunierer der Langhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23639;
+-- OLD name : Harpunierer der Langhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23640
-UPDATE `creature_template_locale` SET `Name` = '[Longtusk Harpooner]' WHERE `locale` = 'deDE' AND `entry` = 23640;
--- OLD name : Meeresrufer der Langhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23640;
+-- OLD name : Meeresrufer der Langhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23641
-UPDATE `creature_template_locale` SET `Name` = '[Longtusk Sea-caller]' WHERE `locale` = 'deDE' AND `entry` = 23641;
--- OLD name : Wegfinder der Langhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23641;
+-- OLD name : Wegfinder der Langhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23642
-UPDATE `creature_template_locale` SET `Name` = '[Longtusk Wayfinder]' WHERE `locale` = 'deDE' AND `entry` = 23642;
--- OLD name : Nordmeerschmuggler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23642;
+-- OLD name : Nordmeerschmuggler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23646
-UPDATE `creature_template_locale` SET `Name` = '[Northsea Smuggler]' WHERE `locale` = 'deDE' AND `entry` = 23646;
--- OLD name : Nordmeerbrigant
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23646;
+-- OLD name : Nordmeerbrigant (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23647
-UPDATE `creature_template_locale` SET `Name` = '[Northsea Brigand]' WHERE `locale` = 'deDE' AND `entry` = 23647;
--- OLD name : Nordmeerräuber
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23647;
+-- OLD name : Nordmeerräuber (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23648
-UPDATE `creature_template_locale` SET `Name` = '[Northsea Raider]' WHERE `locale` = 'deDE' AND `entry` = 23648;
--- OLD name : Nordmeerschwadroneur
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23648;
+-- OLD name : Nordmeerschwadroneur (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23649
-UPDATE `creature_template_locale` SET `Name` = '[Northsea Swashbuckler]' WHERE `locale` = 'deDE' AND `entry` = 23649;
--- OLD name : Nordmeerpirat
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23649;
+-- OLD name : Nordmeerpirat (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23650
-UPDATE `creature_template_locale` SET `Name` = '[Northsea Pirate]' WHERE `locale` = 'deDE' AND `entry` = 23650;
--- OLD name : Ältester der Drachenschinder
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23650;
+-- OLD name : Ältester der Drachenschinder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23659
-UPDATE `creature_template_locale` SET `Name` = '[Dragonflayer Elder]' WHERE `locale` = 'deDE' AND `entry` = 23659;
--- OLD name : Zottelfelleber
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23659;
+-- OLD name : Zottelfelleber (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23692
-UPDATE `creature_template_locale` SET `Name` = '[Shaghide Boar]' WHERE `locale` = 'deDE' AND `entry` = 23692;
--- OLD name : Tuskarr (Northrend Size Model)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23692;
+-- OLD name : Tuskarr (Northrend Size Model) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23695
-UPDATE `creature_template_locale` SET `Name` = '[Tuskarr (Northrend Size Model)]' WHERE `locale` = 'deDE' AND `entry` = 23695;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23695;
 -- OLD name : Festagsfass der Gerstenbräus
 -- Source : https://www.wowhead.com/wotlk/de/npc=23700
 UPDATE `creature_template_locale` SET `Name` = 'Festtagsfass der Gerstenbräus' WHERE `locale` = 'deDE' AND `entry` = 23700;
@@ -2560,591 +3716,783 @@ UPDATE `creature_template_locale` SET `Name` = 'Festtagsfass der Donnerbräus' W
 -- OLD name : Festagsfass der Gordok
 -- Source : https://www.wowhead.com/wotlk/de/npc=23706
 UPDATE `creature_template_locale` SET `Name` = 'Festtagsfass der Gordok' WHERE `locale` = 'deDE' AND `entry` = 23706;
--- OLD name : Claytons Testkreatur, subname : Geprüfte Qualität
+-- OLD name : Claytons Testkreatur, subname : Geprüfte Qualität (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23715
-UPDATE `creature_template_locale` SET `Name` = '[Clayton''s Test Creature]',`Title` = '[Quality Assured]' WHERE `locale` = 'deDE' AND `entry` = 23715;
--- OLD name : Steinlord
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23715;
+-- OLD name : Steinlord (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23726
-UPDATE `creature_template_locale` SET `Name` = '[Stone Lord]' WHERE `locale` = 'deDE' AND `entry` = 23726;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23726;
 -- OLD subname : Lehrerin für Erste Hilfe
 -- Source : https://www.wowhead.com/wotlk/de/npc=23734
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ersten Hilfe' WHERE `locale` = 'deDE' AND `entry` = 23734;
--- OLD name : Eishöhlenyeti
+-- OLD name : Eishöhlenyeti (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23743
-UPDATE `creature_template_locale` SET `Name` = '[Icehollow Yeti]' WHERE `locale` = 'deDE' AND `entry` = 23743;
--- OLD name : Dampfpanzer von Eisenschmiede
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23743;
+-- OLD name : Dampfpanzer von Eisenschmiede (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23756
-UPDATE `creature_template_locale` SET `Name` = '[Ironforge Steam Tank]' WHERE `locale` = 'deDE' AND `entry` = 23756;
--- OLD name : Kapitän der Blockade
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23756;
+-- OLD name : Kapitän der Blockade (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23767
-UPDATE `creature_template_locale` SET `Name` = '[Blockade Captain]' WHERE `locale` = 'deDE' AND `entry` = 23767;
--- OLD name : Scharfschütze von Valgarde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23767;
+-- OLD name : Scharfschütze von Valgarde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23792
-UPDATE `creature_template_locale` SET `Name` = '[Valgarde Rifleman]' WHERE `locale` = 'deDE' AND `entry` = 23792;
--- OLD name : Flamme der Drachenschinder
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23792;
+-- OLD name : Flamme der Drachenschinder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23806
-UPDATE `creature_template_locale` SET `Name` = '[Dragonflayer Blaze]' WHERE `locale` = 'deDE' AND `entry` = 23806;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23806;
+-- OLD name : Fass des Braufests zum Ziel bewegen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23808
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23808;
+-- OLD name : Feiernder Zwergenmann des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23819
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23819;
+-- OLD name : Feiernde Zwergenfrau des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23820
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23820;
+-- OLD name : Feiernde Goblinfrau des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23824
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23824;
+-- OLD name : Feiernder Goblinmann des Braufests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23825
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23825;
+-- OLD name : [DND] L70ETC FX Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23830
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23830;
 -- OLD name : Unteroffizierin Amelyn
 -- Source : https://www.wowhead.com/wotlk/de/npc=23835
 UPDATE `creature_template_locale` SET `Name` = 'Unteroffizier Amelyn' WHERE `locale` = 'deDE' AND `entry` = 23835;
--- OLD name : Holzfäller der Westwacht
+-- OLD name : Holzfäller der Westwacht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23838
-UPDATE `creature_template_locale` SET `Name` = '[Westguard Lumberjack (Wood)]' WHERE `locale` = 'deDE' AND `entry` = 23838;
--- OLD name : Kavallerist der Westwacht
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23838;
+-- OLD name : [DND] L70ETC Bergrisst Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23845
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23845;
+-- OLD name : [DND] L70ETC Concert Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23850
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23850;
+-- OLD name : [DND] L70ETC Mai'Kyl Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23852
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23852;
+-- OLD name : [DND] L70ETC Samuro Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23853
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23853;
+-- OLD name : [DND] L70ETC Sig Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23854
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23854;
+-- OLD name : [DND] L70ETC Chief Thunder-Skins Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23855
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23855;
+-- OLD name : Kavallerist der Westwacht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23856
-UPDATE `creature_template_locale` SET `Name` = '[Westguard Cavalryman Dwarf]' WHERE `locale` = 'deDE' AND `entry` = 23856;
--- OLD name : Kavallerist der Westwacht
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23856;
+-- OLD name : Kavallerist der Westwacht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23857
-UPDATE `creature_template_locale` SET `Name` = '[Westguard Cavalryman Human]' WHERE `locale` = 'deDE' AND `entry` = 23857;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23857;
 -- OLD subname : Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=23862
 UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deDE' AND `entry` = 23862;
--- OLD name : Gezähmter Protowelpe
+-- OLD name : Gezähmter Protowelpe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23882
-UPDATE `creature_template_locale` SET `Name` = '[Tamed Proto-Whelp]' WHERE `locale` = 'deDE' AND `entry` = 23882;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23882;
 -- OLD subname : Angellehrer & Handwerkswaren
 -- Source : https://www.wowhead.com/wotlk/de/npc=23896
 UPDATE `creature_template_locale` SET `Title` = 'Fischhändler' WHERE `locale` = 'deDE' AND `entry` = 23896;
--- OLD name : Invisible Giant Trigger
+-- OLD name : Wiedererweckter Berserker (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23898
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23898;
+-- OLD name : Invisible Giant Trigger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23901
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Giant Trigger]' WHERE `locale` = 'deDE' AND `entry` = 23901;
--- OLD name : Test Guy Brian
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23901;
+-- OLD name : Test Guy Brian (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23925
-UPDATE `creature_template_locale` SET `Name` = '[Test Guy Brian]' WHERE `locale` = 'deDE' AND `entry` = 23925;
--- OLD name : Verteidiger der Westwacht
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23925;
+-- OLD name : Verteidiger der Westwacht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23933
-UPDATE `creature_template_locale` SET `Name` = '[Westguard Defender - Sleeping]' WHERE `locale` = 'deDE' AND `entry` = 23933;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23933;
+-- OLD name : [DNT]TEST Pet Moth (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=23936
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23936;
 -- OLD name : Gastwirtin Celeste Gutstall
 -- Source : https://www.wowhead.com/wotlk/de/npc=23937
 UPDATE `creature_template_locale` SET `Name` = 'Gastwirt Celeste Gutstall' WHERE `locale` = 'deDE' AND `entry` = 23937;
--- OLD name : Mogisu der Wanderer
+-- OLD name : Mogisu der Wanderer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=23981
-UPDATE `creature_template_locale` SET `Name` = '[Mogisu the Wayfarer]' WHERE `locale` = 'deDE' AND `entry` = 23981;
--- OLD name : Hungriger Seuchenhund
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 23981;
+-- OLD name : Hungriger Seuchenhund (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24000
-UPDATE `creature_template_locale` SET `Name` = '[Hungry Plaguehound Counter]' WHERE `locale` = 'deDE' AND `entry` = 24000;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24000;
 -- OLD name : Belagerungsarbeiter
 -- Source : https://www.wowhead.com/wotlk/de/npc=24005
 UPDATE `creature_template_locale` SET `Name` = 'Mühlenarbeiter' WHERE `locale` = 'deDE' AND `entry` = 24005;
--- OLD name : Aasfressende Made
+-- OLD name : Aasfressende Made (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24017
-UPDATE `creature_template_locale` SET `Name` = '[Scavenging Maggot]' WHERE `locale` = 'deDE' AND `entry` = 24017;
--- OLD name : Reitpferd
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24017;
+-- OLD name : Reitpferd (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24020
-UPDATE `creature_template_locale` SET `Name` = '[Riding Horse (Gjalerbron Felsteed) (scale x2)]' WHERE `locale` = 'deDE' AND `entry` = 24020;
--- OLD name : Test Faction Monster
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24020;
+-- OLD name : Test Faction Monster (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24022
-UPDATE `creature_template_locale` SET `Name` = '[Test Faction Monster]' WHERE `locale` = 'deDE' AND `entry` = 24022;
--- OLD name : Steinhornwidder
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24022;
+-- OLD name : Steinhornwidder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24049
-UPDATE `creature_template_locale` SET `Name` = '[Rockhorn Ram]' WHERE `locale` = 'deDE' AND `entry` = 24049;
--- OLD name : Protodrachenbrutmutter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24049;
+-- OLD name : Protodrachenbrutmutter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24072
-UPDATE `creature_template_locale` SET `Name` = '[Proto-Drake Broodmother]' WHERE `locale` = 'deDE' AND `entry` = 24072;
--- OLD name : Inspektor
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24072;
+-- OLD name : Inspektor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24074
-UPDATE `creature_template_locale` SET `Name` = '[Surveyor]' WHERE `locale` = 'deDE' AND `entry` = 24074;
--- OLD name : Späher von Valgarde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24074;
+-- OLD name : Späher von Valgarde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24075
-UPDATE `creature_template_locale` SET `Name` = '[Valgarde Scout]' WHERE `locale` = 'deDE' AND `entry` = 24075;
--- OLD name : Gefangenes Kind von Valgarde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24075;
+-- OLD name : Gefangenes Kind von Valgarde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24091
-UPDATE `creature_template_locale` SET `Name` = '[Captured Valgarde Child]' WHERE `locale` = 'deDE' AND `entry` = 24091;
--- OLD name : Winterskorn Vrykul Dismembering Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24091;
+-- OLD name : Winterskorn Vrykul Dismembering Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24095
-UPDATE `creature_template_locale` SET `Name` = '[Winterskorn Vrykul Dismembering Bunny]' WHERE `locale` = 'deDE' AND `entry` = 24095;
--- OLD name : Skorn Longhouse SW Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24095;
+-- OLD name : Skorn Longhouse SW Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24101
-UPDATE `creature_template_locale` SET `Name` = '[Skorn Longhouse SW Bunny]' WHERE `locale` = 'deDE' AND `entry` = 24101;
--- OLD name : Protodrachenhimmelswache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24101;
+-- OLD name : Protodrachenhimmelswache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24105
-UPDATE `creature_template_locale` SET `Name` = '[Proto-Drake Skyguard]' WHERE `locale` = 'deDE' AND `entry` = 24105;
--- OLD name : Schildwache der Drachenschinder
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24105;
+-- OLD name : Schildwache der Drachenschinder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24107
-UPDATE `creature_template_locale` SET `Name` = '[Dragonflayer Sentinel]' WHERE `locale` = 'deDE' AND `entry` = 24107;
--- OLD name : Reservist der Nordflotte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24107;
+-- OLD name : Zielattrappe des Braufests zum Ziel bewegen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24109
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24109;
+-- OLD name : Reservist der Nordflotte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24121
-UPDATE `creature_template_locale` SET `Name` = '[North Fleet Reservist Credit]' WHERE `locale` = 'deDE' AND `entry` = 24121;
--- OLD name : Gefangener Einwohner Valgardes (PROXY)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24121;
+-- OLD name : Gefangener Einwohner Valgardes (PROXY) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24124
-UPDATE `creature_template_locale` SET `Name` = '[Captured Valgarde Prisoner (PROXY)]' WHERE `locale` = 'deDE' AND `entry` = 24124;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24124;
 -- OLD name : Kriegerheld der Winterhufe
 -- Source : https://www.wowhead.com/wotlk/de/npc=24130
 UPDATE `creature_template_locale` SET `Name` = 'Held der Winterhufe' WHERE `locale` = 'deDE' AND `entry` = 24130;
--- OLD name : Nebelsäbler
+-- OLD name : Nebelsäbler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24134
-UPDATE `creature_template_locale` SET `Name` = '[Mistsaber]' WHERE `locale` = 'deDE' AND `entry` = 24134;
--- OLD name : Leichnam der Nordflotte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24134;
+-- OLD name : Leichnam der Nordflotte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24146
-UPDATE `creature_template_locale` SET `Name` = '[North Fleet Corpse]' WHERE `locale` = 'deDE' AND `entry` = 24146;
--- OLD name : Ulf Credit Marker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24146;
+-- OLD name : Wiedererwecktes Orakel (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24153
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24153;
+-- OLD name : Ulf Credit Marker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24165
-UPDATE `creature_template_locale` SET `Name` = '[Ulf Credit Marker]' WHERE `locale` = 'deDE' AND `entry` = 24165;
--- OLD name : Oric Credit Marker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24165;
+-- OLD name : Oric Credit Marker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24166
-UPDATE `creature_template_locale` SET `Name` = '[Oric Credit Marker]' WHERE `locale` = 'deDE' AND `entry` = 24166;
--- OLD name : Gunnar Credit Marker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24166;
+-- OLD name : Gunnar Credit Marker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24167
-UPDATE `creature_template_locale` SET `Name` = '[Gunnar Credit Marker]' WHERE `locale` = 'deDE' AND `entry` = 24167;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24167;
+-- OLD name : [DND] Darkmoon Faire Target Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24171
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24171;
 -- OLD name : Aufklärer der Amani'shi
 -- Source : https://www.wowhead.com/wotlk/de/npc=24175
 UPDATE `creature_template_locale` SET `Name` = 'Ausguck der Amani''shi' WHERE `locale` = 'deDE' AND `entry` = 24175;
--- OLD name : Diener des Lichts
+-- OLD name : Geist von Forscher Jaren (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24181
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24181;
+-- OLD name : Diener des Lichts (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24190
-UPDATE `creature_template_locale` SET `Name` = '[Servitor of the Light]' WHERE `locale` = 'deDE' AND `entry` = 24190;
--- OLD name : Diener des Lichts
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24190;
+-- OLD name : Diener des Lichts (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24192
-UPDATE `creature_template_locale` SET `Name` = '[Servitor of the Light (Escort)]' WHERE `locale` = 'deDE' AND `entry` = 24192;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24192;
 -- OLD name : Armee der Toten
 -- Source : https://www.wowhead.com/wotlk/de/npc=24207
 UPDATE `creature_template_locale` SET `Name` = 'Ghul aus der Armee der Toten' WHERE `locale` = 'deDE' AND `entry` = 24207;
--- OLD name : Quälheimer Massenmörder
+-- OLD name : [DND] Darkmoon Faire Target Bunny Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24220
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24220;
+-- OLD name : Quälheimer Massenmörder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24231
-UPDATE `creature_template_locale` SET `Name` = '[Baleheim Bodycount]' WHERE `locale` = 'deDE' AND `entry` = 24231;
--- OLD name : Protodrachenreittier der Vrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24231;
+-- OLD name : Protodrachenreittier der Vrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24237
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul Proto-dragon Mount (White)]' WHERE `locale` = 'deDE' AND `entry` = 24237;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24237;
 -- OLD name : Kriecher
 -- Source : https://www.wowhead.com/wotlk/de/npc=24242
 UPDATE `creature_template_locale` SET `Name` = 'Glibber' WHERE `locale` = 'deDE' AND `entry` = 24242;
--- OLD name : Arthas
+-- OLD name : [DND] Brewfest Speed Bunny Green (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24263
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24263;
+-- OLD name : [DND] Brewfest Speed Bunny Yellow (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24264
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24264;
+-- OLD name : [DND] Brewfest Speed Bunny Red (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24265
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24265;
+-- OLD name : Arthas (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24266
-UPDATE `creature_template_locale` SET `Name` = '[Arthas, Lich King]' WHERE `locale` = 'deDE' AND `entry` = 24266;
--- OLD name : Arthas
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24266;
+-- OLD name : Arthas (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24267
-UPDATE `creature_template_locale` SET `Name` = '[Arthas, Dark]' WHERE `locale` = 'deDE' AND `entry` = 24267;
--- OLD name : Arthas
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24267;
+-- OLD name : Arthas (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24268
-UPDATE `creature_template_locale` SET `Name` = '[Arthas, Human]' WHERE `locale` = 'deDE' AND `entry` = 24268;
--- OLD name : The Cleansing Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24268;
+-- OLD name : The Cleansing Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24269
-UPDATE `creature_template_locale` SET `Name` = '[The Cleansing Bunny [reuse me]]' WHERE `locale` = 'deDE' AND `entry` = 24269;
--- OLD name : Plagued Dragonflayer Explode Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24269;
+-- OLD name : Plagued Dragonflayer Explode Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24274
-UPDATE `creature_template_locale` SET `Name` = '[Plagued Dragonflayer Explode Credit]' WHERE `locale` = 'deDE' AND `entry` = 24274;
--- OLD name : Björn Kill Credit, subname : Häuptling der Winterskorn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24274;
+-- OLD name : Björn Kill Credit, subname : Häuptling der Winterskorn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24275
-UPDATE `creature_template_locale` SET `Name` = '[Bjorn Kill Credit]',`Title` = '[Winterskorn Chieftain]' WHERE `locale` = 'deDE' AND `entry` = 24275;
--- OLD name : Björn Insult Credit, subname : Häuptling der Winterskorn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24275;
+-- OLD name : Björn Insult Credit, subname : Häuptling der Winterskorn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24276
-UPDATE `creature_template_locale` SET `Name` = '[Bjorn Insult Credit]',`Title` = '[Winterskorn Chieftain]' WHERE `locale` = 'deDE' AND `entry` = 24276;
--- OLD name : Garwal - Worgentransformation
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24276;
+-- OLD name : Garwal - Worgentransformation (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24278
-UPDATE `creature_template_locale` SET `Name` = '[Garwal - Worgen Transform]' WHERE `locale` = 'deDE' AND `entry` = 24278;
--- OLD name : Plagued Dragonflayer Spray Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24278;
+-- OLD name : Plagued Dragonflayer Spray Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24281
-UPDATE `creature_template_locale` SET `Name` = '[Plagued Dragonflayer Spray Credit]' WHERE `locale` = 'deDE' AND `entry` = 24281;
--- OLD name : Nifflevar Event Controller
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24281;
+-- OLD name : [PH] Gossip NPC Human Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24292
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24292;
+-- OLD name : [PH] Gossip NPC Human Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24293
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24293;
+-- OLD name : [PH] Gossip NPC Blood Elf Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24294
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24294;
+-- OLD name : [PH] Gossip NPC Blood Elf Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24295
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24295;
+-- OLD name : [PH] Gossip NPC Draenei Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24296
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24296;
+-- OLD name : [PH] Gossip NPC Draenei Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24297
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24297;
+-- OLD name : [PH] Gossip NPC Dwarf Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24298
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24298;
+-- OLD name : [PH] Gossip NPC Dwarf Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24299
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24299;
+-- OLD name : [PH] Gossip NPC Undead Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24300
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24300;
+-- OLD name : [PH] Gossip NPC Undead Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24301
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24301;
+-- OLD name : [PH] Gossip NPC Gnome Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24302
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24302;
+-- OLD name : [PH] Gossip NPC Gnome Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24303
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24303;
+-- OLD name : [PH] Gossip NPC Goblin Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24304
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24304;
+-- OLD name : [PH] Gossip NPC Goblin Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24305
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24305;
+-- OLD name : [PH] Gossip NPC Night Elf Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24306
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24306;
+-- OLD name : [PH] Gossip NPC Night Elf Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24307
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24307;
+-- OLD name : [PH] Gossip NPC Orc Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24308
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24308;
+-- OLD name : [PH] Gossip NPC Orc Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24309
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24309;
+-- OLD name : [PH] Gossip NPC Tauren Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24310
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24310;
+-- OLD name : [PH] Gossip NPC Tauren Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24311
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24311;
+-- OLD name : Gruselige Lumpenpuppe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24319
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24319;
+-- OLD name : Nifflevar Event Controller (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24326
-UPDATE `creature_template_locale` SET `Name` = '[Nifflevar Event Controller]' WHERE `locale` = 'deDE' AND `entry` = 24326;
--- OLD name : Nordendtransportmittel der Blizzcon
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24326;
+-- OLD name : Nordendtransportmittel der Blizzcon (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24331
-UPDATE `creature_template_locale` SET `Name` = '[Blizzcon Northrend Transport]' WHERE `locale` = 'deDE' AND `entry` = 24331;
--- OLD name : Zul'Aman Transport
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24331;
+-- OLD name : Zul'Aman Transport (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24332
-UPDATE `creature_template_locale` SET `Name` = '[Blizzcon Zul''Aman Transport]' WHERE `locale` = 'deDE' AND `entry` = 24332;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24332;
 -- OLD name : Jason Gutstall, subname : Barkeeper
 -- Source : https://www.wowhead.com/wotlk/de/npc=24333
 UPDATE `creature_template_locale` SET `Name` = 'Schankkellner Jason Gutstall',`Title` = 'Getränke' WHERE `locale` = 'deDE' AND `entry` = 24333;
--- OLD name : Scharlachroter Wuchs
+-- OLD name : Scharlachroter Wuchs (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24339
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Growth]' WHERE `locale` = 'deDE' AND `entry` = 24339;
--- OLD name : Eric Maloof Test Forsaken Male
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24339;
+-- OLD name : [PH] Gossip NPC Troll Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24351
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24351;
+-- OLD name : [PH] Gossip NPC Troll Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24352
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24352;
+-- OLD name : Eric Maloof Test Forsaken Male (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24353
-UPDATE `creature_template_locale` SET `Name` = '[Eric Maloof Test Forsaken Male]' WHERE `locale` = 'deDE' AND `entry` = 24353;
--- OLD name : Eric Maloof Test Forsaken Female
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24353;
+-- OLD name : Eric Maloof Test Forsaken Female (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24354
-UPDATE `creature_template_locale` SET `Name` = '[Eric Maloof Test Forsaken Female]' WHERE `locale` = 'deDE' AND `entry` = 24354;
--- OLD name : Eric Maloof Test Human Male
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24354;
+-- OLD name : Eric Maloof Test Human Male (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24355
-UPDATE `creature_template_locale` SET `Name` = '[Eric Maloof Test Human Male]' WHERE `locale` = 'deDE' AND `entry` = 24355;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24355;
+-- OLD name : [PH] Gossip NPC Troll Female, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24360
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24360;
+-- OLD name : [PH] Gossip NPC Troll Male, Halloween (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24361
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24361;
 -- OLD name : Harrisons Leichnam
 -- Source : https://www.wowhead.com/wotlk/de/npc=24365
 UPDATE `creature_template_locale` SET `Name` = 'Willies Leichnam' WHERE `locale` = 'deDE' AND `entry` = 24365;
--- OLD name : Begrüßer der Blizzcon
+-- OLD name : [UNUSED]Vazruden Kill Credit (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24377
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24377;
+-- OLD name : [UNUSED]Nazan Kill Credit (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24378
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24378;
+-- OLD name : Begrüßer der Blizzcon (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24380
-UPDATE `creature_template_locale` SET `Name` = '[Blizzcon Greeter]' WHERE `locale` = 'deDE' AND `entry` = 24380;
--- OLD name : Eisenrunendiener
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24380;
+-- OLD name : Eisenrunendiener (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24387
-UPDATE `creature_template_locale` SET `Name` = '[Iron Rune Servant]' WHERE `locale` = 'deDE' AND `entry` = 24387;
--- OLD name : Alter Kutter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24387;
+-- OLD name : Alter Kutter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24391
-UPDATE `creature_template_locale` SET `Name` = '[Speedboat]' WHERE `locale` = 'deDE' AND `entry` = 24391;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24391;
 -- OLD subname : Arenaverkäufer
 -- Source : https://www.wowhead.com/wotlk/de/npc=24395
 UPDATE `creature_template_locale` SET `Title` = '' WHERE `locale` = 'deDE' AND `entry` = 24395;
--- OLD name : Steel Gate - Grapple Target
+-- OLD name : Invisible Man - No Weapons (Server Only/Hide Body) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24417
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24417;
+-- OLD name : Steel Gate - Grapple Target (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24438
-UPDATE `creature_template_locale` SET `Name` = '[Steel Gate - Grapple Target]' WHERE `locale` = 'deDE' AND `entry` = 24438;
--- OLD name : Der Lichkönig
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24438;
+-- OLD name : Der Lichkönig (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24446
-UPDATE `creature_template_locale` SET `Name` = '[The Lich King]' WHERE `locale` = 'deDE' AND `entry` = 24446;
--- OLD name : Frostwyrm
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24446;
+-- OLD name : Frostwyrm (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24447
-UPDATE `creature_template_locale` SET `Name` = '[Frostwyrm (Dragonblight)]' WHERE `locale` = 'deDE' AND `entry` = 24447;
--- OLD name : Invisible Charge Target 1
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24447;
+-- OLD name : Invisible Charge Target 1 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24449
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Charge Target 1]' WHERE `locale` = 'deDE' AND `entry` = 24449;
--- OLD name : Invisible Charge Target 2
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24449;
+-- OLD name : Invisible Charge Target 2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24450
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Charge Target 2]' WHERE `locale` = 'deDE' AND `entry` = 24450;
--- OLD name : Blue Floating Rune Channel Bunny 01
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24450;
+-- OLD name : Blue Floating Rune Channel Bunny 01 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24465
-UPDATE `creature_template_locale` SET `Name` = '[Blue Floating Rune Channel Bunny 01]' WHERE `locale` = 'deDE' AND `entry` = 24465;
--- OLD name : Blue Floating Rune Channel Bunny 02
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24465;
+-- OLD name : Blue Floating Rune Channel Bunny 02 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24466
-UPDATE `creature_template_locale` SET `Name` = '[Blue Floating Rune Channel Bunny 02]' WHERE `locale` = 'deDE' AND `entry` = 24466;
--- OLD name : SP Test
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24466;
+-- OLD name : Maldonados Testkreatur (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24470
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24470;
+-- OLD name : Schmiedenfeuer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24471
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24471;
+-- OLD name : SP Test (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24472
-UPDATE `creature_template_locale` SET `Name` = '[SP Test]' WHERE `locale` = 'deDE' AND `entry` = 24472;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24472;
 -- OLD name : Blutdürstiger Worg
 -- Source : https://www.wowhead.com/wotlk/de/npc=24475
 UPDATE `creature_template_locale` SET `Name` = 'Blutdurstiger Worg' WHERE `locale` = 'deDE' AND `entry` = 24475;
--- OLD name : Eiskriecher
+-- OLD name : Eiskriecher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24479
-UPDATE `creature_template_locale` SET `Name` = '[Ice Crawler]' WHERE `locale` = 'deDE' AND `entry` = 24479;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24479;
 -- OLD name : Froschtransformation
 -- Source : https://www.wowhead.com/wotlk/de/npc=24483
 UPDATE `creature_template_locale` SET `Name` = 'Transformation des Froschs' WHERE `locale` = 'deDE' AND `entry` = 24483;
--- OLD name : Harpunenkanone der Vrykul
+-- OLD name : Harpunenkanone der Vrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24512
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul Harpoon Gun (OLD)]' WHERE `locale` = 'deDE' AND `entry` = 24512;
--- OLD name : Vrykul Harpoon Controller 001 View
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24512;
+-- OLD name : Vrykul Harpoon Controller 001 View (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24513
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul Harpoon Controller 001 View]' WHERE `locale` = 'deDE' AND `entry` = 24513;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24513;
 -- OLD subname : Rüstmeisterin für Rüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=24520
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 24520;
--- OLD name : Northsea Test1
+-- OLD name : Northsea Test1 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24521
-UPDATE `creature_template_locale` SET `Name` = '[Northsea Test1]' WHERE `locale` = 'deDE' AND `entry` = 24521;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24521;
 -- OLD subname : Garaxxas Tier
 -- Source : https://www.wowhead.com/wotlk/de/npc=24552
 UPDATE `creature_template_locale` SET `Title` = 'Garaxxas'' Begleiter' WHERE `locale` = 'deDE' AND `entry` = 24552;
--- OLD name : Gespinstunhold der Nerub'ar
+-- OLD name : Gespinstunhold der Nerub'ar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24564
-UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Webfiend]' WHERE `locale` = 'deDE' AND `entry` = 24564;
--- OLD name : Spinne der Nerub'ar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24564;
+-- OLD name : Spinne der Nerub'ar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24565
-UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Spider]' WHERE `locale` = 'deDE' AND `entry` = 24565;
--- OLD name : Höhlenratte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24565;
+-- OLD name : Höhlenratte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24568
-UPDATE `creature_template_locale` SET `Name` = '[Den Rat]' WHERE `locale` = 'deDE' AND `entry` = 24568;
--- OLD name : Höhlenkriecher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24568;
+-- OLD name : Höhlenkriecher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24569
-UPDATE `creature_template_locale` SET `Name` = '[Den Creeper]' WHERE `locale` = 'deDE' AND `entry` = 24569;
--- OLD name : Tundragezücht
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24569;
+-- OLD name : Tundragezücht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24570
-UPDATE `creature_template_locale` SET `Name` = '[Tundra Vermin]' WHERE `locale` = 'deDE' AND `entry` = 24570;
--- OLD name : Gezüchttyrann
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24570;
+-- OLD name : Gezüchttyrann (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24571
-UPDATE `creature_template_locale` SET `Name` = '[Vermin Bully]' WHERE `locale` = 'deDE' AND `entry` = 24571;
--- OLD name : Gezüchthexling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24571;
+-- OLD name : Gezüchthexling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24572
-UPDATE `creature_template_locale` SET `Name` = '[Vermin Witchling]' WHERE `locale` = 'deDE' AND `entry` = 24572;
--- OLD name : Tundraroc
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24572;
+-- OLD name : Tundraroc (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24573
-UPDATE `creature_template_locale` SET `Name` = '[Tundra Roc]' WHERE `locale` = 'deDE' AND `entry` = 24573;
--- OLD name : Großer Tundraroc
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24573;
+-- OLD name : Großer Tundraroc (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24574
-UPDATE `creature_template_locale` SET `Name` = '[Greater Tundra Roc]' WHERE `locale` = 'deDE' AND `entry` = 24574;
--- OLD name : Feldmesser der Eisenwoge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24574;
+-- OLD name : Schinder der Peitschennarbe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24575
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24575;
+-- OLD name : Gezeitenjäger der Peitschennarbe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24577
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24577;
+-- OLD name : Schlangenwache der Peitschennarbe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24578
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24578;
+-- OLD name : Gezeitenlord der Peitschennarbe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24579
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24579;
+-- OLD name : Feldmesser der Eisenwoge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24581
-UPDATE `creature_template_locale` SET `Name` = '[Irontide Surveyor]' WHERE `locale` = 'deDE' AND `entry` = 24581;
--- OLD name : Maschinenschmied der Eisenwoge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24581;
+-- OLD name : Maschinenschmied der Eisenwoge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24582
-UPDATE `creature_template_locale` SET `Name` = '[Irontide Machinesmith]' WHERE `locale` = 'deDE' AND `entry` = 24582;
--- OLD name : Ingenieur der Eisenwoge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24582;
+-- OLD name : Ingenieur der Eisenwoge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24583
-UPDATE `creature_template_locale` SET `Name` = '[Irontide Engineer]' WHERE `locale` = 'deDE' AND `entry` = 24583;
--- OLD name : Fischer der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24583;
+-- OLD name : Fischer der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24584
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Fisherman]' WHERE `locale` = 'deDE' AND `entry` = 24584;
--- OLD name : Stammesmitglied der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24584;
+-- OLD name : Stammesmitglied der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24585
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Clansman]' WHERE `locale` = 'deDE' AND `entry` = 24585;
--- OLD name : Harpunierer der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24585;
+-- OLD name : Harpunierer der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24586
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Harpooner]' WHERE `locale` = 'deDE' AND `entry` = 24586;
--- OLD name : Walfänger der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24586;
+-- OLD name : Walfänger der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24587
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Whaler]' WHERE `locale` = 'deDE' AND `entry` = 24587;
--- OLD name : Meeresrufer der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24587;
+-- OLD name : Meeresrufer der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24588
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Sea-caller]' WHERE `locale` = 'deDE' AND `entry` = 24588;
--- OLD name : Orcajäger der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24588;
+-- OLD name : Orcajäger der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24589
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Orca Hunter]' WHERE `locale` = 'deDE' AND `entry` = 24589;
--- OLD name : Wegfinder der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24589;
+-- OLD name : Wegfinder der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24590
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Wayfinder]' WHERE `locale` = 'deDE' AND `entry` = 24590;
--- OLD name : Götzenschnitzer der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24590;
+-- OLD name : Götzenschnitzer der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24591
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Idol-Carver]' WHERE `locale` = 'deDE' AND `entry` = 24591;
--- OLD name : Ältester der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24591;
+-- OLD name : Ältester der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24592
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Elder]' WHERE `locale` = 'deDE' AND `entry` = 24592;
--- OLD name : Weiser Priester der Wahrhauer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24592;
+-- OLD name : Weiser Priester der Wahrhauer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24593
-UPDATE `creature_template_locale` SET `Name` = '[Truetusk Sage-Priest]' WHERE `locale` = 'deDE' AND `entry` = 24593;
--- OLD name : Korallenbewachsene Schildkröte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24593;
+-- OLD name : Korallenbewachsene Schildkröte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24594
-UPDATE `creature_template_locale` SET `Name` = '[Coral Shell Turtle]' WHERE `locale` = 'deDE' AND `entry` = 24594;
--- OLD name : Korallenbewachsener Schnapper
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24594;
+-- OLD name : Korallenbewachsener Schnapper (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24595
-UPDATE `creature_template_locale` SET `Name` = '[Coral Shell Snapper]' WHERE `locale` = 'deDE' AND `entry` = 24595;
--- OLD name : Korallenbewachsenes Urtum
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24595;
+-- OLD name : Korallenbewachsenes Urtum (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24596
-UPDATE `creature_template_locale` SET `Name` = '[Ancient Coral Shell]' WHERE `locale` = 'deDE' AND `entry` = 24596;
--- OLD name : Küstenwoger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24596;
+-- OLD name : Küstenwoger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24597
-UPDATE `creature_template_locale` SET `Name` = '[Coast Surger]' WHERE `locale` = 'deDE' AND `entry` = 24597;
--- OLD name : Tidenwoger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24597;
+-- OLD name : Tidenwoger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24598
-UPDATE `creature_template_locale` SET `Name` = '[Tide Surger]' WHERE `locale` = 'deDE' AND `entry` = 24598;
--- OLD name : Großer Tidenwoger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24598;
+-- OLD name : Großer Tidenwoger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24599
-UPDATE `creature_template_locale` SET `Name` = '[Greater Tide Surger]' WHERE `locale` = 'deDE' AND `entry` = 24599;
--- OLD name : Dampfreißer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24599;
+-- OLD name : Dampfreißer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24600
-UPDATE `creature_template_locale` SET `Name` = '[Steam Ripper]' WHERE `locale` = 'deDE' AND `entry` = 24600;
--- OLD name : Lebendiger Geysir
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24600;
+-- OLD name : Lebendiger Geysir (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24602
-UPDATE `creature_template_locale` SET `Name` = '[Living Geyser]' WHERE `locale` = 'deDE' AND `entry` = 24602;
--- OLD name : Lebendiger Blizzard
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24602;
+-- OLD name : Lebendiger Blizzard (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24603
-UPDATE `creature_template_locale` SET `Name` = '[Living Blizzard]' WHERE `locale` = 'deDE' AND `entry` = 24603;
--- OLD name : Eisfuror
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24603;
+-- OLD name : Eisfuror (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24604
-UPDATE `creature_template_locale` SET `Name` = '[Ice Fury]' WHERE `locale` = 'deDE' AND `entry` = 24604;
--- OLD name : Räuber der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24604;
+-- OLD name : Räuber der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24605
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Raider]' WHERE `locale` = 'deDE' AND `entry` = 24605;
--- OLD name : Brandschatzer der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24605;
+-- OLD name : Brandschatzer der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24606
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Plunderer]' WHERE `locale` = 'deDE' AND `entry` = 24606;
--- OLD name : Schildmaid der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24606;
+-- OLD name : Schildmaid der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24607
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Shield-Maiden]' WHERE `locale` = 'deDE' AND `entry` = 24607;
--- OLD name : Ruderer der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24607;
+-- OLD name : Ruderer der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24608
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Oar-man]' WHERE `locale` = 'deDE' AND `entry` = 24608;
--- OLD name : Plünderer der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24608;
+-- OLD name : Plünderer der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24609
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Pillager]' WHERE `locale` = 'deDE' AND `entry` = 24609;
--- OLD name : Runenmagier der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24609;
+-- OLD name : Runenmagier der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24610
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Rune-caster]' WHERE `locale` = 'deDE' AND `entry` = 24610;
--- OLD name : Wogentürmer der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24610;
+-- OLD name : Wogentürmer der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24611
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Sea-Waker]' WHERE `locale` = 'deDE' AND `entry` = 24611;
--- OLD name : Than der Voldskar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24611;
+-- OLD name : Than der Voldskar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24612
-UPDATE `creature_template_locale` SET `Name` = '[Voldskar Thane]' WHERE `locale` = 'deDE' AND `entry` = 24612;
--- OLD name : Einzelgängerisches Mammut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24612;
+-- OLD name : Einzelgängerisches Mammut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24615
-UPDATE `creature_template_locale` SET `Name` = '[Solitary Mammoth]' WHERE `locale` = 'deDE' AND `entry` = 24615;
--- OLD name : Mammutpatriarch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24615;
+-- OLD name : Mammutpatriarch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24616
-UPDATE `creature_template_locale` SET `Name` = '[Mammoth Patriarch]' WHERE `locale` = 'deDE' AND `entry` = 24616;
--- OLD name : Verhungernder Tundrawolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24616;
+-- OLD name : Tundrawolf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24617
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24617;
+-- OLD name : Verhungernder Tundrawolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24618
-UPDATE `creature_template_locale` SET `Name` = '[Starving Tundra Wolf]' WHERE `locale` = 'deDE' AND `entry` = 24618;
--- OLD name : Großer Tundrawolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24618;
+-- OLD name : Großer Tundrawolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24619
-UPDATE `creature_template_locale` SET `Name` = '[Greater Tundra Wolf]' WHERE `locale` = 'deDE' AND `entry` = 24619;
--- OLD name : Frostkäfigskelett
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24619;
+-- OLD name : Tundraleitwolf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24620
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24620;
+-- OLD name : Frostkäfigskelett (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24621
-UPDATE `creature_template_locale` SET `Name` = '[Frost Cage Skeleton]' WHERE `locale` = 'deDE' AND `entry` = 24621;
--- OLD name : Frostkäfigverheerer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24621;
+-- OLD name : Frostkäfigverheerer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24622
-UPDATE `creature_template_locale` SET `Name` = '[Frost Cage Reaver]' WHERE `locale` = 'deDE' AND `entry` = 24622;
--- OLD name : Frostknochen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24622;
+-- OLD name : Frostknochen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24623
-UPDATE `creature_template_locale` SET `Name` = '[Frosty Bones]' WHERE `locale` = 'deDE' AND `entry` = 24623;
--- OLD name : Boralsteingargoyle
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24623;
+-- OLD name : Boralsteingargoyle (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24624
-UPDATE `creature_template_locale` SET `Name` = '[Boralstone Gargoyle]' WHERE `locale` = 'deDE' AND `entry` = 24624;
--- OLD name : Boralsteinhimmelsjäger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24624;
+-- OLD name : Boralsteinhimmelsjäger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24625
-UPDATE `creature_template_locale` SET `Name` = '[Boralstone Skyhunter]' WHERE `locale` = 'deDE' AND `entry` = 24625;
--- OLD name : Geißelhymnenkreischer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24625;
+-- OLD name : Geißelhymnenkreischer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24626
-UPDATE `creature_template_locale` SET `Name` = '[Scourgesong Shrieker]' WHERE `locale` = 'deDE' AND `entry` = 24626;
--- OLD name : Geißelhymnenheuler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24626;
+-- OLD name : Geißelhymnenheuler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24627
-UPDATE `creature_template_locale` SET `Name` = '[Scourgesong Wailer]' WHERE `locale` = 'deDE' AND `entry` = 24627;
--- OLD name : Nordmeerfreibeuter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24627;
+-- OLD name : Nordmeerfreibeuter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24636
-UPDATE `creature_template_locale` SET `Name` = '[Northsea Freebooter]' WHERE `locale` = 'deDE' AND `entry` = 24636;
--- OLD name : Alliance Standard Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24636;
+-- OLD name : Alliance Standard Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24641
-UPDATE `creature_template_locale` SET `Name` = '[Alliance Standard Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 24641;
--- OLD name : Mirror Frame
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24641;
+-- OLD name : Mirror Frame (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24645
-UPDATE `creature_template_locale` SET `Name` = '[Mirror Frame]' WHERE `locale` = 'deDE' AND `entry` = 24645;
--- OLD name : Invisible Stalker (Scale x2)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24645;
+-- OLD name : Invisible Stalker (Scale x2) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24648
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Stalker (Scale x2)]' WHERE `locale` = 'deDE' AND `entry` = 24648;
--- OLD name : Reflection of Flame
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24648;
+-- OLD name : Reflection of Flame (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24651
-UPDATE `creature_template_locale` SET `Name` = '[Reflection of Flame]' WHERE `locale` = 'deDE' AND `entry` = 24651;
--- OLD name : Wellenreiterbrett mit Harpune
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24651;
+-- OLD name : Wellenreiterbrett mit Harpune (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24652
-UPDATE `creature_template_locale` SET `Name` = '[Harpoon Surfboard]' WHERE `locale` = 'deDE' AND `entry` = 24652;
--- OLD name : Reflection Bounce Target
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24652;
+-- OLD name : Reflection Bounce Target (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24655
-UPDATE `creature_template_locale` SET `Name` = '[Reflection Bounce Target]' WHERE `locale` = 'deDE' AND `entry` = 24655;
--- OLD name : Gezeitenlord
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24655;
+-- OLD name : Blauer männlicher Blutelf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24658
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24658;
+-- OLD name : Hydra der Peitschennarbe (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24661
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24661;
+-- OLD name : Gezeitenlord (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24663
-UPDATE `creature_template_locale` SET `Name` = '[Tidelord]' WHERE `locale` = 'deDE' AND `entry` = 24663;
--- OLD name : Harpunenkanone der Vrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24663;
+-- OLD name : Leutnant Eishammer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24665
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24665;
+-- OLD name : Harpunenkanone der Vrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24682
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul Harpoon Gun (OLD)]' WHERE `locale` = 'deDE' AND `entry` = 24682;
--- OLD name : Invisible Vehicle (Floating)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24682;
+-- OLD name : Invisible Vehicle (Floating) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24704
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Vehicle (Floating)]' WHERE `locale` = 'deDE' AND `entry` = 24704;
--- OLD name : Test Scaling Bony Construct
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24704;
+-- OLD name : Test Scaling Bony Construct (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24712
-UPDATE `creature_template_locale` SET `Name` = '[Test Scaling Bony Construct]' WHERE `locale` = 'deDE' AND `entry` = 24712;
--- OLD name : Flugmaschinentaxi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24712;
+-- OLD name : Flugmaschinentaxi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24716
-UPDATE `creature_template_locale` SET `Name` = '[Flying Machine Taxi]' WHERE `locale` = 'deDE' AND `entry` = 24716;
--- OLD name : Fliegender blauer Drache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24716;
+-- OLD name : Fliegender blauer Drache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24721
-UPDATE `creature_template_locale` SET `Name` = '[Flying Blue Drake]' WHERE `locale` = 'deDE' AND `entry` = 24721;
--- OLD name : Gorloc Oracle Black
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24721;
+-- OLD name : Gorloc Oracle Black (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24724
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Black (Northrend Model)]' WHERE `locale` = 'deDE' AND `entry` = 24724;
--- OLD name : Hundeschlitten
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24724;
+-- OLD name : Hundeschlitten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24725
-UPDATE `creature_template_locale` SET `Name` = '[Dog Sled]' WHERE `locale` = 'deDE' AND `entry` = 24725;
--- OLD name : Schlittenhund
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24725;
+-- OLD name : Schlittenhund (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24726
-UPDATE `creature_template_locale` SET `Name` = '[Sled Dog]' WHERE `locale` = 'deDE' AND `entry` = 24726;
--- OLD name : Schlammwespe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24726;
+-- OLD name : Schlammwespe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24731
-UPDATE `creature_template_locale` SET `Name` = '[Mud Wasp]' WHERE `locale` = 'deDE' AND `entry` = 24731;
--- OLD name : Schlammspringer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24731;
+-- OLD name : Schlammspringer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24732
-UPDATE `creature_template_locale` SET `Name` = '[Mud Skipper]' WHERE `locale` = 'deDE' AND `entry` = 24732;
--- OLD name : Fjord Prey 03
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24732;
+-- OLD name : Fjord Prey 03 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24748
-UPDATE `creature_template_locale` SET `Name` = '[Fjord Prey 03]' WHERE `locale` = 'deDE' AND `entry` = 24748;
--- OLD name : Fjord Prey 04
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24748;
+-- OLD name : Fjord Prey 04 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24749
-UPDATE `creature_template_locale` SET `Name` = '[Fjord Prey 04]' WHERE `locale` = 'deDE' AND `entry` = 24749;
--- OLD name : Magiereflexion
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24749;
+-- OLD name : Magiereflexion (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24756
-UPDATE `creature_template_locale` SET `Name` = '[Reflection of Magic]' WHERE `locale` = 'deDE' AND `entry` = 24756;
--- OLD name : Fjordfelsenschlange
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24756;
+-- OLD name : Fjordfelsenschlange (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24757
-UPDATE `creature_template_locale` SET `Name` = '[Fjord Rock Snake]' WHERE `locale` = 'deDE' AND `entry` = 24757;
--- OLD name : Spearfang Worg Totem Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24757;
+-- OLD name : Spearfang Worg Totem Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24758
-UPDATE `creature_template_locale` SET `Name` = '[Spearfang Worg Totem Credit]' WHERE `locale` = 'deDE' AND `entry` = 24758;
--- OLD name : Gefangener Tuskarr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24758;
+-- OLD name : Gefangener Tuskarr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24759
-UPDATE `creature_template_locale` SET `Name` = '[Captive Tuskarr]' WHERE `locale` = 'deDE' AND `entry` = 24759;
--- OLD name : Fjordmonarch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24759;
+-- OLD name : Fjordmonarch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24760
-UPDATE `creature_template_locale` SET `Name` = '[Fjord Monarch]' WHERE `locale` = 'deDE' AND `entry` = 24760;
--- OLD name : Suirut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24760;
+-- OLD name : Suirut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24764
-UPDATE `creature_template_locale` SET `Name` = '[Suirut]' WHERE `locale` = 'deDE' AND `entry` = 24764;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24764;
+-- OLD name : [DND] Brewfest Face Me Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24766
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24766;
 -- OLD name : Behüter des Nexus
 -- Source : https://www.wowhead.com/wotlk/de/npc=24770
 UPDATE `creature_template_locale` SET `Name` = 'Behüter des Nexus''' WHERE `locale` = 'deDE' AND `entry` = 24770;
--- OLD name : Roter Kaltarrawelpe
+-- OLD name : Roter Kaltarrawelpe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24775
-UPDATE `creature_template_locale` SET `Name` = '[Coldarra Red Whelp]' WHERE `locale` = 'deDE' AND `entry` = 24775;
--- OLD name : Red-Breath Cannon (PH)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24775;
+-- OLD name : Red-Breath Cannon (PH) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24776
-UPDATE `creature_template_locale` SET `Name` = '[Red-Breath Cannon (PH)]' WHERE `locale` = 'deDE' AND `entry` = 24776;
--- OLD name : Missile Target Flare
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24776;
+-- OLD name : Missile Target Flare (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24778
-UPDATE `creature_template_locale` SET `Name` = '[Missile Target Flare]' WHERE `locale` = 'deDE' AND `entry` = 24778;
--- OLD name : Fjordwespe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24778;
+-- OLD name : Fjordwespe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24793
-UPDATE `creature_template_locale` SET `Name` = '[Fjord Wasp]' WHERE `locale` = 'deDE' AND `entry` = 24793;
--- OLD name : Fjordkäfer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24793;
+-- OLD name : Fjordkäfer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24794
-UPDATE `creature_template_locale` SET `Name` = '[Fjord Beetle]' WHERE `locale` = 'deDE' AND `entry` = 24794;
--- OLD name : Grell
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24794;
+-- OLD name : Grell (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24798
-UPDATE `creature_template_locale` SET `Name` = '[Grell (Pink)]' WHERE `locale` = 'deDE' AND `entry` = 24798;
--- OLD name : Grell
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24798;
+-- OLD name : Grell (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24799
-UPDATE `creature_template_locale` SET `Name` = '[Grell (Blue)]' WHERE `locale` = 'deDE' AND `entry` = 24799;
--- OLD name : Grell
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24799;
+-- OLD name : Grell (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24800
-UPDATE `creature_template_locale` SET `Name` = '[Grell (Blanca)]' WHERE `locale` = 'deDE' AND `entry` = 24800;
--- OLD name : Grell
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24800;
+-- OLD name : Grell (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24801
-UPDATE `creature_template_locale` SET `Name` = '[Grell (Red)]' WHERE `locale` = 'deDE' AND `entry` = 24801;
--- OLD name : Grell
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24801;
+-- OLD name : Grell (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24802
-UPDATE `creature_template_locale` SET `Name` = '[Grell (Orange)]' WHERE `locale` = 'deDE' AND `entry` = 24802;
--- OLD name : Grell
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24802;
+-- OLD name : Grell (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24803
-UPDATE `creature_template_locale` SET `Name` = '[Grell (White)]' WHERE `locale` = 'deDE' AND `entry` = 24803;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24803;
 -- OLD name : Ross des kopflosen Reiters
 -- Source : https://www.wowhead.com/wotlk/de/npc=24814
 UPDATE `creature_template_locale` SET `Name` = 'Reittier des kopflosen Reiters' WHERE `locale` = 'deDE' AND `entry` = 24814;
--- OLD name : Fjordstachelschwein
+-- OLD name : Fjordstachelschwein (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24816
-UPDATE `creature_template_locale` SET `Name` = '[Fjord Porcupine]' WHERE `locale` = 'deDE' AND `entry` = 24816;
--- OLD name : Schubkarre
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24816;
+-- OLD name : Schubkarre (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24853
-UPDATE `creature_template_locale` SET `Name` = '[Wheelbarrow]' WHERE `locale` = 'deDE' AND `entry` = 24853;
--- OLD name : Supererhitzter Elementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24853;
+-- OLD name : Supererhitzter Elementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24859
-UPDATE `creature_template_locale` SET `Name` = '[Superheated Elemental]' WHERE `locale` = 'deDE' AND `entry` = 24859;
--- OLD name : Kristallstrahl
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24859;
+-- OLD name : Piratin der Defias (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24860
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24860;
+-- OLD name : Kristallstrahl (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24861
-UPDATE `creature_template_locale` SET `Name` = '[Crystal Beam]' WHERE `locale` = 'deDE' AND `entry` = 24861;
--- OLD name : Kristallstrahl
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24861;
+-- OLD name : Kristallstrahl (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24865
-UPDATE `creature_template_locale` SET `Name` = '[Crystal Beam Relay]' WHERE `locale` = 'deDE' AND `entry` = 24865;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24865;
 -- OLD subname : Ingenieurskunstlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=24868
 UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrerin' WHERE `locale` = 'deDE' AND `entry` = 24868;
--- OLD name : Maschinenwächter
+-- OLD name : Maschinenwächter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24869
-UPDATE `creature_template_locale` SET `Name` = '[Rig Guardian]' WHERE `locale` = 'deDE' AND `entry` = 24869;
--- OLD name : Maschinentechniker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24869;
+-- OLD name : Maschinentechniker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24870
-UPDATE `creature_template_locale` SET `Name` = '[Rig Technician]' WHERE `locale` = 'deDE' AND `entry` = 24870;
--- OLD name : Maschinenspäher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24870;
+-- OLD name : Maschinenspäher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24878
-UPDATE `creature_template_locale` SET `Name` = '[Rig Sentry]' WHERE `locale` = 'deDE' AND `entry` = 24878;
--- OLD name : Windan Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24878;
+-- OLD name : Windan Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24890
-UPDATE `creature_template_locale` SET `Name` = '[Windan Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 24890;
--- OLD name : Klippenungetüm
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24890;
+-- OLD name : Klippenungetüm (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24894
-UPDATE `creature_template_locale` SET `Name` = '[Bluff Behemoth]' WHERE `locale` = 'deDE' AND `entry` = 24894;
--- OLD name : Lou der Kabinenjunge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24894;
+-- OLD name : Lou der Kabinenjunge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24898
-UPDATE `creature_template_locale` SET `Name` = '[Lou the Cabin Boy (Canoe)]' WHERE `locale` = 'deDE' AND `entry` = 24898;
--- OLD name : Snowball Stampede
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24898;
+-- OLD name : Lawine (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=24912
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24912;
+-- OLD name : Snowball Stampede (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24915
-UPDATE `creature_template_locale` SET `Name` = '[Snowball Stampede]' WHERE `locale` = 'deDE' AND `entry` = 24915;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24915;
 -- OLD name : Erste Offizierin Kupferbolz
 -- Source : https://www.wowhead.com/wotlk/de/npc=24926
 UPDATE `creature_template_locale` SET `Name` = 'Erster Offizier Kupferbolz' WHERE `locale` = 'deDE' AND `entry` = 24926;
 -- OLD name : Madame Flaschatauren, subname : Gefährtin des Flaschatauren
 -- Source : https://www.wowhead.com/wotlk/de/npc=24982
 UPDATE `creature_template_locale` SET `Name` = 'Frau Flaschatauren',`Title` = 'PTR-Verzauberungen' WHERE `locale` = 'deDE' AND `entry` = 24982;
--- OLD name : Besudelter Magnataurengeist
+-- OLD name : Besudelter Magnataurengeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=24983
-UPDATE `creature_template_locale` SET `Name` = '[Tainted Magnataur Spirit]' WHERE `locale` = 'deDE' AND `entry` = 24983;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 24983;
 -- OLD name : Winterhauptmann Skarloc
 -- Source : https://www.wowhead.com/wotlk/de/npc=24987
 UPDATE `creature_template_locale` SET `Name` = 'Winterkapitän Skarloc' WHERE `locale` = 'deDE' AND `entry` = 24987;
--- OLD name : Dan's Test Vehicle
+-- OLD name : Dan's Test Vehicle (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25006
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Vehicle]' WHERE `locale` = 'deDE' AND `entry` = 25006;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25006;
 -- OLD name : Schildwache
 -- Source : https://www.wowhead.com/wotlk/de/npc=25045
 UPDATE `creature_template_locale` SET `Name` = 'Wächter' WHERE `locale` = 'deDE' AND `entry` = 25045;
@@ -3157,6 +4505,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Grunzer Ounda' WHERE `locale` = 
 -- OLD subname : Ingenieurskunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25099
 UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer' WHERE `locale` = 'deDE' AND `entry` = 25099;
+-- OLD name : Brianna (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25139
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25139;
 -- OLD name : Frixi Messingkipper
 -- Source : https://www.wowhead.com/wotlk/de/npc=25179
 UPDATE `creature_template_locale` SET `Name` = 'Frixee Messingkipper' WHERE `locale` = 'deDE' AND `entry` = 25179;
@@ -3172,51 +4523,54 @@ UPDATE `creature_template_locale` SET `Title` = 'Händler für Spezialmunition' 
 -- OLD subname : Specialty Ammunition Vendor
 -- Source : https://www.wowhead.com/wotlk/de/npc=25196
 UPDATE `creature_template_locale` SET `Title` = 'Händler für Spezialmunition' WHERE `locale` = 'deDE' AND `entry` = 25196;
--- OLD name : TEST - Clayton Dubin - TEST
+-- OLD name : Fackel (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25218
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25218;
+-- OLD name : TEST - Clayton Dubin - TEST (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25221
-UPDATE `creature_template_locale` SET `Name` = '[TEST - Clayton Dubin - TEST]' WHERE `locale` = 'deDE' AND `entry` = 25221;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25221;
 -- OLD name : Trainingsattrappe
 -- Source : https://www.wowhead.com/wotlk/de/npc=25225
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe' WHERE `locale` = 'deDE' AND `entry` = 25225;
--- OLD name : Grunzer der Horde
+-- OLD name : Grunzer der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25252
-UPDATE `creature_template_locale` SET `Name` = '[Horde Grunt (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25252;
--- OLD name : Soldat der Allianz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25252;
+-- OLD name : Soldat der Allianz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25254
-UPDATE `creature_template_locale` SET `Name` = '[Alliance Soldier (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25254;
--- OLD name : Soldat der Geißel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25254;
+-- OLD name : Soldat der Geißel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25255
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Soldier (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25255;
--- OLD name : Inschriftenkundelehrer, subname : Inschriftenkundelehrer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25255;
+-- OLD name : Inschriftenkundelehrer, subname : Inschriftenkundelehrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25263
-UPDATE `creature_template_locale` SET `Name` = '[World Inscription Trainer]',`Title` = '[Inscription Trainer]' WHERE `locale` = 'deDE' AND `entry` = 25263;
--- OLD name : Zivilrekrut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25263;
+-- OLD name : Zivilrekrut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25266
-UPDATE `creature_template_locale` SET `Name` = '[Civilian Recruit]' WHERE `locale` = 'deDE' AND `entry` = 25266;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25266;
 -- OLD name : Hordezeppelin (Nordend)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25269
 UPDATE `creature_template_locale` SET `Name` = 'Hordenzeppelin (Nordend)' WHERE `locale` = 'deDE' AND `entry` = 25269;
 -- OLD subname : Ingenieurkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25277
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Ingenieurskunst' WHERE `locale` = 'deDE' AND `entry` = 25277;
--- OLD name : König Mrgl-Mrgls Reserveanzug
+-- OLD name : König Mrgl-Mrgls Reserveanzug (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25283
-UPDATE `creature_template_locale` SET `Name` = '[King Mrgl-Mrgl''s Spare Suit]' WHERE `locale` = 'deDE' AND `entry` = 25283;
--- OLD name : Wyvern des Kriegshymnenklans
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25283;
+-- OLD name : Wyvern des Kriegshymnenklans (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25287
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Wyvern]' WHERE `locale` = 'deDE' AND `entry` = 25287;
--- OLD name : Ay'mon, subname : To'bors Begleiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25287;
+-- OLD name : Ay'mon, subname : To'bors Begleiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25290
-UPDATE `creature_template_locale` SET `Name` = '[Ay''mon]',`Title` = '[To''bor''s Companion]' WHERE `locale` = 'deDE' AND `entry` = 25290;
--- OLD name : Eiersack der Nerub'ar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25290;
+-- OLD name : Eiersack der Nerub'ar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25293
-UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Egg Sac]' WHERE `locale` = 'deDE' AND `entry` = 25293;
--- OLD name : Larve der Nerub'ar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25293;
+-- OLD name : Larve der Nerub'ar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25296
-UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Larva]' WHERE `locale` = 'deDE' AND `entry` = 25296;
--- OLD name : Cel, subname : Reagenzien & Gifte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25296;
+-- OLD name : Cel, subname : Reagenzien & Gifte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25312
-UPDATE `creature_template_locale` SET `Name` = '[Cel]',`Title` = '[Reagent and Poison Vendor]' WHERE `locale` = 'deDE' AND `entry` = 25312;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25312;
 -- OLD subname : Software Engineer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25323
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25323;
@@ -3224,48 +4578,48 @@ INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALU
 -- OLD name : Gortsch der Leichenmalmer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25329
 UPDATE `creature_template_locale` SET `Name` = 'Annihilator Grek''lor' WHERE `locale` = 'deDE' AND `entry` = 25329;
--- OLD name : Scheusal der Nerub'ar
+-- OLD name : Scheusal der Nerub'ar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25330
-UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Behemoth]' WHERE `locale` = 'deDE' AND `entry` = 25330;
--- OLD name : Zerstörer der Nerub'ar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25330;
+-- OLD name : Zerstörer der Nerub'ar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25331
-UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Destroyer]' WHERE `locale` = 'deDE' AND `entry` = 25331;
--- OLD name : Standartenträger des Kriegshymnenklans
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25331;
+-- OLD name : Standartenträger des Kriegshymnenklans (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25337
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Standard Bearer]' WHERE `locale` = 'deDE' AND `entry` = 25337;
--- OLD name : Tote Karawanenwache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25337;
+-- OLD name : Tote Karawanenwache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25340
-UPDATE `creature_template_locale` SET `Name` = '[Dead Caravan Guard Transform]' WHERE `locale` = 'deDE' AND `entry` = 25340;
--- OLD name : Toter Karawanenarbeiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25340;
+-- OLD name : Toter Karawanenarbeiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25341
-UPDATE `creature_template_locale` SET `Name` = '[Dead Caravan Worker Transform]' WHERE `locale` = 'deDE' AND `entry` = 25341;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25341;
 -- OLD name : Zwielichtspion Viktor, subname : Schattenhammer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25346
 UPDATE `creature_template_locale` SET `Name` = 'Spion Viktor des Schattenhammers',`Title` = 'Schattenhammerklan' WHERE `locale` = 'deDE' AND `entry` = 25346;
--- OLD name : Oberanführer der Geißel
+-- OLD name : Oberanführer der Geißel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25352
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Overlord]' WHERE `locale` = 'deDE' AND `entry` = 25352;
--- OLD name : Schreckenszwirnspinner
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25352;
+-- OLD name : Schreckenszwirnspinner (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25365
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Dreadweave Spinner]' WHERE `locale` = 'deDE' AND `entry` = 25365;
--- OLD name : (PH) DEPRECATED
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25365;
+-- OLD name : (PH) DEPRECATED (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25366
-UPDATE `creature_template_locale` SET `Name` = '[(PH) DEPRECATED]' WHERE `locale` = 'deDE' AND `entry` = 25366;
--- OLD name : Riesiger Skarabäus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25366;
+-- OLD name : Riesiger Skarabäus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25375
-UPDATE `creature_template_locale` SET `Name` = '[Giant Scarab]' WHERE `locale` = 'deDE' AND `entry` = 25375;
--- OLD name : Stellvertreter der Nerub'ar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25375;
+-- OLD name : Stellvertreter der Nerub'ar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25382
-UPDATE `creature_template_locale` SET `Name` = '[Nerub''ar Proxy]' WHERE `locale` = 'deDE' AND `entry` = 25382;
--- OLD name : Schlupfling von En'kilah
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25382;
+-- OLD name : Schlupfling von En'kilah (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25388
-UPDATE `creature_template_locale` SET `Name` = '[En''kilah Hatchling (1)]' WHERE `locale` = 'deDE' AND `entry` = 25388;
--- OLD name : Schlupfling von En'kilah
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25388;
+-- OLD name : Schlupfling von En'kilah (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25389
-UPDATE `creature_template_locale` SET `Name` = '[En''kilah Hatchling (2)]' WHERE `locale` = 'deDE' AND `entry` = 25389;
--- OLD name : Ältester Yakone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25389;
+-- OLD name : Ältester Yakone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25400
-UPDATE `creature_template_locale` SET `Name` = '[Elder Yakone]' WHERE `locale` = 'deDE' AND `entry` = 25400;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25400;
 -- OLD subname : Software Engineer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25406
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25406;
@@ -3280,169 +4634,190 @@ UPDATE `creature_template_locale` SET `Name` = 'Vision des Weissagers Grimmläuf
 -- OLD name : Scharfseher Grimmläufers Geist
 -- Source : https://www.wowhead.com/wotlk/de/npc=25425
 UPDATE `creature_template_locale` SET `Name` = 'Weissager Grimmläufers Geist' WHERE `locale` = 'deDE' AND `entry` = 25425;
--- OLD name : Urahnengeist der Tuskarr
+-- OLD name : Urahnengeist der Tuskarr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25436
-UPDATE `creature_template_locale` SET `Name` = '[Elder Tuskarr Spirit]' WHERE `locale` = 'deDE' AND `entry` = 25436;
--- OLD name : Wolf des Kriegshymnenklans
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25436;
+-- OLD name : Wolf des Kriegshymnenklans (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25447
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Wolf]' WHERE `locale` = 'deDE' AND `entry` = 25447;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25447;
 -- OLD name : Vision des Geistes von Scharfseher Grimmläufer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25458
 UPDATE `creature_template_locale` SET `Name` = 'Vision des Geistes von Weissager Grimmläufer' WHERE `locale` = 'deDE' AND `entry` = 25458;
 -- OLD name : Scharfseher Grimmläufer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25461
 UPDATE `creature_template_locale` SET `Name` = 'Weissager Grimmläufer' WHERE `locale` = 'deDE' AND `entry` = 25461;
--- OLD name : Soldat der Eisigen Weiten
+-- OLD name : Soldat der Eisigen Weiten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25463
-UPDATE `creature_template_locale` SET `Name` = '[Soldier of the Frozen Wastes]' WHERE `locale` = 'deDE' AND `entry` = 25463;
--- OLD name : Stellvertretende Geißeleinheit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25463;
+-- OLD name : Stellvertretende Geißeleinheit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25495
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Proxy Unit]' WHERE `locale` = 'deDE' AND `entry` = 25495;
--- OLD name : Orabus der Steuermann
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25495;
+-- OLD name : Orabus der Steuermann (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25497
-UPDATE `creature_template_locale` SET `Name` = '[Orabus the Helmsman]' WHERE `locale` = 'deDE' AND `entry` = 25497;
--- OLD name : Hah... You're Not So Big Now! Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25497;
+-- OLD name : Hah... You're Not So Big Now! Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25505
-UPDATE `creature_template_locale` SET `Name` = '[Hah... You''re Not So Big Now! Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 25505;
--- OLD name : Caleb, subname : Stallmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25505;
+-- OLD name : [PH] Feuerjongleur des Sonnenwendfests (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25515
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25515;
+-- OLD name : Caleb, subname : Stallmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25519
-UPDATE `creature_template_locale` SET `Name` = '[Caleb]',`Title` = '[Stable Master]' WHERE `locale` = 'deDE' AND `entry` = 25519;
--- OLD name : Versklavte Priesterin der Peitschennarbe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25519;
+-- OLD name : Versklavte Priesterin der Peitschennarbe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25524
-UPDATE `creature_template_locale` SET `Name` = '[Enslaved Riplash Priestess]' WHERE `locale` = 'deDE' AND `entry` = 25524;
--- OLD name : Orabus Spell Trigger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25524;
+-- OLD name : Orabus Spell Trigger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25525
-UPDATE `creature_template_locale` SET `Name` = '[Orabus Spell Trigger]' WHERE `locale` = 'deDE' AND `entry` = 25525;
--- OLD name : Nackte Karawanenwache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25525;
+-- OLD name : Nackte Karawanenwache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25526
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Guard - Orc Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 25526;
--- OLD name : Nackte Karawanenwache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25526;
+-- OLD name : Nackte Karawanenwache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25527
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Guard - Forsaken Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 25527;
--- OLD name : Naked Caravan Guard - Orc Female Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25527;
+-- OLD name : Naked Caravan Guard - Orc Female Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25528
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Guard - Orc Female Transform]' WHERE `locale` = 'deDE' AND `entry` = 25528;
--- OLD name : Naked Caravan Guard - Tauren Male Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25528;
+-- OLD name : Naked Caravan Guard - Tauren Male Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25529
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Guard - Tauren Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 25529;
--- OLD name : Naked Caravan Worker - Orc Male Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25529;
+-- OLD name : Naked Caravan Worker - Orc Male Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25530
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Worker - Orc Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 25530;
--- OLD name : Naked Caravan Worker - Forsaken Male Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25530;
+-- OLD name : Naked Caravan Worker - Forsaken Male Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25531
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Worker - Forsaken Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 25531;
--- OLD name : Naked Caravan Worker - Orc Female Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25531;
+-- OLD name : Naked Caravan Worker - Orc Female Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25532
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Worker - Orc Female Transform]' WHERE `locale` = 'deDE' AND `entry` = 25532;
--- OLD name : Naked Caravan Worker - Troll Male Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25532;
+-- OLD name : Naked Caravan Worker - Troll Male Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25533
-UPDATE `creature_template_locale` SET `Name` = '[Naked Caravan Worker - Troll Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 25533;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25533;
+-- OLD name : [DNT] Torch Tossing Target Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25535
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25535;
+-- OLD name : [DNT] Torch Tossing Target Bunny Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25536
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25536;
 -- OLD name : Craig's Test Human A
 -- Source : https://www.wowhead.com/wotlk/de/npc=25537
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25537;
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (25537, 'deDE','Craig''s Test Human',NULL);
--- OLD name : It Was The Orcs, Honest! Kill Credit Bunny
+-- OLD name : It Was The Orcs, Honest! Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25581
-UPDATE `creature_template_locale` SET `Name` = '[It Was The Orcs, Honest! Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 25581;
--- OLD name : Landmine des Kriegshymnenklans
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25581;
+-- OLD name : Landmine des Kriegshymnenklans (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25583
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Land Mine]' WHERE `locale` = 'deDE' AND `entry` = 25583;
--- OLD name : Warsong Orc Disguise Male Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25583;
+-- OLD name : Warsong Orc Disguise Male Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25586
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Orc Disguise Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 25586;
--- OLD name : Warsong Orc Disguise Female Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25586;
+-- OLD name : Warsong Orc Disguise Female Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25587
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Orc Disguise Female Transform]' WHERE `locale` = 'deDE' AND `entry` = 25587;
--- OLD name : Ruderer der Skadir
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25587;
+-- OLD name : Ruderer der Skadir (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25612
-UPDATE `creature_template_locale` SET `Name` = '[Skadir Oarsman]' WHERE `locale` = 'deDE' AND `entry` = 25612;
--- OLD name : Boot der Skadir
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25612;
+-- OLD name : Boot der Skadir (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25614
-UPDATE `creature_template_locale` SET `Name` = '[Skadir Boat]' WHERE `locale` = 'deDE' AND `entry` = 25614;
--- OLD name : Verseuchter Schneebold
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25614;
+-- OLD name : Verseuchter Schneebold (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25616
-UPDATE `creature_template_locale` SET `Name` = '[Plagued Snobold]' WHERE `locale` = 'deDE' AND `entry` = 25616;
--- OLD name : Stop the Plague Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25616;
+-- OLD name : Stop the Plague Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25654
-UPDATE `creature_template_locale` SET `Name` = '[Stop the Plague Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 25654;
--- OLD name : Das Schiff des Steuermanns
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25654;
+-- OLD name : Das Schiff des Steuermanns (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25656
-UPDATE `creature_template_locale` SET `Name` = '[The Helmsman''s Ship]' WHERE `locale` = 'deDE' AND `entry` = 25656;
--- OLD name : Besatzungsmitglied der Kvaldir
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25656;
+-- OLD name : Besatzungsmitglied der Kvaldir (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25659
-UPDATE `creature_template_locale` SET `Name` = '[Kvaldir Crewman]' WHERE `locale` = 'deDE' AND `entry` = 25659;
--- OLD name : Verseuchtes Karibu
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25659;
+-- OLD name : Verseuchtes Karibu (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25667
-UPDATE `creature_template_locale` SET `Name` = '[Plagued Caribou]' WHERE `locale` = 'deDE' AND `entry` = 25667;
--- OLD name : Reitmammut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25667;
+-- OLD name : Reitmammut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25673
-UPDATE `creature_template_locale` SET `Name` = '[Mammoth Mount]' WHERE `locale` = 'deDE' AND `entry` = 25673;
--- OLD name : Mammutreiter der Taunka
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25673;
+-- OLD name : Mammutreiter der Taunka (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25674
-UPDATE `creature_template_locale` SET `Name` = '[Taunka Mammoth-rider]' WHERE `locale` = 'deDE' AND `entry` = 25674;
--- OLD name : Sturmwolke
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25674;
+-- OLD name : Sturmwolke (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25676
-UPDATE `creature_template_locale` SET `Name` = '[Storm Cloud]' WHERE `locale` = 'deDE' AND `entry` = 25676;
--- OLD name : Wahnsinniger Überlebender der Tuskarr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25676;
+-- OLD name : Wahnsinniger Überlebender der Tuskarr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25681
-UPDATE `creature_template_locale` SET `Name` = '[Maddened Tuskarr Survivor]' WHERE `locale` = 'deDE' AND `entry` = 25681;
--- OLD name : Orakel der Gorlocs gelb (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25681;
+-- OLD name : Orakel der Gorlocs gelb (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25688
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Yellow (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25688;
--- OLD name : Orakel der Gorlocs rosa (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25688;
+-- OLD name : Orakel der Gorlocs rosa (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25689
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Pink (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25689;
--- OLD name : Orakel der Gorlocs rot (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25689;
+-- OLD name : Orakel der Gorlocs rot (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25690
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Red (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25690;
--- OLD name : Orakel der Gorlocs grün (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25690;
+-- OLD name : Orakel der Gorlocs grün (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25691
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Green (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25691;
--- OLD name : Orakel der Gorlocs kohlefarben (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25691;
+-- OLD name : Orakel der Gorlocs kohlefarben (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25692
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Charcoal (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25692;
--- OLD name : Orakel der Gorlocs hellblau (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25692;
+-- OLD name : Orakel der Gorlocs hellblau (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25693
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Light Blue (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25693;
--- OLD name : Orakel der Gorlocs blau (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25693;
+-- OLD name : Orakel der Gorlocs blau (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25694
-UPDATE `creature_template_locale` SET `Name` = '[Gorloc Oracle Blue (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25694;
--- OLD name : Kodo Saved Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25694;
+-- OLD name : Kodo Saved Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25698
-UPDATE `creature_template_locale` SET `Name` = '[Kodo Saved Credit]' WHERE `locale` = 'deDE' AND `entry` = 25698;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25698;
 -- OLD name : Sengender Flämmling
 -- Source : https://www.wowhead.com/wotlk/de/npc=25706
 UPDATE `creature_template_locale` SET `Name` = 'Flämmling' WHERE `locale` = 'deDE' AND `entry` = 25706;
+-- OLD name : Blaudrachenpatrouille von Kaltarra (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25723
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25723;
+-- OLD name : Leylinienwart von Kaltarra, subname : PH MODEL: TASK 23362 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25734
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25734;
+-- OLD name : [PH] Ahune Summon Loc Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25745
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25745;
+-- OLD name : [PH] Ahune Loot Loc Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=25746
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25746;
 -- OLD name : Leerenschildwache
 -- Source : https://www.wowhead.com/wotlk/de/npc=25772
 UPDATE `creature_template_locale` SET `Name` = 'Leerenwache' WHERE `locale` = 'deDE' AND `entry` = 25772;
--- OLD name : Lastkodo der Flüchtlinge
+-- OLD name : Lastkodo der Flüchtlinge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25775
-UPDATE `creature_template_locale` SET `Name` = '[Refugee Pack Kodo]' WHERE `locale` = 'deDE' AND `entry` = 25775;
--- OLD name : Flüchtlingsmutter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25775;
+-- OLD name : Flüchtlingsmutter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25776
-UPDATE `creature_template_locale` SET `Name` = '[Refugee Wife]' WHERE `locale` = 'deDE' AND `entry` = 25776;
--- OLD name : Flüchtlingsvater
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25776;
+-- OLD name : Flüchtlingsvater (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25777
-UPDATE `creature_template_locale` SET `Name` = '[Refugee Father]' WHERE `locale` = 'deDE' AND `entry` = 25777;
--- OLD name : Einsamer Flüchtling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25777;
+-- OLD name : Einsamer Flüchtling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25778
-UPDATE `creature_template_locale` SET `Name` = '[Refugee Loner]' WHERE `locale` = 'deDE' AND `entry` = 25778;
--- OLD name : X-42B
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25778;
+-- OLD name : X-42B (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25787
-UPDATE `creature_template_locale` SET `Name` = '[X-42B]' WHERE `locale` = 'deDE' AND `entry` = 25787;
--- OLD name : Nesingwarys Lakai
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25787;
+-- OLD name : Nesingwarys Lakai (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25805
-UPDATE `creature_template_locale` SET `Name` = '[Nesingwary Lackey]' WHERE `locale` = 'deDE' AND `entry` = 25805;
--- OLD name : Sonnenbrunnen FX
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25805;
+-- OLD name : Sonnenbrunnen FX (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25813
-UPDATE `creature_template_locale` SET `Name` = '[(Deprecated) Sunwell FX]' WHERE `locale` = 'deDE' AND `entry` = 25813;
--- OLD name : Herr und Diener Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25813;
+-- OLD name : Herr und Diener Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25815
-UPDATE `creature_template_locale` SET `Name` = '[Master and Servant Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 25815;
--- OLD name : Terrorfurbolg (Nordend)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25815;
+-- OLD name : Terrorfurbolg (Nordend) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25842
-UPDATE `creature_template_locale` SET `Name` = '[Dire Furbolg (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25842;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25842;
 -- OLD subname : Schattenhammer
 -- Source : https://www.wowhead.com/wotlk/de/npc=25863
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan' WHERE `locale` = 'deDE' AND `entry` = 25863;
@@ -3479,85 +4854,120 @@ UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan' WHERE `loca
 -- OLD subname : Juwelierskunstbedarf
 -- Source : https://www.wowhead.com/wotlk/de/npc=25950
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf' WHERE `locale` = 'deDE' AND `entry` = 25950;
--- OLD name : Arktischer Kondor
+-- OLD name : Arktischer Kondor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25963
-UPDATE `creature_template_locale` SET `Name` = '[Arctic Condor (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 25963;
--- OLD name : Konvertierter Sammler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25963;
+-- OLD name : Konvertierter Sammler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=25993
-UPDATE `creature_template_locale` SET `Name` = '[Converted Collector]' WHERE `locale` = 'deDE' AND `entry` = 25993;
--- OLD name : Craig's Test Human B
--- Source : https://www.wowhead.com/wotlk/de/npc=26080
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26080;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (26080, 'deDE','[Craig''s Test Human B]',NULL);
--- OLD name : Hochadmiral "Shelly" Jorrik, subname : Pensionär
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 25993;
+-- OLD name : Hochadmiral "Shelly" Jorrik, subname : Pensionär (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26081
-UPDATE `creature_template_locale` SET `Name` = '[High Admiral "Shelly" Jorrik]',`Title` = '[Retiree]' WHERE `locale` = 'deDE' AND `entry` = 26081;
--- OLD name : Weakness to Lightning Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26081;
+-- OLD name : Weakness to Lightning Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26082
-UPDATE `creature_template_locale` SET `Name` = '[Weakness to Lightning Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 26082;
--- OLD name : Transportkugel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26082;
+-- OLD name : Transportkugel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26086
-UPDATE `creature_template_locale` SET `Name` = '[Transport Orb]' WHERE `locale` = 'deDE' AND `entry` = 26086;
--- OLD name : Kurier der roten Drachen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26086;
+-- OLD name : Kurier der roten Drachen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26088
-UPDATE `creature_template_locale` SET `Name` = '[Red Drake Courier]' WHERE `locale` = 'deDE' AND `entry` = 26088;
--- OLD name : Wagen mit Erz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26088;
+-- OLD name : Wagen mit Erz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26099
-UPDATE `creature_template_locale` SET `Name` = '[Ore Cart (1)]' WHERE `locale` = 'deDE' AND `entry` = 26099;
--- OLD name : Plagued Grain Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26099;
+-- OLD name : Plagued Grain Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26114
-UPDATE `creature_template_locale` SET `Name` = '[Plagued Grain Credit]' WHERE `locale` = 'deDE' AND `entry` = 26114;
--- OLD name : Worg des Kriegshymnenklans (Taxi)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26114;
+-- OLD name : Worg des Kriegshymnenklans (Taxi) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26128
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Worg (Taxi)]' WHERE `locale` = 'deDE' AND `entry` = 26128;
--- OLD name : Quest InvisMan - Buying Time - Effect Caster
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26128;
+-- OLD name : Quest InvisMan - Buying Time - Effect Caster (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26129
-UPDATE `creature_template_locale` SET `Name` = '[Quest InvisMan - Buying Time - Effect Caster]' WHERE `locale` = 'deDE' AND `entry` = 26129;
--- OLD name : Quest InvisMan - Buying Time - Effect Target
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26129;
+-- OLD name : Quest InvisMan - Buying Time - Effect Target (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26130
-UPDATE `creature_template_locale` SET `Name` = '[Quest InvisMan - Buying Time - Effect Target]' WHERE `locale` = 'deDE' AND `entry` = 26130;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26130;
+-- OLD name : [PH] Tom Test (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26176
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26176;
 -- OLD name : Elitesoldat der Kor'kron
 -- Source : https://www.wowhead.com/wotlk/de/npc=26183
 UPDATE `creature_template_locale` SET `Name` = 'Elite der Kor''kron' WHERE `locale` = 'deDE' AND `entry` = 26183;
--- OLD name : Nexus 70 - Buying Time - Kill Credit
+-- OLD name : [PH] Torch Catching Target Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26188
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26188;
+-- OLD name : [PH] Spank Target Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26190
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26190;
+-- OLD name : Nexus 70 - Buying Time - Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26193
-UPDATE `creature_template_locale` SET `Name` = '[Nexus 70 - Buying Time - Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 26193;
--- OLD name : Einheit von En'kilah
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26193;
+-- OLD name : Einheit von En'kilah (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26195
-UPDATE `creature_template_locale` SET `Name` = '[En''kilah Unit]' WHERE `locale` = 'deDE' AND `entry` = 26195;
--- OLD name : Krieger von Moa'ki
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26195;
+-- OLD name : Krieger von Moa'ki (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26220
-UPDATE `creature_template_locale` SET `Name` = '[Moa''ki Warrior]' WHERE `locale` = 'deDE' AND `entry` = 26220;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26220;
 -- OLD subname : Schattenhammer
 -- Source : https://www.wowhead.com/wotlk/de/npc=26222
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan' WHERE `locale` = 'deDE' AND `entry` = 26222;
 -- OLD subname : Schattenhammer
 -- Source : https://www.wowhead.com/wotlk/de/npc=26223
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan' WHERE `locale` = 'deDE' AND `entry` = 26223;
--- OLD name : Slay Loguhn Kill Credit Bunny
+-- OLD name : Slay Loguhn Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26227
-UPDATE `creature_template_locale` SET `Name` = '[Slay Loguhn Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 26227;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26227;
 -- OLD name : Gischtalbatros
 -- Source : https://www.wowhead.com/wotlk/de/npc=26240
 UPDATE `creature_template_locale` SET `Name` = 'Gischtalbatross' WHERE `locale` = 'deDE' AND `entry` = 26240;
+-- OLD name : [PH] Ghost of Ahune (Disguise) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26241
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26241;
 -- OLD name : Purpurschlange
 -- Source : https://www.wowhead.com/wotlk/de/npc=26243
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachrote Schlange' WHERE `locale` = 'deDE' AND `entry` = 26243;
--- OLD name : Farshire Bell Credit
+-- OLD name : Farshire Bell Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26256
-UPDATE `creature_template_locale` SET `Name` = '[Farshire Bell Credit]' WHERE `locale` = 'deDE' AND `entry` = 26256;
--- OLD name : Roter Reitdrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26256;
+-- OLD name : [DND] Midsummer Bonfire Faction Bunny - A (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26258
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26258;
+-- OLD name : Roter Reitdrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26263
-UPDATE `creature_template_locale` SET `Name` = '[Red Dragon Mount]' WHERE `locale` = 'deDE' AND `entry` = 26263;
--- OLD name : Pico, subname : Lederhändler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26263;
+-- OLD name : Pico, subname : Lederhändler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26269
-UPDATE `creature_template_locale` SET `Name` = '[Pico]',`Title` = '[Leather Trader]' WHERE `locale` = 'deDE' AND `entry` = 26269;
--- OLD name : Roter Drache der Drachenöde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26269;
+-- OLD name : Urtum der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26274
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26274;
+-- OLD name : Schwarzdrache der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26275
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26275;
+-- OLD name : Grüner Drache der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26278
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26278;
+-- OLD name : Roter Drache der Drachenöde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26279
-UPDATE `creature_template_locale` SET `Name` = '[Dragonblight Red Dragon]' WHERE `locale` = 'deDE' AND `entry` = 26279;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26279;
+-- OLD name : Elementarobsidiandrachenhain der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26285
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26285;
+-- OLD name : Ereignisauslöser des Vergessenen Strands. (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26288
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26288;
 -- OLD name : Risswirker der Zerschmetterten Sonne
 -- Source : https://www.wowhead.com/wotlk/de/npc=26289
 UPDATE `creature_template_locale` SET `Name` = 'Felsspalter der Zerschmetterten Sonne' WHERE `locale` = 'deDE' AND `entry` = 26289;
+-- OLD name : Aasfelder der Geißel in der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26292
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26292;
+-- OLD name : Magmawyrm der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26294
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26294;
+-- OLD name : Drachenöde; Scharlachroter Ansturm (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26296
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26296;
 -- OLD name : Händler für Stoffrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=26301
 UPDATE `creature_template_locale` SET `Name` = 'Händler für Stoff- und Lederrüstungen' WHERE `locale` = 'deDE' AND `entry` = 26301;
@@ -3573,25 +4983,54 @@ UPDATE `creature_template_locale` SET `Name` = 'Händler für schwere Rüstungen
 -- OLD name : Händler für Kettenrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=26308
 UPDATE `creature_template_locale` SET `Name` = 'Händler für Plattenrüstungen' WHERE `locale` = 'deDE' AND `entry` = 26308;
+-- OLD name : Taunka der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26311
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26311;
+-- OLD name : Taunkageist der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26312
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26312;
+-- OLD name : Treant der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26313
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26313;
+-- OLD name : Galakronds Ruhestätte der Geißel in der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26317
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26317;
+-- OLD name : Obsidiandrachenhain der Geißel in der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26318
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26318;
+-- OLD name : Rubindrachenschrein der Geißel in der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26320
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26320;
 -- OLD name : Zokk "Lulatsch" Drillzang
 -- Source : https://www.wowhead.com/wotlk/de/npc=26352
 UPDATE `creature_template_locale` SET `Name` = 'Bigzokk Drillzang' WHERE `locale` = 'deDE' AND `entry` = 26352;
--- OLD name : (PH) Wildlife Test Doe
+-- OLD name : [DND] Midsummer Bonfire Faction Bunny - H (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26355
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26355;
+-- OLD name : (PH) Wildlife Test Doe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26364
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Wildlife Test Doe]' WHERE `locale` = 'deDE' AND `entry` = 26364;
--- OLD name : (PH) Wildlife Test Bear
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26364;
+-- OLD name : (PH) Wildlife Test Bear (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26368
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Wildlife Test Bear]' WHERE `locale` = 'deDE' AND `entry` = 26368;
--- OLD name : (PH) Grizzly Test Low Aggro Worg
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26368;
+-- OLD name : (PH) Grizzly Test Low Aggro Worg (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26372
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Grizzly Test Low Aggro Worg]' WHERE `locale` = 'deDE' AND `entry` = 26372;
--- OLD name : Test - Brutallus Craig
--- Source : https://www.wowhead.com/wotlk/de/npc=26376
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26376;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (26376, 'deDE','[Test - Brutallus Craig]',NULL);
--- OLD name : Verwandelter Fallensteller
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26372;
+-- OLD name : Evee Kupferspule, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26378
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26378;
+-- OLD name : Grikkin Kupferspule, subname : Arenaverkäufer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26383
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26383;
+-- OLD name : Frixi Messingkipper, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26384
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26384;
+-- OLD name : Verwandelter Fallensteller (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26390
-UPDATE `creature_template_locale` SET `Name` = '[Transformed Trapper Male]' WHERE `locale` = 'deDE' AND `entry` = 26390;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26390;
+-- OLD name : [PH] Ice Chest Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26391
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26391;
 -- OLD subname : Rüstmeisterin für Rüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=26397
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 26397;
@@ -3601,84 +5040,96 @@ UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Rüstungen' W
 -- OLD name : Aufklärer von Kaskala
 -- Source : https://www.wowhead.com/wotlk/de/npc=26403
 UPDATE `creature_template_locale` SET `Name` = 'Warte von Kaskala' WHERE `locale` = 'deDE' AND `entry` = 26403;
--- OLD name : Schwarzes Kriegsskelettpferd
+-- OLD name : Schwarzes Kriegsskelettpferd (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26404
-UPDATE `creature_template_locale` SET `Name` = '[Black Skeletal Warhorse]' WHERE `locale` = 'deDE' AND `entry` = 26404;
--- OLD name : (PH) Wildlife Test Worg
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26404;
+-- OLD name : (PH) Wildlife Test Worg (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26412
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Wildlife Test Worg]' WHERE `locale` = 'deDE' AND `entry` = 26412;
--- OLD name : Verändertes Aussehen des Fallenstellers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26412;
+-- OLD name : Verändertes Aussehen des Fallenstellers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26427
-UPDATE `creature_template_locale` SET `Name` = '[Transformed Trapper Visual]' WHERE `locale` = 'deDE' AND `entry` = 26427;
--- OLD name : Budd
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26427;
+-- OLD name : Budd (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26429
-UPDATE `creature_template_locale` SET `Name` = '[Budd]' WHERE `locale` = 'deDE' AND `entry` = 26429;
--- OLD name : Ducals Beifahrersitz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26429;
+-- OLD name : Ducals Beifahrersitz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26430
-UPDATE `creature_template_locale` SET `Name` = '[Ducal''s Passenger Seat]' WHERE `locale` = 'deDE' AND `entry` = 26430;
--- OLD name : Flüchtling der Taunka'le
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26430;
+-- OLD name : Flüchtling der Taunka'le (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26432
-UPDATE `creature_template_locale` SET `Name` = '[Taunka''le Refugee]' WHERE `locale` = 'deDE' AND `entry` = 26432;
--- OLD name : Flüchtling der Taunka'le
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26432;
+-- OLD name : Flüchtling der Taunka'le (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26433
-UPDATE `creature_template_locale` SET `Name` = '[Taunka''le Refugee]' WHERE `locale` = 'deDE' AND `entry` = 26433;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26433;
 -- OLD name : Gesandter Reißzahn
 -- Source : https://www.wowhead.com/wotlk/de/npc=26441
 UPDATE `creature_template_locale` SET `Name` = 'Entsandter Reißzahn' WHERE `locale` = 'deDE' AND `entry` = 26441;
--- OLD name : Rak'la der Reisende, subname : Glücksspieler
+-- OLD name : Rak'la der Reisende, subname : Glücksspieler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26442
-UPDATE `creature_template_locale` SET `Name` = '[Rak''la the Traveler]',`Title` = '[Gambler]' WHERE `locale` = 'deDE' AND `entry` = 26442;
--- OLD name : Quest Invisman - Filling the Cages
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26442;
+-- OLD name : Quest Invisman - Filling the Cages (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26444
-UPDATE `creature_template_locale` SET `Name` = '[Quest Invisman - Filling the Cages]' WHERE `locale` = 'deDE' AND `entry` = 26444;
--- OLD name : Runenplatte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26444;
+-- OLD name : Runenplatte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26445
-UPDATE `creature_template_locale` SET `Name` = '[Rune Plate]' WHERE `locale` = 'deDE' AND `entry` = 26445;
--- OLD name : (PH) Duskhowl Stalker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26445;
+-- OLD name : (PH) Duskhowl Stalker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26454
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Duskhowl Stalker]' WHERE `locale` = 'deDE' AND `entry` = 26454;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26454;
 -- OLD name : Kranker Drakkari
 -- Source : https://www.wowhead.com/wotlk/de/npc=26457
 UPDATE `creature_template_locale` SET `Name` = 'Verstorbener Drakkari' WHERE `locale` = 'deDE' AND `entry` = 26457;
--- OLD name : Lorn Todessprecher
+-- OLD name : Lorn Todessprecher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26460
-UPDATE `creature_template_locale` SET `Name` = '[Lorn Deathspeaker]' WHERE `locale` = 'deDE' AND `entry` = 26460;
--- OLD name : Testgreif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26460;
+-- OLD name : Testgreif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26462
-UPDATE `creature_template_locale` SET `Name` = '[Test Gryphon]' WHERE `locale` = 'deDE' AND `entry` = 26462;
--- OLD name : Transformation eines toten Magierjägers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26462;
+-- OLD name : Transformation eines toten Magierjägers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26476
-UPDATE `creature_template_locale` SET `Name` = '[Dead Mage Hunter Transform]' WHERE `locale` = 'deDE' AND `entry` = 26476;
--- OLD name : Krieger der Horde, subname : Söhne des Kriegshymnenklans
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26476;
+-- OLD name : Krieger der Horde, subname : Söhne des Kriegshymnenklans (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26486
-UPDATE `creature_template_locale` SET `Name` = '[Horde Warrior]',`Title` = '[Sons of Warsong]' WHERE `locale` = 'deDE' AND `entry` = 26486;
--- OLD name : Soldat der Allianz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26486;
+-- OLD name : Soldat der Allianz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26487
-UPDATE `creature_template_locale` SET `Name` = '[Alliance Soldier]' WHERE `locale` = 'deDE' AND `entry` = 26487;
--- OLD name : Testkatapult
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26487;
+-- OLD name : Aasfeldtotenbeschwörer der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26489
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26489;
+-- OLD name : Aasfeldzombie der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26490
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26490;
+-- OLD name : Aasfeldgargoyle der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26491
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26491;
+-- OLD name : Testkatapult (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26495
-UPDATE `creature_template_locale` SET `Name` = '[Test Catapult]' WHERE `locale` = 'deDE' AND `entry` = 26495;
--- OLD name : Pestrufer der Verlassenen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26495;
+-- OLD name : Pestrufer der Verlassenen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26508
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Blightcaller]' WHERE `locale` = 'deDE' AND `entry` = 26508;
--- OLD name : Aasbeschwörer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26508;
+-- OLD name : Aasbeschwörer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26512
-UPDATE `creature_template_locale` SET `Name` = '[Carrion Necromancer]' WHERE `locale` = 'deDE' AND `entry` = 26512;
--- OLD name : Aasghul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26512;
+-- OLD name : Aasghul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26515
-UPDATE `creature_template_locale` SET `Name` = '[Carrion Ghoul]' WHERE `locale` = 'deDE' AND `entry` = 26515;
--- OLD name : Aasgargoyle
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26515;
+-- OLD name : Aasgargoyle (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26517
-UPDATE `creature_template_locale` SET `Name` = '[Carrion Gargoyle]' WHERE `locale` = 'deDE' AND `entry` = 26517;
--- OLD name : Aasmonstrosität
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26517;
+-- OLD name : Aasmonstrosität (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26518
-UPDATE `creature_template_locale` SET `Name` = '[Carrion Abomination]' WHERE `locale` = 'deDE' AND `entry` = 26518;
--- OLD name : Scharlachroter Fußsoldat
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26518;
+-- OLD name : Scharlachroter Fußsoldat (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26524
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Footman]' WHERE `locale` = 'deDE' AND `entry` = 26524;
--- OLD name : Verseuchter Scharlachroter Fußsoldat
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26524;
+-- OLD name : Verseuchter Scharlachroter Fußsoldat (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26526
-UPDATE `creature_template_locale` SET `Name` = '[Scourged Scarlet Footman]' WHERE `locale` = 'deDE' AND `entry` = 26526;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26526;
+-- OLD name : Craig Amai (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26535
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26535;
 -- OLD subname : Zeppelinmeister, Boreanische Tundra (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26537
 UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, boreanische Tundra' WHERE `locale` = 'deDE' AND `entry` = 26537;
@@ -3688,72 +5139,150 @@ UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, Durotar' WHERE
 -- OLD subname : Zeppelinmeisterin, Heulender Fjord
 -- Source : https://www.wowhead.com/wotlk/de/npc=26539
 UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, heulender Fjord' WHERE `locale` = 'deDE' AND `entry` = 26539;
--- OLD name : Zab Dampfbolz, subname : Zeppelinmeister, Heulender Fjord
+-- OLD name : Zab Dampfbolz, subname : Zeppelinmeister, Heulender Fjord (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26541
-UPDATE `creature_template_locale` SET `Name` = '[Zab Steambolt]',`Title` = '[Howling Fjord Zeppelin Master]' WHERE `locale` = 'deDE' AND `entry` = 26541;
--- OLD name : Lini Laschenbolz, subname : Zeppelinmeister, Boreanische Tundra
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26541;
+-- OLD name : Lini Laschenbolz, subname : Zeppelinmeister, Boreanische Tundra (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26542
-UPDATE `creature_template_locale` SET `Name` = '[Lini Lugbolt]',`Title` = '[Borean Tundra Zeppelin Master]' WHERE `locale` = 'deDE' AND `entry` = 26542;
--- OLD name : Hansrick Stämmig, subname : Dockmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26542;
+-- OLD name : Hansrick Stämmig, subname : Dockmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26551
-UPDATE `creature_template_locale` SET `Name` = '[Hansric Stout]',`Title` = '[Dockmaster]' WHERE `locale` = 'deDE' AND `entry` = 26551;
--- OLD name : Maye Pfeifer, subname : Dockmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26551;
+-- OLD name : Maye Pfeifer, subname : Dockmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26552
-UPDATE `creature_template_locale` SET `Name` = '[Maye Piper]',`Title` = '[Dockmaster]' WHERE `locale` = 'deDE' AND `entry` = 26552;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26552;
 -- OLD subname : Schmiedekunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=26564
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst' WHERE `locale` = 'deDE' AND `entry` = 26564;
--- OLD name : Eingekerkerter Affe
+-- OLD name : Eingekerkerter Affe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26571
-UPDATE `creature_template_locale` SET `Name` = '[Imprisoned Monkey]' WHERE `locale` = 'deDE' AND `entry` = 26571;
--- OLD name : Verweilender Bewohner
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26571;
+-- OLD name : Verweilender Bewohner (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26573
-UPDATE `creature_template_locale` SET `Name` = '[Lingering Villager]' WHERE `locale` = 'deDE' AND `entry` = 26573;
--- OLD name : Hase der Grizzlyhügel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26573;
+-- OLD name : [PH] Justin's Test NPC (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26576
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26576;
+-- OLD name : Hase der Grizzlyhügel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26587
-UPDATE `creature_template_locale` SET `Name` = '[Grizzly Hills Rabbit]' WHERE `locale` = 'deDE' AND `entry` = 26587;
--- OLD name : Transformation der spirituellen Einsicht
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26587;
+-- OLD name : Transformation der spirituellen Einsicht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26594
-UPDATE `creature_template_locale` SET `Name` = '[Spiritual Insight Transform]' WHERE `locale` = 'deDE' AND `entry` = 26594;
--- OLD name : Burninate Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26594;
+-- OLD name : Burninate Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26612
-UPDATE `creature_template_locale` SET `Name` = '[Burninate Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 26612;
--- OLD name : Grunzer Tar'yug
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26612;
+-- OLD name : Grunzer Tar'yug (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26617
-UPDATE `creature_template_locale` SET `Name` = '[Grunt Tar''yug]' WHERE `locale` = 'deDE' AND `entry` = 26617;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26617;
 -- OLD name : Fallschirmjäger von Kurbelzisch
 -- Source : https://www.wowhead.com/wotlk/de/npc=26619
 UPDATE `creature_template_locale` SET `Name` = 'Fallschirmspringer von Kurbelzisch' WHERE `locale` = 'deDE' AND `entry` = 26619;
+-- OLD name : Kondor names Shirrak (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26665
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26665;
 -- OLD name : Blutdürstiger Tundrawolf
 -- Source : https://www.wowhead.com/wotlk/de/npc=26672
 UPDATE `creature_template_locale` SET `Name` = 'Blutdurstiger Tundrawolf' WHERE `locale` = 'deDE' AND `entry` = 26672;
--- OLD name : Jormungarfleisch
+-- OLD name : Jormungarfleisch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26699
-UPDATE `creature_template_locale` SET `Name` = '[Jormungar Meat]' WHERE `locale` = 'deDE' AND `entry` = 26699;
--- OLD name : Verseuchtes Orakel der Drakkari
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26699;
+-- OLD name : Verseuchtes Orakel der Drakkari (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26702
-UPDATE `creature_template_locale` SET `Name` = '[Scourged Drakkari Oracle]' WHERE `locale` = 'deDE' AND `entry` = 26702;
--- OLD name : Verseuchter Kriegshetzer der Drakkari
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26702;
+-- OLD name : Verseuchter Kriegshetzer der Drakkari (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26703
-UPDATE `creature_template_locale` SET `Name` = '[Scourged Drakkari Warmonger]' WHERE `locale` = 'deDE' AND `entry` = 26703;
--- OLD name : Versuchsobjekt der Drachenöde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26703;
+-- OLD name : Versuchsobjekt der Drachenöde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26713
-UPDATE `creature_template_locale` SET `Name` = '[Dragonblight Test Subject]' WHERE `locale` = 'deDE' AND `entry` = 26713;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26713;
+-- OLD name : [DND] TAR Pedestal - Armor, Cloth & Leather (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26724
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26724;
 -- OLD name : Windelementar der Boreanischen Tundra (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26726
 UPDATE `creature_template_locale` SET `Name` = 'Windelementar der boreanischen Tundra' WHERE `locale` = 'deDE' AND `entry` = 26726;
+-- OLD name : [dnd] Fizzcrank Paratrooper Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26732
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26732;
+-- OLD name : [DND] TAR Pedestal - Accessories (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26738
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26738;
+-- OLD name : [DND] TAR Pedestal - Enchantments (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26739
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26739;
+-- OLD name : [DND] TAR Pedestal - Gems (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26740
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26740;
+-- OLD name : [DND] TAR Pedestal - General Goods (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26741
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26741;
+-- OLD name : [DND] TAR Pedestal - Armor, Mail & Plate (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26742
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26742;
+-- OLD name : [DND] TAR Pedestal - Glyph, Cloth & Leather (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26743
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26743;
+-- OLD name : [DND] TAR Pedestal - Glyph, Mail & Plate (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26744
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26744;
+-- OLD name : [DND] TAR Pedestal - Weapons (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26745
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26745;
+-- OLD name : [DND] TAR Pedestal - Arena Organizer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26747
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26747;
+-- OLD name : [DND] TAR Pedestal - Beastmaster (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26748
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26748;
+-- OLD name : [DND] TAR Pedestal - Paymaster (-> Monk) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26749
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26749;
+-- OLD name : [DND] TAR Pedestal - Teleporter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26750
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26750;
+-- OLD name : [DND] TAR Pedestal - Trainer, Druid (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26751
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26751;
+-- OLD name : [DND] TAR Pedestal - Trainer, Hunter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26752
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26752;
+-- OLD name : [DND] TAR Pedestal - Trainer, Mage (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26753
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26753;
+-- OLD name : [DND] TAR Pedestal - Trainer, Paladin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26754
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26754;
+-- OLD name : [DND] TAR Pedestal - Trainer, Priest (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26755
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26755;
+-- OLD name : [DND] TAR Pedestal - Trainer, Rogue (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26756
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26756;
+-- OLD name : [DND] TAR Pedestal - Trainer, Shaman (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26757
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26757;
+-- OLD name : [DND] TAR Pedestal - Trainer, Warlock (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26758
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26758;
+-- OLD name : [DND] TAR Pedestal - Trainer, Warrior (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26759
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26759;
+-- OLD name : [DND] TAR Pedestal - Fight Promoter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26765
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26765;
 -- OLD name : Kriegerheld Sturmhimmel
 -- Source : https://www.wowhead.com/wotlk/de/npc=26766
 UPDATE `creature_template_locale` SET `Name` = 'Tapfer Sturmhimmel' WHERE `locale` = 'deDE' AND `entry` = 26766;
--- OLD name : The Focus on the Beach Kill Credit Bunny
+-- OLD name : The Focus on the Beach Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26773
-UPDATE `creature_template_locale` SET `Name` = '[The Focus on the Beach Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 26773;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26773;
 -- OLD name : Klerikerin der 7. Legion
 -- Source : https://www.wowhead.com/wotlk/de/npc=26780
 UPDATE `creature_template_locale` SET `Name` = 'Kleriker der 7. Legion' WHERE `locale` = 'deDE' AND `entry` = 26780;
--- OLD name : Dan's Test Dummy
+-- OLD name : Dan's Test Dummy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26784
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Dummy]' WHERE `locale` = 'deDE' AND `entry` = 26784;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26784;
 -- OLD subname : Thug Life
 -- Source : https://www.wowhead.com/wotlk/de/npc=26791
 DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26791;
@@ -3761,48 +5290,57 @@ INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALU
 -- OLD name : Waldläuferin der Allianz
 -- Source : https://www.wowhead.com/wotlk/de/npc=26802
 UPDATE `creature_template_locale` SET `Name` = 'Waldläufer der Allianz' WHERE `locale` = 'deDE' AND `entry` = 26802;
--- OLD name : Verwandelte Fallenstellerin
+-- OLD name : Verwandelte Fallenstellerin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26819
-UPDATE `creature_template_locale` SET `Name` = '[Tranformed Trapper Female]' WHERE `locale` = 'deDE' AND `entry` = 26819;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26819;
 -- OLD name : Gesandter Ducal
 -- Source : https://www.wowhead.com/wotlk/de/npc=26821
 UPDATE `creature_template_locale` SET `Name` = 'Entsandter Ducal' WHERE `locale` = 'deDE' AND `entry` = 26821;
--- OLD name : Rasender Worgen
+-- OLD name : Rasender Worgen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26829
-UPDATE `creature_template_locale` SET `Name` = '[Frenzied Worgen]' WHERE `locale` = 'deDE' AND `entry` = 26829;
--- OLD name : Atop the Woodlands Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26829;
+-- OLD name : Atop the Woodlands Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26831
-UPDATE `creature_template_locale` SET `Name` = '[Atop the Woodlands Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 26831;
--- OLD name : Aufgeschrecktes Schlachtross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26831;
+-- OLD name : Aufgeschrecktes Schlachtross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26833
-UPDATE `creature_template_locale` SET `Name` = '[Startled Warhorse]' WHERE `locale` = 'deDE' AND `entry` = 26833;
--- OLD name : Kareg, subname : Windreitermeisterin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26833;
+-- OLD name : Schaufelhaueraasfresser der Drachenöde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26835
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26835;
+-- OLD name : Frostwyrm der Horde der Drachenöde mit Namen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26840
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26840;
+-- OLD name : [PH] Vanguard Landing Flight Master, subname : Windreitermeister (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=26842
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26842;
+-- OLD name : Kareg, subname : Windreitermeisterin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26846
-UPDATE `creature_template_locale` SET `Name` = '[Kareg]',`Title` = '[Wind Rider Master]' WHERE `locale` = 'deDE' AND `entry` = 26846;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26846;
 -- OLD name : Erdwächter Graif
 -- Source : https://www.wowhead.com/wotlk/de/npc=26854
 UPDATE `creature_template_locale` SET `Name` = 'Erdenwächter Graif' WHERE `locale` = 'deDE' AND `entry` = 26854;
--- OLD name : Arktischer Grizzly
+-- OLD name : Arktischer Grizzly (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26882
-UPDATE `creature_template_locale` SET `Name` = '[Arctic Grizzly Credit]' WHERE `locale` = 'deDE' AND `entry` = 26882;
--- OLD name : The End of the Line Ley Line Focus Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26882;
+-- OLD name : The End of the Line Ley Line Focus Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26887
-UPDATE `creature_template_locale` SET `Name` = '[The End of the Line Ley Line Focus Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 26887;
--- OLD name : Kartograf Tobias
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26887;
+-- OLD name : Kartograf Tobias (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26888
-UPDATE `creature_template_locale` SET `Name` = '[Cartographer Tobias]' WHERE `locale` = 'deDE' AND `entry` = 26888;
--- OLD name : TEST ESCORTEE - LAB
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26888;
+-- OLD name : TEST ESCORTEE - LAB (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26894
-UPDATE `creature_template_locale` SET `Name` = '[TEST ESCORTEE - LAB]' WHERE `locale` = 'deDE' AND `entry` = 26894;
--- OLD name : Schneewehenelch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26894;
+-- OLD name : Schneewehenelch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26895
-UPDATE `creature_template_locale` SET `Name` = '[Snowfall Elk Credit]' WHERE `locale` = 'deDE' AND `entry` = 26895;
--- OLD name : Gnom
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26895;
+-- OLD name : Gnom (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26897
-UPDATE `creature_template_locale` SET `Name` = '[Gnome, Clockwork (Northrend)]' WHERE `locale` = 'deDE' AND `entry` = 26897;
--- OLD name : Reitdrache, rot
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26897;
+-- OLD name : Reitdrache, rot (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26899
-UPDATE `creature_template_locale` SET `Name` = '[Riding Drake, Red]' WHERE `locale` = 'deDE' AND `entry` = 26899;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26899;
 -- OLD subname : Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=26901
 UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deDE' AND `entry` = 26901;
@@ -3845,15 +5383,15 @@ UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Juwelenschleif
 -- OLD subname : Inschriftenkundelehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=26916
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Inschriftenkunde' WHERE `locale` = 'deDE' AND `entry` = 26916;
--- OLD name : Warlord Jin'gom Kill Credit
+-- OLD name : Warlord Jin'gom Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26927
-UPDATE `creature_template_locale` SET `Name` = '[Warlord Jin''gom Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 26927;
--- OLD name : Blutbanns Reittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26927;
+-- OLD name : Blutbanns Reittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26931
-UPDATE `creature_template_locale` SET `Name` = '[Bloodbane''s Mount]' WHERE `locale` = 'deDE' AND `entry` = 26931;
--- OLD name : Vix Chromblaster, subname : Händler für Selbsthilfebücher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26931;
+-- OLD name : Vix Chromblaster, subname : Händler für Selbsthilfebücher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26947
-UPDATE `creature_template_locale` SET `Name` = '[Vix Chromeblaster]',`Title` = '[Self-Help Bookseller]' WHERE `locale` = 'deDE' AND `entry` = 26947;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26947;
 -- OLD subname : Alchemielehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=26951
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Alchemie' WHERE `locale` = 'deDE' AND `entry` = 26951;
@@ -3896,15 +5434,15 @@ UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kürschnerei
 -- OLD subname : Schneiderlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=26964
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Schneiderei' WHERE `locale` = 'deDE' AND `entry` = 26964;
--- OLD name : Frostbruttöter
+-- OLD name : Frostbruttöter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26967
-UPDATE `creature_template_locale` SET `Name` = '[Frostbrood Slayer]' WHERE `locale` = 'deDE' AND `entry` = 26967;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26967;
 -- OLD subname : Schneiderlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=26969
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Schneiderei' WHERE `locale` = 'deDE' AND `entry` = 26969;
--- OLD name : Kleintiertransformation von Großmagistrix Telestra
+-- OLD name : Kleintiertransformation von Großmagistrix Telestra (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=26970
-UPDATE `creature_template_locale` SET `Name` = '[Grand Magus Telestra Critter Transform]' WHERE `locale` = 'deDE' AND `entry` = 26970;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 26970;
 -- OLD subname : Kochkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=26972
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kochkunst' WHERE `locale` = 'deDE' AND `entry` = 26972;
@@ -3977,12 +5515,12 @@ UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kürschnerei' 
 -- OLD subname : Schneiderlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=27001
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schneiderei' WHERE `locale` = 'deDE' AND `entry` = 27001;
--- OLD name : Baumeister Stumpi
+-- OLD name : Baumeister Stumpi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27014
-UPDATE `creature_template_locale` SET `Name` = '[Builder Bezzle]' WHERE `locale` = 'deDE' AND `entry` = 27014;
--- OLD name : Baumeister Stümpi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27014;
+-- OLD name : Baumeister Stümpi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27015
-UPDATE `creature_template_locale` SET `Name` = '[Builder Bozzle]' WHERE `locale` = 'deDE' AND `entry` = 27015;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27015;
 -- OLD subname : Alchemielehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=27023
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrerin' WHERE `locale` = 'deDE' AND `entry` = 27023;
@@ -3992,36 +5530,36 @@ UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer' WHERE `l
 -- OLD subname : Schmiedekunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=27034
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst' WHERE `locale` = 'deDE' AND `entry` = 27034;
--- OLD name : Schreckenslord
+-- OLD name : Schreckenslord (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27036
-UPDATE `creature_template_locale` SET `Name` = '[Dreadlord - Metamorphosis (Warlock)]' WHERE `locale` = 'deDE' AND `entry` = 27036;
--- OLD name : Aufgeladener Kriegsgolem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27036;
+-- OLD name : Aufgeladener Kriegsgolem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27049
-UPDATE `creature_template_locale` SET `Name` = '[Charged War Golem]' WHERE `locale` = 'deDE' AND `entry` = 27049;
--- OLD name : Belagerungspanzer der Horde 2
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27049;
+-- OLD name : Belagerungspanzer der Horde 2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27103
-UPDATE `creature_template_locale` SET `Name` = '[Horde Siege Tank 2]' WHERE `locale` = 'deDE' AND `entry` = 27103;
--- OLD name : Belagerungspanzer der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27103;
+-- OLD name : Belagerungspanzer der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27104
-UPDATE `creature_template_locale` SET `Name` = '[Horde Siege Tank 3]' WHERE `locale` = 'deDE' AND `entry` = 27104;
--- OLD name : Verletzter Stellvertreter des Kriegshymnenklans
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27104;
+-- OLD name : Verletzter Stellvertreter des Kriegshymnenklans (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27109
-UPDATE `creature_template_locale` SET `Name` = '[Injured Warsong Proxy]' WHERE `locale` = 'deDE' AND `entry` = 27109;
--- OLD name : Blighted Elk Liquid Fire of Elune Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27109;
+-- OLD name : Blighted Elk Liquid Fire of Elune Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27111
-UPDATE `creature_template_locale` SET `Name` = '[Blighted Elk Liquid Fire of Elune Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27111;
--- OLD name : Rabid Grizzly Liquid Fire of Elune Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27111;
+-- OLD name : Rabid Grizzly Liquid Fire of Elune Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27112
-UPDATE `creature_template_locale` SET `Name` = '[Rabid Grizzly Liquid Fire of Elune Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27112;
--- OLD name : Blackriver Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27112;
+-- OLD name : Blackriver Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27121
-UPDATE `creature_template_locale` SET `Name` = '[Blackriver Credit]' WHERE `locale` = 'deDE' AND `entry` = 27121;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27121;
 -- OLD name : Kriegerheld von Oneqwah
 -- Source : https://www.wowhead.com/wotlk/de/npc=27126
 UPDATE `creature_template_locale` SET `Name` = 'Kriegsheld von Oneqwah' WHERE `locale` = 'deDE' AND `entry` = 27126;
--- OLD name : Hippogryphentaxi
+-- OLD name : Hippogryphentaxi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27127
-UPDATE `creature_template_locale` SET `Name` = '[Hippogryph Taxi (Dragonblight)]' WHERE `locale` = 'deDE' AND `entry` = 27127;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27127;
 -- OLD subname : Rüstungsschmiedin
 -- Source : https://www.wowhead.com/wotlk/de/npc=27134
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmied' WHERE `locale` = 'deDE' AND `entry` = 27134;
@@ -4031,105 +5569,114 @@ UPDATE `creature_template_locale` SET `Name` = 'Oberkommandant Halford Wyrmbann'
 -- OLD subname : Juwelierskunstbedarf
 -- Source : https://www.wowhead.com/wotlk/de/npc=27142
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf' WHERE `locale` = 'deDE' AND `entry` = 27142;
--- OLD name : Test Faction NPC
+-- OLD name : Test Faction NPC (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27154
-UPDATE `creature_template_locale` SET `Name` = '[Test Faction NPC]' WHERE `locale` = 'deDE' AND `entry` = 27154;
--- OLD name : Testeinheit der 7. Legion
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27154;
+-- OLD name : Testeinheit der 7. Legion (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27168
-UPDATE `creature_template_locale` SET `Name` = '[7th Legion Test Unit]' WHERE `locale` = 'deDE' AND `entry` = 27168;
--- OLD name : Kriegsmagier von Bernsteinflöz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27168;
+-- OLD name : Kriegsmagier von Bernsteinflöz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27170
-UPDATE `creature_template_locale` SET `Name` = '[Amber Ledge Warmage]' WHERE `locale` = 'deDE' AND `entry` = 27170;
--- OLD name : Fledermaustaxi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27170;
+-- OLD name : Fledermaustaxi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27179
-UPDATE `creature_template_locale` SET `Name` = '[Bat Taxi (Howling Fjord)]' WHERE `locale` = 'deDE' AND `entry` = 27179;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27179;
+-- OLD name : Scharlachroter Fußsoldat von Neuherdweiler (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27205
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27205;
+-- OLD name : Scharlachroter Kommandant von Neuherdweiler (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27208
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27208;
 -- OLD name : Folterer LeCraft
 -- Source : https://www.wowhead.com/wotlk/de/npc=27209
 UPDATE `creature_template_locale` SET `Name` = 'Folterer Alphonse' WHERE `locale` = 'deDE' AND `entry` = 27209;
--- OLD name : Pferd des Ansturms
+-- OLD name : Pferd des Ansturms (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27214
-UPDATE `creature_template_locale` SET `Name` = '[Onslaught Horse]' WHERE `locale` = 'deDE' AND `entry` = 27214;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27214;
+-- OLD name : Scharlachroter Späher von Neuherdweiler (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27218
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27218;
 -- OLD name : Zielscheibe
 -- Source : https://www.wowhead.com/wotlk/de/npc=27222
 UPDATE `creature_template_locale` SET `Name` = 'Pfeil-und-Bogen-Ziel' WHERE `locale` = 'deDE' AND `entry` = 27222;
 -- OLD name : Zielscheibe
 -- Source : https://www.wowhead.com/wotlk/de/npc=27223
 UPDATE `creature_template_locale` SET `Name` = 'Pfeil-und-Bogen-Ziel' WHERE `locale` = 'deDE' AND `entry` = 27223;
--- OLD name : Clayton Dubin J, subname : Geprüfte Qualität
+-- OLD name : Clayton Dubin J, subname : Geprüfte Qualität (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27231
-UPDATE `creature_template_locale` SET `Name` = '[Clayton Dubin J]',`Title` = '[Assured Quality ]' WHERE `locale` = 'deDE' AND `entry` = 27231;
--- OLD name : Rogue Test Dummy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27231;
+-- OLD name : Rogue Test Dummy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27239
-UPDATE `creature_template_locale` SET `Name` = '[Rogue Test Dummy]' WHERE `locale` = 'deDE' AND `entry` = 27239;
--- OLD name : Vergessener Greif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27239;
+-- OLD name : Vergessener Greif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27240
-UPDATE `creature_template_locale` SET `Name` = '[Forgotten Gryphon]' WHERE `locale` = 'deDE' AND `entry` = 27240;
--- OLD name : Schutzgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27240;
+-- OLD name : Schutzgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27242
-UPDATE `creature_template_locale` SET `Name` = '[Guardian Spirit]' WHERE `locale` = 'deDE' AND `entry` = 27242;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27242;
 -- OLD name : Ergebener Leibwächter
 -- Source : https://www.wowhead.com/wotlk/de/npc=27247
 UPDATE `creature_template_locale` SET `Name` = 'Andächtiger Leibwächter' WHERE `locale` = 'deDE' AND `entry` = 27247;
--- OLD name : Smaragdgrüner Irrwisch
+-- OLD name : Smaragdgrüner Irrwisch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27252
-UPDATE `creature_template_locale` SET `Name` = '[Emerald Wisp]' WHERE `locale` = 'deDE' AND `entry` = 27252;
--- OLD name : Blighted Last Rites Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27252;
+-- OLD name : Blighted Last Rites Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27253
-UPDATE `creature_template_locale` SET `Name` = '[Blighted Last Rites Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27253;
--- OLD name : Seuchenverbreiter der Geißel (KLEIN)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27253;
+-- OLD name : Seuchenverbreiter der Geißel (KLEIN) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27257
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Plague Spreader (SMALL)]' WHERE `locale` = 'deDE' AND `entry` = 27257;
--- OLD name : Smaragdsetzling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27257;
+-- OLD name : Smaragdsetzling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27261
-UPDATE `creature_template_locale` SET `Name` = '[Emerald Seedling]' WHERE `locale` = 'deDE' AND `entry` = 27261;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27261;
 -- OLD name : Forstmeister Anderhol
 -- Source : https://www.wowhead.com/wotlk/de/npc=27277
 UPDATE `creature_template_locale` SET `Name` = 'Förstermeister Anderhol' WHERE `locale` = 'deDE' AND `entry` = 27277;
--- OLD name : Let Them Not Rise! Kill Credit Bunny
+-- OLD name : Let Them Not Rise! Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27280
-UPDATE `creature_template_locale` SET `Name` = '[Let Them Not Rise! Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27280;
--- OLD name : Begrabener Gefangener
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27280;
+-- OLD name : Begrabener Gefangener (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27282
-UPDATE `creature_template_locale` SET `Name` = '[Buried Prisoner]' WHERE `locale` = 'deDE' AND `entry` = 27282;
--- OLD name : Fresh Remounts Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27282;
+-- OLD name : Fresh Remounts Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27296
-UPDATE `creature_template_locale` SET `Name` = '[Fresh Remounts Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27296;
--- OLD name : König Björn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27296;
+-- OLD name : König Björn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27304
-UPDATE `creature_template_locale` SET `Name` = '[King Bjorn Visual]' WHERE `locale` = 'deDE' AND `entry` = 27304;
--- OLD name : König Haldor
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27304;
+-- OLD name : König Haldor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27310
-UPDATE `creature_template_locale` SET `Name` = '[King Haldor Visual]' WHERE `locale` = 'deDE' AND `entry` = 27310;
--- OLD name : König Ranulf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27310;
+-- OLD name : König Ranulf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27311
-UPDATE `creature_template_locale` SET `Name` = '[King Ranulf Visual]' WHERE `locale` = 'deDE' AND `entry` = 27311;
--- OLD name : König Tor
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27311;
+-- OLD name : König Tor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27312
-UPDATE `creature_template_locale` SET `Name` = '[King Tor Visual]' WHERE `locale` = 'deDE' AND `entry` = 27312;
--- OLD name : Eisriese
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27312;
+-- OLD name : Eisriese (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27313
-UPDATE `creature_template_locale` SET `Name` = '[Ice Giant, Northrend]' WHERE `locale` = 'deDE' AND `entry` = 27313;
--- OLD name : Outhouse Stalker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27313;
+-- OLD name : Outhouse Stalker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27323
-UPDATE `creature_template_locale` SET `Name` = '[Outhouse Stalker]' WHERE `locale` = 'deDE' AND `entry` = 27323;
--- OLD name : Outhouse Invisible Man
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27323;
+-- OLD name : Outhouse Invisible Man (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27324
-UPDATE `creature_template_locale` SET `Name` = '[Outhouse Invisible Man]' WHERE `locale` = 'deDE' AND `entry` = 27324;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27324;
 -- OLD name : Spionagemeisterin Repine
 -- Source : https://www.wowhead.com/wotlk/de/npc=27337
 UPDATE `creature_template_locale` SET `Name` = 'Spionenmeisterin Repine' WHERE `locale` = 'deDE' AND `entry` = 27337;
--- OLD name : Dan's Test Vehicle 2
+-- OLD name : Dan's Test Vehicle 2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27338
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Vehicle 2]' WHERE `locale` = 'deDE' AND `entry` = 27338;
--- OLD name : Stellvertretender hilfloser Dorfbewohner
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27338;
+-- OLD name : Stellvertretender hilfloser Dorfbewohner (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27341
-UPDATE `creature_template_locale` SET `Name` = '[Helpless Villager Proxy]' WHERE `locale` = 'deDE' AND `entry` = 27341;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27341;
 -- OLD name : Adeline Kammerer
 -- Source : https://www.wowhead.com/wotlk/de/npc=27344
 UPDATE `creature_template_locale` SET `Name` = 'Fledermausführerin Adeline' WHERE `locale` = 'deDE' AND `entry` = 27344;
--- OLD name : Hilfloser Dorfbauer von Wintergarde
+-- OLD name : Hilfloser Dorfbauer von Wintergarde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27345
-UPDATE `creature_template_locale` SET `Name` = '[Helpless Wintergarde Villager (Peasants)]' WHERE `locale` = 'deDE' AND `entry` = 27345;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27345;
 -- OLD name : Schwelendes Skelett
 -- Source : https://www.wowhead.com/wotlk/de/npc=27360
 UPDATE `creature_template_locale` SET `Name` = 'Glimmendes Skelett' WHERE `locale` = 'deDE' AND `entry` = 27360;
@@ -4139,355 +5686,378 @@ UPDATE `creature_template_locale` SET `Name` = 'Glimmendes Konstrukt' WHERE `loc
 -- OLD name : Schwelender Spuk
 -- Source : https://www.wowhead.com/wotlk/de/npc=27363
 UPDATE `creature_template_locale` SET `Name` = 'Glimmender Spuk' WHERE `locale` = 'deDE' AND `entry` = 27363;
--- OLD name : Vordrassil Sapling Credit
+-- OLD name : Vordrassil Sapling Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27366
-UPDATE `creature_template_locale` SET `Name` = '[Vordrassil Sapling Credit]' WHERE `locale` = 'deDE' AND `entry` = 27366;
--- OLD name : Ursoc Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27366;
+-- OLD name : [DND] Stabled Pet Appearance (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27368
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27368;
+-- OLD name : Ursoc Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27372
-UPDATE `creature_template_locale` SET `Name` = '[Ursoc Credit]' WHERE `locale` = 'deDE' AND `entry` = 27372;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27372;
 -- OLD name : Chefschreiber Barriga
 -- Source : https://www.wowhead.com/wotlk/de/npc=27378
 UPDATE `creature_template_locale` SET `Name` = 'Chefschreiber Kinnedius' WHERE `locale` = 'deDE' AND `entry` = 27378;
--- OLD name : Torture the Torturer Kill Credit Bunny
+-- OLD name : Angriffsauslöser des Inneren Tores von Wintergarde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27380
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27380;
+-- OLD name : Thel'zan der Dämmerbringer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27384
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27384;
+-- OLD name : Fußsoldatenzuschauer der Valianzfeste (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27387
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27387;
+-- OLD name : Torture the Torturer Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27394
-UPDATE `creature_template_locale` SET `Name` = '[Torture the Torturer Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27394;
--- OLD name : Taifun
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27394;
+-- OLD name : Taifun (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27395
-UPDATE `creature_template_locale` SET `Name` = '[Typhoon]' WHERE `locale` = 'deDE' AND `entry` = 27395;
--- OLD name : Kill Credit Bunny - Shredder Delivery
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27395;
+-- OLD name : Kill Credit Bunny - Shredder Delivery (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27396
-UPDATE `creature_template_locale` SET `Name` = '[Kill Credit Bunny - Shredder Delivery]' WHERE `locale` = 'deDE' AND `entry` = 27396;
--- OLD name : Rocket Mount (Log Ride Test)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27396;
+-- OLD name : Rocket Mount (Log Ride Test) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27397
-UPDATE `creature_template_locale` SET `Name` = '[Rocket Mount (Log Ride Test)]' WHERE `locale` = 'deDE' AND `entry` = 27397;
--- OLD name : The Perfect Dissemblance Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27397;
+-- OLD name : Utgarde Duo Trigger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27404
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27404;
+-- OLD name : The Perfect Dissemblance Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27419
-UPDATE `creature_template_locale` SET `Name` = '[The Perfect Dissemblance Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27419;
--- OLD name : Rothins nekromantisches Runenhäschen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27419;
+-- OLD name : Rothins nekromantisches Runenhäschen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27420
-UPDATE `creature_template_locale` SET `Name` = '[Rothin''s Necromantic Rune Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27420;
--- OLD name : Commander Jordan Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27420;
+-- OLD name : Commander Jordan Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27426
-UPDATE `creature_template_locale` SET `Name` = '[Commander Jordan Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27426;
--- OLD name : Lead Cannoneer Zierhut Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27426;
+-- OLD name : Lead Cannoneer Zierhut Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27427
-UPDATE `creature_template_locale` SET `Name` = '[Lead Cannoneer Zierhut Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27427;
--- OLD name : Blacksmith Goodman Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27427;
+-- OLD name : Blacksmith Goodman Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27428
-UPDATE `creature_template_locale` SET `Name` = '[Blacksmith Goodman Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27428;
--- OLD name : Stable Master Mercer Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27428;
+-- OLD name : Stable Master Mercer Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27429
-UPDATE `creature_template_locale` SET `Name` = '[Stable Master Mercer Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27429;
--- OLD name : Bild eines Scharlachroten Rabenpriesters - Weibliche Transformation
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27429;
+-- OLD name : Bild eines Scharlachroten Rabenpriesters - Weibliche Transformation (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27442
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Raven Priest Image - Female Transform]' WHERE `locale` = 'deDE' AND `entry` = 27442;
--- OLD name : Bild eines Scharlachroten Rabenpriesters - Männliche Transformation
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27442;
+-- OLD name : Bild eines Scharlachroten Rabenpriesters - Männliche Transformation (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27443
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Raven Priest Image - Male Transform]' WHERE `locale` = 'deDE' AND `entry` = 27443;
--- OLD name : A Fall from Grace High Abbot Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27443;
+-- OLD name : A Fall from Grace High Abbot Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27444
-UPDATE `creature_template_locale` SET `Name` = '[A Fall from Grace High Abbot Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27444;
--- OLD name : A Fall from Grace Bell Rung Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27444;
+-- OLD name : A Fall from Grace Bell Rung Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27445
-UPDATE `creature_template_locale` SET `Name` = '[A Fall from Grace Bell Rung Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27445;
--- OLD name : Sprungvehikel des Hohen Abtes Landgren
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27445;
+-- OLD name : Sprungvehikel des Hohen Abtes Landgren (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27446
-UPDATE `creature_template_locale` SET `Name` = '[High Abbot Landgren''s Jump Vehicle]' WHERE `locale` = 'deDE' AND `entry` = 27446;
--- OLD name : Blue Sky Kill Credit Bunny - Grizzly Hills
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27446;
+-- OLD name : Blue Sky Kill Credit Bunny - Grizzly Hills (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27453
-UPDATE `creature_template_locale` SET `Name` = '[Blue Sky Kill Credit Bunny - Grizzly Hills]' WHERE `locale` = 'deDE' AND `entry` = 27453;
--- OLD name : Kill Credit Bunny - Wounded Skirmishers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27453;
+-- OLD name : Kill Credit Bunny - Wounded Skirmishers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27466
-UPDATE `creature_template_locale` SET `Name` = '[Kill Credit Bunny - Wounded Skirmishers]' WHERE `locale` = 'deDE' AND `entry` = 27466;
--- OLD name : Forgotten Rifleman Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27466;
+-- OLD name : Forgotten Rifleman Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27471
-UPDATE `creature_template_locale` SET `Name` = '[Forgotten Rifleman Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 27471;
--- OLD name : Forgotten Peasant Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27471;
+-- OLD name : Forgotten Peasant Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27472
-UPDATE `creature_template_locale` SET `Name` = '[Forgotten Peasant Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 27472;
--- OLD name : Forgotten Knight Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27472;
+-- OLD name : Forgotten Knight Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27473
-UPDATE `creature_template_locale` SET `Name` = '[Forgotten Knight Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 27473;
--- OLD name : Captain Luc D'Merud Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27473;
+-- OLD name : Captain Luc D'Merud Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27474
-UPDATE `creature_template_locale` SET `Name` = '[Captain Luc D''Merud Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 27474;
--- OLD name : Greifentaxi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27474;
+-- OLD name : Greifentaxi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27491
-UPDATE `creature_template_locale` SET `Name` = '[Gryphon Taxi (Howling Fjord -> Dragonblight - DND)]' WHERE `locale` = 'deDE' AND `entry` = 27491;
--- OLD name : Greifenreiter von Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27491;
+-- OLD name : Greifenreiter von Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27504
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Gryphon Rider]' WHERE `locale` = 'deDE' AND `entry` = 27504;
--- OLD name : Aufgezogener Greif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27504;
+-- OLD name : Aufgezogener Greif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27505
-UPDATE `creature_template_locale` SET `Name` = '[Raised Gryphon]' WHERE `locale` = 'deDE' AND `entry` = 27505;
--- OLD name : Gaststättenratte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27505;
+-- OLD name : Gaststättenratte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27522
-UPDATE `creature_template_locale` SET `Name` = '[Inn Rat]' WHERE `locale` = 'deDE' AND `entry` = 27522;
--- OLD name : Weißer gepanzerter Greif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27522;
+-- OLD name : Weißer gepanzerter Greif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27526
-UPDATE `creature_template_locale` SET `Name` = '[White Armored Gryphon]' WHERE `locale` = 'deDE' AND `entry` = 27526;
--- OLD name : Clayton Dubin - TEST COPY DATA, subname : Quality Assured
--- Source : https://www.wowhead.com/wotlk/de/npc=27527
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27527;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (27527, 'deDE','[Clayton Dubin - TEST COPY DATA]','[Quality Assured]');
--- OLD name : Pinguin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27526;
+-- OLD name : Pinguin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27548
-UPDATE `creature_template_locale` SET `Name` = '[Penguin, Northrend]' WHERE `locale` = 'deDE' AND `entry` = 27548;
--- OLD name : Undead Miner Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27548;
+-- OLD name : Undead Miner Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27561
-UPDATE `creature_template_locale` SET `Name` = '[Undead Miner Credit]' WHERE `locale` = 'deDE' AND `entry` = 27561;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27561;
 -- OLD name : Zenturio Kaggrum
 -- Source : https://www.wowhead.com/wotlk/de/npc=27563
 UPDATE `creature_template_locale` SET `Name` = 'Zenturion Kaggrum' WHERE `locale` = 'deDE' AND `entry` = 27563;
--- OLD name : Ställe der Venture Co.
+-- OLD name : Ställe der Venture Co. (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27568
-UPDATE `creature_template_locale` SET `Name` = '[Venture Co. Stables]' WHERE `locale` = 'deDE' AND `entry` = 27568;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27568;
 -- OLD name : Lord Afrasastrasz
 -- Source : https://www.wowhead.com/wotlk/de/npc=27575
 UPDATE `creature_template_locale` SET `Name` = 'Lord Devrestrasz' WHERE `locale` = 'deDE' AND `entry` = 27575;
--- OLD name : Beschwörungsziel von Novos
+-- OLD name : Beschwörungsziel von Novos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27583
-UPDATE `creature_template_locale` SET `Name` = '[Novos Summon Target]' WHERE `locale` = 'deDE' AND `entry` = 27583;
--- OLD name : QA Testdummy 80 Normal, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27583;
+-- OLD name : QA Testdummy 80 Normal, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27586
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Normal]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27586;
--- OLD name : QA Testdummy 80 Keine Rüstung, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27586;
+-- OLD name : QA Testdummy 80 Keine Rüstung, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27590
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 No Armor]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27590;
--- OLD name : QA Testdummy 80 Keine Rüstung, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27590;
+-- OLD name : QA Testdummy 80 Keine Rüstung, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27591
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 83 No Armor]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27591;
--- OLD name : QA Testdummy 83 Normal, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27591;
+-- OLD name : QA Testdummy 83 Normal, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27592
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 83 Normal]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27592;
--- OLD name : QA Testdummy 80 Hohe Magieresi, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27592;
+-- OLD name : QA Testdummy 80 Hohe Magieresi, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27595
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 High Magic Resist]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27595;
--- OLD name : QA Testdummy 83 Hohe Magieresi, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27595;
+-- OLD name : QA Testdummy 83 Hohe Magieresi, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27596
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 83 High Magic Resist]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27596;
--- OLD name : QA Testdummy 80 Statischer Schaden, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27596;
+-- OLD name : QA Testdummy 80 Statischer Schaden, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27599
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Fixed Damage]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27599;
--- OLD name : QA Testdummy 83 Statischer Schaden, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27599;
+-- OLD name : QA Testdummy 83 Statischer Schaden, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27601
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 83 Fixed Damage]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27601;
--- OLD name : QA Testdummy 80 Zauberspammer, subname : QA Prügelknabe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27601;
+-- OLD name : QA Testdummy 80 Zauberspammer, subname : QA Prügelknabe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27609
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Spell Spammer]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 27609;
--- OLD name : Totenbeschwörer von Jintha'kalar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27609;
+-- OLD name : Totenbeschwörer von Jintha'kalar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27614
-UPDATE `creature_template_locale` SET `Name` = '[Jintha''kalar Necromancer]' WHERE `locale` = 'deDE' AND `entry` = 27614;
--- OLD name : Abbild des Lichkönigs
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27614;
+-- OLD name : Abbild des Lichkönigs (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27623
-UPDATE `creature_template_locale` SET `Name` = '[Image of the Lich King]' WHERE `locale` = 'deDE' AND `entry` = 27623;
--- OLD name : Plague Wagon Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27623;
+-- OLD name : Plague Wagon Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27625
-UPDATE `creature_template_locale` SET `Name` = '[Plague Wagon Credit]' WHERE `locale` = 'deDE' AND `entry` = 27625;
--- OLD name : Tatjana, subname : Initiand des Wolfskults
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27625;
+-- OLD name : Gruftbestie der Pforte des Zorns (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27630
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27630;
+-- OLD name : Tatjana, subname : Initiand des Wolfskults (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27632
-UPDATE `creature_template_locale` SET `Name` = '[Tatjana (Unconscious)]',`Title` = '[Wolfcult Initiate]' WHERE `locale` = 'deDE' AND `entry` = 27632;
--- OLD name : Wolfsgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27632;
+-- OLD name : Wolfsgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27634
-UPDATE `creature_template_locale` SET `Name` = '[Wolf Spirit Visual (Ymirjar Dusk Shaman)]' WHERE `locale` = 'deDE' AND `entry` = 27634;
--- OLD name : Tempelrufer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27634;
+-- OLD name : Tempelrufer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27643
-UPDATE `creature_template_locale` SET `Name` = '[Temple Caller]' WHERE `locale` = 'deDE' AND `entry` = 27643;
--- OLD name : Kill Credit Bunny - Venture Bay 01
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27643;
+-- OLD name : Kill Credit Bunny - Venture Bay 01 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27660
-UPDATE `creature_template_locale` SET `Name` = '[Kill Credit Bunny - Venture Bay 01]' WHERE `locale` = 'deDE' AND `entry` = 27660;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27660;
 -- OLD subname : Juwelierskunstbedarf
 -- Source : https://www.wowhead.com/wotlk/de/npc=27666
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf' WHERE `locale` = 'deDE' AND `entry` = 27666;
--- OLD name : Zauberatrappe von Novos
+-- OLD name : Zauberatrappe von Novos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27669
-UPDATE `creature_template_locale` SET `Name` = '[Novos Spell Dummy]' WHERE `locale` = 'deDE' AND `entry` = 27669;
--- OLD name : Annäherungsmine
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27669;
+-- OLD name : Annäherungsmine (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27679
-UPDATE `creature_template_locale` SET `Name` = '[Proximity Mine]' WHERE `locale` = 'deDE' AND `entry` = 27679;
--- OLD name : Verteidiger des Wyrmruhtempels
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27679;
+-- OLD name : Verteidiger des Wyrmruhtempels (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27690
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Defender]' WHERE `locale` = 'deDE' AND `entry` = 27690;
--- OLD name : Spielerskelett
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27690;
+-- OLD name : Spielerskelett (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27694
-UPDATE `creature_template_locale` SET `Name` = '[Player Skeleton [PH]]' WHERE `locale` = 'deDE' AND `entry` = 27694;
--- OLD name : Der Prophet Tharon'ja
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27694;
+-- OLD name : Der Prophet Tharon'ja (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27696
-UPDATE `creature_template_locale` SET `Name` = '[The Prophet Tharon''ja ]' WHERE `locale` = 'deDE' AND `entry` = 27696;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27696;
 -- OLD name : Reitkodo des Braufests
 -- Source : https://www.wowhead.com/wotlk/de/npc=27706
 UPDATE `creature_template_locale` SET `Name` = 'Reitkodo des Brausfests' WHERE `locale` = 'deDE' AND `entry` = 27706;
--- OLD name : Goblin Rocket Mount Test
+-- OLD name : Goblin Rocket Mount Test (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27710
-UPDATE `creature_template_locale` SET `Name` = '[Goblin Rocket Mount Test]' WHERE `locale` = 'deDE' AND `entry` = 27710;
--- OLD name : Reitfledermaus der Drakkari
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27710;
+-- OLD name : [DND] Aldor Mailbox Malfunction Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27723
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27723;
+-- OLD name : Reitfledermaus der Drakkari (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27724
-UPDATE `creature_template_locale` SET `Name` = '[Drakkari Bat Mount (For Drakkari Invaders)]' WHERE `locale` = 'deDE' AND `entry` = 27724;
--- OLD name : Gorgonna
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27724;
+-- OLD name : Gorgonna (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27726
-UPDATE `creature_template_locale` SET `Name` = '[Gorgonna]' WHERE `locale` = 'deDE' AND `entry` = 27726;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27726;
 -- OLD name : Akolyth
 -- Source : https://www.wowhead.com/wotlk/de/npc=27731
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt' WHERE `locale` = 'deDE' AND `entry` = 27731;
--- OLD name : Frostsäbelvehikel
+-- OLD name : Frostsäbelvehikel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27738
-UPDATE `creature_template_locale` SET `Name` = '[Frostsabre Vehicle]' WHERE `locale` = 'deDE' AND `entry` = 27738;
--- OLD name : Vehikelversion des Wildelekks
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27738;
+-- OLD name : Vehikelversion des Wildelekks (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27740
-UPDATE `creature_template_locale` SET `Name` = '[Wild Elekk Vehicle Version]' WHERE `locale` = 'deDE' AND `entry` = 27740;
--- OLD name : Currency Token Test Wizard
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27740;
+-- OLD name : Currency Token Test Wizard (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27741
-UPDATE `creature_template_locale` SET `Name` = '[Currency Token Test Wizard]' WHERE `locale` = 'deDE' AND `entry` = 27741;
--- OLD name : Eindringling der Drakkari
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27741;
+-- OLD name : Eindringling der Drakkari (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27754
-UPDATE `creature_template_locale` SET `Name` = '[Drakkari Invader]' WHERE `locale` = 'deDE' AND `entry` = 27754;
--- OLD name : Greif von Wintergarde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27754;
+-- OLD name : Greif von Wintergarde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27764
-UPDATE `creature_template_locale` SET `Name` = '[Wintergarde Gryphon (Taxi)]' WHERE `locale` = 'deDE' AND `entry` = 27764;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27764;
 -- OLD name : Späherhauptmann Carter
 -- Source : https://www.wowhead.com/wotlk/de/npc=27783
 UPDATE `creature_template_locale` SET `Name` = 'Feldspäherhauptmann Carter' WHERE `locale` = 'deDE' AND `entry` = 27783;
--- OLD name : Imperial Eagle Credit
+-- OLD name : Imperial Eagle Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27786
-UPDATE `creature_template_locale` SET `Name` = '[Imperial Eagle Credit]' WHERE `locale` = 'deDE' AND `entry` = 27786;
--- OLD name : Worg's Blood Elixir Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27786;
+-- OLD name : Worg's Blood Elixir Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27796
-UPDATE `creature_template_locale` SET `Name` = '[Worg''s Blood Elixir Credit]' WHERE `locale` = 'deDE' AND `entry` = 27796;
--- OLD name : Orb Target Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27796;
+-- OLD name : Orb Target Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27802
-UPDATE `creature_template_locale` SET `Name` = '[Orb Target Credit]' WHERE `locale` = 'deDE' AND `entry` = 27802;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27802;
 -- OLD name : Bierschankwirtin
 -- Source : https://www.wowhead.com/wotlk/de/npc=27819
 UPDATE `creature_template_locale` SET `Name` = 'Bierschankwirt' WHERE `locale` = 'deDE' AND `entry` = 27819;
--- OLD name : Stellvertretende Mausoleumsgeißel
+-- OLD name : Stellvertretende Mausoleumsgeißel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27825
-UPDATE `creature_template_locale` SET `Name` = '[Mausoleum Scourge Proxy]' WHERE `locale` = 'deDE' AND `entry` = 27825;
--- OLD name : Glengarry Adams, subname : 7. Legion
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27825;
+-- OLD name : Glengarry Adams, subname : 7. Legion (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27833
-UPDATE `creature_template_locale` SET `Name` = '[Glengarry Adams]',`Title` = '[7th Legion]' WHERE `locale` = 'deDE' AND `entry` = 27833;
--- OLD name : Schattengeistwächter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27833;
+-- OLD name : Schattengeistwächter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27834
-UPDATE `creature_template_locale` SET `Name` = '[Shadowfiend Guardian]' WHERE `locale` = 'deDE' AND `entry` = 27834;
--- OLD name : Kampfflugzeug von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27834;
+-- OLD name : Kampfflugzeug von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27838
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Fighter Plane]' WHERE `locale` = 'deDE' AND `entry` = 27838;
--- OLD name : Greif von Wintergarde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27838;
+-- OLD name : Greif von Wintergarde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27841
-UPDATE `creature_template_locale` SET `Name` = '[Wintergarde Gryphon (NPC Mount)]' WHERE `locale` = 'deDE' AND `entry` = 27841;
--- OLD name : Schattenleere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27841;
+-- OLD name : Schattenleere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27847
-UPDATE `creature_template_locale` SET `Name` = '[Shadow Void]' WHERE `locale` = 'deDE' AND `entry` = 27847;
--- OLD name : Bomber von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27847;
+-- OLD name : Bomber von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27850
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Bomber]' WHERE `locale` = 'deDE' AND `entry` = 27850;
--- OLD name : Fahrzeug der verpesteten Zombies
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27850;
+-- OLD name : Fahrzeug der verpesteten Zombies (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27854
-UPDATE `creature_template_locale` SET `Name` = '[Plague Zombie Vehicle - TEST]' WHERE `locale` = 'deDE' AND `entry` = 27854;
--- OLD name : Patty's test vehicle TEST
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27854;
+-- OLD name : Patty's test vehicle TEST (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27862
-UPDATE `creature_template_locale` SET `Name` = '[Patty''s test vehicle]' WHERE `locale` = 'deDE' AND `entry` = 27862;
--- OLD name : Rubinblüten
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27862;
+-- OLD name : Rubinblüten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27863
-UPDATE `creature_template_locale` SET `Name` = '[Ruby Flowers]' WHERE `locale` = 'deDE' AND `entry` = 27863;
--- OLD name : Fangkrallenworgverkleidung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27863;
+-- OLD name : Fangkrallenworgverkleidung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27864
-UPDATE `creature_template_locale` SET `Name` = '[Fanggore Worg Disguise]' WHERE `locale` = 'deDE' AND `entry` = 27864;
--- OLD name : Verseuchtes Haustier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27864;
+-- OLD name : Verseuchtes Haustier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27865
-UPDATE `creature_template_locale` SET `Name` = '[Plagued Pet]' WHERE `locale` = 'deDE' AND `entry` = 27865;
--- OLD name : Reitwyvern der Kor'kron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27865;
+-- OLD name : Reitwyvern der Kor'kron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27873
-UPDATE `creature_template_locale` SET `Name` = '[Kor''kron Wyvern Mount (Wrathgate)]' WHERE `locale` = 'deDE' AND `entry` = 27873;
--- OLD name : Onslaught Base Camp Proxy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27873;
+-- OLD name : Onslaught Base Camp Proxy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27875
-UPDATE `creature_template_locale` SET `Name` = '[Onslaught Base Camp Proxy]' WHERE `locale` = 'deDE' AND `entry` = 27875;
--- OLD name : Landmine von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27875;
+-- OLD name : Landmine von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27878
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Land Mine]' WHERE `locale` = 'deDE' AND `entry` = 27878;
--- OLD name : Frostmourne Cavern Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27878;
+-- OLD name : Frostmourne Cavern Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27879
-UPDATE `creature_template_locale` SET `Name` = '[Frostmourne Cavern Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 27879;
--- OLD name : Waffenhalter von Frostgram
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27879;
+-- OLD name : Waffenhalter von Frostgram (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27880
-UPDATE `creature_template_locale` SET `Name` = '[Frostmourne Weapon Holder]' WHERE `locale` = 'deDE' AND `entry` = 27880;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27880;
 -- OLD name : Gebräublase
 -- Source : https://www.wowhead.com/wotlk/de/npc=27882
 UPDATE `creature_template_locale` SET `Name` = 'Bierblase' WHERE `locale` = 'deDE' AND `entry` = 27882;
--- OLD name : Schredder von Tausendwinter
+-- OLD name : Schredder von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27883
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Shredder]' WHERE `locale` = 'deDE' AND `entry` = 27883;
--- OLD name : Taking Wing Timer Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27883;
+-- OLD name : Taking Wing Timer Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27889
-UPDATE `creature_template_locale` SET `Name` = '[Taking Wing Timer Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27889;
--- OLD name : Feuerklagegeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27889;
+-- OLD name : Feuerklagegeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27895
-UPDATE `creature_template_locale` SET `Name` = '[Fire Revenant, Northrend]' WHERE `locale` = 'deDE' AND `entry` = 27895;
--- OLD name : Bombercockpit von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27895;
+-- OLD name : Bombercockpit von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27905
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Bomber Cockpit]' WHERE `locale` = 'deDE' AND `entry` = 27905;
--- OLD name : World Death Knight Trainer, subname : Todesritterlehrer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27905;
+-- OLD name : World Death Knight Trainer, subname : Todesritterlehrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27916
-UPDATE `creature_template_locale` SET `Name` = '[World Deathknight Trainer]',`Title` = '[Deathknight Trainer]' WHERE `locale` = 'deDE' AND `entry` = 27916;
--- OLD name : Rekrutierer der Allianz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27916;
+-- OLD name : Rekrutierer der Allianz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27917
-UPDATE `creature_template_locale` SET `Name` = '[Alliance Recruiter]' WHERE `locale` = 'deDE' AND `entry` = 27917;
--- OLD name : Rekrutierer der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27917;
+-- OLD name : Rekrutierer der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27918
-UPDATE `creature_template_locale` SET `Name` = '[Horde Recruiter]' WHERE `locale` = 'deDE' AND `entry` = 27918;
--- OLD name : Herold der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27918;
+-- OLD name : Herold der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27919
-UPDATE `creature_template_locale` SET `Name` = '[Herald of the Horde]' WHERE `locale` = 'deDE' AND `entry` = 27919;
--- OLD name : Herold der Allianz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27919;
+-- OLD name : Herold der Allianz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27920
-UPDATE `creature_template_locale` SET `Name` = '[Herald of the Alliance]' WHERE `locale` = 'deDE' AND `entry` = 27920;
--- OLD name : Drakuru Handshake KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27920;
+-- OLD name : Drakuru Handshake KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27921
-UPDATE `creature_template_locale` SET `Name` = '[Drakuru Handshake KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27921;
--- OLD name : Mummified Carcass KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27921;
+-- OLD name : Mummified Carcass KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27929
-UPDATE `creature_template_locale` SET `Name` = '[Mummified Carcass KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27929;
--- OLD name : Orf der Steuermann
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27929;
+-- OLD name : Orf der Steuermann (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27937
-UPDATE `creature_template_locale` SET `Name` = '[Orf the Helmsman]' WHERE `locale` = 'deDE' AND `entry` = 27937;
--- OLD name : Ice Spike Trigger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27937;
+-- OLD name : Ice Spike Trigger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27942
-UPDATE `creature_template_locale` SET `Name` = '[Ice Spike Trigger]' WHERE `locale` = 'deDE' AND `entry` = 27942;
--- OLD name : Bild eines Beschützers des Wyrmruhtempels (rot)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27942;
+-- OLD name : Bild eines Beschützers des Wyrmruhtempels (rot) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27952
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Protector Visual (Red)]' WHERE `locale` = 'deDE' AND `entry` = 27952;
--- OLD name : Bild eines Beschützers des Wyrmruhtempels (grün)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27952;
+-- OLD name : Bild eines Beschützers des Wyrmruhtempels (grün) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27954
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Protector Visual (Green)]' WHERE `locale` = 'deDE' AND `entry` = 27954;
--- OLD name : Bild eines Beschützers des Wyrmruhtempels (bronze)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27954;
+-- OLD name : Bild eines Beschützers des Wyrmruhtempels (bronze) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27955
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Protector Visual (Bronze)]' WHERE `locale` = 'deDE' AND `entry` = 27955;
--- OLD name : Dan's Test Turret
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27955;
+-- OLD name : Dan's Test Turret (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27956
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Turret]' WHERE `locale` = 'deDE' AND `entry` = 27956;
--- OLD name : Dunkler Runenbewahrer, subname : PH MODEL: TASK 17271
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27956;
+-- OLD name : Dunkler Runenbewahrer, subname : PH MODEL: TASK 17271 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27968
-UPDATE `creature_template_locale` SET `Name` = '[Dark Rune Keeper [PH]]',`Title` = '[PH MODEL: TASK 17271]' WHERE `locale` = 'deDE' AND `entry` = 27968;
--- OLD name : Prototyp der Flugscheibe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27968;
+-- OLD name : Reittier des Sphärenjägers (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27976
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27976;
+-- OLD name : Prototyp der Flugscheibe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27991
-UPDATE `creature_template_locale` SET `Name` = '[Flying Disc Prototype]' WHERE `locale` = 'deDE' AND `entry` = 27991;
--- OLD name : The Gearmaster's Manual Researched Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27991;
+-- OLD name : Leutnant Eishammer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=27994
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27994;
+-- OLD name : The Gearmaster's Manual Researched Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27995
-UPDATE `creature_template_locale` SET `Name` = '[The Gearmaster''s Manual Researched Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 27995;
--- OLD name : Test-PvP-Questgeber
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27995;
+-- OLD name : Test-PvP-Questgeber (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=27997
-UPDATE `creature_template_locale` SET `Name` = '[Test PvP Questgiver]' WHERE `locale` = 'deDE' AND `entry` = 27997;
--- OLD name : Antioks Reittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 27997;
+-- OLD name : Antioks Reittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28007
-UPDATE `creature_template_locale` SET `Name` = '[Antiok''s Mount]' WHERE `locale` = 'deDE' AND `entry` = 28007;
--- OLD name : Fire Upon the Waters Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28007;
+-- OLD name : Fire Upon the Waters Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28013
-UPDATE `creature_template_locale` SET `Name` = '[Fire Upon the Waters Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28013;
--- OLD name : Escape from Silverbrook Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28013;
+-- OLD name : Escape from Silverbrook Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28019
-UPDATE `creature_template_locale` SET `Name` = '[Escape from Silverbrook Credit]' WHERE `locale` = 'deDE' AND `entry` = 28019;
--- OLD name : Bezwinger den Wyrmruhtempels (Knochen)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28019;
+-- OLD name : Bezwinger den Wyrmruhtempels (Knochen) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28021
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Vanquisher (Bones)]' WHERE `locale` = 'deDE' AND `entry` = 28021;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28021;
 -- OLD name : Verrottende Monstrosität
 -- Source : https://www.wowhead.com/wotlk/de/npc=28023
 UPDATE `creature_template_locale` SET `Name` = 'Verrottende Montrosität' WHERE `locale` = 'deDE' AND `entry` = 28023;
@@ -4506,247 +6076,252 @@ UPDATE `creature_template_locale` SET `Name` = 'Käpt''n Slappy' WHERE `locale` 
 -- OLD name : Saphirblaue Schwarmdrohne
 -- Source : https://www.wowhead.com/wotlk/de/npc=28085
 UPDATE `creature_template_locale` SET `Name` = 'Saphirblaue Schwarmdrone' WHERE `locale` = 'deDE' AND `entry` = 28085;
--- OLD name : Moveto Test - Bewegungen, subname : Expeditionsleiter
+-- OLD name : Moveto Test - Bewegungen, subname : Expeditionsleiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28088
-UPDATE `creature_template_locale` SET `Name` = '[Moveto Test - Moves]',`Title` = '[Expedition Leader]' WHERE `locale` = 'deDE' AND `entry` = 28088;
--- OLD name : Theresas Frostsäblergefährt
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28088;
+-- OLD name : Theresas Frostsäblergefährt (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28119
-UPDATE `creature_template_locale` SET `Name` = '[TEST- Theresa''s frostsaber vehicle]' WHERE `locale` = 'deDE' AND `entry` = 28119;
--- OLD name : Nahrung der Grannenkiefer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28119;
+-- OLD name : Nahrung der Grannenkiefer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28128
-UPDATE `creature_template_locale` SET `Name` = '[Bristlepine Food Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28128;
--- OLD name : Hirnlose Entartung (nicht tötbar)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28128;
+-- OLD name : Hirnlose Entartung (nicht tötbar) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28144
-UPDATE `creature_template_locale` SET `Name` = '[Mindless Aberration (Unkillable)]' WHERE `locale` = 'deDE' AND `entry` = 28144;
--- OLD name : Geißelherzdrakkari
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28144;
+-- OLD name : Geißelherzdrakkari (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28159
-UPDATE `creature_template_locale` SET `Name` = '[Scourgeheart Drakkari]' WHERE `locale` = 'deDE' AND `entry` = 28159;
--- OLD name : Kunz' Schlachtross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28159;
+-- OLD name : Kunz' Schlachtross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28172
-UPDATE `creature_template_locale` SET `Name` = '[Kunz''s Warhorse]' WHERE `locale` = 'deDE' AND `entry` = 28172;
--- OLD name : Trauerleere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28172;
+-- OLD name : Trauerleere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28174
-UPDATE `creature_template_locale` SET `Name` = '[Grief Void]' WHERE `locale` = 'deDE' AND `entry` = 28174;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28174;
 -- OLD subname : Der Zirkel des Cenarius
 -- Source : https://www.wowhead.com/wotlk/de/npc=28177
 UPDATE `creature_template_locale` SET `Title` = 'Zirkel des Cenarius' WHERE `locale` = 'deDE' AND `entry` = 28177;
--- OLD name : Venture Bay Kill Credit Bunny - Grizzly Hills
+-- OLD name : Venture Bay Kill Credit Bunny - Grizzly Hills (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28190
-UPDATE `creature_template_locale` SET `Name` = '[Venture Bay Kill Credit Bunny - Grizzly Hills]' WHERE `locale` = 'deDE' AND `entry` = 28190;
--- OLD name : Raketenwerfer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28190;
+-- OLD name : Raketenwerfer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28198
-UPDATE `creature_template_locale` SET `Name` = '[Rocket Launcher]' WHERE `locale` = 'deDE' AND `entry` = 28198;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28198;
+-- OLD name : [DND] L70ETC Drums (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28206
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28206;
 -- OLD name : Hartknöchelmatriarchin
 -- Source : https://www.wowhead.com/wotlk/de/npc=28213
 UPDATE `creature_template_locale` SET `Name` = 'Hartknöchelmatriachin' WHERE `locale` = 'deDE' AND `entry` = 28213;
--- OLD name : Falltürkrabbler - Bunny
+-- OLD name : Falltürkrabbler - Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28224
-UPDATE `creature_template_locale` SET `Name` = '[Trapdoor Crawler Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28224;
--- OLD name : Blutgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28224;
+-- OLD name : Blutgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28232
-UPDATE `creature_template_locale` SET `Name` = '[Sanguine Spirit]' WHERE `locale` = 'deDE' AND `entry` = 28232;
--- OLD name : Luftüberwachung der Venture Co.
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28232;
+-- OLD name : Luftüberwachung der Venture Co. (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28241
-UPDATE `creature_template_locale` SET `Name` = '[Venture Co. Air Patrol]' WHERE `locale` = 'deDE' AND `entry` = 28241;
--- OLD name : QA Test First Aid Trainer, subname : Sanitäter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28241;
+-- OLD name : QA Test First Aid Trainer, subname : Sanitäter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28245
-UPDATE `creature_template_locale` SET `Name` = '[QA Test First Aid Trainer]',`Title` = '[Medic]' WHERE `locale` = 'deDE' AND `entry` = 28245;
--- OLD name : Alchemist KC - Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28245;
+-- OLD name : Alchemist KC - Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28248
-UPDATE `creature_template_locale` SET `Name` = '[Alchemist KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28248;
--- OLD name : Bild eines Beschützers des Wyrmruhtempels (Schwarz)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28248;
+-- OLD name : Bild eines Beschützers des Wyrmruhtempels (Schwarz) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28250
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Protector Visual (Black)]' WHERE `locale` = 'deDE' AND `entry` = 28250;
--- OLD name : Bild eines Beschützers des Wyrmruhtempels (Blau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28250;
+-- OLD name : Bild eines Beschützers des Wyrmruhtempels (Blau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28251
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Protector Visual (Blue)]' WHERE `locale` = 'deDE' AND `entry` = 28251;
--- OLD name : Bild eines Beschützers des Wyrmruhtempels (Nether)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28251;
+-- OLD name : Bild eines Beschützers des Wyrmruhtempels (Nether) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28252
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Protector Visual (Nether)]' WHERE `locale` = 'deDE' AND `entry` = 28252;
--- OLD name : Besiegter Argentumfußsoldat (transformiert)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28252;
+-- OLD name : Besiegter Argentumfußsoldat (transformiert) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28259
-UPDATE `creature_template_locale` SET `Name` = '[Defeated Argent Footman (Transform)]' WHERE `locale` = 'deDE' AND `entry` = 28259;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28259;
 -- OLD name : Koyotengeist
 -- Source : https://www.wowhead.com/wotlk/de/npc=28267
 UPDATE `creature_template_locale` SET `Name` = 'Kojotengeist' WHERE `locale` = 'deDE' AND `entry` = 28267;
--- OLD name : Flugmaschine
+-- OLD name : Flugmaschine (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28269
-UPDATE `creature_template_locale` SET `Name` = '[Flying Machine Vehicle]' WHERE `locale` = 'deDE' AND `entry` = 28269;
--- OLD name : Geißel von Jintha'kalar (PROXY DO NOT SPAWN)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28269;
+-- OLD name : Geißel von Jintha'kalar (PROXY DO NOT SPAWN) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28270
-UPDATE `creature_template_locale` SET `Name` = '[Jintha''kalar Scourge (PROXY DO NOT SPAWN)]' WHERE `locale` = 'deDE' AND `entry` = 28270;
--- OLD name : Glacial Breach Scourge Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28270;
+-- OLD name : Glacial Breach Scourge Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28271
-UPDATE `creature_template_locale` SET `Name` = '[Glacial Breach Scourge Credit]' WHERE `locale` = 'deDE' AND `entry` = 28271;
--- OLD name : Gefräßiger Seuchenhund
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28271;
+-- OLD name : Gefräßiger Seuchenhund (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28278
-UPDATE `creature_template_locale` SET `Name` = '[Ravenous Plaguehound]' WHERE `locale` = 'deDE' AND `entry` = 28278;
--- OLD name : Belohnung für Seuchenspritzers Tod
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28278;
+-- OLD name : Belohnung für Seuchenspritzers Tod (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28289
-UPDATE `creature_template_locale` SET `Name` = '[Plague Sprayer Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28289;
--- OLD name : Schlammige Moormaden - KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28289;
+-- OLD name : [DND] taxi flavor eagle (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28292
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28292;
+-- OLD name : Schlammige Moormaden - KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28293
-UPDATE `creature_template_locale` SET `Name` = '[Muddy Mire Maggot KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28293;
--- OLD name : Getrockneter Fledermausflügel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28293;
+-- OLD name : Getrockneter Fledermausflügel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28294
-UPDATE `creature_template_locale` SET `Name` = '[Withered Batwing KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28294;
--- OLD name : Bernsteinsamen - KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28294;
+-- OLD name : Bernsteinsamen - KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28295
-UPDATE `creature_template_locale` SET `Name` = '[Amberseed KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28295;
--- OLD name : Gekühlter Schlangenschleim
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28295;
+-- OLD name : Gekühlter Schlangenschleim (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28296
-UPDATE `creature_template_locale` SET `Name` = '[Chilled Serpent Mucus KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28296;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28296;
 -- OLD name : Antimagisches Feld
 -- Source : https://www.wowhead.com/wotlk/de/npc=28306
 UPDATE `creature_template_locale` SET `Name` = 'Antimagiezone' WHERE `locale` = 'deDE' AND `entry` = 28306;
--- OLD name : QA Test Dummy 80 Buff Spammer, subname : QA Punching Bag
+-- OLD name : QA Test Dummy 80 Buff Spammer, subname : QA Punching Bag (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28310
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Buff Spammer]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 28310;
--- OLD name : QA Test Dummy 80 Spell Reflector, subname : QA Punching Bag
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28310;
+-- OLD name : QA Test Dummy 80 Spell Reflector, subname : QA Punching Bag (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28311
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Spell Reflector]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 28311;
--- OLD name : Besiegter Argentumfußsoldat
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28311;
+-- OLD name : Besiegter Argentumfußsoldat (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28316
-UPDATE `creature_template_locale` SET `Name` = '[Defeated Argent Footman KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28316;
--- OLD name : Entflohener Gladiator
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28316;
+-- OLD name : Entflohener Gladiator (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28322
-UPDATE `creature_template_locale` SET `Name` = '[Escaped Gladiator]' WHERE `locale` = 'deDE' AND `entry` = 28322;
--- OLD name : Auferstandener Vrykulberserker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28322;
+-- OLD name : Auferstandener Vrykulberserker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28349
-UPDATE `creature_template_locale` SET `Name` = '[Risen Vrykul Berserker]' WHERE `locale` = 'deDE' AND `entry` = 28349;
--- OLD name : Auferstandener Vrykulmagus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28349;
+-- OLD name : Auferstandener Vrykulmagus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28350
-UPDATE `creature_template_locale` SET `Name` = '[Risen Vrykul Magus]' WHERE `locale` = 'deDE' AND `entry` = 28350;
--- OLD name : Seuchenverbreiter der Verlassenen (Rot)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28350;
+-- OLD name : Seuchenverbreiter der Verlassenen (Rot) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28353
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Blightspreader (Red)]' WHERE `locale` = 'deDE' AND `entry` = 28353;
--- OLD name : Wissenschaftler der Verlassenen (Seuchenrucksack)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28353;
+-- OLD name : Wissenschaftler der Verlassenen (Seuchenrucksack) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28354
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Scientist (Blight Backpack)]' WHERE `locale` = 'deDE' AND `entry` = 28354;
--- OLD name : Kurbelzischs Flugtaxi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28354;
+-- OLD name : Kurbelzischs Flugtaxi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28360
-UPDATE `creature_template_locale` SET `Name` = '[Riding Fizzcrank Flyer Taxi]' WHERE `locale` = 'deDE' AND `entry` = 28360;
--- OLD name : Drachenfalke
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28360;
+-- OLD name : Drachenfalke (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28361
-UPDATE `creature_template_locale` SET `Name` = '[Riding Dragonhawk (A)]' WHERE `locale` = 'deDE' AND `entry` = 28361;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28361;
 -- OLD name : Großer Kampfbär
 -- Source : https://www.wowhead.com/wotlk/de/npc=28363
 UPDATE `creature_template_locale` SET `Name` = 'Großer Kriegsbär' WHERE `locale` = 'deDE' AND `entry` = 28363;
--- OLD name : Slims Testmagier
+-- OLD name : Slims Testmagier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28364
-UPDATE `creature_template_locale` SET `Name` = '[Slim''s Test Mage]' WHERE `locale` = 'deDE' AND `entry` = 28364;
--- OLD name : Slims Testhexenmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28364;
+-- OLD name : Slims Testhexenmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28365
-UPDATE `creature_template_locale` SET `Name` = '[Slim''s Test Warlock]' WHERE `locale` = 'deDE' AND `entry` = 28365;
--- OLD name : Belagerungsingenieur der 7. Legion
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28365;
+-- OLD name : Belagerungsingenieur der 7. Legion (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28370
-UPDATE `creature_template_locale` SET `Name` = '[7th Legion Siege Engineer (DVD)]' WHERE `locale` = 'deDE' AND `entry` = 28370;
--- OLD name : TR (Mensch, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28370;
+-- OLD name : TR (Mensch, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28395
-UPDATE `creature_template_locale` SET `Name` = '[DK (Human Male)]' WHERE `locale` = 'deDE' AND `entry` = 28395;
--- OLD name : Lederverarbeitungslehrer von Nordend, subname : Lederverarbeitungslehrer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28395;
+-- OLD name : Lederverarbeitungslehrer von Nordend, subname : Lederverarbeitungslehrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28400
-UPDATE `creature_template_locale` SET `Name` = '[Northrend Leatherworking Trainer]',`Title` = '[Leatherworking Trainer]' WHERE `locale` = 'deDE' AND `entry` = 28400;
--- OLD name : TR (Mensch, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28400;
+-- OLD name : TR (Mensch, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28420
-UPDATE `creature_template_locale` SET `Name` = '[DK (Human Female)]' WHERE `locale` = 'deDE' AND `entry` = 28420;
--- OLD name : TR (Zwerg, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28420;
+-- OLD name : TR (Zwerg, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28421
-UPDATE `creature_template_locale` SET `Name` = '[DK (Dwarf Female)]' WHERE `locale` = 'deDE' AND `entry` = 28421;
--- OLD name : TR (Gnom, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28421;
+-- OLD name : TR (Gnom, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28422
-UPDATE `creature_template_locale` SET `Name` = '[DK (Gnome Female)]' WHERE `locale` = 'deDE' AND `entry` = 28422;
--- OLD name : TR (Nachtelf, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28422;
+-- OLD name : TR (Nachtelf, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28423
-UPDATE `creature_template_locale` SET `Name` = '[DK (Night Elf Female)]' WHERE `locale` = 'deDE' AND `entry` = 28423;
--- OLD name : TR (Draenei, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28423;
+-- OLD name : TR (Draenei, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28424
-UPDATE `creature_template_locale` SET `Name` = '[DK (Draenei Female)]' WHERE `locale` = 'deDE' AND `entry` = 28424;
--- OLD name : TR (Zwerg, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28424;
+-- OLD name : TR (Zwerg, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28425
-UPDATE `creature_template_locale` SET `Name` = '[DK (Dwarf Male)]' WHERE `locale` = 'deDE' AND `entry` = 28425;
--- OLD name : TR (Gnom, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28425;
+-- OLD name : TR (Gnom, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28426
-UPDATE `creature_template_locale` SET `Name` = '[DK (Gnome Male)]' WHERE `locale` = 'deDE' AND `entry` = 28426;
--- OLD name : TR (Nachtelf, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28426;
+-- OLD name : TR (Nachtelf, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28427
-UPDATE `creature_template_locale` SET `Name` = '[DK (Night Elf Male)]' WHERE `locale` = 'deDE' AND `entry` = 28427;
--- OLD name : TR (Draenei, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28427;
+-- OLD name : TR (Draenei, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28428
-UPDATE `creature_template_locale` SET `Name` = '[DK (Draenei Male)]' WHERE `locale` = 'deDE' AND `entry` = 28428;
--- OLD name : TR (Blutelf, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28428;
+-- OLD name : TR (Blutelf, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28429
-UPDATE `creature_template_locale` SET `Name` = '[DK (Blood Elf Male)]' WHERE `locale` = 'deDE' AND `entry` = 28429;
--- OLD name : TR (Orc, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28429;
+-- OLD name : TR (Orc, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28430
-UPDATE `creature_template_locale` SET `Name` = '[DK (Orc Male)]' WHERE `locale` = 'deDE' AND `entry` = 28430;
--- OLD name : TR (Verlassener, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28430;
+-- OLD name : TR (Verlassener, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28431
-UPDATE `creature_template_locale` SET `Name` = '[DK (Forsaken Male)]' WHERE `locale` = 'deDE' AND `entry` = 28431;
--- OLD name : TR (Troll, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28431;
+-- OLD name : TR (Troll, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28432
-UPDATE `creature_template_locale` SET `Name` = '[DK (Troll Male)]' WHERE `locale` = 'deDE' AND `entry` = 28432;
--- OLD name : TR (Tauren, Mann)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28432;
+-- OLD name : TR (Tauren, Mann) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28433
-UPDATE `creature_template_locale` SET `Name` = '[DK (Tauren Male)]' WHERE `locale` = 'deDE' AND `entry` = 28433;
--- OLD name : TR (Blutelf, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28433;
+-- OLD name : TR (Blutelf, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28434
-UPDATE `creature_template_locale` SET `Name` = '[DK (Blood Elf Female)]' WHERE `locale` = 'deDE' AND `entry` = 28434;
--- OLD name : TR (Troll, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28434;
+-- OLD name : TR (Troll, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28435
-UPDATE `creature_template_locale` SET `Name` = '[DK (Troll Female)]' WHERE `locale` = 'deDE' AND `entry` = 28435;
--- OLD name : TR (Orc, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28435;
+-- OLD name : TR (Orc, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28436
-UPDATE `creature_template_locale` SET `Name` = '[DK (Orc Female)]' WHERE `locale` = 'deDE' AND `entry` = 28436;
--- OLD name : TR (Verlassener, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28436;
+-- OLD name : TR (Verlassener, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28437
-UPDATE `creature_template_locale` SET `Name` = '[DK (Forsaken Female)]' WHERE `locale` = 'deDE' AND `entry` = 28437;
--- OLD name : TR (Tauren, Frau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28437;
+-- OLD name : TR (Tauren, Frau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28438
-UPDATE `creature_template_locale` SET `Name` = '[DK (Tauren Female)]' WHERE `locale` = 'deDE' AND `entry` = 28438;
--- OLD name : Großer Uhu
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28438;
+-- OLD name : Großer Uhu (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28441
-UPDATE `creature_template_locale` SET `Name` = '[Great Horned Owl Hover Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28441;
--- OLD name : Entfesseltes Streitross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28441;
+-- OLD name : Entfesseltes Streitross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28450
-UPDATE `creature_template_locale` SET `Name` = '[Unbound Charger]' WHERE `locale` = 'deDE' AND `entry` = 28450;
--- OLD name : Riding Horse (Vehicle Demo)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28450;
+-- OLD name : Riding Horse (Vehicle Demo) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28453
-UPDATE `creature_template_locale` SET `Name` = '[Riding Horse (Vehicle Demo)]' WHERE `locale` = 'deDE' AND `entry` = 28453;
--- OLD name : Runenklingenaxt
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28453;
+-- OLD name : Altar von Quetz'lun (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28469
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28469;
+-- OLD name : Runenklingenaxt (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28475
-UPDATE `creature_template_locale` SET `Name` = '[Runebladed Axe]' WHERE `locale` = 'deDE' AND `entry` = 28475;
--- OLD name : Avatar von Freya
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28475;
+-- OLD name : Avatar von Freya (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28482
-UPDATE `creature_template_locale` SET `Name` = '[Avatar of Freya Conversation Credit]' WHERE `locale` = 'deDE' AND `entry` = 28482;
--- OLD name : Runenschmied
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28482;
+-- OLD name : Runenschmied (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28483
-UPDATE `creature_template_locale` SET `Name` = '[Runeforge (SW)]' WHERE `locale` = 'deDE' AND `entry` = 28483;
--- OLD name : Sindragosa, subname : Die Königin der Frostbrut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28483;
+-- OLD name : Sindragosa, subname : Die Königin der Frostbrut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28499
-UPDATE `creature_template_locale` SET `Name` = '[Sindragosa]',`Title` = '[Queen of the Frostbrood]' WHERE `locale` = 'deDE' AND `entry` = 28499;
--- OLD name : Ronakada, subname : Blademaster
--- Source : https://www.wowhead.com/wotlk/de/npc=28501
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28501;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (28501, 'deDE','[Ronakada]','[Blademaster]');
--- OLD name : Summon Vision Test - LAB
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28499;
+-- OLD name : Summon Vision Test - LAB (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28507
-UPDATE `creature_template_locale` SET `Name` = '[Summon Vision Test - LAB]' WHERE `locale` = 'deDE' AND `entry` = 28507;
--- OLD name : Gebäude
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28507;
+-- OLD name : Gebäude (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28509
-UPDATE `creature_template_locale` SET `Name` = '[Building (CoT Stratholme)]' WHERE `locale` = 'deDE' AND `entry` = 28509;
--- OLD name : Hair Sample KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28509;
+-- OLD name : Hair Sample KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28520
-UPDATE `creature_template_locale` SET `Name` = '[Hair Sample KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28520;
--- OLD name : Frostwyrmreittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28520;
+-- OLD name : Frostwyrmreittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28531
-UPDATE `creature_template_locale` SET `Name` = '[Frost Wyrm Mount]' WHERE `locale` = 'deDE' AND `entry` = 28531;
--- OLD name : Reitpferd
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28531;
+-- OLD name : Reitpferd (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28533
-UPDATE `creature_template_locale` SET `Name` = '[Riding Horse (Scarlet Commander)]' WHERE `locale` = 'deDE' AND `entry` = 28533;
--- OLD name : Destillo-matik 5000
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28533;
+-- OLD name : Destillo-matik 5000 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28545
-UPDATE `creature_template_locale` SET `Name` = '[Distillo-matic 5000]' WHERE `locale` = 'deDE' AND `entry` = 28545;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28545;
 -- OLD name : Kapitän Shely
 -- Source : https://www.wowhead.com/wotlk/de/npc=28549
 UPDATE `creature_template_locale` SET `Name` = 'Hauptmann Shely' WHERE `locale` = 'deDE' AND `entry` = 28549;
@@ -4759,78 +6334,78 @@ UPDATE `creature_template_locale` SET `Name` = 'Folterer Alphonse' WHERE `locale
 -- OLD name : Wasserfontäne
 -- Source : https://www.wowhead.com/wotlk/de/npc=28567
 UPDATE `creature_template_locale` SET `Name` = 'Wasserstrahl' WHERE `locale` = 'deDE' AND `entry` = 28567;
--- OLD name : Geißelverkleidung
+-- OLD name : Geißelverkleidung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28570
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Disguise]' WHERE `locale` = 'deDE' AND `entry` = 28570;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28570;
 -- OLD name : Maurermeisterin van der Gülden
 -- Source : https://www.wowhead.com/wotlk/de/npc=28572
 UPDATE `creature_template_locale` SET `Name` = 'Maurermeister van der Gülden' WHERE `locale` = 'deDE' AND `entry` = 28572;
--- OLD name : Corpse Explosion Rubble
+-- OLD name : Corpse Explosion Rubble (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28590
-UPDATE `creature_template_locale` SET `Name` = '[Corpse Explosion Rubble]' WHERE `locale` = 'deDE' AND `entry` = 28590;
--- OLD name : Freyas Horn Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28590;
+-- OLD name : Freyas Horn Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28595
-UPDATE `creature_template_locale` SET `Name` = '[Freya''s Horn Credit]' WHERE `locale` = 'deDE' AND `entry` = 28595;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28595;
 -- OLD name : Akolyth der Todeshand
 -- Source : https://www.wowhead.com/wotlk/de/npc=28602
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt der Todeshand' WHERE `locale` = 'deDE' AND `entry` = 28602;
--- OLD name : Wolfsreiter von Orgrimmar
+-- OLD name : Wolfsreiter von Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28613
-UPDATE `creature_template_locale` SET `Name` = '[Orgrimmar Wolf Rider]' WHERE `locale` = 'deDE' AND `entry` = 28613;
--- OLD name : Reitpferd
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28613;
+-- OLD name : Reitpferd (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28620
-UPDATE `creature_template_locale` SET `Name` = '[Riding Horse (Charger, Default Run Speed)]' WHERE `locale` = 'deDE' AND `entry` = 28620;
--- OLD name : Grauson Eisenschwinge, subname : Flugmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28620;
+-- OLD name : Grauson Eisenschwinge, subname : Flugmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28621
-UPDATE `creature_template_locale` SET `Name` = '[Grayson Ironwing]',`Title` = '[Flight Master]' WHERE `locale` = 'deDE' AND `entry` = 28621;
--- OLD name : Scalps! Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28621;
+-- OLD name : Scalps! Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28622
-UPDATE `creature_template_locale` SET `Name` = '[Scalps! Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28622;
--- OLD name : Gyrokopter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28622;
+-- OLD name : Gyrokopter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28625
-UPDATE `creature_template_locale` SET `Name` = '[Riding Gyrocopter (Taxi)]' WHERE `locale` = 'deDE' AND `entry` = 28625;
--- OLD name : Scharlachroter Arbeiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28625;
+-- OLD name : Scharlachroter Arbeiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28626
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Peasant (Logs Transform Visual)]' WHERE `locale` = 'deDE' AND `entry` = 28626;
--- OLD name : Slims Testpriester
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28626;
+-- OLD name : Slims Testpriester (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28628
-UPDATE `creature_template_locale` SET `Name` = '[Slim''s Test Priest]' WHERE `locale` = 'deDE' AND `entry` = 28628;
--- OLD name : Slims Testkrieger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28628;
+-- OLD name : Slims Testkrieger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28629
-UPDATE `creature_template_locale` SET `Name` = '[Slim''s Test Warrior]' WHERE `locale` = 'deDE' AND `entry` = 28629;
--- OLD name : Drakuru KC Bunny 01
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28629;
+-- OLD name : Drakuru KC Bunny 01 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28631
-UPDATE `creature_template_locale` SET `Name` = '[Drakuru KC Bunny 01]' WHERE `locale` = 'deDE' AND `entry` = 28631;
--- OLD name : Geisterwolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28631;
+-- OLD name : Geisterwolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28635
-UPDATE `creature_template_locale` SET `Name` = '[Spirit Wolf]' WHERE `locale` = 'deDE' AND `entry` = 28635;
--- OLD name : Mosswalker Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28635;
+-- OLD name : Mosswalker Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28644
-UPDATE `creature_template_locale` SET `Name` = '[Mosswalker Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 28644;
--- OLD name : Vics selbstreplizierende Monstrosität
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28644;
+-- OLD name : Vics selbstreplizierende Monstrosität (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28645
-UPDATE `creature_template_locale` SET `Name` = '[Vic''s Self Replicating Abomination (DND)]' WHERE `locale` = 'deDE' AND `entry` = 28645;
--- OLD name : Mysteriöser Zigeuner
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28645;
+-- OLD name : Mysteriöser Zigeuner (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28652
-UPDATE `creature_template_locale` SET `Name` = '[Mysterious Gypsy]' WHERE `locale` = 'deDE' AND `entry` = 28652;
--- OLD name : Gorebag KC Bunny 01
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28652;
+-- OLD name : Gorebag KC Bunny 01 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28663
-UPDATE `creature_template_locale` SET `Name` = '[Gorebag KC Bunny 01]' WHERE `locale` = 'deDE' AND `entry` = 28663;
--- OLD name : Seat Squatter - LAB
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28663;
+-- OLD name : Seat Squatter - LAB (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28664
-UPDATE `creature_template_locale` SET `Name` = '[Seat Squatter - LAB]' WHERE `locale` = 'deDE' AND `entry` = 28664;
--- OLD name : Kassiererin Halder, subname : Bankier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28664;
+-- OLD name : Kassiererin Halder, subname : Bankier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28678
-UPDATE `creature_template_locale` SET `Name` = '[Teller Halder]',`Title` = '[Banker]' WHERE `locale` = 'deDE' AND `entry` = 28678;
--- OLD name : Kassiererin Duta, subname : Bankier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28678;
+-- OLD name : Kassiererin Duta, subname : Bankier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28679
-UPDATE `creature_template_locale` SET `Name` = '[Teller Duta]',`Title` = '[Banker]' WHERE `locale` = 'deDE' AND `entry` = 28679;
--- OLD name : Kassierer Banner, subname : Bankier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28679;
+-- OLD name : Kassierer Banner, subname : Bankier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28680
-UPDATE `creature_template_locale` SET `Name` = '[Teller Banning]',`Title` = '[Banker]' WHERE `locale` = 'deDE' AND `entry` = 28680;
--- OLD name : Scharlachroter Stallknecht
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28680;
+-- OLD name : Scharlachroter Stallknecht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28689
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Stablehand]' WHERE `locale` = 'deDE' AND `entry` = 28689;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28689;
 -- OLD subname : Verzauberkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=28693
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Verzauberkunst' WHERE `locale` = 'deDE' AND `entry` = 28693;
@@ -4870,84 +6445,96 @@ UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kochkunst' W
 -- OLD subname : Lehrerin für Erste Hilfe
 -- Source : https://www.wowhead.com/wotlk/de/npc=28706
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin für Erste Hilfe' WHERE `locale` = 'deDE' AND `entry` = 28706;
--- OLD name : Untoter Adler
+-- OLD name : Untoter Adler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28711
-UPDATE `creature_template_locale` SET `Name` = '[Undead Eagle]' WHERE `locale` = 'deDE' AND `entry` = 28711;
--- OLD name : Einfache Plünderpiñata, subname : Schlag mich!
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28711;
+-- OLD name : Einfache Plünderpiñata, subname : Schlag mich! (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28712
-UPDATE `creature_template_locale` SET `Name` = '[Basic Loot Pinata]',`Title` = '[Hit Me!]' WHERE `locale` = 'deDE' AND `entry` = 28712;
--- OLD name : Quetz'lun Troll Worshipper Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28712;
+-- OLD name : Quetz'lun Troll Worshipper Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28713
-UPDATE `creature_template_locale` SET `Name` = '[Quetz''lun Troll Worshipper Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28713;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28713;
 -- OLD name : Seelenbrunnenzone der Leere
 -- Source : https://www.wowhead.com/wotlk/de/npc=28719
 UPDATE `creature_template_locale` SET `Name` = 'Leerenzone des Seelenbrunnens' WHERE `locale` = 'deDE' AND `entry` = 28719;
--- OLD name : Plünderpiñata für Erste Hilfe, subname : Schlag mich!
+-- OLD name : Plünderpiñata für Erste Hilfe, subname : Schlag mich! (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28720
-UPDATE `creature_template_locale` SET `Name` = '[First Aid Loot Pinata]',`Title` = '[Hit Me!]' WHERE `locale` = 'deDE' AND `entry` = 28720;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28720;
 -- OLD subname : Juwelierskunstbedarf
 -- Source : https://www.wowhead.com/wotlk/de/npc=28721
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf' WHERE `locale` = 'deDE' AND `entry` = 28721;
--- OLD name : Alte Nelly
+-- OLD name : Alte Nelly (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28737
-UPDATE `creature_template_locale` SET `Name` = '[Ol'' Nelly]' WHERE `locale` = 'deDE' AND `entry` = 28737;
--- OLD name : Drakuru KC Bunny 00
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28737;
+-- OLD name : Drakuru KC Bunny 00 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28738
-UPDATE `creature_template_locale` SET `Name` = '[Drakuru KC Bunny 00]' WHERE `locale` = 'deDE' AND `entry` = 28738;
--- OLD name : Blight Crystal KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28738;
+-- OLD name : Blight Crystal KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28740
-UPDATE `creature_template_locale` SET `Name` = '[Blight Crystal KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28740;
--- OLD name : Blight Cauldron KC Bunny 02
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28740;
+-- OLD name : Blight Cauldron KC Bunny 02 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28741
-UPDATE `creature_template_locale` SET `Name` = '[Blight Cauldron KC Bunny 02]' WHERE `locale` = 'deDE' AND `entry` = 28741;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28741;
 -- OLD subname : Angellehrerin & Angelbedarf
 -- Source : https://www.wowhead.com/wotlk/de/npc=28742
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin des Angelns & Angelbedarf' WHERE `locale` = 'deDE' AND `entry` = 28742;
--- OLD name : Slims untötbarer Boss
+-- OLD name : Slims untötbarer Boss (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28744
-UPDATE `creature_template_locale` SET `Name` = '[Slim''s Unkillable Boss]' WHERE `locale` = 'deDE' AND `entry` = 28744;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28744;
 -- OLD subname : Fluglehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=28746
 UPDATE `creature_template_locale` SET `Title` = 'Lehrer für Kaltwetterflug' WHERE `locale` = 'deDE' AND `entry` = 28746;
--- OLD name : High Priest Mu'funu Kill Credit Bunny
+-- OLD name : Froststeingargoyle (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28749
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28749;
+-- OLD name : High Priest Mu'funu Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28753
-UPDATE `creature_template_locale` SET `Name` = '[High Priest Mu''funu Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28753;
--- OLD name : High Priestess Tua-Tua Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28753;
+-- OLD name : High Priestess Tua-Tua Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28755
-UPDATE `creature_template_locale` SET `Name` = '[High Priestess Tua-Tua Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28755;
--- OLD name : High Priest Hawinni Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28755;
+-- OLD name : High Priest Hawinni Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28757
-UPDATE `creature_template_locale` SET `Name` = '[High Priest Hawinni Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28757;
--- OLD name : Reconnaisaince Flight Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28757;
+-- OLD name : Reconnaisaince Flight Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28758
-UPDATE `creature_template_locale` SET `Name` = '[Reconnaisaince Flight Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 28758;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28758;
 -- OLD name : Hargus der Krüppel
 -- Source : https://www.wowhead.com/wotlk/de/npc=28760
 UPDATE `creature_template_locale` SET `Name` = 'Hargus der Spuk' WHERE `locale` = 'deDE' AND `entry` = 28760;
--- OLD name : Drakuru KC Bunny 02
+-- OLD name : Drakuru KC Bunny 02 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28762
-UPDATE `creature_template_locale` SET `Name` = '[Drakuru KC Bunny 02]' WHERE `locale` = 'deDE' AND `entry` = 28762;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28762;
+-- OLD name : [Phase 1] Scarlet Crusade Proxy Creature (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28763
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28763;
+-- OLD name : [Phase 1] Citizen of Havenshire Proxy Creature (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28764
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28764;
+-- OLD name : [Phase 1] Havenshrie Horse Credit, Step 01 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28767
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28767;
 -- OLD name : Schattenhafter Peiniger
 -- Source : https://www.wowhead.com/wotlk/de/npc=28769
 UPDATE `creature_template_locale` SET `Name` = 'Schattenhafter Foltermeister' WHERE `locale` = 'deDE' AND `entry` = 28769;
--- OLD name : High Priestess Tua-Tua Hex of Fire Bunny
+-- OLD name : High Priestess Tua-Tua Hex of Fire Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28770
-UPDATE `creature_template_locale` SET `Name` = '[High Priestess Tua-Tua Hex of Fire Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28770;
--- OLD name : High Priest Hawinni Hex of Frost Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28770;
+-- OLD name : High Priest Hawinni Hex of Frost Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28773
-UPDATE `creature_template_locale` SET `Name` = '[High Priest Hawinni Hex of Frost Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28773;
--- OLD name : Dunkler Reiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28773;
+-- OLD name : Dunkler Reiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28775
-UPDATE `creature_template_locale` SET `Name` = '[Dark Rider Target]' WHERE `locale` = 'deDE' AND `entry` = 28775;
--- OLD name : Catapult KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28775;
+-- OLD name : Catapult KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28777
-UPDATE `creature_template_locale` SET `Name` = '[Catapult KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28777;
--- OLD name : Reitgreif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28777;
+-- OLD name : Reitgreif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28783
-UPDATE `creature_template_locale` SET `Name` = '[Riding Gryphon, Amored, Neutral (Taxi)]' WHERE `locale` = 'deDE' AND `entry` = 28783;
--- OLD name : Drakuru KC Bunny 03
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28783;
+-- OLD name : Drakuru KC Bunny 03 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28786
-UPDATE `creature_template_locale` SET `Name` = '[Drakuru KC Bunny 03]' WHERE `locale` = 'deDE' AND `entry` = 28786;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28786;
 -- OLD name : Ausgelaugter Prophet von Quetz'lun
 -- Source : https://www.wowhead.com/wotlk/de/npc=28795
 UPDATE `creature_template_locale` SET `Name` = 'Ausgelaugter Prophet von Quetz''lin' WHERE `locale` = 'deDE' AND `entry` = 28795;
@@ -4960,303 +6547,330 @@ UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deD
 -- OLD subname : Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=28813
 UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deDE' AND `entry` = 28813;
--- OLD name : Destructive Ward Kill Credit
+-- OLD name : Destructive Ward Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28820
-UPDATE `creature_template_locale` SET `Name` = '[Destructive Ward Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 28820;
--- OLD name : Minenwagen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28820;
+-- OLD name : Minenwagen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28842
-UPDATE `creature_template_locale` SET `Name` = '[Mine Cart Test]' WHERE `locale` = 'deDE' AND `entry` = 28842;
--- OLD name : Scharlachrote Flotte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28842;
+-- OLD name : Scharlachrote Flotte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28849
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Fleet (PROXY)]' WHERE `locale` = 'deDE' AND `entry` = 28849;
--- OLD name : Toter Jünger von Mam'toth
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28849;
+-- OLD name : Toter Jünger von Mam'toth (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28853
-UPDATE `creature_template_locale` SET `Name` = '[Dead Mam''toth Disciple Transform]' WHERE `locale` = 'deDE' AND `entry` = 28853;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28853;
 -- OLD name : Scharlachroter Flottenverteidiger
 -- Source : https://www.wowhead.com/wotlk/de/npc=28856
 UPDATE `creature_template_locale` SET `Name` = 'Wächter der Scharlachroten Flotte' WHERE `locale` = 'deDE' AND `entry` = 28856;
--- OLD name : Mam'toth Disciple Kill Credit Bunny
+-- OLD name : Mam'toth Disciple Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28876
-UPDATE `creature_template_locale` SET `Name` = '[Mam''toth Disciple Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28876;
--- OLD name : Testeisenzwerg
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28876;
+-- OLD name : Testeisenzwerg (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28880
-UPDATE `creature_template_locale` SET `Name` = '[Test Iron Dwarf]' WHERE `locale` = 'deDE' AND `entry` = 28880;
--- OLD name : Scharlachrote Kanone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28880;
+-- OLD name : Scharlachrote Kanone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28887
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Cannon]' WHERE `locale` = 'deDE' AND `entry` = 28887;
--- OLD name : Scharlachroter Greifenreiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28887;
+-- OLD name : Scharlachroter Greifenreiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28894
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Gryphon Rider]' WHERE `locale` = 'deDE' AND `entry` = 28894;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28894;
 -- OLD name : Scharlachroter Hauptmann
 -- Source : https://www.wowhead.com/wotlk/de/npc=28898
 UPDATE `creature_template_locale` SET `Name` = 'Schalachroter Hauptmann' WHERE `locale` = 'deDE' AND `entry` = 28898;
--- OLD name : Stute aus Havenau
+-- OLD name : Stute aus Havenau (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28899
-UPDATE `creature_template_locale` SET `Name` = '[Havenshire Mare]' WHERE `locale` = 'deDE' AND `entry` = 28899;
--- OLD name : Hengst aus Havenau
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28899;
+-- OLD name : Hengst aus Havenau (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28900
-UPDATE `creature_template_locale` SET `Name` = '[Havenshire Stallion]' WHERE `locale` = 'deDE' AND `entry` = 28900;
--- OLD name : Reittier des dunklen Reiters
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28900;
+-- OLD name : Reittier des dunklen Reiters (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28915
-UPDATE `creature_template_locale` SET `Name` = '[Dark Rider Mount Fixed]' WHERE `locale` = 'deDE' AND `entry` = 28915;
--- OLD name : Drakuru KC Bunny 04
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28915;
+-- OLD name : Drakuru KC Bunny 04 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28928
-UPDATE `creature_template_locale` SET `Name` = '[Drakuru KC Bunny 04]' WHERE `locale` = 'deDE' AND `entry` = 28928;
--- OLD name : Drakuru's Upper Chamber Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28928;
+-- OLD name : Drakuru's Upper Chamber Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28929
-UPDATE `creature_template_locale` SET `Name` = '[Drakuru''s Upper Chamber Bunny]' WHERE `locale` = 'deDE' AND `entry` = 28929;
--- OLD name : Der Schreiber, subname : Designer extraordinaire
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28929;
+-- OLD name : Der Schreiber, subname : Designer extraordinaire (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28944
-UPDATE `creature_template_locale` SET `Name` = '[The Inscriber]',`Title` = '[Designer Extraordinaire]' WHERE `locale` = 'deDE' AND `entry` = 28944;
--- OLD name : Spell Performance Test Caster, subname : QA-Sandsack
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28944;
+-- OLD name : Spell Performance Test Caster, subname : QA-Sandsack (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28949
-UPDATE `creature_template_locale` SET `Name` = '[Spell Performance Test Caster]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 28949;
--- OLD name : Spell Performance Test Target, subname : QA-Sandsack
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28949;
+-- OLD name : Spell Performance Test Target, subname : QA-Sandsack (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28950
-UPDATE `creature_template_locale` SET `Name` = '[Spell Performance Test Target]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 28950;
--- OLD name : Unkillable Test Dummy 70 Gnome
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28950;
+-- OLD name : Unkillable Test Dummy 70 Gnome (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28953
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 70 Gnome]' WHERE `locale` = 'deDE' AND `entry` = 28953;
--- OLD name : Unkillable Test Dummy 70 Tauren
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28953;
+-- OLD name : Unkillable Test Dummy 70 Tauren (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28954
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 70 Tauren]' WHERE `locale` = 'deDE' AND `entry` = 28954;
--- OLD name : Unkillable Test Dummy 70 Dwarf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28954;
+-- OLD name : Unkillable Test Dummy 70 Dwarf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28955
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 70 Dwarf]' WHERE `locale` = 'deDE' AND `entry` = 28955;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28955;
+-- OLD name : [Chapter II] Scarlet Crusader Test Dummy Guy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28957
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28957;
 -- OLD name : Scharlachroter Lord Jesseriah McCree
 -- Source : https://www.wowhead.com/wotlk/de/npc=28964
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Lord Borugh' WHERE `locale` = 'deDE' AND `entry` = 28964;
--- OLD name : Stellvertretender Bürger von Neu-Avalon
+-- OLD name : Stellvertretender Scharlachroter Kreuzfahrer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=28984
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28984;
+-- OLD name : Stellvertretender Bürger von Neu-Avalon (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=28986
-UPDATE `creature_template_locale` SET `Name` = '[Citizen of New Avalon Proxy]' WHERE `locale` = 'deDE' AND `entry` = 28986;
--- OLD name : Frostvrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 28986;
+-- OLD name : Frostvrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29002
-UPDATE `creature_template_locale` SET `Name` = '[Frost Vrykul (Type A)]' WHERE `locale` = 'deDE' AND `entry` = 29002;
--- OLD name : Frostvrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29002;
+-- OLD name : Frostvrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29003
-UPDATE `creature_template_locale` SET `Name` = '[Frost Vrykul (Type B)]' WHERE `locale` = 'deDE' AND `entry` = 29003;
--- OLD name : Frostvrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29003;
+-- OLD name : Frostvrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29004
-UPDATE `creature_template_locale` SET `Name` = '[Frost Vrykul (Type C)]' WHERE `locale` = 'deDE' AND `entry` = 29004;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29004;
 -- OLD name : Purpurroter Akolyth
 -- Source : https://www.wowhead.com/wotlk/de/npc=29007
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Akolyt' WHERE `locale` = 'deDE' AND `entry` = 29007;
--- OLD name : Monsoon Revenant Credit
+-- OLD name : Monsoon Revenant Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29008
-UPDATE `creature_template_locale` SET `Name` = '[Monsoon Revenant Credit]' WHERE `locale` = 'deDE' AND `entry` = 29008;
--- OLD name : Storm Revenant Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29008;
+-- OLD name : Storm Revenant Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29009
-UPDATE `creature_template_locale` SET `Name` = '[Storm Revenant Credit]' WHERE `locale` = 'deDE' AND `entry` = 29009;
--- OLD name : Antimagische Barriere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29009;
+-- OLD name : Antimagische Barriere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29010
-UPDATE `creature_template_locale` SET `Name` = '[Anti-Magic Barrier (Quest)]' WHERE `locale` = 'deDE' AND `entry` = 29010;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29010;
 -- OLD subname : Bogenmacher
 -- Source : https://www.wowhead.com/wotlk/de/npc=29014
 UPDATE `creature_template_locale` SET `Title` = 'Pfeilmacher' WHERE `locale` = 'deDE' AND `entry` = 29014;
+-- OLD name : Dockarbeiter mit Tasche (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29020
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29020;
+-- OLD name : [609] Ebon Hold Duel Credit (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29025
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29025;
+-- OLD name : Greif von Sturmwind (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29039
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29039;
 -- OLD name : Blutklauenmatriarchin
 -- Source : https://www.wowhead.com/wotlk/de/npc=29044
 UPDATE `creature_template_locale` SET `Name` = 'Blutklauenmatriarch' WHERE `locale` = 'deDE' AND `entry` = 29044;
--- OLD name : Das ist'n Chopper, Baby (Horde), subname : Horde
+-- OLD name : Das ist'n Chopper, Baby (Horde), subname : Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29045
-UPDATE `creature_template_locale` SET `Name` = '[It''s A Chopper, Baby (Horde)]',`Title` = '[Horde]' WHERE `locale` = 'deDE' AND `entry` = 29045;
--- OLD name : Das ist'n Chopper, Baby (Allianz), subname : Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29045;
+-- OLD name : Das ist'n Chopper, Baby (Allianz), subname : Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29046
-UPDATE `creature_template_locale` SET `Name` = '[It''s A Chopper, Baby (Alliance)]',`Title` = '[Horde]' WHERE `locale` = 'deDE' AND `entry` = 29046;
--- OLD name : Unsichtbare Plumsklofrau
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29046;
+-- OLD name : Unsichtbare Plumsklofrau (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29052
-UPDATE `creature_template_locale` SET `Name` = '[Outhouse Invisible Woman]' WHERE `locale` = 'deDE' AND `entry` = 29052;
--- OLD name : Missile Test Mob
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29052;
+-- OLD name : Missile Test Mob (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29054
-UPDATE `creature_template_locale` SET `Name` = '[Missile Test Mob]' WHERE `locale` = 'deDE' AND `entry` = 29054;
--- OLD name : Horn of Fecundity Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29054;
+-- OLD name : Horn of Fecundity Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29055
-UPDATE `creature_template_locale` SET `Name` = '[Horn of Fecundity Credit]' WHERE `locale` = 'deDE' AND `entry` = 29055;
--- OLD name : Craig - TEST - Iron Dwarf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29055;
+-- OLD name : Craig - TEST - Iron Dwarf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29059
-UPDATE `creature_template_locale` SET `Name` = '[Craig - TEST - Iron Dwarf]' WHERE `locale` = 'deDE' AND `entry` = 29059;
--- OLD name : Crusader Parachute Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29059;
+-- OLD name : Crusader Parachute Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29060
-UPDATE `creature_template_locale` SET `Name` = '[Crusader Parachute Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29060;
--- OLD name : QA Test Dummy 73 Raid Debuff (Low Armor)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29060;
+-- OLD name : QA Test Dummy 73 Raid Debuff (Low Armor) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29075
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 73 Raid Debuff (Low Armor)]' WHERE `locale` = 'deDE' AND `entry` = 29075;
--- OLD name : PattyMacks The Duece
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29075;
+-- OLD name : PattyMacks The Duece (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29083
-UPDATE `creature_template_locale` SET `Name` = '[PattyMacks The Duece]' WHERE `locale` = 'deDE' AND `entry` = 29083;
--- OLD name : Drakkari Skullcrusher KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29083;
+-- OLD name : Drakkari Skullcrusher KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29099
-UPDATE `creature_template_locale` SET `Name` = '[Drakkari Skullcrusher KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29099;
--- OLD name : Kriegsmaid der Val'kyr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29099;
+-- OLD name : Kriegsmaid der Val'kyr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29111
-UPDATE `creature_template_locale` SET `Name` = '[Val''kyr Battle-maiden]' WHERE `locale` = 'deDE' AND `entry` = 29111;
--- OLD name : Hochkommandant Galvar Reinblut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29111;
+-- OLD name : Hochkommandant Galvar Reinblut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29114
-UPDATE `creature_template_locale` SET `Name` = '[High Commander Galvar Pureblood]' WHERE `locale` = 'deDE' AND `entry` = 29114;
--- OLD name : Klagende Drakkariseele
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29114;
+-- OLD name : Klagende Drakkariseele (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29135
-UPDATE `creature_template_locale` SET `Name` = '[Wailing Drakkari Soul]' WHERE `locale` = 'deDE' AND `entry` = 29135;
--- OLD name : Camera Shaker - 20-40 seconds
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29135;
+-- OLD name : Camera Shaker - 20-40 seconds (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29140
-UPDATE `creature_template_locale` SET `Name` = '[Camera Shaker - 20-40 seconds]' WHERE `locale` = 'deDE' AND `entry` = 29140;
--- OLD name : Stellvertretender Scharlachroter Soldat
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29140;
+-- OLD name : Stellvertretender Scharlachroter Soldat (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29150
-UPDATE `creature_template_locale` SET `Name` = '[Scarlet Soldier Proxy]' WHERE `locale` = 'deDE' AND `entry` = 29150;
--- OLD name : Test Scaling Vendor
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29150;
+-- OLD name : Test Scaling Vendor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29163
-UPDATE `creature_template_locale` SET `Name` = '[Test Scaling Vendor]' WHERE `locale` = 'deDE' AND `entry` = 29163;
--- OLD name : Teleporter der Hallen des Steins
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29163;
+-- OLD name : Teleporter der Hallen des Steins (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29165
-UPDATE `creature_template_locale` SET `Name` = '[Halls of Stone Teleporter]' WHERE `locale` = 'deDE' AND `entry` = 29165;
--- OLD name : Kunz Jr.
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29165;
+-- OLD name : Kunz Jr. (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29171
-UPDATE `creature_template_locale` SET `Name` = '[Kunz Jr.]' WHERE `locale` = 'deDE' AND `entry` = 29171;
--- OLD name : Seucheneruptor
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29171;
+-- OLD name : Seucheneruptor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29187
-UPDATE `creature_template_locale` SET `Name` = '[Plague Eruptor]' WHERE `locale` = 'deDE' AND `entry` = 29187;
--- OLD name : Eisgespenst
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29187;
+-- OLD name : Eisgespenst (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29188
-UPDATE `creature_template_locale` SET `Name` = '[Coldwraith]' WHERE `locale` = 'deDE' AND `entry` = 29188;
--- OLD name : Gefrorener Schemen, Höhepunkt
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29188;
+-- OLD name : [Chapter IV] Chapter IV Dummy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29192
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29192;
+-- OLD name : Gefrorener Schemen, Höhepunkt (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29197
-UPDATE `creature_template_locale` SET `Name` = '[Frozen Shade, Climax]' WHERE `locale` = 'deDE' AND `entry` = 29197;
--- OLD name : Mograines Reittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29197;
+-- OLD name : Mograines Reittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29198
-UPDATE `creature_template_locale` SET `Name` = '[Mograine''s Mount]' WHERE `locale` = 'deDE' AND `entry` = 29198;
--- OLD name : Reittier eines Todesritters
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29198;
+-- OLD name : Reittier eines Todesritters (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29201
-UPDATE `creature_template_locale` SET `Name` = '[Death Knight Mount]' WHERE `locale` = 'deDE' AND `entry` = 29201;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29201;
 -- OLD subname : Reagenzienverkäufer
 -- Source : https://www.wowhead.com/wotlk/de/npc=29203
 UPDATE `creature_template_locale` SET `Title` = 'Leichenstaubverkäufer' WHERE `locale` = 'deDE' AND `entry` = 29203;
--- OLD name : Jünger des unheiligen Häschens
+-- OLD name : Jünger des unheiligen Häschens (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29215
-UPDATE `creature_template_locale` SET `Name` = '[Disciples of the Unholy Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29215;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29215;
 -- OLD name : Cenarischer Späher
 -- Source : https://www.wowhead.com/wotlk/de/npc=29220
 UPDATE `creature_template_locale` SET `Name` = 'Aufklärer des Cenarius' WHERE `locale` = 'deDE' AND `entry` = 29220;
--- OLD name : Reittier eines Todesritters
+-- OLD name : Reittier eines Todesritters (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29221
-UPDATE `creature_template_locale` SET `Name` = '[Death Knight Mount, Ebon Hold]' WHERE `locale` = 'deDE' AND `entry` = 29221;
--- OLD name : Präsenz von Yogg-Saron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29221;
+-- OLD name : Präsenz von Yogg-Saron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29224
-UPDATE `creature_template_locale` SET `Name` = '[Presence of Yogg-Saron]' WHERE `locale` = 'deDE' AND `entry` = 29224;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29224;
 -- OLD name : Antimagisches Feld
 -- Source : https://www.wowhead.com/wotlk/de/npc=29225
 UPDATE `creature_template_locale` SET `Name` = 'Antimagiezone' WHERE `locale` = 'deDE' AND `entry` = 29225;
--- OLD name : Niederes Schattenkonstrukt
+-- OLD name : Niederes Schattenkonstrukt (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29230
-UPDATE `creature_template_locale` SET `Name` = '[Lesser Shadow Construct]' WHERE `locale` = 'deDE' AND `entry` = 29230;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29230;
 -- OLD subname : Lehrerin für Erste Hilfe
 -- Source : https://www.wowhead.com/wotlk/de/npc=29233
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ersten Hilfe' WHERE `locale` = 'deDE' AND `entry` = 29233;
--- OLD name : Kampfmeister des Strands der Uralten
+-- OLD name : Kampfmeister des Strands der Uralten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29234
-UPDATE `creature_template_locale` SET `Name` = '[Strand of the Ancients Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 29234;
--- OLD name : Omar the Test Dragon Gen2
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29234;
+-- OLD name : Licht der Morgendämmerung (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29245
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29245;
+-- OLD name : Omar the Test Dragon Gen2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29257
-UPDATE `creature_template_locale` SET `Name` = '[Omar the Test Dragon Gen2]' WHERE `locale` = 'deDE' AND `entry` = 29257;
--- OLD name : Omar's accumulator bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29257;
+-- OLD name : Omar's accumulator bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29258
-UPDATE `creature_template_locale` SET `Name` = '[Omar''s accumulator bunny]' WHERE `locale` = 'deDE' AND `entry` = 29258;
--- OLD name : PattyMacks schwebende Dummy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29258;
+-- OLD name : PattyMacks schwebende Dummy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29263
-UPDATE `creature_template_locale` SET `Name` = '[PattyMacks Hovering Dummy]' WHERE `locale` = 'deDE' AND `entry` = 29263;
--- OLD name : Ballrückstoß, subname : <Schlag mich!>
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29263;
+-- OLD name : Ballrückstoß, subname : <Schlag mich!> (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29265
-UPDATE `creature_template_locale` SET `Name` = '[Knockback Ball]',`Title` = '[<Hit Me!>]' WHERE `locale` = 'deDE' AND `entry` = 29265;
--- OLD name : Zwergischer Golem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29265;
+-- OLD name : Zwergischer Golem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29272
-UPDATE `creature_template_locale` SET `Name` = '[Dwarven Golem]' WHERE `locale` = 'deDE' AND `entry` = 29272;
--- OLD name : Zahlmeister Habert, subname : Bankier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29272;
+-- OLD name : Zahlmeister Habert, subname : Bankier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29283
-UPDATE `creature_template_locale` SET `Name` = '[Paymaster Habert]',`Title` = '[Banker]' WHERE `locale` = 'deDE' AND `entry` = 29283;
--- OLD name : Lebensblutelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29283;
+-- OLD name : Lebensblutelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29303
-UPDATE `creature_template_locale` SET `Name` = '[Lifeblood Elemental Credit]' WHERE `locale` = 'deDE' AND `entry` = 29303;
--- OLD name : Cyanigosa
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29303;
+-- OLD name : Cyanigosa (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29317
-UPDATE `creature_template_locale` SET `Name` = '[Cyanigosa (Dragon)]' WHERE `locale` = 'deDE' AND `entry` = 29317;
--- OLD name : Arenakampfmeister von Dalaran, subname : Kampfmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29317;
+-- OLD name : Arenakampfmeister von Dalaran, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29318
-UPDATE `creature_template_locale` SET `Name` = '[Dalaran Arena Battlemaster]',`Title` = '[Battle Master]' WHERE `locale` = 'deDE' AND `entry` = 29318;
--- OLD name : Sturmmaid
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29318;
+-- OLD name : Sturmmaid (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29320
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Storm Maiden]' WHERE `locale` = 'deDE' AND `entry` = 29320;
--- OLD name : Sturmmaid - Zauberin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29320;
+-- OLD name : Sturmmaid - Zauberin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29322
-UPDATE `creature_template_locale` SET `Name` = '[(PH) Storm Maiden - Caster]' WHERE `locale` = 'deDE' AND `entry` = 29322;
--- OLD name : Argentumritter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29322;
+-- OLD name : Argentumritter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29336
-UPDATE `creature_template_locale` SET `Name` = '[Argent Knight]' WHERE `locale` = 'deDE' AND `entry` = 29336;
--- OLD name : Sybille (Bogenschützin)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29336;
+-- OLD name : Sybille (Bogenschützin) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29342
-UPDATE `creature_template_locale` SET `Name` = '[Sybil (Archer) - Deprecated]' WHERE `locale` = 'deDE' AND `entry` = 29342;
--- OLD name : Banner der Argentumdämmerung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29342;
+-- OLD name : Banner der Argentumdämmerung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29345
-UPDATE `creature_template_locale` SET `Name` = '[Argent Dawn Banner]' WHERE `locale` = 'deDE' AND `entry` = 29345;
--- OLD name : Apotheker Chaney, subname : Alchemiebedarf & Gifte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29345;
+-- OLD name : Apotheker Chaney, subname : Alchemiebedarf & Gifte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29348
-UPDATE `creature_template_locale` SET `Name` = '[Apothecary Chaney]',`Title` = '[Alchemy & Poison Supplies]' WHERE `locale` = 'deDE' AND `entry` = 29348;
--- OLD name : Sekretkugel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29348;
+-- OLD name : Eisläufer (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29361
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29361;
+-- OLD name : Sekretkugel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29367
-UPDATE `creature_template_locale` SET `Name` = '[Ichor Globule (Transform)]' WHERE `locale` = 'deDE' AND `entry` = 29367;
--- OLD name : Zwielichtdrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29367;
+-- OLD name : Zwielichtdrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29372
-UPDATE `creature_template_locale` SET `Name` = '[Twilight Drake]' WHERE `locale` = 'deDE' AND `entry` = 29372;
--- OLD name : Beobachterin von Brunnhildar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29372;
+-- OLD name : Beobachterin von Brunnhildar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29378
-UPDATE `creature_template_locale` SET `Name` = '[Brunnhildar Observer]' WHERE `locale` = 'deDE' AND `entry` = 29378;
--- OLD name : QA Arena Master: Blade's Edge, subname : Kampfmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29378;
+-- OLD name : QA Arena Master: Blade's Edge, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29381
-UPDATE `creature_template_locale` SET `Name` = '[QA Arena Master: Blade''s Edge]',`Title` = '[Battle Master]' WHERE `locale` = 'deDE' AND `entry` = 29381;
--- OLD name : QA Arena Master: Nagrand Arena, subname : Kampfmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29381;
+-- OLD name : QA Arena Master: Nagrand Arena, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29383
-UPDATE `creature_template_locale` SET `Name` = '[QA Arena Master: Nagrand Arena]',`Title` = '[Battle Master]' WHERE `locale` = 'deDE' AND `entry` = 29383;
--- OLD name : QA Arena Master: Ruins of Lordaeron, subname : Kampfmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29383;
+-- OLD name : QA Arena Master: Ruins of Lordaeron, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29385
-UPDATE `creature_template_locale` SET `Name` = '[QA Arena Master: Ruins of Lordaeron]',`Title` = '[Battle Master]' WHERE `locale` = 'deDE' AND `entry` = 29385;
--- OLD name : QA Arena Master: Orgrimmar Arena, subname : Kampfmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29385;
+-- OLD name : QA Arena Master: Orgrimmar Arena, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29386
-UPDATE `creature_template_locale` SET `Name` = '[QA Arena Master: Orgrimmar Arena]',`Title` = '[Battle Master]' WHERE `locale` = 'deDE' AND `entry` = 29386;
--- OLD name : QA Arena Master: Dalaran Arena, subname : Kampfmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29386;
+-- OLD name : QA Arena Master: Dalaran Arena, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29387
-UPDATE `creature_template_locale` SET `Name` = '[QA Arena Master: Dalaran Arena]',`Title` = '[Battle Master]' WHERE `locale` = 'deDE' AND `entry` = 29387;
--- OLD name : Ausgehungerter Hai
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29387;
+-- OLD name : Ausgehungerter Hai (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29391
-UPDATE `creature_template_locale` SET `Name` = '[Ravenous Jaws Blood Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29391;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29391;
 -- OLD name : Land Mine Bunny
 -- Source : https://www.wowhead.com/wotlk/de/npc=29397
 UPDATE `creature_template_locale` SET `Name` = 'Landminenhäschen' WHERE `locale` = 'deDE' AND `entry` = 29397;
--- OLD name : From Their Corpses, Rise! Kill Credit Bunny
+-- OLD name : From Their Corpses, Rise! Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29398
-UPDATE `creature_template_locale` SET `Name` = '[From Their Corpses, Rise! Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29398;
--- OLD name : Da brauchst du noch ein Greiftötungskredithäschen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29398;
+-- OLD name : Da brauchst du noch ein Greiftötungskredithäschen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29406
-UPDATE `creature_template_locale` SET `Name` = '[You''ll Need a Gryphon Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29406;
--- OLD name : Garmräuber
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29406;
+-- OLD name : Garmräuber (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29408
-UPDATE `creature_template_locale` SET `Name` = '[Garm Raider]' WHERE `locale` = 'deDE' AND `entry` = 29408;
--- OLD name : Beschwörungstester
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29408;
+-- OLD name : Gluth (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29417
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29417;
+-- OLD name : Beschwörungstester (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29423
-UPDATE `creature_template_locale` SET `Name` = '[Summon Tester]' WHERE `locale` = 'deDE' AND `entry` = 29423;
--- OLD name : Sybille (Unbewaffnet)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29423;
+-- OLD name : Sybille (Unbewaffnet) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29435
-UPDATE `creature_template_locale` SET `Name` = '[Sybil (Unarmed) - Deprecated]' WHERE `locale` = 'deDE' AND `entry` = 29435;
--- OLD name : Leutnant Kregor, subname : Die Argentumdämmerung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29435;
+-- OLD name : Leutnant Kregor, subname : Die Argentumdämmerung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29442
-UPDATE `creature_template_locale` SET `Name` = '[Lieutenant Kregor]',`Title` = '[The Argent Dawn]' WHERE `locale` = 'deDE' AND `entry` = 29442;
--- OLD name : Troll der Drakkari
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29442;
+-- OLD name : Troll der Drakkari (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29471
-UPDATE `creature_template_locale` SET `Name` = '[Drakkari Troll]' WHERE `locale` = 'deDE' AND `entry` = 29471;
--- OLD name : Argentumkreuzfahrer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29471;
+-- OLD name : Argentumkreuzfahrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29472
-UPDATE `creature_template_locale` SET `Name` = '[Argent Crusader]' WHERE `locale` = 'deDE' AND `entry` = 29472;
--- OLD name : Reitskelettgreif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29472;
+-- OLD name : Reitskelettgreif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29474
-UPDATE `creature_template_locale` SET `Name` = '[Riding Skeletal Gryphon]' WHERE `locale` = 'deDE' AND `entry` = 29474;
--- OLD name : Haustierskunk
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29474;
+-- OLD name : Haustierskunk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29482
-UPDATE `creature_template_locale` SET `Name` = '[Pet Skunk]' WHERE `locale` = 'deDE' AND `entry` = 29482;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29482;
 -- OLD subname : Specialty Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=29493
 UPDATE `creature_template_locale` SET `Title` = 'Spezialmunition' WHERE `locale` = 'deDE' AND `entry` = 29493;
@@ -5281,252 +6895,264 @@ UPDATE `creature_template_locale` SET `Title` = 'Gnomeningenieurslehrer' WHERE `
 -- OLD subname : Händler für Kettenrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=29523
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 29523;
--- OLD name : Mammutfleischhäschen
+-- OLD name : Mammutfleischhäschen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29524
-UPDATE `creature_template_locale` SET `Name` = '[Mammoth Meat Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29524;
--- OLD name : Sholazar Daily Test NPC
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29524;
+-- OLD name : Sholazar Daily Test NPC (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29526
-UPDATE `creature_template_locale` SET `Name` = '[Sholazar Daily Test NPC]' WHERE `locale` = 'deDE' AND `entry` = 29526;
--- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29526;
+-- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29539
-UPDATE `creature_template_locale` SET `Name` = '[Nargle Lashcord]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 29539;
--- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29539;
+-- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29540
-UPDATE `creature_template_locale` SET `Name` = '[Xazi Smolderpipe]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 29540;
--- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29540;
+-- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29541
-UPDATE `creature_template_locale` SET `Name` = '[Zom Bocom]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 29541;
--- OLD name : Arete's Gate Summoned Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29541;
+-- OLD name : Arete's Gate Summoned Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29550
-UPDATE `creature_template_locale` SET `Name` = '[Arete''s Gate Summoned Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29550;
--- OLD name : Garmräuber
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29550;
+-- OLD name : Garmräuber (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29552
-UPDATE `creature_template_locale` SET `Name` = '[Garm Raider]' WHERE `locale` = 'deDE' AND `entry` = 29552;
--- OLD name : Drachenreiterin von Valkyrion
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29552;
+-- OLD name : Drachenreiterin von Valkyrion (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29591
-UPDATE `creature_template_locale` SET `Name` = '[Valkyrion Drake-Rider]' WHERE `locale` = 'deDE' AND `entry` = 29591;
--- OLD name : Frostworg KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29591;
+-- OLD name : Frostworg KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29595
-UPDATE `creature_template_locale` SET `Name` = '[Frostworg KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29595;
--- OLD name : Frost Giant KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29595;
+-- OLD name : Frost Giant KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29597
-UPDATE `creature_template_locale` SET `Name` = '[Frost Giant KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29597;
--- OLD name : Jorwyrgan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29597;
+-- OLD name : Jorwyrgan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29610
-UPDATE `creature_template_locale` SET `Name` = '[Jorwyrgan]' WHERE `locale` = 'deDE' AND `entry` = 29610;
--- OLD name : Eiszahn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29610;
+-- OLD name : Eiszahn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29616
-UPDATE `creature_template_locale` SET `Name` = '[Icefang TEST]' WHERE `locale` = 'deDE' AND `entry` = 29616;
--- OLD name : Grand Admiral Westwind Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29616;
+-- OLD name : Grand Admiral Westwind Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29627
-UPDATE `creature_template_locale` SET `Name` = '[Grand Admiral Westwind Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29627;
--- OLD name : Owen Testkreatur
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29627;
+-- OLD name : Owen Testkreatur (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29629
-UPDATE `creature_template_locale` SET `Name` = '[Owen Test Creature]' WHERE `locale` = 'deDE' AND `entry` = 29629;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29629;
 -- OLD subname : Kochkunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=29631
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kochkunst' WHERE `locale` = 'deDE' AND `entry` = 29631;
--- OLD name : Mechanischer Anzug ZX-5103
+-- OLD name : Mechanischer Anzug ZX-5103 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29645
-UPDATE `creature_template_locale` SET `Name` = '[Mechanical Suit ZX-5103]' WHERE `locale` = 'deDE' AND `entry` = 29645;
--- OLD name : Rhinozeros von Gal'darah, subname : Hochprophet von Akali
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29645;
+-- OLD name : Rhinozeros von Gal'darah, subname : Hochprophet von Akali (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29681
-UPDATE `creature_template_locale` SET `Name` = '[Gal''darah Rhino]',`Title` = '[High Prophet of Akali]' WHERE `locale` = 'deDE' AND `entry` = 29681;
--- OLD name : Mei
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29681;
+-- OLD name : Mei (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29711
-UPDATE `creature_template_locale` SET `Name` = '[Mei]' WHERE `locale` = 'deDE' AND `entry` = 29711;
--- OLD name : Befreite Brunnhildar, subname : PH Textur
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29711;
+-- OLD name : Befreite Brunnhildar, subname : PH Textur (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29734
-UPDATE `creature_template_locale` SET `Name` = '[Liberated Brunnhildar]',`Title` = '[PH Texture]' WHERE `locale` = 'deDE' AND `entry` = 29734;
--- OLD name : Fass voller Spaß
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29734;
+-- OLD name : Fass voller Spaß (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29737
-UPDATE `creature_template_locale` SET `Name` = '[Barrel o'' Fun]' WHERE `locale` = 'deDE' AND `entry` = 29737;
--- OLD name : Sichtbares Moorabimammut, subname : Hochprophet des Man'toth
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29737;
+-- OLD name : Sichtbares Moorabimammut, subname : Hochprophet des Man'toth (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29741
-UPDATE `creature_template_locale` SET `Name` = '[Moorabi Mammoth Visual]',`Title` = '[High Prophet of Man''toth]' WHERE `locale` = 'deDE' AND `entry` = 29741;
--- OLD name : Morgana Tagesglanz, subname : Flugmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29741;
+-- OLD name : Morgana Tagesglanz, subname : Flugmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29749
-UPDATE `creature_template_locale` SET `Name` = '[Morgana Dayblaze]',`Title` = '[Flight Master]' WHERE `locale` = 'deDE' AND `entry` = 29749;
--- OLD name : Veranus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29749;
+-- OLD name : Veranus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29756
-UPDATE `creature_template_locale` SET `Name` = '[Veranus]' WHERE `locale` = 'deDE' AND `entry` = 29756;
--- OLD name : Kosmetisches Windtotem der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29756;
+-- OLD name : Kosmetisches Windtotem der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29758
-UPDATE `creature_template_locale` SET `Name` = '[Cosmetic Totem Horde Air]' WHERE `locale` = 'deDE' AND `entry` = 29758;
--- OLD name : Kosmetisches Erdtotem der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29758;
+-- OLD name : Kosmetisches Erdtotem der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29759
-UPDATE `creature_template_locale` SET `Name` = '[Cosmetic Totem Horde Earth]' WHERE `locale` = 'deDE' AND `entry` = 29759;
--- OLD name : Kosmetisches Feuertotem der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29759;
+-- OLD name : Kosmetisches Feuertotem der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29760
-UPDATE `creature_template_locale` SET `Name` = '[Cosmetic Totem Horde Fire]' WHERE `locale` = 'deDE' AND `entry` = 29760;
--- OLD name : Kosmetisches Wassertotem der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29760;
+-- OLD name : Kosmetisches Wassertotem der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29761
-UPDATE `creature_template_locale` SET `Name` = '[Cosmetic Totem Horde Water]' WHERE `locale` = 'deDE' AND `entry` = 29761;
--- OLD name : Spektraler Greif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29761;
+-- OLD name : Spektraler Greif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29767
-UPDATE `creature_template_locale` SET `Name` = '[Spectral Gryphon, Mount]' WHERE `locale` = 'deDE' AND `entry` = 29767;
--- OLD name : ELM General Purpose Bunny Large (Phase I)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29767;
+-- OLD name : ELM General Purpose Bunny Large (Phase I) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29773
-UPDATE `creature_template_locale` SET `Name` = '[ELM General Purpose Bunny Large (Phase I)]' WHERE `locale` = 'deDE' AND `entry` = 29773;
--- OLD name : Irrwisch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29773;
+-- OLD name : Irrwisch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29776
-UPDATE `creature_template_locale` SET `Name` = '[Wisp, Ghost Mount]' WHERE `locale` = 'deDE' AND `entry` = 29776;
--- OLD name : The Ocular - Eye of C'Thun Transform
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29776;
+-- OLD name : The Ocular - Eye of C'Thun Transform (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29789
-UPDATE `creature_template_locale` SET `Name` = '[The Ocular - Eye of C''Thun Transform]' WHERE `locale` = 'deDE' AND `entry` = 29789;
--- OLD name : Drachenreiter des Hildarthings
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29789;
+-- OLD name : Drachenreiter des Hildarthings (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29800
-UPDATE `creature_template_locale` SET `Name` = '[Hyldsmeet Drake-Rider Credit]' WHERE `locale` = 'deDE' AND `entry` = 29800;
--- OLD name : The Ocular Destroyed Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29800;
+-- OLD name : The Ocular Destroyed Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29803
-UPDATE `creature_template_locale` SET `Name` = '[The Ocular Destroyed Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29803;
--- OLD name : Schilfs verbessertes Exoskelett
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29803;
+-- OLD name : [DND] Dalaran Toy Store Plane String Hook (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29807
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29807;
+-- OLD name : Schilfs verbessertes Exoskelett (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29810
-UPDATE `creature_template_locale` SET `Name` = '[Reed''s Enhanced Exoskeleton]' WHERE `locale` = 'deDE' AND `entry` = 29810;
--- OLD name : Todesstreitross von Naxxramas
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29810;
+-- OLD name : [DND] Dalaran Toy Store Plane String Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29812
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29812;
+-- OLD name : Todesstreitross von Naxxramas (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29814
-UPDATE `creature_template_locale` SET `Name` = '[Naxxramas Deathcharger]' WHERE `locale` = 'deDE' AND `entry` = 29814;
--- OLD name : Chain Swing Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29814;
+-- OLD name : Chain Swing Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29815
-UPDATE `creature_template_locale` SET `Name` = '[Chain Swing Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29815;
--- OLD name : Eagle Feeding Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29815;
+-- OLD name : Eagle Feeding Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29816
-UPDATE `creature_template_locale` SET `Name` = '[Eagle Feeding Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 29816;
--- OLD name : Merdel, subname : Funksockels Stolz und Freude
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29816;
+-- OLD name : Merdel, subname : Funksockels Stolz und Freude (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29841
-UPDATE `creature_template_locale` SET `Name` = '[Merdle]',`Title` = '[Sparksocket''s Pride and Joy]' WHERE `locale` = 'deDE' AND `entry` = 29841;
--- OLD name : Vile Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29841;
+-- OLD name : Vile Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29845
-UPDATE `creature_template_locale` SET `Name` = '[Vile Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29845;
--- OLD name : Lady Nightswood Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29845;
+-- OLD name : Lady Nightswood Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29846
-UPDATE `creature_template_locale` SET `Name` = '[Lady Nightswood Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29846;
--- OLD name : The Leaper Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29846;
+-- OLD name : The Leaper Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29847
-UPDATE `creature_template_locale` SET `Name` = '[The Leaper Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 29847;
--- OLD name : Lo'Gosh, subname : Der Geisterwolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29847;
+-- OLD name : Lo'Gosh, subname : Der Geisterwolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29850
-UPDATE `creature_template_locale` SET `Name` = '[Lo''Gosh]',`Title` = '[The Ghost Wolf]' WHERE `locale` = 'deDE' AND `entry` = 29850;
--- OLD name : Exemplar eines Ritters von Lordaeron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29850;
+-- OLD name : Exemplar eines Ritters von Lordaeron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29864
-UPDATE `creature_template_locale` SET `Name` = '[Lordaeron Knight Specimen]' WHERE `locale` = 'deDE' AND `entry` = 29864;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29864;
 -- OLD name : Exemplar eines Jungen von Stratholme
 -- Source : https://www.wowhead.com/wotlk/de/npc=29868
 UPDATE `creature_template_locale` SET `Name` = 'Exemplar eines Kindes von Stratholme' WHERE `locale` = 'deDE' AND `entry` = 29868;
--- OLD name : Persistence Waypoint 00
+-- OLD name : Persistence Waypoint 00 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29870
-UPDATE `creature_template_locale` SET `Name` = '[Persistence Waypoint 00]' WHERE `locale` = 'deDE' AND `entry` = 29870;
--- OLD name : Persistence Waypoint 01
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29870;
+-- OLD name : Persistence Waypoint 01 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29871
-UPDATE `creature_template_locale` SET `Name` = '[Persistence Waypoint 01]' WHERE `locale` = 'deDE' AND `entry` = 29871;
--- OLD name : ELM General Purpose Bunny (Phase I)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29871;
+-- OLD name : ELM General Purpose Bunny (Phase I) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29876
-UPDATE `creature_template_locale` SET `Name` = '[ELM General Purpose Bunny (Phase I)]' WHERE `locale` = 'deDE' AND `entry` = 29876;
--- OLD name : ELM General Purpose Bunny (scale x0.01 - Phase I) Large
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29876;
+-- OLD name : ELM General Purpose Bunny (scale x0.01 - Phase I) Large (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29877
-UPDATE `creature_template_locale` SET `Name` = '[ELM General Purpose Bunny (scale x0.01 - Phase I) Large]' WHERE `locale` = 'deDE' AND `entry` = 29877;
--- OLD name : Log Ride (Log A)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29877;
+-- OLD name : Log Ride (Log A) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29878
-UPDATE `creature_template_locale` SET `Name` = '[Log Ride (Log A)]' WHERE `locale` = 'deDE' AND `entry` = 29878;
--- OLD name : Log Ride (Log B)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29878;
+-- OLD name : Log Ride (Log B) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29879
-UPDATE `creature_template_locale` SET `Name` = '[Log Ride (Log B)]' WHERE `locale` = 'deDE' AND `entry` = 29879;
--- OLD name : Stellvertreter der Vargul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29879;
+-- OLD name : Stellvertreter der Vargul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29882
-UPDATE `creature_template_locale` SET `Name` = '[Vargul Proxy]' WHERE `locale` = 'deDE' AND `entry` = 29882;
--- OLD name : Kyles Testfahrzeug
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29882;
+-- OLD name : Kyles Testfahrzeug (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29883
-UPDATE `creature_template_locale` SET `Name` = '[Kyle''s Test Vehicle]' WHERE `locale` = 'deDE' AND `entry` = 29883;
--- OLD name : Exhausted Vrykul Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29883;
+-- OLD name : Exhausted Vrykul Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29886
-UPDATE `creature_template_locale` SET `Name` = '[Exhausted Vrykul Credit]' WHERE `locale` = 'deDE' AND `entry` = 29886;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29886;
 -- OLD name : Runenlord der Vargul
 -- Source : https://www.wowhead.com/wotlk/de/npc=29891
 UPDATE `creature_template_locale` SET `Name` = 'Runenlord' WHERE `locale` = 'deDE' AND `entry` = 29891;
 -- OLD name : Seuchenklaue der Vargul
 -- Source : https://www.wowhead.com/wotlk/de/npc=29894
 UPDATE `creature_template_locale` SET `Name` = 'Vargul Seuchenklaue' WHERE `locale` = 'deDE' AND `entry` = 29894;
--- OLD name : Brüder des Sturms
+-- OLD name : Brüder des Sturms (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29896
-UPDATE `creature_template_locale` SET `Name` = '[Brothers of the Storm]' WHERE `locale` = 'deDE' AND `entry` = 29896;
--- OLD name : Kill Credit Test
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29896;
+-- OLD name : Kill Credit Test (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29902
-UPDATE `creature_template_locale` SET `Name` = '[Kill Credit Test]' WHERE `locale` = 'deDE' AND `entry` = 29902;
--- OLD name : Dan's Test Dummy (Large AOI)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29902;
+-- OLD name : Dan's Test Dummy (Large AOI) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29913
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Dummy (Large AOI)]' WHERE `locale` = 'deDE' AND `entry` = 29913;
--- OLD name : GGOODMAN 2
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29913;
+-- OLD name : GGOODMAN 2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29921
-UPDATE `creature_template_locale` SET `Name` = '[GGOODMAN 2]' WHERE `locale` = 'deDE' AND `entry` = 29921;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29921;
 -- OLD subname : Schmiedekunstlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=29924
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst' WHERE `locale` = 'deDE' AND `entry` = 29924;
--- OLD name : Motorrad der Horde
+-- OLD name : Motorrad der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29930
-UPDATE `creature_template_locale` SET `Name` = '[Alliance Motorcycle]' WHERE `locale` = 'deDE' AND `entry` = 29930;
--- OLD name : Das Schwein, subname : PH: Name, Modell
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29930;
+-- OLD name : Das Schwein, subname : PH: Name, Modell (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29933
-UPDATE `creature_template_locale` SET `Name` = '[The Hog]',`Title` = '[PH: Name, Model]' WHERE `locale` = 'deDE' AND `entry` = 29933;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29933;
 -- OLD name : Akolyth der Pein
 -- Source : https://www.wowhead.com/wotlk/de/npc=29934
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt der Pein' WHERE `locale` = 'deDE' AND `entry` = 29934;
 -- OLD name : Akolyth des Schmerzes
 -- Source : https://www.wowhead.com/wotlk/de/npc=29935
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt des Schmerzes' WHERE `locale` = 'deDE' AND `entry` = 29935;
--- OLD name : Algars Reitfrostwyrm
+-- OLD name : Algars Reitfrostwyrm (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29936
-UPDATE `creature_template_locale` SET `Name` = '[Algar''s Frost Wyrm Mount]' WHERE `locale` = 'deDE' AND `entry` = 29936;
--- OLD name : Bodenreittier der Tuskarr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29936;
+-- OLD name : Bodenreittier der Tuskarr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29938
-UPDATE `creature_template_locale` SET `Name` = '[Tuskarr Land Mount]' WHERE `locale` = 'deDE' AND `entry` = 29938;
--- OLD name : SCOURGE PROXY (PHASED)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29938;
+-- OLD name : SCOURGE PROXY (PHASED) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29943
-UPDATE `creature_template_locale` SET `Name` = '[SCOURGE PROXY (PHASED)]' WHERE `locale` = 'deDE' AND `entry` = 29943;
--- OLD name : Verteidiger von Orgrimmar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29943;
+-- OLD name : Verteidiger von Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29949
-UPDATE `creature_template_locale` SET `Name` = '[Orgrimmar Defender]' WHERE `locale` = 'deDE' AND `entry` = 29949;
--- OLD name : Haylin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29949;
+-- OLD name : [UNUSED] [ph] Ulduar Camp (H) Flight Master, subname : Flugmeister (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=29952
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29952;
+-- OLD name : Haylin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29977
-UPDATE `creature_template_locale` SET `Name` = '[Haylin]' WHERE `locale` = 'deDE' AND `entry` = 29977;
--- OLD name : Der Lichkönig
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29977;
+-- OLD name : Der Lichkönig (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29983
-UPDATE `creature_template_locale` SET `Name` = '[The Lich King (Icecrown)]' WHERE `locale` = 'deDE' AND `entry` = 29983;
--- OLD name : Zone der Leere X
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29983;
+-- OLD name : Zone der Leere X (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29992
-UPDATE `creature_template_locale` SET `Name` = '[Void Zone X]' WHERE `locale` = 'deDE' AND `entry` = 29992;
--- OLD name : Beschwörer der Eisenzwerge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29992;
+-- OLD name : Beschwörer der Eisenzwerge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29995
-UPDATE `creature_template_locale` SET `Name` = '[Iron Dwarf Summoner]' WHERE `locale` = 'deDE' AND `entry` = 29995;
--- OLD name : Entweihter Boden V
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29995;
+-- OLD name : Entweihter Boden V (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=29998
-UPDATE `creature_template_locale` SET `Name` = '[Desecrated Ground V]' WHERE `locale` = 'deDE' AND `entry` = 29998;
--- OLD name : Ferngesteuerter Turbotriebgyrobomber des Todes
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 29998;
+-- OLD name : Ferngesteuerter Turbotriebgyrobomber des Todes (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30004
-UPDATE `creature_template_locale` SET `Name` = '[Turbo-propelled Remote-controlled Gyro Bomber of Death]' WHERE `locale` = 'deDE' AND `entry` = 30004;
--- OLD name : Verpesteter Zombie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30004;
+-- OLD name : Verpesteter Zombie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30034
-UPDATE `creature_template_locale` SET `Name` = '[Plague Zombie]' WHERE `locale` = 'deDE' AND `entry` = 30034;
--- OLD name : Mjordin Combatant Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30034;
+-- OLD name : Mjordin Combatant Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30038
-UPDATE `creature_template_locale` SET `Name` = '[Mjordin Combatant Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30038;
--- OLD name : Irdener Steinstatus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30038;
+-- OLD name : Irdener Steinstatus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30050
-UPDATE `creature_template_locale` SET `Name` = '[Earthen Stone State]' WHERE `locale` = 'deDE' AND `entry` = 30050;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30050;
 -- OLD name : Bibliothekarin Tiare
 -- Source : https://www.wowhead.com/wotlk/de/npc=30051
 UPDATE `creature_template_locale` SET `Name` = 'Bibliothekar Tiare' WHERE `locale` = 'deDE' AND `entry` = 30051;
--- OLD name : Gefrorene Kugel
+-- OLD name : Gefrorene Kugel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30054
-UPDATE `creature_template_locale` SET `Name` = '[Frozen Orb]' WHERE `locale` = 'deDE' AND `entry` = 30054;
--- OLD name : Sturmgipfelwyrm
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30054;
+-- OLD name : Sturmgipfelwyrm (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30055
-UPDATE `creature_template_locale` SET `Name` = '[Stormpeak Wyrm]' WHERE `locale` = 'deDE' AND `entry` = 30055;
--- OLD name : Sichtbarer Wyrmruhwächter (Bronze)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30055;
+-- OLD name : Sichtbarer Wyrmruhwächter (Bronze) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30059
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Warden Visual (Bronze)]' WHERE `locale` = 'deDE' AND `entry` = 30059;
--- OLD name : Sturmgeschmiedeter Verstärker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30059;
+-- OLD name : Kel''Thuzad (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30061
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30061;
+-- OLD name : Sturmgeschmiedeter Verstärker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30062
-UPDATE `creature_template_locale` SET `Name` = '[Stormforged Amplifier]' WHERE `locale` = 'deDE' AND `entry` = 30062;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30062;
 -- OLD name : Initiandin Claget
 -- Source : https://www.wowhead.com/wotlk/de/npc=30067
 UPDATE `creature_template_locale` SET `Name` = 'Initiant Claget' WHERE `locale` = 'deDE' AND `entry` = 30067;
@@ -5536,99 +7162,108 @@ UPDATE `creature_template_locale` SET `Name` = 'Initiant Roderick' WHERE `locale
 -- OLD name : Initiand Gahark
 -- Source : https://www.wowhead.com/wotlk/de/npc=30070
 UPDATE `creature_template_locale` SET `Name` = 'Initiant Gahark' WHERE `locale` = 'deDE' AND `entry` = 30070;
--- OLD name : Sichtbarer Wyrmruhwächter (Rot)
+-- OLD name : Sichtbarer Wyrmruhwächter (Rot) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30072
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Warden Visual (Red)]' WHERE `locale` = 'deDE' AND `entry` = 30072;
--- OLD name : Sichtbarer Wyrmruhwächter (Grün)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30072;
+-- OLD name : Sichtbarer Wyrmruhwächter (Grün) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30073
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Warden Visual (Green)]' WHERE `locale` = 'deDE' AND `entry` = 30073;
--- OLD name : Sichtbarer Wyrmruhwächter (Blau)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30073;
+-- OLD name : Sichtbarer Wyrmruhwächter (Blau) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30076
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Warden Visual (Blue)]' WHERE `locale` = 'deDE' AND `entry` = 30076;
--- OLD name : Sichtbarer Wyrmruhwächter (Schwarz)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30076;
+-- OLD name : Sichtbarer Wyrmruhwächter (Schwarz) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30077
-UPDATE `creature_template_locale` SET `Name` = '[Wyrmrest Warden Visual (Black)]' WHERE `locale` = 'deDE' AND `entry` = 30077;
--- OLD name : ELM General Purpose Bunny (Phase II)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30077;
+-- OLD name : [DND]Wyrmrest Temple Beam Target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30078
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30078;
+-- OLD name : ELM General Purpose Bunny (Phase II) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30079
-UPDATE `creature_template_locale` SET `Name` = '[ELM General Purpose Bunny (Phase II)]' WHERE `locale` = 'deDE' AND `entry` = 30079;
--- OLD name : Willzyx
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30079;
+-- OLD name : Willzyx (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30080
-UPDATE `creature_template_locale` SET `Name` = '[Willzyx]' WHERE `locale` = 'deDE' AND `entry` = 30080;
--- OLD name : Gebrochener Zeh
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30080;
+-- OLD name : Gebrochener Zeh (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30088
-UPDATE `creature_template_locale` SET `Name` = '[Brokentoe (Mount)]' WHERE `locale` = 'deDE' AND `entry` = 30088;
--- OLD name : Reitmammut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30088;
+-- OLD name : Reitmammut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30089
-UPDATE `creature_template_locale` SET `Name` = '[Mammoth Mount (Small)]' WHERE `locale` = 'deDE' AND `entry` = 30089;
--- OLD name : WotLK City Attacks Ice Block Bunny, Small
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30089;
+-- OLD name : WotLK City Attacks Ice Block Bunny, Small (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30101
-UPDATE `creature_template_locale` SET `Name` = '[WotLK City Attacks Ice Block Bunny, Small]' WHERE `locale` = 'deDE' AND `entry` = 30101;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30101;
 -- OLD subname : Waldläufergeneralin des Silberbunds
 -- Source : https://www.wowhead.com/wotlk/de/npc=30115
 UPDATE `creature_template_locale` SET `Title` = 'Waldläufergeneral des Silberbunds' WHERE `locale` = 'deDE' AND `entry` = 30115;
--- OLD name : Vengeful Revenant KC Bunny
+-- OLD name : Vengeful Revenant KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30125
-UPDATE `creature_template_locale` SET `Name` = '[Vengeful Revenant KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30125;
--- OLD name : Njormeld KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30125;
+-- OLD name : Njormeld KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30126
-UPDATE `creature_template_locale` SET `Name` = '[Njormeld KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30126;
--- OLD name : Veranus Right Foot Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30126;
+-- OLD name : Veranus Right Foot Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30130
-UPDATE `creature_template_locale` SET `Name` = '[Veranus Right Foot Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30130;
--- OLD name : Veranus Left Foot Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30130;
+-- OLD name : Veranus Left Foot Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30131
-UPDATE `creature_template_locale` SET `Name` = '[Veranus Left Foot Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30131;
--- OLD name : Veranus Right Wing Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30131;
+-- OLD name : Veranus Right Wing Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30132
-UPDATE `creature_template_locale` SET `Name` = '[Veranus Right Wing Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30132;
--- OLD name : Veranus Left Wing Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30132;
+-- OLD name : Veranus Left Wing Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30133
-UPDATE `creature_template_locale` SET `Name` = '[Veranus Left Wing Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30133;
--- OLD name : Frostriesengeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30133;
+-- OLD name : Frostriesengeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30138
-UPDATE `creature_template_locale` SET `Name` = '[Frost Giant Ghost KC]' WHERE `locale` = 'deDE' AND `entry` = 30138;
--- OLD name : Frostzwerggeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30138;
+-- OLD name : Frostzwerggeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30139
-UPDATE `creature_template_locale` SET `Name` = '[Frost Dwarf Ghost KC]' WHERE `locale` = 'deDE' AND `entry` = 30139;
--- OLD name : Demo, Kultist der Eiskrone, subname : Kult der Verdammten
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30139;
+-- OLD name : Demo, Kultist der Eiskrone, subname : Kult der Verdammten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30149
-UPDATE `creature_template_locale` SET `Name` = '[Demo, Icecrown Cultist]',`Title` = '[Cult of the Damned]' WHERE `locale` = 'deDE' AND `entry` = 30149;
--- OLD name : Frostbrutzerstörer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30149;
+-- OLD name : Frostbrutzerstörer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30150
-UPDATE `creature_template_locale` SET `Name` = '[Frostbrood Destroyer]' WHERE `locale` = 'deDE' AND `entry` = 30150;
--- OLD name : Last Chapter Dialogue Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30150;
+-- OLD name : Last Chapter Dialogue Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30153
-UPDATE `creature_template_locale` SET `Name` = '[Last Chapter Dialogue Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30153;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30153;
+-- OLD name : Nicole Morris, subname : Stallmeisterin (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30155
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30155;
+-- OLD name : [DND] Anguish Spectator Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30156
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30156;
 -- OLD name : Himmelsklaue des Wyrmruhtempels
 -- Source : https://www.wowhead.com/wotlk/de/npc=30161
 UPDATE `creature_template_locale` SET `Name` = 'Himmelsklaue von Wyrmruh' WHERE `locale` = 'deDE' AND `entry` = 30161;
--- OLD name : Kampfmeister des Rings der Ehre, subname : Kampfmeister
+-- OLD name : Kampfmeister des Rings der Ehre, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30171
-UPDATE `creature_template_locale` SET `Name` = '[The Ring of Valor Battlemaster]',`Title` = '[Battle Master]' WHERE `locale` = 'deDE' AND `entry` = 30171;
--- OLD name : G'eras Test Vendor List
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30171;
+-- OLD name : G'eras Test Vendor List (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30201
-UPDATE `creature_template_locale` SET `Name` = '[G''eras Test Vendor List]' WHERE `locale` = 'deDE' AND `entry` = 30201;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30201;
 -- OLD name : Akolyth der Vergessenen Tiefen
 -- Source : https://www.wowhead.com/wotlk/de/npc=30205
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt der Vergessenen Tiefen' WHERE `locale` = 'deDE' AND `entry` = 30205;
--- OLD name : Hodir's Helm KC Bunny
+-- OLD name : Hodir's Helm KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30210
-UPDATE `creature_template_locale` SET `Name` = '[Hodir''s Helm KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30210;
--- OLD name : Thrall's Big Hit, Lightning Bolt Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30210;
+-- OLD name : Thrall's Big Hit, Lightning Bolt Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30214
-UPDATE `creature_template_locale` SET `Name` = '[Thrall''s Big Hit, Lightning Bolt Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30214;
--- OLD name : Leave Our Mark Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30214;
+-- OLD name : Leave Our Mark Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30220
-UPDATE `creature_template_locale` SET `Name` = '[Leave Our Mark Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30220;
--- OLD name : Kirgaraak Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30220;
+-- OLD name : Kirgaraak Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30221
-UPDATE `creature_template_locale` SET `Name` = '[Kirgaraak Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 30221;
--- OLD name : Eisschlundbärenreittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30221;
+-- OLD name : Eisschlundbärenreittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30229
-UPDATE `creature_template_locale` SET `Name` = '[Icemaw Bear Mount]' WHERE `locale` = 'deDE' AND `entry` = 30229;
--- OLD name : Verletzter Späher der Sonnenhäscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30229;
+-- OLD name : Verletzter Späher der Sonnenhäscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30240
-UPDATE `creature_template_locale` SET `Name` = '[Injured Sunreaver Scout]' WHERE `locale` = 'deDE' AND `entry` = 30240;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30240;
 -- OLD name : Nexusfürst
 -- Source : https://www.wowhead.com/wotlk/de/npc=30245
 UPDATE `creature_template_locale` SET `Name` = 'Nexuslord' WHERE `locale` = 'deDE' AND `entry` = 30245;
@@ -5638,498 +7273,558 @@ UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Randvir' WHER
 -- OLD name : Späherhauptmann Daelin
 -- Source : https://www.wowhead.com/wotlk/de/npc=30261
 UPDATE `creature_template_locale` SET `Name` = 'Feldspäherhauptmann Daelin' WHERE `locale` = 'deDE' AND `entry` = 30261;
--- OLD name : Verletzter Späher des Silberbunds
+-- OLD name : Verletzter Späher des Silberbunds (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30266
-UPDATE `creature_template_locale` SET `Name` = '[Injured Silver Covenant Scout]' WHERE `locale` = 'deDE' AND `entry` = 30266;
--- OLD name : Wütender gepanzerter Hippogryph
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30266;
+-- OLD name : Wütender gepanzerter Hippogryph (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30280
-UPDATE `creature_template_locale` SET `Name` = '[Enraged Armored Hippogryph]' WHERE `locale` = 'deDE' AND `entry` = 30280;
--- OLD name : Verteidiger des Hafens von Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30280;
+-- OLD name : Verteidiger des Hafens von Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30289
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind Harbor Defender]' WHERE `locale` = 'deDE' AND `entry` = 30289;
--- OLD name : Drachenfalke der Sonnenhäscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30289;
+-- OLD name : Drachenfalke der Sonnenhäscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30290
-UPDATE `creature_template_locale` SET `Name` = '[Sunreaver Dragonhawk]' WHERE `locale` = 'deDE' AND `entry` = 30290;
--- OLD name : Hauptmann des Hafens von Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30290;
+-- OLD name : Hauptmann des Hafens von Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30293
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind Harbor Captain]' WHERE `locale` = 'deDE' AND `entry` = 30293;
--- OLD name : Iron Sentinel Credit, subname : Diener von Loken
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30293;
+-- OLD name : Iron Sentinel Credit, subname : Diener von Loken (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30296
-UPDATE `creature_template_locale` SET `Name` = '[Iron Sentinel Credit]',`Title` = '[Servant of Loken]' WHERE `locale` = 'deDE' AND `entry` = 30296;
--- OLD name : Iron Dwarf Assailant Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30296;
+-- OLD name : Iron Dwarf Assailant Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30297
-UPDATE `creature_template_locale` SET `Name` = '[Iron Dwarf Assailant Credit]' WHERE `locale` = 'deDE' AND `entry` = 30297;
--- OLD name : Schneller fliegender Besen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30297;
+-- OLD name : Schneller fliegender Besen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30305
-UPDATE `creature_template_locale` SET `Name` = '[Swift Flying Broom]' WHERE `locale` = 'deDE' AND `entry` = 30305;
--- OLD name : Jokkum KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30305;
+-- OLD name : Jokkum KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30327
-UPDATE `creature_template_locale` SET `Name` = '[Jokkum KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30327;
--- OLD name : Thorim
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30327;
+-- OLD name : Thorim (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30328
-UPDATE `creature_template_locale` SET `Name` = '[Thorim]' WHERE `locale` = 'deDE' AND `entry` = 30328;
--- OLD name : Frigid Tomb Controller Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30328;
+-- OLD name : Frigid Tomb Controller Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30339
-UPDATE `creature_template_locale` SET `Name` = '[Frigid Tomb Controller Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30339;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30339;
 -- OLD name : Jormuttar
 -- Source : https://www.wowhead.com/wotlk/de/npc=30340
 UPDATE `creature_template_locale` SET `Name` = 'Jorkuttar' WHERE `locale` = 'deDE' AND `entry` = 30340;
--- OLD name : Urahne Sardis
+-- OLD name : Urahne Sardis (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30348
-UPDATE `creature_template_locale` SET `Name` = '[Elder Sardis]' WHERE `locale` = 'deDE' AND `entry` = 30348;
--- OLD name : Allianzwache von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30348;
+-- OLD name : Allianzwache von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30354
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Alliance Melee Guard]' WHERE `locale` = 'deDE' AND `entry` = 30354;
--- OLD name : Allianzwache von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30354;
+-- OLD name : Allianzwache von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30355
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Alliance Ranged Guard]' WHERE `locale` = 'deDE' AND `entry` = 30355;
--- OLD name : Urahne Beldak
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30355;
+-- OLD name : Urahne Beldak (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30357
-UPDATE `creature_template_locale` SET `Name` = '[Elder Beldak]' WHERE `locale` = 'deDE' AND `entry` = 30357;
--- OLD name : Urahne Morthie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30357;
+-- OLD name : Urahne Morthie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30358
-UPDATE `creature_template_locale` SET `Name` = '[Elder Morthie]' WHERE `locale` = 'deDE' AND `entry` = 30358;
--- OLD name : Urahne Fargal
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30358;
+-- OLD name : Urahne Fargal (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30359
-UPDATE `creature_template_locale` SET `Name` = '[Elder Fargal]' WHERE `locale` = 'deDE' AND `entry` = 30359;
--- OLD name : Urahne Northal
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30359;
+-- OLD name : Urahne Northal (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30360
-UPDATE `creature_template_locale` SET `Name` = '[Elder Northal]' WHERE `locale` = 'deDE' AND `entry` = 30360;
--- OLD name : Urahne Sandrene
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30360;
+-- OLD name : Urahne Sandrene (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30362
-UPDATE `creature_template_locale` SET `Name` = '[Elder Sandrene]' WHERE `locale` = 'deDE' AND `entry` = 30362;
--- OLD name : Urahne Thoim
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30362;
+-- OLD name : Urahne Thoim (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30363
-UPDATE `creature_template_locale` SET `Name` = '[Elder Thoim]' WHERE `locale` = 'deDE' AND `entry` = 30363;
--- OLD name : Urahne Arp
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30363;
+-- OLD name : Urahne Arp (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30364
-UPDATE `creature_template_locale` SET `Name` = '[Elder Arp]' WHERE `locale` = 'deDE' AND `entry` = 30364;
--- OLD name : Urahne Wanikaya
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30364;
+-- OLD name : Urahne Wanikaya (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30365
-UPDATE `creature_template_locale` SET `Name` = '[Elder Wanikaya]' WHERE `locale` = 'deDE' AND `entry` = 30365;
--- OLD name : Urahne Lunaro
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30365;
+-- OLD name : Urahne Lunaro (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30367
-UPDATE `creature_template_locale` SET `Name` = '[Elder Lunaro]' WHERE `locale` = 'deDE' AND `entry` = 30367;
--- OLD name : Urahne Blauwolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30367;
+-- OLD name : Urahne Blauwolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30368
-UPDATE `creature_template_locale` SET `Name` = '[Elder Bluewolf]' WHERE `locale` = 'deDE' AND `entry` = 30368;
--- OLD name : Urahne Pamuya
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30368;
+-- OLD name : Urahne Pamuya (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30371
-UPDATE `creature_template_locale` SET `Name` = '[Elder Pamuya]' WHERE `locale` = 'deDE' AND `entry` = 30371;
--- OLD name : Urahne Whurain
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30371;
+-- OLD name : Urahne Whurain (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30372
-UPDATE `creature_template_locale` SET `Name` = '[Elder Whurain]' WHERE `locale` = 'deDE' AND `entry` = 30372;
--- OLD name : Urahne Muraco
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30372;
+-- OLD name : Urahne Muraco (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30374
-UPDATE `creature_template_locale` SET `Name` = '[Elder Muraco]' WHERE `locale` = 'deDE' AND `entry` = 30374;
--- OLD name : Urahne Steinbart
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30374;
+-- OLD name : Urahne Steinbart (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30375
-UPDATE `creature_template_locale` SET `Name` = '[Elder Stonebeard]' WHERE `locale` = 'deDE' AND `entry` = 30375;
--- OLD name : Ahne der Taunka
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30375;
+-- OLD name : Ahne der Taunka (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30386
-UPDATE `creature_template_locale` SET `Name` = '[Taunka Ancestor]' WHERE `locale` = 'deDE' AND `entry` = 30386;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30386;
 -- OLD subname : Verwüsteringenieur
 -- Source : https://www.wowhead.com/wotlk/de/npc=30400
 UPDATE `creature_template_locale` SET `Title` = 'Verwüstungsingenieur' WHERE `locale` = 'deDE' AND `entry` = 30400;
--- OLD name : Proxy der vergessenen Tiefen
+-- OLD name : Proxy der vergessenen Tiefen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30402
-UPDATE `creature_template_locale` SET `Name` = '[Forgotten Depths Proxy]' WHERE `locale` = 'deDE' AND `entry` = 30402;
--- OLD name : Deep in the Bowels of The Underhalls Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30402;
+-- OLD name : Deep in the Bowels of The Underhalls Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30412
-UPDATE `creature_template_locale` SET `Name` = '[Deep in the Bowels of The Underhalls Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30412;
--- OLD name : Wild Wyrm KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30412;
+-- OLD name : Wild Wyrm KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30415
-UPDATE `creature_template_locale` SET `Name` = '[Wild Wyrm KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30415;
--- OLD name : Lok'lira die Greisin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30415;
+-- OLD name : Lok'lira die Greisin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30417
-UPDATE `creature_template_locale` SET `Name` = '[Lok''lira the Crone]' WHERE `locale` = 'deDE' AND `entry` = 30417;
--- OLD name : Roaming Jormungar KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30417;
+-- OLD name : Roaming Jormungar KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30421
-UPDATE `creature_template_locale` SET `Name` = '[Roaming Jormungar KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30421;
--- OLD name : Fürstin Sylvanas Windläufer, subname : Bansheekönigin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30421;
+-- OLD name : Fürstin Sylvanas Windläufer, subname : Bansheekönigin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30426
-UPDATE `creature_template_locale` SET `Name` = '[Lady Sylvanas Windrunner (Test 01)]',`Title` = '[Banshee Queen]' WHERE `locale` = 'deDE' AND `entry` = 30426;
--- OLD name : Fürstin Sylvanas Windläufer, subname : Bansheekönigin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30426;
+-- OLD name : Fürstin Sylvanas Windläufer, subname : Bansheekönigin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30427
-UPDATE `creature_template_locale` SET `Name` = '[Lady Sylvanas Windrunner (Test 02)]',`Title` = '[Banshee Queen]' WHERE `locale` = 'deDE' AND `entry` = 30427;
--- OLD name : Fürstin Sylvanas Windläufer, subname : Bansheekönigin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30427;
+-- OLD name : Fürstin Sylvanas Windläufer, subname : Bansheekönigin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30428
-UPDATE `creature_template_locale` SET `Name` = '[Lady Sylvanas Windrunner (Test 03)]',`Title` = '[Banshee Queen]' WHERE `locale` = 'deDE' AND `entry` = 30428;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30428;
 -- OLD subname : Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=30437
 UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deDE' AND `entry` = 30437;
 -- OLD subname : Gifte, Reagenzien & Handwerkswaren
 -- Source : https://www.wowhead.com/wotlk/de/npc=30438
 UPDATE `creature_template_locale` SET `Title` = 'Gifte, Reagenzien & Handelswaren' WHERE `locale` = 'deDE' AND `entry` = 30438;
--- OLD name : Hilfsarbeiter des Vorpostens
+-- OLD name : Hilfsarbeiter des Vorpostens (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30440
-UPDATE `creature_template_locale` SET `Name` = '[Vanguard Laborer]' WHERE `locale` = 'deDE' AND `entry` = 30440;
--- OLD name : Verbrannter Hilfsarbeiter des Vorpostens
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30440;
+-- OLD name : Verbrannter Hilfsarbeiter des Vorpostens (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30441
-UPDATE `creature_template_locale` SET `Name` = '[Burdened Vanguard Laborer]' WHERE `locale` = 'deDE' AND `entry` = 30441;
--- OLD name : Zaks Flugmaschine
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30441;
+-- OLD name : Zaks Flugmaschine (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30463
-UPDATE `creature_template_locale` SET `Name` = '[Zak''s Flying Machine]' WHERE `locale` = 'deDE' AND `entry` = 30463;
--- OLD name : Dans Testleerenwache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30463;
+-- OLD name : Dans Testleerenwache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30465
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Void Sentry]' WHERE `locale` = 'deDE' AND `entry` = 30465;
--- OLD name : Lok'lira the Crone's Conversation Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30465;
+-- OLD name : Lok'lira the Crone's Conversation Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30467
-UPDATE `creature_template_locale` SET `Name` = '[Lok''lira the Crone''s Conversation Credit]' WHERE `locale` = 'deDE' AND `entry` = 30467;
--- OLD name : Ritssyn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30467;
+-- OLD name : [DND] Icecrown Flight To Airship Bunny (A) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30476
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30476;
+-- OLD name : Ritssyn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30491
-UPDATE `creature_template_locale` SET `Name` = '[Ritssyn]' WHERE `locale` = 'deDE' AND `entry` = 30491;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30491;
 -- OLD name : Gnomeningenieur
 -- Source : https://www.wowhead.com/wotlk/de/npc=30499
 UPDATE `creature_template_locale` SET `Name` = 'Gnomingenieur' WHERE `locale` = 'deDE' AND `entry` = 30499;
--- OLD name : Sturmgeschmiedeter Dezimierer
+-- OLD name : Sturmgeschmiedeter Dezimierer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30503
-UPDATE `creature_template_locale` SET `Name` = '[Stormforged Decimator]' WHERE `locale` = 'deDE' AND `entry` = 30503;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30503;
 -- OLD name : Sturmgeschmiedeter Kriegshetzer
 -- Source : https://www.wowhead.com/wotlk/de/npc=30504
 UPDATE `creature_template_locale` SET `Name` = 'Sturmgeschmiedeter Kriegstreiber' WHERE `locale` = 'deDE' AND `entry` = 30504;
--- OLD name : Braufestkodo
+-- OLD name : Braufestkodo (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30507
-UPDATE `creature_template_locale` SET `Name` = '[Brewfest Kodo]' WHERE `locale` = 'deDE' AND `entry` = 30507;
--- OLD name : Thorim Talk KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30507;
+-- OLD name : Großmagistrix Telestra (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30510
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30510;
+-- OLD name : Großmagistrix Telestra (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30513
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30513;
+-- OLD name : Thorim Talk KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30514
-UPDATE `creature_template_locale` SET `Name` = '[Thorim Talk KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30514;
--- OLD name : Witness the Reckoning Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30514;
+-- OLD name : Witness the Reckoning Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30515
-UPDATE `creature_template_locale` SET `Name` = '[Witness the Reckoning Credit]' WHERE `locale` = 'deDE' AND `entry` = 30515;
--- OLD name : Training Dummy
--- Source : https://www.wowhead.com/wotlk/de/npc=30527
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30527;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (30527, 'deDE','[Training Dummy]',NULL);
--- OLD name : Urahne Jarten
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30515;
+-- OLD name : Urahne Jarten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30531
-UPDATE `creature_template_locale` SET `Name` = '[Elder Jarten]' WHERE `locale` = 'deDE' AND `entry` = 30531;
--- OLD name : Urahne Nurgen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30531;
+-- OLD name : Urahne Nurgen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30533
-UPDATE `creature_template_locale` SET `Name` = '[Elder Nurgen]' WHERE `locale` = 'deDE' AND `entry` = 30533;
--- OLD name : Urahne Yurauk
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30533;
+-- OLD name : Urahne Yurauk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30535
-UPDATE `creature_template_locale` SET `Name` = '[Elder Yurauk]' WHERE `locale` = 'deDE' AND `entry` = 30535;
--- OLD name : Urahne Igasho
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30535;
+-- OLD name : Urahne Igasho (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30536
-UPDATE `creature_template_locale` SET `Name` = '[Elder Igasho]' WHERE `locale` = 'deDE' AND `entry` = 30536;
--- OLD name : Urahne Ohanzee
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30536;
+-- OLD name : Urahne Ohanzee (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30537
-UPDATE `creature_template_locale` SET `Name` = '[Elder Ohanzee]' WHERE `locale` = 'deDE' AND `entry` = 30537;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30537;
+-- OLD name : Zornstoßgargoyle (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30545
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30545;
+-- OLD name : Wiedererweckter Kreuzfahrer, subname : PH MODEL: Task 25946 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30546
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30546;
 -- OLD name : Fras Siabi
 -- Source : https://www.wowhead.com/wotlk/de/npc=30552
 UPDATE `creature_template_locale` SET `Name` = 'Ezra Grimm' WHERE `locale` = 'deDE' AND `entry` = 30552;
--- OLD name : Jessica Rotpfad
+-- OLD name : Jessica Rotpfad (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30558
-UPDATE `creature_template_locale` SET `Name` = '[Jessica Redpath]' WHERE `locale` = 'deDE' AND `entry` = 30558;
--- OLD name : Kiste mit Landminen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30558;
+-- OLD name : [DND] Icecrown Flight To Airship Bunny (A) Teleport Target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30559
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30559;
+-- OLD name : Kiste mit Landminen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30563
-UPDATE `creature_template_locale` SET `Name` = '[Crate of Land Mines]' WHERE `locale` = 'deDE' AND `entry` = 30563;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30563;
 -- OLD subname : Schankkellner
 -- Source : https://www.wowhead.com/wotlk/de/npc=30570
 UPDATE `creature_template_locale` SET `Title` = 'Barkeeper' WHERE `locale` = 'deDE' AND `entry` = 30570;
 -- OLD subname : Ammunition
 -- Source : https://www.wowhead.com/wotlk/de/npc=30572
 UPDATE `creature_template_locale` SET `Title` = 'Munition' WHERE `locale` = 'deDE' AND `entry` = 30572;
--- OLD name : Bethany Aldire, subname : Kampfmeisterin des Strands der Uralten
+-- OLD name : Bethany Aldire, subname : Kampfmeisterin des Strands der Uralten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30578
-UPDATE `creature_template_locale` SET `Name` = '[Bethany Aldire]',`Title` = '[Strand of the Ancients Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 30578;
--- OLD name : Buhurda, subname : Kampfmeister des Strands der Uralten
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30578;
+-- OLD name : Buhurda, subname : Kampfmeister des Strands der Uralten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30581
-UPDATE `creature_template_locale` SET `Name` = '[Buhurda]',`Title` = '[Strand of the Ancients Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 30581;
--- OLD name : Mabrian Morgenferne, subname : Kampfmeister des Strands der Uralten
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30581;
+-- OLD name : Mabrian Morgenferne, subname : Kampfmeister des Strands der Uralten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30584
-UPDATE `creature_template_locale` SET `Name` = '[Mabrian Fardawn]',`Title` = '[Strand of the Ancients Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 30584;
--- OLD name : Stachelziel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30584;
+-- OLD name : [DND] Icecrown Flight To Airship Bunny (H) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30588
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30588;
+-- OLD name : [DND] Icecrown Flight To Airship Bunny (H) Teleport Target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30589
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30589;
+-- OLD name : Hohepriester der Vergessenen Tiefen (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30594
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30594;
+-- OLD name : Stachelziel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30598
-UPDATE `creature_template_locale` SET `Name` = '[Spike Target]' WHERE `locale` = 'deDE' AND `entry` = 30598;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30598;
 -- OLD subname : Arena Organizer
 -- Source : https://www.wowhead.com/wotlk/de/npc=30611
 UPDATE `creature_template_locale` SET `Title` = 'Arenaveranstalterin' WHERE `locale` = 'deDE' AND `entry` = 30611;
--- OLD name : Blutstachel, subname : Mologs Begleiter
+-- OLD name : Blutstachel, subname : Mologs Begleiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30613
-UPDATE `creature_template_locale` SET `Name` = '[Bloodsting]',`Title` = '[Molog''s Pet]' WHERE `locale` = 'deDE' AND `entry` = 30613;
--- OLD name : Stachelziel 2
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30613;
+-- OLD name : Stachelziel 2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30614
-UPDATE `creature_template_locale` SET `Name` = '[Spike Target 2]' WHERE `locale` = 'deDE' AND `entry` = 30614;
--- OLD name : Dans Testdummy (Non Vehicle)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30614;
+-- OLD name : Dans Testdummy (Non Vehicle) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30615
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Dummy (Non Vehicle)]' WHERE `locale` = 'deDE' AND `entry` = 30615;
--- OLD name : NONE
--- Source : https://www.wowhead.com/wotlk/de/npc=30618
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30618;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (30618, 'deDE','[]',NULL);
--- OLD name : Peon von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30615;
+-- OLD name : Peon von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30619
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Peon]' WHERE `locale` = 'deDE' AND `entry` = 30619;
--- OLD name : Arbeiter von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30619;
+-- OLD name : Arbeiter von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30626
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Peasant]' WHERE `locale` = 'deDE' AND `entry` = 30626;
--- OLD name : Auge von Acherus (TR)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30626;
+-- OLD name : Auge von Acherus (TR) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30628
-UPDATE `creature_template_locale` SET `Name` = '[Eye of Acherus (DK)]' WHERE `locale` = 'deDE' AND `entry` = 30628;
--- OLD name : Sterbliche Essenz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30628;
+-- OLD name : Sterbliche Essenz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30629
-UPDATE `creature_template_locale` SET `Name` = '[Mortal Essence]' WHERE `locale` = 'deDE' AND `entry` = 30629;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30629;
+-- OLD name : [DND] Icecrown Airship (A) - Cannon Target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30640
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30640;
 -- OLD name : Zwielichtriss
 -- Source : https://www.wowhead.com/wotlk/de/npc=30641
 UPDATE `creature_template_locale` SET `Name` = 'Zwielichtspalt' WHERE `locale` = 'deDE' AND `entry` = 30641;
--- OLD name : The Art of Being a Water Terror Kill Credit Bunny
+-- OLD name : The Art of Being a Water Terror Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30644
-UPDATE `creature_template_locale` SET `Name` = '[The Art of Being a Water Terror Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30644;
--- OLD name : Shadron Portal Visual
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30644;
+-- OLD name : [DND] Icecrown Airship (A) - Cannon, Even (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30646
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30646;
+-- OLD name : [DND] Icecrown Airship (H) - Cannon Target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30649
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30649;
+-- OLD name : Shadron Portal Visual (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30650
-UPDATE `creature_template_locale` SET `Name` = '[Shadron Portal Visual]' WHERE `locale` = 'deDE' AND `entry` = 30650;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30650;
+-- OLD name : [DND] Icecrown Airship (A) - Cannon, Odd (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30651
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30651;
+-- OLD name : [DND] Icecrown Airship (A) - Cannon Controller 01 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30655
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30655;
 -- OLD name : Azurblauer Zauberer
 -- Source : https://www.wowhead.com/wotlk/de/npc=30667
 UPDATE `creature_template_locale` SET `Name` = 'Azurblaue Zauberin' WHERE `locale` = 'deDE' AND `entry` = 30667;
--- OLD name : Scourge Proxy Chapter II
+-- OLD name : Scourge Proxy Chapter II (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30670
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Proxy Chapter II]' WHERE `locale` = 'deDE' AND `entry` = 30670;
--- OLD name : Jonna Robertson, subname : Wegbeschreibungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30670;
+-- OLD name : Jonna Robertson, subname : Wegbeschreibungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30678
-UPDATE `creature_template_locale` SET `Name` = '[Jonna Robertson]',`Title` = '[Directions]' WHERE `locale` = 'deDE' AND `entry` = 30678;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30678;
+-- OLD name : [DND] Icecrown Airship (H) - Flak Cannon, Even (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30699
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30699;
+-- OLD name : [DND] Icecrown Airship (H) - Cannon, Neutral (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30700
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30700;
+-- OLD name : [DND] Icecrown Airship (H) - Cannon Controller 01 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30707
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30707;
 -- OLD subname : Inschriftenkundelehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=30721
 UPDATE `creature_template_locale` SET `Title` = 'Inschriftenkundemeisterlehrer' WHERE `locale` = 'deDE' AND `entry` = 30721;
 -- OLD subname : Inschriftenkundelehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=30722
 UPDATE `creature_template_locale` SET `Title` = 'Inschriftenkundemeisterlehrerin' WHERE `locale` = 'deDE' AND `entry` = 30722;
--- OLD name : Stachelloser Ghul
+-- OLD name : Stachelloser Ghul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30728
-UPDATE `creature_template_locale` SET `Name` = '[Unspiked Ghoul]' WHERE `locale` = 'deDE' AND `entry` = 30728;
--- OLD name : Tabard Faction Tester
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30728;
+-- OLD name : Tabard Faction Tester (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30738
-UPDATE `creature_template_locale` SET `Name` = '[Tabard Faction Tester]' WHERE `locale` = 'deDE' AND `entry` = 30738;
--- OLD name : Shadronportal
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30738;
+-- OLD name : Shadronportal (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30741
-UPDATE `creature_template_locale` SET `Name` = '[Shadron Portal]' WHERE `locale` = 'deDE' AND `entry` = 30741;
--- OLD name : Succubus Transform 01
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30741;
+-- OLD name : Succubus Transform 01 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30743
-UPDATE `creature_template_locale` SET `Name` = '[Succubus Transform 01]' WHERE `locale` = 'deDE' AND `entry` = 30743;
--- OLD name : Through the Eye Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30743;
+-- OLD name : [DND] Icecrown Airship (H) - Cannon Target, Shield (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30749
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30749;
+-- OLD name : Through the Eye Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30750
-UPDATE `creature_template_locale` SET `Name` = '[Through the Eye Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30750;
--- OLD name : Teleporter in den Hallen der Blitze
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30750;
+-- OLD name : Teleporter in den Hallen der Blitze (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30828
-UPDATE `creature_template_locale` SET `Name` = '[Halls of Lightning Teleporter]' WHERE `locale` = 'deDE' AND `entry` = 30828;
--- OLD name : Abgetrennte Seele
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30828;
+-- OLD name : [DND] Icecrown Airship (A) - Cannon Target, Shield (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=30832
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30832;
+-- OLD name : Abgetrennte Seele (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30843
-UPDATE `creature_template_locale` SET `Name` = '[Severed Soul]' WHERE `locale` = 'deDE' AND `entry` = 30843;
--- OLD name : Death Gate (Dummy)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30843;
+-- OLD name : Death Gate (Dummy) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30844
-UPDATE `creature_template_locale` SET `Name` = '[Death Gate (Dummy)]' WHERE `locale` = 'deDE' AND `entry` = 30844;
--- OLD name : Gnomhubschrauber
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30844;
+-- OLD name : Gnomhubschrauber (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30853
-UPDATE `creature_template_locale` SET `Name` = '[Gnomish ''Chopper]' WHERE `locale` = 'deDE' AND `entry` = 30853;
--- OLD name : Ingenieur von Tausendwinter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30853;
+-- OLD name : Ingenieur von Tausendwinter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30855
-UPDATE `creature_template_locale` SET `Name` = '[Wintergrasp Engineer]' WHERE `locale` = 'deDE' AND `entry` = 30855;
--- OLD name : Aura der Unverwundbarkeit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30855;
+-- OLD name : Aura der Unverwundbarkeit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30874
-UPDATE `creature_template_locale` SET `Name` = '[Invulnerability Aura]' WHERE `locale` = 'deDE' AND `entry` = 30874;
--- OLD name : Find the Ancient Hero Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30874;
+-- OLD name : Find the Ancient Hero Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30880
-UPDATE `creature_template_locale` SET `Name` = '[Find the Ancient Hero Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30880;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30880;
 -- OLD subname : Überholte Arenarüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=30885
 UPDATE `creature_template_locale` SET `Title` = 'Wasserverkäufer' WHERE `locale` = 'deDE' AND `entry` = 30885;
--- OLD name : QA Test Dummy 80 Hostile Low Damage, subname : QA Punching Bag
+-- OLD name : QA Test Dummy 80 Hostile Low Damage, subname : QA Punching Bag (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30888
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Hostile Low Damage]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 30888;
--- OLD name : Ei der Tenebron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30888;
+-- OLD name : Ei der Tenebron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30948
-UPDATE `creature_template_locale` SET `Name` = '[Tenebron Egg (Twilight)]' WHERE `locale` = 'deDE' AND `entry` = 30948;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30948;
 -- OLD name : Azurblauer Magiertöter
 -- Source : https://www.wowhead.com/wotlk/de/npc=30963
 UPDATE `creature_template_locale` SET `Name` = 'Azurblauer Pirscher' WHERE `locale` = 'deDE' AND `entry` = 30963;
--- OLD name : Magistrat Barthilas
+-- OLD name : Magistrat Barthilas (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30994
-UPDATE `creature_template_locale` SET `Name` = '[Magistrate Barthilas]' WHERE `locale` = 'deDE' AND `entry` = 30994;
--- OLD name : Kisten
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30994;
+-- OLD name : Kisten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=30996
-UPDATE `creature_template_locale` SET `Name` = '[CoT Stratholme - Crates KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 30996;
--- OLD name : Mal'Ganis
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 30996;
+-- OLD name : Mal'Ganis (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31006
-UPDATE `creature_template_locale` SET `Name` = '[CoT Stratholme - Mal''Ganis KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31006;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31006;
+-- OLD name : Der Lichkönig (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=31014
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31014;
 -- OLD subname : Schankkellner
 -- Source : https://www.wowhead.com/wotlk/de/npc=31017
 UPDATE `creature_template_locale` SET `Title` = 'Barkeeper' WHERE `locale` = 'deDE' AND `entry` = 31017;
--- OLD name : Olivia Zenith, subname : Schneiderin
+-- OLD name : Olivia Zenith, subname : Schneiderin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31020
-UPDATE `creature_template_locale` SET `Name` = '[Olivia Zenith]',`Title` = '[Tailor]' WHERE `locale` = 'deDE' AND `entry` = 31020;
--- OLD name : Sophie Aaren, subname : Floristin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31020;
+-- OLD name : Sophie Aaren, subname : Floristin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31021
-UPDATE `creature_template_locale` SET `Name` = '[Sophie Aaren]',`Title` = '[Florist]' WHERE `locale` = 'deDE' AND `entry` = 31021;
--- OLD name : George Gutmann, subname : Gemischtwaren
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31021;
+-- OLD name : George Gutmann, subname : Gemischtwaren (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31022
-UPDATE `creature_template_locale` SET `Name` = '[George Goodman]',`Title` = '[General Goods]' WHERE `locale` = 'deDE' AND `entry` = 31022;
--- OLD name : Robert Pierce, subname : Ammunition
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31022;
+-- OLD name : Robert Pierce (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31025
-UPDATE `creature_template_locale` SET `Name` = '[Robert Pierce]',`Title` = '[Ammunition]' WHERE `locale` = 'deDE' AND `entry` = 31025;
--- OLD name : Anna Moony, subname : Kellnerin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31025;
+-- OLD name : Anna Moony, subname : Kellnerin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31026
-UPDATE `creature_template_locale` SET `Name` = '[Anna Moony]',`Title` = '[Waitress]' WHERE `locale` = 'deDE' AND `entry` = 31026;
--- OLD name : Patricia O'Reilly, subname : Magistratsassistentin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31026;
+-- OLD name : Patricia O'Reilly, subname : Magistratsassistentin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31028
-UPDATE `creature_template_locale` SET `Name` = '[Patricia O''Reilly]',`Title` = '[Magistrate Assistant]' WHERE `locale` = 'deDE' AND `entry` = 31028;
--- OLD name : Töter der Vergessenen Tiefen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31028;
+-- OLD name : Töter der Vergessenen Tiefen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31038
-UPDATE `creature_template_locale` SET `Name` = '[Forgotten Depths Slayer]' WHERE `locale` = 'deDE' AND `entry` = 31038;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31038;
 -- OLD name : Entmutigter Ent
 -- Source : https://www.wowhead.com/wotlk/de/npc=31041
 UPDATE `creature_template_locale` SET `Name` = 'Zweigeistiger Ent' WHERE `locale` = 'deDE' AND `entry` = 31041;
--- OLD name : Packmuli
+-- OLD name : Packmuli (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31046
-UPDATE `creature_template_locale` SET `Name` = '[Pack Mule (Chapter IV)]' WHERE `locale` = 'deDE' AND `entry` = 31046;
--- OLD name : ELM General Purpose Bunny Gigantic
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31046;
+-- OLD name : ELM General Purpose Bunny Gigantic (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31047
-UPDATE `creature_template_locale` SET `Name` = '[ELM General Purpose Bunny Gigantic]' WHERE `locale` = 'deDE' AND `entry` = 31047;
--- OLD name : Eliteprotodrache von Balagarde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31047;
+-- OLD name : Eliteprotodrache von Balagarde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31056
-UPDATE `creature_template_locale` SET `Name` = '[Balargarde Elite Proto-Drake]' WHERE `locale` = 'deDE' AND `entry` = 31056;
--- OLD name : Kreuzzugsarchitekt Silas
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31056;
+-- OLD name : Kreuzzugsarchitekt Silas (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31058
-UPDATE `creature_template_locale` SET `Name` = '[Crusade Architect Silas (Chapter IV)]' WHERE `locale` = 'deDE' AND `entry` = 31058;
--- OLD name : Russell Bernau Test NPC
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31058;
+-- OLD name : Russell Bernau Test NPC (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31060
-UPDATE `creature_template_locale` SET `Name` = '[Russell Bernau Test NPC]' WHERE `locale` = 'deDE' AND `entry` = 31060;
--- OLD name : Kreuzzugsingenieur Spitzpatrick
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31060;
+-- OLD name : Kreuzzugsingenieur Spitzpatrick (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31061
-UPDATE `creature_template_locale` SET `Name` = '[Crusade Engineer Spitzpatrick (Chapter IV)]' WHERE `locale` = 'deDE' AND `entry` = 31061;
--- OLD name : Belagerungsmeister Fezzik
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31061;
+-- OLD name : Belagerungsmeister Fezzik (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31062
-UPDATE `creature_template_locale` SET `Name` = '[Siegemaster Fezzik (Chapter IV)]' WHERE `locale` = 'deDE' AND `entry` = 31062;
--- OLD name : Indalamars Nax-10-Verkäufer, subname : Tolles Emporium des UNGLAUBLICHEN
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31062;
+-- OLD name : Indalamars Nax-10-Verkäufer, subname : Tolles Emporium des UNGLAUBLICHEN (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31076
-UPDATE `creature_template_locale` SET `Name` = '[Indalamar''s Nax 10 Vendor]',`Title` = '[Emporium of AWESOME]' WHERE `locale` = 'deDE' AND `entry` = 31076;
--- OLD name : Feiger Acherusspuk
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31076;
+-- OLD name : Feiger Acherusspuk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31090
-UPDATE `creature_template_locale` SET `Name` = '[Cowardly Acherus Geist]' WHERE `locale` = 'deDE' AND `entry` = 31090;
--- OLD name : Scourge Egg KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31090;
+-- OLD name : Scourge Egg KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31092
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Egg KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31092;
--- OLD name : Verängstigter Ghul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31092;
+-- OLD name : Verängstigter Ghul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31097
-UPDATE `creature_template_locale` SET `Name` = '[Frightened Ghoul]' WHERE `locale` = 'deDE' AND `entry` = 31097;
--- OLD name : Geißelstellvertreter von Acherus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31097;
+-- OLD name : Geißelstellvertreter von Acherus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31100
-UPDATE `creature_template_locale` SET `Name` = '[Acherus Scourge Proxy]' WHERE `locale` = 'deDE' AND `entry` = 31100;
--- OLD name : Nachtelfirokese
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31100;
+-- OLD name : Nachtelfirokese (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31111
-UPDATE `creature_template_locale` SET `Name` = '[Night Elf Mohawk]' WHERE `locale` = 'deDE' AND `entry` = 31111;
--- OLD name : Indalamars Nax-25-Verkäufer, subname : Tolles Emporium des UNGLAUBLICHEN
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31111;
+-- OLD name : Indalamars Nax-25-Verkäufer, subname : Tolles Emporium des UNGLAUBLICHEN (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31116
-UPDATE `creature_template_locale` SET `Name` = '[Indalamar''s Nax 25 Vendor]',`Title` = '[Emporium of AWESOME]' WHERE `locale` = 'deDE' AND `entry` = 31116;
--- OLD name : Verfallendes Geschöpf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31116;
+-- OLD name : Chilly (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=31128
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31128;
+-- OLD name : Verfallendes Geschöpf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31141
-UPDATE `creature_template_locale` SET `Name` = '[Decaying Wight]' WHERE `locale` = 'deDE' AND `entry` = 31141;
--- OLD name : Reinforced Training Dummy
--- Source : https://www.wowhead.com/wotlk/de/npc=31143
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31143;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (31143, 'deDE','[Reinforced Training Dummy]',NULL);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31141;
 -- OLD name : Trainingsattrappe
 -- Source : https://www.wowhead.com/wotlk/de/npc=31144
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe des Großmeisters' WHERE `locale` = 'deDE' AND `entry` = 31144;
 -- OLD name : Trainingsattrappe des Schlachtzuges
 -- Source : https://www.wowhead.com/wotlk/de/npc=31146
 UPDATE `creature_template_locale` SET `Name` = 'Heroische Trainingsattrappe' WHERE `locale` = 'deDE' AND `entry` = 31146;
--- OLD name : Portal des Tausendwintersees
+-- OLD name : Portal des Tausendwintersees (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31149
-UPDATE `creature_template_locale` SET `Name` = '[Lake Wintergrasp Portal]' WHERE `locale` = 'deDE' AND `entry` = 31149;
--- OLD name : V
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31149;
+-- OLD name : V (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31168
-UPDATE `creature_template_locale` SET `Name` = '[V]' WHERE `locale` = 'deDE' AND `entry` = 31168;
--- OLD name : Reitargentumhimmelsklaue
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31168;
+-- OLD name : Ewiger Agent (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=31203
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31203;
+-- OLD name : Reitargentumhimmelsklaue (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31209
-UPDATE `creature_template_locale` SET `Name` = '[Riding Argent Skytalon, Neutral (Taxi)]' WHERE `locale` = 'deDE' AND `entry` = 31209;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31209;
 -- OLD name : Akolyth von Shadron
 -- Source : https://www.wowhead.com/wotlk/de/npc=31218
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt von Shadron' WHERE `locale` = 'deDE' AND `entry` = 31218;
 -- OLD name : Akolyth von Vesperon
 -- Source : https://www.wowhead.com/wotlk/de/npc=31219
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt von Vesperon' WHERE `locale` = 'deDE' AND `entry` = 31219;
--- OLD name : Unglückselige Dryade
+-- OLD name : Unglückselige Dryade (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31230
-UPDATE `creature_template_locale` SET `Name` = '[Forlorn Dryad]' WHERE `locale` = 'deDE' AND `entry` = 31230;
--- OLD name : Indalamars Verkäufer für Embleme der Ehre, subname : Tolles Emporium des UNGLAUBLICHEN
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31230;
+-- OLD name : Indalamars Verkäufer für Embleme der Ehre, subname : Tolles Emporium des UNGLAUBLICHEN (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31234
-UPDATE `creature_template_locale` SET `Name` = '[Indalamar''s Emblem of Valor Vendor]',`Title` = '[Emporium of AWESOME]' WHERE `locale` = 'deDE' AND `entry` = 31234;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31234;
 -- OLD subname : Fluglehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=31238
 UPDATE `creature_template_locale` SET `Title` = 'Lehrerin für Kaltwetterflug' WHERE `locale` = 'deDE' AND `entry` = 31238;
+-- OLD name : [DND] Icecrown Airship Cannon Explosion Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=31246
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31246;
 -- OLD subname : Fluglehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=31247
 UPDATE `creature_template_locale` SET `Title` = 'Lehrer für Kaltwetterflug' WHERE `locale` = 'deDE' AND `entry` = 31247;
--- OLD name : Rimi Kaltkurbel, subname : Fluglehrer
+-- OLD name : Rimi Kaltkurbel, subname : Fluglehrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31248
-UPDATE `creature_template_locale` SET `Name` = '[Rimi Coldcrank]',`Title` = '[Cold Weather Flying Trainer]' WHERE `locale` = 'deDE' AND `entry` = 31248;
--- OLD name : Sigrid Eiskinds Protodrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31248;
+-- OLD name : Sigrid Eiskinds Protodrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31249
-UPDATE `creature_template_locale` SET `Name` = '[Sigrid Iceborn''s Proto-Drake (mountable)]' WHERE `locale` = 'deDE' AND `entry` = 31249;
--- OLD name : Böser Fisch - Frosch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31249;
+-- OLD name : Böser Fisch - Frosch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31252
-UPDATE `creature_template_locale` SET `Name` = '[Bad Fish - Critter]' WHERE `locale` = 'deDE' AND `entry` = 31252;
--- OLD name : Böser Fisch - Hase
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31252;
+-- OLD name : Böser Fisch - Hase (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31256
-UPDATE `creature_template_locale` SET `Name` = '[Bad Fish - Rabbits]' WHERE `locale` = 'deDE' AND `entry` = 31256;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31256;
 -- OLD name : Eine geheimnisvolle Stimme
 -- Source : https://www.wowhead.com/wotlk/de/npc=31264
 UPDATE `creature_template_locale` SET `Name` = 'Eine mysteriöse Stimme' WHERE `locale` = 'deDE' AND `entry` = 31264;
 -- OLD name : Kampfwyvern der Kor'kron
 -- Source : https://www.wowhead.com/wotlk/de/npc=31269
 UPDATE `creature_template_locale` SET `Name` = 'Kampfflügeldrache der Kor''kron' WHERE `locale` = 'deDE' AND `entry` = 31269;
--- OLD name : Dying Berserker KC Bunny
+-- OLD name : Dying Berserker KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31272
-UPDATE `creature_template_locale` SET `Name` = '[Dying Berserker KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31272;
--- OLD name : Aufseher der Todesritter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31272;
+-- OLD name : Aufseher der Todesritter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31274
-UPDATE `creature_template_locale` SET `Name` = '[Death Knight Overseer]' WHERE `locale` = 'deDE' AND `entry` = 31274;
--- OLD name : Gefräßiger Ghul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31274;
+-- OLD name : Gefräßiger Ghul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31278
-UPDATE `creature_template_locale` SET `Name` = '[Ravenous Ghoul]' WHERE `locale` = 'deDE' AND `entry` = 31278;
--- OLD name : Arkanistin Ivrenne, subname : Antiquitätenrüstmeisterin für Gerechtigkeitspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31278;
+-- OLD name : Arkanistin Ivrenne, subname : Antiquitätenrüstmeisterin für Gerechtigkeitspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31300
-UPDATE `creature_template_locale` SET `Name` = '[Arcanist Ivrenne]',`Title` = '[Emblem of Heroism Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31300;
--- OLD name : Magistrix Lambriesse, subname : Antiquitätenrüstmeisterin für Gerechtigkeitspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31300;
+-- OLD name : Magistrix Lambriesse, subname : Antiquitätenrüstmeisterin für Gerechtigkeitspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31302
-UPDATE `creature_template_locale` SET `Name` = '[Magistrix Lambriesse]',`Title` = '[Emblem of Heroism Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31302;
--- OLD name : Arkanist Adurin, subname : Antiquitätenrüstmeister für Gerechtigkeitspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31302;
+-- OLD name : Arkanist Adurin, subname : Antiquitätenrüstmeister für Gerechtigkeitspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31305
-UPDATE `creature_template_locale` SET `Name` = '[Arcanist Adurin]',`Title` = '[Emblem of Valor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31305;
--- OLD name : Magister Brasael, subname : Antiquitätenrüstmeister für Gerechtigkeitspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31305;
+-- OLD name : Magister Brasael, subname : Antiquitätenrüstmeister für Gerechtigkeitspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31307
-UPDATE `creature_template_locale` SET `Name` = '[Magister Brasael]',`Title` = '[Emblem of Valor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31307;
--- OLD name : Dying Soldier KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31307;
+-- OLD name : Dying Soldier KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31312
-UPDATE `creature_template_locale` SET `Name` = '[Dying Soldier KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31312;
--- OLD name : Reithippogryph
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31312;
+-- OLD name : Reithippogryph (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31315
-UPDATE `creature_template_locale` SET `Name` = '[Riding Hippogryph (Armored)]' WHERE `locale` = 'deDE' AND `entry` = 31315;
--- OLD name : Großer Blizzardbär
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31315;
+-- OLD name : Großer Blizzardbär (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31319
-UPDATE `creature_template_locale` SET `Name` = '[Big Blizzard Bear]' WHERE `locale` = 'deDE' AND `entry` = 31319;
--- OLD name : Skeletal Footsoldier Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31319;
+-- OLD name : Skeletal Footsoldier Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31329
-UPDATE `creature_template_locale` SET `Name` = '[Skeletal Footsoldier Credit]' WHERE `locale` = 'deDE' AND `entry` = 31329;
--- OLD name : Indalamars Verkäufer für Embleme des Heldentums, subname : Tolles Emporium des UNGLAUBLICHEN
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31329;
+-- OLD name : Indalamars Verkäufer für Embleme des Heldentums, subname : Tolles Emporium des UNGLAUBLICHEN (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31331
-UPDATE `creature_template_locale` SET `Name` = '[Indalamar''s Emblem of Heroism Vendor]',`Title` = '[Emporium of AWESOME]' WHERE `locale` = 'deDE' AND `entry` = 31331;
--- OLD name : Frostbruthimmelsklaue KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31331;
+-- OLD name : [DND] Icecrown Airship (N) - Attack Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=31353
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31353;
+-- OLD name : Frostbruthimmelsklaue KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31364
-UPDATE `creature_template_locale` SET `Name` = '[Frostbrood Skytalon KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31364;
--- OLD name : Illidan Sturmgrimm
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31364;
+-- OLD name : Illidan Sturmgrimm (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31395
-UPDATE `creature_template_locale` SET `Name` = '[Illidan Stormrage]' WHERE `locale` = 'deDE' AND `entry` = 31395;
--- OLD name : Der auserwählte Held
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31395;
+-- OLD name : Der auserwählte Held (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31398
-UPDATE `creature_template_locale` SET `Name` = '[The Chosen Champion]' WHERE `locale` = 'deDE' AND `entry` = 31398;
--- OLD name : Bomber von Eiskrone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31398;
+-- OLD name : Bomber von Eiskrone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31405
-UPDATE `creature_template_locale` SET `Name` = '[Icecrown Bomber Beacon, Horde]' WHERE `locale` = 'deDE' AND `entry` = 31405;
--- OLD name : WotLK City Attacks Ice Block Bunny, BUG TEST
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31405;
+-- OLD name : WotLK City Attacks Ice Block Bunny, BUG TEST (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31415
-UPDATE `creature_template_locale` SET `Name` = '[WotLK City Attacks Ice Block Bunny, BUG TEST]' WHERE `locale` = 'deDE' AND `entry` = 31415;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31415;
 -- OLD subname : Schusswaffenverkäuferin
 -- Source : https://www.wowhead.com/wotlk/de/npc=31423
 UPDATE `creature_template_locale` SET `Title` = 'Schusswaffen & Munition' WHERE `locale` = 'deDE' AND `entry` = 31423;
@@ -6139,54 +7834,54 @@ UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstun
 -- OLD name : Auktionator Thathung
 -- Source : https://www.wowhead.com/wotlk/de/npc=31430
 UPDATE `creature_template_locale` SET `Name` = 'Auktionator Thatung' WHERE `locale` = 'deDE' AND `entry` = 31430;
--- OLD name : Scourge Fight Kill Credit
+-- OLD name : Scourge Fight Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31481
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Fight Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 31481;
--- OLD name : Freundlicher Zauberer aus Dalaran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31481;
+-- OLD name : Freundlicher Zauberer aus Dalaran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31522
-UPDATE `creature_template_locale` SET `Name` = '[Friendly Dalaran Wizard]' WHERE `locale` = 'deDE' AND `entry` = 31522;
--- OLD name : Freundlicher Gladiator aus Dalaran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31522;
+-- OLD name : Freundlicher Gladiator aus Dalaran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31523
-UPDATE `creature_template_locale` SET `Name` = '[Friendly Dalaran Gladiator]' WHERE `locale` = 'deDE' AND `entry` = 31523;
--- OLD name : Arkanist Peridris, subname : Rüstmeister für Ehrenpunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31523;
+-- OLD name : Arkanist Peridris, subname : Rüstmeister für Ehrenpunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31545
-UPDATE `creature_template_locale` SET `Name` = '[Arcanist Peridris]',`Title` = '[Honor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31545;
--- OLD name : Arkanistin Baladrialle, subname : Erfahrene Rüstmeisterin für Ehrenpunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31545;
+-- OLD name : Arkanistin Baladrialle, subname : Erfahrene Rüstmeisterin für Ehrenpunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31549
-UPDATE `creature_template_locale` SET `Name` = '[Arcanist Baladrialle]',`Title` = '[Veteran Honor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31549;
--- OLD name : Magistrix Feyrina, subname : Erfahrene Rüstmeisterin für Ehrenpunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31549;
+-- OLD name : Magistrix Feyrina, subname : Erfahrene Rüstmeisterin für Ehrenpunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31551
-UPDATE `creature_template_locale` SET `Name` = '[Magistrix Feyrina]',`Title` = '[Veteran Honor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31551;
--- OLD name : Magister Saremvir, subname : Rüstmeister für Ehrenpunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31551;
+-- OLD name : Magister Saremvir, subname : Rüstmeister für Ehrenpunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31552
-UPDATE `creature_template_locale` SET `Name` = '[Magister Saremvir]',`Title` = '[Honor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 31552;
--- OLD name : Blight Wagon [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31552;
+-- OLD name : Blight Wagon [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31566
-UPDATE `creature_template_locale` SET `Name` = '[Blight Wagon [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31566;
--- OLD name : Forsaken Chemistry Set [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31566;
+-- OLD name : Forsaken Chemistry Set [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31567
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Chemistry Set [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31567;
--- OLD name : Forsaken Chemistry Set 02 [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31567;
+-- OLD name : Forsaken Chemistry Set 02 [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31568
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Chemistry Set 02 [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31568;
--- OLD name : Plague Barrel [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31568;
+-- OLD name : Plague Barrel [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31569
-UPDATE `creature_template_locale` SET `Name` = '[Plague Barrel [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31569;
--- OLD name : Broken Plague Barrel  [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31569;
+-- OLD name : Broken Plague Barrel  [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31570
-UPDATE `creature_template_locale` SET `Name` = '[Broken Plague Barrel  [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31570;
--- OLD name : Broken Plague Barrel 2 [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31570;
+-- OLD name : Broken Plague Barrel 2 [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31571
-UPDATE `creature_template_locale` SET `Name` = '[Broken Plague Barrel 2 [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31571;
--- OLD name : Verseuchte Kakerlake
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31571;
+-- OLD name : Verseuchte Kakerlake (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31572
-UPDATE `creature_template_locale` SET `Name` = '[Blighted Cockroach]' WHERE `locale` = 'deDE' AND `entry` = 31572;
--- OLD name : Forsaken Fire [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31572;
+-- OLD name : Forsaken Fire [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31573
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Fire [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31573;
--- OLD name : Forsaken Fire Small [Wrath Gate Both] (UC)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31573;
+-- OLD name : Forsaken Fire Small [Wrath Gate Both] (UC) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31574
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Fire Small [Wrath Gate Both] (UC)]' WHERE `locale` = 'deDE' AND `entry` = 31574;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31574;
 -- OLD subname : Emblem der Ehre Rüstmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=31579
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der Ehre' WHERE `locale` = 'deDE' AND `entry` = 31579;
@@ -6199,175 +7894,183 @@ UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der E
 -- OLD subname : Emblem des Heldentums Rüstmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=31582
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Heldentums' WHERE `locale` = 'deDE' AND `entry` = 31582;
--- OLD name : Cosmetic Trigger - Phase 2 - LAB
+-- OLD name : Cosmetic Trigger - Phase 2 - LAB (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31645
-UPDATE `creature_template_locale` SET `Name` = '[Cosmetic Trigger - Phase 2 - LAB]' WHERE `locale` = 'deDE' AND `entry` = 31645;
--- OLD name : Wrath Gate Dummy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31645;
+-- OLD name : Wrath Gate Dummy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31683
-UPDATE `creature_template_locale` SET `Name` = '[Wrath Gate Dummy]' WHERE `locale` = 'deDE' AND `entry` = 31683;
--- OLD name : Bronze Drake
--- Source : https://www.wowhead.com/wotlk/de/npc=31696
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31696;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (31696, 'deDE','[Bronze Drake]',NULL);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31683;
 -- OLD name : Zwielichtdrache
 -- Source : https://www.wowhead.com/wotlk/de/npc=31698
 UPDATE `creature_template_locale` SET `Name` = 'Zwielichtreitdrache' WHERE `locale` = 'deDE' AND `entry` = 31698;
--- OLD name : Schwarzer Reiteisbär
+-- OLD name : Schwarzer Reiteisbär (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31699
-UPDATE `creature_template_locale` SET `Name` = '[Black Polar Bear Mount]' WHERE `locale` = 'deDE' AND `entry` = 31699;
--- OLD name : Brauner Reiteisbär
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31699;
+-- OLD name : Brauner Reiteisbär (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31700
-UPDATE `creature_template_locale` SET `Name` = '[Brown Polar Bear Mount]' WHERE `locale` = 'deDE' AND `entry` = 31700;
--- OLD name : Schwares Reitmammut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31700;
+-- OLD name : Schwares Reitmammut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31703
-UPDATE `creature_template_locale` SET `Name` = '[Black Mammoth Mount]' WHERE `locale` = 'deDE' AND `entry` = 31703;
--- OLD name : Purpurne kosmetische Schlange
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31703;
+-- OLD name : Purpurne kosmetische Schlange (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31712
-UPDATE `creature_template_locale` SET `Name` = '[Cosmetic Crimson Snake]' WHERE `locale` = 'deDE' AND `entry` = 31712;
--- OLD name : Grüne kosmetische Wasserschlange
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31712;
+-- OLD name : Grüne kosmetische Wasserschlange (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31713
-UPDATE `creature_template_locale` SET `Name` = '[Cosmetic Green Water Snake]' WHERE `locale` = 'deDE' AND `entry` = 31713;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31713;
 -- OLD name : Grunzerin Grikee
 -- Source : https://www.wowhead.com/wotlk/de/npc=31727
 UPDATE `creature_template_locale` SET `Name` = 'Grunzer Grikee' WHERE `locale` = 'deDE' AND `entry` = 31727;
--- OLD name : Icy Ghoul KC Bunny
+-- OLD name : Malygos (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=31734
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31734;
+-- OLD name : Icy Ghoul KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31743
-UPDATE `creature_template_locale` SET `Name` = '[Icy Ghoul KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31743;
--- OLD name : Kosmetische Plünderpiñata, subname : Verhaut mich!
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31743;
+-- OLD name : Kosmetische Plünderpiñata, subname : Verhaut mich! (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31744
-UPDATE `creature_template_locale` SET `Name` = '[Cooking Loot Pinata]',`Title` = '[Hit Me!]' WHERE `locale` = 'deDE' AND `entry` = 31744;
--- OLD name : Icecrown Bomber - Bindsight Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31744;
+-- OLD name : Icecrown Bomber - Bindsight Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31745
-UPDATE `creature_template_locale` SET `Name` = '[Icecrown Bomber - Bindsight Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31745;
--- OLD name : King of the Mountain Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31745;
+-- OLD name : King of the Mountain Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31766
-UPDATE `creature_template_locale` SET `Name` = '[King of the Mountain Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 31766;
--- OLD name : Plague Cauldron KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31766;
+-- OLD name : Plague Cauldron KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31767
-UPDATE `creature_template_locale` SET `Name` = '[Plague Cauldron KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31767;
--- OLD name : Cloak Dome Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31767;
+-- OLD name : Cloak Dome Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31777
-UPDATE `creature_template_locale` SET `Name` = '[Cloak Dome Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31777;
--- OLD name : Im Stall abgestelltes Reittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31777;
+-- OLD name : Im Stall abgestelltes Reittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31799
-UPDATE `creature_template_locale` SET `Name` = '[Stabled Mount]' WHERE `locale` = 'deDE' AND `entry` = 31799;
--- OLD name : Im Stall abgestelltes Reittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31799;
+-- OLD name : Im Stall abgestelltes Reittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31800
-UPDATE `creature_template_locale` SET `Name` = '[Stabled Mount]' WHERE `locale` = 'deDE' AND `entry` = 31800;
--- OLD name : Treantverbündeter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31800;
+-- OLD name : Treantverbündeter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31802
-UPDATE `creature_template_locale` SET `Name` = '[Treant Ally]' WHERE `locale` = 'deDE' AND `entry` = 31802;
--- OLD name : Im Stall abgestelltes Reittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31802;
+-- OLD name : Im Stall abgestelltes Reittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31803
-UPDATE `creature_template_locale` SET `Name` = '[Stabled Mount]' WHERE `locale` = 'deDE' AND `entry` = 31803;
--- OLD name : Schneller Hengst von Dalaran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31803;
+-- OLD name : Schneller Hengst von Dalaran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31809
-UPDATE `creature_template_locale` SET `Name` = '[Swift Dalaran Steed]' WHERE `locale` = 'deDE' AND `entry` = 31809;
--- OLD name : Branns Flugmaschine
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31809;
+-- OLD name : Branns Flugmaschine (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31827
-UPDATE `creature_template_locale` SET `Name` = '[Brann''s Flying Machine]' WHERE `locale` = 'deDE' AND `entry` = 31827;
--- OLD name : Slaves to Saronite Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31827;
+-- OLD name : Slaves to Saronite Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31866
-UPDATE `creature_template_locale` SET `Name` = '[Slaves to Saronite Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 31866;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31866;
 -- OLD name : Schrottreifer Verwüster
 -- Source : https://www.wowhead.com/wotlk/de/npc=31868
 UPDATE `creature_template_locale` SET `Name` = 'Defekter Verwüster' WHERE `locale` = 'deDE' AND `entry` = 31868;
--- OLD name : Blitzwespe
+-- OLD name : Blitzwespe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31871
-UPDATE `creature_template_locale` SET `Name` = '[Lighting Wasp (Underbelly Elixer Shapeshift)]' WHERE `locale` = 'deDE' AND `entry` = 31871;
--- OLD name : Indalamars Verkäufer für Splitter eines Steinbewahrers, subname : Tolles Emporium des UNGLAUBLICHEN
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31871;
+-- OLD name : Indalamars Verkäufer für Splitter eines Steinbewahrers, subname : Tolles Emporium des UNGLAUBLICHEN (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31872
-UPDATE `creature_template_locale` SET `Name` = '[Indalamar''s Stone Keeper''s Shard Vendor]',`Title` = '[Emporium of AWESOME]' WHERE `locale` = 'deDE' AND `entry` = 31872;
--- OLD name : Menschenmagier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31872;
+-- OLD name : Menschenmagier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31879
-UPDATE `creature_template_locale` SET `Name` = '[Human Mage (Underbelly Elixir Mirror Effect)]' WHERE `locale` = 'deDE' AND `entry` = 31879;
--- OLD name : Unsichtbarer Pirscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31879;
+-- OLD name : Unsichtbarer Pirscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=31913
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Stalker (Dispersion)]' WHERE `locale` = 'deDE' AND `entry` = 31913;
--- OLD name : Zollinger, Meister der Lehren
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 31913;
+-- OLD name : Zollinger, Meister der Lehren (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32150
-UPDATE `creature_template_locale` SET `Name` = '[Loremaster Zollinger]' WHERE `locale` = 'deDE' AND `entry` = 32150;
--- OLD name : Zwielichtreitdrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32150;
+-- OLD name : Zwielichtreitdrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32165
-UPDATE `creature_template_locale` SET `Name` = '[Twilight Drake Mount (Red)]' WHERE `locale` = 'deDE' AND `entry` = 32165;
--- OLD name : Zwielichtreitdrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32165;
+-- OLD name : Zwielichtreitdrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32166
-UPDATE `creature_template_locale` SET `Name` = '[Twilight Drake Mount (Purple)]' WHERE `locale` = 'deDE' AND `entry` = 32166;
--- OLD name : Risen Skeleton KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32166;
+-- OLD name : Risen Skeleton KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32167
-UPDATE `creature_template_locale` SET `Name` = '[Risen Skeleton KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32167;
--- OLD name : Vicious Geist KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32167;
+-- OLD name : Vicious Geist KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32168
-UPDATE `creature_template_locale` SET `Name` = '[Vicious Geist KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32168;
--- OLD name : Unkillable Test Dummy 80 Warrior
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32168;
+-- OLD name : Unkillable Test Dummy 80 Warrior (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32171
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 80 Warrior]' WHERE `locale` = 'deDE' AND `entry` = 32171;
--- OLD name : Eiskronennekropole
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32171;
+-- OLD name : Eiskronennekropole (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32173
-UPDATE `creature_template_locale` SET `Name` = '[Icecrown Necropolis]' WHERE `locale` = 'deDE' AND `entry` = 32173;
--- OLD name : Teufelsfledermaus von Heb'Drakkar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32173;
+-- OLD name : [DND] Icecrown Airship Bomb (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=32193
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32193;
+-- OLD name : Teufelsfledermaus von Heb'Drakkar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32194
-UPDATE `creature_template_locale` SET `Name` = '[Heb''Drakkar Felbat]' WHERE `locale` = 'deDE' AND `entry` = 32194;
--- OLD name : South Gate KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32194;
+-- OLD name : South Gate KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32195
-UPDATE `creature_template_locale` SET `Name` = '[South Gate KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32195;
--- OLD name : Central Gate KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32195;
+-- OLD name : Central Gate KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32196
-UPDATE `creature_template_locale` SET `Name` = '[Central Gate KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32196;
--- OLD name : North Gate KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32196;
+-- OLD name : North Gate KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32197
-UPDATE `creature_template_locale` SET `Name` = '[North Gate KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32197;
--- OLD name : Geliehene Greif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32197;
+-- OLD name : Geliehene Greif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32198
-UPDATE `creature_template_locale` SET `Name` = '[Loaned Gryphon]' WHERE `locale` = 'deDE' AND `entry` = 32198;
--- OLD name : Northwest Gate KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32198;
+-- OLD name : Northwest Gate KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32199
-UPDATE `creature_template_locale` SET `Name` = '[Northwest Gate KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32199;
--- OLD name : Gemieteter Windreiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32199;
+-- OLD name : Gemieteter Windreiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32208
-UPDATE `creature_template_locale` SET `Name` = '[Loaned Wind Rider]' WHERE `locale` = 'deDE' AND `entry` = 32208;
--- OLD name : Großes Karawanenmammut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32208;
+-- OLD name : Großes Karawanenmammut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32212
-UPDATE `creature_template_locale` SET `Name` = '[Grand Caravan Mammoth]' WHERE `locale` = 'deDE' AND `entry` = 32212;
--- OLD name : Großes Karawanenmammut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32212;
+-- OLD name : Großes Karawanenmammut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32213
-UPDATE `creature_template_locale` SET `Name` = '[Grand Caravan Mammoth]' WHERE `locale` = 'deDE' AND `entry` = 32213;
--- OLD name : Drag Drop KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32213;
+-- OLD name : Drag Drop KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32229
-UPDATE `creature_template_locale` SET `Name` = '[Drag Drop KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32229;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32229;
 -- OLD name : Leerenfürst
 -- Source : https://www.wowhead.com/wotlk/de/npc=32230
 UPDATE `creature_template_locale` SET `Name` = 'Herr der Leere' WHERE `locale` = 'deDE' AND `entry` = 32230;
 -- OLD name : Verkleideter Kreuzfahrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=32241
 UPDATE `creature_template_locale` SET `Name` = 'Verkleideter Kreuzzügler' WHERE `locale` = 'deDE' AND `entry` = 32241;
--- OLD name : Heckenschützenkanone
+-- OLD name : Heckenschützenkanone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32254
-UPDATE `creature_template_locale` SET `Name` = '[Sniper Rifle]' WHERE `locale` = 'deDE' AND `entry` = 32254;
--- OLD name : Writhing Mass KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32254;
+-- OLD name : Writhing Mass KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32266
-UPDATE `creature_template_locale` SET `Name` = '[Writhing Mass KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32266;
--- OLD name : Unruhiges Fragment
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32266;
+-- OLD name : Unruhiges Fragment (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32283
-UPDATE `creature_template_locale` SET `Name` = '[Unquiet Remnant]' WHERE `locale` = 'deDE' AND `entry` = 32283;
--- OLD name : Befreites Fragment
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32283;
+-- OLD name : Befreites Fragment (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32288
-UPDATE `creature_template_locale` SET `Name` = '[Freed Remnant]' WHERE `locale` = 'deDE' AND `entry` = 32288;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32288;
 -- OLD name : Wachposten der Aldur'thar
 -- Source : https://www.wowhead.com/wotlk/de/npc=32292
 UPDATE `creature_template_locale` SET `Name` = 'Späher von Aldur''thar' WHERE `locale` = 'deDE' AND `entry` = 32292;
--- OLD name : Transformation des dunklen Unterwerfers, subname : Kult der Verdammten
+-- OLD name : Transformation des dunklen Unterwerfers, subname : Kult der Verdammten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32293
-UPDATE `creature_template_locale` SET `Name` = '[Dark Subjugator Transform]',`Title` = '[Cult of the Damned]' WHERE `locale` = 'deDE' AND `entry` = 32293;
--- OLD name : Testtotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32293;
+-- OLD name : Testtotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32304
-UPDATE `creature_template_locale` SET `Name` = '[Test Totem]' WHERE `locale` = 'deDE' AND `entry` = 32304;
--- OLD name : Dark Messenger KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32304;
+-- OLD name : Dark Messenger KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32314
-UPDATE `creature_template_locale` SET `Name` = '[Dark Messenger KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32314;
--- OLD name : Raketenturm TF-Xplosiv
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32314;
+-- OLD name : [DND] Dalaran Sewer Arena - Controller - Death (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=32328
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32328;
+-- OLD name : [DND] Dalaran Sewer Arena - Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=32339
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32339;
+-- OLD name : Raketenturm TF-Xplosiv (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32350
-UPDATE `creature_template_locale` SET `Name` = '[TF-Xplosive Rocket Turret]' WHERE `locale` = 'deDE' AND `entry` = 32350;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32350;
 -- OLD name : Zokk "Lulatsch" Drillzang
 -- Source : https://www.wowhead.com/wotlk/de/npc=32355
 UPDATE `creature_template_locale` SET `Name` = 'Bigzokk Drillzang' WHERE `locale` = 'deDE' AND `entry` = 32355;
@@ -6383,18 +8086,18 @@ UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterveteran für Rüstu
 -- OLD subname : Rüstmeisterin für Juwelierskunst
 -- Source : https://www.wowhead.com/wotlk/de/npc=32382
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Juwelenschleifen' WHERE `locale` = 'deDE' AND `entry` = 32382;
--- OLD name : Unteroffizier Kien, subname : Rüstmeister für Juwelierskunst
+-- OLD name : Unteroffizier Kien, subname : Rüstmeister für Juwelierskunst (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32384
-UPDATE `creature_template_locale` SET `Name` = '[Sergeant Kien]',`Title` = '[Jewelcrafting Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 32384;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32384;
 -- OLD subname : Rüstmeisterin für Veteranenrüstungen
 -- Source : https://www.wowhead.com/wotlk/de/npc=32385
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterveteran für Rüstungen' WHERE `locale` = 'deDE' AND `entry` = 32385;
--- OLD name : Kezzik der Meuchler
+-- OLD name : Kezzik der Meuchler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32405
-UPDATE `creature_template_locale` SET `Name` = '[Kezzik the Striker]' WHERE `locale` = 'deDE' AND `entry` = 32405;
--- OLD name : Argex Eisenmagen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32405;
+-- OLD name : Argex Eisenmagen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32407
-UPDATE `creature_template_locale` SET `Name` = '[Argex Irongut]' WHERE `locale` = 'deDE' AND `entry` = 32407;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32407;
 -- OLD name : Wahnsinniger Überlebender von Indu'le
 -- Source : https://www.wowhead.com/wotlk/de/npc=32409
 UPDATE `creature_template_locale` SET `Name` = 'Verrückter Überlebender von Indu''le' WHERE `locale` = 'deDE' AND `entry` = 32409;
@@ -6410,69 +8113,72 @@ UPDATE `creature_template_locale` SET `Title` = 'Barkeeper' WHERE `locale` = 'de
 -- OLD name : Scharlachrote Hochfürstin Daion
 -- Source : https://www.wowhead.com/wotlk/de/npc=32417
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Hochlord Daion' WHERE `locale` = 'deDE' AND `entry` = 32417;
--- OLD name : Iragos
+-- OLD name : Iragos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32432
-UPDATE `creature_template_locale` SET `Name` = '[Iragos]' WHERE `locale` = 'deDE' AND `entry` = 32432;
--- OLD name : Selagosa
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32432;
+-- OLD name : Selagosa (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32433
-UPDATE `creature_template_locale` SET `Name` = '[Selagosa]' WHERE `locale` = 'deDE' AND `entry` = 32433;
--- OLD name : Anygos
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32433;
+-- OLD name : Anygos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32434
-UPDATE `creature_template_locale` SET `Name` = '[Anygos]' WHERE `locale` = 'deDE' AND `entry` = 32434;
--- OLD name : Theragos
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32434;
+-- OLD name : Theragos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32436
-UPDATE `creature_template_locale` SET `Name` = '[Theragos]' WHERE `locale` = 'deDE' AND `entry` = 32436;
--- OLD name : Myragosa
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32436;
+-- OLD name : Myragosa (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32437
-UPDATE `creature_template_locale` SET `Name` = '[Myragosa]' WHERE `locale` = 'deDE' AND `entry` = 32437;
--- OLD name : Zyndragosa
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32437;
+-- OLD name : Zyndragosa (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32439
-UPDATE `creature_template_locale` SET `Name` = '[Zyndragosa]' WHERE `locale` = 'deDE' AND `entry` = 32439;
--- OLD name : Corthegos
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32439;
+-- OLD name : Corthegos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32440
-UPDATE `creature_template_locale` SET `Name` = '[Corthegos]' WHERE `locale` = 'deDE' AND `entry` = 32440;
--- OLD name : Geborgter Besen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32440;
+-- OLD name : Geborgter Besen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32449
-UPDATE `creature_template_locale` SET `Name` = '[Borrowed Broom]' WHERE `locale` = 'deDE' AND `entry` = 32449;
--- OLD name : Fahrzeug des Tals der Verlorenen Hoffnung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32449;
+-- OLD name : Fahrzeug des Tals der Verlorenen Hoffnung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32452
-UPDATE `creature_template_locale` SET `Name` = '[Valley of Lost Hope Vehicle]' WHERE `locale` = 'deDE' AND `entry` = 32452;
--- OLD name : Einwohner von Dalaran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32452;
+-- OLD name : Einwohner von Dalaran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32453
-UPDATE `creature_template_locale` SET `Name` = '[Dalaran Citizen]' WHERE `locale` = 'deDE' AND `entry` = 32453;
--- OLD name : Einwohner von Dalaran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32453;
+-- OLD name : Einwohner von Dalaran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32454
-UPDATE `creature_template_locale` SET `Name` = '[Dalaran Citizen]' WHERE `locale` = 'deDE' AND `entry` = 32454;
--- OLD name : Seuchenbringer der Geißel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32454;
+-- OLD name : Seuchenbringer der Geißel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32473
-UPDATE `creature_template_locale` SET `Name` = '[Scourge Blightbringer]' WHERE `locale` = 'deDE' AND `entry` = 32473;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32473;
 -- OLD subname : Angellehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=32474
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Angelns' WHERE `locale` = 'deDE' AND `entry` = 32474;
--- OLD name : Nerubischer Unterkönig
+-- OLD name : Nerubischer Unterkönig (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32480
-UPDATE `creature_template_locale` SET `Name` = '[Nerubian Underking]' WHERE `locale` = 'deDE' AND `entry` = 32480;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32480;
 -- OLD name : Vollgesogener Seuchenwurm
 -- Source : https://www.wowhead.com/wotlk/de/npc=32483
 UPDATE `creature_template_locale` SET `Name` = 'Verstopfter Seuchenwurm' WHERE `locale` = 'deDE' AND `entry` = 32483;
--- OLD name : Verwundeter Bürger von Dalaran
+-- OLD name : Verwundeter Bürger von Dalaran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32493
-UPDATE `creature_template_locale` SET `Name` = '[Wounded Dalaran]' WHERE `locale` = 'deDE' AND `entry` = 32493;
--- OLD name : Kind aus Dalaran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32493;
+-- OLD name : Kind aus Dalaran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32494
-UPDATE `creature_template_locale` SET `Name` = '[Dalaran Child]' WHERE `locale` = 'deDE' AND `entry` = 32494;
--- OLD name : Torkelnder Zombie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32494;
+-- OLD name : Torkelnder Zombie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32499
-UPDATE `creature_template_locale` SET `Name` = '[Shambling Zombie]' WHERE `locale` = 'deDE' AND `entry` = 32499;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32499;
 -- OLD name : Akolyth der Kultisten
 -- Source : https://www.wowhead.com/wotlk/de/npc=32507
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt der Kultisten' WHERE `locale` = 'deDE' AND `entry` = 32507;
--- OLD name : Davids Testkreatur 1235
+-- OLD name : Davids Testkreatur 1235 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32508
-UPDATE `creature_template_locale` SET `Name` = '[David Test Creature 1235]' WHERE `locale` = 'deDE' AND `entry` = 32508;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32508;
 -- OLD name : Fehlgeschlagenes Experiment
 -- Source : https://www.wowhead.com/wotlk/de/npc=32519
 UPDATE `creature_template_locale` SET `Name` = 'Gescheitertes Experiment' WHERE `locale` = 'deDE' AND `entry` = 32519;
+-- OLD name : Geistheiler (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=32536
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32536;
 -- OLD name : Trainingsattrappe des Initianden
 -- Source : https://www.wowhead.com/wotlk/de/npc=32541
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe des Initianden' WHERE `locale` = 'deDE' AND `entry` = 32541;
@@ -6491,72 +8197,72 @@ UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe des Schwarzritte
 -- OLD name : Nemesislehrer des Hochlords
 -- Source : https://www.wowhead.com/wotlk/de/npc=32547
 UPDATE `creature_template_locale` SET `Name` = 'Nemesisattrappe des Hochlords' WHERE `locale` = 'deDE' AND `entry` = 32547;
--- OLD name : QA Test Dummy 80 Undead, subname : Sandsack der QA
+-- OLD name : QA Test Dummy 80 Undead, subname : Sandsack der QA (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32556
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Undead]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 32556;
--- OLD name : QA Test Dummy 80 Beast, subname : Sandsack der QA
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32556;
+-- OLD name : QA Test Dummy 80 Beast, subname : Sandsack der QA (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32557
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Beast]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 32557;
--- OLD name : QA Test Dummy 80 Dragonkin, subname : Sandsack der QA
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32557;
+-- OLD name : QA Test Dummy 80 Dragonkin, subname : Sandsack der QA (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32558
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Dragonkin]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 32558;
--- OLD name : QA Test Dummy 80 Demon, subname : Sandsack der QA
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32558;
+-- OLD name : QA Test Dummy 80 Demon, subname : Sandsack der QA (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32559
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Demon]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 32559;
--- OLD name : QA Test Dummy 80 Giant, subname : Sandsack der QA
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32559;
+-- OLD name : QA Test Dummy 80 Giant, subname : Sandsack der QA (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32560
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Giant]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 32560;
--- OLD name : QA Test Dummy 80 Elemental, subname : Sandsack der QA
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32560;
+-- OLD name : QA Test Dummy 80 Elemental, subname : Sandsack der QA (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32561
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 80 Elemental]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 32561;
--- OLD name : Roter Reitdrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32561;
+-- OLD name : Roter Reitdrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32563
-UPDATE `creature_template_locale` SET `Name` = '[Red Drake Mount]' WHERE `locale` = 'deDE' AND `entry` = 32563;
--- OLD name : Großartiger fliegender Teppich
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32563;
+-- OLD name : Großartiger fliegender Teppich (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32567
-UPDATE `creature_template_locale` SET `Name` = '[Magnificent Flying Carpet]' WHERE `locale` = 'deDE' AND `entry` = 32567;
--- OLD name : Fliegende schwarze Qirajipanzerdrohne
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32567;
+-- OLD name : Fliegende schwarze Qirajipanzerdrohne (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32568
-UPDATE `creature_template_locale` SET `Name` = '[Flying Black Qiraji Battle Tank]' WHERE `locale` = 'deDE' AND `entry` = 32568;
--- OLD name : Verwandelte schwarze Katze
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32568;
+-- OLD name : Verwandelte schwarze Katze (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32570
-UPDATE `creature_template_locale` SET `Name` = '[Polymorphed Black Cat]' WHERE `locale` = 'deDE' AND `entry` = 32570;
--- OLD name : Testflugmaschine
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32570;
+-- OLD name : Testflugmaschine (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32574
-UPDATE `creature_template_locale` SET `Name` = '[Test Flying Machine]' WHERE `locale` = 'deDE' AND `entry` = 32574;
--- OLD name : Wolvarillusion
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32574;
+-- OLD name : Wolvarillusion (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32584
-UPDATE `creature_template_locale` SET `Name` = '[Wolvar Illusion]' WHERE `locale` = 'deDE' AND `entry` = 32584;
--- OLD name : Blauer Reitprotodrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32584;
+-- OLD name : Blauer Reitprotodrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32585
-UPDATE `creature_template_locale` SET `Name` = '[Riding Protodrake, Blue]' WHERE `locale` = 'deDE' AND `entry` = 32585;
--- OLD name : Bronzefarbener Protodrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32585;
+-- OLD name : Bronzefarbener Protodrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32586
-UPDATE `creature_template_locale` SET `Name` = '[Riding Protodrake, Bronze]' WHERE `locale` = 'deDE' AND `entry` = 32586;
--- OLD name : Hordentestpilot des Bombers von Eiskrone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32586;
+-- OLD name : Hordentestpilot des Bombers von Eiskrone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32607
-UPDATE `creature_template_locale` SET `Name` = '[Icecrown Bomber Horde Test Pilot (DND)]' WHERE `locale` = 'deDE' AND `entry` = 32607;
--- OLD name : Kriegshetzer der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32607;
+-- OLD name : Kriegshetzer der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32615
-UPDATE `creature_template_locale` SET `Name` = '[Horde Warbringer]' WHERE `locale` = 'deDE' AND `entry` = 32615;
--- OLD name : Brigadegeneral der Allianz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32615;
+-- OLD name : Brigadegeneral der Allianz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32626
-UPDATE `creature_template_locale` SET `Name` = '[Alliance Brigadier General]' WHERE `locale` = 'deDE' AND `entry` = 32626;
--- OLD name : Stubengast
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32626;
+-- OLD name : Stubengast (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32632
-UPDATE `creature_template_locale` SET `Name` = '[Parlor Patron]' WHERE `locale` = 'deDE' AND `entry` = 32632;
--- OLD name : Schneller Mondgespinstteppich
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32632;
+-- OLD name : Schneller Mondgespinstteppich (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32634
-UPDATE `creature_template_locale` SET `Name` = '[Swift Mooncloth Carpet]' WHERE `locale` = 'deDE' AND `entry` = 32634;
--- OLD name : Schneller Schwarztuchteppich
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32634;
+-- OLD name : Schneller Schwarztuchteppich (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32635
-UPDATE `creature_template_locale` SET `Name` = '[Swift Shadoweave Carpet]' WHERE `locale` = 'deDE' AND `entry` = 32635;
--- OLD name : Schneller Zaubertuchteppich
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32635;
+-- OLD name : Schneller Zaubertuchteppich (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32636
-UPDATE `creature_template_locale` SET `Name` = '[Swift Spellfire Carpet]' WHERE `locale` = 'deDE' AND `entry` = 32636;
--- OLD name : Fliegender Teppich
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32636;
+-- OLD name : Fliegender Teppich (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32637
-UPDATE `creature_template_locale` SET `Name` = '[Flying Carpet]' WHERE `locale` = 'deDE' AND `entry` = 32637;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32637;
 -- OLD subname : Handelsreisender
 -- Source : https://www.wowhead.com/wotlk/de/npc=32638
 UPDATE `creature_template_locale` SET `Title` = 'Handlungsreisender' WHERE `locale` = 'deDE' AND `entry` = 32638;
@@ -6566,12 +8272,12 @@ UPDATE `creature_template_locale` SET `Title` = 'Handlungsreisender' WHERE `loca
 -- OLD name : Trainingsattrappe der Kriegshymnenfeste
 -- Source : https://www.wowhead.com/wotlk/de/npc=32647
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe der Kriegshymnenfeste' WHERE `locale` = 'deDE' AND `entry` = 32647;
--- OLD name : Tirion's Gambit Event Credit
+-- OLD name : Tirion's Gambit Event Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32648
-UPDATE `creature_template_locale` SET `Name` = '[Tirion''s Gambit Event Credit]' WHERE `locale` = 'deDE' AND `entry` = 32648;
--- OLD name : Gorky, subname : Fliegender Händler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32648;
+-- OLD name : Gorky, subname : Fliegender Händler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32649
-UPDATE `creature_template_locale` SET `Name` = '[Gorky]',`Title` = '[Traveling Salesman]' WHERE `locale` = 'deDE' AND `entry` = 32649;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32649;
 -- OLD name : Trainingsattrappe
 -- Source : https://www.wowhead.com/wotlk/de/npc=32666
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe des Experten' WHERE `locale` = 'deDE' AND `entry` = 32666;
@@ -6614,48 +8320,51 @@ UPDATE `creature_template_locale` SET `Title` = 'Hexenmeisterausrüstung' WHERE 
 -- OLD subname : Kriegerglyphen
 -- Source : https://www.wowhead.com/wotlk/de/npc=32762
 UPDATE `creature_template_locale` SET `Title` = 'Kriegerausrüstung' WHERE `locale` = 'deDE' AND `entry` = 32762;
--- OLD name : Totem der Feuernova IX
+-- OLD name : Totem der Feuernova IX (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32775
-UPDATE `creature_template_locale` SET `Name` = '[Fire Nova Totem IX]' WHERE `locale` = 'deDE' AND `entry` = 32775;
--- OLD name : Totem der Feuernova VIII
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32775;
+-- OLD name : Totem der Feuernova VIII (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32776
-UPDATE `creature_template_locale` SET `Name` = '[Fire Nova Totem VIII]' WHERE `locale` = 'deDE' AND `entry` = 32776;
--- OLD name : Gemeiner Dieb
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32776;
+-- OLD name : Gemeiner Dieb (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32779
-UPDATE `creature_template_locale` SET `Name` = '[Ignoble Thief]' WHERE `locale` = 'deDE' AND `entry` = 32779;
--- OLD name : Nobelgartenhase
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32779;
+-- OLD name : Nobelgartenhase (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32781
-UPDATE `creature_template_locale` SET `Name` = '[Noblegarden Rabbit]' WHERE `locale` = 'deDE' AND `entry` = 32781;
--- OLD name : Nobelgartenhase
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32781;
+-- OLD name : Nobelgartenhase (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32782
-UPDATE `creature_template_locale` SET `Name` = '[Noblegarden Bunny Waypoint]' WHERE `locale` = 'deDE' AND `entry` = 32782;
--- OLD name : Nobelgartenhase
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32782;
+-- OLD name : Nobelgartenhase (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32784
-UPDATE `creature_template_locale` SET `Name` = '[Noblegarden Bunny Controller]' WHERE `locale` = 'deDE' AND `entry` = 32784;
--- OLD name : Verwandelter Hase
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32784;
+-- OLD name : Web Wrap Visual (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=32785
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32785;
+-- OLD name : Verwandelter Hase (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32789
-UPDATE `creature_template_locale` SET `Name` = '[Polymorphed Rabbit]' WHERE `locale` = 'deDE' AND `entry` = 32789;
--- OLD name : Indalamars 83 Testdummy, subname : QA Punching Bag
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32789;
+-- OLD name : Indalamars 83 Testdummy, subname : QA Punching Bag (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32794
-UPDATE `creature_template_locale` SET `Name` = '[Indalamar''s 83 Test Dummy]',`Title` = '[QA Punching Bag]' WHERE `locale` = 'deDE' AND `entry` = 32794;
--- OLD name : Illidan Sturmgrimm Kill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32794;
+-- OLD name : Illidan Sturmgrimm Kill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32797
-UPDATE `creature_template_locale` SET `Name` = '[Illidan Stormrage Kill Credit]' WHERE `locale` = 'deDE' AND `entry` = 32797;
--- OLD name : Frühlingsernter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32797;
+-- OLD name : Frühlingsernter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32798
-UPDATE `creature_template_locale` SET `Name` = '[Spring Gatherer]' WHERE `locale` = 'deDE' AND `entry` = 32798;
--- OLD name : Frühlingssammler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32798;
+-- OLD name : Frühlingssammler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32799
-UPDATE `creature_template_locale` SET `Name` = '[Spring Collector]' WHERE `locale` = 'deDE' AND `entry` = 32799;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32799;
 -- OLD name : Flammenwächter der Boreanischen Tundra (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32801
 UPDATE `creature_template_locale` SET `Name` = 'Flammenwächter der boreanischen Tundra' WHERE `locale` = 'deDE' AND `entry` = 32801;
 -- OLD name : Flammenwächter des Heulenden Fjords (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32804
 UPDATE `creature_template_locale` SET `Name` = 'Flammenwächter des heulenden Fjords' WHERE `locale` = 'deDE' AND `entry` = 32804;
--- OLD name : Flammenbewahrer der Boreanischen Tundra
+-- OLD name : Flammenbewahrer der Boreanischen Tundra (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32809
-UPDATE `creature_template_locale` SET `Name` = '[Borean Tundra Flame Keeper]' WHERE `locale` = 'deDE' AND `entry` = 32809;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32809;
 -- OLD name : Flammenbewahrer des Heulenden Fjords (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32812
 UPDATE `creature_template_locale` SET `Name` = 'Flammenbewahrer des heulenden Fjords' WHERE `locale` = 'deDE' AND `entry` = 32812;
@@ -6665,87 +8374,87 @@ UPDATE `creature_template_locale` SET `Name` = 'Plumper Truthahn' WHERE `locale`
 -- OLD name : Plump Turkey Bunny
 -- Source : https://www.wowhead.com/wotlk/de/npc=32819
 UPDATE `creature_template_locale` SET `Name` = 'Plumper Truthahn' WHERE `locale` = 'deDE' AND `entry` = 32819;
--- OLD name : Revenge for the Vargul Kill Credit Bunny
+-- OLD name : Revenge for the Vargul Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32821
-UPDATE `creature_template_locale` SET `Name` = '[Revenge for the Vargul Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32821;
--- OLD name : Großer Truthahn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32821;
+-- OLD name : Großer Truthahn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32822
-UPDATE `creature_template_locale` SET `Name` = '[Large Turkey (Polymorph)]' WHERE `locale` = 'deDE' AND `entry` = 32822;
--- OLD name : Rustikaler Hocker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32822;
+-- OLD name : Rustikaler Hocker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32826
-UPDATE `creature_template_locale` SET `Name` = '[Sturdy Seat]' WHERE `locale` = 'deDE' AND `entry` = 32826;
--- OLD name : Stuhlhalter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32826;
+-- OLD name : Stuhlhalter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32828
-UPDATE `creature_template_locale` SET `Name` = '[Chair Holder]' WHERE `locale` = 'deDE' AND `entry` = 32828;
--- OLD name : Späher Zar'shi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32828;
+-- OLD name : Späher Zar'shi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32833
-UPDATE `creature_template_locale` SET `Name` = '[Scout Zar''shi]' WHERE `locale` = 'deDE' AND `entry` = 32833;
--- OLD name : Korporal Mondstreich
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32833;
+-- OLD name : Korporal Mondstreich (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32835
-UPDATE `creature_template_locale` SET `Name` = '[Corporal Moonstrike]' WHERE `locale` = 'deDE' AND `entry` = 32835;
--- OLD name : Unkillable Test Dummy 80 Warrior (Bonus Armor)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32835;
+-- OLD name : Unkillable Test Dummy 80 Warrior (Bonus Armor) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32847
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 80 Warrior (Bonus Armor)]' WHERE `locale` = 'deDE' AND `entry` = 32847;
--- OLD name : Untötbare Testdummy 80 S1 Resil-Priester, subname : Priester
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32847;
+-- OLD name : Untötbare Testdummy 80 S1 Resil-Priester, subname : Priester (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32848
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 80 S1 Resil Priest]',`Title` = '[Priest]' WHERE `locale` = 'deDE' AND `entry` = 32848;
--- OLD name : Untötbare Testdummy 80 S1 Resil-Krieger, subname : Krieger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32848;
+-- OLD name : Untötbare Testdummy 80 S1 Resil-Krieger, subname : Krieger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32849
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 80 S1 Resil Warrior]',`Title` = '[Warrior]' WHERE `locale` = 'deDE' AND `entry` = 32849;
--- OLD name : QA Test Dummy 83 Raid Debuff (High Armor)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32849;
+-- OLD name : QA Test Dummy 83 Raid Debuff (High Armor) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32853
-UPDATE `creature_template_locale` SET `Name` = '[QA Test Dummy 83 Raid Debuff (High Armor)]' WHERE `locale` = 'deDE' AND `entry` = 32853;
--- OLD name : Unkillable Test Dummy 83 Warrior (Bonus Armor)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32853;
+-- OLD name : Unkillable Test Dummy 83 Warrior (Bonus Armor) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32854
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 83 Warrior (Bonus Armor)]' WHERE `locale` = 'deDE' AND `entry` = 32854;
--- OLD name : Ronakada, subname : Klingenmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32854;
+-- OLD name : Ronakada, subname : Klingenmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32870
-UPDATE `creature_template_locale` SET `Name` = '[The Real Ronakada]',`Title` = '[Blademaster]' WHERE `locale` = 'deDE' AND `entry` = 32870;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32870;
 -- OLD name : Dunkler Runenakolyth
 -- Source : https://www.wowhead.com/wotlk/de/npc=32886
 UPDATE `creature_template_locale` SET `Name` = 'Dunkler Runenakolyt' WHERE `locale` = 'deDE' AND `entry` = 32886;
--- OLD name : Totem des glühenden Magmas TEST
+-- OLD name : Totem des glühenden Magmas TEST (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32887
-UPDATE `creature_template_locale` SET `Name` = '[Magma Totem TEST]' WHERE `locale` = 'deDE' AND `entry` = 32887;
--- OLD name : Sarahs Schlachtfeldhaudrauf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32887;
+-- OLD name : Sarahs Schlachtfeldhaudrauf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32898
-UPDATE `creature_template_locale` SET `Name` = '[Sarah''s Battleground Bruiser]' WHERE `locale` = 'deDE' AND `entry` = 32898;
--- OLD name : Tollwütiger Truthahn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32898;
+-- OLD name : Tollwütiger Truthahn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32905
-UPDATE `creature_template_locale` SET `Name` = '[Rabid Turkey]' WHERE `locale` = 'deDE' AND `entry` = 32905;
--- OLD name : Dans Testreittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32905;
+-- OLD name : Dans Testreittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32931
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Mount]' WHERE `locale` = 'deDE' AND `entry` = 32931;
--- OLD name : Spektralreitgreif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32931;
+-- OLD name : Spektralreitgreif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32942
-UPDATE `creature_template_locale` SET `Name` = '[Riding Spectral Gryphon (Taxi)]' WHERE `locale` = 'deDE' AND `entry` = 32942;
--- OLD name : Hungriger Tuskarr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32942;
+-- OLD name : Hungriger Tuskarr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32954
-UPDATE `creature_template_locale` SET `Name` = '[Hungry Tuskarr]' WHERE `locale` = 'deDE' AND `entry` = 32954;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32954;
 -- OLD name : Dunkler Runenakolyth
 -- Source : https://www.wowhead.com/wotlk/de/npc=32957
 UPDATE `creature_template_locale` SET `Name` = 'Dunkler Runenakolyt' WHERE `locale` = 'deDE' AND `entry` = 32957;
--- OLD name : Treues Muli
+-- OLD name : Treues Muli (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32980
-UPDATE `creature_template_locale` SET `Name` = '[Faithful Mule]' WHERE `locale` = 'deDE' AND `entry` = 32980;
--- OLD name : Reitgeißelgreif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32980;
+-- OLD name : Reitgeißelgreif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32981
-UPDATE `creature_template_locale` SET `Name` = '[Riding Scourge Gryphon (Taxi)]' WHERE `locale` = 'deDE' AND `entry` = 32981;
--- OLD name : Mietpackmuli
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32981;
+-- OLD name : Mietpackmuli (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32983
-UPDATE `creature_template_locale` SET `Name` = '[Rented Pack Mule]' WHERE `locale` = 'deDE' AND `entry` = 32983;
--- OLD name : Test der Stärke
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32983;
+-- OLD name : Test der Stärke (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=32984
-UPDATE `creature_template_locale` SET `Name` = '[Test of Strength Bunny]' WHERE `locale` = 'deDE' AND `entry` = 32984;
--- OLD name : Männchen oder Weibchen Frostleopard Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 32984;
+-- OLD name : Männchen oder Weibchen Frostleopard Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33005
-UPDATE `creature_template_locale` SET `Name` = '[Tails Up Frost Leopard Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 33005;
--- OLD name : Männchen oder Weibchen Eispfotenbär Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33005;
+-- OLD name : Männchen oder Weibchen Eispfotenbär Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33006
-UPDATE `creature_template_locale` SET `Name` = '[Tails Up Icepaw Bear Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 33006;
--- OLD name : Justin Testfahrzeug A
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33006;
+-- OLD name : Justin Testfahrzeug A (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33014
-UPDATE `creature_template_locale` SET `Name` = '[Justin Test Vehicle A]' WHERE `locale` = 'deDE' AND `entry` = 33014;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33014;
 -- OLD name : Schwelendes Skelett
 -- Source : https://www.wowhead.com/wotlk/de/npc=33016
 UPDATE `creature_template_locale` SET `Name` = 'Glimmendes Skelett' WHERE `locale` = 'deDE' AND `entry` = 33016;
@@ -6755,187 +8464,240 @@ UPDATE `creature_template_locale` SET `Name` = 'Glimmendes Konstrukt' WHERE `loc
 -- OLD subname : Hochprozentiges
 -- Source : https://www.wowhead.com/wotlk/de/npc=33026
 UPDATE `creature_template_locale` SET `Title` = 'Alkohol' WHERE `locale` = 'deDE' AND `entry` = 33026;
--- OLD name : Glühwürmchen
+-- OLD name : Glühwürmchen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33032
-UPDATE `creature_template_locale` SET `Name` = '[Firefly (Purple)]' WHERE `locale` = 'deDE' AND `entry` = 33032;
--- OLD name : ELM General Purpose Bunny Large (scale x5)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33032;
+-- OLD name : ELM General Purpose Bunny Large (scale x5) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33045
-UPDATE `creature_template_locale` SET `Name` = '[ELM General Purpose Bunny Large (scale x5)]' WHERE `locale` = 'deDE' AND `entry` = 33045;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33045;
+-- OLD name : [ph] justin test backstab target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33049
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33049;
 -- OLD name : Instabiler Sonnenstrahl
 -- Source : https://www.wowhead.com/wotlk/de/npc=33050
 UPDATE `creature_template_locale` SET `Name` = 'Unstabiler Sonnenstrahl' WHERE `locale` = 'deDE' AND `entry` = 33050;
--- OLD name : Schrottreifer Feuerstuhl
+-- OLD name : Schrottreifer Feuerstuhl (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33061
-UPDATE `creature_template_locale` SET `Name` = '[Wrecked Mechano-hog]' WHERE `locale` = 'deDE' AND `entry` = 33061;
--- OLD name : Frizzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33061;
+-- OLD name : Frizzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33064
-UPDATE `creature_template_locale` SET `Name` = '[Frizzer]' WHERE `locale` = 'deDE' AND `entry` = 33064;
--- OLD name : Haudrauf von Dunkelmond
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33064;
+-- OLD name : Haudrauf von Dunkelmond (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33069
-UPDATE `creature_template_locale` SET `Name` = '[Darkmoon Bruiser]' WHERE `locale` = 'deDE' AND `entry` = 33069;
--- OLD name : Unkillable Test Dummy 87 Warrior Sessile
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33069;
+-- OLD name : Unkillable Test Dummy 87 Warrior Sessile (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33073
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 83 Warrior Sessile]' WHERE `locale` = 'deDE' AND `entry` = 33073;
--- OLD name : Belagerungsturm der Kriegshymnenschlucht
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33073;
+-- OLD name : Belagerungsturm der Kriegshymnenschlucht (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33080
-UPDATE `creature_template_locale` SET `Name` = '[Warsong Siege Turret]' WHERE `locale` = 'deDE' AND `entry` = 33080;
--- OLD name : Panzerziel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33080;
+-- OLD name : Panzerziel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33081
-UPDATE `creature_template_locale` SET `Name` = '[Tonk Cannon Target]' WHERE `locale` = 'deDE' AND `entry` = 33081;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33081;
 -- OLD name : Dunkler Runenakolyth
 -- Source : https://www.wowhead.com/wotlk/de/npc=33110
 UPDATE `creature_template_locale` SET `Name` = 'Dunkler Runenakolyt' WHERE `locale` = 'deDE' AND `entry` = 33110;
--- OLD name : Eisernes Konstrukt (Magma)
+-- OLD name : Eisernes Konstrukt (Magma) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33122
-UPDATE `creature_template_locale` SET `Name` = '[Iron Construct (Magma Visual)]' WHERE `locale` = 'deDE' AND `entry` = 33122;
--- OLD name : Puppenspieler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33122;
+-- OLD name : Puppenspieler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33128
-UPDATE `creature_template_locale` SET `Name` = '[Puppeteer]' WHERE `locale` = 'deDE' AND `entry` = 33128;
--- OLD name : Gnompuppe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33128;
+-- OLD name : Gnompuppe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33129
-UPDATE `creature_template_locale` SET `Name` = '[Gnome Puppet]' WHERE `locale` = 'deDE' AND `entry` = 33129;
--- OLD name : Puppenhand
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33129;
+-- OLD name : Tjostpferd (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33130
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33130;
+-- OLD name : Tjostritter (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33135
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33135;
+-- OLD name : Puppenhand (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33137
-UPDATE `creature_template_locale` SET `Name` = '[Puppet Hand]' WHERE `locale` = 'deDE' AND `entry` = 33137;
--- OLD name : Verwüsterkontrollkonsole
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33137;
+-- OLD name : Verwüsterkontrollkonsole (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33146
-UPDATE `creature_template_locale` SET `Name` = '[Demolisher Engineering Console (Old)]' WHERE `locale` = 'deDE' AND `entry` = 33146;
--- OLD name : Granatenkiste
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33146;
+-- OLD name : Klingenschuppenharpunenkanone (unbenutzt) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33184
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33184;
+-- OLD name : Granatenkiste (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33185
-UPDATE `creature_template_locale` SET `Name` = '[Grenade Crate]' WHERE `locale` = 'deDE' AND `entry` = 33185;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33185;
 -- OLD name : Flüssiges Pyrit
 -- Source : https://www.wowhead.com/wotlk/de/npc=33189
 UPDATE `creature_template_locale` SET `Name` = 'Flüssiger Pyrit' WHERE `locale` = 'deDE' AND `entry` = 33189;
--- OLD name : Geißelmelder von Eiskrone
+-- OLD name : Geißelmelder von Eiskrone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33192
-UPDATE `creature_template_locale` SET `Name` = '[Icecrown Scourge Proxy]' WHERE `locale` = 'deDE' AND `entry` = 33192;
--- OLD name : Schwarzer Knappe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33192;
+-- OLD name : Schwarzer Knappe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33240
-UPDATE `creature_template_locale` SET `Name` = '[Ebon Squire [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33240;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33240;
 -- OLD name : Klingenschuppe-Spawner
 -- Source : https://www.wowhead.com/wotlk/de/npc=33245
 UPDATE `creature_template_locale` SET `Name` = 'Klingenschuppen Spawner' WHERE `locale` = 'deDE' AND `entry` = 33245;
--- OLD name : Krieger der Eisenzwerge
+-- OLD name : Krieger der Eisenzwerge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33246
-UPDATE `creature_template_locale` SET `Name` = '[Iron Dwarf Warrior [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33246;
--- OLD name : Machtwort: Barriere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33246;
+-- OLD name : Machtwort: Barriere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33248
-UPDATE `creature_template_locale` SET `Name` = '[Power Word: Barrier]' WHERE `locale` = 'deDE' AND `entry` = 33248;
--- OLD name : Todesritterlehrer und Runenschmiede
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33248;
+-- OLD name : Todesritterlehrer und Runenschmiede (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33251
-UPDATE `creature_template_locale` SET `Name` = '[Death Knight Trainer and Runeforge]' WHERE `locale` = 'deDE' AND `entry` = 33251;
--- OLD name : Titansturmlord
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33251;
+-- OLD name : [DND] TAR Pedestal - Trainer, Death Knight (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33252
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33252;
+-- OLD name : Titansturmlord (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33255
-UPDATE `creature_template_locale` SET `Name` = '[Titanium Stormlord]' WHERE `locale` = 'deDE' AND `entry` = 33255;
--- OLD name : Jacqueline Aschebäscha, subname : Die süßeste aller Aschebäschas
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33255;
+-- OLD name : Jacqueline Aschebäscha, subname : Die süßeste aller Aschebäschas (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33290
-UPDATE `creature_template_locale` SET `Name` = '[Jillian McWeaksauce]',`Title` = '[The Cutest McWeaksauce]' WHERE `locale` = 'deDE' AND `entry` = 33290;
--- OLD name : Ross aus Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33290;
+-- OLD name : Ross aus Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33297
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind Steed]' WHERE `locale` = 'deDE' AND `entry` = 33297;
--- OLD name : Roboschreiter aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33297;
+-- OLD name : Roboschreiter aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33301
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Mechanostrider]' WHERE `locale` = 'deDE' AND `entry` = 33301;
--- OLD name : Gerome der Gnom
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33301;
+-- OLD name : [DND] Tournament - TEST NPC (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33305
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33305;
+-- OLD name : Gerome der Gnom (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33314
-UPDATE `creature_template_locale` SET `Name` = '[Gerome the Gnome]' WHERE `locale` = 'deDE' AND `entry` = 33314;
--- OLD name : Morgan Test
--- Source : https://www.wowhead.com/wotlk/de/npc=33351
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33351;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (33351, 'deDE','[Morgan Test]',NULL);
--- OLD name : "Spektraltiger"
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33314;
+-- OLD name : [DND] Tournament - Ranged Target Dummy - Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33339
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33339;
+-- OLD name : [DND] Tournament - Mounted Melee - Target Dummy - Charge Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33340
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33340;
+-- OLD name : [DND] Tournament - Mounted Melee - Target Dummy - Block Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33341
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33341;
+-- OLD name : "Spektraltiger" (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33357
-UPDATE `creature_template_locale` SET `Name` = '["Spectral Tiger"]' WHERE `locale` = 'deDE' AND `entry` = 33357;
--- OLD name : Hammervehikel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33357;
+-- OLD name : Hammervehikel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33380
-UPDATE `creature_template_locale` SET `Name` = '[Hammer Vehicle [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33380;
--- OLD name : Widder aus Eisenschmiede
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33380;
+-- OLD name : Widder aus Eisenschmiede (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33408
-UPDATE `creature_template_locale` SET `Name` = '[Ironforge Ram]' WHERE `locale` = 'deDE' AND `entry` = 33408;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33408;
+-- OLD name : [ph] Tournament War Elekk - NPC Only (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33415
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33415;
 -- OLD name : Falkenschreiter von Silbermond
 -- Source : https://www.wowhead.com/wotlk/de/npc=33418
 UPDATE `creature_template_locale` SET `Name` = 'Falkenschreiter aus Silbermond' WHERE `locale` = 'deDE' AND `entry` = 33418;
--- OLD name : Hordenmagier
+-- OLD name : Hordenmagier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33425
-UPDATE `creature_template_locale` SET `Name` = '[Horde Engineer [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33425;
--- OLD name : Drachenführer der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33425;
+-- OLD name : Drachenführer der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33426
-UPDATE `creature_template_locale` SET `Name` = '[Horde Dragon Handler [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33426;
--- OLD name : Streiter von Orgrimmar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33426;
+-- OLD name : [ph] Tournament War Kodo - NPC Only (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33450
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33450;
+-- OLD name : Streiter von Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33461
-UPDATE `creature_template_locale` SET `Name` = '[Orgrimmar Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33461;
--- OLD name : Streiter von Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33461;
+-- OLD name : Streiter von Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33464
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33464;
--- OLD name : Streiter von Silbermond
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33464;
+-- OLD name : Streiter von Silbermond (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33466
-UPDATE `creature_template_locale` SET `Name` = '[Silvermoon Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33466;
--- OLD name : Streiter von Unterstadt
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33466;
+-- OLD name : Streiter von Unterstadt (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33470
-UPDATE `creature_template_locale` SET `Name` = '[Undercity Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33470;
--- OLD name : Champion von Donnerfels
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33470;
+-- OLD name : Champion von Donnerfels (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33471
-UPDATE `creature_template_locale` SET `Name` = '[Thunder Bluff Champion]' WHERE `locale` = 'deDE' AND `entry` = 33471;
--- OLD name : Streiter von Donnerfels
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33471;
+-- OLD name : Streiter von Donnerfels (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33472
-UPDATE `creature_template_locale` SET `Name` = '[Thunder Bluff Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33472;
--- OLD name : Streiter von Sen'jin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33472;
+-- OLD name : Streiter von Sen'jin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33475
-UPDATE `creature_template_locale` SET `Name` = '[Sen''jin Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33475;
--- OLD name : Streiter von Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33475;
+-- OLD name : Streiter von Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33478
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33478;
--- OLD name : Streiter von Eisenschmiede
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33478;
+-- OLD name : Streiter von Eisenschmiede (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33482
-UPDATE `creature_template_locale` SET `Name` = '[Ironforge Aspirant]' WHERE `locale` = 'deDE' AND `entry` = 33482;
--- OLD name : Zähmbarer Kernhund
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33482;
+-- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 01 - Weak Guy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33489
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33489;
+-- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 02 -Speedy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33490
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33490;
+-- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 03 - Block Guy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33491
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33491;
+-- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 04 - Strong Guy (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33492
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33492;
+-- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 05 - Ultimate (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33493
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33493;
+-- OLD name : [ph] Tournament - Daily Combatant Summoner (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33501
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33501;
+-- OLD name : Zähmbarer Kernhund (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33502
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Core Hound]' WHERE `locale` = 'deDE' AND `entry` = 33502;
--- OLD name : Kommandant der Horde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33502;
+-- OLD name : Kommandant der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33503
-UPDATE `creature_template_locale` SET `Name` = '[Horde Commander [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33503;
--- OLD name : Zähmbare Schimäre
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33503;
+-- OLD name : Zähmbare Schimäre (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33504
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Chimaera]' WHERE `locale` = 'deDE' AND `entry` = 33504;
--- OLD name : Zähmbarer Teufelssaurier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33504;
+-- OLD name : Zähmbarer Teufelssaurier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33505
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Devilsaur]' WHERE `locale` = 'deDE' AND `entry` = 33505;
--- OLD name : Zähmbares Rhinozeros
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33505;
+-- OLD name : Zähmbares Rhinozeros (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33506
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Rhino]' WHERE `locale` = 'deDE' AND `entry` = 33506;
--- OLD name : Zähmbarer Silithid
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33506;
+-- OLD name : Zähmbarer Silithid (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33508
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Silithid]' WHERE `locale` = 'deDE' AND `entry` = 33508;
--- OLD name : Zähmbare Geisterbestie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33508;
+-- OLD name : Zähmbare Geisterbestie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33510
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Spirit Beast]' WHERE `locale` = 'deDE' AND `entry` = 33510;
--- OLD name : Zähmbarer Wurm
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33510;
+-- OLD name : Zähmbarer Wurm (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33511
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Worm]' WHERE `locale` = 'deDE' AND `entry` = 33511;
--- OLD name : Gepanzerter schwarzer Greif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33511;
+-- OLD name : Gepanzerter schwarzer Greif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33517
-UPDATE `creature_template_locale` SET `Name` = '[Armored Ebon Gryphon]' WHERE `locale` = 'deDE' AND `entry` = 33517;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33517;
+-- OLD name : [ph] Tournament - Mounted Combatant - Valiant Test (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33520
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33520;
+-- OLD name : [ph] Tournament - Mounted Combatant - Champion Test (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33521
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33521;
 -- OLD name : Neugieriges Gorlocjunges
 -- Source : https://www.wowhead.com/wotlk/de/npc=33530
 UPDATE `creature_template_locale` SET `Name` = 'Neugieriges Orakeljunges' WHERE `locale` = 'deDE' AND `entry` = 33530;
--- OLD name : Wolvarwaisenkind
+-- OLD name : Wolvarwaisenkind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33532
-UPDATE `creature_template_locale` SET `Name` = '[Wolvar Orphan]' WHERE `locale` = 'deDE' AND `entry` = 33532;
--- OLD name : Orakelwaisenkind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33532;
+-- OLD name : Orakelwaisenkind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33533
-UPDATE `creature_template_locale` SET `Name` = '[Oracle Orphan]' WHERE `locale` = 'deDE' AND `entry` = 33533;
--- OLD name : Zuverlässiges Streitross aus Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33533;
+-- OLD name : Zuverlässiges Streitross aus Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33551
-UPDATE `creature_template_locale` SET `Name` = '[Trusty Stormwind Charger [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33551;
--- OLD name : Champion von Darnassus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33551;
+-- OLD name : Champion von Darnassus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33563
-UPDATE `creature_template_locale` SET `Name` = '[Darnassus Champion]' WHERE `locale` = 'deDE' AND `entry` = 33563;
--- OLD name : Fisch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33563;
+-- OLD name : Fisch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33568
-UPDATE `creature_template_locale` SET `Name` = '[Fish]' WHERE `locale` = 'deDE' AND `entry` = 33568;
--- OLD name : Bernau Test Dummy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33568;
+-- OLD name : Bernau Test Dummy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33570
-UPDATE `creature_template_locale` SET `Name` = '[Bernau Test Dummy]' WHERE `locale` = 'deDE' AND `entry` = 33570;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33570;
 -- OLD subname : Schneiderlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=33580
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schneiderei' WHERE `locale` = 'deDE' AND `entry` = 33580;
@@ -6969,9 +8731,9 @@ UPDATE `creature_template_locale` SET `Title` = 'Juweliersbedarf' WHERE `locale`
 -- OLD subname : Inschriftenkundelehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=33603
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Inschriftenkunde' WHERE `locale` = 'deDE' AND `entry` = 33603;
--- OLD name : Hochlord Tirion Fordring
+-- OLD name : Hochlord Tirion Fordring (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33628
-UPDATE `creature_template_locale` SET `Name` = '[Highlord Tirion Fordring]' WHERE `locale` = 'deDE' AND `entry` = 33628;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33628;
 -- OLD subname : Alchemielehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=33630
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer' WHERE `locale` = 'deDE' AND `entry` = 33630;
@@ -7005,21 +8767,21 @@ UPDATE `creature_template_locale` SET `Title` = 'Bergbaumeisterlehrer' WHERE `lo
 -- OLD subname : Kürschnerlehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=33641
 UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrer' WHERE `locale` = 'deDE' AND `entry` = 33641;
--- OLD name : Flickwerk
+-- OLD name : Flickwerk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33663
-UPDATE `creature_template_locale` SET `Name` = '[Patchwerk (PTR DPS Test)]' WHERE `locale` = 'deDE' AND `entry` = 33663;
--- OLD name : Ursula Aschebäscha, subname : Händlerin für "Über"hemden
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33663;
+-- OLD name : Ursula Aschebäscha, subname : Händlerin für "Über"hemden (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33665
-UPDATE `creature_template_locale` SET `Name` = '[Ursula McWeaksauce]',`Title` = '[Shirt of Uber Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33665;
--- OLD name : Flickwerk
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33665;
+-- OLD name : Flickwerk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33667
-UPDATE `creature_template_locale` SET `Name` = '[Patchwerk (PTR Tank Test)]' WHERE `locale` = 'deDE' AND `entry` = 33667;
--- OLD name : Kriecherreittier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33667;
+-- OLD name : Kriecherreittier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33671
-UPDATE `creature_template_locale` SET `Name` = '[Crawler Mount]' WHERE `locale` = 'deDE' AND `entry` = 33671;
--- OLD name : Pengoro, subname : Prinz der Pinguine
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33671;
+-- OLD name : Pengoro, subname : Prinz der Pinguine (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33673
-UPDATE `creature_template_locale` SET `Name` = '[Pengoro]',`Title` = '[Prince of Penguins]' WHERE `locale` = 'deDE' AND `entry` = 33673;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33673;
 -- OLD subname : Alchemielehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=33674
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer' WHERE `locale` = 'deDE' AND `entry` = 33674;
@@ -7053,171 +8815,177 @@ UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrer' WHERE 
 -- OLD name : Weberin Aoa, subname : Schneiderlehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=33684
 UPDATE `creature_template_locale` SET `Name` = 'Weber Aoa',`Title` = 'Schneidermeisterlehrer' WHERE `locale` = 'deDE' AND `entry` = 33684;
--- OLD name : James Barlo, subname : Meister des Angelns
+-- OLD name : James Barlo, subname : Meister des Angelns (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33685
-UPDATE `creature_template_locale` SET `Name` = '[James Barlo]',`Title` = '[Master of Fishing]' WHERE `locale` = 'deDE' AND `entry` = 33685;
--- OLD name : Argent Champion Credit (Valiant Test), subname : A.L.K.
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33685;
+-- OLD name : Argent Champion Credit (Valiant Test), subname : A.L.K. (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33708
-UPDATE `creature_template_locale` SET `Name` = '[Argent Champion Credit (Valiant Test)]',`Title` = '[S.T.O.U.T.]' WHERE `locale` = 'deDE' AND `entry` = 33708;
--- OLD name : Bronzekonsort
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33708;
+-- OLD name : Bronzekonsort (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33718
-UPDATE `creature_template_locale` SET `Name` = '[Bronze Consort]' WHERE `locale` = 'deDE' AND `entry` = 33718;
--- OLD name : Entweihter Boden II
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33718;
+-- OLD name : Entweihter Boden II (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33751
-UPDATE `creature_template_locale` SET `Name` = '[Desecrated Ground II]' WHERE `locale` = 'deDE' AND `entry` = 33751;
--- OLD name : Entweihter Boden III
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33751;
+-- OLD name : Entweihter Boden III (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33752
-UPDATE `creature_template_locale` SET `Name` = '[Desecrated Ground III]' WHERE `locale` = 'deDE' AND `entry` = 33752;
--- OLD name : Entweihter Boden IV
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33752;
+-- OLD name : Entweihter Boden IV (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33753
-UPDATE `creature_template_locale` SET `Name` = '[Desecrated Ground IV]' WHERE `locale` = 'deDE' AND `entry` = 33753;
--- OLD name : Abbild des Ältesten Hellblatt
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33753;
+-- OLD name : Abbild des Ältesten Hellblatt (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33761
-UPDATE `creature_template_locale` SET `Name` = '[Elder Brightleaf Image]' WHERE `locale` = 'deDE' AND `entry` = 33761;
--- OLD name : OCL Testkreatur
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33761;
+-- OLD name : OCL Testkreatur (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33764
-UPDATE `creature_template_locale` SET `Name` = '[OCL Test Creature]' WHERE `locale` = 'deDE' AND `entry` = 33764;
--- OLD name : Todesstreitross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33764;
+-- OLD name : Todesstreitross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33783
-UPDATE `creature_template_locale` SET `Name` = '[Deathcharger]' WHERE `locale` = 'deDE' AND `entry` = 33783;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33783;
+-- OLD name : Testturnierstreitross (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33784
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33784;
 -- OLD subname : Der Zirkel des Cenarius
 -- Source : https://www.wowhead.com/wotlk/de/npc=33788
 UPDATE `creature_template_locale` SET `Title` = 'Zirkel des Cenarius' WHERE `locale` = 'deDE' AND `entry` = 33788;
--- OLD name : Verteidiger der Horde
+-- OLD name : Verteidiger der Horde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33805
-UPDATE `creature_template_locale` SET `Name` = '[Horde Defender [PH]]' WHERE `locale` = 'deDE' AND `entry` = 33805;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33805;
 -- OLD name : Rubble Stalker Kologarn
 -- Source : https://www.wowhead.com/wotlk/de/npc=33809
 UPDATE `creature_template_locale` SET `Name` = 'Geröllpirscher Kologarn' WHERE `locale` = 'deDE' AND `entry` = 33809;
+-- OLD name : Mimiron Fokuspunkte (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=33835
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33835;
 -- OLD name : Streitross der Quel'dorei
 -- Source : https://www.wowhead.com/wotlk/de/npc=33840
 UPDATE `creature_template_locale` SET `Name` = 'Ross der Quel''dorei' WHERE `locale` = 'deDE' AND `entry` = 33840;
--- OLD name : Abbild des Ältesten Eisenast
+-- OLD name : Abbild des Ältesten Eisenast (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33861
-UPDATE `creature_template_locale` SET `Name` = '[Elder Ironbranch Image]' WHERE `locale` = 'deDE' AND `entry` = 33861;
--- OLD name : Abbild des Ältesten Steinrinde
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33861;
+-- OLD name : Abbild des Ältesten Steinrinde (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33862
-UPDATE `creature_template_locale` SET `Name` = '[Elder Stonebark Image]' WHERE `locale` = 'deDE' AND `entry` = 33862;
--- OLD name : Argentumschlachtross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33862;
+-- OLD name : Argentumschlachtross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33863
-UPDATE `creature_template_locale` SET `Name` = '[Argent Warhorse]' WHERE `locale` = 'deDE' AND `entry` = 33863;
--- OLD name : Relga, subname : Erfrischungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33863;
+-- OLD name : Relga, subname : Erfrischungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33867
-UPDATE `creature_template_locale` SET `Name` = '[Relga]',`Title` = '[Refreshments]' WHERE `locale` = 'deDE' AND `entry` = 33867;
--- OLD name : Abbild von Freya
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33867;
+-- OLD name : Abbild von Freya (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33876
-UPDATE `creature_template_locale` SET `Name` = '[Freya Image]' WHERE `locale` = 'deDE' AND `entry` = 33876;
--- OLD name : Abbild von Sif
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33876;
+-- OLD name : Abbild von Sif (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33877
-UPDATE `creature_template_locale` SET `Name` = '[Sif Image]' WHERE `locale` = 'deDE' AND `entry` = 33877;
--- OLD name : Abbild von Thorim
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33877;
+-- OLD name : Abbild von Thorim (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33878
-UPDATE `creature_template_locale` SET `Name` = '[Thorim Image]' WHERE `locale` = 'deDE' AND `entry` = 33878;
--- OLD name : Abbild von Hodir
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33878;
+-- OLD name : Abbild von Hodir (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33879
-UPDATE `creature_template_locale` SET `Name` = '[Hodir Image]' WHERE `locale` = 'deDE' AND `entry` = 33879;
--- OLD name : Abbild von Mimiron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33879;
+-- OLD name : Abbild von Mimiron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33880
-UPDATE `creature_template_locale` SET `Name` = '[Mimiron Image]' WHERE `locale` = 'deDE' AND `entry` = 33880;
--- OLD name : Yogg-Saron (Nur Transformation)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33880;
+-- OLD name : Yogg-Saron (Nur Transformation) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33883
-UPDATE `creature_template_locale` SET `Name` = '[Yogg-Saron (Transform Only)]' WHERE `locale` = 'deDE' AND `entry` = 33883;
--- OLD name : Argex Eisenmagen, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33883;
+-- OLD name : Argex Eisenmagen, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33915
-UPDATE `creature_template_locale` SET `Name` = '[Argex Irongut]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33915;
--- OLD name : Zokk "Lulatsch" Drillzang, subname : Arenaverkäufer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33915;
+-- OLD name : Zokk "Lulatsch" Drillzang, subname : Arenaverkäufer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33916
-UPDATE `creature_template_locale` SET `Name` = '[Big Zokk Torquewrench]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33916;
--- OLD name : Ecton Messingkipper, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33916;
+-- OLD name : Ecton Messingkipper, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33917
-UPDATE `creature_template_locale` SET `Name` = '[Ecton Brasstumbler]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33917;
--- OLD name : Kezzik der Meuchler, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33917;
+-- OLD name : Kezzik der Meuchler, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33918
-UPDATE `creature_template_locale` SET `Name` = '[Kezzik the Striker]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33918;
--- OLD name : Leeni "Kicher" Erbse, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33918;
+-- OLD name : Leeni "Kicher" Erbse, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33919
-UPDATE `creature_template_locale` SET `Name` = '[Leeni "Smiley" Smalls]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33919;
--- OLD name : Evee Kupferspule, subname : Arenaverkäuferin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33919;
+-- OLD name : Evee Kupferspule, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33920
-UPDATE `creature_template_locale` SET `Name` = '[Evee Copperspring]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33920;
--- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33920;
+-- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33921
-UPDATE `creature_template_locale` SET `Name` = '[Nargle Lashcord]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33921;
--- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33921;
+-- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33922
-UPDATE `creature_template_locale` SET `Name` = '[Xazi Smolderpipe]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33922;
--- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33922;
+-- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33923
-UPDATE `creature_template_locale` SET `Name` = '[Zom Bocom]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33923;
--- OLD name : Argex Eisenmagen, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33923;
+-- OLD name : Argex Eisenmagen, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33924
-UPDATE `creature_template_locale` SET `Name` = '[Argex Irongut]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33924;
--- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33924;
+-- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33925
-UPDATE `creature_template_locale` SET `Name` = '[Zom Bocom]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33925;
--- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33925;
+-- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33926
-UPDATE `creature_template_locale` SET `Name` = '[Xazi Smolderpipe]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33926;
--- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33926;
+-- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33927
-UPDATE `creature_template_locale` SET `Name` = '[Nargle Lashcord]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33927;
--- OLD name : Evee Kupferspule, subname : Arenaverkäuferin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33927;
+-- OLD name : Evee Kupferspule, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33928
-UPDATE `creature_template_locale` SET `Name` = '[Evee Copperspring]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33928;
--- OLD name : Ecton Messingkipper, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33928;
+-- OLD name : Ecton Messingkipper, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33929
-UPDATE `creature_template_locale` SET `Name` = '[Ecton Brasstumbler]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33929;
--- OLD name : Leeni "Kicher" Erbse, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33929;
+-- OLD name : Leeni "Kicher" Erbse, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33930
-UPDATE `creature_template_locale` SET `Name` = '[Leeni "Smiley" Smalls]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33930;
--- OLD name : Kezzik der Meuchler, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33930;
+-- OLD name : Kezzik der Meuchler, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33931
-UPDATE `creature_template_locale` SET `Name` = '[Kezzik the Striker]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33931;
--- OLD name : Zokk "Lulatsch" Drillzang, subname : Arenaverkäufer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33931;
+-- OLD name : Zokk "Lulatsch" Drillzang, subname : Arenaverkäufer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33932
-UPDATE `creature_template_locale` SET `Name` = '[Big Zokk Torquewrench]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33932;
--- OLD name : Zokk "Lulatsch" Drillzang, subname : Arenaverkäufer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33932;
+-- OLD name : Zokk "Lulatsch" Drillzang, subname : Arenaverkäufer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33933
-UPDATE `creature_template_locale` SET `Name` = '[Big Zokk Torquewrench]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33933;
--- OLD name : Ecton Messingkipper, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33933;
+-- OLD name : Ecton Messingkipper, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33934
-UPDATE `creature_template_locale` SET `Name` = '[Ecton Brasstumbler]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33934;
--- OLD name : Evee Kupferspule, subname : Arenaverkäuferin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33934;
+-- OLD name : Evee Kupferspule, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33935
-UPDATE `creature_template_locale` SET `Name` = '[Evee Copperspring]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33935;
--- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33935;
+-- OLD name : Nargel Peitschleine, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33936
-UPDATE `creature_template_locale` SET `Name` = '[Nargle Lashcord]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33936;
--- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33936;
+-- OLD name : Xazi Schmauchpfeife, subname : Arenaverkäuferin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33937
-UPDATE `creature_template_locale` SET `Name` = '[Xazi Smolderpipe]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33937;
--- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33937;
+-- OLD name : Zom Bocom, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33938
-UPDATE `creature_template_locale` SET `Name` = '[Zom Bocom]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33938;
--- OLD name : Argex Eisenmagen, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33938;
+-- OLD name : Argex Eisenmagen, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33939
-UPDATE `creature_template_locale` SET `Name` = '[Argex Irongut]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33939;
--- OLD name : Kezzik der Meuchler, subname : Arenaverkäuferveteran
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33939;
+-- OLD name : Kezzik der Meuchler, subname : Arenaverkäuferveteran (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33940
-UPDATE `creature_template_locale` SET `Name` = '[Kezzik the Striker]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33940;
--- OLD name : Leeni "Kicher" Erbse, subname : Arenaverkäuferlehrling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33940;
+-- OLD name : Leeni "Kicher" Erbse, subname : Arenaverkäuferlehrling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33941
-UPDATE `creature_template_locale` SET `Name` = '[Leeni "Smiley" Smalls]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 33941;
--- OLD name : Verkäufer von Indalamars Emblem der Eroberung, subname : Emporium des UNGLAUBLICHEN
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33941;
+-- OLD name : Verkäufer von Indalamars Emblem der Eroberung, subname : Emporium des UNGLAUBLICHEN (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33946
-UPDATE `creature_template_locale` SET `Name` = '[Indalamar''s Emblem of Conquest Vendor]',`Title` = '[Emporium of AWESOME]' WHERE `locale` = 'deDE' AND `entry` = 33946;
--- OLD name : Gigantischer schwarzer Wolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33946;
+-- OLD name : Gigantischer schwarzer Wolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33949
-UPDATE `creature_template_locale` SET `Name` = '[Giant Black Wolf]' WHERE `locale` = 'deDE' AND `entry` = 33949;
--- OLD name : Gigantischer weißer Wolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33949;
+-- OLD name : Gigantischer weißer Wolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33950
-UPDATE `creature_template_locale` SET `Name` = '[Giant White Wolf]' WHERE `locale` = 'deDE' AND `entry` = 33950;
--- OLD name : Gigantischer grauer Wolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33950;
+-- OLD name : Gigantischer grauer Wolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33951
-UPDATE `creature_template_locale` SET `Name` = '[Giant Grey Wolf]' WHERE `locale` = 'deDE' AND `entry` = 33951;
--- OLD name : Gigantischer roter Wolf
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33951;
+-- OLD name : Gigantischer roter Wolf (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33952
-UPDATE `creature_template_locale` SET `Name` = '[Giant Red Wolf]' WHERE `locale` = 'deDE' AND `entry` = 33952;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33952;
 -- OLD subname : Emblem der Eroberung Rüstmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=33963
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der Eroberung' WHERE `locale` = 'deDE' AND `entry` = 33963;
@@ -7227,307 +8995,324 @@ UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der E
 -- OLD subname : Meister des Sturmangriffs
 -- Source : https://www.wowhead.com/wotlk/de/npc=33972
 UPDATE `creature_template_locale` SET `Title` = 'Meister des Anstürmens' WHERE `locale` = 'deDE' AND `entry` = 33972;
--- OLD name : Nobelgartenhase
+-- OLD name : Nobelgartenhase (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33975
-UPDATE `creature_template_locale` SET `Name` = '[Noblegarden Bunny]' WHERE `locale` = 'deDE' AND `entry` = 33975;
--- OLD name : Harry Reinwasser, subname : Angelmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33975;
+-- OLD name : Harry Reinwasser, subname : Angelmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=33992
-UPDATE `creature_template_locale` SET `Name` = '[Harry Clearwater]',`Title` = '[Fishmaster]' WHERE `locale` = 'deDE' AND `entry` = 33992;
--- OLD name : Zone der Leere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 33992;
+-- OLD name : Zone der Leere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34000
-UPDATE `creature_template_locale` SET `Name` = '[Void Zone]' WHERE `locale` = 'deDE' AND `entry` = 34000;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34000;
 -- OLD name : Zone der Leere
 -- Source : https://www.wowhead.com/wotlk/de/npc=34001
 UPDATE `creature_template_locale` SET `Name` = 'Leerenzone' WHERE `locale` = 'deDE' AND `entry` = 34001;
--- OLD name : Algalon Test Creature
+-- OLD name : Algalon Test Creature (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34002
-UPDATE `creature_template_locale` SET `Name` = '[Algalon Test Creature]' WHERE `locale` = 'deDE' AND `entry` = 34002;
--- OLD name : Abbild des Knopfs
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34002;
+-- OLD name : Abbild des Knopfs (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34011
-UPDATE `creature_template_locale` SET `Name` = '[Button Image]' WHERE `locale` = 'deDE' AND `entry` = 34011;
--- OLD name : Schnelles graues Ross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34011;
+-- OLD name : Schnelles graues Ross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34017
-UPDATE `creature_template_locale` SET `Name` = '[Swift Gray Steed]' WHERE `locale` = 'deDE' AND `entry` = 34017;
--- OLD name : Zähmbarer Sporensegler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34017;
+-- OLD name : Zähmbarer Sporensegler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34018
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Sporebat]' WHERE `locale` = 'deDE' AND `entry` = 34018;
--- OLD name : Zähmbare Hyäne
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34018;
+-- OLD name : Zähmbare Hyäne (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34019
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Hyena]' WHERE `locale` = 'deDE' AND `entry` = 34019;
--- OLD name : Zähmbare Motte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34019;
+-- OLD name : Zähmbare Motte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34021
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Moth]' WHERE `locale` = 'deDE' AND `entry` = 34021;
--- OLD name : Zähmbarer Weitschreiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34021;
+-- OLD name : Zähmbarer Weitschreiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34022
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Tallstrider]' WHERE `locale` = 'deDE' AND `entry` = 34022;
--- OLD name : Zähmbare Wespe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34022;
+-- OLD name : Zähmbare Wespe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34024
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Wasp]' WHERE `locale` = 'deDE' AND `entry` = 34024;
--- OLD name : Zähmbarer Bär
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34024;
+-- OLD name : Zähmbarer Bär (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34025
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Bear]' WHERE `locale` = 'deDE' AND `entry` = 34025;
--- OLD name : Zähmbarer Krebs
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34025;
+-- OLD name : Zähmbarer Krebs (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34026
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Crab]' WHERE `locale` = 'deDE' AND `entry` = 34026;
--- OLD name : Zähmbarer Krokilisk
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34026;
+-- OLD name : Zähmbarer Krokilisk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34027
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Crocolisk]' WHERE `locale` = 'deDE' AND `entry` = 34027;
--- OLD name : Zähmbarer Gorilla
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34027;
+-- OLD name : Zähmbarer Gorilla (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34028
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Gorilla]' WHERE `locale` = 'deDE' AND `entry` = 34028;
--- OLD name : Zähmbare Schildkröte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34028;
+-- OLD name : Zähmbare Schildkröte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34029
-UPDATE `creature_template_locale` SET `Name` = '[Tamable Turtle]' WHERE `locale` = 'deDE' AND `entry` = 34029;
--- OLD name : Abbild des Schreins
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34029;
+-- OLD name : Abbild des Schreins (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34032
-UPDATE `creature_template_locale` SET `Name` = '[Cache Image]' WHERE `locale` = 'deDE' AND `entry` = 34032;
--- OLD name : Unteroffizier Donnerhorn, subname : Rüstmeisterlehrling für Rüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34032;
+-- OLD name : Unteroffizier Donnerhorn, subname : Rüstmeisterlehrling für Rüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34036
-UPDATE `creature_template_locale` SET `Name` = '[Sergeant Thunderhorn]',`Title` = '[Apprentice Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34036;
--- OLD name : Unteroffizier Donnerhorn, subname : Rüstmeisterlehrling für Rüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34036;
+-- OLD name : Unteroffizier Donnerhorn, subname : Rüstmeisterlehrling für Rüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34037
-UPDATE `creature_template_locale` SET `Name` = '[Sergeant Thunderhorn]',`Title` = '[Apprentice Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34037;
--- OLD name : Unteroffizier Donnerhorn, subname : Rüstmeisterlehrling für Rüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34037;
+-- OLD name : Unteroffizier Donnerhorn, subname : Rüstmeisterlehrling für Rüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34038
-UPDATE `creature_template_locale` SET `Name` = '[Sergeant Thunderhorn]',`Title` = '[Apprentice Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34038;
--- OLD name : Lady Palanseher, subname : Rüstmeisterin für Juwelierskunst
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34038;
+-- OLD name : Lady Palanseher, subname : Rüstmeisterin für Juwelierskunst (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34039
-UPDATE `creature_template_locale` SET `Name` = '[Lady Palanseer]',`Title` = '[Jewelcrafting Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34039;
--- OLD name : Lady Palanseher, subname : Rüstmeisterin für Juwelierskunst
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34039;
+-- OLD name : Lady Palanseher, subname : Rüstmeisterin für Juwelierskunst (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34040
-UPDATE `creature_template_locale` SET `Name` = '[Lady Palanseer]',`Title` = '[Jewelcrafting Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34040;
--- OLD name : Phantomgeisterfisch, subname : Außergewöhnlicher Designer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34040;
+-- OLD name : Phantomgeisterfisch, subname : Außergewöhnlicher Designer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34042
-UPDATE `creature_template_locale` SET `Name` = '[Phantom Ghostfish]',`Title` = '[Designer Extraordinaire]' WHERE `locale` = 'deDE' AND `entry` = 34042;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34042;
 -- OLD subname : Rüstmeisterin für Juwelierskunst
 -- Source : https://www.wowhead.com/wotlk/de/npc=34043
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Juwelenschleifen' WHERE `locale` = 'deDE' AND `entry` = 34043;
--- OLD name : Doris Volanthius, subname : Rüstmeisterin für Veteranenrüstungen
+-- OLD name : Euer Funkgerät erwacht knisternd zum Leben. Bronzebart (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34054
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34054;
+-- OLD name : Doris Volanthius, subname : Rüstmeisterin für Veteranenrüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34058
-UPDATE `creature_template_locale` SET `Name` = '[Doris Volanthius]',`Title` = '[Veteran Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34058;
--- OLD name : Doris Volanthius, subname : Rüstmeisterin für Veteranenrüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34058;
+-- OLD name : Doris Volanthius, subname : Rüstmeisterin für Veteranenrüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34059
-UPDATE `creature_template_locale` SET `Name` = '[Doris Volanthius]',`Title` = '[Veteran Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34059;
--- OLD name : Doris Volanthius, subname : Rüstmeisterin für Veteranenrüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34059;
+-- OLD name : Doris Volanthius, subname : Rüstmeisterin für Veteranenrüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34060
-UPDATE `creature_template_locale` SET `Name` = '[Doris Volanthius]',`Title` = '[Veteran Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34060;
--- OLD name : Blutwache Zar'shi, subname : Rüstmeister für Rüstungen aus Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34060;
+-- OLD name : Blutwache Zar'shi, subname : Rüstmeister für Rüstungen aus Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34061
-UPDATE `creature_template_locale` SET `Name` = '[Blood Guard Zar''shi]',`Title` = '[Northrend Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34061;
--- OLD name : Blutwache Zar'shi, subname : Rüstmeister für Rüstungen aus Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34061;
+-- OLD name : Blutwache Zar'shi, subname : Rüstmeister für Rüstungen aus Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34062
-UPDATE `creature_template_locale` SET `Name` = '[Blood Guard Zar''shi]',`Title` = '[Northrend Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34062;
--- OLD name : Blutwache Zar'shi, subname : Rüstmeister für Rüstungen aus Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34062;
+-- OLD name : Blutwache Zar'shi, subname : Rüstmeister für Rüstungen aus Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34063
-UPDATE `creature_template_locale` SET `Name` = '[Blood Guard Zar''shi]',`Title` = '[Northrend Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34063;
--- OLD name : Urel Steinherz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34063;
+-- OLD name : Urel Steinherz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34070
-UPDATE `creature_template_locale` SET `Name` = '[Urel Stoneheart]' WHERE `locale` = 'deDE' AND `entry` = 34070;
--- OLD name : Hauptmann Klagehammer, subname : Rüstmeisterlehrling für Rüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34070;
+-- OLD name : Hauptmann Klagehammer, subname : Rüstmeisterlehrling für Rüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34073
-UPDATE `creature_template_locale` SET `Name` = '[Captain Dirgehammer]',`Title` = '[Apprentice Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34073;
--- OLD name : Hauptmann Klagehammer, subname : Rüstmeisterlehrling für Rüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34073;
+-- OLD name : Hauptmann Klagehammer, subname : Rüstmeisterlehrling für Rüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34074
-UPDATE `creature_template_locale` SET `Name` = '[Captain Dirgehammer]',`Title` = '[Apprentice Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34074;
--- OLD name : Hauptmann Klagehammer, subname : Rüstmeisterlehrling für Rüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34074;
+-- OLD name : Hauptmann Klagehammer, subname : Rüstmeisterlehrling für Rüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34075
-UPDATE `creature_template_locale` SET `Name` = '[Captain Dirgehammer]',`Title` = '[Apprentice Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34075;
--- OLD name : Leutnant Tristia, subname : Rüstmeisterin für Veteranenrüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34075;
+-- OLD name : Leutnant Tristia, subname : Rüstmeisterin für Veteranenrüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34076
-UPDATE `creature_template_locale` SET `Name` = '[Lieutenant Tristia]',`Title` = '[Veteran Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34076;
--- OLD name : Leutnant Tristia, subname : Rüstmeisterin für Veteranenrüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34076;
+-- OLD name : Leutnant Tristia, subname : Rüstmeisterin für Veteranenrüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34077
-UPDATE `creature_template_locale` SET `Name` = '[Lieutenant Tristia]',`Title` = '[Veteran Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34077;
--- OLD name : Leutnant Tristia, subname : Rüstmeisterin für Veteranenrüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34077;
+-- OLD name : Leutnant Tristia, subname : Rüstmeisterin für Veteranenrüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34078
-UPDATE `creature_template_locale` SET `Name` = '[Lieutenant Tristia]',`Title` = '[Veteran Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34078;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34078;
 -- OLD subname : Rüstmeister für Juwelierskunst
 -- Source : https://www.wowhead.com/wotlk/de/npc=34079
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Juwelenschleifen' WHERE `locale` = 'deDE' AND `entry` = 34079;
--- OLD name : Hauptmann O'Neal, subname : Rüstmeister für Juwelierskunst
+-- OLD name : Hauptmann O'Neal, subname : Rüstmeister für Juwelierskunst (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34080
-UPDATE `creature_template_locale` SET `Name` = '[Captain O''Neal]',`Title` = '[Jewelcrafting Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34080;
--- OLD name : Hauptmann O'Neal, subname : Rüstmeister für Juwelierskunst
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34080;
+-- OLD name : Hauptmann O'Neal, subname : Rüstmeister für Juwelierskunst (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34081
-UPDATE `creature_template_locale` SET `Name` = '[Captain O''Neal]',`Title` = '[Jewelcrafting Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34081;
--- OLD name : Hauptmann Mondstreich, subname : Rüstmeister für Rüstungen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34081;
+-- OLD name : Hauptmann Mondstreich, subname : Rüstmeister für Rüstungen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34082
-UPDATE `creature_template_locale` SET `Name` = '[Knight-Lieutenant Moonstrike]',`Title` = '[Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34082;
--- OLD name : Hauptmann Mondstreich, subname : Rüstmeister für Rüstungen aus Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34082;
+-- OLD name : Hauptmann Mondstreich, subname : Rüstmeister für Rüstungen aus Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34083
-UPDATE `creature_template_locale` SET `Name` = '[Knight-Lieutenant Moonstrike]',`Title` = '[Northrend Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34083;
--- OLD name : Hauptmann Mondstreich, subname : Rüstmeister für Rüstungen aus Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34083;
+-- OLD name : Hauptmann Mondstreich, subname : Rüstmeister für Rüstungen aus Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34084
-UPDATE `creature_template_locale` SET `Name` = '[Knight-Lieutenant Moonstrike]',`Title` = '[Northrend Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 34084;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34084;
 -- OLD name : Eisenfang Rüsti
 -- Source : https://www.wowhead.com/wotlk/de/npc=34087
 UPDATE `creature_template_locale` SET `Name` = 'Eisenfang Rix' WHERE `locale` = 'deDE' AND `entry` = 34087;
--- OLD name : Blazzek der Beißer, subname : Außergewöhnliche Arenawaffen
+-- OLD name : Blazzek der Beißer, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34088
-UPDATE `creature_template_locale` SET `Name` = '[Blazzek the Biter]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34088;
--- OLD name : Grex Hirnkocher, subname : Außergewöhnliche Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34088;
+-- OLD name : Grex Hirnkocher, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34089
-UPDATE `creature_template_locale` SET `Name` = '[Grex Brainboiler]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34089;
--- OLD name : Blazzek der Beißer, subname : Außergewöhnliche Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34089;
+-- OLD name : Blazzek der Beißer, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34090
-UPDATE `creature_template_locale` SET `Name` = '[Blazzek the Biter]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34090;
--- OLD name : Grex Hirnkocher, subname : Außergewöhnliche Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34090;
+-- OLD name : Grex Hirnkocher, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34091
-UPDATE `creature_template_locale` SET `Name` = '[Grex Brainboiler]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34091;
--- OLD name : Eisenfang Rüsti, subname : Außergewöhnliche Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34091;
+-- OLD name : Eisenfang Rüsti, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34092
-UPDATE `creature_template_locale` SET `Name` = '[Trapjaw Rix]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34092;
--- OLD name : Blazzek der Beißer, subname : Außergewöhnliche Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34092;
+-- OLD name : Blazzek der Beißer, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34093
-UPDATE `creature_template_locale` SET `Name` = '[Blazzek the Biter]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34093;
--- OLD name : Grex Hirnkocher, subname : Außergewöhnliche Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34093;
+-- OLD name : Grex Hirnkocher, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34094
-UPDATE `creature_template_locale` SET `Name` = '[Grex Brainboiler]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34094;
--- OLD name : Eisenfang Rüsti, subname : Außergewöhnliche Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34094;
+-- OLD name : Eisenfang Rüsti, subname : Außergewöhnliche Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34095
-UPDATE `creature_template_locale` SET `Name` = '[Trapjaw Rix]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 34095;
--- OLD name : Der Schwarze Ritter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34095;
+-- OLD name : Der Schwarze Ritter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34104
-UPDATE `creature_template_locale` SET `Name` = '[The Black Knight (No helmet)]' WHERE `locale` = 'deDE' AND `entry` = 34104;
--- OLD name : Argentumstreitross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34104;
+-- OLD name : Argentumstreitross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34107
-UPDATE `creature_template_locale` SET `Name` = '[Argent Charger (No abilities)]' WHERE `locale` = 'deDE' AND `entry` = 34107;
--- OLD name : Schattenfisch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34107;
+-- OLD name : Schattenfisch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34116
-UPDATE `creature_template_locale` SET `Name` = '[Shadowy Fish]' WHERE `locale` = 'deDE' AND `entry` = 34116;
--- OLD name : Seuchenwagen der Knochenwache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34116;
+-- OLD name : Seuchenwagen der Knochenwache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34128
-UPDATE `creature_template_locale` SET `Name` = '[Boneguard Plague Wagon]' WHERE `locale` = 'deDE' AND `entry` = 34128;
--- OLD name : Blaues Skelettschlachtross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34128;
+-- OLD name : Blaues Skelettschlachtross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34154
-UPDATE `creature_template_locale` SET `Name` = '[Blue Skeletal Warhorse]' WHERE `locale` = 'deDE' AND `entry` = 34154;
--- OLD name : Toxic Tolerance Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34154;
+-- OLD name : Toxic Tolerance Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34157
-UPDATE `creature_template_locale` SET `Name` = '[Toxic Tolerance Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 34157;
--- OLD name : Hannes Aschebäscha, subname : Fahrzeugtestausrüstung für Ulduar 10er
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34157;
+-- OLD name : Hannes Aschebäscha, subname : Fahrzeugtestausrüstung für Ulduar 10er (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34168
-UPDATE `creature_template_locale` SET `Name` = '[Jack McWeaksauce]',`Title` = '[Ulduar 10 Vehicle Test Gear]' WHERE `locale` = 'deDE' AND `entry` = 34168;
--- OLD name : Hauptmann Hermann Aschebäscha, subname : Der flammende Falke
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34168;
+-- OLD name : Hauptmann Hermann Aschebäscha, subname : Der flammende Falke (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34172
-UPDATE `creature_template_locale` SET `Name` = '[Captain Julian McWeaksauce]',`Title` = '[The Flaming Falcon]' WHERE `locale` = 'deDE' AND `entry` = 34172;
--- OLD name : Großmutter Aschebäscha, subname : Verkäufer zukünftiger Rüstungssets
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34172;
+-- OLD name : Großmutter Aschebäscha, subname : Verkäufer zukünftiger Rüstungssets (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34173
-UPDATE `creature_template_locale` SET `Name` = '[Granny McWeaksauce]',`Title` = '[Future Loot Tier Vendor]' WHERE `locale` = 'deDE' AND `entry` = 34173;
--- OLD name : Grylls
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34173;
+-- OLD name : Grylls (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34178
-UPDATE `creature_template_locale` SET `Name` = '[Grylls]' WHERE `locale` = 'deDE' AND `entry` = 34178;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34178;
 -- OLD name : Fokussierter Laser
 -- Source : https://www.wowhead.com/wotlk/de/npc=34181
 UPDATE `creature_template_locale` SET `Name` = 'Fokuslaser' WHERE `locale` = 'deDE' AND `entry` = 34181;
--- OLD name : Sichtbares Einflusstentakel
+-- OLD name : Sichtbares Einflusstentakel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34202
-UPDATE `creature_template_locale` SET `Name` = '[Influence Tentacle Visual]' WHERE `locale` = 'deDE' AND `entry` = 34202;
--- OLD name : Brennende Rune
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34202;
+-- OLD name : Brennende Rune (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34213
-UPDATE `creature_template_locale` SET `Name` = '[Flaming Rune]' WHERE `locale` = 'deDE' AND `entry` = 34213;
--- OLD name : Azerothplanetenpirscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34213;
+-- OLD name : Azerothplanetenpirscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34250
-UPDATE `creature_template_locale` SET `Name` = '[Azeroth Planet Stalker]' WHERE `locale` = 'deDE' AND `entry` = 34250;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34250;
+-- OLD name : [DND]Azeroth Children's Week Trigger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34281
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34281;
 -- OLD name : Recyclebotsägeblatt
 -- Source : https://www.wowhead.com/wotlk/de/npc=34288
 UPDATE `creature_template_locale` SET `Name` = 'Recyclebot Sägeblatt' WHERE `locale` = 'deDE' AND `entry` = 34288;
--- OLD name : Sara
+-- OLD name : Sara (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34313
-UPDATE `creature_template_locale` SET `Name` = '[Sara (Transform Only)]' WHERE `locale` = 'deDE' AND `entry` = 34313;
--- OLD name : Dino Meat Feeding Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34313;
+-- OLD name : [DND] Champion Go-To Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34319
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34319;
+-- OLD name : Dino Meat Feeding Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34327
-UPDATE `creature_template_locale` SET `Name` = '[Dino Meat Feeding Credit]' WHERE `locale` = 'deDE' AND `entry` = 34327;
--- OLD name : Silithid Meat Feeding Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34327;
+-- OLD name : Silithid Meat Feeding Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34336
-UPDATE `creature_template_locale` SET `Name` = '[Silithid Meat Feeding Credit]' WHERE `locale` = 'deDE' AND `entry` = 34336;
--- OLD name : Silithid Egg Feeding Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34336;
+-- OLD name : Silithid Egg Feeding Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34338
-UPDATE `creature_template_locale` SET `Name` = '[Silithid Egg Feeding Credit]' WHERE `locale` = 'deDE' AND `entry` = 34338;
--- OLD name : Hasi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34338;
+-- OLD name : Hasi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34360
-UPDATE `creature_template_locale` SET `Name` = '[Wabbit]' WHERE `locale` = 'deDE' AND `entry` = 34360;
--- OLD name : Hochorakel Soo-roo
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34360;
+-- OLD name : [DND]Northrend Children's Week Trigger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34381
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34381;
+-- OLD name : Hochorakel Soo-roo (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34386
-UPDATE `creature_template_locale` SET `Name` = '[High-Oracle Soo-roo]' WHERE `locale` = 'deDE' AND `entry` = 34386;
--- OLD name : Ältester Kekek
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34386;
+-- OLD name : Ältester Kekek (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34387
-UPDATE `creature_template_locale` SET `Name` = '[Elder Kekek]' WHERE `locale` = 'deDE' AND `entry` = 34387;
--- OLD name : Testverkäufer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34387;
+-- OLD name : Testverkäufer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34393
-UPDATE `creature_template_locale` SET `Name` = '[Test Vendor]' WHERE `locale` = 'deDE' AND `entry` = 34393;
--- OLD name : MiniZep
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34393;
+-- OLD name : MiniZep (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34428
-UPDATE `creature_template_locale` SET `Name` = '[MiniZep]' WHERE `locale` = 'deDE' AND `entry` = 34428;
--- OLD name : ELM Daze Target
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34428;
+-- OLD name : ELM Daze Target (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34434
-UPDATE `creature_template_locale` SET `Name` = '[ELM Daze Target]' WHERE `locale` = 'deDE' AND `entry` = 34434;
--- OLD name : ELM Attacker
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34434;
+-- OLD name : ELM Attacker (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34436
-UPDATE `creature_template_locale` SET `Name` = '[ELM Attacker]' WHERE `locale` = 'deDE' AND `entry` = 34436;
--- OLD name : Kampfmeister der Insel der Eroberung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34436;
+-- OLD name : Kampfmeister der Insel der Eroberung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34437
-UPDATE `creature_template_locale` SET `Name` = '[Isle of Conquest Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 34437;
--- OLD name : Heiterer Orcgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34437;
+-- OLD name : Heiterer Orcgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34477
-UPDATE `creature_template_locale` SET `Name` = '[Cheerful Orc Spirit]' WHERE `locale` = 'deDE' AND `entry` = 34477;
--- OLD name : Heiterer Zwergengeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34477;
+-- OLD name : Heiterer Zwergengeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34478
-UPDATE `creature_template_locale` SET `Name` = '[Cheerful Dwarf Spirit]' WHERE `locale` = 'deDE' AND `entry` = 34478;
--- OLD name : Heiterer Gnomengeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34478;
+-- OLD name : Heiterer Gnomengeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34481
-UPDATE `creature_template_locale` SET `Name` = '[Cheerful Gnome Spirit]' WHERE `locale` = 'deDE' AND `entry` = 34481;
--- OLD name : Heiterer Trollgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34481;
+-- OLD name : Heiterer Trollgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34482
-UPDATE `creature_template_locale` SET `Name` = '[Cheerful Troll Spirit]' WHERE `locale` = 'deDE' AND `entry` = 34482;
--- OLD name : Heiterer Draeneigeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34482;
+-- OLD name : Heiterer Draeneigeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34484
-UPDATE `creature_template_locale` SET `Name` = '[Cheerful Draenei Spirit]' WHERE `locale` = 'deDE' AND `entry` = 34484;
--- OLD name : Spielgefährte von den Winterflossen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34484;
+-- OLD name : Spielgefährte von den Winterflossen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34489
-UPDATE `creature_template_locale` SET `Name` = '[Winterfin Playmate]' WHERE `locale` = 'deDE' AND `entry` = 34489;
--- OLD name : Spielgefährte von der Schneewehenlichtung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34489;
+-- OLD name : Spielgefährte von der Schneewehenlichtung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34490
-UPDATE `creature_template_locale` SET `Name` = '[Snowfall Glade Playmate]' WHERE `locale` = 'deDE' AND `entry` = 34490;
--- OLD name : Kupferkesselgoonie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34490;
+-- OLD name : Kupferkesselgoonie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34505
-UPDATE `creature_template_locale` SET `Name` = '[Copperpot Goon]' WHERE `locale` = 'deDE' AND `entry` = 34505;
--- OLD name : XT-005 Debugger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34505;
+-- OLD name : XT-005 Debugger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34515
-UPDATE `creature_template_locale` SET `Name` = '[XT-005 Debugger]' WHERE `locale` = 'deDE' AND `entry` = 34515;
--- OLD name : Roo
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34515;
+-- OLD name : Roo (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34531
-UPDATE `creature_template_locale` SET `Name` = '[Roo]' WHERE `locale` = 'deDE' AND `entry` = 34531;
--- OLD name : Kekek
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34531;
+-- OLD name : Kekek (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34532
-UPDATE `creature_template_locale` SET `Name` = '[Kekek]' WHERE `locale` = 'deDE' AND `entry` = 34532;
--- OLD name : ScottM Test Creature
--- Source : https://www.wowhead.com/wotlk/de/npc=34533
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34533;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (34533, 'deDE','[ScottM Test Creature]',NULL);
--- OLD name : Verlassener Witzbold
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34532;
+-- OLD name : Verlassener Witzbold (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34561
-UPDATE `creature_template_locale` SET `Name` = '[Forsaken Prankster]' WHERE `locale` = 'deDE' AND `entry` = 34561;
--- OLD name : Gifthautjunges
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34561;
+-- OLD name : [DND] Stink Bomb Target (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34562
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34562;
+-- OLD name : Gifthautjunges (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34579
-UPDATE `creature_template_locale` SET `Name` = '[Venomhide Hatchling (1.25)]' WHERE `locale` = 'deDE' AND `entry` = 34579;
--- OLD name : Gifthautjunges
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34579;
+-- OLD name : Gifthautjunges (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34580
-UPDATE `creature_template_locale` SET `Name` = '[Venomhide Hatchling (1.50)]' WHERE `locale` = 'deDE' AND `entry` = 34580;
--- OLD name : Gifthautjunges
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34580;
+-- OLD name : Gifthautjunges (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34581
-UPDATE `creature_template_locale` SET `Name` = '[Venomhide Hatchling (1.75)]' WHERE `locale` = 'deDE' AND `entry` = 34581;
--- OLD name : Danowe Donnerhorn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34581;
+-- OLD name : [DND] Warbot - Blue (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34588
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34588;
+-- OLD name : [DND] Warbot - Red (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34589
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34589;
+-- OLD name : Danowe Donnerhorn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34612
-UPDATE `creature_template_locale` SET `Name` = '[Danowe Thunderhorn]' WHERE `locale` = 'deDE' AND `entry` = 34612;
--- OLD name : Ogerpinata
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34612;
+-- OLD name : Ogerpinata (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34632
-UPDATE `creature_template_locale` SET `Name` = '[Ogre Pinata]' WHERE `locale` = 'deDE' AND `entry` = 34632;
--- OLD name : Magischer Hahn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34632;
+-- OLD name : Magischer Hahn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34655
-UPDATE `creature_template_locale` SET `Name` = '[Magic Rooster]' WHERE `locale` = 'deDE' AND `entry` = 34655;
--- OLD name : Silberner Reitdrachenfalke
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34655;
+-- OLD name : Silberner Reitdrachenfalke (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34709
-UPDATE `creature_template_locale` SET `Name` = '[Silver Riding Dragonhawk]' WHERE `locale` = 'deDE' AND `entry` = 34709;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34709;
 -- OLD name : Besatzungsmitglied Rohrschlüssel
 -- Source : https://www.wowhead.com/wotlk/de/npc=34717
 UPDATE `creature_template_locale` SET `Name` = 'Crewmitglied Rohrschlüssel' WHERE `locale` = 'deDE' AND `entry` = 34717;
@@ -7537,135 +9322,192 @@ UPDATE `creature_template_locale` SET `Name` = 'Crewmitglied Schlossriegel' WHER
 -- OLD name : Besatzungsmitglied Schroter
 -- Source : https://www.wowhead.com/wotlk/de/npc=34719
 UPDATE `creature_template_locale` SET `Name` = 'Crewmitglied Schroter' WHERE `locale` = 'deDE' AND `entry` = 34719;
--- OLD name : Spice Bread Stuffing Proxy
+-- OLD name : [DND] Magic Rooster (Draenei Male) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34731
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34731;
+-- OLD name : [DND] Magic Rooster (Tauren Male) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34732
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34732;
+-- OLD name : Spice Bread Stuffing Proxy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34737
-UPDATE `creature_template_locale` SET `Name` = '[Spice Bread Stuffing Proxy]' WHERE `locale` = 'deDE' AND `entry` = 34737;
--- OLD name : Slow-roasted Turkey Proxy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34737;
+-- OLD name : Slow-roasted Turkey Proxy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34738
-UPDATE `creature_template_locale` SET `Name` = '[Slow-roasted Turkey Proxy]' WHERE `locale` = 'deDE' AND `entry` = 34738;
--- OLD name : Candied Sweet Potato Proxy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34738;
+-- OLD name : Candied Sweet Potato Proxy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34739
-UPDATE `creature_template_locale` SET `Name` = '[Candied Sweet Potato Proxy]' WHERE `locale` = 'deDE' AND `entry` = 34739;
--- OLD name : Pumpkin Pie Proxy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34739;
+-- OLD name : Pumpkin Pie Proxy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34740
-UPDATE `creature_template_locale` SET `Name` = '[Pumpkin Pie Proxy]' WHERE `locale` = 'deDE' AND `entry` = 34740;
--- OLD name : Cranberry Chutney Proxy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34740;
+-- OLD name : Cranberry Chutney Proxy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34741
-UPDATE `creature_template_locale` SET `Name` = '[Cranberry Chutney Proxy]' WHERE `locale` = 'deDE' AND `entry` = 34741;
--- OLD name : Ätzschlund
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34741;
+-- OLD name : Ätzschlund (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34798
-UPDATE `creature_template_locale` SET `Name` = '[Acidmaw (Mobile)]' WHERE `locale` = 'deDE' AND `entry` = 34798;
--- OLD name : Versengtes Skelett
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34798;
+-- OLD name : Versengtes Skelett (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34801
-UPDATE `creature_template_locale` SET `Name` = '[Incinerated Skeleton]' WHERE `locale` = 'deDE' AND `entry` = 34801;
--- OLD name : Bountiful Table Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34801;
+-- OLD name : Bountiful Table Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34806
-UPDATE `creature_template_locale` SET `Name` = '[Bountiful Table Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 34806;
--- OLD name : Argent Coliseum PTR Beast Master
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34806;
+-- OLD name : Argent Coliseum PTR Beast Master (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34827
-UPDATE `creature_template_locale` SET `Name` = '[Argent Coliseum PTR Beast Master]' WHERE `locale` = 'deDE' AND `entry` = 34827;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34827;
 -- OLD name : Nachtelfischer Kolosseumszuschauer
 -- Source : https://www.wowhead.com/wotlk/de/npc=34871
 UPDATE `creature_template_locale` SET `Name` = 'Nachelfischer Kolosseumszuschauer' WHERE `locale` = 'deDE' AND `entry` = 34871;
--- OLD name : Jend Jow (Test), subname : Kampfmeister
+-- OLD name : [ph] Argent Raid Spectator - FX - Horde (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34883
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34883;
+-- OLD name : [ph] Argent Raid Spectator - FX - Alliance (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34887
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34887;
+-- OLD name : [PH] Goss Test NPC (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34889
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34889;
+-- OLD name : [PH] Tournament Hippogryph Quest Mount (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34891
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34891;
+-- OLD name : [PH] Stabled Argent Hippogryph (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34893
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34893;
+-- OLD name : Jend Jow (Test), subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34895
-UPDATE `creature_template_locale` SET `Name` = '[Jend Jow (Test)]',`Title` = '[Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 34895;
--- OLD name : Schneeblinder Anhänger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34895;
+-- OLD name : Schneeblinder Anhänger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34899
-UPDATE `creature_template_locale` SET `Name` = '[Snowblind Follower Proxy]' WHERE `locale` = 'deDE' AND `entry` = 34899;
--- OLD name : Höllische Teufelsflammenkugel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34899;
+-- OLD name : [ph] Argent Raid Spectator - FX - Human (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34900
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34900;
+-- OLD name : [ph] Argent Raid Spectator - FX - Orc (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34901
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34901;
+-- OLD name : [ph] Argent Raid Spectator - FX - Troll (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34902
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34902;
+-- OLD name : [ph] Argent Raid Spectator - FX - Tauren (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34903
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34903;
+-- OLD name : [ph] Argent Raid Spectator - FX - Blood Elf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34904
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34904;
+-- OLD name : [ph] Argent Raid Spectator - FX - Undead (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34905
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34905;
+-- OLD name : [ph] Argent Raid Spectator - FX - Dwarf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34906
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34906;
+-- OLD name : [ph] Argent Raid Spectator - FX - Draenei (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34908
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34908;
+-- OLD name : [ph] Argent Raid Spectator - FX - Night Elf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34909
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34909;
+-- OLD name : [ph] Argent Raid Spectator - FX - Gnome (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=34910
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34910;
+-- OLD name : Höllische Teufelsflammenkugel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34921
-UPDATE `creature_template_locale` SET `Name` = '[Felflame Infernal Ball]' WHERE `locale` = 'deDE' AND `entry` = 34921;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34921;
 -- OLD name : Kanone des Allianzluftschiffs
 -- Source : https://www.wowhead.com/wotlk/de/npc=34929
 UPDATE `creature_template_locale` SET `Name` = 'Kanone des Allianzkanonenboots' WHERE `locale` = 'deDE' AND `entry` = 34929;
--- OLD name : Erinnerung an Hogger
+-- OLD name : Erinnerung an Hogger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34942
-UPDATE `creature_template_locale` SET `Name` = '[Memory of Hogger]' WHERE `locale` = 'deDE' AND `entry` = 34942;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34942;
 -- OLD name : Abgesandter der Insel der Eroberung
 -- Source : https://www.wowhead.com/wotlk/de/npc=34950
 UPDATE `creature_template_locale` SET `Name` = 'Botschafter der Insel der Eroberung' WHERE `locale` = 'deDE' AND `entry` = 34950;
 -- OLD name : Luftschiffkapitän der Allianz
 -- Source : https://www.wowhead.com/wotlk/de/npc=34960
 UPDATE `creature_template_locale` SET `Name` = 'Kanonenbootkapitän der Allianz' WHERE `locale` = 'deDE' AND `entry` = 34960;
--- OLD name : Hotoro, subname : Kampfmeister
+-- OLD name : Hotoro, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34971
-UPDATE `creature_template_locale` SET `Name` = '[Hotoro]',`Title` = '[Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 34971;
--- OLD name : Aelus Goldmorgen, subname : Kampfmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34971;
+-- OLD name : Aelus Goldmorgen, subname : Kampfmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34972
-UPDATE `creature_template_locale` SET `Name` = '[Aelus Goldmorn]',`Title` = '[Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 34972;
--- OLD name : Larina Herzschmiede, subname : Kampfmeisterin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34972;
+-- OLD name : Larina Herzschmiede, subname : Kampfmeisterin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=34993
-UPDATE `creature_template_locale` SET `Name` = '[Larina Heartforge]',`Title` = '[Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 34993;
--- OLD name : Koralon
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 34993;
+-- OLD name : [ph] Argent Raid Spectator - Generic Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=35016
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35016;
+-- OLD name : Koralon (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35018
-UPDATE `creature_template_locale` SET `Name` = '[Stalker Koralon]' WHERE `locale` = 'deDE' AND `entry` = 35018;
--- OLD name : Bruka Trauerbringer, subname : Kampfmeisterin der Insel der Eroberung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35018;
+-- OLD name : Bruka Trauerbringer, subname : Kampfmeisterin der Insel der Eroberung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35019
-UPDATE `creature_template_locale` SET `Name` = '[Bruka Woebringer]',`Title` = '[Isle of Conquest Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 35019;
--- OLD name : Terrance Matterly, subname : Kampfmeister der Insel der Eroberung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35019;
+-- OLD name : Terrance Matterly, subname : Kampfmeister der Insel der Eroberung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35023
-UPDATE `creature_template_locale` SET `Name` = '[Terrance Matterly]',`Title` = '[Isle of Conquest Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 35023;
--- OLD name : Dracien Flanning, subname : Kampfmeister der Insel der Eroberung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35023;
+-- OLD name : Dracien Flanning, subname : Kampfmeister der Insel der Eroberung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35024
-UPDATE `creature_template_locale` SET `Name` = '[Dracien Flanning]',`Title` = '[Isle of Conquest Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 35024;
--- OLD name : Lynette Hefter, subname : Kampfmeisterin der Insel der Eroberung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35024;
+-- OLD name : Lynette Hefter, subname : Kampfmeisterin der Insel der Eroberung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35025
-UPDATE `creature_template_locale` SET `Name` = '[Lynette Bracer]',`Title` = '[Isle of Conquest Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 35025;
--- OLD name : Erutor, subname : Kampfmeister der Insel der Eroberung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35025;
+-- OLD name : Erutor, subname : Kampfmeister der Insel der Eroberung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35027
-UPDATE `creature_template_locale` SET `Name` = '[Erutor]',`Title` = '[Isle of Conquest Battlemaster]' WHERE `locale` = 'deDE' AND `entry` = 35027;
--- OLD name : Erinnerung an Lucifron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35027;
+-- OLD name : Erinnerung an Lucifron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35031
-UPDATE `creature_template_locale` SET `Name` = '[Memory of Lucifron]' WHERE `locale` = 'deDE' AND `entry` = 35031;
--- OLD name : Erinnerung an Donneraan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35031;
+-- OLD name : Erinnerung an Donneraan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35032
-UPDATE `creature_template_locale` SET `Name` = '[Memory of Thunderaan]' WHERE `locale` = 'deDE' AND `entry` = 35032;
--- OLD name : Erinnerung an Hakkar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35032;
+-- OLD name : Erinnerung an Hakkar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35034
-UPDATE `creature_template_locale` SET `Name` = '[Memory of Hakkar]' WHERE `locale` = 'deDE' AND `entry` = 35034;
--- OLD name : Geist eines gefallenen Helden
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35034;
+-- OLD name : Geist eines gefallenen Helden (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35055
-UPDATE `creature_template_locale` SET `Name` = '[Fallen Hero''s Spirit Proxy]' WHERE `locale` = 'deDE' AND `entry` = 35055;
--- OLD name : Wichtel in der Kugel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35055;
+-- OLD name : [ph] Argent Raid Spectator - FX - Alliance Fireworks NOT USED (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=35066
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35066;
+-- OLD name : Wichtel in der Kugel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35067
-UPDATE `creature_template_locale` SET `Name` = '[Imp in a Bottle]' WHERE `locale` = 'deDE' AND `entry` = 35067;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35067;
 -- OLD name : Scharfseher Eannu
 -- Source : https://www.wowhead.com/wotlk/de/npc=35073
 UPDATE `creature_template_locale` SET `Name` = 'Weitseher Eannu' WHERE `locale` = 'deDE' AND `entry` = 35073;
--- OLD name : Großmagd Fisk
+-- OLD name : Großmagd Fisk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35085
-UPDATE `creature_template_locale` SET `Name` = '[Foreman Fisk]' WHERE `locale` = 'deDE' AND `entry` = 35085;
--- OLD name : Arbeitsaufseher Grabbit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35085;
+-- OLD name : Arbeitsaufseher Grabbit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35086
-UPDATE `creature_template_locale` SET `Name` = '[Labor Captain Grabbit]' WHERE `locale` = 'deDE' AND `entry` = 35086;
--- OLD name : Malynea Himmelshäscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35086;
+-- OLD name : Malynea Himmelshäscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35087
-UPDATE `creature_template_locale` SET `Name` = '[Malynea Skyreaver]' WHERE `locale` = 'deDE' AND `entry` = 35087;
--- OLD name : Custer Clubnik
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35087;
+-- OLD name : Custer Clubnik (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35088
-UPDATE `creature_template_locale` SET `Name` = '[Custer Clubnik]' WHERE `locale` = 'deDE' AND `entry` = 35088;
--- OLD name : Horzak Zignibbel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35088;
+-- OLD name : Horzak Zignibbel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35091
-UPDATE `creature_template_locale` SET `Name` = '[Horzak Zignibble]' WHERE `locale` = 'deDE' AND `entry` = 35091;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35091;
 -- OLD subname : Fluglehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=35093
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrer' WHERE `locale` = 'deDE' AND `entry` = 35093;
 -- OLD subname : Fluglehrer
 -- Source : https://www.wowhead.com/wotlk/de/npc=35100
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrer' WHERE `locale` = 'deDE' AND `entry` = 35100;
--- OLD name : Argent Coliseum PTR Eredar Master
+-- OLD name : Argent Coliseum PTR Eredar Master (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35107
-UPDATE `creature_template_locale` SET `Name` = '[Argent Coliseum PTR Eredar Master]' WHERE `locale` = 'deDE' AND `entry` = 35107;
--- OLD name : Argent Coliseum PTR Faction Champion Master
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35107;
+-- OLD name : Argent Coliseum PTR Faction Champion Master (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35108
-UPDATE `creature_template_locale` SET `Name` = '[Argent Coliseum PTR Faction Champion Master]' WHERE `locale` = 'deDE' AND `entry` = 35108;
--- OLD name : Argent Coliseum PTR Val'kyr Master
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35108;
+-- OLD name : Argent Coliseum PTR Val'kyr Master (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35109
-UPDATE `creature_template_locale` SET `Name` = '[Argent Coliseum PTR Val''kyr Master]' WHERE `locale` = 'deDE' AND `entry` = 35109;
--- OLD name : Argent Coliseum PTR Anub'arak Master
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35109;
+-- OLD name : Argent Coliseum PTR Anub'arak Master (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35110
-UPDATE `creature_template_locale` SET `Name` = '[Argent Coliseum PTR Anub''arak Master]' WHERE `locale` = 'deDE' AND `entry` = 35110;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35110;
 -- OLD name : Assassine des Kults
 -- Source : https://www.wowhead.com/wotlk/de/npc=35127
 UPDATE `creature_template_locale` SET `Name` = 'Assassin des Kults' WHERE `locale` = 'deDE' AND `entry` = 35127;
@@ -7675,75 +9517,75 @@ UPDATE `creature_template_locale` SET `Title` = 'Reitlehrerin' WHERE `locale` = 
 -- OLD subname : Fluglehrerin
 -- Source : https://www.wowhead.com/wotlk/de/npc=35135
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrerin' WHERE `locale` = 'deDE' AND `entry` = 35135;
--- OLD name : Schreckensmaul
+-- OLD name : Schreckensmaul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35145
-UPDATE `creature_template_locale` SET `Name` = '[Dreadscale (Sessile)]' WHERE `locale` = 'deDE' AND `entry` = 35145;
--- OLD name : Argentumhippogryph
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35145;
+-- OLD name : Argentumhippogryph (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35146
-UPDATE `creature_template_locale` SET `Name` = '[Argent Hippogryph (Bombing Run)]' WHERE `locale` = 'deDE' AND `entry` = 35146;
--- OLD name : Manageist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35146;
+-- OLD name : Manageist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35155
-UPDATE `creature_template_locale` SET `Name` = '[Mana Spirit]' WHERE `locale` = 'deDE' AND `entry` = 35155;
--- OLD name : Jadepanda
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35155;
+-- OLD name : Jadepanda (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35156
-UPDATE `creature_template_locale` SET `Name` = '[Jade Panda]' WHERE `locale` = 'deDE' AND `entry` = 35156;
--- OLD name : Winziger Jadedrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35156;
+-- OLD name : Winziger Jadedrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35157
-UPDATE `creature_template_locale` SET `Name` = '[Tiny Jade Dragon]' WHERE `locale` = 'deDE' AND `entry` = 35157;
--- OLD name : Argentumstreitross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35157;
+-- OLD name : Argentumstreitross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35179
-UPDATE `creature_template_locale` SET `Name` = '[Argent Charger]' WHERE `locale` = 'deDE' AND `entry` = 35179;
--- OLD name : Argentumschlachtross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35179;
+-- OLD name : Argentumschlachtross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35180
-UPDATE `creature_template_locale` SET `Name` = '[Argent Warhorse]' WHERE `locale` = 'deDE' AND `entry` = 35180;
--- OLD name : Vergrabener Jormungar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35180;
+-- OLD name : Vergrabener Jormungar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35228
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Burrowed Jormungar]' WHERE `locale` = 'deDE' AND `entry` = 35228;
--- OLD name : Eindringling der Kvaldir
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35228;
+-- OLD name : Eindringling der Kvaldir (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35242
-UPDATE `creature_template_locale` SET `Name` = '[Kvaldir Invader]' WHERE `locale` = 'deDE' AND `entry` = 35242;
--- OLD name : Feiernder Draeneigeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35242;
+-- OLD name : Feiernder Draeneigeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35246
-UPDATE `creature_template_locale` SET `Name` = '[Ghostly Draenei Celebrant]' WHERE `locale` = 'deDE' AND `entry` = 35246;
--- OLD name : Feiernder Zwergengeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35246;
+-- OLD name : Feiernder Zwergengeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35247
-UPDATE `creature_template_locale` SET `Name` = '[Ghostly Dwarf Celebrant]' WHERE `locale` = 'deDE' AND `entry` = 35247;
--- OLD name : Feiernder Gnomengeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35247;
+-- OLD name : Feiernder Gnomengeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35248
-UPDATE `creature_template_locale` SET `Name` = '[Ghostly Gnome Celebrant]' WHERE `locale` = 'deDE' AND `entry` = 35248;
--- OLD name : Feiernder Nachtelfengeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35248;
+-- OLD name : Feiernder Nachtelfengeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35250
-UPDATE `creature_template_locale` SET `Name` = '[Ghostly Night Elf Celebrant]' WHERE `locale` = 'deDE' AND `entry` = 35250;
--- OLD name : Feiernder Orcgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35250;
+-- OLD name : Feiernder Orcgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35251
-UPDATE `creature_template_locale` SET `Name` = '[Ghostly Orc Celebrant]' WHERE `locale` = 'deDE' AND `entry` = 35251;
--- OLD name : Feiernder Trollgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35251;
+-- OLD name : Feiernder Trollgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35253
-UPDATE `creature_template_locale` SET `Name` = '[Ghostly Troll Celebrant]' WHERE `locale` = 'deDE' AND `entry` = 35253;
--- OLD name : Argentumfohlen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35253;
+-- OLD name : Argentumfohlen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35285
-UPDATE `creature_template_locale` SET `Name` = '[Argent Colt]' WHERE `locale` = 'deDE' AND `entry` = 35285;
--- OLD name : Kultist von Eiskrone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35285;
+-- OLD name : Kultist von Eiskrone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35297
-UPDATE `creature_template_locale` SET `Name` = '[Icecrown Cultist Proxy]' WHERE `locale` = 'deDE' AND `entry` = 35297;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35297;
 -- OLD subname : Oberanführer der Kriegshymnenoffensive
 -- Source : https://www.wowhead.com/wotlk/de/npc=35372
 UPDATE `creature_template_locale` SET `Title` = 'Hochlord der Kriegshymnenoffensive' WHERE `locale` = 'deDE' AND `entry` = 35372;
--- OLD name : Der Lichkönig
+-- OLD name : Der Lichkönig (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35459
-UPDATE `creature_template_locale` SET `Name` = '[The Lich King]' WHERE `locale` = 'deDE' AND `entry` = 35459;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35459;
 -- OLD name : Elitesoldat der Kor'kron
 -- Source : https://www.wowhead.com/wotlk/de/npc=35460
 UPDATE `creature_template_locale` SET `Name` = 'Elite der Kor''kron' WHERE `locale` = 'deDE' AND `entry` = 35460;
--- OLD name : Rachsüchtige Val'kyr
+-- OLD name : Rachsüchtige Val'kyr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35474
-UPDATE `creature_template_locale` SET `Name` = '[Vengeful Val''kyr]' WHERE `locale` = 'deDE' AND `entry` = 35474;
--- OLD name : Wache der Zephyr, subname : Die Zephyr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35474;
+-- OLD name : Wache der Zephyr, subname : Die Zephyr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35492
-UPDATE `creature_template_locale` SET `Name` = '[Zephyr Guard]',`Title` = '[The Zephyr]' WHERE `locale` = 'deDE' AND `entry` = 35492;
--- OLD name : Rachsüchtiger Frostwyrm
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35492;
+-- OLD name : Rachsüchtiger Frostwyrm (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35493
-UPDATE `creature_template_locale` SET `Name` = '[Vengeful Frostwyrm]' WHERE `locale` = 'deDE' AND `entry` = 35493;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35493;
 -- OLD subname : Emblem des Triumph Rüstmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=35494
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Triumphs' WHERE `locale` = 'deDE' AND `entry` = 35494;
@@ -7765,1282 +9607,1536 @@ UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des
 -- OLD subname : Antiquitätenrüstmeisterin für Gerechtigkeitspunkte
 -- Source : https://www.wowhead.com/wotlk/de/npc=35574
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Triumphs' WHERE `locale` = 'deDE' AND `entry` = 35574;
--- OLD name : Argentumhippogryph
+-- OLD name : Argentumhippogryph (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35586
-UPDATE `creature_template_locale` SET `Name` = '[Argent Hippogryph (Herald Mount)]' WHERE `locale` = 'deDE' AND `entry` = 35586;
--- OLD name : Argentumfriedensbewahrer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35586;
+-- OLD name : Argentumfriedensbewahrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35587
-UPDATE `creature_template_locale` SET `Name` = '[Argent Peacekeeper]' WHERE `locale` = 'deDE' AND `entry` = 35587;
--- OLD name : Kolosseumsmeister der Flickwerke
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35587;
+-- OLD name : Kolosseumsmeister der Flickwerke (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35588
-UPDATE `creature_template_locale` SET `Name` = '[Coliseum Master of Patchwerks]' WHERE `locale` = 'deDE' AND `entry` = 35588;
--- OLD name : Jaeren Sonnenschwur
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35588;
+-- OLD name : Jaeren Sonnenschwur (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35589
-UPDATE `creature_template_locale` SET `Name` = '[Jaeren Sunsworn]' WHERE `locale` = 'deDE' AND `entry` = 35589;
--- OLD name : Arelas Hellstern
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35589;
+-- OLD name : Arelas Hellstern (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35604
-UPDATE `creature_template_locale` SET `Name` = '[Arelas Brightstar]' WHERE `locale` = 'deDE' AND `entry` = 35604;
--- OLD name : Kaputte Festungskanone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35604;
+-- OLD name : [DND] Dalaran Argent Tournament Herald Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=35608
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35608;
+-- OLD name : Kaputte Festungskanone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35819
-UPDATE `creature_template_locale` SET `Name` = '[Broken Keep Cannon]' WHERE `locale` = 'deDE' AND `entry` = 35819;
--- OLD name : Barrett Ramsey, subname : Zeremonienmeister des Argentumkolosseums
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35819;
+-- OLD name : Barrett Ramsey, subname : Zeremonienmeister des Argentumkolosseums (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35895
-UPDATE `creature_template_locale` SET `Name` = '[Barrett Ramsey]',`Title` = '[Argent Coliseum Master]' WHERE `locale` = 'deDE' AND `entry` = 35895;
--- OLD name : Barrett Ramsey, subname : Zeremonienmeister des Argentumkolosseums
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35895;
+-- OLD name : Barrett Ramsey, subname : Zeremonienmeister des Argentumkolosseums (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=35910
-UPDATE `creature_template_locale` SET `Name` = '[Barrett Ramsey]',`Title` = '[Argent Coliseum Master]' WHERE `locale` = 'deDE' AND `entry` = 35910;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35910;
+-- OLD name : [DNT] Test Dragonhawk (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=35983
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 35983;
 -- OLD name : Die Schwarze Schankmaid (CASE ONLY)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36024
 UPDATE `creature_template_locale` SET `Name` = 'Die schwarze Schankmaid' WHERE `locale` = 'deDE' AND `entry` = 36024;
--- OLD name : Frostwyrmreiter
+-- OLD name : [DND] Argent Charger (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36071
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36071;
+-- OLD name : [DND] Swift Burgundy Wolf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36072
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36072;
+-- OLD name : [DND] Swift Horde Wolf (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36074
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36074;
+-- OLD name : [DND] White Stallion (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36075
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36075;
+-- OLD name : [DND] Swift Alliance Steed (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36076
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36076;
+-- OLD name : Frostwyrmreiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36128
-UPDATE `creature_template_locale` SET `Name` = '[Frostwyrm Rider]' WHERE `locale` = 'deDE' AND `entry` = 36128;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36128;
 -- OLD name : Häscher der Kor'kron
 -- Source : https://www.wowhead.com/wotlk/de/npc=36164
 UPDATE `creature_template_locale` SET `Name` = 'Häscher der Kro''kron' WHERE `locale` = 'deDE' AND `entry` = 36164;
--- OLD name : Dan's Testkoloss
+-- OLD name : Dan's Testkoloss (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36168
-UPDATE `creature_template_locale` SET `Name` = '[Dan''s Test Colossus]' WHERE `locale` = 'deDE' AND `entry` = 36168;
--- OLD name : Hardknuckle Charger Proxy
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36168;
+-- OLD name : Hardknuckle Charger Proxy (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36189
-UPDATE `creature_template_locale` SET `Name` = '[Hardknuckle Charger Proxy]' WHERE `locale` = 'deDE' AND `entry` = 36189;
--- OLD name : Aufseher der Kor'kron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36189;
+-- OLD name : [DND]Northrend Children's Week Trigger 2 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36209
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36209;
+-- OLD name : [DND] Crazed Apothecary Generator (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36212
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36212;
+-- OLD name : Aufseher der Kor'kron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36213
-UPDATE `creature_template_locale` SET `Name` = '[Kor''kron Overseer]' WHERE `locale` = 'deDE' AND `entry` = 36213;
--- OLD name : Schweitzermobil
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36213;
+-- OLD name : Schweitzermobil (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36215
-UPDATE `creature_template_locale` SET `Name` = '[Schweitzermobile]' WHERE `locale` = 'deDE' AND `entry` = 36215;
--- OLD name : Aufseher Kraggosh
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36215;
+-- OLD name : Aufseher Kraggosh (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36217
-UPDATE `creature_template_locale` SET `Name` = '[Overseer Kraggosh]' WHERE `locale` = 'deDE' AND `entry` = 36217;
--- OLD name : Auktionator Felsknochen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36217;
+-- OLD name : Auktionator Felsknochen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36235
-UPDATE `creature_template_locale` SET `Name` = '[Auctioneer Rockbone]' WHERE `locale` = 'deDE' AND `entry` = 36235;
--- OLD name : Flint Eisenhirsch, subname : Bankier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36235;
+-- OLD name : Flint Eisenhirsch, subname : Bankier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36284
-UPDATE `creature_template_locale` SET `Name` = '[Flint Ironstag]',`Title` = '[Banker]' WHERE `locale` = 'deDE' AND `entry` = 36284;
--- OLD name : Honorable Defender Trigger, 25 yd (Horde)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36284;
+-- OLD name : Honorable Defender Trigger, 25 yd (Horde) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36350
-UPDATE `creature_template_locale` SET `Name` = '[Honorable Defender Trigger, 25 yd (Horde)]' WHERE `locale` = 'deDE' AND `entry` = 36350;
--- OLD name : Slab Schott, subname : Bankier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36350;
+-- OLD name : Slab Schott, subname : Bankier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36351
-UPDATE `creature_template_locale` SET `Name` = '[Slab Bulkhead]',`Title` = '[Banker]' WHERE `locale` = 'deDE' AND `entry` = 36351;
--- OLD name : Kister Truhendeckel, subname : Bankier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36351;
+-- OLD name : Kister Truhendeckel, subname : Bankier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36352
-UPDATE `creature_template_locale` SET `Name` = '[Trunk Slamchest]',`Title` = '[Banker]' WHERE `locale` = 'deDE' AND `entry` = 36352;
--- OLD name : Auktionator Plankkist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36352;
+-- OLD name : Auktionator Plankkist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36359
-UPDATE `creature_template_locale` SET `Name` = '[Auctioneer Plankchest]' WHERE `locale` = 'deDE' AND `entry` = 36359;
--- OLD name : Auktionator Flachstein
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36359;
+-- OLD name : Auktionator Flachstein (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36360
-UPDATE `creature_template_locale` SET `Name` = '[Auctioneer Slabrock]' WHERE `locale` = 'deDE' AND `entry` = 36360;
--- OLD name : Buff Hartrücken
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36360;
+-- OLD name : Buff Hartrücken (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36380
-UPDATE `creature_template_locale` SET `Name` = '[Buff Hardback]' WHERE `locale` = 'deDE' AND `entry` = 36380;
--- OLD name : Blast Dicknacken
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36380;
+-- OLD name : Blast Dicknacken (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36390
-UPDATE `creature_template_locale` SET `Name` = '[Blast Thickneck]' WHERE `locale` = 'deDE' AND `entry` = 36390;
--- OLD name : Wache der Dunkeleisenzwerge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36390;
+-- OLD name : Wache der Dunkeleisenzwerge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36431
-UPDATE `creature_template_locale` SET `Name` = '[Dark Iron Guard]' WHERE `locale` = 'deDE' AND `entry` = 36431;
--- OLD name : Kleiner Schimmel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36431;
+-- OLD name : Kleiner Schimmel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36483
-UPDATE `creature_template_locale` SET `Name` = '[Little White Stallion]' WHERE `locale` = 'deDE' AND `entry` = 36483;
--- OLD name : Kleiner elfenbeinfarbener Raptor
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36483;
+-- OLD name : Kleiner elfenbeinfarbener Raptor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36484
-UPDATE `creature_template_locale` SET `Name` = '[Little Ivory Raptor]' WHERE `locale` = 'deDE' AND `entry` = 36484;
--- OLD name : Verschlinger der Seelen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36484;
+-- OLD name : Verschlinger der Seelen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36503
-UPDATE `creature_template_locale` SET `Name` = '[Devourer of Souls]' WHERE `locale` = 'deDE' AND `entry` = 36503;
--- OLD name : Verschlinger der Seelen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36503;
+-- OLD name : Verschlinger der Seelen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36504
-UPDATE `creature_template_locale` SET `Name` = '[Devourer of Souls]' WHERE `locale` = 'deDE' AND `entry` = 36504;
--- OLD name : Sandvortex von Durotar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36504;
+-- OLD name : Sandvortex von Durotar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36510
-UPDATE `creature_template_locale` SET `Name` = '[Durotar Sand Vortex]' WHERE `locale` = 'deDE' AND `entry` = 36510;
--- OLD name : Instabiles Totem der Verbrennung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36510;
+-- OLD name : [DND] Valentine Boss - Vial Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36530
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36530;
+-- OLD name : Instabiles Totem der Verbrennung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36532
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Searing Totem]' WHERE `locale` = 'deDE' AND `entry` = 36532;
--- OLD name : Instabiler Feuerelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36532;
+-- OLD name : Instabiler Feuerelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36533
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Fire Elemental]' WHERE `locale` = 'deDE' AND `entry` = 36533;
--- OLD name : Instabiler Erdelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36533;
+-- OLD name : Instabiler Erdelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36537
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Earth Elemental [mini]]' WHERE `locale` = 'deDE' AND `entry` = 36537;
--- OLD name : Instabiles Totem des heilenden Flusses
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36537;
+-- OLD name : Instabiles Totem des heilenden Flusses (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36542
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Healing Stream Totem]' WHERE `locale` = 'deDE' AND `entry` = 36542;
--- OLD name : Instabiler Wasserelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36542;
+-- OLD name : Instabiler Wasserelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36543
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Water Elemental [mini]]' WHERE `locale` = 'deDE' AND `entry` = 36543;
--- OLD name : Nachtelfirokese
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36543;
+-- OLD name : Nachtelfirokese (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36544
-UPDATE `creature_template_locale` SET `Name` = '[Night Elf Mohawk]' WHERE `locale` = 'deDE' AND `entry` = 36544;
--- OLD name : Instabiler Wasserelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36544;
+-- OLD name : Instabiler Wasserelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36545
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Water Elemental]' WHERE `locale` = 'deDE' AND `entry` = 36545;
--- OLD name : Instabiler Luftelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36545;
+-- OLD name : Instabiler Luftelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36546
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Air Elemental]' WHERE `locale` = 'deDE' AND `entry` = 36546;
--- OLD name : Instabiler Luftelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36546;
+-- OLD name : Instabiler Luftelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36547
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Air Elemental [mini]]' WHERE `locale` = 'deDE' AND `entry` = 36547;
--- OLD name : Instabiles Totem der Steinhaut
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36547;
+-- OLD name : Instabiles Totem der Steinhaut (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36550
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Stoneskin Totem]' WHERE `locale` = 'deDE' AND `entry` = 36550;
--- OLD name : Instabiler Feuerelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36550;
+-- OLD name : Instabiler Feuerelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36553
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Fire Elemental [mini] ]' WHERE `locale` = 'deDE' AND `entry` = 36553;
--- OLD name : Instabiler Erdelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36553;
+-- OLD name : Instabiler Erdelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36554
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Earth Elemental]' WHERE `locale` = 'deDE' AND `entry` = 36554;
--- OLD name : Instabiles Totem des stürmischen Zorns
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36554;
+-- OLD name : Instabiles Totem des stürmischen Zorns (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36556
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Wrath of Air Totem]' WHERE `locale` = 'deDE' AND `entry` = 36556;
--- OLD name : Justin's test Boss A
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36556;
+-- OLD name : Justin's test Boss A (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36573
-UPDATE `creature_template_locale` SET `Name` = '[Justin''s test Boss A]' WHERE `locale` = 'deDE' AND `entry` = 36573;
--- OLD name : Justin's Test Boss B
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36573;
+-- OLD name : Justin's Test Boss B (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36574
-UPDATE `creature_template_locale` SET `Name` = '[Justin''s Test Boss B]' WHERE `locale` = 'deDE' AND `entry` = 36574;
--- OLD name : Instabiler Lichtbrunnen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36574;
+-- OLD name : Instabiler Lichtbrunnen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36605
-UPDATE `creature_template_locale` SET `Name` = '[Unstable Lightwell]' WHERE `locale` = 'deDE' AND `entry` = 36605;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36605;
 -- OLD name : Adeptin der Seelenwache
 -- Source : https://www.wowhead.com/wotlk/de/npc=36620
 UPDATE `creature_template_locale` SET `Name` = 'Adept der Seelenwache' WHERE `locale` = 'deDE' AND `entry` = 36620;
--- OLD name : Ahmo Donnerhorn
+-- OLD name : [DND] Valentine Boss Manager (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36643
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36643;
+-- OLD name : Ahmo Donnerhorn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36644
-UPDATE `creature_template_locale` SET `Name` = '[Ahmo Thunderhorn]' WHERE `locale` = 'deDE' AND `entry` = 36644;
--- OLD name : Baine Bluthuf, subname : Oberhäuptling
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36644;
+-- OLD name : Baine Bluthuf, subname : Oberhäuptling (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36648
-UPDATE `creature_template_locale` SET `Name` = '[Baine Bloodhoof (Leader)]',`Title` = '[High Chieftain]' WHERE `locale` = 'deDE' AND `entry` = 36648;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36648;
 -- OLD name : Schildwache des Silberbunds
 -- Source : https://www.wowhead.com/wotlk/de/npc=36656
 UPDATE `creature_template_locale` SET `Name` = 'Schildwache des Silberbundes' WHERE `locale` = 'deDE' AND `entry` = 36656;
--- OLD name : Skelettminenarbeiter
+-- OLD name : Skelettminenarbeiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36677
-UPDATE `creature_template_locale` SET `Name` = '[Skeletal Miner (Cosmetic)]' WHERE `locale` = 'deDE' AND `entry` = 36677;
--- OLD name : Leutnant der Frostanbeter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36677;
+-- OLD name : Leutnant der Frostanbeter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36679
-UPDATE `creature_template_locale` SET `Name` = '[Frostsworn Lieutenant]' WHERE `locale` = 'deDE' AND `entry` = 36679;
--- OLD name : Quel'Delar Krasus Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36679;
+-- OLD name : [DND] Apothecary Table (Spell Effect) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36710
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36710;
+-- OLD name : Quel'Delar Krasus Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36715
-UPDATE `creature_template_locale` SET `Name` = '[Quel''Delar Krasus Credit]' WHERE `locale` = 'deDE' AND `entry` = 36715;
--- OLD name : Unsichtbarer Pirscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36715;
+-- OLD name : [PH] Icecrown Reanimated Crusader (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36726
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36726;
+-- OLD name : Unsichtbarer Pirscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36737
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Stalker]' WHERE `locale` = 'deDE' AND `entry` = 36737;
--- OLD name : Berserker der Frostanbeter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36737;
+-- OLD name : Berserker der Frostanbeter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36757
-UPDATE `creature_template_locale` SET `Name` = '[Frostsworn Berserker]' WHERE `locale` = 'deDE' AND `entry` = 36757;
--- OLD name : Schlachtenmagier der Frostanbeter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36757;
+-- OLD name : Schlachtenmagier der Frostanbeter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36763
-UPDATE `creature_template_locale` SET `Name` = '[Frostsworn Battle-Mage]' WHERE `locale` = 'deDE' AND `entry` = 36763;
--- OLD name : Schütze der Frostanbeter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36763;
+-- OLD name : Schütze der Frostanbeter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36769
-UPDATE `creature_template_locale` SET `Name` = '[Frostsworn Marksman]' WHERE `locale` = 'deDE' AND `entry` = 36769;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36769;
 -- OLD name : Agent des Silberbunds
 -- Source : https://www.wowhead.com/wotlk/de/npc=36774
 UPDATE `creature_template_locale` SET `Name` = 'Agent des Silberbundes' WHERE `locale` = 'deDE' AND `entry` = 36774;
--- OLD name : Mächtiger Frostsäbler, subname : Begleiter des Nachtelfirokesen
+-- OLD name : Mächtiger Frostsäbler, subname : Begleiter des Nachtelfirokesen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36778
-UPDATE `creature_template_locale` SET `Name` = '[Mighty Frostsaber]',`Title` = '[Night Elf Mohawk''s Companion]' WHERE `locale` = 'deDE' AND `entry` = 36778;
--- OLD name : Verderbter Champion
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36778;
+-- OLD name : Verderbter Champion (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36796
-UPDATE `creature_template_locale` SET `Name` = '[Corrupted Champion]' WHERE `locale` = 'deDE' AND `entry` = 36796;
--- OLD name : Matts Testpriester
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36796;
+-- OLD name : Matts Testpriester (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36804
-UPDATE `creature_template_locale` SET `Name` = '[Matt''s Test Priest]' WHERE `locale` = 'deDE' AND `entry` = 36804;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36804;
+-- OLD name : [DND] Love Boat Summoner (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36817
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36817;
 -- OLD name : Kanone des Allianzluftschiffs
 -- Source : https://www.wowhead.com/wotlk/de/npc=36838
 UPDATE `creature_template_locale` SET `Name` = 'Kanone des Allianzkanonenboots' WHERE `locale` = 'deDE' AND `entry` = 36838;
--- OLD name : Blutelfenkrieger
+-- OLD name : Blutelfenkrieger, subname : Kriegerlehrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36857
-UPDATE `creature_template_locale` SET `Name` = '[Blood Elf Warrior]' WHERE `locale` = 'deDE' AND `entry` = 36857;
--- OLD name : Zwergenmagier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36857;
+-- OLD name : Zwergenmagier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36858
-UPDATE `creature_template_locale` SET `Name` = '[Dwarf Mage]' WHERE `locale` = 'deDE' AND `entry` = 36858;
--- OLD name : Zwergenschamane
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36858;
+-- OLD name : Zwergenschamane (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36859
-UPDATE `creature_template_locale` SET `Name` = '[Dwarf Shaman]' WHERE `locale` = 'deDE' AND `entry` = 36859;
--- OLD name : Gnomenpriester
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36859;
+-- OLD name : Gnomenpriester (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36860
-UPDATE `creature_template_locale` SET `Name` = '[Gnome Priest]' WHERE `locale` = 'deDE' AND `entry` = 36860;
--- OLD name : Menschlicher Jäger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36860;
+-- OLD name : Menschlicher Jäger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36861
-UPDATE `creature_template_locale` SET `Name` = '[Human Hunter]' WHERE `locale` = 'deDE' AND `entry` = 36861;
--- OLD name : Nachtelfenmagier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36861;
+-- OLD name : Nachtelfenmagier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36862
-UPDATE `creature_template_locale` SET `Name` = '[Night Elf Mage]' WHERE `locale` = 'deDE' AND `entry` = 36862;
--- OLD name : Orcmagier
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36862;
+-- OLD name : Orcmagier (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36863
-UPDATE `creature_template_locale` SET `Name` = '[Orc Mage]' WHERE `locale` = 'deDE' AND `entry` = 36863;
--- OLD name : Taurenpaladin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36863;
+-- OLD name : Taurenpaladin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36864
-UPDATE `creature_template_locale` SET `Name` = '[Tauren Paladin]' WHERE `locale` = 'deDE' AND `entry` = 36864;
--- OLD name : Taurenpriester
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36864;
+-- OLD name : Taurenpriester (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36865
-UPDATE `creature_template_locale` SET `Name` = '[Tauren Priest]' WHERE `locale` = 'deDE' AND `entry` = 36865;
--- OLD name : Trolldruide
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36865;
+-- OLD name : Trolldruide (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36866
-UPDATE `creature_template_locale` SET `Name` = '[Troll Druid]' WHERE `locale` = 'deDE' AND `entry` = 36866;
--- OLD name : Untoter Jäger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36866;
+-- OLD name : Untoter Jäger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36867
-UPDATE `creature_template_locale` SET `Name` = '[Undead Hunter]' WHERE `locale` = 'deDE' AND `entry` = 36867;
--- OLD name : Gryphon Hatchling 3.3.0
--- Source : https://www.wowhead.com/wotlk/de/npc=36904
-DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36904;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`) VALUES (36904, 'deDE','[Gryphon Hatchling 3.3.0]',NULL);
--- OLD name : Chen Sturmbräu
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36867;
+-- OLD name : [PH] Icecrown Gauntlet Ghoul (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36875
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36875;
+-- OLD name : Chen Sturmbräu (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36912
-UPDATE `creature_template_locale` SET `Name` = '[Chen Stormstout]' WHERE `locale` = 'deDE' AND `entry` = 36912;
--- OLD name : Wütender Wasserelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36912;
+-- OLD name : Sengender Elementar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36949
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36949;
+-- OLD name : Rumpelnder Elementar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36963
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36963;
+-- OLD name : Windstoßelementar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36964
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36964;
+-- OLD name : Wütender Wasserelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36965
-UPDATE `creature_template_locale` SET `Name` = '[Furious Water Elemental]' WHERE `locale` = 'deDE' AND `entry` = 36965;
--- OLD name : Seelengebundener Feuerelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36965;
+-- OLD name : [DND] World Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=36966
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36966;
+-- OLD name : Seelengebundener Feuerelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=36977
-UPDATE `creature_template_locale` SET `Name` = '[Soulbound Fire Elemental]' WHERE `locale` = 'deDE' AND `entry` = 36977;
--- OLD name : Wogender Wasserelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 36977;
+-- OLD name : Wogender Wasserelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37036
-UPDATE `creature_template_locale` SET `Name` = '[Rippling Water Elemental]' WHERE `locale` = 'deDE' AND `entry` = 37036;
--- OLD name : Acanthurus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37036;
+-- OLD name : Acanthurus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37037
-UPDATE `creature_template_locale` SET `Name` = '[Acanthurus]' WHERE `locale` = 'deDE' AND `entry` = 37037;
--- OLD name : Stadtwache von Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37037;
+-- OLD name : [DND]Ground Cover Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37039
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37039;
+-- OLD name : Stadtwache von Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37063
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind City Guard]' WHERE `locale` = 'deDE' AND `entry` = 37063;
--- OLD name : Argent Warhose TEST
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37063;
+-- OLD name : Argent Warhose TEST (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37074
-UPDATE `creature_template_locale` SET `Name` = '[Argent Warhose TEST]' WHERE `locale` = 'deDE' AND `entry` = 37074;
--- OLD name : Brigadegeneral der Allianz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37074;
+-- OLD name : Brigadegeneral der Allianz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37100
-UPDATE `creature_template_locale` SET `Name` = '[Alliance Brigadier General (Stormwind Visual)]' WHERE `locale` = 'deDE' AND `entry` = 37100;
--- OLD name : Horde Warbringer - Orgrimmar Appearance (DND)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37100;
+-- OLD name : Horde Warbringer - Orgrimmar Appearance (DND) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37101
-UPDATE `creature_template_locale` SET `Name` = '[Horde Warbringer - Orgrimmar Appearance (DND)]' WHERE `locale` = 'deDE' AND `entry` = 37101;
--- OLD name : Elementarstein
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37101;
+-- OLD name : Elementarstein (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37118
-UPDATE `creature_template_locale` SET `Name` = '[Elemental Stone]' WHERE `locale` = 'deDE' AND `entry` = 37118;
--- OLD name : Spiegelbild
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37118;
+-- OLD name : [PH] Icecrown Shade (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37128
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37128;
+-- OLD name : Spiegelbild (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37130
-UPDATE `creature_template_locale` SET `Name` = '[Mirror Image]' WHERE `locale` = 'deDE' AND `entry` = 37130;
--- OLD name : Spiegelbild
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37130;
+-- OLD name : Spiegelbild (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37131
-UPDATE `creature_template_locale` SET `Name` = '[Mirror Image Bug Test]' WHERE `locale` = 'deDE' AND `entry` = 37131;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37131;
 -- OLD name : Heckenschütze der Kor'kron
 -- Source : https://www.wowhead.com/wotlk/de/npc=37146
 UPDATE `creature_template_locale` SET `Name` = 'Scharfschütze der Kor''kron' WHERE `locale` = 'deDE' AND `entry` = 37146;
--- OLD name : Balistoides
+-- OLD name : [DND] Summon Bunny 1 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37168
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37168;
+-- OLD name : [PH] Ice Stone 2 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37191
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37191;
+-- OLD name : [PH] Ice Stone 3 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37192
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37192;
+-- OLD name : Balistoides (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37193
-UPDATE `creature_template_locale` SET `Name` = '[Balistoides]' WHERE `locale` = 'deDE' AND `entry` = 37193;
--- OLD name : Chaetodon
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37193;
+-- OLD name : Chaetodon (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37194
-UPDATE `creature_template_locale` SET `Name` = '[Chaetodon]' WHERE `locale` = 'deDE' AND `entry` = 37194;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37194;
+-- OLD name : [DND] Summon Bunny 2 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37201
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37201;
+-- OLD name : [DND] Summon Bunny 3 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37202
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37202;
 -- OLD name : Thalorien Morgensucher
 -- Source : https://www.wowhead.com/wotlk/de/npc=37205
 UPDATE `creature_template_locale` SET `Name` = 'Thalorien Dämmersucher' WHERE `locale` = 'deDE' AND `entry` = 37205;
 -- OLD name : Lakai der Manufaktur Krone
 -- Source : https://www.wowhead.com/wotlk/de/npc=37214
 UPDATE `creature_template_locale` SET `Name` = 'Lakei der Manufaktur Krone' WHERE `locale` = 'deDE' AND `entry` = 37214;
--- OLD name : Schleimiges Tentakel
+-- OLD name : Schleimiges Tentakel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37530
-UPDATE `creature_template_locale` SET `Name` = '[Slimy Tentacle]' WHERE `locale` = 'deDE' AND `entry` = 37530;
--- OLD name : Schlammbedecktes Tentakel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37530;
+-- OLD name : Schlammbedecktes Tentakel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37535
-UPDATE `creature_template_locale` SET `Name` = '[Ooze Covered Tentacle]' WHERE `locale` = 'deDE' AND `entry` = 37535;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37535;
+-- OLD name : [DND] Shaker (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37543
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37543;
 -- OLD name : Überreste von Thalorien Morgensucher
 -- Source : https://www.wowhead.com/wotlk/de/npc=37552
 UPDATE `creature_template_locale` SET `Name` = 'Überreste von Thalorien Dämmersucher' WHERE `locale` = 'deDE' AND `entry` = 37552;
--- OLD name : Thalorien Dawnseeker Credit
+-- OLD name : [DND]Something Stinks Kill Credit Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37558
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37558;
+-- OLD name : [DND] Shaker - Small (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37574
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37574;
+-- OLD name : Thalorien Dawnseeker Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37601
-UPDATE `creature_template_locale` SET `Name` = '[Thalorien Dawnseeker Credit]' WHERE `locale` = 'deDE' AND `entry` = 37601;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37601;
+-- OLD name : Schmiedemeister Garfrost (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37613
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37613;
 -- OLD name : Mutierte Monstrosität
 -- Source : https://www.wowhead.com/wotlk/de/npc=37672
 UPDATE `creature_template_locale` SET `Name` = 'Mutierte Monströsität' WHERE `locale` = 'deDE' AND `entry` = 37672;
--- OLD name : Wächterschatten
+-- OLD name : Wächterschatten (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37691
-UPDATE `creature_template_locale` SET `Name` = '[Guardian Shade]' WHERE `locale` = 'deDE' AND `entry` = 37691;
--- OLD name : Kommandant Aliocha Segard, subname : Rüstmeisterin des Argentumkreuzzugs
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37691;
+-- OLD name : Kommandant Aliocha Segard, subname : Rüstmeisterin des Argentumkreuzzugs (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37693
-UPDATE `creature_template_locale` SET `Name` = '[Commander Aliocha Segard [Icecrown Raid]]',`Title` = '[Argent Crusade Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 37693;
--- OLD name : RN Test Honor Guard
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37693;
+-- OLD name : RN Test Honor Guard (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37699
-UPDATE `creature_template_locale` SET `Name` = '[RN Test Honor Guard]' WHERE `locale` = 'deDE' AND `entry` = 37699;
--- OLD name : RN Test Royal Guard
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37699;
+-- OLD name : RN Test Royal Guard (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37700
-UPDATE `creature_template_locale` SET `Name` = '[RN Test Royal Guard]' WHERE `locale` = 'deDE' AND `entry` = 37700;
--- OLD name : Strudelnder Wasserelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37700;
+-- OLD name : Strudelnder Wasserelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37703
-UPDATE `creature_template_locale` SET `Name` = '[Surging Water Elemental]' WHERE `locale` = 'deDE' AND `entry` = 37703;
--- OLD name : Evakuierungsportal
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37703;
+-- OLD name : Stadtmagier von Sturmwind (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37732
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37732;
+-- OLD name : Evakuierungsportal (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37734
-UPDATE `creature_template_locale` SET `Name` = '[Evacuation Portal]' WHERE `locale` = 'deDE' AND `entry` = 37734;
--- OLD name : Zwergisches Lufttotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37734;
+-- OLD name : Zwergisches Lufttotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37749
-UPDATE `creature_template_locale` SET `Name` = '[Dwarf Air Totem]' WHERE `locale` = 'deDE' AND `entry` = 37749;
--- OLD name : Zwergisches Erdtotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37749;
+-- OLD name : Zwergisches Erdtotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37750
-UPDATE `creature_template_locale` SET `Name` = '[Dwarf Earth Totem]' WHERE `locale` = 'deDE' AND `entry` = 37750;
--- OLD name : Zwergisches Feuertotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37750;
+-- OLD name : Zwergisches Feuertotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37751
-UPDATE `creature_template_locale` SET `Name` = '[Dwarf Fire Totem]' WHERE `locale` = 'deDE' AND `entry` = 37751;
--- OLD name : Zwergisches Wassertotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37751;
+-- OLD name : Zwergisches Wassertotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37752
-UPDATE `creature_template_locale` SET `Name` = '[Dwarf Water Totem]' WHERE `locale` = 'deDE' AND `entry` = 37752;
--- OLD name : Orcisches Lufttotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37752;
+-- OLD name : Orcisches Lufttotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37766
-UPDATE `creature_template_locale` SET `Name` = '[Orc Air Totem]' WHERE `locale` = 'deDE' AND `entry` = 37766;
--- OLD name : Orcisches Erdtotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37766;
+-- OLD name : Orcisches Erdtotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37767
-UPDATE `creature_template_locale` SET `Name` = '[Orc Earth Totem]' WHERE `locale` = 'deDE' AND `entry` = 37767;
--- OLD name : Trollisches Erdtotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37767;
+-- OLD name : Trollisches Erdtotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37768
-UPDATE `creature_template_locale` SET `Name` = '[Troll Earth Totem]' WHERE `locale` = 'deDE' AND `entry` = 37768;
--- OLD name : Trollisches Lufttotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37768;
+-- OLD name : Trollisches Lufttotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37769
-UPDATE `creature_template_locale` SET `Name` = '[Troll Air Totem]' WHERE `locale` = 'deDE' AND `entry` = 37769;
--- OLD name : Orcisches Feuertotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37769;
+-- OLD name : Orcisches Feuertotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37770
-UPDATE `creature_template_locale` SET `Name` = '[Orc Fire Totem]' WHERE `locale` = 'deDE' AND `entry` = 37770;
--- OLD name : Trollisches Feuertotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37770;
+-- OLD name : Trollisches Feuertotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37771
-UPDATE `creature_template_locale` SET `Name` = '[Troll Fire Totem]' WHERE `locale` = 'deDE' AND `entry` = 37771;
--- OLD name : Orcisches Wassertotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37771;
+-- OLD name : Orcisches Wassertotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37772
-UPDATE `creature_template_locale` SET `Name` = '[Orc Water Totem]' WHERE `locale` = 'deDE' AND `entry` = 37772;
--- OLD name : Trollisches Wassertotem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37772;
+-- OLD name : Trollisches Wassertotem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37773
-UPDATE `creature_template_locale` SET `Name` = '[Troll Water Totem]' WHERE `locale` = 'deDE' AND `entry` = 37773;
--- OLD name : Wache von Eisenschmiede
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37773;
+-- OLD name : Wache von Eisenschmiede (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37775
-UPDATE `creature_template_locale` SET `Name` = '[Ironforge Guard]' WHERE `locale` = 'deDE' AND `entry` = 37775;
--- OLD name : Schildwache von Darnassus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37775;
+-- OLD name : Bürger von Sturmwind (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37787
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37787;
+-- OLD name : Runner Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37788
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37788;
+-- OLD name : Schildwache von Darnassus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37790
-UPDATE `creature_template_locale` SET `Name` = '[Darnassus Sentinel]' WHERE `locale` = 'deDE' AND `entry` = 37790;
--- OLD name : Friedensbewahrer der Exodar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37790;
+-- OLD name : Friedensbewahrer der Exodar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37798
-UPDATE `creature_template_locale` SET `Name` = '[Exodar Peacekeeper]' WHERE `locale` = 'deDE' AND `entry` = 37798;
--- OLD name : Stadtwache von Silbermond
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37798;
+-- OLD name : Stadtwache von Silbermond (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37800
-UPDATE `creature_template_locale` SET `Name` = '[Silvermoon City Guardian]' WHERE `locale` = 'deDE' AND `entry` = 37800;
--- OLD name : Aufseher der Kor'kron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37800;
+-- OLD name : [TEST] High Overlord Omar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37820
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37820;
+-- OLD name : Aufseher der Kor'kron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37825
-UPDATE `creature_template_locale` SET `Name` = '[Kor''kron Overseer]' WHERE `locale` = 'deDE' AND `entry` = 37825;
--- OLD name : Lichträcher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37825;
+-- OLD name : Lichträcher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37826
-UPDATE `creature_template_locale` SET `Name` = '[Light''s Vengeance]' WHERE `locale` = 'deDE' AND `entry` = 37826;
--- OLD name : Light's Vengeance Vehicle Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37826;
+-- OLD name : Light's Vengeance Vehicle Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37827
-UPDATE `creature_template_locale` SET `Name` = '[Light''s Vengeance Vehicle Bunny]' WHERE `locale` = 'deDE' AND `entry` = 37827;
--- OLD name : Abbild von Thalorien Morgensucher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37827;
+-- OLD name : Abbild von Thalorien Morgensucher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37828
-UPDATE `creature_template_locale` SET `Name` = '[Image of Thalorien Dawnseeker]' WHERE `locale` = 'deDE' AND `entry` = 37828;
--- OLD name : Abbild von Alexstrasza, subname : Königin der Drachen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37828;
+-- OLD name : Abbild von Alexstrasza, subname : Königin der Drachen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37829
-UPDATE `creature_template_locale` SET `Name` = '[Image of Alexstrasza]',`Title` = '[Queen of the Dragons]' WHERE `locale` = 'deDE' AND `entry` = 37829;
--- OLD name : Lich King Stun Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37829;
+-- OLD name : [PH] Captain (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37831
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37831;
+-- OLD name : Lich King Stun Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37832
-UPDATE `creature_template_locale` SET `Name` = '[Lich King Stun Bunny]' WHERE `locale` = 'deDE' AND `entry` = 37832;
--- OLD name : Abbild von Anasterian
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37832;
+-- OLD name : Abbild von Anasterian (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37844
-UPDATE `creature_template_locale` SET `Name` = '[Image of Anasterian]' WHERE `locale` = 'deDE' AND `entry` = 37844;
--- OLD name : Abbild von Morlen Kaltfaust
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37844;
+-- OLD name : Abbild von Morlen Kaltfaust (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37845
-UPDATE `creature_template_locale` SET `Name` = '[Image of Morlen Coldgrip]' WHERE `locale` = 'deDE' AND `entry` = 37845;
--- OLD name : Blutkönigin Lana'thel, subname : Die San'layn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37845;
+-- OLD name : Blutkönigin Lana'thel, subname : Die San'layn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37846
-UPDATE `creature_template_locale` SET `Name` = '[Blood-Queen Lana''thel]',`Title` = '[The San''layn]' WHERE `locale` = 'deDE' AND `entry` = 37846;
--- OLD name : Abbild von Anub'Rekhan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37846;
+-- OLD name : Abbild von Anub'Rekhan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37850
-UPDATE `creature_template_locale` SET `Name` = '[Anub''Rekhan Image]' WHERE `locale` = 'deDE' AND `entry` = 37850;
--- OLD name : Abbild von Noth dem Seuchenfürst
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37850;
+-- OLD name : Abbild von Noth dem Seuchenfürst (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37851
-UPDATE `creature_template_locale` SET `Name` = '[Noth the Plaguebringer Image]' WHERE `locale` = 'deDE' AND `entry` = 37851;
--- OLD name : Abbild von Instrukteur Razuvious
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37851;
+-- OLD name : Abbild von Instrukteur Razuvious (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37853
-UPDATE `creature_template_locale` SET `Name` = '[Instructor Razuvious Image]' WHERE `locale` = 'deDE' AND `entry` = 37853;
--- OLD name : Abbild von Malygos
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37853;
+-- OLD name : Abbild von Malygos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37855
-UPDATE `creature_template_locale` SET `Name` = '[Malygos Image]' WHERE `locale` = 'deDE' AND `entry` = 37855;
--- OLD name : Abbild des Flammenleviathans
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37855;
+-- OLD name : Abbild des Flammenleviathans (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37856
-UPDATE `creature_template_locale` SET `Name` = '[Flame Leviathan Image]' WHERE `locale` = 'deDE' AND `entry` = 37856;
--- OLD name : Der Lichkönig
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37856;
+-- OLD name : Der Lichkönig (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37857
-UPDATE `creature_template_locale` SET `Name` = '[The Lich King]' WHERE `locale` = 'deDE' AND `entry` = 37857;
--- OLD name : Abbild von Klingenschuppe
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37857;
+-- OLD name : Abbild von Klingenschuppe (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37858
-UPDATE `creature_template_locale` SET `Name` = '[Razorscale Image]' WHERE `locale` = 'deDE' AND `entry` = 37858;
--- OLD name : Abbild von Ignis, Meister des Eisenwerks
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37858;
+-- OLD name : Abbild von Ignis, Meister des Eisenwerks (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37859
-UPDATE `creature_template_locale` SET `Name` = '[Ignis the Furnace Master Image]' WHERE `locale` = 'deDE' AND `entry` = 37859;
--- OLD name : Behüter von Donnerfels
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37859;
+-- OLD name : Behüter von Donnerfels (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37860
-UPDATE `creature_template_locale` SET `Name` = '[Bluffwatcher]' WHERE `locale` = 'deDE' AND `entry` = 37860;
--- OLD name : Grunzer von Orgrimmar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37860;
+-- OLD name : Grunzer von Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37869
-UPDATE `creature_template_locale` SET `Name` = '[Orgrimmar Grunt]' WHERE `locale` = 'deDE' AND `entry` = 37869;
--- OLD name : Event Fail Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37869;
+-- OLD name : Event Fail Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37871
-UPDATE `creature_template_locale` SET `Name` = '[Event Fail Bunny]' WHERE `locale` = 'deDE' AND `entry` = 37871;
--- OLD name : AoD Impact Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37871;
+-- OLD name : AoD Impact Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37878
-UPDATE `creature_template_locale` SET `Name` = '[AoD Impact Bunny]' WHERE `locale` = 'deDE' AND `entry` = 37878;
--- OLD name : Elender Ghul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37878;
+-- OLD name : Elender Ghul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37881
-UPDATE `creature_template_locale` SET `Name` = '[Wretched Ghoul]' WHERE `locale` = 'deDE' AND `entry` = 37881;
--- OLD name : Der Frostthron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37881;
+-- OLD name : Der Frostthron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37882
-UPDATE `creature_template_locale` SET `Name` = '[The Frozen Throne]' WHERE `locale` = 'deDE' AND `entry` = 37882;
--- OLD name : Bug 174037
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37882;
+-- OLD name : Bug 174037 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37883
-UPDATE `creature_template_locale` SET `Name` = '[Bug 174037]' WHERE `locale` = 'deDE' AND `entry` = 37883;
--- OLD name : Vegard der Unverziehene
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37883;
+-- OLD name : Vegard der Unverziehene (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37893
-UPDATE `creature_template_locale` SET `Name` = '[Vegard the Unforgiven]' WHERE `locale` = 'deDE' AND `entry` = 37893;
--- OLD name : Vegard Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37893;
+-- OLD name : Vegard Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37894
-UPDATE `creature_template_locale` SET `Name` = '[Vegard Bunny]' WHERE `locale` = 'deDE' AND `entry` = 37894;
--- OLD name : Ingenieur der Himmelsbrecher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37894;
+-- OLD name : Ingenieur der Himmelsbrecher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37898
-UPDATE `creature_template_locale` SET `Name` = '[Skybreaker Engineer]' WHERE `locale` = 'deDE' AND `entry` = 37898;
--- OLD name : Rohling der Manufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37898;
+-- OLD name : Rohling der Manufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37917
-UPDATE `creature_template_locale` SET `Name` = '[Crown Thug]' WHERE `locale` = 'deDE' AND `entry` = 37917;
--- OLD name : Machterfülltes Vampirscheusal
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37917;
+-- OLD name : Machterfülltes Vampirscheusal (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37919
-UPDATE `creature_template_locale` SET `Name` = '[Empowered Vampiric Fiend]' WHERE `locale` = 'deDE' AND `entry` = 37919;
--- OLD name : Belagerungsingenieur der Orgrims Hammer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37919;
+-- OLD name : Belagerungsingenieur der Orgrims Hammer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37932
-UPDATE `creature_template_locale` SET `Name` = '[Orgrim''s Hammer Siege Engineer]' WHERE `locale` = 'deDE' AND `entry` = 37932;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37932;
 -- OLD subname : Emblem des Frost Rüstmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=37941
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme des Frosts' WHERE `locale` = 'deDE' AND `entry` = 37941;
 -- OLD subname : Emblem des Frost Rüstmeister
 -- Source : https://www.wowhead.com/wotlk/de/npc=37942
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme des Frosts' WHERE `locale` = 'deDE' AND `entry` = 37942;
--- OLD name : Stadtpatrolleur von Sturmwind
+-- OLD name : Stadtpatrolleur von Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37944
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind City Patroller]' WHERE `locale` = 'deDE' AND `entry` = 37944;
--- OLD name : Light's Vengeance Vehicle Bunny 2
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37944;
+-- OLD name : Light's Vengeance Vehicle Bunny 2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37952
-UPDATE `creature_template_locale` SET `Name` = '[Light''s Vengeance Vehicle Bunny 2]' WHERE `locale` = 'deDE' AND `entry` = 37952;
--- OLD name : Vegard der Unverziehene
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37952;
+-- OLD name : [DND] Love Boat Summoner 02 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37964
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37964;
+-- OLD name : Vegard der Unverziehene (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37976
-UPDATE `creature_template_locale` SET `Name` = '[Vegard the Unforgiven]' WHERE `locale` = 'deDE' AND `entry` = 37976;
--- OLD name : Liebesboot von Darnassus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37976;
+-- OLD name : Liebesboot von Darnassus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37980
-UPDATE `creature_template_locale` SET `Name` = '[Darnassus Love Boat]' WHERE `locale` = 'deDE' AND `entry` = 37980;
--- OLD name : Wütender Feuerelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37980;
+-- OLD name : [DND] Love Boat Summoner 03 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37981
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37981;
+-- OLD name : Wütender Feuerelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37982
-UPDATE `creature_template_locale` SET `Name` = '[Furious Fire Elemental]' WHERE `locale` = 'deDE' AND `entry` = 37982;
--- OLD name : Sengender Feuerelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37982;
+-- OLD name : Sengender Feuerelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37983
-UPDATE `creature_template_locale` SET `Name` = '[Searing Fire Elemental]' WHERE `locale` = 'deDE' AND `entry` = 37983;
--- OLD name : Gauner der Manufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37983;
+-- OLD name : Gauner der Manufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=37984
-UPDATE `creature_template_locale` SET `Name` = '[Crown Duster]' WHERE `locale` = 'deDE' AND `entry` = 37984;
--- OLD name : Light's Vengeance Bunny 2
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37984;
+-- OLD name : [DND] Sample Quest Kill Credit Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=37990
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 37990;
+-- OLD name : Light's Vengeance Bunny 2 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38001
-UPDATE `creature_template_locale` SET `Name` = '[Light''s Vengeance Bunny 2]' WHERE `locale` = 'deDE' AND `entry` = 38001;
--- OLD name : Gangster der Manufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38001;
+-- OLD name : Gangster der Manufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38006
-UPDATE `creature_template_locale` SET `Name` = '[Crown Hoodlum]' WHERE `locale` = 'deDE' AND `entry` = 38006;
--- OLD name : Verkleidung als Mitglied der Sonnenhäscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38006;
+-- OLD name : Verkleidung als Mitglied der Sonnenhäscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38011
-UPDATE `creature_template_locale` SET `Name` = '[Sunreaver Disguise (Male)]' WHERE `locale` = 'deDE' AND `entry` = 38011;
--- OLD name : Verkleidung als Mitglied der Sonnenhäscher
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38011;
+-- OLD name : Verkleidung als Mitglied der Sonnenhäscher (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38012
-UPDATE `creature_template_locale` SET `Name` = '[Sunreaver Disguise (Female)]' WHERE `locale` = 'deDE' AND `entry` = 38012;
--- OLD name : Verkleidung als Mitglied des Silberbunds
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38012;
+-- OLD name : Verkleidung als Mitglied des Silberbunds (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38013
-UPDATE `creature_template_locale` SET `Name` = '[Silver Covenant Disguise (Female)]' WHERE `locale` = 'deDE' AND `entry` = 38013;
--- OLD name : Verkleidung als Mitglied des Silberbunds
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38013;
+-- OLD name : Verkleidung als Mitglied des Silberbunds (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38014
-UPDATE `creature_template_locale` SET `Name` = '[Silver Covenant Disguise (Male)]' WHERE `locale` = 'deDE' AND `entry` = 38014;
--- OLD name : Agent der Manufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38014;
+-- OLD name : Agent der Manufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38016
-UPDATE `creature_template_locale` SET `Name` = '[Crown Agent]' WHERE `locale` = 'deDE' AND `entry` = 38016;
--- OLD name : Anolis
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38016;
+-- OLD name : Anolis (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38019
-UPDATE `creature_template_locale` SET `Name` = '[Anolis]' WHERE `locale` = 'deDE' AND `entry` = 38019;
--- OLD name : Basiliscus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38019;
+-- OLD name : Basiliscus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38020
-UPDATE `creature_template_locale` SET `Name` = '[Basiliscus]' WHERE `locale` = 'deDE' AND `entry` = 38020;
--- OLD name : Conolophus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38020;
+-- OLD name : Conolophus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38021
-UPDATE `creature_template_locale` SET `Name` = '[Conolophus]' WHERE `locale` = 'deDE' AND `entry` = 38021;
--- OLD name : Besprenkler der Manufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38021;
+-- OLD name : Besprenkler der Manufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38023
-UPDATE `creature_template_locale` SET `Name` = '[Crown Sprinkler]' WHERE `locale` = 'deDE' AND `entry` = 38023;
--- OLD name : Untergebener der Manufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38023;
+-- OLD name : Untergebener der Manufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38030
-UPDATE `creature_template_locale` SET `Name` = '[Crown Underling]' WHERE `locale` = 'deDE' AND `entry` = 38030;
--- OLD name : Qixi Q. Pido, subname : Chemiemanufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38030;
+-- OLD name : Qixi Q. Pido, subname : Chemiemanufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38039
-UPDATE `creature_template_locale` SET `Name` = '[Kwee Q. Peddlefeet]',`Title` = '[Crown Chemical Co.]' WHERE `locale` = 'deDE' AND `entry` = 38039;
--- OLD name : Qixi Q. Pido, subname : Chemiemanufaktur Krone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38039;
+-- OLD name : Qixi Q. Pido, subname : Chemiemanufaktur Krone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38040
-UPDATE `creature_template_locale` SET `Name` = '[Kwee Q. Peddlefeet]',`Title` = '[Crown Chemical Co.]' WHERE `locale` = 'deDE' AND `entry` = 38040;
--- OLD name : Junger Pilger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38040;
+-- OLD name : Junger Pilger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38049
-UPDATE `creature_template_locale` SET `Name` = '[Young Pilgrim]' WHERE `locale` = 'deDE' AND `entry` = 38049;
--- OLD name : Grunzer von Orgrimmar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38049;
+-- OLD name : Grunzer von Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38050
-UPDATE `creature_template_locale` SET `Name` = '[Orgrimmar Grunt]' WHERE `locale` = 'deDE' AND `entry` = 38050;
--- OLD name : Abbild des Sonnenbrunnens
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38050;
+-- OLD name : [DND] Fire Creature (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38053
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38053;
+-- OLD name : Bürger von Orgrimmar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38067
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38067;
+-- OLD name : Abbild des Sonnenbrunnens (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38116
-UPDATE `creature_template_locale` SET `Name` = '[Image of the Sunwell]' WHERE `locale` = 'deDE' AND `entry` = 38116;
--- OLD name : Soul Feast Kill Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38116;
+-- OLD name : Soul Feast Kill Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38121
-UPDATE `creature_template_locale` SET `Name` = '[Soul Feast Kill Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 38121;
--- OLD name : Gefangener Bürger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38121;
+-- OLD name : Magier von Orgrimmar (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38158
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38158;
+-- OLD name : Gefangener Bürger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38162
-UPDATE `creature_template_locale` SET `Name` = '[Trapped Citizen]' WHERE `locale` = 'deDE' AND `entry` = 38162;
--- OLD name : Entfesselndes Totem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38162;
+-- OLD name : [PH] Captain (Orgrimmar) (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38164
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38164;
+-- OLD name : Entfesselndes Totem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38180
-UPDATE `creature_template_locale` SET `Name` = '[Cleansing Totem]' WHERE `locale` = 'deDE' AND `entry` = 38180;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38180;
 -- OLD name : Große Liebesrakete
 -- Source : https://www.wowhead.com/wotlk/de/npc=38204
 UPDATE `creature_template_locale` SET `Name` = 'Herzbrecher X-45' WHERE `locale` = 'deDE' AND `entry` = 38204;
--- OLD name : Große Liebesrakete
+-- OLD name : Große Liebesrakete (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38207
-UPDATE `creature_template_locale` SET `Name` = '[Flying Big Love Rocket]' WHERE `locale` = 'deDE' AND `entry` = 38207;
--- OLD name : Wrath of the Lich King Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38207;
+-- OLD name : Wrath of the Lich King Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38211
-UPDATE `creature_template_locale` SET `Name` = '[Wrath of the Lich King Credit]' WHERE `locale` = 'deDE' AND `entry` = 38211;
--- OLD name : Mutierter Professor Seuchenmord
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38211;
+-- OLD name : Mutierter Professor Seuchenmord (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38216
-UPDATE `creature_template_locale` SET `Name` = '[Mutated Professor Putricide]' WHERE `locale` = 'deDE' AND `entry` = 38216;
--- OLD name : Unbesiegbar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38216;
+-- OLD name : [DND] Fire Wall - No Scaling (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38226
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38226;
+-- OLD name : [DND] Fire Wall (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38230
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38230;
+-- OLD name : [DND] Fire Strat (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38236
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38236;
+-- OLD name : Unbesiegbar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38260
-UPDATE `creature_template_locale` SET `Name` = '[Invincible]' WHERE `locale` = 'deDE' AND `entry` = 38260;
--- OLD name : Transformierter dunkler Runenriese
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38260;
+-- OLD name : Transformierter dunkler Runenriese (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38264
-UPDATE `creature_template_locale` SET `Name` = '[Dark Rune Giant Transform]' WHERE `locale` = 'deDE' AND `entry` = 38264;
--- OLD name : Illusion eines Vrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38264;
+-- OLD name : Illusion eines Vrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38271
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul Illusion]' WHERE `locale` = 'deDE' AND `entry` = 38271;
--- OLD name : Illusion eines Taunka
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38271;
+-- OLD name : Illusion eines Taunka (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38273
-UPDATE `creature_template_locale` SET `Name` = '[Taunka Illusion]' WHERE `locale` = 'deDE' AND `entry` = 38273;
--- OLD name : Unholy Infusion KC Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38273;
+-- OLD name : Unholy Infusion KC Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38289
-UPDATE `creature_template_locale` SET `Name` = '[Unholy Infusion KC Bunny]' WHERE `locale` = 'deDE' AND `entry` = 38289;
--- OLD name : Nahkampfschmuckstück - Tuskarr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38289;
+-- OLD name : Nahkampfschmuckstück - Tuskarr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38291
-UPDATE `creature_template_locale` SET `Name` = '[Melee Trinket - Tuskarr]' WHERE `locale` = 'deDE' AND `entry` = 38291;
--- OLD name : Nahkampfschmuckstück - Taunka
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38291;
+-- OLD name : Nahkampfschmuckstück - Taunka (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38292
-UPDATE `creature_template_locale` SET `Name` = '[Melee Trinket - Taunka]' WHERE `locale` = 'deDE' AND `entry` = 38292;
--- OLD name : Invisible Stalker (Float, Uninteractible, LargeAOI) (3.00)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38292;
+-- OLD name : Invisible Stalker (Float, Uninteractible, LargeAOI) (3.00) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38310
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Stalker (Float, Uninteractible, LargeAOI) (3.00)]' WHERE `locale` = 'deDE' AND `entry` = 38310;
--- OLD name : Kugel der Blutkönigin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38310;
+-- OLD name : [DND] Holiday - Love - Bank Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38340
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38340;
+-- OLD name : [DND] Holiday - Love - AH Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38341
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38341;
+-- OLD name : [DND] Holiday - Love - Barber Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38342
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38342;
+-- OLD name : Kugel der Blutkönigin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38353
-UPDATE `creature_template_locale` SET `Name` = '[Blood Queen Orb]' WHERE `locale` = 'deDE' AND `entry` = 38353;
--- OLD name : Teslaspule
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38353;
+-- OLD name : Teslaspule (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38367
-UPDATE `creature_template_locale` SET `Name` = '[Tesla Coil Stalker]' WHERE `locale` = 'deDE' AND `entry` = 38367;
--- OLD name : Flickwerk (PTR Rundum-Test)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38367;
+-- OLD name : Flickwerk (PTR Rundum-Test) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38386
-UPDATE `creature_template_locale` SET `Name` = '[Patchwerk (PTR All-Around Test)]' WHERE `locale` = 'deDE' AND `entry` = 38386;
--- OLD name : Darnavan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38386;
+-- OLD name : Darnavan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38472
-UPDATE `creature_template_locale` SET `Name` = '[Darnavan]' WHERE `locale` = 'deDE' AND `entry` = 38472;
--- OLD name : Argentumkreuzfahrer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38472;
+-- OLD name : Argentumkreuzfahrer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38497
-UPDATE `creature_template_locale` SET `Name` = '[Argent Crusader (Mounted)]' WHERE `locale` = 'deDE' AND `entry` = 38497;
--- OLD name : Blood Infusion Quest Credit Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38497;
+-- OLD name : Blood Infusion Quest Credit Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38503
-UPDATE `creature_template_locale` SET `Name` = '[Blood Infusion Quest Credit Bunny]' WHERE `locale` = 'deDE' AND `entry` = 38503;
--- OLD name : Shadowmourne Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38503;
+-- OLD name : Shadowmourne Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38527
-UPDATE `creature_template_locale` SET `Name` = '[Shadowmourne Bunny]' WHERE `locale` = 'deDE' AND `entry` = 38527;
--- OLD name : Shadowmourne Axe Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38527;
+-- OLD name : Shadowmourne Axe Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38528
-UPDATE `creature_template_locale` SET `Name` = '[Shadowmourne Axe Bunny]' WHERE `locale` = 'deDE' AND `entry` = 38528;
--- OLD name : Schattengram
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38528;
+-- OLD name : Schattengram (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38529
-UPDATE `creature_template_locale` SET `Name` = '[Shadowmourne]' WHERE `locale` = 'deDE' AND `entry` = 38529;
--- OLD name : Frost Infusion Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38529;
+-- OLD name : Frost Infusion Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38546
-UPDATE `creature_template_locale` SET `Name` = '[Frost Infusion Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 38546;
--- OLD name : Sindragosa Quest Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38546;
+-- OLD name : Sindragosa Quest Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38547
-UPDATE `creature_template_locale` SET `Name` = '[Sindragosa Quest Credit]' WHERE `locale` = 'deDE' AND `entry` = 38547;
--- OLD name : Phantomhafte Halluzination
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38547;
+-- OLD name : Phantomhafte Halluzination (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38566
-UPDATE `creature_template_locale` SET `Name` = '[Phantom Hallucination]' WHERE `locale` = 'deDE' AND `entry` = 38566;
--- OLD name : Bug 181860
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38566;
+-- OLD name : Bug 181860 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38572
-UPDATE `creature_template_locale` SET `Name` = '[Bug 181860]' WHERE `locale` = 'deDE' AND `entry` = 38572;
--- OLD name : Professor Seuchenmord Proxy Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38572;
+-- OLD name : [PH] Matt Test NPC (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38580
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38580;
+-- OLD name : [PH] Matt Test NPC 2 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38581
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38581;
+-- OLD name : Todesbringer Saurfang (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38583
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38583;
+-- OLD name : Professor Seuchenmord Proxy Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38587
-UPDATE `creature_template_locale` SET `Name` = '[Professor Putricide Proxy Bunny]' WHERE `locale` = 'deDE' AND `entry` = 38587;
--- OLD name : Blood Queen Proxy Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38587;
+-- OLD name : Blood Queen Proxy Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38588
-UPDATE `creature_template_locale` SET `Name` = '[Blood Queen Proxy Bunny]' WHERE `locale` = 'deDE' AND `entry` = 38588;
--- OLD name : Argentumreckenverdienst (Streitertest), subname : A.L.K.
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38588;
+-- OLD name : Argentumreckenverdienst (Streitertest), subname : A.L.K. (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38595
-UPDATE `creature_template_locale` SET `Name` = '[Argent Valiant Credit (Aspirant Test)]',`Title` = '[S.T.O.U.T.]' WHERE `locale` = 'deDE' AND `entry` = 38595;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38595;
 -- OLD name : Fürstin Sylvanas Windläufer
 -- Source : https://www.wowhead.com/wotlk/de/npc=38609
 UPDATE `creature_template_locale` SET `Name` = 'Lady Sylvanas Windläufer' WHERE `locale` = 'deDE' AND `entry` = 38609;
--- OLD name : Hochlord Alexandros Mograine, subname : Der Aschenbringer
+-- OLD name : Hochlord Alexandros Mograine, subname : Der Aschenbringer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38610
-UPDATE `creature_template_locale` SET `Name` = '[Highlord Alexandros Mograine]',`Title` = '[The Ashbringer]' WHERE `locale` = 'deDE' AND `entry` = 38610;
--- OLD name : Frostmourne Soul Transform Visual
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38610;
+-- OLD name : Frostmourne Soul Transform Visual (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38710
-UPDATE `creature_template_locale` SET `Name` = '[Frostmourne Soul Transform Visual]' WHERE `locale` = 'deDE' AND `entry` = 38710;
--- OLD name : Magister Thelos
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38710;
+-- OLD name : Magister Thelos (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38716
-UPDATE `creature_template_locale` SET `Name` = '[Magister Thelos]' WHERE `locale` = 'deDE' AND `entry` = 38716;
--- OLD name : Aerin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38716;
+-- OLD name : Aerin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38825
-UPDATE `creature_template_locale` SET `Name` = '[Aerin]' WHERE `locale` = 'deDE' AND `entry` = 38825;
--- OLD name : Erschlagener Behüter von Donnerfels
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38825;
+-- OLD name : Beschützer der Grimmtotem (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38830
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38830;
+-- OLD name : Erschlagener Behüter von Donnerfels (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38831
-UPDATE `creature_template_locale` SET `Name` = '[Slain Bluffwatcher]' WHERE `locale` = 'deDE' AND `entry` = 38831;
--- OLD name : Wache der Dunkeleisenzwerge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38831;
+-- OLD name : Wache der Dunkeleisenzwerge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38839
-UPDATE `creature_template_locale` SET `Name` = '[Dark Iron Guard]' WHERE `locale` = 'deDE' AND `entry` = 38839;
--- OLD name : PattyMacks Lichkönig
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38839;
+-- OLD name : Sammler der Grimmtotem (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38843
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38843;
+-- OLD name : Erschlagener Drudie (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38846
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38846;
+-- OLD name : PattyMacks Lichkönig (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38857
-UPDATE `creature_template_locale` SET `Name` = '[PattyMacks LK]' WHERE `locale` = 'deDE' AND `entry` = 38857;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38857;
 -- OLD subname : Antiquitätenrüstmeister für Gerechtigkeitspunkte
 -- Source : https://www.wowhead.com/wotlk/de/npc=38858
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme des Frosts' WHERE `locale` = 'deDE' AND `entry` = 38858;
--- OLD name : Bug 184688
+-- OLD name : Bug 184688 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38860
-UPDATE `creature_template_locale` SET `Name` = '[Bug 184688  ]' WHERE `locale` = 'deDE' AND `entry` = 38860;
--- OLD name : Unkillable Test Dummy 83 Rogue
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38860;
+-- OLD name : Unkillable Test Dummy 83 Rogue (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38863
-UPDATE `creature_template_locale` SET `Name` = '[Unkillable Test Dummy 83 Rogue]' WHERE `locale` = 'deDE' AND `entry` = 38863;
--- OLD name : Bürger der Dunkeleisenzwerge
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38863;
+-- OLD name : [DND] Dark Iron Guard Move To Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38870
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38870;
+-- OLD name : Bürger der Dunkeleisenzwerge (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38877
-UPDATE `creature_template_locale` SET `Name` = '[Dark Iron Citizen]' WHERE `locale` = 'deDE' AND `entry` = 38877;
--- OLD name : ScottG Test
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38877;
+-- OLD name : [DND] Mole Machine Spawner (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38882
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38882;
+-- OLD name : ScottG Test (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38883
-UPDATE `creature_template_locale` SET `Name` = '[ScottG Test]' WHERE `locale` = 'deDE' AND `entry` = 38883;
--- OLD name : Auktionator Kavarn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38883;
+-- OLD name : Auktionator Kavarn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38900
-UPDATE `creature_template_locale` SET `Name` = '[Auctioneer Kavarn]' WHERE `locale` = 'deDE' AND `entry` = 38900;
--- OLD name : Zivilist aus Eisenschmiede
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38900;
+-- OLD name : Zivilist aus Eisenschmiede (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38901
-UPDATE `creature_template_locale` SET `Name` = '[Ironforge Civilian]' WHERE `locale` = 'deDE' AND `entry` = 38901;
--- OLD name : Queue trigger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38901;
+-- OLD name : Queue trigger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38903
-UPDATE `creature_template_locale` SET `Name` = '[Queue trigger]' WHERE `locale` = 'deDE' AND `entry` = 38903;
--- OLD name : Auktionator Sarnkin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38903;
+-- OLD name : Händer der Grimmtotem (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38905
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38905;
+-- OLD name : Auktionator Sarnkin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38906
-UPDATE `creature_template_locale` SET `Name` = '[Auctioneer Sarnkin]' WHERE `locale` = 'deDE' AND `entry` = 38906;
--- OLD name : Queue Controller
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38906;
+-- OLD name : Queue Controller (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=38907
-UPDATE `creature_template_locale` SET `Name` = '[Queue Controller]' WHERE `locale` = 'deDE' AND `entry` = 38907;
--- OLD name : Aufgebrachter Erdgeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38907;
+-- OLD name : Bankier der Grimmtotem, subname : Bankier (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38919
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38919;
+-- OLD name : Bankier der Grimmtotem, subname : Bankier (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38920
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38920;
+-- OLD name : Bankier der Grimmtotem, subname : Bankier (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=38921
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 38921;
+-- OLD name : Aufgebrachter Erdgeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39021
-UPDATE `creature_template_locale` SET `Name` = '[Agitated Earth Spirit]' WHERE `locale` = 'deDE' AND `entry` = 39021;
--- OLD name : Azurblaues Todesstreitross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39021;
+-- OLD name : [DND] TB Event Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39023
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39023;
+-- OLD name : Azurblaues Todesstreitross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39045
-UPDATE `creature_template_locale` SET `Name` = '[Azure Deathcharger]' WHERE `locale` = 'deDE' AND `entry` = 39045;
--- OLD name : Aufgebrachter Feuergeist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39045;
+-- OLD name : Aufgebrachter Feuergeist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39047
-UPDATE `creature_template_locale` SET `Name` = '[Agitated Fire Spirit]' WHERE `locale` = 'deDE' AND `entry` = 39047;
--- OLD name : Gavan Graufeder
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39047;
+-- OLD name : Gavan Graufeder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39055
-UPDATE `creature_template_locale` SET `Name` = '[Gavan Grayfeather]' WHERE `locale` = 'deDE' AND `entry` = 39055;
--- OLD name : Brann Bronzebart
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39055;
+-- OLD name : [DND] Fire Strat Auto (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39057
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39057;
+-- OLD name : Orcische Feuerwehr (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39058
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39058;
+-- OLD name : Brann Bronzebart (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39060
-UPDATE `creature_template_locale` SET `Name` = '[Brann Bronzebeard (Prologue)]' WHERE `locale` = 'deDE' AND `entry` = 39060;
--- OLD name : Gegenstand: Illusion der Frosterben
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39060;
+-- OLD name : Gegenstand: Illusion der Frosterben (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39089
-UPDATE `creature_template_locale` SET `Name` = '[Item: Frostborn Illusion]' WHERE `locale` = 'deDE' AND `entry` = 39089;
--- OLD name : Durak Flammensprecher, subname : Der Irdene Ring
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39089;
+-- OLD name : Durak Flammensprecher, subname : Der Irdene Ring (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39090
-UPDATE `creature_template_locale` SET `Name` = '[Durak Flamespeaker]',`Title` = '[The Earthen Ring]' WHERE `locale` = 'deDE' AND `entry` = 39090;
--- OLD name : Darnavan Kill Credit 10
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39090;
+-- OLD name : Darnavan Kill Credit 10 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39091
-UPDATE `creature_template_locale` SET `Name` = '[Darnavan Kill Credit 10]' WHERE `locale` = 'deDE' AND `entry` = 39091;
--- OLD name : Darnavan Kill Credit 25
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39091;
+-- OLD name : Darnavan Kill Credit 25 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39092
-UPDATE `creature_template_locale` SET `Name` = '[Darnavan Kill Credit 25]' WHERE `locale` = 'deDE' AND `entry` = 39092;
--- OLD name : Kurier Tormun, subname : Forscherliga
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39092;
+-- OLD name : Kurier Tormun, subname : Forscherliga (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39101
-UPDATE `creature_template_locale` SET `Name` = '[Courier Tormun]',`Title` = '[Explorer''s League]' WHERE `locale` = 'deDE' AND `entry` = 39101;
--- OLD name : Zwielichtsucher, subname : Schattenhammer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39101;
+-- OLD name : Zwielichtsucher, subname : Schattenhammer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39103
-UPDATE `creature_template_locale` SET `Name` = '[Twilight Seeker]',`Title` = '[Twilight''s Hammer]' WHERE `locale` = 'deDE' AND `entry` = 39103;
--- OLD name : Blood Quickening Credit 25
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39103;
+-- OLD name : Blood Quickening Credit 25 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39123
-UPDATE `creature_template_locale` SET `Name` = '[Blood Quickening Credit 25]' WHERE `locale` = 'deDE' AND `entry` = 39123;
--- OLD name : Schattenwächterin der Val'kyr
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39123;
+-- OLD name : Schattenwächterin der Val'kyr (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39125
-UPDATE `creature_template_locale` SET `Name` = '[Val''kyr Shadowguard (Hover Height 20 Visual)]' WHERE `locale` = 'deDE' AND `entry` = 39125;
--- OLD name : Flammender Diener
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39125;
+-- OLD name : Flammender Diener (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39130
-UPDATE `creature_template_locale` SET `Name` = '[Blazing Servant]' WHERE `locale` = 'deDE' AND `entry` = 39130;
--- OLD name : Wässriger Diener
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39130;
+-- OLD name : Wässriger Diener (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39131
-UPDATE `creature_template_locale` SET `Name` = '[Watery Servant]' WHERE `locale` = 'deDE' AND `entry` = 39131;
--- OLD name : Irdener Diener
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39131;
+-- OLD name : Irdener Diener (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39132
-UPDATE `creature_template_locale` SET `Name` = '[Earthen Servant]' WHERE `locale` = 'deDE' AND `entry` = 39132;
--- OLD name : Prologue Portal Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39132;
+-- OLD name : Prologue Portal Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39135
-UPDATE `creature_template_locale` SET `Name` = '[Prologue Portal Bunny]' WHERE `locale` = 'deDE' AND `entry` = 39135;
--- OLD name : Phalanx 2.0
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39135;
+-- OLD name : Phalanx 2.0 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39158
-UPDATE `creature_template_locale` SET `Name` = '[Phalanx 2.0]' WHERE `locale` = 'deDE' AND `entry` = 39158;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39158;
 -- OLD name : Marschall Magruder
 -- Source : https://www.wowhead.com/wotlk/de/npc=39172
 UPDATE `creature_template_locale` SET `Name` = 'Marshall Magruder' WHERE `locale` = 'deDE' AND `entry` = 39172;
--- OLD name : Mechanopanzerpilot aus Gnomeregan
+-- OLD name : Flugmaschine (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39229
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39229;
+-- OLD name : Mechanopanzerpilot aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39230
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Mechano-Tank Pilot]' WHERE `locale` = 'deDE' AND `entry` = 39230;
--- OLD name : Der Lichkönig
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39230;
+-- OLD name : Der Lichkönig (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39231
-UPDATE `creature_template_locale` SET `Name` = '[The Lich King (Temp)]' WHERE `locale` = 'deDE' AND `entry` = 39231;
--- OLD name : Infanterist aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39231;
+-- OLD name : Infanterist aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39252
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Infantry]' WHERE `locale` = 'deDE' AND `entry` = 39252;
--- OLD name : Gnomenbürgerin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39252;
+-- OLD name : Gnomenbürgerin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39253
-UPDATE `creature_template_locale` SET `Name` = '[Gnome Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39253;
--- OLD name : Flugmaschine aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39253;
+-- OLD name : Flugmaschine aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39259
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Flying Machine]' WHERE `locale` = 'deDE' AND `entry` = 39259;
--- OLD name : Zerlegter Mechanopanzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39259;
+-- OLD name : Zerlegter Mechanopanzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39263
-UPDATE `creature_template_locale` SET `Name` = '[Disassembled Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39263;
--- OLD name : Mechanopanzerpilot von Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39263;
+-- OLD name : Mechanopanzerpilot von Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39264
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Mechano-Tank Pilot]' WHERE `locale` = 'deDE' AND `entry` = 39264;
--- OLD name : Geretterter Flüchtling aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39264;
+-- OLD name : Geretterter Flüchtling aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39265
-UPDATE `creature_template_locale` SET `Name` = '[Rescued Gnomeregan Evacuee]' WHERE `locale` = 'deDE' AND `entry` = 39265;
--- OLD name : Hochtüftler Mekkadrill, subname : König der Gnome
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39265;
+-- OLD name : Hochtüftler Mekkadrill, subname : König der Gnome (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39271
-UPDATE `creature_template_locale` SET `Name` = '[High Tinker Mekkatorque]',`Title` = '[King of Gnomes]' WHERE `locale` = 'deDE' AND `entry` = 39271;
--- OLD name : "Doc" Raddreh, subname : Generalärztin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39271;
+-- OLD name : "Doc" Raddreh, subname : Generalärztin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39273
-UPDATE `creature_template_locale` SET `Name` = '["Doc" Cogspin]',`Title` = '[Surgeon General]' WHERE `locale` = 'deDE' AND `entry` = 39273;
--- OLD name : Sanitäter aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39273;
+-- OLD name : Sanitäter aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39275
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Medic]' WHERE `locale` = 'deDE' AND `entry` = 39275;
--- OLD name : Erdheilerin Norsala, subname : Der Irdene Ring
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39275;
+-- OLD name : Erdheilerin Norsala, subname : Der Irdene Ring (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39283
-UPDATE `creature_template_locale` SET `Name` = '[Seer Bahura]',`Title` = '[The Earthen Ring]' WHERE `locale` = 'deDE' AND `entry` = 39283;
--- OLD name : Weltuntergangsverkünder
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39283;
+-- OLD name : Weltuntergangsverkünder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39328
-UPDATE `creature_template_locale` SET `Name` = '[Doomsayer]' WHERE `locale` = 'deDE' AND `entry` = 39328;
--- OLD name : Bürger von Orgrimmar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39328;
+-- OLD name : Bürger von Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39343
-UPDATE `creature_template_locale` SET `Name` = '[Orgrimmar Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39343;
--- OLD name : Lehrling aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39343;
+-- OLD name : Lehrling aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39349
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Trainee]' WHERE `locale` = 'deDE' AND `entry` = 39349;
--- OLD name : Ausbildungsoffizier Dampfkurbel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39349;
+-- OLD name : [DND] Salute Quest Credit Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39355
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39355;
+-- OLD name : [DND] Roar Quest Credit Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39356
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39356;
+-- OLD name : [DND] Dance Quest Credit Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39361
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39361;
+-- OLD name : [DND] Cheer Quest Credit Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39362
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39362;
+-- OLD name : Ausbildungsoffizier Dampfkurbel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39368
-UPDATE `creature_template_locale` SET `Name` = '[Drill Sergeant Steamcrank]' WHERE `locale` = 'deDE' AND `entry` = 39368;
--- OLD name : Pilot Sprossmündung
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39368;
+-- OLD name : Pilot Sprossmündung (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39386
-UPDATE `creature_template_locale` SET `Name` = '[Pilot Muzzlesprock]' WHERE `locale` = 'deDE' AND `entry` = 39386;
--- OLD name : 'Donnerschlag'
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39386;
+-- OLD name : 'Donnerschlag' (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39396
-UPDATE `creature_template_locale` SET `Name` = '[''Thunderflash'']' WHERE `locale` = 'deDE' AND `entry` = 39396;
--- OLD name : Radiageigatron
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39396;
+-- OLD name : [DND] Probe Target Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39420
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39420;
+-- OLD name : Radiageigatron (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39421
-UPDATE `creature_template_locale` SET `Name` = '[Radiageigatron]' WHERE `locale` = 'deDE' AND `entry` = 39421;
--- OLD name : Blutwache Torek
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39421;
+-- OLD name : Blutwache Torek (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39448
-UPDATE `creature_template_locale` SET `Name` = '[Blood Guard Torek]' WHERE `locale` = 'deDE' AND `entry` = 39448;
--- OLD name : Doomsayer Speech Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39448;
+-- OLD name : Doomsayer Speech Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39454
-UPDATE `creature_template_locale` SET `Name` = '[Doomsayer Speech Credit]' WHERE `locale` = 'deDE' AND `entry` = 39454;
--- OLD name : Owen Testverkäufer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39454;
+-- OLD name : Owen Testverkäufer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39462
-UPDATE `creature_template_locale` SET `Name` = '[Owen Test Vendor]' WHERE `locale` = 'deDE' AND `entry` = 39462;
--- OLD name : Motivierter Bürger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39462;
+-- OLD name : Motivierter Bürger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39466
-UPDATE `creature_template_locale` SET `Name` = '[Motivated Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39466;
--- OLD name : Hauptmann Anton
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39466;
+-- OLD name : Hauptmann Anton (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39508
-UPDATE `creature_template_locale` SET `Name` = '[Captain Anton]' WHERE `locale` = 'deDE' AND `entry` = 39508;
--- OLD name : Poster Marker - Orgrimmar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39508;
+-- OLD name : Poster Marker - Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39581
-UPDATE `creature_template_locale` SET `Name` = '[Poster Marker - Orgrimmar ]' WHERE `locale` = 'deDE' AND `entry` = 39581;
--- OLD name : Gnomenbürger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39581;
+-- OLD name : Gnomenbürger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39623
-UPDATE `creature_template_locale` SET `Name` = '[Gnome Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39623;
--- OLD name : Motivierte Bürgerin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39623;
+-- OLD name : Motivierte Bürgerin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39624
-UPDATE `creature_template_locale` SET `Name` = '[Motivated Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39624;
--- OLD name : Bürger von Orgrimmar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39624;
+-- OLD name : Bürger von Orgrimmar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39632
-UPDATE `creature_template_locale` SET `Name` = '[Orgrimmar Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39632;
--- OLD name : Behüter von Sen'jin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39632;
+-- OLD name : Behüter von Sen'jin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39633
-UPDATE `creature_template_locale` SET `Name` = '[Sen''jin Watcher]' WHERE `locale` = 'deDE' AND `entry` = 39633;
--- OLD name : Ruheloser Zombie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39633;
+-- OLD name : Ruheloser Zombie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39639
-UPDATE `creature_template_locale` SET `Name` = '[Restless Zombie]' WHERE `locale` = 'deDE' AND `entry` = 39639;
--- OLD name : Zalazane
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39639;
+-- OLD name : Zalazane (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39647
-UPDATE `creature_template_locale` SET `Name` = '[Zalazane]' WHERE `locale` = 'deDE' AND `entry` = 39647;
--- OLD name : Weltuntergangskultist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39647;
+-- OLD name : Weltuntergangskultist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39648
-UPDATE `creature_template_locale` SET `Name` = '[Doomsday Cultist]' WHERE `locale` = 'deDE' AND `entry` = 39648;
--- OLD name : Vol'jin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39648;
+-- OLD name : Vol'jin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39654
-UPDATE `creature_template_locale` SET `Name` = '[Vol''jin]' WHERE `locale` = 'deDE' AND `entry` = 39654;
--- OLD name : Poster Marker - Stormwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39654;
+-- OLD name : Poster Marker - Stormwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39672
-UPDATE `creature_template_locale` SET `Name` = '[Poster Marker - Stormwind]' WHERE `locale` = 'deDE' AND `entry` = 39672;
--- OLD name : Hauptmann Tret Funkdüse
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39672;
+-- OLD name : Hauptmann Tret Funkdüse (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39675
-UPDATE `creature_template_locale` SET `Name` = '[Captain Tread Sparknozzle]' WHERE `locale` = 'deDE' AND `entry` = 39675;
--- OLD name : Toby Zeigrad, subname : Redenschreiber
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39675;
+-- OLD name : Toby Zeigrad, subname : Redenschreiber (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39678
-UPDATE `creature_template_locale` SET `Name` = '[Toby Zeigear]',`Title` = '[Speechwriter]' WHERE `locale` = 'deDE' AND `entry` = 39678;
--- OLD name : Mechanopanzer mit Schleudersitzsystem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39678;
+-- OLD name : Mechanopanzer mit Schleudersitzsystem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39682
-UPDATE `creature_template_locale` SET `Name` = '[Ejector Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39682;
--- OLD name : Bürger von Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39682;
+-- OLD name : [DND] Quest Credit Bunny - Eject (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39683
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39683;
+-- OLD name : Bürger von Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39686
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39686;
--- OLD name : Mechanopanzerangriffsziel
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39686;
+-- OLD name : [DND] Quest Credit Bunny - Move 1 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39691
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39691;
+-- OLD name : [DND] Quest Credit Bunny - Move 2 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39692
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39692;
+-- OLD name : [DND] Quest Credit Bunny - Move 3 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39695
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39695;
+-- OLD name : [DND] Quest Credit Bunny - Attack (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39703
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39703;
+-- OLD name : [DND] Attack Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39707
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39707;
+-- OLD name : Mechanopanzerangriffsziel (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39711
-UPDATE `creature_template_locale` SET `Name` = '[Mechano-Tank Attack Target]' WHERE `locale` = 'deDE' AND `entry` = 39711;
--- OLD name : Hochtüftler Mekkadrill, subname : König der Gnome
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39711;
+-- OLD name : Hochtüftler Mekkadrill, subname : König der Gnome (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39712
-UPDATE `creature_template_locale` SET `Name` = '[High Tinker Mekkatorque]',`Title` = '[King of Gnomes]' WHERE `locale` = 'deDE' AND `entry` = 39712;
--- OLD name : Krabbelnder Mechanopanzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39712;
+-- OLD name : Krabbelnder Mechanopanzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39713
-UPDATE `creature_template_locale` SET `Name` = '[Scuttling Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39713;
--- OLD name : Schießender Mechanopanzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39713;
+-- OLD name : Schießender Mechanopanzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39714
-UPDATE `creature_template_locale` SET `Name` = '[Shooting Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39714;
--- OLD name : Mechanopanzer mit Schleudersitzsystem
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39714;
+-- OLD name : Mechanopanzer mit Schleudersitzsystem (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39715
-UPDATE `creature_template_locale` SET `Name` = '[Ejector Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39715;
--- OLD name : Krabbelnder Mechanopanzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39715;
+-- OLD name : Krabbelnder Mechanopanzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39716
-UPDATE `creature_template_locale` SET `Name` = '[Scuttling Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39716;
--- OLD name : Schießender Mechanopanzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39716;
+-- OLD name : Schießender Mechanopanzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39717
-UPDATE `creature_template_locale` SET `Name` = '[Shooting Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39717;
--- OLD name : Multibomber von Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39717;
+-- OLD name : Multibomber von Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39735
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Multi-Bomber]' WHERE `locale` = 'deDE' AND `entry` = 39735;
--- OLD name : Bestrahlter Infanterist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39735;
+-- OLD name : [DND] GT Bomber Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39743
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39743;
+-- OLD name : [DND] GT Bomber Bunny 2 (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39744
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39744;
+-- OLD name : Bestrahlter Infanterist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39755
-UPDATE `creature_template_locale` SET `Name` = '[Irradiated Infantry]' WHERE `locale` = 'deDE' AND `entry` = 39755;
--- OLD name : Kultist Kagarn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39755;
+-- OLD name : Kultist Kagarn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39757
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Kagarn]' WHERE `locale` = 'deDE' AND `entry` = 39757;
--- OLD name : Kultist Agtar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39757;
+-- OLD name : Kultist Agtar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39758
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Agtar]' WHERE `locale` = 'deDE' AND `entry` = 39758;
--- OLD name : Panzerbrecherkanone
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39758;
+-- OLD name : Panzerbrecherkanone (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39759
-UPDATE `creature_template_locale` SET `Name` = '[Tankbuster Cannon]' WHERE `locale` = 'deDE' AND `entry` = 39759;
--- OLD name : Kultistin Tokka
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39759;
+-- OLD name : Kultistin Tokka (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39760
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Tokka]' WHERE `locale` = 'deDE' AND `entry` = 39760;
--- OLD name : Kultistin Rokaga
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39760;
+-- OLD name : Kultistin Rokaga (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39763
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Rokaga]' WHERE `locale` = 'deDE' AND `entry` = 39763;
--- OLD name : Gasherikk
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39763;
+-- OLD name : Muttertrogg (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39798
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39798;
+-- OLD name : Gasherikk (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39799
-UPDATE `creature_template_locale` SET `Name` = '[Gasherikk]' WHERE `locale` = 'deDE' AND `entry` = 39799;
--- OLD name : Abbild von Cho'gall, subname : Anführer des Schattenhammers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39799;
+-- OLD name : Abbild von Cho'gall, subname : Anführer des Schattenhammers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39807
-UPDATE `creature_template_locale` SET `Name` = '[Image of Cho''Gall]',`Title` = '[Leader of Twilight''s Hammer]' WHERE `locale` = 'deDE' AND `entry` = 39807;
--- OLD name : Bestrahlter Mechanopanzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39807;
+-- OLD name : [DND] Summoning Pad (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39817
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39817;
+-- OLD name : Bestrahlter Mechanopanzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39818
-UPDATE `creature_template_locale` SET `Name` = '[Irradiated Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39818;
--- OLD name : Bestrahlter Mechanopanzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39818;
+-- OLD name : Bestrahlter Mechanopanzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39819
-UPDATE `creature_template_locale` SET `Name` = '[Irradiated Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39819;
--- OLD name : Raketenwerfer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39819;
+-- OLD name : Raketenwerfer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39820
-UPDATE `creature_template_locale` SET `Name` = '[Rocket Launcher]' WHERE `locale` = 'deDE' AND `entry` = 39820;
--- OLD name : Cho'Gall Speech Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39820;
+-- OLD name : Cho'Gall Speech Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39821
-UPDATE `creature_template_locale` SET `Name` = '[Cho''Gall Speech Credit]' WHERE `locale` = 'deDE' AND `entry` = 39821;
--- OLD name : Aufseher Golbaz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39821;
+-- OLD name : Aufseher Golbaz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39825
-UPDATE `creature_template_locale` SET `Name` = '[Overseer Golbaz]' WHERE `locale` = 'deDE' AND `entry` = 39825;
--- OLD name : Bestrahlter Trogg
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39825;
+-- OLD name : Bestrahlter Trogg (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39826
-UPDATE `creature_template_locale` SET `Name` = '[Irradiated Trogg]' WHERE `locale` = 'deDE' AND `entry` = 39826;
--- OLD name : Aufseherin Jintak
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39826;
+-- OLD name : Aufseherin Jintak (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39827
-UPDATE `creature_template_locale` SET `Name` = '[Overseer Jintak]' WHERE `locale` = 'deDE' AND `entry` = 39827;
--- OLD name : Bestrahlte Kavallerie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39827;
+-- OLD name : Bestrahlte Kavallerie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39836
-UPDATE `creature_template_locale` SET `Name` = '[Irradiated Cavalry]' WHERE `locale` = 'deDE' AND `entry` = 39836;
--- OLD name : Kommandant Bolzrad
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39836;
+-- OLD name : Kommandant Bolzrad (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39837
-UPDATE `creature_template_locale` SET `Name` = '[Commander Boltcog]' WHERE `locale` = 'deDE' AND `entry` = 39837;
--- OLD name : Invisible Stalker (Hostile, Ignore Combat, Float, Uninteractible, Large AOI)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39837;
+-- OLD name : [DND] Boom Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=39841
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39841;
+-- OLD name : Invisible Stalker (Hostile, Ignore Combat, Float, Uninteractible, Large AOI) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39842
-UPDATE `creature_template_locale` SET `Name` = '[Invisible Stalker (Hostile, Ignore Combat, Float, Uninteractible, Large AOI)]' WHERE `locale` = 'deDE' AND `entry` = 39842;
--- OLD name : Tobender Feuerelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39842;
+-- OLD name : Tobender Feuerelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39852
-UPDATE `creature_template_locale` SET `Name` = '[Raging Fire Elemental]' WHERE `locale` = 'deDE' AND `entry` = 39852;
--- OLD name : Tobender Sturmelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39852;
+-- OLD name : Tobender Sturmelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39856
-UPDATE `creature_template_locale` SET `Name` = '[Raging Storm Elemental]' WHERE `locale` = 'deDE' AND `entry` = 39856;
--- OLD name : Mechanopanzer aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39856;
+-- OLD name : Mechanopanzer aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39860
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 39860;
--- OLD name : Besorgter Bürger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39860;
+-- OLD name : Besorgter Bürger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39861
-UPDATE `creature_template_locale` SET `Name` = '[Worried Citizen]' WHERE `locale` = 'deDE' AND `entry` = 39861;
--- OLD name : Cult Recruitment Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39861;
+-- OLD name : Cult Recruitment Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39872
-UPDATE `creature_template_locale` SET `Name` = '[Cult Recruitment Credit]' WHERE `locale` = 'deDE' AND `entry` = 39872;
--- OLD name : Sanitäter aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39872;
+-- OLD name : Sanitäter aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39888
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Medic]' WHERE `locale` = 'deDE' AND `entry` = 39888;
--- OLD name : Weltuntergangskultist
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39888;
+-- OLD name : Weltuntergangskultist (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39891
-UPDATE `creature_template_locale` SET `Name` = '[Doomsday Cultist]' WHERE `locale` = 'deDE' AND `entry` = 39891;
--- OLD name : Robogenieur Thermadrahts Prahlomat
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39891;
+-- OLD name : Robogenieur Thermadrahts Prahlomat (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39901
-UPDATE `creature_template_locale` SET `Name` = '[Mekgineer Thermaplugg''s Brag-Bot]' WHERE `locale` = 'deDE' AND `entry` = 39901;
--- OLD name : Kampfanzug aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39901;
+-- OLD name : Kampfanzug aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39902
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Battle Suit]' WHERE `locale` = 'deDE' AND `entry` = 39902;
--- OLD name : Verstrahler 3000
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39902;
+-- OLD name : Verstrahler 3000 (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39903
-UPDATE `creature_template_locale` SET `Name` = '[Irradiator 3000]' WHERE `locale` = 'deDE' AND `entry` = 39903;
--- OLD name : Hinkels Schnellknall
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39903;
+-- OLD name : Hinkels Schnellknall (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39910
-UPDATE `creature_template_locale` SET `Name` = '[Hinkles Fastblast]' WHERE `locale` = 'deDE' AND `entry` = 39910;
--- OLD name : Zeppelinwache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39910;
+-- OLD name : Zeppelinwache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39934
-UPDATE `creature_template_locale` SET `Name` = '[Zeppelin Sentry]' WHERE `locale` = 'deDE' AND `entry` = 39934;
--- OLD name : Reittier des Zwielichtsuchers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39934;
+-- OLD name : Reittier des Zwielichtsuchers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39938
-UPDATE `creature_template_locale` SET `Name` = '[Twilight Seeker''s Mount]' WHERE `locale` = 'deDE' AND `entry` = 39938;
--- OLD name : Todessucher, subname : Schattenhammer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39938;
+-- OLD name : Todessucher, subname : Schattenhammer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39940
-UPDATE `creature_template_locale` SET `Name` = '[Dead Seeker]',`Title` = '[Twilight''s Hammer]' WHERE `locale` = 'deDE' AND `entry` = 39940;
--- OLD name : Kultistin Lethelyn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39940;
+-- OLD name : Kultistin Lethelyn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39967
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Lethelyn]' WHERE `locale` = 'deDE' AND `entry` = 39967;
--- OLD name : Kultistin Kaima
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39967;
+-- OLD name : Kultistin Kaima (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39968
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Kaima]' WHERE `locale` = 'deDE' AND `entry` = 39968;
--- OLD name : Kultist Wyman
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39968;
+-- OLD name : Kultist Wyman (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39969
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Wyman]' WHERE `locale` = 'deDE' AND `entry` = 39969;
--- OLD name : Kultist Orlunn
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39969;
+-- OLD name : Kultist Orlunn (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39970
-UPDATE `creature_template_locale` SET `Name` = '[Cultist Orlunn]' WHERE `locale` = 'deDE' AND `entry` = 39970;
--- OLD name : Schneller orangefarbener Roboschreiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39970;
+-- OLD name : Schneller orangefarbener Roboschreiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39973
-UPDATE `creature_template_locale` SET `Name` = '[Swift Orange Mechanostrider]' WHERE `locale` = 'deDE' AND `entry` = 39973;
--- OLD name : East Zeppelin Tower Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39973;
+-- OLD name : East Zeppelin Tower Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39975
-UPDATE `creature_template_locale` SET `Name` = '[East Zeppelin Tower Credit]' WHERE `locale` = 'deDE' AND `entry` = 39975;
--- OLD name : West Zeppelin Tower Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39975;
+-- OLD name : West Zeppelin Tower Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39976
-UPDATE `creature_template_locale` SET `Name` = '[West Zeppelin Tower Credit]' WHERE `locale` = 'deDE' AND `entry` = 39976;
--- OLD name : Razor Hill Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39976;
+-- OLD name : Razor Hill Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=39977
-UPDATE `creature_template_locale` SET `Name` = '[Razor Hill Credit]' WHERE `locale` = 'deDE' AND `entry` = 39977;
--- OLD name : Duraks Schild
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 39977;
+-- OLD name : Duraks Schild (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40006
-UPDATE `creature_template_locale` SET `Name` = '[Durak''s Shield]' WHERE `locale` = 'deDE' AND `entry` = 40006;
--- OLD name : Mechanoanzug aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40006;
+-- OLD name : Mechanoanzug aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40010
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Mechano-Suit]' WHERE `locale` = 'deDE' AND `entry` = 40010;
--- OLD name : Duraks Schild
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40010;
+-- OLD name : Duraks Schild (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40037
-UPDATE `creature_template_locale` SET `Name` = '[Durak''s Shield (stage 2)]' WHERE `locale` = 'deDE' AND `entry` = 40037;
--- OLD name : Duraks Schild
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40037;
+-- OLD name : Duraks Schild (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40038
-UPDATE `creature_template_locale` SET `Name` = '[Durak''s Shield (stage 3)]' WHERE `locale` = 'deDE' AND `entry` = 40038;
--- OLD name : Duraks Schild
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40038;
+-- OLD name : Duraks Schild (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40039
-UPDATE `creature_template_locale` SET `Name` = '[Durak''s Shield (stage 4)]' WHERE `locale` = 'deDE' AND `entry` = 40039;
--- OLD name : Mekkadrills Roboschreiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40039;
+-- OLD name : Mekkadrills Roboschreiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40057
-UPDATE `creature_template_locale` SET `Name` = '[Mekkatorque''s Swift Blue Mechanostrider]' WHERE `locale` = 'deDE' AND `entry` = 40057;
--- OLD name : Aufseher Talathor
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40057;
+-- OLD name : Aufseher Talathor (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40097
-UPDATE `creature_template_locale` SET `Name` = '[Overseer Talathor]' WHERE `locale` = 'deDE' AND `entry` = 40097;
--- OLD name : Aufseherin Sylandra
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40097;
+-- OLD name : Aufseherin Sylandra (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40098
-UPDATE `creature_template_locale` SET `Name` = '[Overseer Sylandra]' WHERE `locale` = 'deDE' AND `entry` = 40098;
--- OLD name : Valley of Heroes Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40098;
+-- OLD name : Valley of Heroes Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40101
-UPDATE `creature_template_locale` SET `Name` = '[Valley of Heroes Credit]' WHERE `locale` = 'deDE' AND `entry` = 40101;
--- OLD name : Westbrook Garrison Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40101;
+-- OLD name : Westbrook Garrison Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40102
-UPDATE `creature_template_locale` SET `Name` = '[Westbrook Garrison Credit]' WHERE `locale` = 'deDE' AND `entry` = 40102;
--- OLD name : Goldshire Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40102;
+-- OLD name : Goldshire Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40103
-UPDATE `creature_template_locale` SET `Name` = '[Goldshire Credit]' WHERE `locale` = 'deDE' AND `entry` = 40103;
--- OLD name : Tobender Windelementar
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40103;
+-- OLD name : Tobender Windelementar (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40104
-UPDATE `creature_template_locale` SET `Name` = '[Raging Wind Elemental]' WHERE `locale` = 'deDE' AND `entry` = 40104;
--- OLD name : Besorgter Bürger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40104;
+-- OLD name : Besorgter Bürger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40110
-UPDATE `creature_template_locale` SET `Name` = '[Worried Citizen]' WHERE `locale` = 'deDE' AND `entry` = 40110;
--- OLD name : Mechanopanzer aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40110;
+-- OLD name : Mechanopanzer aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40120
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 40120;
--- OLD name : Infanterist aus Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40120;
+-- OLD name : Infanterist aus Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40122
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Infantry]' WHERE `locale` = 'deDE' AND `entry` = 40122;
--- OLD name : Weltuntergangsverkünder
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40122;
+-- OLD name : Weltuntergangsverkünder (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40124
-UPDATE `creature_template_locale` SET `Name` = '[Doomsayer]' WHERE `locale` = 'deDE' AND `entry` = 40124;
--- OLD name : Bürger von Sturmwind
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40124;
+-- OLD name : Bürger von Sturmwind (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40125
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind Citizen]' WHERE `locale` = 'deDE' AND `entry` = 40125;
--- OLD name : Stadtwache von Sturmwind (Leichnam)
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40125;
+-- OLD name : Stadtwache von Sturmwind (Leichnam) (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40138
-UPDATE `creature_template_locale` SET `Name` = '[Stormwind City Guard (Corpse)]' WHERE `locale` = 'deDE' AND `entry` = 40138;
--- OLD name : Tormuns Schild
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40138;
+-- OLD name : Tormuns Schild (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40141
-UPDATE `creature_template_locale` SET `Name` = '[Tormun''s Shield]' WHERE `locale` = 'deDE' AND `entry` = 40141;
--- OLD name : Flammender Hippogryph
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40141;
+-- OLD name : Flammender Hippogryph (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40165
-UPDATE `creature_template_locale` SET `Name` = '[Blazing Hippogryph]' WHERE `locale` = 'deDE' AND `entry` = 40165;
--- OLD name : Mechanopanzer von Gnomeregan
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40165;
+-- OLD name : Mechanopanzer von Gnomeregan (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40175
-UPDATE `creature_template_locale` SET `Name` = '[Gnomeregan Mechano-Tank]' WHERE `locale` = 'deDE' AND `entry` = 40175;
--- OLD name : Frosch aus Sen'jin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40175;
+-- OLD name : Frosch aus Sen'jin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40176
-UPDATE `creature_template_locale` SET `Name` = '[Sen''jin Frog]' WHERE `locale` = 'deDE' AND `entry` = 40176;
--- OLD name : Bwonsamdi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40176;
+-- OLD name : Bwonsamdi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40182
-UPDATE `creature_template_locale` SET `Name` = '[Bwonsamdi]' WHERE `locale` = 'deDE' AND `entry` = 40182;
--- OLD name : Vanira
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40182;
+-- OLD name : Vanira (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40184
-UPDATE `creature_template_locale` SET `Name` = '[Vanira]' WHERE `locale` = 'deDE' AND `entry` = 40184;
--- OLD name : Vaniras Totem des Wachens
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40184;
+-- OLD name : Vaniras Totem des Wachens (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40187
-UPDATE `creature_template_locale` SET `Name` = '[Vanira''s Sentry Totem]' WHERE `locale` = 'deDE' AND `entry` = 40187;
--- OLD name : Abgestimmter Frosch
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40187;
+-- OLD name : Abgestimmter Frosch (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40188
-UPDATE `creature_template_locale` SET `Name` = '[Attuned Frog]' WHERE `locale` = 'deDE' AND `entry` = 40188;
--- OLD name : Jun'do der Verräter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40188;
+-- OLD name : Jun'do der Verräter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40189
-UPDATE `creature_template_locale` SET `Name` = '[Jun''do the Traitor]' WHERE `locale` = 'deDE' AND `entry` = 40189;
--- OLD name : Weißes Wollrhinozeros
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40189;
+-- OLD name : Weißes Wollrhinozeros (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40191
-UPDATE `creature_template_locale` SET `Name` = '[Wooly White Rhino]' WHERE `locale` = 'deDE' AND `entry` = 40191;
--- OLD name : Vanira
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40191;
+-- OLD name : Vanira (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40192
-UPDATE `creature_template_locale` SET `Name` = '[Vanira]' WHERE `locale` = 'deDE' AND `entry` = 40192;
--- OLD name : Geistloser Troll
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40192;
+-- OLD name : Geistloser Troll (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40195
-UPDATE `creature_template_locale` SET `Name` = '[Mindless Troll]' WHERE `locale` = 'deDE' AND `entry` = 40195;
--- OLD name : Zen'tabra
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40195;
+-- OLD name : Zen'tabra (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40196
-UPDATE `creature_template_locale` SET `Name` = '[Zen''tabra]' WHERE `locale` = 'deDE' AND `entry` = 40196;
--- OLD name : Tikikrieger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40196;
+-- OLD name : Tikikrieger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40199
-UPDATE `creature_template_locale` SET `Name` = '[Tiki Warrior]' WHERE `locale` = 'deDE' AND `entry` = 40199;
--- OLD name : Aufklärungsfledermaus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40199;
+-- OLD name : Aufklärungsfledermaus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40203
-UPDATE `creature_template_locale` SET `Name` = '[Recon Bat]' WHERE `locale` = 'deDE' AND `entry` = 40203;
--- OLD name : Tierführer Marnlek, subname : Fledermausführer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40203;
+-- OLD name : Tierführer Marnlek, subname : Fledermausführer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40204
-UPDATE `creature_template_locale` SET `Name` = '[Handler Marnlek]',`Title` = '[Bat Handler]' WHERE `locale` = 'deDE' AND `entry` = 40204;
--- OLD name : Zom Bocom, subname : Rüstmeister für Ehrenpunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40204;
+-- OLD name : Zom Bocom, subname : Rüstmeister für Ehrenpunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40205
-UPDATE `creature_template_locale` SET `Name` = '[Zom Bocom]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40205;
--- OLD name : Zokk "Lulatsch" Drillzang, subname : Rüstmeister für Eroberungspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40205;
+-- OLD name : Zokk "Lulatsch" Drillzang, subname : Rüstmeister für Eroberungspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40206
-UPDATE `creature_template_locale` SET `Name` = '[Big Zokk Torquewrench]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40206;
--- OLD name : Kezzik der Meuchler, subname : Glorreicher Rüstmeister für Eroberungspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40206;
+-- OLD name : Kezzik der Meuchler, subname : Glorreicher Rüstmeister für Eroberungspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40207
-UPDATE `creature_template_locale` SET `Name` = '[Kezzik the Striker]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40207;
--- OLD name : Leeni "Kicher" Erbse, subname : Rüstmeisterin für Ehrenpunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40207;
+-- OLD name : Leeni "Kicher" Erbse, subname : Rüstmeisterin für Ehrenpunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40208
-UPDATE `creature_template_locale` SET `Name` = '[Leeni "Smiley" Smalls]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40208;
--- OLD name : Grex Hirnkocher, subname : Klassische Stoff- & Lederrüstungen der Allianz
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40208;
+-- OLD name : Grex Hirnkocher, subname : Klassische Stoff- & Lederrüstungen der Allianz (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40209
-UPDATE `creature_template_locale` SET `Name` = '[Grex Brainboiler]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 40209;
--- OLD name : Xazi Schmauchpfeife, subname : Rüstmeisterin für Eroberungspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40209;
+-- OLD name : Xazi Schmauchpfeife, subname : Rüstmeisterin für Eroberungspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40210
-UPDATE `creature_template_locale` SET `Name` = '[Xazi Smolderpipe]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40210;
--- OLD name : Nargel Peitschleine, subname : Glorreicher Rüstmeister für Eroberungspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40210;
+-- OLD name : Nargel Peitschleine, subname : Glorreicher Rüstmeister für Eroberungspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40211
-UPDATE `creature_template_locale` SET `Name` = '[Nargle Lashcord]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40211;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40211;
 -- OLD name : Eisenfang Rüsti, subname : Überholte Arenawaffen
 -- Source : https://www.wowhead.com/wotlk/de/npc=40212
 UPDATE `creature_template_locale` SET `Name` = 'Eisenfang Rix',`Title` = 'Außergewöhnliche Arenawaffen' WHERE `locale` = 'deDE' AND `entry` = 40212;
--- OLD name : Ecton Messingkipper, subname : Rüstmeister für Ehrenpunkte
+-- OLD name : Ecton Messingkipper, subname : Rüstmeister für Ehrenpunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40213
-UPDATE `creature_template_locale` SET `Name` = '[Ecton Brasstumbler]',`Title` = '[Apprentice Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40213;
--- OLD name : Evee Kupferspule, subname : Rüstmeisterin für Eroberungspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40213;
+-- OLD name : Evee Kupferspule, subname : Rüstmeisterin für Eroberungspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40214
-UPDATE `creature_template_locale` SET `Name` = '[Evee Copperspring]',`Title` = '[Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40214;
--- OLD name : Argex Eisenmagen, subname : Glorreicher Rüstmeister für Eroberungspunkte
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40214;
+-- OLD name : Argex Eisenmagen, subname : Glorreicher Rüstmeister für Eroberungspunkte (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40215
-UPDATE `creature_template_locale` SET `Name` = '[Argex Irongut]',`Title` = '[Veteran Arena Vendor]' WHERE `locale` = 'deDE' AND `entry` = 40215;
--- OLD name : Blazzek der Beißer, subname : Überholte Arenawaffen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40215;
+-- OLD name : Blazzek der Beißer, subname : Überholte Arenawaffen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40216
-UPDATE `creature_template_locale` SET `Name` = '[Blazzek the Biter]',`Title` = '[Exceptional Arena Weaponry]' WHERE `locale` = 'deDE' AND `entry` = 40216;
--- OLD name : Tier von den Echoinseln
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40216;
+-- OLD name : Tier von den Echoinseln (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40217
-UPDATE `creature_template_locale` SET `Name` = '[Echo Isle Animal]' WHERE `locale` = 'deDE' AND `entry` = 40217;
--- OLD name : Spy Frog Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40217;
+-- OLD name : Spy Frog Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40218
-UPDATE `creature_template_locale` SET `Name` = '[Spy Frog Credit]' WHERE `locale` = 'deDE' AND `entry` = 40218;
--- OLD name : Spähfledermaus
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40218;
+-- OLD name : Mysteriöses Gerät (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=40220
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40220;
+-- OLD name : Spähfledermaus (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40222
-UPDATE `creature_template_locale` SET `Name` = '[Scout Bat]' WHERE `locale` = 'deDE' AND `entry` = 40222;
--- OLD name : Verhexter Terrortroll
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40222;
+-- OLD name : Verhexter Terrortroll (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40225
-UPDATE `creature_template_locale` SET `Name` = '[Hexed Dire Troll]' WHERE `locale` = 'deDE' AND `entry` = 40225;
--- OLD name : Verhexter Troll
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40225;
+-- OLD name : Verhexter Troll (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40231
-UPDATE `creature_template_locale` SET `Name` = '[Hexed Troll]' WHERE `locale` = 'deDE' AND `entry` = 40231;
--- OLD name : Krieger der Dunkelspeere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40231;
+-- OLD name : Krieger der Dunkelspeere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40241
-UPDATE `creature_template_locale` SET `Name` = '[Darkspear Warrior]' WHERE `locale` = 'deDE' AND `entry` = 40241;
--- OLD name : Sockel der Instantstatue
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40241;
+-- OLD name : Sockel der Instantstatue (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40246
-UPDATE `creature_template_locale` SET `Name` = '[Instant Statue Pedestal]' WHERE `locale` = 'deDE' AND `entry` = 40246;
--- OLD name : Champion Uru'zin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40246;
+-- OLD name : Champion Uru'zin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40253
-UPDATE `creature_template_locale` SET `Name` = '[Champion Uru''zin]' WHERE `locale` = 'deDE' AND `entry` = 40253;
--- OLD name : Trollbürgerin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40253;
+-- OLD name : Trollbürgerin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40256
-UPDATE `creature_template_locale` SET `Name` = '[Troll Citizen]' WHERE `locale` = 'deDE' AND `entry` = 40256;
--- OLD name : Trollbürger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40256;
+-- OLD name : Trollbürger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40257
-UPDATE `creature_template_locale` SET `Name` = '[Troll Citizen]' WHERE `locale` = 'deDE' AND `entry` = 40257;
--- OLD name : Trollfreiwilliger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40257;
+-- OLD name : Trollfreiwilliger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40260
-UPDATE `creature_template_locale` SET `Name` = '[Troll Volunteer]' WHERE `locale` = 'deDE' AND `entry` = 40260;
--- OLD name : Tikikrieger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40260;
+-- OLD name : Tikikrieger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40263
-UPDATE `creature_template_locale` SET `Name` = '[Tiki Warrior]' WHERE `locale` = 'deDE' AND `entry` = 40263;
--- OLD name : Trollfreiwilliger
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40263;
+-- OLD name : Trollfreiwilliger (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40264
-UPDATE `creature_template_locale` SET `Name` = '[Troll Volunteer]' WHERE `locale` = 'deDE' AND `entry` = 40264;
--- OLD name : Ruheloser Zombie
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40264;
+-- OLD name : [DND] Zen'tabra Cat Form (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=40265
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40265;
+-- OLD name : Ruheloser Zombie (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40274
-UPDATE `creature_template_locale` SET `Name` = '[Restless Zombie]' WHERE `locale` = 'deDE' AND `entry` = 40274;
--- OLD name : Bwonsamdi
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40274;
+-- OLD name : Bwonsamdi (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40279
-UPDATE `creature_template_locale` SET `Name` = '[Bwonsamdi]' WHERE `locale` = 'deDE' AND `entry` = 40279;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40279;
 -- OLD name : Blauer Aufziehraketenbot
 -- Source : https://www.wowhead.com/wotlk/de/npc=40295
 UPDATE `creature_template_locale` SET `Name` = 'Uhrwerkraketenbot' WHERE `locale` = 'deDE' AND `entry` = 40295;
--- OLD name : Tiger Matriarch Credit
+-- OLD name : Tiger Matriarch Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40301
-UPDATE `creature_template_locale` SET `Name` = '[Tiger Matriarch Credit]' WHERE `locale` = 'deDE' AND `entry` = 40301;
--- OLD name : Geist des Tigers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40301;
+-- OLD name : Geist des Tigers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40305
-UPDATE `creature_template_locale` SET `Name` = '[Spirit of the Tiger]' WHERE `locale` = 'deDE' AND `entry` = 40305;
--- OLD name : Tigermatriarchin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40305;
+-- OLD name : Tigermatriarchin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40312
-UPDATE `creature_template_locale` SET `Name` = '[Tiger Matriarch]' WHERE `locale` = 'deDE' AND `entry` = 40312;
--- OLD name : Zen'tabra
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40312;
+-- OLD name : Zen'tabra (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40329
-UPDATE `creature_template_locale` SET `Name` = '[Zen''tabra]' WHERE `locale` = 'deDE' AND `entry` = 40329;
--- OLD name : Hexendoktor Hez'tok
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40329;
+-- OLD name : Hexendoktor Hez'tok (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40352
-UPDATE `creature_template_locale` SET `Name` = '[Witch Doctor Hez''tok]' WHERE `locale` = 'deDE' AND `entry` = 40352;
--- OLD name : Ritualtänzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40352;
+-- OLD name : Zen'tabras Reiseform (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=40354
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40354;
+-- OLD name : Ritualtänzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40356
-UPDATE `creature_template_locale` SET `Name` = '[Ritual Dancer]' WHERE `locale` = 'deDE' AND `entry` = 40356;
--- OLD name : Vortänzertroll
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40356;
+-- OLD name : Vortänzertroll (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40361
-UPDATE `creature_template_locale` SET `Name` = '[Troll Dance Leader]' WHERE `locale` = 'deDE' AND `entry` = 40361;
--- OLD name : Tänzer
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40361;
+-- OLD name : Tänzer (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40363
-UPDATE `creature_template_locale` SET `Name` = '[Dance Participant]' WHERE `locale` = 'deDE' AND `entry` = 40363;
--- OLD name : Zalazanes Überreste
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40363;
+-- OLD name : Zalazanes Überreste (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40368
-UPDATE `creature_template_locale` SET `Name` = '[Zalazane''s Remains]' WHERE `locale` = 'deDE' AND `entry` = 40368;
--- OLD name : Ritualtrommler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40368;
+-- OLD name : Ritualtrommler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40373
-UPDATE `creature_template_locale` SET `Name` = '[Ritual Drummer]' WHERE `locale` = 'deDE' AND `entry` = 40373;
--- OLD name : Stimme der Geister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40373;
+-- OLD name : Stimme der Geister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40374
-UPDATE `creature_template_locale` SET `Name` = '[Voice of the Spirits]' WHERE `locale` = 'deDE' AND `entry` = 40374;
--- OLD name : Omen Event Credit
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40374;
+-- OLD name : Omen Event Credit (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40387
-UPDATE `creature_template_locale` SET `Name` = '[Omen Event Credit]' WHERE `locale` = 'deDE' AND `entry` = 40387;
--- OLD name : Vorfahre der Dunkelspeere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40387;
+-- OLD name : Vorfahre der Dunkelspeere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40388
-UPDATE `creature_template_locale` SET `Name` = '[Darkspear Ancestor]' WHERE `locale` = 'deDE' AND `entry` = 40388;
--- OLD name : Vol'jin
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40388;
+-- OLD name : Vol'jin (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40391
-UPDATE `creature_template_locale` SET `Name` = '[Vol''jin]' WHERE `locale` = 'deDE' AND `entry` = 40391;
--- OLD name : Krieger der Dunkelspeere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40391;
+-- OLD name : Krieger der Dunkelspeere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40392
-UPDATE `creature_template_locale` SET `Name` = '[Darkspear Warrior]' WHERE `locale` = 'deDE' AND `entry` = 40392;
--- OLD name : Tyrantus, subname : Kieupids Begleiter
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40392;
+-- OLD name : Tyrantus, subname : Kieupids Begleiter (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40404
-UPDATE `creature_template_locale` SET `Name` = '[Tyrantus]',`Title` = '[Kieupid''s Pet]' WHERE `locale` = 'deDE' AND `entry` = 40404;
--- OLD name : Bwonsamdis Knochen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40404;
+-- OLD name : Bwonsamdis Knochen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40414
-UPDATE `creature_template_locale` SET `Name` = '[Bones of Bwonsamdi]' WHERE `locale` = 'deDE' AND `entry` = 40414;
--- OLD name : Fledermaus des Spähers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40414;
+-- OLD name : Fledermaus des Spähers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40415
-UPDATE `creature_template_locale` SET `Name` = '[Scout''s Bat]' WHERE `locale` = 'deDE' AND `entry` = 40415;
--- OLD name : Späher der Dunkelspeere
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40415;
+-- OLD name : Späher der Dunkelspeere (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40416
-UPDATE `creature_template_locale` SET `Name` = '[Darkspear Scout]' WHERE `locale` = 'deDE' AND `entry` = 40416;
--- OLD name : Voodootroll
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40416;
+-- OLD name : Voodootroll (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40425
-UPDATE `creature_template_locale` SET `Name` = '[Voodoo Troll]' WHERE `locale` = 'deDE' AND `entry` = 40425;
--- OLD name : Winziger Mondstoffteppich
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40425;
+-- OLD name : Winziger Mondstoffteppich (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40426
-UPDATE `creature_template_locale` SET `Name` = '[Tiny Mooncloth Carpet]' WHERE `locale` = 'deDE' AND `entry` = 40426;
--- OLD name : Winkeladvokat des Dampfdruckkartells, subname : Dungeonmeister
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40426;
+-- OLD name : [DND] Quest Credit Bunny - ET Battle (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=40428
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40428;
+-- OLD name : Winkeladvokat des Dampfdruckkartells, subname : Dungeonmeister (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40438
-UPDATE `creature_template_locale` SET `Name` = '[Steamwheedle Shyster]',`Title` = '[Dungeonmaster]' WHERE `locale` = 'deDE' AND `entry` = 40438;
--- OLD name : Elgin Klicksprung, subname : Assistentin des Hochtüftlers
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40438;
+-- OLD name : Elgin Klicksprung, subname : Assistentin des Hochtüftlers (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40478
-UPDATE `creature_template_locale` SET `Name` = '[Elgin Clickspring]',`Title` = '[High Tinker''s Assistant]' WHERE `locale` = 'deDE' AND `entry` = 40478;
--- OLD name : Kamerafahrzeug
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40478;
+-- OLD name : Kamerafahrzeug (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40479
-UPDATE `creature_template_locale` SET `Name` = '[Camera Vehicle]' WHERE `locale` = 'deDE' AND `entry` = 40479;
--- OLD name : Feiernder Troll
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40479;
+-- OLD name : Feiernder Troll (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40481
-UPDATE `creature_template_locale` SET `Name` = '[Troll Celebrant]' WHERE `locale` = 'deDE' AND `entry` = 40481;
--- OLD name : Zild'jian, subname : Vol'jins Kriegstrommler
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40481;
+-- OLD name : Zild'jian, subname : Vol'jins Kriegstrommler (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40492
-UPDATE `creature_template_locale` SET `Name` = '[Zild''jian]',`Title` = '[Vol''jin''s Wardrummer]' WHERE `locale` = 'deDE' AND `entry` = 40492;
--- OLD name : Zalazane
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40492;
+-- OLD name : Zalazane (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40502
-UPDATE `creature_template_locale` SET `Name` = '[Zalazane]' WHERE `locale` = 'deDE' AND `entry` = 40502;
--- OLD name : Explosion Bunny
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40502;
+-- OLD name : Explosion Bunny (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40506
-UPDATE `creature_template_locale` SET `Name` = '[Explosion Bunny]' WHERE `locale` = 'deDE' AND `entry` = 40506;
--- OLD name : Hauptmann T'Maire Sydes, subname : Rüstmeisterin für Rüstungen aus Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40506;
+-- OLD name : Hauptmann T'Maire Sydes, subname : Rüstmeisterin für Rüstungen aus Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40606
-UPDATE `creature_template_locale` SET `Name` = '[Knight-Lieutenant T''Maire Sydes]',`Title` = '[Northrend Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 40606;
--- OLD name : Hauptmann T'Maire Sydes, subname : Rüstmeisterin für Rüstungen aus Nordend
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40606;
+-- OLD name : Hauptmann T'Maire Sydes, subname : Rüstmeisterin für Rüstungen aus Nordend (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40607
-UPDATE `creature_template_locale` SET `Name` = '[Knight-Lieutenant T''Maire Sydes]',`Title` = '[Northrend Armor Quartermaster]' WHERE `locale` = 'deDE' AND `entry` = 40607;
--- OLD name : Himmelsross
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40607;
+-- OLD name : [DND] Bunny (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=40617
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40617;
+-- OLD name : Himmelsross (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40625
-UPDATE `creature_template_locale` SET `Name` = '[Celestial Steed]' WHERE `locale` = 'deDE' AND `entry` = 40625;
--- OLD name : Protodrachenreittier der Vrykul
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40625;
+-- OLD name : Protodrachenreittier der Vrykul (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40704
-UPDATE `creature_template_locale` SET `Name` = '[Vrykul Proto-dragon Mount]' WHERE `locale` = 'deDE' AND `entry` = 40704;
--- OLD name : Crafticus Jones, subname : Nicht spawnen
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40704;
+-- OLD name : Crafticus Jones, subname : Nicht spawnen (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40724
-UPDATE `creature_template_locale` SET `Name` = '[Crafticus Jones]',`Title` = '[Do Not Spawn]' WHERE `locale` = 'deDE' AND `entry` = 40724;
--- OLD name : X-53 Reiserakete
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40724;
+-- OLD name : X-53 Reiserakete (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40725
-UPDATE `creature_template_locale` SET `Name` = '[X-53 Touring Rocket]' WHERE `locale` = 'deDE' AND `entry` = 40725;
--- OLD name : Rubindrache
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40725;
+-- OLD name : Rubindrache (NO TRANSLATION EXIST)
 -- Source : https://www.wowhead.com/wotlk/de/npc=40842
-UPDATE `creature_template_locale` SET `Name` = '[Ruby Drake]' WHERE `locale` = 'deDE' AND `entry` = 40842;
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 40842;
+-- OLD name : [DND] Controller (NO TRANSLATION EXIST)
+-- Source : https://www.wowhead.com/wotlk/de/npc=41839
+DELETE FROM `creature_template_locale` WHERE `locale` = 'deDE' AND `entry` = 41839;
