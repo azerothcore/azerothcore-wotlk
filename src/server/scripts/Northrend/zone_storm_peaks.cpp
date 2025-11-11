@@ -31,6 +31,7 @@
 enum qSniffingOutThePerpetrator
 {
     NPC_FROSTHOUND                          = 29677,
+    NPC_FROSTBITE                           = 29903,
     SPELL_SUMMON_PURSUERS_PERIODIC          = 54993,
     SPELL_SNIFFING_CREDIT                   = 55477,
     TALK_EMOTE_FROSTHOUND_SNIFF             = 0,
@@ -41,7 +42,7 @@ enum qSniffingOutThePerpetrator
 
 struct npc_frosthound : public npc_escortAI
 {
-    explicit npc_frosthound(Creature* creature) : npc_escortAI(creature), _summons(creature) {}
+    explicit npc_frosthound(Creature* creature) : npc_escortAI(creature), _summons(creature), _completionWaypoint((creature->GetEntry() == NPC_FROSTBITE) ? 19 : 34) { }
 
     void AttackStart(Unit* /*who*/) override {}
     void JustEngagedWith(Unit* /*who*/) override {}
@@ -77,20 +78,15 @@ struct npc_frosthound : public npc_escortAI
         if (!player)
             return;
 
-        switch (waypointId)
+        if (waypointId == 0)
+            Talk(TALK_SEEN, player);
+        else if (waypointId == _completionWaypoint)
         {
-            case 0:
-                Talk(TALK_SEEN, player);
-                break;
-            case 34:
-                Talk(TALK_EMOTE_TRACKED_COMPLETE, me);
-                Talk(TALK_CONFRONT, player);
-                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                    summoner->ToPlayer()->KilledMonsterCredit(NPC_FROSTHOUND);
-                _summons.DespawnAll();
-                break;
-            default:
-                break;
+            Talk(TALK_EMOTE_TRACKED_COMPLETE, me);
+            Talk(TALK_CONFRONT, player);
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                summoner->ToPlayer()->KilledMonsterCredit(NPC_FROSTHOUND); // same credit for Alliance and Horde
+            _summons.DespawnAll();
         }
     }
 
@@ -112,6 +108,7 @@ struct npc_frosthound : public npc_escortAI
 
 private:
     SummonList _summons;
+    uint32 _completionWaypoint;
 };
 
 enum eIronWatcher
@@ -467,17 +464,7 @@ public:
             if (startPath)
             {
                 startPath = false;
-                Movement::PointsArray pathPoints;
-                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath());
-                for (uint8 i = 0; i < i_path->size(); ++i)
-                {
-                    WaypointData const* node = i_path->at(i);
-                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                }
-
-                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
             }
             if (setCharm)
             {
@@ -849,17 +836,7 @@ public:
                             {
                                 Talk(TEXT_EMOTE, passenger);
 
-                                Movement::PointsArray pathPoints;
-                                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                                WaypointPath const* i_path = sWaypointMgr->GetPath(NPC_DRAKE);
-                                for (uint8 i = 0; i < i_path->size(); ++i)
-                                {
-                                    WaypointData const* node = i_path->at(i);
-                                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                                }
-
-                                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                                me->GetMotionMaster()->MovePath(NPC_DRAKE, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
                             }
                     }
                     else
@@ -1087,15 +1064,7 @@ public:
         {
             if (apply)
             {
-                Movement::PointsArray pathPoints;
-                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetEntry() * 100);
-                for (uint8 i = 0; i < i_path->size(); ++i)
-                {
-                    WaypointData const* node = i_path->at(i);
-                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                }
-                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 100, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
                 me->SetSpeed(MOVE_RUN, 6.0f);

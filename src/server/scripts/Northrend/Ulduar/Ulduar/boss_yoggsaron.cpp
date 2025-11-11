@@ -24,6 +24,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
@@ -102,8 +103,7 @@ enum YoggSpells
 
     // CONSTRICTOR TENTACLE
     SPELL_LUNGE                         = 64123,
-    SPELL_SQUEEZE_10                    = 64125,
-    SPELL_SQUEEZE_25                    = 64126,
+    SPELL_SQUEEZE                       = 64125,
 
     // CORRUPTOR TENTACLE
     SPELL_APATHY                        = 64156,
@@ -142,14 +142,9 @@ enum YoggSpells
     SPELL_SIMPLE_TELEPORT               = 64195,
     SPELL_EMPOWERED                     = 65294,
     SPELL_EMPOWERED_PASSIVE             = 64161,
-    SPELL_DRAIN_LIFE_10                 = 64159,
-    SPELL_DRAIN_LIFE_25                 = 64160,
+    SPELL_DRAIN_LIFE                    = 64159,
     SPELL_RECENTLY_SPAWNED              = 64497,
 };
-
-#define SPELL_PSYCHOSIS         RAID_MODE(SPELL_SARA_PSYCHOSIS_10, SPELL_SARA_PSYCHOSIS_25)
-#define SPELL_SQUEEZE           RAID_MODE(SPELL_SQUEEZE_10, SPELL_SQUEEZE_25)
-#define SPELL_DRAIN_LIFE        RAID_MODE(SPELL_DRAIN_LIFE_10, SPELL_DRAIN_LIFE_25)
 
 enum YoggEvents
 {
@@ -846,7 +841,7 @@ public:
                     {
                         Talk(SAY_SARA_PSYCHOSIS_HIT);
                     }
-                    me->CastCustomSpell(SPELL_PSYCHOSIS, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                    me->CastCustomSpell(SPELL_SARA_PSYCHOSIS_10, SPELLVALUE_MAX_TARGETS, 1, me, false);
                     events.Repeat(3500ms);
                     break;
                 case EVENT_SARA_P2_DEATH_RAY:
@@ -1677,7 +1672,7 @@ public:
             {
                 if (me->GetDistance(itr->GetSource()) > 10 || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     continue;
-                if (itr->GetSource()->HasAura(SPELL_SQUEEZE) || itr->GetSource()->HasAura(SPELL_INSANE1))
+                if (itr->GetSource()->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me)) || itr->GetSource()->HasAura(SPELL_INSANE1))
                     continue;
 
                 if (count <= num || !target)
@@ -1719,7 +1714,7 @@ public:
         void JustDied(Unit*) override
         {
             if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
-                player->RemoveAura(SPELL_SQUEEZE);
+                player->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me));
         }
     };
 };

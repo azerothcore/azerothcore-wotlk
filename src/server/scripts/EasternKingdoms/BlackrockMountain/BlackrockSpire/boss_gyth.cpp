@@ -128,7 +128,7 @@ public:
                             events.ScheduleEvent(EVENT_SUMMONED_2, 2s);
                             break;
                         case EVENT_SUMMONED_2:
-                            me->GetMotionMaster()->MovePath(GYTH_PATH_1, false);
+                            me->GetMotionMaster()->MoveWaypoint(GYTH_PATH_1, false);
                             break;
                         default:
                             break;
