@@ -21,10 +21,8 @@
 
 enum Spells
 {
-    SPELL_CONSTRICTING_CHAINS_N                 = 52696,
-    SPELL_CONSTRICTING_CHAINS_H                 = 58823,
-    SPELL_DISEASE_EXPULSION_N                   = 52666,
-    SPELL_DISEASE_EXPULSION_H                   = 58824,
+    SPELL_CONSTRICTING_CHAINS                   = 52696,
+    SPELL_DISEASE_EXPULSION                     = 52666,
     SPELL_FRENZY                                = 58841,
 };
 
@@ -97,7 +95,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_DISEASE_EXPULSION:
-                    me->CastSpell(me, DUNGEON_MODE(SPELL_DISEASE_EXPULSION_N, SPELL_DISEASE_EXPULSION_H), false);
+                    me->CastSpell(me, SPELL_DISEASE_EXPULSION, false);
                     events.Repeat(6s);
                     break;
                 case EVENT_SPELL_FRENZY:
@@ -106,7 +104,7 @@ public:
                     break;
                 case EVENT_SPELL_CONSTRICTING_CHAINS:
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinThreat, 0, 50.0f, true))
-                        me->CastSpell(pTarget, DUNGEON_MODE(SPELL_CONSTRICTING_CHAINS_N, SPELL_CONSTRICTING_CHAINS_H), false);
+                        me->CastSpell(pTarget, SPELL_CONSTRICTING_CHAINS, false);
                     events.Repeat(14s);
                     break;
             }

@@ -18,9 +18,28 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <cstdint>
 #include <stdexcept>
 #include <string_view>
 #include <vector>
+
+enum class ConfigSeverity : uint8_t
+{
+    Skip,
+    Warn,
+    Error,
+    Fatal
+};
+
+struct ConfigPolicy
+{
+    ConfigSeverity defaultSeverity = ConfigSeverity::Warn;
+    ConfigSeverity missingFileSeverity = ConfigSeverity::Error;
+    ConfigSeverity missingOptionSeverity = ConfigSeverity::Warn;
+    ConfigSeverity criticalOptionSeverity = ConfigSeverity::Fatal;
+    ConfigSeverity unknownOptionSeverity = ConfigSeverity::Error;
+    ConfigSeverity valueErrorSeverity = ConfigSeverity::Error;
+};
 
 class ConfigMgr
 {
@@ -32,7 +51,7 @@ class ConfigMgr
 public:
     bool LoadAppConfigs(bool isReload = false);
     bool LoadModulesConfigs(bool isReload = false, bool isNeedPrintInfo = true);
-    void Configure(std::string const& initFileName, std::vector<std::string> args, std::string_view modulesConfigList = {});
+    void Configure(std::string const& initFileName, std::vector<std::string> args, std::string_view modulesConfigList = {}, ConfigPolicy policy = {});
 
     static ConfigMgr* instance();
 

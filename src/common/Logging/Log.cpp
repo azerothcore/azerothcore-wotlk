@@ -211,13 +211,16 @@ void Log::ReadLoggersFromConfig()
         AppenderConsole* appender = new AppenderConsole(NextAppenderId(), "Console", LOG_LEVEL_DEBUG, APPENDER_FLAGS_NONE, {});
         appenders[appender->getId()].reset(appender);
 
-        Logger* rootLogger = new Logger(LOGGER_ROOT, LOG_LEVEL_ERROR);
+        Logger* rootLogger = new Logger(LOGGER_ROOT, LOG_LEVEL_WARN);
         rootLogger->addAppender(appender->getId(), appender);
         loggers[LOGGER_ROOT].reset(rootLogger);
 
         Logger* serverLogger = new Logger("server", LOG_LEVEL_INFO);
         serverLogger->addAppender(appender->getId(), appender);
         loggers["server"].reset(serverLogger);
+
+        highestLogLevel = LOG_LEVEL_INFO;
+        return;
     }
 }
 

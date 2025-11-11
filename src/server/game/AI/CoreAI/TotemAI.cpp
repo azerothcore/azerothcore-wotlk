@@ -135,6 +135,6 @@ void TotemAI::AttackStart(Unit* /*victim*/)
         data << me->GetGUID();
         data << me->GetPositionX();
         data << me->GetPositionY();
-        me->GetOwner()->ToPlayer()->GetSession()->SendPacket(&data);
+        me->GetOwner()->ToPlayer()->SendDirectMessage(&data);
     }
 }

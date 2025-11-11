@@ -43,7 +43,7 @@ enum Says
 
 enum Misc
 {
-    POINT_SCOUT_WP_END       = 3,
+    POINT_SCOUT_WP_END       = 4,
 
     SET_DATA_ARBITRARY_VALUE = 1,
     SET_DATA_ENCOUNTER_DONE  = 2
@@ -100,7 +100,7 @@ struct npc_shattered_hand_scout : public ScriptedAI
             DoCastSelf(SPELL_CLEAR_ALL);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             Talk(SAY_INVADERS_BREACHED);
-            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
 
             _firstZealots.clear();
             std::list<Creature*> creatureList;

@@ -118,6 +118,12 @@ export CCACHE_DIR=${CCACHE_DIR:-"$AC_PATH_VAR/ccache"}
 #
 export AC_ENABLE_ROOT_CMAKE_INSTALL=${AC_ENABLE_ROOT_CMAKE_INSTALL:-0}
 
+#
+# Enable copying configuration files on install
+# Default: 1 (true)
+#
+export AC_ENABLE_CONF_COPY_ON_INSTALL=${AC_ENABLE_CONF_COPY_ON_INSTALL:-1}
+
 ##############################################
 #
 #  GOOGLE PERF TOOLS
@@ -181,5 +187,35 @@ export MODULES_EXCLUDE_LIST=""
 
 NO_COLOR=${NO_COLOR:-}
 FORCE_COLOR=${FORCE_COLOR:-}
+
+##############################################
+#
+#  CONFIGURATION SEVERITY POLICY
+#
+#  Controls how the core reacts to missing configuration files,
+#  missing/unknown options and invalid values.
+#  The policy string follows the format "key=severity" separated by commas.
+#  Supported severities: skip, warn, error, fatal.
+#  Possible keys: default, missing_file, missing_option, critical_option,
+#  unknown_option, value_error.
+#
+#  Examples:
+#    export AC_CONFIG_POLICY="$AC_CONFIG_POLICY_PRESET_DEFAULT"
+#    export AC_CONFIG_POLICY="default=skip,critical_option=fatal,unknown_option=warn"
+#    export AC_CONFIG_POLICY="missing_file=fatal,missing_option=error"
+#
+#  Presets:
+#    AC_CONFIG_POLICY_PRESET_DEFAULT     -> mirrors the core default behaviour
+#                                          (errors on missing files, fatal on critical)
+#    AC_CONFIG_POLICY_PRESET_ZERO_CONF  -> skips non-critical gaps so the core
+#                                          can boot from environment defaults
+#    AC_CONFIG_POLICY_PRESET_STRICT     -> escalates everything to errors/fatals
+#
+
+export AC_CONFIG_POLICY_PRESET_ZERO_CONF='default=skip'
+export AC_CONFIG_POLICY_PRESET_DEFAULT='missing_file=error,missing_option=warn,critical_option=fatal,unknown_option=error,value_error=error'
+export AC_CONFIG_POLICY_PRESET_STRICT='default=error,missing_file=fatal,missing_option=error,critical_option=fatal,unknown_option=error,value_error=error'
+
+export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_DEFAULT
 
 

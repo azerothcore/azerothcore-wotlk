@@ -354,7 +354,7 @@ void AuctionHouseSearcher::Update()
     {
         Player* player = ObjectAccessor::FindConnectedPlayer(response->playerGuid);
         if (player)
-            player->GetSession()->SendPacket(&response->packet);
+            player->SendDirectMessage(&response->packet);
 
         delete response;
     }

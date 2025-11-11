@@ -10,8 +10,12 @@ on:
       - synchronize
 
 concurrency:
-  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  group: ${{ github.head_ref }} || concat(${{ github.ref_name }}, ${{ github.workflow }})
   cancel-in-progress: true
+
+permissions:
+  actions: write
+  contents: read
 
 jobs:
   build:

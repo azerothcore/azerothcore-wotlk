@@ -23,14 +23,12 @@
 
 enum Spells
 {
-    SPELL_SHADOW_BOLT_N                         = 57725,
-    SPELL_SHADOW_BOLT_H                         = 58827,
+    SPELL_SHADOW_BOLT                           = 57725,
     SPELL_STEAL_FLESH_CHANNEL                   = 52708,
     SPELL_STEAL_FLESH_TARGET                    = 52711,
     SPELL_STEAL_FLESH_CASTER                    = 52712,
     SPELL_SUMMON_GHOULS                         = 52451,
-    SPELL_EXPLODE_GHOUL_N                       = 52480,
-    SPELL_EXPLODE_GHOUL_H                       = 58825,
+    SPELL_EXPLODE_GHOUL                         = 52480,
     SPELL_CURSE_OF_TWISTED_FAITH                = 58845,
 };
 
@@ -112,7 +110,7 @@ public:
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
                     if (cr->IsAlive())
                     {
-                        me->CastSpell(cr, DUNGEON_MODE(SPELL_EXPLODE_GHOUL_N, SPELL_EXPLODE_GHOUL_H), false);
+                        me->CastSpell(cr, SPELL_EXPLODE_GHOUL, false);
                         return;
                     }
         }
@@ -129,7 +127,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOW_BOLT:
-                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
+                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
                     events.Repeat(10s);
                     break;
                 case EVENT_SPELL_STEAL_FLESH:

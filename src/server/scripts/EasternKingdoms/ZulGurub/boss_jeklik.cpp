@@ -140,7 +140,7 @@ struct boss_jeklik : public BossAI
         me->SetDisableGravity(true);
         DoCastSelf(SPELL_BAT_FORM, true);
 
-        me->GetMotionMaster()->MovePath(PATH_JEKLIK_INTRO, false);
+        me->GetMotionMaster()->MoveWaypoint(PATH_JEKLIK_INTRO, false);
     }
 
     void PathEndReached(uint32 pathId) override
@@ -295,7 +295,7 @@ struct npc_batrider : public CreatureAI
             me->SetSpeed(MOVE_WALK, 5.0f, true);
 
             me->SetCanFly(true);
-            me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);
+            me->GetMotionMaster()->MovePath(PATH_BATRIDER_LOOP);
         }
         else
         {
@@ -375,7 +375,7 @@ struct npc_batrider : public CreatureAI
             if (!me->isMoving())
             {
                 me->SetCanFly(true);
-                me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);
+                me->GetMotionMaster()->MovePath(PATH_BATRIDER_LOOP);
             }
         }
         else if (_mode == BATRIDER_MODE_TRASH)

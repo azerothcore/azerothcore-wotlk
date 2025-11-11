@@ -25,13 +25,11 @@
 enum LokenSpells
 {
     SPELL_ARC_LIGHTNING             = 52921,
-    SPELL_LIGHTNING_NOVA_N          = 52960,
-    SPELL_LIGHTNING_NOVA_H          = 59835,
+    SPELL_LIGHTNING_NOVA            = 52960,
     SPELL_LIGHTNING_NOVA_VISUAL     = 56502,
     SPELL_LIGHTNING_NOVA_THUNDERS   = 52663,
 
-    SPELL_PULSING_SHOCKWAVE_N       = 52961,
-    SPELL_PULSING_SHOCKWAVE_H       = 59836,
+    SPELL_PULSING_SHOCKWAVE         = 52961,
 
     // Achievement
     ACHIEVEMENT_TIMELY_DEATH        = 20384
@@ -146,10 +144,10 @@ struct boss_loken : public BossAI
                 events.DelayEvents(5s);
                 events.ScheduleEvent(EVENT_AURA_REMOVE, me->GetMap()->IsHeroic() ? 4s : 5s);
 
-                me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_LIGHTNING_NOVA_H : SPELL_LIGHTNING_NOVA_N, false);
+                me->CastSpell(me, SPELL_LIGHTNING_NOVA, false);
                 break;
             case EVENT_SHOCKWAVE:
-                me->CastSpell(me, me->GetMap()->IsHeroic() ? SPELL_PULSING_SHOCKWAVE_H : SPELL_PULSING_SHOCKWAVE_N, false);
+                me->CastSpell(me, SPELL_PULSING_SHOCKWAVE, false);
                 break;
             case EVENT_ARC_LIGHTNING:
                 if (Unit* target = SelectTargetFromPlayerList(100, SPELL_ARC_LIGHTNING))

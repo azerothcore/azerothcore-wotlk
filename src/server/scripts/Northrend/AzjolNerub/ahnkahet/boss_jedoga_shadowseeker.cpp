@@ -54,12 +54,9 @@ enum Spells
 
     // FIGHT
     SPELL_GIFT_OF_THE_HERALD                = 56219,
-    SPELL_CYCLONE_STRIKE                    = 56855, // Self
-    SPELL_CYCLONE_STRIKE_H                  = 60030,
-    SPELL_LIGHTNING_BOLT                    = 56891, // 40Y
-    SPELL_LIGHTNING_BOLT_H                  = 60032, // 40Y
-    SPELL_THUNDERSHOCK                      = 56926, // 30Y
-    SPELL_THUNDERSHOCK_H                    = 60029  // 30Y
+    SPELL_CYCLONE_STRIKE                    = 56855,
+    SPELL_LIGHTNING_BOLT                    = 56891,
+    SPELL_THUNDERSHOCK                      = 56926,
 };
 
 enum Events
@@ -461,7 +458,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 // Normal phase
                 case EVENT_JEDOGA_CYCLONE:
                 {
-                    DoCastSelf(DUNGEON_MODE(SPELL_CYCLONE_STRIKE, SPELL_CYCLONE_STRIKE_H), false);
+                    DoCastSelf(SPELL_CYCLONE_STRIKE, false);
                     events.Repeat(10s, 14s);
                     break;
                 }
@@ -469,7 +466,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
-                        DoCast(pTarget, DUNGEON_MODE(SPELL_LIGHTNING_BOLT, SPELL_LIGHTNING_BOLT_H), false);
+                        DoCast(pTarget, SPELL_LIGHTNING_BOLT, false);
                     }
                     events.Repeat(11s, 15s);
                     break;
@@ -478,7 +475,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
-                        DoCast(pTarget, DUNGEON_MODE(SPELL_THUNDERSHOCK, SPELL_THUNDERSHOCK_H), false);
+                        DoCast(pTarget, SPELL_THUNDERSHOCK, false);
                     }
 
                     events.Repeat(16s, 22s);

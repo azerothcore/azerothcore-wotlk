@@ -29,10 +29,8 @@ enum Spells
     SPELL_OVERCHARGE                = 64218,
     SPELL_BERSERK                   = 26662,
 
-    SPELL_CHAIN_LIGHTNING_10        = 64213,
-    SPELL_CHAIN_LIGHTNING_25        = 64215,
-    SPELL_LIGHTNING_NOVA_10         = 64216,
-    SPELL_LIGHTNING_NOVA_25         = 65279,
+    SPELL_CHAIN_LIGHTNING           = 64213,
+    SPELL_LIGHTNING_NOVA            = 64216,
 };
 
 enum Events
@@ -171,11 +169,11 @@ public:
             {
                 case EVENT_CHAIN_LIGHTNING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25), false);
+                        me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.Repeat(25s);
                     break;
                 case EVENT_LIGHTNING_NOVA:
-                    me->CastSpell(me, RAID_MODE(SPELL_LIGHTNING_NOVA_10, SPELL_LIGHTNING_NOVA_25), false);
+                    me->CastSpell(me, SPELL_LIGHTNING_NOVA, false);
                     events.Repeat(40s);
                     break;
                 case EVENT_OVERCHARGE:

@@ -22,8 +22,7 @@
 enum Spells
 {
     SPELL_MAGIC_PULL                    = 51336,
-    SPELL_THUNDERING_STOMP_N            = 50774,
-    SPELL_THUNDERING_STOMP_H            = 59370,
+    SPELL_THUNDERING_STOMP              = 50774,
 
     SPELL_UNSTABLE_SPHERE_PASSIVE       = 50756,
     SPELL_UNSTABLE_SPHERE_PULSE         = 50757,
@@ -43,8 +42,6 @@ enum Events
     EVENT_SUMMON                        = 3,
     EVENT_SUMMON_x4                     = 4,
 };
-
-#define SPELL_THUNDERING_STOMP          DUNGEON_MODE(SPELL_THUNDERING_STOMP_N, SPELL_THUNDERING_STOMP_H)
 
 enum Yells
 {

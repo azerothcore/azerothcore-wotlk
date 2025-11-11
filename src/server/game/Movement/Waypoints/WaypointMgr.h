@@ -22,6 +22,7 @@
 #include <optional>
 #include <unordered_map>
 #include <vector>
+#include <map>
 
 enum WaypointMoveType
 {
@@ -39,12 +40,12 @@ struct WaypointData
     float x, y, z;
     std::optional<float> orientation;
     uint32 delay;
-    uint32 event_id;
-    uint32 move_type;
-    uint8 event_chance;
+    uint32 event_id = 0;
+    uint32 move_type = 0;
+    uint8 event_chance = 0;
 };
 
-typedef std::vector<WaypointData*> WaypointPath;
+typedef std::map<uint32, WaypointData> WaypointPath;
 typedef std::unordered_map<uint32, WaypointPath> WaypointPathContainer;
 
 class WaypointMgr

@@ -23,8 +23,7 @@ enum Spells
 {
     SPELL_ENSNARING_MOSS    = 31948,
     SPELL_FRENZY            = 34970,
-    SPELL_GRIEVOUS_WOUND_N  = 31956,
-    SPELL_GRIEVOUS_WOUND_H  = 38801,
+    SPELL_GRIEVOUS_WOUND  = 31956,
     SPELL_WATER_SPIT        = 35008
 };
 
@@ -53,7 +52,7 @@ struct boss_rokmar_the_crackler : public BossAI
 
         scheduler.Schedule(8s, [this] (TaskContext context)
         {
-            DoCastVictim(DUNGEON_MODE(SPELL_GRIEVOUS_WOUND_N, SPELL_GRIEVOUS_WOUND_H));
+            DoCastVictim(SPELL_GRIEVOUS_WOUND);
             context.Repeat(20700ms);
         }).Schedule(15300ms, [this](TaskContext context)
         {

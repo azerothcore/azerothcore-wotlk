@@ -567,9 +567,9 @@ struct npc_pet_gen_imp_in_a_bottle : public NullCreatureAI
                     for (GroupReference* itr = player->GetGroup()->GetFirstMember(); itr != nullptr && limit < 4; itr = itr->next(), ++limit)
                         if (Player* groupPlayer = itr->GetSource())
                             if (groupPlayer != player)
-                                groupPlayer->GetSession()->SendPacket(&_data);
+                                groupPlayer->SendDirectMessage(&_data);
 
-                player->GetSession()->SendPacket(&_data);
+                player->SendDirectMessage(&_data);
             }
         }
     }

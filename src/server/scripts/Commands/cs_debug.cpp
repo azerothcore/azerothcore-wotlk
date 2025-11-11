@@ -433,7 +433,7 @@ public:
         }
 
         data.hexlike();
-        player->GetSession()->SendPacket(&data);
+        player->SendDirectMessage(&data);
         handler->PSendSysMessage(LANG_COMMAND_OPCODESENT, data.GetOpcode(), unit->GetName());
         return true;
     }

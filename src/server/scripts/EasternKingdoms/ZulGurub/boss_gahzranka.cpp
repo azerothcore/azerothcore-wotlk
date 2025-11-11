@@ -41,7 +41,7 @@ struct boss_gahzranka : public BossAI
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
-        me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+        me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override

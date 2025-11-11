@@ -44,7 +44,7 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if (type != WAYPOINT_MOTION_TYPE || id != 12)
+            if (type != WAYPOINT_MOTION_TYPE || id != 13)
             {
                 return;
             }

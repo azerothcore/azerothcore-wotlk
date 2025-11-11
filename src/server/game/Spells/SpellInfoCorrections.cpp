@@ -2187,12 +2187,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(1);
     });
 
-    // Halls of Lightning, Arcing Burn
-    ApplySpellFix({ 52671, 59834 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
-    });
-
     // Trial of the Champion, Death's Respite
     ApplySpellFix({ 68306 }, [](SpellInfo* spellInfo)
     {
@@ -5155,6 +5149,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 55599, 58981 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx5 |= SPELL_ATTR5_LIMIT_N;
+    });
+
+    // Acid Splash
+    ApplySpellFix({ 52446, 59363 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

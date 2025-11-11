@@ -25,25 +25,18 @@ enum Spells
     // SJONNIR
     SPELL_FRENZY                            = 28747, //at 20% hp
     SPELL_CHAIN_LIGHTNING                   = 50830,
-    SPELL_CHAIN_LIGHTNING_H                 = 59844,
     SPELL_LIGHTNING_SHIELD                  = 50831,
-    SPELL_LIGHTNING_SHIELD_H                = 59845,
     SPELL_STATIC_CHARGE                     = 50834,
-    SPELL_STATIC_CHARGE_H                   = 59846,
     SPELL_LIGHTNING_RING                    = 50840,
-    SPELL_LIGHTNING_RING_H                  = 59848,
 
     // IRON SLUDGE
     SPELL_TOXIC_VOLLEY                      = 50838,
-    SPELL_TOXIC_VOLLEY_H                    = 59853,
 
     // FORGED IRON DWARF
     SPELL_LIGHTNING_TETHER                  = 50895,
-    SPELL_LIGHTNING_TETHER_H                = 59851,
 
     // FORGED IRON TROGG
     SPELL_LIGHTNING_SHOCK                   = 50900,
-    SPELL_LIGHTNING_SHOCK_H                 = 59852,
 };
 
 enum Npc
@@ -241,14 +234,14 @@ public:
                     }
                 case EVENT_SHIELD:
                     {
-                        me->CastSpell(me, DUNGEON_MODE(SPELL_LIGHTNING_SHIELD, SPELL_LIGHTNING_SHIELD_H), false);
+                        me->CastSpell(me, SPELL_LIGHTNING_SHIELD, false);
                         events.Repeat(14s, 19s);
                         break;
                     }
                 case EVENT_CHAIN_LIGHTNING:
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, DUNGEON_MODE(SPELL_CHAIN_LIGHTNING, SPELL_CHAIN_LIGHTNING_H), false);
+                            me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
 
                         events.Repeat(6s, 12s);
                         break;
@@ -256,14 +249,14 @@ public:
                 case EVENT_STATIC_CHARGE:
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, DUNGEON_MODE(SPELL_STATIC_CHARGE, SPELL_STATIC_CHARGE_H), false);
+                            me->CastSpell(target, SPELL_STATIC_CHARGE, false);
 
                         events.Repeat(20s);
                         break;
                     }
                 case EVENT_LIGHTNING_RING:
                     {
-                        me->CastSpell(me, DUNGEON_MODE(SPELL_LIGHTNING_RING, SPELL_LIGHTNING_RING_H), false);
+                        me->CastSpell(me, SPELL_LIGHTNING_RING, false);
                         events.Repeat(25s, 31s);
                         events.DelayEvents(10s); // Channel duration
                         break;
@@ -399,7 +392,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            DoSpellAttackIfReady((me->GetEntry() == NPC_FORGED_IRON_DWARF) ? DUNGEON_MODE(SPELL_LIGHTNING_TETHER, SPELL_LIGHTNING_TETHER_H) : DUNGEON_MODE(SPELL_LIGHTNING_SHOCK, SPELL_LIGHTNING_SHOCK_H));
+            DoSpellAttackIfReady((me->GetEntry() == NPC_FORGED_IRON_DWARF) ? SPELL_LIGHTNING_TETHER : SPELL_LIGHTNING_SHOCK);
         }
     };
 };
@@ -448,7 +441,7 @@ public:
                 // Every 5 seconds
                 case EVENT_TOXIC_VOLLEY:
                     {
-                        me->CastSpell(me, DUNGEON_MODE(SPELL_TOXIC_VOLLEY, SPELL_TOXIC_VOLLEY_H), false);
+                        me->CastSpell(me, SPELL_TOXIC_VOLLEY, false);
                         events.Repeat(5s);
                         break;
                     }

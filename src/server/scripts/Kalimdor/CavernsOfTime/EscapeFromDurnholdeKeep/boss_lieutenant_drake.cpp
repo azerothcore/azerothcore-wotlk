@@ -48,7 +48,7 @@ struct boss_lieutenant_drake : public BossAI
     {
         runSecondPath = false;
         pathId = me->GetEntry() * 10;
-        me->GetMotionMaster()->MovePath(pathId, false);
+        me->GetMotionMaster()->MoveWaypoint(pathId, false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -114,10 +114,10 @@ struct boss_lieutenant_drake : public BossAI
         {
             switch (point)
             {
-                case 7:
+                case 8:
                     Talk(SAY_ENTER);
                     break;
-                case 10:
+                case 11:
                     pathId = (me->GetEntry() * 10) + 1;
                     runSecondPath = true;
                     break;
@@ -132,7 +132,7 @@ struct boss_lieutenant_drake : public BossAI
         if (runSecondPath)
         {
             runSecondPath = false;
-            me->GetMotionMaster()->MovePath(pathId, true);
+            me->GetMotionMaster()->MoveWaypoint(pathId, true);
         }
 
         if (!UpdateVictim())

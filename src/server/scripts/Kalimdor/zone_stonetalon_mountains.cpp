@@ -137,7 +137,10 @@ public:
         if (quest->GetQuestId() == QUEST_PROTECT_KAYA)
         {
             if (npc_escortAI* pEscortAI = CAST_AI(npc_kaya_flathoof::npc_kaya_flathoofAI, creature->AI()))
+            {
+                creature->SetWalk(true);
                 pEscortAI->Start(true, player->GetGUID());
+            }
 
             creature->AI()->Talk(SAY_START);
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);

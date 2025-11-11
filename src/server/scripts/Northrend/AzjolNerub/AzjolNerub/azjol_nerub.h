@@ -28,7 +28,7 @@ enum ANData
 {
     DATA_KRIKTHIR                       = 0,
     DATA_HADRONOX                       = 1,
-    DATA_ANUBARAK_EVENT                 = 2,
+    DATA_ANUBARAK                       = 2,
     MAX_ENCOUNTERS                      = 3
 };
 
@@ -41,6 +41,8 @@ enum ANIds
     NPC_SKITTERING_INFECTIOR            = 28736,
     NPC_KRIKTHIR_THE_GATEWATCHER        = 28684,
     NPC_HADRONOX                        = 28921,
+    NPC_ANUBARAK                        = 29120,
+
     NPC_ANUB_AR_CHAMPION                = 29062,
     NPC_ANUB_AR_NECROMANCER             = 29063,
     NPC_ANUB_AR_CRYPTFIEND              = 29064,
@@ -58,5 +60,7 @@ inline AI* GetAzjolNerubAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, AzjolNerubScriptName);
 }
+
+#define RegisterAzjolNerubCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetAzjolNerubAI)
 
 #endif

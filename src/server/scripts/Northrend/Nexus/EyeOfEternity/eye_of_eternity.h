@@ -71,14 +71,11 @@ enum eSpells
     SPELL_TELEPORT_VISUAL               = 52096,
 
     SPELL_SCION_ARCANE_BARRAGE          = 56397,
-    SPELL_ARCANE_SHOCK_N                = 57058,
-    SPELL_ARCANE_SHOCK_H                = 60073,
+    SPELL_ARCANE_SHOCK                  = 57058,
     SPELL_HASTE                         = 57060,
 
     SPELL_ALEXSTRASZA_GIFT              = 61028,
 };
-
-#define SPELL_ARCANE_SHOCK              DUNGEON_MODE(SPELL_ARCANE_SHOCK_N, SPELL_ARCANE_SHOCK_H)
 
 enum eAchiev
 {

@@ -9,8 +9,12 @@ on:
       - synchronize
 
 concurrency:
-  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  group: ${{ github.head_ref }} || concat(${{ github.ref_name }}, ${{ github.workflow }})
   cancel-in-progress: true
+
+permissions:
+  actions: write
+  contents: read
 
 jobs:
   macos-build:
@@ -31,13 +35,19 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/ccache
-          key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
+          key: ccache:${{ matrix.os }}:${{ github.ref_name }}
           restore-keys: |
-            ccache:${{ matrix.os }}:${{ github.ref }}
+            ccache:${{ matrix.os }}:${{ github.ref_name }}
             ccache:${{ matrix.os }}
+      - name: reset ccache stats
+        shell: bash
+        run: ccache -z || true
       - name: Install latest bash
         run: brew install bash
       - name: Configure OS
         run: source ./acore.sh install-deps
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
+      - name: ccache stats
+        shell: bash
+        run: ccache -s || true

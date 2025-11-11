@@ -40,8 +40,10 @@ apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev m
 # Do not install MySQL if we are in docker (It will be used a docker container instead) or we are explicitly skipping it.
 if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
   # run noninteractive install for MYSQL 8.4 LTS
-  wget https://dev.mysql.com/get/mysql-apt-config_0.8.32-1_all.deb -P "$VAR_PATH"
-  DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.32-1_all.deb"
+  wget https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb -P "$VAR_PATH"
+  # resolve expired key issue
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
+  DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
   $SUDO apt-get update
   DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-server
 fi

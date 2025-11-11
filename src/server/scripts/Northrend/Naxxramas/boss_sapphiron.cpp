@@ -33,14 +33,11 @@ enum Yells
 enum Spells
 {
     // Fight
-    SPELL_FROST_AURA_10             = 28531,
-    SPELL_FROST_AURA_25             = 55799,
+    SPELL_FROST_AURA                = 28531,
     SPELL_CLEAVE                    = 19983,
-    SPELL_TAIL_SWEEP_10             = 55697,
-    SPELL_TAIL_SWEEP_25             = 55696,
+    SPELL_TAIL_SWEEP                = 55697,
     SPELL_SUMMON_BLIZZARD           = 28560,
-    SPELL_LIFE_DRAIN_10             = 28542,
-    SPELL_LIFE_DRAIN_25             = 55665,
+    SPELL_LIFE_DRAIN                = 28542,
     SPELL_BERSERK                   = 26662,
 
     // Ice block
@@ -160,7 +157,7 @@ public:
         {
             BossAI::JustEngagedWith(who);
             EnterCombatSelfFunction();
-            me->CastSpell(me, RAID_MODE(SPELL_FROST_AURA_10, SPELL_FROST_AURA_25), true);
+            me->CastSpell(me, SPELL_FROST_AURA, true);
             events.ScheduleEvent(EVENT_BERSERK, 15min);
             events.ScheduleEvent(EVENT_CLEAVE, 5s);
             events.ScheduleEvent(EVENT_TAIL_SWEEP, 10s);
@@ -258,11 +255,11 @@ public:
                     events.Repeat(10s);
                     return;
                 case EVENT_TAIL_SWEEP:
-                    me->CastSpell(me, RAID_MODE(SPELL_TAIL_SWEEP_10, SPELL_TAIL_SWEEP_25), false);
+                    me->CastSpell(me, SPELL_TAIL_SWEEP, false);
                     events.Repeat(10s);
                     return;
                 case EVENT_LIFE_DRAIN:
-                    me->CastCustomSpell(RAID_MODE(SPELL_LIFE_DRAIN_10, SPELL_LIFE_DRAIN_25), SPELLVALUE_MAX_TARGETS, RAID_MODE(2, 5), me, false);
+                    me->CastCustomSpell(SPELL_LIFE_DRAIN, SPELLVALUE_MAX_TARGETS, RAID_MODE(2, 5), me, false);
                     events.Repeat(24s);
                     return;
                 case EVENT_BLIZZARD:

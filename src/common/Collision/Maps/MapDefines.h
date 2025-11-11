@@ -26,7 +26,7 @@
 #define SIZE_OF_GRIDS            533.3333f
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'
-#define MMAP_VERSION 17
+#define MMAP_VERSION 18
 
 struct MmapTileRecastConfig
 {

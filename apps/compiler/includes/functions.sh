@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# shellcheck source=../../../deps/acore/bash-lib/src/common/boolean.sh
+source "$AC_BASH_LIB_PATH/common/boolean.sh"
+
 # Set SUDO variable - one liner
 SUDO=""
 
@@ -135,7 +138,8 @@ function comp_compile() {
       echo "Done"
       ;;
     linux*|darwin*)
-      local confDir=${CONFDIR:-"$AC_BINPATH_FULL/../etc"}
+      local confDir
+      confDir=${CONFDIR:-"$AC_BINPATH_FULL/../etc"}
 
       # create the folders before installing to
       # set the current user and permissions
@@ -144,6 +148,8 @@ function comp_compile() {
       echo "Creating $confDir..."
       mkdir -p "$confDir"
       mkdir -p "$confDir/modules"
+
+      confDir=$(realpath "$confDir")
 
       echo "Cmake install..."
       $SUDO cmake --install . --config $CTYPE
@@ -161,18 +167,25 @@ function comp_compile() {
         $SUDO setcap cap_sys_nice=eip "$AC_BINPATH_FULL/authserver"
       fi
 
-      [[ -f "$confDir/worldserver.conf.dist" ]] && \
-          cp -v --no-clobber "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
-      [[ -f "$confDir/authserver.conf.dist" ]] && \
-          cp -v --no-clobber "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
-      [[ -f "$confDir/dbimport.conf.dist" ]] && \
-          cp -v --no-clobber "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
 
-      for f in "$confDir/modules/"*.dist
-      do
-          [[ -e $f ]] || break  # handle the case of no *.dist files
-          cp -v --no-clobber "$f" "${f%.dist}";
-      done
+      if ( isTrue "$AC_ENABLE_CONF_COPY_ON_INSTALL" ) then
+        echo "Copying default configuration files to $confDir ..."
+        [[ -f "$confDir/worldserver.conf.dist" && ! -f "$confDir/worldserver.conf" ]] && \
+            cp -v "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
+        [[ -f "$confDir/authserver.conf.dist" && ! -f "$confDir/authserver.conf"  ]] && \
+            cp -v "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
+        [[ -f "$confDir/dbimport.conf.dist" && ! -f "$confDir/dbimport.conf" ]] && \
+            cp -v "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
+
+        for f in "$confDir/modules/"*.dist
+        do
+            [[ -e $f ]] || break  # handle the case of no *.dist files
+            if [[ ! -f "${f%.dist}" ]]; then
+                echo "Copying module config $(basename "${f%.dist}")"
+                cp -v "$f" "${f%.dist}";
+            fi
+        done
+      fi
 
       echo "Done"
       ;;

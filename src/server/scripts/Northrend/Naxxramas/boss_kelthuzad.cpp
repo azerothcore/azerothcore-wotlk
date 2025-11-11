@@ -43,10 +43,8 @@ enum Yells
 enum Spells
 {
     // Kel'Thzuad
-    SPELL_FROST_BOLT_SINGLE_10              = 28478,
-    SPELL_FROST_BOLT_SINGLE_25              = 55802,
-    SPELL_FROST_BOLT_MULTI_10               = 28479,
-    SPELL_FROST_BOLT_MULTI_25               = 55807,
+    SPELL_FROST_BOLT_SINGLE                 = 28478,
+    SPELL_FROST_BOLT_MULTI                  = 28479,
     SPELL_SHADOW_FISURE                     = 27810,
     SPELL_VOID_BLAST                        = 27812,
     SPELL_DETONATE_MANA                     = 27819,
@@ -367,11 +365,11 @@ public:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_FROST_BOLT_SINGLE:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_FROST_BOLT_SINGLE_10, SPELL_FROST_BOLT_SINGLE_25), false);
+                    me->CastSpell(me->GetVictim(), SPELL_FROST_BOLT_SINGLE, false);
                     events.Repeat(2s, 10s);
                     break;
                 case EVENT_FROST_BOLT_MULTI:
-                    me->CastSpell(me, RAID_MODE(SPELL_FROST_BOLT_MULTI_10, SPELL_FROST_BOLT_MULTI_25), false);
+                    me->CastSpell(me, SPELL_FROST_BOLT_MULTI, false);
                     events.Repeat(15s, 30s);
                     break;
                 case EVENT_SHADOW_FISSURE:
