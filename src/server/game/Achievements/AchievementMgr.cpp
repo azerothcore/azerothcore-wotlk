@@ -1826,6 +1826,15 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         // someone on this realm has already completed that achievement
         if (sAchievementMgr->IsRealmCompleted(achievement))
             return false;
+
+        // A character may only have 1 race-specific 'Realm First!' achievement
+        // prevent clever use of the race/faction change service to obtain multiple 'Realm First!' achievements
+        constexpr std::array<uint32, 9> raceSpecificRealmFirstAchievements { 1405, 1406, 1407, 1408, 1409, 1410, 1411, 1412, 1413 };
+        bool isRaceSpecific = std::ranges::find(raceSpecificRealmFirstAchievements, achievement->ID) != std::ranges::end(raceSpecificRealmFirstAchievements);
+        if (isRaceSpecific)
+            for (uint32 raceAchievementId : raceSpecificRealmFirstAchievements)
+                if (raceAchievementId != achievement->ID && HasAchieved(raceAchievementId))
+                    return false;
     }
 
     // pussywizard: progress will be deleted after getting the achievement (optimization)
