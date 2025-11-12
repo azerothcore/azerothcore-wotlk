@@ -9409,11 +9409,7 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
 {
     std::string _text(text);
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
@@ -9435,11 +9431,7 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_YELL, language, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
@@ -9461,11 +9453,7 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
@@ -9494,11 +9482,7 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
