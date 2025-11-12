@@ -32,4 +32,4 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 3, 26619, 0, 0, 30, 0, 188420, 20, 0, 0, 0, 0, '', 'Requires Fizzcrank Parachute spell focus');
 
-UPDATE `gameobject` SET `position_x` = 4227.6616, `position_y` = 5270.674, `position_z` = 71.928215 WHERE `guid` = 99767;
+UPDATE `gameobject` SET `position_x` = 4227.6616, `position_y` = 5270.674, `position_z` = 71.928215 WHERE `guid` = 99767 `id` = 188420;
