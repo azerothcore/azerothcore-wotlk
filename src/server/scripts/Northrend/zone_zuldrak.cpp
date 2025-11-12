@@ -316,7 +316,7 @@ struct npc_overlord_drakuru_betrayal : public ScriptedAI
 {
     npc_overlord_drakuru_betrayal(Creature* creature) : ScriptedAI(creature), _summons(me), _state(BETRAYAL_NOT_STARTED)
     {
-        me->SetCombatMovement(false);
+        me->SetControlled(true, UNIT_STATE_ROOT);
     }
 
     void EnterEvadeMode(EvadeReason why) override
