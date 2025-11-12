@@ -12088,18 +12088,6 @@ void Player::GetAurasForTarget(Unit* target, bool force /*= false*/)
     if (!target || (!force && target->GetVisibleAuras()->empty()))    // speedup things
         return;
 
-    /*! Blizz sends certain movement packets sometimes even before CreateObject
-        These movement packets are usually found in SMSG_COMPRESSED_MOVES
-    */
-    if (target->HasFeatherFallAura())
-        target->SendMovementFeatherFall(this);
-
-    if (target->HasWaterWalkAura())
-        target->SendMovementWaterWalking(this);
-
-    if (target->HasHoverAura())
-        target->SendMovementHover(this);
-
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data<< target->GetPackGUID();
 
