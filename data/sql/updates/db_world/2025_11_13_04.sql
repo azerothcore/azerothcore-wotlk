@@ -1,3 +1,4 @@
+-- DB update 2025_11_13_03 -> 2025_11_13_04
 
 -- Set Sniffed Unit_flag (Vrykul Harpoon Gun)
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` &~ 4 WHERE (`entry` = 27992);
