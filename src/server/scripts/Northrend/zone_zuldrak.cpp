@@ -590,7 +590,6 @@ struct npc_overlord_drakuru_betrayal : public ScriptedAI
             case EVENT_BETRAYAL_EPILOGUE_10:
                 _state = BETRAYAL_EVADE;
                 EnterEvadeMode(EVADE_REASON_OTHER);
-                
                 break;
         }
 
