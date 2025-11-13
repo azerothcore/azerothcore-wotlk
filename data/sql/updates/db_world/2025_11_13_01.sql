@@ -1,3 +1,4 @@
+-- DB update 2025_11_13_00 -> 2025_11_13_01
 
 -- Delete SmartAI
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 30066;
