@@ -265,6 +265,7 @@ enum OverlordDrakuru
     NPC_TOTALLY_GENERIC_BUNNY             = 29100,
     NPC_TOTALLY_GENERIC_BUNNY_JSB         = 28960,
     GO_DRAKURUS_LAST_WISH                 = 202357,
+    GO_DRAKURUS_BONE                      = 191458,
 
     ACTION_SUMMON_DRAKURU_LAST_WISH       = 1,
     ACTION_DESTROY_DRAKURU_LAST_WISH      = 2,
@@ -375,7 +376,7 @@ struct npc_overlord_drakuru_betrayal : public ScriptedAI
     {
         if (Player* player = who->ToPlayer())
         {
-            bool shouldStartEvent = (_state == BETRAYAL_NOT_STARTED) && IsPlayerOnQuest(player) && player->HasAura(SPELL_SCOURGE_DISGUISE) && player->IsWithinDistInMap(me, 80.0f);
+            bool shouldStartEvent = (_state == BETRAYAL_NOT_STARTED) && IsPlayerOnQuest(player) && player->HasAura(SPELL_SCOURGE_DISGUISE) && player->IsWithinDistInMap(me, 80.0f) && !me->FindNearestGameObject(GO_DRAKURUS_BONE, 80.0f);
             if (shouldStartEvent)
             {
                 me->SetVisible(true);
@@ -587,6 +588,7 @@ struct npc_overlord_drakuru_betrayal : public ScriptedAI
                     lich->GetMotionMaster()->MovePoint(0, 6141.2393, -2011.2728, 589.8653);
                 break;
             case EVENT_BETRAYAL_EPILOGUE_10:
+                _state = BETRAYAL_EVADE;
                 EnterEvadeMode(EVADE_REASON_OTHER);
                 break;
         }
