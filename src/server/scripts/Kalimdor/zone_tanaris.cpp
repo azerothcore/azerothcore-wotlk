@@ -260,7 +260,8 @@ public:
                     float Radius = 10.0f;
                     if (me->IsWithinDistInMap(who, Radius))
                     {
-                        Start(false, false, who->GetGUID());
+                        me->SetWalk(true);
+                        Start(false, who->GetGUID());
                     }
                 }
             }

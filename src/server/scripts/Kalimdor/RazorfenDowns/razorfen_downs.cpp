@@ -51,7 +51,7 @@ enum Belnistrasz
     EVENT_FROST_NOVA             = 6,
 
     PATH_ESCORT                  = 871710,
-    POINT_REACH_IDOL             = 17,
+    POINT_REACH_IDOL             = 18,
 
     QUEST_EXTINGUISHING_THE_IDOL = 3525,
 
@@ -115,7 +115,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(5000);
+            me->DespawnOrUnsummon(5s);
         }
 
         void sQuestAccept(Player* /*player*/, Quest const* quest) override
@@ -126,7 +126,7 @@ public:
                 Talk(SAY_QUEST_ACCEPTED);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
-                me->GetMotionMaster()->MovePath(PATH_ESCORT, false);
+                me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
             }
         }
 

@@ -347,7 +347,7 @@ class spell_item_rocket_chicken : public AuraScript
     {
         if (roll_chance_i(5))
         {
-            GetTarget()->ToCreature()->DespawnOrUnsummon(8000);
+            GetTarget()->ToCreature()->DespawnOrUnsummon(8s);
             GetTarget()->Kill(GetTarget(), GetTarget());
         }
         else if (roll_chance_i(50))
@@ -468,7 +468,7 @@ class spell_item_toxic_wasteling : public SpellScript
             GetCaster()->GetMotionMaster()->MoveIdle();
             GetCaster()->ToCreature()->SetHomePosition(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f);
             GetCaster()->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 12.0f, 3.0f, 1);
-            target->DespawnOrUnsummon(1500);
+            target->DespawnOrUnsummon(1500ms);
         }
     }
 
@@ -505,7 +505,7 @@ class spell_item_lil_xt : public SpellScript
             return;
         if (GetCaster()->IsCreature() && GetCaster()->ToCreature()->AI())
             GetCaster()->ToCreature()->AI()->Talk(2);
-        target->DespawnOrUnsummon(500);
+        target->DespawnOrUnsummon(500ms);
     }
 
     void Register() override
@@ -1669,7 +1669,7 @@ public:
             _player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_DANCESPECIAL, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
         }
 
-        _player->m_Events.AddEvent(this, RAND(_player->m_Events.CalculateTime(5000), _player->m_Events.CalculateTime(10000), _player->m_Events.CalculateTime(15000)));
+        _player->m_Events.AddEventAtOffset(this, RAND(5s, 10s, 15s));
 
         return false; // do not delete re-added event in EventProcessor::Update
     }
@@ -1690,7 +1690,7 @@ class spell_item_party_time : public AuraScript
             return;
         }
 
-        player->m_Events.AddEvent(new PartyTimeEmoteEvent(player), RAND(player->m_Events.CalculateTime(5000), player->m_Events.CalculateTime(10000), player->m_Events.CalculateTime(15000)));
+        player->m_Events.AddEventAtOffset(new PartyTimeEmoteEvent(player), RAND(5s, 10s, 15s));
     }
 
     void Register() override

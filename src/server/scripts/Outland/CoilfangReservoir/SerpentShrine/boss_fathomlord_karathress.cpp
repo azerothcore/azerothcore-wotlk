@@ -139,7 +139,7 @@ struct boss_fathomlord_karathress : public BossAI
         if (Creature* olum = instance->GetCreature(DATA_SEER_OLUM))
         {
             olum->SetWalk(true);
-            olum->GetMotionMaster()->MovePoint(0, olumWalk, false);
+            olum->GetMotionMaster()->MovePoint(0, olumWalk, FORCED_MOVEMENT_NONE, 0.f, false);
             olum->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             olum->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
@@ -269,7 +269,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         {
             me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS, true);
             karathress->AI()->Talk(SAY_GAIN_ABILITY2);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 
@@ -452,7 +452,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         {
             me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS, true);
             karathress->AI()->Talk(SAY_GAIN_ABILITY1);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 
@@ -546,7 +546,7 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         {
             me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS, true);
             karathress->AI()->Talk(SAY_GAIN_ABILITY3);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 

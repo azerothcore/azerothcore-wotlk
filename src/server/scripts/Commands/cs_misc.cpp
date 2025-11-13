@@ -194,7 +194,8 @@ public:
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
             { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
-            { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  }
+            { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  },
+            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::No  }
         };
 
         return commandTable;
@@ -486,7 +487,7 @@ public:
             uint32 queueSlot = 0;
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
 
             // Remove from LFG queues
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
@@ -3102,6 +3103,33 @@ public:
         {
             SetBMMod(false);
             return true;
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
+    static bool HandlePacketLog(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+            return false;
+
+        if (enableArg)
+        {
+            if (*enableArg)
+            {
+                session->SetPacketLogging(true);
+                handler->SendNotification(LANG_ON);
+                return true;
+            }
+            else
+            {
+                session->SetPacketLogging(false);
+                handler->SendNotification(LANG_OFF);
+                return true;
+            }
         }
 
         handler->SendErrorMessage(LANG_USE_BOL);

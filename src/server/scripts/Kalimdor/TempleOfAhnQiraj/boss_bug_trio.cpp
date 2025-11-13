@@ -204,7 +204,7 @@ public:
 
         if (me->GetEntry() == NPC_VEM)
         {
-            me->GetMotionMaster()->MovePath(VEM_WAYPOINT_PATH, true);
+            me->GetMotionMaster()->MoveWaypoint(VEM_WAYPOINT_PATH, true);
         }
     }
 
@@ -310,7 +310,7 @@ public:
             me->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
             DoFinalSpell();
             Talk(EMOTE_DEVOURED);
-            me->DespawnOrUnsummon(3000);
+            me->DespawnOrUnsummon(3s);
             return;
         }
 

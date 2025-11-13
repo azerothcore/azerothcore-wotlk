@@ -54,12 +54,9 @@ enum Spells
 
     // FIGHT
     SPELL_GIFT_OF_THE_HERALD                = 56219,
-    SPELL_CYCLONE_STRIKE                    = 56855, // Self
-    SPELL_CYCLONE_STRIKE_H                  = 60030,
-    SPELL_LIGHTNING_BOLT                    = 56891, // 40Y
-    SPELL_LIGHTNING_BOLT_H                  = 60032, // 40Y
-    SPELL_THUNDERSHOCK                      = 56926, // 30Y
-    SPELL_THUNDERSHOCK_H                    = 60029  // 30Y
+    SPELL_CYCLONE_STRIKE                    = 56855,
+    SPELL_LIGHTNING_BOLT                    = 56891,
+    SPELL_THUNDERSHOCK                      = 56926,
 };
 
 enum Events
@@ -173,7 +170,7 @@ struct boss_jedoga_shadowseeker : public BossAI
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         me->SetDisableGravity(true);
         me->SetHover(true);
-        me->GetMotionMaster()->MovePoint(POINT_INITIAL, JedogaPosition[0], false);
+        me->GetMotionMaster()->MovePoint(POINT_INITIAL, JedogaPosition[0], FORCED_MOVEMENT_NONE, 0.f, false);
 
         _Reset();
         events.SetPhase(PHASE_NORMAL);
@@ -247,7 +244,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 DespawnOOCSummons();
                 DoCastSelf(SPELL_HOVER_FALL);
                 me->GetMotionMaster()->MoveIdle();
-                me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+                me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], FORCED_MOVEMENT_NONE, 0.f, false);
 
                 if (!combatSummonsSummoned)
                 {
@@ -397,7 +394,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                         volunteerWork = false;
                         me->GetMotionMaster()->Clear();
                         DoCastSelf(SPELL_HOVER_FALL);
-                        me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+                        me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], FORCED_MOVEMENT_NONE, 0.f, false);
                     }
                 }
                 break;
@@ -461,7 +458,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 // Normal phase
                 case EVENT_JEDOGA_CYCLONE:
                 {
-                    DoCastSelf(DUNGEON_MODE(SPELL_CYCLONE_STRIKE, SPELL_CYCLONE_STRIKE_H), false);
+                    DoCastSelf(SPELL_CYCLONE_STRIKE, false);
                     events.Repeat(10s, 14s);
                     break;
                 }
@@ -469,7 +466,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
-                        DoCast(pTarget, DUNGEON_MODE(SPELL_LIGHTNING_BOLT, SPELL_LIGHTNING_BOLT_H), false);
+                        DoCast(pTarget, SPELL_LIGHTNING_BOLT, false);
                     }
                     events.Repeat(11s, 15s);
                     break;
@@ -478,7 +475,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
-                        DoCast(pTarget, DUNGEON_MODE(SPELL_THUNDERSHOCK, SPELL_THUNDERSHOCK_H), false);
+                        DoCast(pTarget, SPELL_THUNDERSHOCK, false);
                     }
 
                     events.Repeat(16s, 22s);
@@ -504,7 +501,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                     summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
                     DoCastSelf(SPELL_HOVER_FALL);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+                    me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
                 }
                 case EVENT_JEDGA_START_RITUAL:
@@ -663,7 +660,7 @@ struct npc_twilight_volunteer : public ScriptedAI
                 me->GetMotionMaster()->Clear();
                 me->SetHomePosition(JedogaPosition[2]);
                 me->SetWalk(true);
-                me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
+                me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], FORCED_MOVEMENT_NONE, 0.f, false);
 
                 if (Creature* jedoga = pInstance->GetCreature(DATA_JEDOGA_SHADOWSEEKER))
                 {

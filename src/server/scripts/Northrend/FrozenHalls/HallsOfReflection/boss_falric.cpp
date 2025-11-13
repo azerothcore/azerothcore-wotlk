@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "halls_of_reflection.h"
 #include "ScriptedCreature.h"
+#include "SpellMgr.h"
 
 enum Yells
 {
@@ -44,7 +45,7 @@ enum Events
     EVENT_UNROOT,
 };
 
-const uint32 hopelessnessId[3][2] = { {72395, 72390}, {72396, 72391}, {72397, 72393} };
+const uint32 hopelessnessId[3] = { 72395, 72396, 72397 };
 
 class boss_falric : public CreatureScript
 {
@@ -131,7 +132,7 @@ public:
                     Talk(SAY_DEFILING_HORROR);
                     me->CastSpell((Unit*)nullptr, SPELL_DEFILING_HORROR, false);
                     me->SetControlled(true, UNIT_STATE_ROOT);
-                    events.DelayEventsToMax(5000, 0);
+                    events.DelayEventsToMax(5s, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 4s);
                     events.ScheduleEvent(EVENT_DEFILING_HORROR, 20s);
                     break;
@@ -143,8 +144,9 @@ public:
             if ((uiHopelessnessCount == 0 && HealthBelowPct(67)) || (uiHopelessnessCount == 1 && HealthBelowPct(34)) || (uiHopelessnessCount == 2 && HealthBelowPct(11)))
             {
                 if (uiHopelessnessCount)
-                    me->RemoveOwnedAura(hopelessnessId[uiHopelessnessCount - 1][DUNGEON_MODE(0, 1)]);
-                me->CastSpell((Unit*)nullptr, hopelessnessId[uiHopelessnessCount][DUNGEON_MODE(0, 1)], true);
+                    me->RemoveOwnedAura(sSpellMgr->GetSpellIdForDifficulty(hopelessnessId[uiHopelessnessCount - 1], me));
+
+                me->CastSpell((Unit*)nullptr, hopelessnessId[uiHopelessnessCount], true);
                 ++uiHopelessnessCount;
             }
 
