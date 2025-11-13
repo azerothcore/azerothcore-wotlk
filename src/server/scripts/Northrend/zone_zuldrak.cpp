@@ -376,7 +376,7 @@ struct npc_overlord_drakuru_betrayal : public ScriptedAI
     {
         if (Player* player = who->ToPlayer())
         {
-            bool shouldStartEvent = (_state == BETRAYAL_NOT_STARTED && IsPlayerOnQuest(player) && player->HasAura(SPELL_SCOURGE_DISGUISE) && player->IsWithinDistInMap(me, 80.0f) && !me->FindNearestGameObject(GO_DRAKURUS_BONE, 80.0f));
+            bool shouldStartEvent = (_state == BETRAYAL_NOT_STARTED) && IsPlayerOnQuest(player) && player->HasAura(SPELL_SCOURGE_DISGUISE) && player->IsWithinDistInMap(me, 80.0f) && !me->FindNearestGameObject(GO_DRAKURUS_BONE, 80.0f);
             if (shouldStartEvent)
             {
                 me->SetVisible(true);
