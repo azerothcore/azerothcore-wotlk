@@ -588,7 +588,9 @@ struct npc_overlord_drakuru_betrayal : public ScriptedAI
                     lich->GetMotionMaster()->MovePoint(0, 6141.2393, -2011.2728, 589.8653);
                 break;
             case EVENT_BETRAYAL_EPILOGUE_10:
-                Reset();
+                _state = BETRAYAL_EVADE;
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                
                 break;
         }
 
