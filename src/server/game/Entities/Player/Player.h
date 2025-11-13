@@ -2059,8 +2059,6 @@ public:
     }
     bool IsMirrorTimerActive(MirrorTimerType type) { return m_MirrorTimer[type] == getMaxTimer(type); }
 
-    void SetMovement(PlayerMovementType pType);
-
     bool CanJoinConstantChannelInZone(ChatChannelsEntry const* channel, AreaTableEntry const* zone);
 
     void JoinedChannel(Channel* c);
