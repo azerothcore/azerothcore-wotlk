@@ -89,7 +89,10 @@ struct boss_loken : public BossAI
     void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode /*mode*/) override
     {
         if (auraApp->GetBase()->GetId() == SPELL_LIGHTNING_NOVA_VISUAL)
+        {
             me->RemoveAura(SPELL_LIGHTNING_NOVA_THUNDERS);
+            me->ClearUnitState(UNIT_STATE_CASTING);
+        }
     }
 
     void ScheduleTasks() override
