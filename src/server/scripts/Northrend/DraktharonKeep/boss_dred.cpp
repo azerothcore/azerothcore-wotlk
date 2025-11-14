@@ -61,7 +61,7 @@ public:
 
             ScheduleHealthCheckEvent({ 67, 34 }, [&] {
                 DoCastAOE(SPELL_BELLOWING_ROAR);
-            });
+            }, false);
         }
 
         void ScheduleTasks() override
@@ -153,13 +153,20 @@ class spell_dred_raptor_call : public SpellScript
         std::list<Creature*> raptors;
         GetCaster()->GetCreatureListWithEntryInGrid(raptors, { NPC_DRAKKARI_SCYTHECLAW, NPC_DRAKKARI_GUTRIPPER }, 100.0f);
 
-        if (!raptors.empty())
+        raptors.remove_if([](Creature* raptor)
         {
-            Creature* raptor = Acore::Containers::SelectRandomContainerElement(raptors);
+            return !raptor->IsAlive() || raptor->IsInCombat();
+        });
 
-            if (GetCaster()->GetVictim())
-                raptor->AI()->AttackStart(GetCaster()->GetVictim());
-        }
+        if (raptors.empty())
+            return;
+
+        Creature* raptor = Acore::Containers::SelectRandomContainerElement(raptors);
+        if (!raptor)
+            return;
+
+        if (GetCaster()->GetVictim())
+            raptor->AI()->AttackStart(GetCaster()->GetVictim());
     }
 
     void Register() override
