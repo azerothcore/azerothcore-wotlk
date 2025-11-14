@@ -92,6 +92,7 @@ struct boss_loken : public BossAI
         {
             me->RemoveAura(SPELL_LIGHTNING_NOVA_THUNDERS);
             me->ClearUnitState(UNIT_STATE_CASTING);
+            me->ResumeChasingVictim();
         }
     }
 
@@ -108,6 +109,8 @@ struct boss_loken : public BossAI
             DoCastSelf(SPELL_LIGHTNING_NOVA_VISUAL, true);
             DoCastSelf(SPELL_LIGHTNING_NOVA_THUNDERS, true);
             DoCastAOE(SPELL_LIGHTNING_NOVA);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
         }, 15s);
 
         if (IsHeroic())
