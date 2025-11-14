@@ -83,29 +83,19 @@ WorldObject* CreatureAI::GetSummoner() const
 inline bool IsValidCombatTarget(Creature* source, Player* target)
 {
     if (target->IsGameMaster())
-    {
         return false;
-    }
 
     if (!source->IsInWorld() || !target->IsInWorld())
-    {
         return false;
-    }
 
     if (!source->IsAlive() || !target->IsAlive())
-    {
         return false;
-    }
 
     if (!source->InSamePhase(target))
-    {
         return false;
-    }
 
-    if (source->HasUnitState(UNIT_STATE_IN_FLIGHT) || target->HasUnitState(UNIT_STATE_IN_FLIGHT))
-    {
+    if (source->IsInFlight() || target->IsInFlight())
         return false;
-    }
 
     return true;
 }
