@@ -2178,7 +2178,7 @@ class spell_soul_deflection : public AuraScript
 enum SpellBloodHaze
 {
     SPELL_BLOODSPORE_HAZE = 50380,
-    SPELL_PSYCHOSIS  = 50396
+    SPELL_PSYCHOSIS       = 50396
 };
 
 // 50380 - Bloodspore Haze
