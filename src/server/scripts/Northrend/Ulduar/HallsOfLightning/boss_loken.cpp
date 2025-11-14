@@ -106,6 +106,7 @@ struct boss_loken : public BossAI
 
         ScheduleTimedEvent(15s, [&] {
             Talk(SAY_NOVA);
+            Talk(EMOTE_NOVA);
             DoCastSelf(SPELL_LIGHTNING_NOVA_VISUAL, true);
             DoCastSelf(SPELL_LIGHTNING_NOVA_THUNDERS, true);
             DoCastAOE(SPELL_LIGHTNING_NOVA);
