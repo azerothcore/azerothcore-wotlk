@@ -2019,15 +2019,16 @@ class spell_gen_animal_blood : public AuraScript
     {
         // Remove all auras with spell id 46221, except the one currently being applied
         while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
-            GetUnitOwner()->RemoveOwnedAura(aur);
+            GetUnitOwner()->RemoveOwnedAura(aur, AURA_REMOVE_BY_EXPIRE);
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            return;
+
         if (Unit* owner = GetUnitOwner())
-        {
             owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
-        }
     }
 
     void Register() override
