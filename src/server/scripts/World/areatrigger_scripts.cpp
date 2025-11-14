@@ -170,7 +170,7 @@ public:
     {
         QuestStatus QLR = player->GetQuestStatus(QUEST_LAST_RITES);
         QuestStatus QBT = player->GetQuestStatus(QUEST_BREAKING_THROUGH);
-        if (!(QLR == QUEST_STATUS_INCOMPLETE || QLR  == QUEST_STATUS_COMPLETE ||
+        if (!(QLR == QUEST_STATUS_INCOMPLETE || QLR  == QUEST_STATUS_COMPLETE || QLR == QUEST_STATUS_REWARDED ||
                 QBT == QUEST_STATUS_INCOMPLETE || QBT == QUEST_STATUS_COMPLETE))
             return false;
 
