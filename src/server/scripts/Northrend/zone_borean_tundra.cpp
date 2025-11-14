@@ -2175,6 +2175,40 @@ class spell_soul_deflection : public AuraScript
     }
 };
 
+enum SpellBloodHaze
+{
+    SPELL_BLOODSPORE_HAZE = 50380,
+    SPELL_PSYCHOSIS       = 50396
+};
+
+// 50380 - Bloodspore Haze
+class spell_bloodspore_haze : public SpellScript
+{
+    PrepareSpellScript(spell_bloodspore_haze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PSYCHOSIS });
+    }
+
+    void HandleEffectHit(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetHitUnit())
+            return;
+
+        if (GetHitUnit()->GetAuraCount(SPELL_BLOODSPORE_HAZE) >= 5)
+        {
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PSYCHOSIS, true);
+            GetHitUnit()->RemoveAura(SPELL_BLOODSPORE_HAZE);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_bloodspore_haze::HandleEffectHit, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -2201,4 +2235,5 @@ void AddSC_borean_tundra()
     RegisterCreatureAI(npc_jenny);
     RegisterSpellScript(spell_necropolis_beam);
     RegisterSpellScript(spell_soul_deflection);
+    RegisterSpellScript(spell_bloodspore_haze);
 }
