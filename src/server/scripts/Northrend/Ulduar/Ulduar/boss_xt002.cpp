@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -30,10 +30,8 @@
 enum XT002Spells
 {
     // BASIC
-    SPELL_GRAVITY_BOMB_10       = 63024,
-    SPELL_GRAVITY_BOMB_25       = 64234,
-    SPELL_SEARING_LIGHT_10      = 63018,
-    SPELL_SEARING_LIGHT_25      = 65121,
+    SPELL_GRAVITY_BOMB          = 63024,
+    SPELL_SEARING_LIGHT         = 63018,
     SPELL_TYMPANIC_TANTARUM     = 62776,
     SPELL_XT002_ENRAGE          = 26662,
 
@@ -48,26 +46,17 @@ enum XT002Spells
     SPELL_EXPOSED_HEART         = 63849,
     SPELL_ENERGY_ORB            = 62790,
     SPELL_ENERGY_ORB_TRIGGER    = 62826,
-    SPELL_HEARTBREAK_10         = 65737,
-    SPELL_HEARTBREAK_25         = 64193,
+    SPELL_HEARTBREAK            = 65737,
 
     // VOID ZONE
-    SPELL_VOID_ZONE_SUMMON_10   = 64203,
-    SPELL_VOID_ZONE_SUMMON_25   = 64235,
-    //SPELL_VOID_ZONE_SUMMON        = RAID_MODE(SPELL_VOID_ZONE_SUMMON_10, SPELL_VOID_ZONE_SUMMON_25, SPELL_VOID_ZONE_SUMMON_10, SPELL_VOID_ZONE_SUMMON_25),
+    SPELL_VOID_ZONE_SUMMON      = 64203,
     SPELL_VOID_ZONE_DAMAGE      = 46262,
 
     // SPARK
     SPELL_SPARK_SUMMON          = 64210,
-    SPELL_SPARK_DAMAGE_10       = 64227,
-    SPELL_SPARK_DAMAGE_25       = 64236,
+    SPELL_SPARK_DAMAGE          = 64227,
     SPELL_SPARK_MELEE           = 64230,
 };
-
-#define SPELL_GRAVITY_BOMB      RAID_MODE(SPELL_GRAVITY_BOMB_10, SPELL_GRAVITY_BOMB_25)
-#define SPELL_SEARING_LIGHT     RAID_MODE(SPELL_SEARING_LIGHT_10, SPELL_SEARING_LIGHT_25)
-#define SPELL_HEARTBREAK        RAID_MODE(SPELL_HEARTBREAK_10, SPELL_HEARTBREAK_25)
-#define SPELL_SPARK_DAMAGE      RAID_MODE(SPELL_SPARK_DAMAGE_10, SPELL_SPARK_DAMAGE_25)
 
 enum XT002Events
 {
@@ -611,7 +600,7 @@ public:
                     if (!urand(0, 2))
                         pXT002->AI()->Talk(EMOTE_SCRAPBOT);
 
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                 }
         }
 
@@ -657,7 +646,7 @@ public:
             if (Unit* target = SelectTargetFromPlayerList(200))
                 AttackStart(target);
             else
-                me->DespawnOrUnsummon(500);
+                me->DespawnOrUnsummon(500ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -769,12 +758,12 @@ public:
             // so that can't be the issue
             // See BoomEvent class
             // Schedule 1s delayed
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
+            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->m_Events.AddEvent(new BoomEvent(me), me->m_Events.CalculateTime(1 * IN_MILLISECONDS));
+            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

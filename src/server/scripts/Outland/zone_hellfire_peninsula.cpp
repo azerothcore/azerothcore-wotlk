@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -171,7 +171,10 @@ public:
         npc_ancestral_wolfAI(Creature* creature) : npc_escortAI(creature)
         {
             if (creature->GetOwner() && creature->GetOwner()->IsPlayer())
-                Start(false, false, creature->GetOwner()->GetGUID());
+            {
+                creature->SetWalk(true);
+                Start(false, creature->GetOwner()->GetGUID());
+            }
             creature->SetSpeed(MOVE_WALK, 1.5f);
             DoCast(SPELL_GUIDED_BY_THE_SPIRITS);
             Reset();
@@ -209,7 +212,7 @@ public:
                         {
                             ryga->SetWalk(true);
                             ryga->SetSpeed(MOVE_WALK, 1.0f);
-                            ryga->GetMotionMaster()->MovePoint(0, 515.877991f, 3885.67627f, 190.470535f, true);
+                            ryga->GetMotionMaster()->MovePoint(0, 515.877991f, 3885.67627f, 190.470535f, FORCED_MOVEMENT_NONE, 0.f, true);
                             Reset();
                         }
                     }
@@ -234,7 +237,7 @@ public:
                             ryga->SetStandState(UNIT_STAND_STATE_STAND);
                             ryga->SetWalk(true);
                             ryga->SetSpeed(MOVE_WALK, 1.0f);
-                            ryga->GetMotionMaster()->MovePoint(0, 504.59201f, 3882.12988f, 192.156006f, true);
+                            ryga->GetMotionMaster()->MovePoint(0, 504.59201f, 3882.12988f, 192.156006f, FORCED_MOVEMENT_NONE, 0.f, true);
                             Reset();
                         }
                     }
@@ -312,7 +315,8 @@ public:
             {
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetFaction(FACTION_ESCORTEE_H_PASSIVE);
-                npc_escortAI::Start(true, false, player->GetGUID());
+                me->SetWalk(true);
+                Start(true, player->GetGUID());
             }
         }
 

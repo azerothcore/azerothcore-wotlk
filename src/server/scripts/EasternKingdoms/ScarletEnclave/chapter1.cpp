@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -230,7 +230,7 @@ public:
                     me->RemoveAllAuras();
                     me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
                     me->RestoreFaction();
-                    me->DespawnOrUnsummon(10000);
+                    me->DespawnOrUnsummon(10s);
                 }
             }
         }
@@ -396,7 +396,7 @@ public:
                 AttackStart(attacker);
         }
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(ObjectGuid const& guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3s);
@@ -407,7 +407,7 @@ public:
         {
             if (type == POINT_MOTION_TYPE && point == 1)
             {
-                me->DespawnOrUnsummon(1500);
+                me->DespawnOrUnsummon(1500ms);
                 me->CastSpell(me, SPELL_GHOUL_SUBMERGE, true);
             }
         }
@@ -438,7 +438,7 @@ public:
                             if (owner->GetVictim())
                                 AttackStart(owner->GetVictim());
 
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     return;
             }
 
@@ -498,49 +498,6 @@ public:
                 spoken -= diff;
 
             ScriptedAI::UpdateAI(diff);
-        }
-    };
-};
-
-class npc_scarlet_cannon : public CreatureScript
-{
-public:
-    npc_scarlet_cannon() : CreatureScript("npc_scarlet_cannon") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_scarlet_cannonAI(creature);
-    }
-
-    struct npc_scarlet_cannonAI : public VehicleAI
-    {
-        npc_scarlet_cannonAI(Creature* creature) : VehicleAI(creature) { summonAttackers = 0; }
-
-        uint32 summonAttackers;
-        void PassengerBoarded(Unit* /*passenger*/, int8 /*seatId*/, bool apply) override
-        {
-            summonAttackers = apply ? 8000 : 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            VehicleAI::UpdateAI(diff);
-
-            if (summonAttackers)
-            {
-                summonAttackers += diff;
-                if (summonAttackers >= 15000)
-                {
-                    for (uint8 i = 0; i < 15; ++i)
-                        if (Creature* summon = me->SummonCreature(28834 /*NPC_SCARLET_FLEET_DEFENDER*/, 2192.56f + irand(-10, 10), -6147.90f + irand(-10, 10), 5.2f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 45000))
-                        {
-                            summon->SetHomePosition(me->GetHomePosition());
-                            summon->AI()->AttackStart(me);
-                        }
-
-                    summonAttackers = 1;
-                }
-            }
         }
     };
 };
@@ -760,22 +717,22 @@ public:
                         {
                             case EVENT_ICY_TOUCH:
                                 DoCastVictim(SPELL_ICY_TOUCH);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_ICY_TOUCH, 5s, GCD_CAST);
                                 break;
                             case EVENT_PLAGUE_STRIKE:
                                 DoCastVictim(SPELL_PLAGUE_STRIKE);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_PLAGUE_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_BLOOD_STRIKE:
                                 DoCastVictim(SPELL_BLOOD_STRIKE);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_BLOOD_STRIKE, 5s, GCD_CAST);
                                 break;
                             case EVENT_DEATH_COIL:
                                 DoCastVictim(SPELL_DEATH_COIL);
-                                events.DelayEvents(1000, GCD_CAST);
+                                events.DelayEvents(1s, GCD_CAST);
                                 events.ScheduleEvent(EVENT_DEATH_COIL, 5s, GCD_CAST);
                                 break;
                         }
@@ -806,7 +763,7 @@ public:
 
         ObjectGuid prisonerGUID;
 
-        void SetGUID(ObjectGuid guid, int32 /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
@@ -832,252 +789,6 @@ public:
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
 
         return false;
-    }
-};
-
-/*####
-## npc_scarlet_miner_cart
-####*/
-
-enum Spells_SM
-{
-    SPELL_CART_CHECK       = 54173,
-    SPELL_CART_DRAG        = 52465
-};
-
-class npc_scarlet_miner_cart : public CreatureScript
-{
-public:
-    npc_scarlet_miner_cart() : CreatureScript("npc_scarlet_miner_cart") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_scarlet_miner_cartAI(creature);
-    }
-
-    struct npc_scarlet_miner_cartAI : public PassiveAI
-    {
-        npc_scarlet_miner_cartAI(Creature* creature) : PassiveAI(creature)
-        {
-            me->SetImmuneToAll(true);
-            me->SetFaction(FACTION_FRIENDLY);
-            me->SetDisplayFromModel(0); // Modelid2 is a horse.
-        }
-
-        ObjectGuid minerGUID;
-
-        void SetGUID(ObjectGuid guid, int32 /*id*/) override
-        {
-            minerGUID = guid;
-        }
-
-        void DoAction(int32 /*param*/) override
-        {
-            if (Creature* miner = ObjectAccessor::GetCreature(*me, minerGUID))
-            {
-                me->SetWalk(false);
-
-                //Not 100% correct, but movement is smooth. Sometimes miner walks faster
-                //than normal, this speed is fast enough to keep up at those times.
-                me->SetSpeed(MOVE_RUN, 1.25f);
-
-                me->GetMotionMaster()->MoveFollow(miner, 1.0f, 0);
-                me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetImmuneToAll(true);
-                me->SetFaction(FACTION_FRIENDLY);
-            }
-        }
-
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
-        {
-            who->SetVisible(!apply);
-            if (!apply)
-                if (Creature* miner = ObjectAccessor::GetCreature(*me, minerGUID))
-                    miner->DisappearAndDie();
-        }
-    };
-};
-
-/*####
-## npc_scarlet_miner
-####*/
-
-enum Says_SM
-{
-    SAY_SCARLET_MINER_0         = 0,
-    SAY_SCARLET_MINER_1         = 1
-};
-
-class npc_scarlet_miner : public CreatureScript
-{
-public:
-    npc_scarlet_miner() : CreatureScript("npc_scarlet_miner") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_scarlet_minerAI(creature);
-    }
-
-    struct npc_scarlet_minerAI : public npc_escortAI
-    {
-        npc_scarlet_minerAI(Creature* creature) : npc_escortAI(creature)
-        {
-            me->SetReactState(REACT_PASSIVE);
-        }
-
-        uint32 IntroTimer;
-        uint32 IntroPhase;
-        ObjectGuid carGUID;
-
-        void Reset() override
-        {
-            carGUID.Clear();
-            IntroTimer = 0;
-            IntroPhase = 0;
-        }
-
-        void InitWaypoint()
-        {
-            AddWaypoint(1, 2389.03f,     -5902.74f,     109.014f, 5000);
-            AddWaypoint(2, 2341.812012f, -5900.484863f, 102.619743f);
-            AddWaypoint(3, 2308.34f, -5904.2f, 91.1099f);
-            AddWaypoint(4, 2300.69f, -5912.99f, 86.1572f);
-            AddWaypoint(5, 2294.142090f, -5927.274414f, 75.316849f);
-            AddWaypoint(6, 2286.984375f, -5944.955566f, 63.714966f);
-            AddWaypoint(7, 2280.001709f, -5961.186035f, 54.228283f);
-            AddWaypoint(8, 2259.389648f, -5974.197754f, 42.359348f);
-            AddWaypoint(9, 2242.882812f, -5984.642578f, 32.827850f);
-            AddWaypoint(10, 2239.79f, -5989.31f, 30.4453f);
-            AddWaypoint(11, 2236.52f, -5994.28f, 27.4829f);
-            AddWaypoint(12, 2232.61f, -6000.23f, 23.1281f);
-            AddWaypoint(13, 2228.69f, -6006.46f, 17.6638f);
-            AddWaypoint(14, 2225.2f, -6012.39f, 12.9487f);
-            AddWaypoint(15, 2217.265625f, -6028.959473f, 7.675705f);
-            AddWaypoint(16, 2202.595947f, -6061.325684f, 5.882018f);
-            AddWaypoint(17, 2188.974609f, -6080.866699f, 3.370027f);
-
-            if (urand(0, 1))
-            {
-                AddWaypoint(18, 2176.483887f, -6110.407227f, 1.855181f);
-                AddWaypoint(19, 2172.516602f, -6146.752441f, 1.074235f);
-                AddWaypoint(20, 2138.918457f, -6158.920898f, 1.342926f);
-                AddWaypoint(21, 2129.866699f, -6174.107910f, 4.380779f);
-                AddWaypoint(22, 2125.250001f, -6181.230001f, 9.91997f);
-                AddWaypoint(23, 2117.709473f, -6193.830078f, 13.3542f, 10000);
-            }
-            else
-            {
-                AddWaypoint(18, 2184.190186f, -6166.447266f, 0.968877f);
-                AddWaypoint(19, 2234.265625f, -6163.741211f, 0.916021f);
-                AddWaypoint(20, 2268.071777f, -6158.750977f, 1.822252f);
-                AddWaypoint(21, 2270.028320f, -6176.505859f, 6.340538f);
-                AddWaypoint(22, 2270.350001f, -6182.410001f, 10.42431f);
-                AddWaypoint(23, 2271.739014f, -6195.401855f, 13.3542f, 10000);
-            }
-        }
-
-        void InitCartQuest(Player* who)
-        {
-            carGUID = who->GetVehicleBase()->GetGUID();
-            InitWaypoint();
-            Start(false, false, who->GetGUID());
-            SetDespawnAtFar(false);
-        }
-
-        void WaypointReached(uint32 waypointId) override
-        {
-            switch (waypointId)
-            {
-                case 1:
-                    if (Unit* car = ObjectAccessor::GetCreature(*me, carGUID))
-                    {
-                        me->SetFacingToObject(car);
-                        // xinef: add some flags
-                        car->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
-                        car->SetImmuneToAll(true);
-                        car->SetFaction(FACTION_FRIENDLY);
-                    }
-                    Talk(SAY_SCARLET_MINER_0);
-                    SetRun(true);
-                    IntroTimer = 4000;
-                    IntroPhase = 1;
-                    break;
-                case 23:
-                    if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
-                    {
-                        car->SetPosition(car->GetPositionX(), car->GetPositionY(), me->GetPositionZ() + 1, car->GetOrientation());
-                        car->StopMovingOnCurrentPos();
-                        me->SetFacingToObject(car);
-                        car->RemoveAura(SPELL_CART_DRAG);
-                    }
-                    Talk(SAY_SCARLET_MINER_1);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (IntroPhase)
-            {
-                if (IntroTimer <= diff)
-                {
-                    if (IntroPhase == 1)
-                    {
-                        if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
-                            DoCast(car, SPELL_CART_DRAG);
-                        IntroTimer = 800;
-                        IntroPhase = 2;
-                    }
-                    else
-                    {
-                        if (Creature* car = ObjectAccessor::GetCreature(*me, carGUID))
-                            car->AI()->DoAction(0);
-                        IntroPhase = 0;
-                    }
-                }
-                else IntroTimer -= diff;
-            }
-            npc_escortAI::UpdateAI(diff);
-        }
-    };
-};
-
-/*######
-## go_inconspicuous_mine_car
-######*/
-
-enum Spells_Cart
-{
-    SPELL_CART_SUMM        = 52463
-};
-
-class go_inconspicuous_mine_car : public GameObjectScript
-{
-public:
-    go_inconspicuous_mine_car() : GameObjectScript("go_inconspicuous_mine_car") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        if (player->GetQuestStatus(12701) == QUEST_STATUS_INCOMPLETE)
-        {
-            // Hack Why Trinity Dont Support Custom Summon Location
-            if (Creature* miner = player->SummonCreature(28841, 2383.869629f, -5900.312500f, 107.996086f, player->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1))
-            {
-                player->CastSpell(player, SPELL_CART_SUMM, true);
-                if (Creature* car = player->GetVehicleCreatureBase())
-                {
-                    if (car->GetEntry() == 28817)
-                    {
-                        car->AI()->SetGUID(miner->GetGUID());
-                        CAST_AI(npc_scarlet_miner::npc_scarlet_minerAI, miner->AI())->InitCartQuest(player);
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 };
 
@@ -1218,13 +929,9 @@ void AddSC_the_scarlet_enclave_c1()
     RegisterSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
     new npc_scarlet_ghoul();
     new npc_dkc1_gothik();
-    new npc_scarlet_cannon();
     new npc_unworthy_initiate();
     new npc_unworthy_initiate_anchor();
     new go_acherus_soul_prison();
-    new npc_scarlet_miner();
-    new npc_scarlet_miner_cart();
-    new go_inconspicuous_mine_car();
     RegisterSpellScript(spell_death_knight_initiate_visual);
     RegisterSpellScript(spell_lich_king_whisper);
     RegisterSpellScript(spell_lich_king_vo_blocker);

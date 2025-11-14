@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -91,6 +91,29 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             uint32 SoundKitID = 0;
+        };
+
+        class MinimapPingClient final : public ClientPacket
+        {
+        public:
+            MinimapPingClient(WorldPacket&& packet) : ClientPacket(MSG_MINIMAP_PING, std::move(packet)) {}
+
+            void Read() override;
+
+            float MapX = 0.0f; // Raw position coordinates
+            float MapY = 0.0f;
+        };
+
+        class MinimapPing final : public ServerPacket
+        {
+        public:
+            MinimapPing() : ServerPacket(MSG_MINIMAP_PING, 8 + 4 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid SourceGuid;
+            float MapX = 0.0f;
+            float MapY = 0.0f;
         };
 
         class RandomRollClient final : public ClientPacket
@@ -186,6 +209,32 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             uint32 Time = 0;
+        };
+
+        class Complain final : public ClientPacket
+        {
+        public:
+            Complain(WorldPacket&& packet) : ClientPacket(CMSG_COMPLAIN, std::move(packet)) {}
+
+            void Read() override;
+
+            uint8 SpamType = 0; // 0 - mail, 1 - chat
+            ObjectGuid SpammerGuid;
+            uint32 Unk1 = 0;
+            uint32 Unk2 = 0;
+            uint32 Unk3 = 0;
+            uint32 Unk4 = 0;
+            std::string Description = "";
+        };
+
+        class ComplainResult final : public ServerPacket
+        {
+        public:
+            ComplainResult() : ServerPacket(SMSG_COMPLAIN_RESULT, 1) {}
+
+            WorldPacket const* Write() override;
+
+            uint8 Unk = 0;
         };
     }
 }

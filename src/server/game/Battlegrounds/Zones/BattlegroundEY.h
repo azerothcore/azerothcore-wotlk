@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -31,13 +31,10 @@ enum BG_EY_Events
     BG_EY_EVENT_CHECK_CPOINTS       = 4
 };
 
-enum BG_EY_Timers
-{
-    BG_EY_FLAG_RESPAWN_TIME         = 10 * IN_MILLISECONDS,
-    BG_EY_FLAG_ON_GROUND_TIME       = 10 * IN_MILLISECONDS,
-    BG_EY_FPOINTS_CHECK_TIME        = 2 * IN_MILLISECONDS,
-    BG_EY_FPOINTS_TICK_TIME         = 2 * IN_MILLISECONDS
-};
+constexpr Milliseconds BG_EY_FLAG_RESPAWN_TIME         = 10s;
+constexpr Milliseconds BG_EY_FLAG_ON_GROUND_TIME       = 10s;
+constexpr Milliseconds BG_EY_FPOINTS_CHECK_TIME        = 2s;
+constexpr Milliseconds BG_EY_FPOINTS_TICK_TIME         = 2s;
 
 enum BG_EY_ProgressBarConsts
 {

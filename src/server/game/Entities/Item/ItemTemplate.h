@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -692,7 +692,6 @@ struct ItemTemplate
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     ItemFlagsCustom FlagsCu;
-    WorldPacket queryData;                                  // pussywizard
 
     // helpers
     [[nodiscard]] bool HasSignature() const
@@ -826,8 +825,6 @@ struct ItemTemplate
     [[nodiscard]] bool HasFlag(ItemFlags flag) const { return (Flags & flag) != 0; }
     [[nodiscard]] bool HasFlag2(ItemFlags2 flag) const { return (Flags2 & flag) != 0; }
     [[nodiscard]] bool HasFlagCu(ItemFlagsCustom flag) const { return (FlagsCu & flag) != 0; }
-
-    void InitializeQueryData();
 };
 
 // Benchmarked: Faster than std::map (insert/find)

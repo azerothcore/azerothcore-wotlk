@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -352,7 +352,7 @@ public:
         {
             if (summon->GetEntry() != 38308 && summon->GetEntry() != 38309 && (!me->IsInCombat() || me->IsInEvadeMode()))
             {
-                summon->DespawnOrUnsummon(1);
+                summon->DespawnOrUnsummon(1ms);
                 return;
             }
 
@@ -566,14 +566,14 @@ public:
                             {
                                 SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_CREATE_CONCOCTION);
                                 me->CastSpell(me, SPELL_CREATE_CONCOCTION, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
+                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
                                 break;
                             }
                         case 3:
                             {
                                 SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_GUZZLE_POTIONS);
                                 me->CastSpell(me, SPELL_GUZZLE_POTIONS, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250);
+                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
                                 break;
                             }
                         default:
@@ -670,8 +670,8 @@ public:
 
         void ChangePhase()
         {
-            uint32 heroicDelay = (IsHeroic() ? 25000 : 0);
-            events.DelayEvents(24000 + heroicDelay, EVENT_GROUP_ABILITIES);
+            Milliseconds heroicDelay = (IsHeroic() ? 25s : 0ms);
+            events.DelayEvents(24s + heroicDelay, EVENT_GROUP_ABILITIES);
             me->AttackStop();
             if (!IsHeroic())
             {
@@ -715,8 +715,8 @@ public:
             {
                 case 1:
                     _phase = 2;
-                    events.ScheduleEvent(EVENT_MALLEABLE_GOO, urand(25000, 28000) + heroicDelay, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, urand(35000, 40000) + heroicDelay, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_MALLEABLE_GOO, randtime(25s, 28s) + heroicDelay, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, randtime(35s, 40s) + heroicDelay, EVENT_GROUP_ABILITIES);
                     break;
                 case 2:
                     _phase = 3;
@@ -745,7 +745,7 @@ public:
 
     ObjectGuid targetGUID;
 
-    void SetGUID(ObjectGuid guid, int32 type) override
+    void SetGUID(ObjectGuid const& guid, int32 type) override
     {
         if (type == -1)
             targetGUID = guid;
@@ -757,7 +757,7 @@ public:
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
             {
                 if (!professor->IsInCombat())
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                 else
                     professor->AI()->JustSummoned(me);
             }
@@ -1056,7 +1056,7 @@ class spell_putricide_ooze_channel : public SpellScript
         if (targets.empty())
         {
             FinishCast(SPELL_FAILED_NO_VALID_TARGETS);
-            GetCaster()->ToCreature()->DespawnOrUnsummon(1);    // despawn next update
+            GetCaster()->ToCreature()->DespawnOrUnsummon(1ms);    // despawn next update
             return;
         }
 
@@ -1491,7 +1491,7 @@ class spell_putricide_eat_ooze : public SpellScript
             {
                 target->RemoveAurasDueToSpell(SPELL_GROW_STACKER);
                 target->RemoveAura(grow);
-                target->DespawnOrUnsummon(1);
+                target->DespawnOrUnsummon(1ms);
             }
             else
                 grow->ModStackAmount(-4);

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -94,7 +94,7 @@ struct boss_anomalus : public BossAI
         {
             if (activeRifts > 0 && --activeRifts == 0 && me->HasAura(SPELL_RIFT_SHIELD))
             {
-                events.DelayEvents(me->GetAura(SPELL_RIFT_SHIELD)->GetDuration() - 46000);
+                events.DelayEvents(Milliseconds(me->GetAura(SPELL_RIFT_SHIELD)->GetDuration() - 46000));
                 me->RemoveAura(SPELL_RIFT_SHIELD);
                 me->InterruptNonMeleeSpells(false);
             }
@@ -114,7 +114,6 @@ struct boss_anomalus : public BossAI
         BossAI::JustEngagedWith(who);
 
         activeRifts = 0;
-        events.SetTimer(45000);
         events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
         events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
         events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
@@ -164,7 +163,7 @@ struct boss_anomalus : public BossAI
             Talk(EMOTE_RIFT);
             me->CastSpell(me, SPELL_CREATE_RIFT, false);
             //Once we hit 51% hp mark, after each rift we spawn an empowered
-            events.ScheduleEvent(me->HealthBelowPct(51) ? EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED : EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15000 : 25000);
+            events.ScheduleEvent(me->HealthBelowPct(51) ? EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED : EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
             break;
         case EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED:
             Talk(SAY_RIFT);
@@ -172,7 +171,7 @@ struct boss_anomalus : public BossAI
 
             me->CastSpell(me, SPELL_CREATE_RIFT, false);
             me->CastSpell(me, SPELL_RIFT_SHIELD, true);
-            me->m_Events.AddEvent(new ChargeRifts(me), me->m_Events.CalculateTime(1000));
+            me->m_Events.AddEventAtOffset(new ChargeRifts(me), 1s);
             events.DelayEvents(46s);
             //As we just spawned an empowered spawn a normal one
             events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);

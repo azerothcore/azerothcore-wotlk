@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -60,7 +60,8 @@ enum WarriorSpells
     SPELL_WARRIOR_VIGILANCE_PROC                    = 50725,
     SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT         = 59665,
     SPELL_WARRIOR_WHIRLWIND_MAIN                    = 50622,
-    SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949
+    SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949,
+    SPELL_WARRIOR_EXECUTE_R1                        = 5308,
 };
 
 enum WarriorSpellIcons
@@ -959,6 +960,26 @@ class spell_warr_heroic_strike : public SpellScript
     }
 };
 
+class spell_war_sudden_death_aura : public AuraScript
+{   PrepareAuraScript(spell_war_sudden_death_aura);
+
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
+    {
+        // Check PROC_SPELL_PHASE_FINISH only for Execute
+        if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_FINISH)
+            return isTriggeredAtSpellProcEvent;
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+            if (procSpell->GetSpellInfo()->GetFirstRankSpell()->Id == SPELL_WARRIOR_EXECUTE_R1)
+                return isTriggeredAtSpellProcEvent;
+        return false;
+    }
+
+    void Register() override
+    {
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_war_sudden_death_aura::AfterCheckProc);
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     RegisterSpellScript(spell_warr_mocking_blow);
@@ -986,4 +1007,5 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_vigilance_trigger);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
     RegisterSpellScript(spell_warr_heroic_strike);
+    RegisterSpellScript(spell_war_sudden_death_aura);
 }

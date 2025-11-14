@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -57,10 +57,8 @@ enum MovementInformPoints
 enum MalygosSpells
 {
     SPELL_BERSERK                       = 64238,
-    SPELL_ARCANE_BREATH_N               = 56272,
-    SPELL_ARCANE_BREATH_H               = 60072,
-    SPELL_ARCANE_STORM_N                = 61693,
-    SPELL_ARCANE_STORM_H                = 61694,
+    SPELL_ARCANE_BREATH                 = 56272,
+    SPELL_ARCANE_STORM                  = 61693,
 
     SPELL_VORTEX_VISUAL                 = 55873,
     SPELL_VORTEX_CONTROL_VEHICLE        = 56263,
@@ -80,18 +78,13 @@ enum MalygosSpells
     SPELL_DESTROY_PLATFORM_VISUAL       = 59084,
 
     SPELL_ARCANE_PULSE                  = 57432,
-    SPELL_PH3_SURGE_OF_POWER_N          = 57407,
-    SPELL_PH3_SURGE_OF_POWER_H          = 60936,
+    SPELL_PH3_SURGE_OF_POWER            = 57407,
 
     SPELL_STATIC_FIELD_MAIN             = 57430,
     SPELL_STATIC_FIELD_SUMMON           = 57431,
     SPELL_STATIC_FIELD_AURA             = 57428,
     SPELL_STATIC_FIELD_DAMAGE           = 57429,
 };
-
-#define SPELL_ARCANE_BREATH             DUNGEON_MODE(SPELL_ARCANE_BREATH_N, SPELL_ARCANE_BREATH_H)
-#define SPELL_ARCANE_STORM              DUNGEON_MODE(SPELL_ARCANE_STORM_N, SPELL_ARCANE_STORM_H)
-#define SPELL_PH3_SURGE_OF_POWER        DUNGEON_MODE(SPELL_PH3_SURGE_OF_POWER_N, SPELL_PH3_SURGE_OF_POWER_H)
 
 enum MalygosEvents
 {
@@ -471,7 +464,7 @@ public:
                         me->SetDisableGravity(true);
                         me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
 
-                        events.DelayEvents(25000, 1); // don't delay berserk (group 0)
+                        events.DelayEvents(25s, 1); // don't delay berserk (group 0)
                     }
                     break;
                 case EVENT_VORTEX_FLY_TO_CENTER:
@@ -521,16 +514,14 @@ public:
                                             }
                                             //pPlayer->ClearUnitState(UNIT_STATE_ONVEHICLE);
 
-                                            Movement::MoveSplineInit init(pPlayer);
+                                            Movement::MoveSplineInit init(pPlayer); // TODO: has to be removed and handled with vehicle exit and vehicle enter code
                                             init.MoveTo(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ());
                                             init.SetFacing(pPlayer->GetOrientation());
                                             init.SetTransportExit();
                                             init.Launch();
 
                                             pPlayer->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
-                                            pPlayer->SetDisableGravity(true, true);
-
-                                            sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
+                                            pPlayer->SetDisableGravity(true);
 
                                             WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
                                             data << pPlayer->GetPackGUID();
@@ -674,7 +665,7 @@ public:
                 case EVENT_CHECK_TRASH_DEAD:
                     {
                         if (me->FindNearestCreature(NPC_SCION_OF_ETERNITY, 250.0f, true) || me->FindNearestCreature(NPC_NEXUS_LORD, 250.0f, true))
-                            events.RepeatEvent(3000);
+                            events.Repeat(3s);
                         else
                         {
                             me->SendMeleeAttackStop();
@@ -727,7 +718,7 @@ public:
                                     {
                                         c->SetFaction(pPlayer->GetFaction());
                                         //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
-                                        c->m_Events.AddEvent(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), c->m_Events.CalculateTime(500));
+                                        c->m_Events.AddEventAtOffset(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), 500ms);
                                         AttackStart(c);
                                     }
                                 }
@@ -803,10 +794,10 @@ public:
             {
                 case NPC_ARCANE_OVERLOAD:
                     summon->CastSpell(summon, SPELL_ARCANE_OVERLOAD_DMG, true);
-                    summon->DespawnOrUnsummon(45000);
+                    summon->DespawnOrUnsummon(45s);
                     break;
                 case NPC_STATIC_FIELD:
-                    summon->DespawnOrUnsummon(20000);
+                    summon->DespawnOrUnsummon(20s);
                     break;
             }
         }
@@ -898,9 +889,9 @@ public:
             {
                 Player* plr = pass->ToPlayer();
                 float speed = plr->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1.0f * 0.001f);
-                plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
+                plr->SetDisableGravity(false); // packet only would lead to issues elsewhere
+                plr->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
-                plr->SetDisableGravity(false, true);
                 plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
 
                 sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
@@ -941,10 +932,7 @@ public:
                             if (!bUpdatedFlying && timer)
                             {
                                 bUpdatedFlying = true;
-                                plr->SetDisableGravity(true, true);
-
-                                sScriptMgr->AnticheatSetCanFlybyServer(plr, true);
-                                sScriptMgr->AnticheatSetUnderACKmount(plr);
+                                plr->SetDisableGravity(true);
                             }
 
                             plr->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * std::sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
@@ -998,7 +986,7 @@ public:
                     MoveTimer = 0;
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.05f, 7.0f);
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.05f, FORCED_MOVEMENT_NONE, 7.0f);
                     break;
             }
         }
@@ -1013,12 +1001,11 @@ public:
                     MoveTimer = 0;
                     me->GetMotionMaster()->MoveIdle();
                     me->DisableSpline();
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 100.0f);
-                    me->SetPosition(me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), me->GetOrientation());
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
                     me->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
                     me->RemoveAura(SPELL_POWER_SPARK_VISUAL);
                     me->CastSpell(me, SPELL_POWER_SPARK_GROUND_BUFF, true);
-                    me->DespawnOrUnsummon(60000);
+                    me->DespawnOrUnsummon(60s);
                 }
             }
         }
@@ -1221,8 +1208,9 @@ public:
             if (Vehicle* v = me->GetVehicle())
                 v->RemoveAllPassengers();
 
-            if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
-                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+            if (killer)
+                if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+                    player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
         }
 
         void MoveInLineOfSight(Unit*  /*who*/) override {}
@@ -1459,14 +1447,14 @@ public:
             else if (pass && pass->IsPlayer() && me->IsAlive())
             {
                 me->SetDisplayId(11686); // prevents nasty falling animation at despawn
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             me->SetDisplayId(11686); // prevents nasty falling animation at despawn
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
     };
 };

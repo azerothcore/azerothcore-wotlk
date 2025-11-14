@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -64,12 +64,12 @@ enum Koltira
     //NPC_DEATH_KNIGHT_MOUNT        = 29201,
     MODEL_DEATH_KNIGHT_MOUNT        = 25278,
 
-    POINT_STAND_UP                  = 0,
-    POINT_BOX                       = 1,
-    POINT_ANTI_MAGIC_ZONE           = 2,
+    POINT_STAND_UP                  = 1,
+    POINT_BOX                       = 2,
+    POINT_ANTI_MAGIC_ZONE           = 3,
 
-    POINT_MOUNT                     = 0,
-    POINT_DESPAWN                   = 1
+    POINT_MOUNT                     = 1,
+    POINT_DESPAWN                   = 2
 };
 
 class npc_koltira_deathweaver : public CreatureScript
@@ -106,7 +106,7 @@ public:
             Talk(SAY_BREAKOUT0);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }, 5s);
         }
 
@@ -167,13 +167,13 @@ public:
                             }
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.6724f, -6032.0527f, 134.82213f, 4.654973506927490234f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath(NPC_CRIMSON_ACOLYTE * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint(NPC_CRIMSON_ACOLYTE * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.0055f, -6031.893f, 134.82211f, 0.401425719261169433f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 1) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 1) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1639.7053f, -6031.7373f, 134.82213f, 2.443460941314697265f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 2) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 2) * 10, false);
                             break;
                         case 1:
                             Talk(SAY_BREAKOUT4);
@@ -182,13 +182,13 @@ public:
                                 valroth->AI()->Talk(SAY_VALROTH_WAVE2);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.7958f, -6030.307f, 134.82211f, 4.65355682373046875f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 3) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 3) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.7305f, -6030.751f, 134.82211f, 6.143558979034423828f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 4) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 4) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1639.4657f, -6030.404f, 134.82211f, 4.502949237823486328f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 5) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 5) * 10, false);
                             break;
                         case 2:
                             Talk(SAY_BREAKOUT5);
@@ -197,16 +197,16 @@ public:
                                 valroth->AI()->Talk(SAY_VALROTH_WAVE3);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.3405f, -6031.436f, 134.82211f, 4.612849712371826171f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 6) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 6) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1642.0404f, -6030.3843f, 134.82211f, 1.378810048103332519f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 7) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 7) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.1162f, -6029.7817f, 134.82211f, 5.707226753234863281f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 8) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 8) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.9948f, -6029.8027f, 134.82211f, 1.605702877044677734f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
-                                acolyte->GetMotionMaster()->MovePath((NPC_CRIMSON_ACOLYTE + 9) * 10, false);
+                                acolyte->GetMotionMaster()->MoveWaypoint((NPC_CRIMSON_ACOLYTE + 9) * 10, false);
                             break;
                         case 3:
                             Talk(SAY_BREAKOUT6);
@@ -223,7 +223,7 @@ public:
                             {
                                 valroth->AI()->Talk(SAY_VALROTH_AGGRO);
                                 valroth->SetReactState(REACT_AGGRESSIVE);
-                                valroth->GetMotionMaster()->MovePath(NPC_HIGH_INQUISITOR_VALROTH * 10, false);
+                                valroth->GetMotionMaster()->MoveWaypoint(NPC_HIGH_INQUISITOR_VALROTH * 10, false);
                             }
                             return;
                         default:
@@ -262,7 +262,7 @@ public:
                     SetInvincibility(true);
                     me->SetReactState(REACT_PASSIVE);
                     me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
-                    me->GetMotionMaster()->MovePath((me->GetEntry() + 1) * 10, false);
+                    me->GetMotionMaster()->MoveWaypoint((me->GetEntry() + 1) * 10, false);
                 });
             }
         }
@@ -610,10 +610,10 @@ public:
             // Start waypoint movement using WaypointMovementGenerator
             if (uint32 pathId = me->GetWaypointPath())
             {
-                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+                me->GetMotionMaster()->MoveWaypoint(pathId, true); // true = repeatable
             }
             // Schedule the first ritual after 20-30s
-            events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
+            events.ScheduleEvent(EVENT_START_RITUAL, 20s, 30s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -628,7 +628,7 @@ public:
                     {
                         if (isOnRitual) // Already performing ritual
                         {
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
 
@@ -655,7 +655,7 @@ public:
                         if (!nearestCorpse)
                         {
                             // No corpse found nearby: try again later
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
                         // Start ritual
@@ -702,7 +702,7 @@ public:
                         // Resume paused waypoint movement
                         me->ResumeMovement();
                         // Schedule next ritual in 20-30s
-                        events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
+                        events.ScheduleEvent(EVENT_START_RITUAL, 20s, 30s);
                         break;
                     }
                 }
@@ -723,9 +723,9 @@ public:
                     me->SetFacingToObject(geist);
                     geistGUID = geist->GetGUID();
                     // Geist found: schedule Ghoulplosion at +3s, then raising at +6s, then resume at +9s
-                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
-                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 6000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 9000);
+                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3s);
+                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 6s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 9s);
                 }
                 else
                 {
@@ -737,8 +737,8 @@ public:
                         me->SetFacingToObject(corpse);
                     }
 
-                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 3000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 6000);
+                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 3s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 6s);
                 }
             }
         }
@@ -797,10 +797,10 @@ public:
             // Start waypoint movement using WaypointMovementGenerator
             if (uint32 pathId = me->GetWaypointPath())
             {
-                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+                me->GetMotionMaster()->MoveWaypoint(pathId, true); // true = repeatable
             }
             // Schedule the first ritual after 50-60s
-            events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
+            events.ScheduleEvent(EVENT_START_RITUAL, 50s, 60s);
         }
         void UpdateAI(uint32 diff) override
         {
@@ -814,7 +814,7 @@ public:
                     {
                         if (isOnRitual) // Already performing ritual
                         {
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
 
@@ -841,7 +841,7 @@ public:
                         }
                         if (!nearestCorpse)
                         {
-                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            events.ScheduleEvent(EVENT_START_RITUAL, 5s, 10s);
                             break;
                         }
                         // Start ritual
@@ -894,7 +894,7 @@ public:
                         // Resume paused waypoint movement
                         me->ResumeMovement();
                         // Schedule next ritual in 50-60s
-                        events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
+                        events.ScheduleEvent(EVENT_START_RITUAL, 50s, 60s);
                         break;
                     }
                 }
@@ -923,15 +923,15 @@ public:
                     me->SetFacingToObject(geist);
                     geistGUID = geist->GetGUID();
                     // Geist present: Ghoulplosion in 3s (with SAY_GEIST), raise in 6s, resume in 9s
-                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
-                    events.ScheduleEvent(EVENT_RAISE_DEAD, 6000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 9000);
+                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3s);
+                    events.ScheduleEvent(EVENT_RAISE_DEAD, 6s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 9s);
                 }
                 else
                 {
                     // No Geist: raise in 3s, resume in 6s
-                    events.ScheduleEvent(EVENT_RAISE_DEAD, 3000);
-                    events.ScheduleEvent(EVENT_RESUME_WP, 6000);
+                    events.ScheduleEvent(EVENT_RAISE_DEAD, 3s);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 6s);
                 }
             }
         }
@@ -1001,20 +1001,25 @@ class spell_chapter2_persuasive_strike : public SpellScript
             creature->AI()->Talk(SAY_PERSUADED3, 24s);
             creature->AI()->Talk(SAY_PERSUADED4, 32s);
 
-            creature->m_Events.AddEventAtOffset([creature, player]
+            ObjectGuid playerGuid = player->GetGUID();
+
+            creature->m_Events.AddEventAtOffset([creature, playerGuid]
             {
-                if (player)
-                    sCreatureTextMgr->SendChat(creature, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+                if (Player* caster = ObjectAccessor::GetPlayer(*creature, playerGuid))
+                    sCreatureTextMgr->SendChat(creature, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, caster);
             }, 40s);
 
-            creature->m_Events.AddEventAtOffset([creature, player]
+            creature->m_Events.AddEventAtOffset([creature, playerGuid]
             {
                 creature->AI()->Talk(SAY_PERSUADED6);
-                if (player)
+
+                if (Player* caster = ObjectAccessor::GetPlayer(*creature, playerGuid))
                 {
-                    Unit::Kill(player, creature);
-                    player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
+                    Unit::Kill(caster, creature);
+                    caster->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
                 }
+                else
+                    creature->KillSelf();
             }, 48s);
         }
         else

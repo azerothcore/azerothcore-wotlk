@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -57,6 +57,9 @@ typedef TYPELIST_5(GameObject, Player, Creature, Corpse, DynamicObject) AllMapGr
 // List of object types stored on map level
 typedef TYPELIST_4(Creature, GameObject, DynamicObject, Corpse) AllMapStoredObjectTypes;
 
+// List of object types that can have far visible range
+typedef TYPELIST_2(Creature, GameObject) AllFarVisibleObjectTypes;
+
 typedef GridRefMgr<Corpse>          CorpseMapType;
 typedef GridRefMgr<Creature>        CreatureMapType;
 typedef GridRefMgr<DynamicObject>   DynamicObjectMapType;
@@ -73,10 +76,11 @@ enum GridMapTypeMask
     GRID_MAP_TYPE_MASK_ALL              = 0x1F
 };
 
-typedef GridCell<AllMapGridStoredObjectTypes> GridCellType;
-typedef MapGrid<AllMapGridStoredObjectTypes> MapGridType;
+typedef GridCell<AllMapGridStoredObjectTypes, AllFarVisibleObjectTypes> GridCellType;
+typedef MapGrid<AllMapGridStoredObjectTypes, AllFarVisibleObjectTypes> MapGridType;
 
 typedef TypeMapContainer<AllMapGridStoredObjectTypes> GridTypeMapContainer;
+typedef TypeVectorContainer<AllFarVisibleObjectTypes> FarVisibleGridContainer;
 typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStoredObjectTypesContainer;
 
 template<uint32 LIMIT>

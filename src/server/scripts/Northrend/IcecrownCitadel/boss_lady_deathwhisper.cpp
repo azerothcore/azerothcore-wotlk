@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -482,7 +482,7 @@ public:
                             minrange = summon->GetExactDist(p);
                         }
 
-                summon->ToTempSummon()->DespawnOrUnsummon(30000);
+                summon->ToTempSummon()->DespawnOrUnsummon(30s);
             }
             else
             {
@@ -522,7 +522,7 @@ public:
                     darnavan->GetMotionMaster()->MoveIdle();
                     darnavan->StopMoving();
                     darnavan->SetReactState(REACT_PASSIVE);
-                    darnavan->m_Events.AddEvent(new DaranavanMoveEvent(*darnavan), darnavan->m_Events.CalculateTime(10000));
+                    darnavan->m_Events.AddEventAtOffset(new DaranavanMoveEvent(*darnavan), 10s);
                     darnavan->AI()->Talk(SAY_DARNAVAN_RESCUED);
                     if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
@@ -949,7 +949,7 @@ public:
                     me->GetMotionMaster()->MovementExpired();
                     me->StopMoving();
                     me->SetControlled(true, UNIT_STATE_STUNNED);
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
                     break;
                 default:
                     break;
@@ -977,7 +977,7 @@ public:
 
             if (!me->GetVictim() || me->GetVictim()->GetGUID() != targetGUID)
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
                 return;
             }
 

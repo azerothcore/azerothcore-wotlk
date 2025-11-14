@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -206,8 +206,8 @@ public:
                     if (Aura* pStorm = me->GetAura(SPELL_BONE_STORM))
                         pStorm->SetDuration(int32(_boneStormDuration));
                     events.ScheduleEvent(EVENT_BONE_STORM_MOVE, 0ms);
-                    events.ScheduleEvent(EVENT_END_BONE_STORM, _boneStormDuration + 1);
-                }
+                    events.ScheduleEvent(EVENT_END_BONE_STORM, Milliseconds(_boneStormDuration + 1));
+            }
                 break;
             case EVENT_BONE_STORM_MOVE:
                 {
@@ -397,7 +397,7 @@ public:
                     trapped->NearTeleportTo(exitPos.GetPositionX(), exitPos.GetPositionY(), exitPos.GetPositionZ(), exitPos.GetOrientation(), false);
                 }
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -429,7 +429,7 @@ public:
                 summonerUnit->SetPetGUID(petGUID);
                 summonerUnit->GetMotionMaster()->Clear();
                 summonerUnit->StopMoving();
-                events.ScheduleEvent(1, 8000);
+                events.ScheduleEvent(1, 8s);
                 hasTrappedUnit = true;
             }
         }
@@ -451,13 +451,13 @@ public:
                 }
                 else
                 {
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     return;
                 }
             }
             else
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
                 return;
             }
 

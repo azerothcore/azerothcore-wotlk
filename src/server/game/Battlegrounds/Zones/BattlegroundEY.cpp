@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -68,7 +68,7 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
                         AddPoints(TEAM_ALLIANCE, BG_EY_TickPoints[_ownedPointsCount[TEAM_ALLIANCE] - 1]);
                     if (_ownedPointsCount[TEAM_HORDE] > 0)
                         AddPoints(TEAM_HORDE, BG_EY_TickPoints[_ownedPointsCount[TEAM_HORDE] - 1]);
-                    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, BG_EY_FPOINTS_TICK_TIME - (GameTime::GetGameTimeMS().count() % BG_EY_FPOINTS_TICK_TIME));
+                    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, BG_EY_FPOINTS_TICK_TIME - (GameTime::GetGameTimeMS() % BG_EY_FPOINTS_TICK_TIME));
                     break;
                 case BG_EY_EVENT_FLAG_ON_GROUND:
                     RespawnFlagAfterDrop();
@@ -78,7 +78,7 @@ void BattlegroundEY::PostUpdateImpl(uint32 diff)
                     break;
                 case BG_EY_EVENT_CHECK_CPOINTS:
                     UpdatePointsState();
-                    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, BG_EY_FPOINTS_CHECK_TIME - (GameTime::GetGameTimeMS().count() % BG_EY_FPOINTS_CHECK_TIME));
+                    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, BG_EY_FPOINTS_CHECK_TIME - (GameTime::GetGameTimeMS() % BG_EY_FPOINTS_CHECK_TIME));
                     break;
             }
     }
@@ -106,8 +106,8 @@ void BattlegroundEY::StartingEventOpenDoors()
 
     // Achievement: Flurry
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, BG_EY_EVENT_START_BATTLE);
-    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, 0);
-    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, 0);
+    _bgEvents.ScheduleEvent(BG_EY_EVENT_ADD_POINTS, 0ms);
+    _bgEvents.ScheduleEvent(BG_EY_EVENT_CHECK_CPOINTS, 0ms);
 }
 
 void BattlegroundEY::AddPoints(TeamId teamId, uint32 points)

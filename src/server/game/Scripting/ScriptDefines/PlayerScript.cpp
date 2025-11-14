@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -139,6 +139,11 @@ void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, R
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_REPUTATION_RANK_CHANGE, script->OnPlayerReputationRankChange(player, factionID, newRank, oldRank, increased));
 }
 
+void ScriptMgr::OnPlayerGiveReputation(Player* player, int32 factionID, float& amount, ReputationSource repSource)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GIVE_REPUTATION, script->OnPlayerGiveReputation(player, factionID, amount, repSource));
+}
+
 void ScriptMgr::OnPlayerLearnSpell(Player* player, uint32 spellID)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_SPELL, script->OnPlayerLearnSpell(player, spellID));
@@ -164,34 +169,9 @@ void ScriptMgr::OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType 
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_DUEL_END, script->OnPlayerDuelEnd(winner, loser, type));
 }
 
-void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg)
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CHAT, script->OnPlayerChat(player, type, lang, msg));
-}
-
 void ScriptMgr::OnPlayerBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE, script->OnPlayerBeforeSendChatMessage(player, type, lang, msg));
-}
-
-void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver)
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CHAT_WITH_RECEIVER, script->OnPlayerChat(player, type, lang, msg, receiver));
-}
-
-void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group)
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CHAT_WITH_GROUP, script->OnPlayerChat(player, type, lang, msg, group));
-}
-
-void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild)
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CHAT_WITH_GUILD, script->OnPlayerChat(player, type, lang, msg, guild));
-}
-
-void ScriptMgr::OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Channel* channel)
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CHAT_WITH_CHANNEL, script->OnPlayerChat(player, type, lang, msg, channel));
 }
 
 void ScriptMgr::OnPlayerEmote(Player* player, uint32 emote)

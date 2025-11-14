@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -605,7 +605,8 @@ public:
                 creature->GetMotionMaster()->MoveJumpTo(0, 0.4f, 0.4f);
                 creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
 
-                pEscortAI->Start(false, false, player->GetGUID());
+                creature->SetWalk(true);
+                pEscortAI->Start(false, player->GetGUID());
                 creature->AI()->Talk(SAY_WP_1);
             }
         }
@@ -1107,118 +1108,6 @@ class spell_q12589_shoot_rjr : public SpellScript
 };
 
 /*######
-## Quest: Reconnaissance Flight (12671)
-######*/
-enum ReconnaissanceFlight
-{
-    NPC_PLANE       = 28710, // Vic's Flying Machine
-    NPC_PILOT       = 28646,
-
-    VIC_SAY_0       = 0,
-    VIC_SAY_1       = 1,
-    VIC_SAY_2       = 2,
-    VIC_SAY_3       = 3,
-    VIC_SAY_4       = 4,
-    VIC_SAY_5       = 5,
-    VIC_SAY_6       = 6,
-    PLANE_EMOTE     = 0,
-
-    AURA_ENGINE     = 52255, // Engine on Fire
-
-    SPELL_LAND      = 52226, // Land Flying Machine
-    SPELL_CREDIT    = 53328 // Land Flying Machine Credit
-};
-
-class npc_vics_flying_machine : public CreatureScript
-{
-public:
-    npc_vics_flying_machine() : CreatureScript("npc_vics_flying_machine") { }
-
-    struct npc_vics_flying_machineAI : public VehicleAI
-    {
-        npc_vics_flying_machineAI(Creature* creature) : VehicleAI(creature)
-        {
-            pointId = 0;
-        }
-
-        uint8 pointId;
-
-        void PassengerBoarded(Unit* passenger, int8 /*seatId*/, bool apply) override
-        {
-            if (apply && passenger->IsPlayer())
-            {
-                Movement::PointsArray pathPoints;
-                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                WaypointPath const* i_path = sWaypointMgr->GetPath(NPC_PLANE);
-                for (uint8 i = 0; i < i_path->size(); ++i)
-                {
-                    WaypointData const* node = i_path->at(i);
-                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                }
-
-                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-            }
-        }
-
-        void MovementInform(uint32 type, uint32  /*id*/) override
-        {
-            if (type != ESCORT_MOTION_TYPE)
-                return;
-
-            if (Vehicle* veh = me->GetVehicleKit())
-                if (Unit* pilot = veh->GetPassenger(0))
-                    switch (pointId)
-                    {
-                        case 5:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_0);
-                            break;
-                        case 11:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_1);
-                            break;
-                        case 12:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_2);
-                            break;
-                        case 14:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_3);
-                            break;
-                        case 15:
-                            pilot->ToCreature()->ToCreature()->AI()->Talk(VIC_SAY_4);
-                            break;
-                        case 17:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_5);
-                            break;
-                        case 21:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_6);
-                            break;
-                        case 25:
-                            Talk(PLANE_EMOTE);
-                            DoCastSelf(AURA_ENGINE);
-                            break;
-                    }
-            pointId++;
-        }
-
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_LAND)
-            {
-                Unit* passenger = me->GetVehicleKit()->GetPassenger(1); // player should be on seat 1
-                if (passenger && passenger->IsPlayer())
-                    passenger->CastSpell(passenger, SPELL_CREDIT, true);
-
-                me->DespawnOrUnsummon();
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_vics_flying_machineAI(creature);
-    }
-};
-
-/*######
 ## Quest Dreadsaber Mastery: Stalking the Prey (12550)
 ######*/
 
@@ -1305,7 +1194,6 @@ void AddSC_sholazar_basin()
     new npc_jungle_punch_target();
     RegisterSpellScript(spell_q12620_the_lifewarden_wrath);
     RegisterSpellScript(spell_q12589_shoot_rjr);
-    new npc_vics_flying_machine();
     RegisterSpellScript(spell_shango_tracks);
 
     RegisterSpellScript(spell_q12611_deathbolt);

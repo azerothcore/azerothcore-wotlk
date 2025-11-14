@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -58,8 +58,7 @@ enum HodirSpellData
     SPELL_ICE_SHARDS_BIG                = 65370,
     SPELL_SNOWDRIFT                     = 62463,
 
-    SPELL_FROZEN_BLOWS_10               = 62478,
-    SPELL_FROZEN_BLOWS_25               = 63512,
+    SPELL_FROZEN_BLOWS                  = 62478,
 
     // Helpers:
     SPELL_PRIEST_DISPELL_MAGIC          = 63499,
@@ -70,9 +69,8 @@ enum HodirSpellData
     SPELL_DRUID_STARLIGHT_AREA_AURA     = 62807,
 
     SPELL_SHAMAN_LAVA_BURST             = 61924,
-    SPELL_SHAMAN_STORM_CLOUD_10         = 65123,
-    SPELL_SHAMAN_STORM_CLOUD_25         = 65133,
-    SPELL_SHAMAN_STORM_POWER_10         = 63711,
+    SPELL_SHAMAN_STORM_CLOUD            = 65123,
+    SPELL_SHAMAN_STORM_POWER            = 63711,
     SPELL_SHAMAN_STORM_POWER_25         = 65134,
 
     SPELL_MAGE_FIREBALL                 = 61909,
@@ -152,9 +150,6 @@ enum HodirText
     TEXT_EMOTE_FREEZE   = 7,
     TEXT_EMOTE_BLOW     = 8,
 };
-
-#define SPELL_FROZEN_BLOWS              RAID_MODE(SPELL_FROZEN_BLOWS_10, SPELL_FROZEN_BLOWS_25)
-#define SPELL_SHAMAN_STORM_CLOUD        RAID_MODE(SPELL_SHAMAN_STORM_CLOUD_10, SPELL_SHAMAN_STORM_CLOUD_25)
 
 enum HodirSounds
 {
@@ -483,7 +478,7 @@ public:
                     {
                         Talk(TEXT_EMOTE_BLOW);
                         Talk(TEXT_STALACTITE);
-                        me->CastSpell(me, Is25ManRaid()? SPELL_FROZEN_BLOWS_25 : SPELL_FROZEN_BLOWS_10, true);
+                        me->CastSpell(me, SPELL_FROZEN_BLOWS, true);
                     }
                     break;
                 case EVENT_FREEZE:
@@ -704,18 +699,18 @@ public:
                     if (Unit* s = me->ToTempSummon()->GetSummonerUnit())
                     {
                         if ((s->IsPlayer() && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER)) || (s->IsCreature() && !s->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC)))
-                            me->DespawnOrUnsummon(2000);
+                            me->DespawnOrUnsummon(2s);
                         else if (s->IsPlayer())
                             if (InstanceScript* instanceScript = me->GetInstanceScript())
                                 if (instanceScript->GetData(TYPE_HODIR) == NOT_STARTED)
                                 {
                                     s->CastSpell(s, SPELL_FLASH_FREEZE_INSTAKILL, true);
-                                    me->DespawnOrUnsummon(2000);
+                                    me->DespawnOrUnsummon(2s);
                                 }
                     }
                     else
                     {
-                        me->DespawnOrUnsummon(2000);
+                        me->DespawnOrUnsummon(2s);
                     }
                 }
             }
@@ -1008,8 +1003,9 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (target && spell->Id == SPELL_SHAMAN_STORM_CLOUD)
-                if (Aura* a = target->GetAura(SPELL_SHAMAN_STORM_CLOUD, me->GetGUID()))
+            uint32 spellid = sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, me);
+            if (target && spell->Id == spellid)
+                if (Aura* a = target->GetAura(spellid, me->GetGUID()))
                     a->SetStackAmount(spell->StackAmount);
         }
 
@@ -1044,10 +1040,13 @@ public:
                     events.Repeat(2600ms);
                     break;
                 case EVENT_SHAMAN_STORM_CLOUD:
-                    if (Player* target = ScriptedAI::SelectTargetFromPlayerList(35.0f, SPELL_SHAMAN_STORM_CLOUD))
-                        me->CastSpell(target, SPELL_SHAMAN_STORM_CLOUD, false);
-                    events.Repeat(30s);
-                    break;
+                    {
+                        uint32 spellid = sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, me);
+                        if (Player* target = ScriptedAI::SelectTargetFromPlayerList(35.0f, spellid))
+                            me->CastSpell(target, spellid, false);
+                        events.Repeat(30s);
+                        break;
+                    }
             }
         }
 
@@ -1403,7 +1402,7 @@ class spell_hodir_storm_power_aura : public AuraScript
     void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
-            if (Aura* a = caster->GetAura(GetId() == SPELL_SHAMAN_STORM_POWER_10 ? SPELL_SHAMAN_STORM_CLOUD_10 : SPELL_SHAMAN_STORM_CLOUD_25))
+            if (Aura* a = caster->GetAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, caster)))
                 a->ModStackAmount(-1);
     }
 
@@ -1427,14 +1426,14 @@ class spell_hodir_storm_cloud_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_SHAMAN_STORM_CLOUD_10, SPELL_SHAMAN_STORM_POWER_10, SPELL_SHAMAN_STORM_POWER_25 });
+        return ValidateSpellInfo({ SPELL_SHAMAN_STORM_POWER });
     }
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         PreventDefaultAction();
         if (Unit* target = GetTarget())
-            target->CastSpell((Unit*)nullptr, (GetId() == SPELL_SHAMAN_STORM_CLOUD_10 ? SPELL_SHAMAN_STORM_POWER_10 : SPELL_SHAMAN_STORM_POWER_25), true);
+            target->CastSpell((Unit*)nullptr, (sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_POWER, GetCaster())), true);
     }
 
     void Register() override
@@ -1528,7 +1527,7 @@ public:
 
     bool OnCheck(Player* player, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
-        return player && player->HasAllAuras(SPELL_MAGE_TOASTY_FIRE_AURA, SPELL_DRUID_STARLIGHT_AREA_AURA, SPELL_SHAMAN_STORM_POWER_10);
+        return player && player->HasAllAuras(SPELL_MAGE_TOASTY_FIRE_AURA, SPELL_DRUID_STARLIGHT_AREA_AURA, SPELL_SHAMAN_STORM_POWER);
     }
 };
 
