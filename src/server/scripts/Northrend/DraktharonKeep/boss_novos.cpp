@@ -173,10 +173,37 @@ struct boss_novos : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
-            summon->SetReactState(REACT_DEFENSIVE);
+
+        // Phase 1
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+        {
+            if (summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
+                summon->SetReactState(REACT_DEFENSIVE);
+
+            if (summon->GetEntry() == NPC_FETID_TROLL_CORPSE)
+                summon->GetMotionMaster()->MovePoint(1, -373.56f, -770.86f, 28.59f);
+        }
+        // Phase 2
         else if (summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET)
             summon->SetInCombatWithZone();
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        if (summon->GetEntry() == NPC_FETID_TROLL_CORPSE)
+            summon->DespawnOrUnsummon(10s);
+    }
+
+    void SummonMovementInform(Creature* summon, uint32 movementType, uint32 pathId) override
+    {
+        if (movementType == POINT_MOTION_TYPE && pathId == 1)
+        {
+            if (summon->GetEntry() == NPC_FETID_TROLL_CORPSE)
+            {
+                DoZoneInCombat(summon);
+                _achievement = false;
+            }
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -259,39 +286,6 @@ private:
     bool _achievement;
 };
 
-// 27598
-struct npc_fetid_troll_corpse : public ScriptedAI
-{
-    npc_fetid_troll_corpse(Creature* creature) : ScriptedAI(creature) { }
-
-    void IsSummonedBy(WorldObject* summoner) override
-    {
-        ScriptedAI::IsSummonedBy(summoner);
-
-        if (Creature* summonerCreature = summoner->ToCreature())
-            if (summonerCreature->HasAura(SPELL_BEAM_CHANNEL))
-                me->GetMotionMaster()->MovePoint(1, -373.56f, -770.86f, 28.59f);
-    }
-
-    void JustDied(Unit* /*killer*/) override
-    {
-        me->DespawnOrUnsummon(10s);
-    }
-
-    void MovementInform(uint32 type, uint32 id) override
-    {
-        if (type == POINT_MOTION_TYPE && id == 1)
-        {
-            DoZoneInCombat();
-
-            if (TempSummon* meSummon = me->ToTempSummon())
-                if (Creature* boss = meSummon->GetSummonerCreatureBase())
-                    if (boss->AI())
-                        boss->AI()->SetData(boss->GetEntry(), 1);
-        }
-    }
-};
-
 // 51403
 class spell_novos_despawn_crystal_handler : public SpellScript
 {
@@ -369,7 +363,6 @@ public:
 void AddSC_boss_novos()
 {
     RegisterCreatureAIWithFactory(boss_novos, GetDraktharonKeepAI);
-    RegisterCreatureAIWithFactory(npc_fetid_troll_corpse, GetDraktharonKeepAI);
     RegisterSpellScript(spell_novos_despawn_crystal_handler);
     RegisterSpellScript(spell_novos_crystal_handler_death_aura);
     RegisterSpellScript(spell_novos_summon_minions);
