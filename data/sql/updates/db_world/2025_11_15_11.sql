@@ -1,3 +1,4 @@
+-- DB update 2025_11_15_10 -> 2025_11_15_11
 
 -- Add Immune To PC, Immune To Npc, Stunned, Prevent Emotes, Feign Death and remove All Dynamic Flags (Sniffed)
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` |256|512|262144|536870912, `unit_flags2` = `unit_flags2` |1, `dynamicflags` = 0  WHERE (`entry` = 26514);
