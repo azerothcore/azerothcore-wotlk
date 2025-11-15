@@ -154,10 +154,11 @@ public:
                             ActivatePipe(i);
                             ooze->GetMotionMaster()->MovePoint(0, RoomPosition[POS_ROOM_CENTER].GetPositionX(), RoomPosition[POS_ROOM_CENTER].GetPositionY(), RoomPosition[POS_ROOM_CENTER].GetPositionZ());
                             ooze->SetReactState(REACT_PASSIVE);
+                            ooze->SetWalk(true);
                         }
                     }
 
-                    context.Repeat(5s, 7s);
+                    context.Repeat(10s, 20s);
                 });
             });
 
@@ -180,7 +181,7 @@ public:
                         }
                     }
 
-                    context.Repeat(5s, 7s);
+                    context.Repeat(10s, 20s);
                 });
             });
 
