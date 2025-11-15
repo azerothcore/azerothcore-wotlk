@@ -3124,7 +3124,6 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                         data << uint32(spellInfo->Id);
                         SendDirectMessage(&data);
                     }
-
                     return false;
                 }
                 else if (nextSpellInfo->GetRank() > spellInfo->GetRank())
@@ -3133,7 +3132,6 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                     if (itr2 != m_spells.end())
                         itr2->second->Active = false;
 
-                    // ✔ Verificar antes de retornar
                     if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
                         SendUnlearnSpells();
 
