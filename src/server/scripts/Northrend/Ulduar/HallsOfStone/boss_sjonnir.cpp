@@ -202,10 +202,6 @@ public:
                 DoCastRandomTarget(SPELL_STATIC_CHARGE, 0, 50.0f);
             }, 20s);
 
-            ScheduleTimedEvent(30s, [&] {
-
-            }, 40s);
-
             scheduler.Schedule(30s, GROUP_LIGHTNING_RING, [&](TaskContext context) {
                 DoCastAOE(SPELL_LIGHTNING_RING);
                 context.Repeat(40s);
