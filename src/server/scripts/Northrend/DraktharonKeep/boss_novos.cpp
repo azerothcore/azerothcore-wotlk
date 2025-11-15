@@ -269,12 +269,8 @@ struct npc_fetid_troll_corpse : public ScriptedAI
         ScriptedAI::IsSummonedBy(summoner);
 
         if (Creature* summonerCreature = summoner->ToCreature())
-        {
             if (summonerCreature->HasAura(SPELL_BEAM_CHANNEL))
                 me->GetMotionMaster()->MovePoint(1, -373.56f, -770.86f, 28.59f);
-            else
-                _countTowardsAchievement = false;
-        }
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -288,16 +284,12 @@ struct npc_fetid_troll_corpse : public ScriptedAI
         {
             DoZoneInCombat();
 
-            if (_countTowardsAchievement)
-                if (TempSummon* meSummon = me->ToTempSummon())
-                    if (Creature* boss = meSummon->GetSummonerCreatureBase())
-                        if (boss->AI())
-                            boss->AI()->SetData(boss->GetEntry(), 1);
+            if (TempSummon* meSummon = me->ToTempSummon())
+                if (Creature* boss = meSummon->GetSummonerCreatureBase())
+                    if (boss->AI())
+                        boss->AI()->SetData(boss->GetEntry(), 1);
         }
     }
-
-private:
-    bool _countTowardsAchievement = true;
 };
 
 // 51403
