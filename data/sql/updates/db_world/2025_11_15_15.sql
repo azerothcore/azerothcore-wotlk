@@ -2,9 +2,9 @@
 --
 SET @MAXSTANDING := 7;
 SET @REPSUMMONS := 1;
-SET @REPREGULAR := 6;
-SET @REPHULK := 13;
-SET @REPBOSS := 65;
+SET @REPREGULAR := 3;
+SET @REPHULK := 10;
+SET @REPBOSS := 50;
 DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (26553, 26554, 26550, 26555, 26668, 26669, 26670, 26672, 26685, 26683, 26684,
 26686, 26687, 26692, 26690, 26691, 26693, 28368, 26696, 26694, 26861);
 INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `RewOnKillRepValue1`, `MaxStanding2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
