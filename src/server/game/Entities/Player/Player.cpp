@@ -2842,6 +2842,7 @@ void Player::SendInitialSpells()
     }
 
     SendDirectMessage(&data);
+    SendUnlearnSpells();
 }
 
 void Player::SendUnlearnSpells()
@@ -3112,6 +3113,10 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                 if (nextSpellInfo->GetRank() < spellInfo->GetRank())
                 {
                     itr->second->Active = false;
+
+                    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+                        SendUnlearnSpells();
+
                     if (IsInWorld())
                     {
                         WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
@@ -3119,6 +3124,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                         data << uint32(spellInfo->Id);
                         SendDirectMessage(&data);
                     }
+
                     return false;
                 }
                 else if (nextSpellInfo->GetRank() > spellInfo->GetRank())
@@ -3126,12 +3132,20 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                     PlayerSpellMap::iterator itr2 = m_spells.find(spellInfo->Id);
                     if (itr2 != m_spells.end())
                         itr2->second->Active = false;
+
+                    // ✔ Verificar antes de retornar
+                    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+                        SendUnlearnSpells();
+
                     return false;
                 }
             }
             nextSpellInfo = nextSpellInfo->GetNextRankSpell();
         }
     }
+
+    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+        SendUnlearnSpells();
 
     return true;
 }
