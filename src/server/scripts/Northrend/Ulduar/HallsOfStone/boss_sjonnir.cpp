@@ -202,9 +202,9 @@ public:
                 DoCastRandomTarget(SPELL_STATIC_CHARGE, 0, 50.0f);
             }, 20s);
 
-            ScheduleTimedEvent(25s, 31s, [&] {
+            ScheduleTimedEvent(30s, [&] {
                 DoCastAOE(SPELL_LIGHTNING_RING);
-            }, 25s, 31s);
+            }, 40s);
 
             if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
                 brann->AI()->Talk(SAY_BRANN_SPAWN_TROGG, 20s);
