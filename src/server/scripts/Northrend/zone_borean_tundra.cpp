@@ -694,6 +694,7 @@ public:
 
         void Initialize()
         {
+            me->SetReactState(REACT_PASSIVE);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0ms);
         }
