@@ -97,10 +97,7 @@ public:
 
     struct boss_sjonnirAI : public BossAI
     {
-        boss_sjonnirAI(Creature* c) : BossAI(c, BOSS_SJONNIR)
-        {
-            SetSchedulerValidator();
-        }
+        boss_sjonnirAI(Creature* c) : BossAI(c, BOSS_SJONNIR) { }
 
         uint8 SlugeCount;
 
@@ -130,13 +127,9 @@ public:
             ScheduleHealthCheckEvent(75, [&] {
                 scheduler.CancelGroup(GROUP_SUMMONS);
                 scheduler.Schedule(1s, GROUP_SUMMONS, [&](TaskContext context) {
-                    for (int i = 0; i < 2; i++)
-                    {
-                        uint8 Pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
-                        me->SummonCreature(NPC_FORGED_IRON_TROGG, RoomPosition[Pos].GetPositionX(), RoomPosition[Pos].GetPositionY(), RoomPosition[Pos].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                        ActivatePipe(Pos);
-                    }
-
+                    uint8 Pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
+                    me->SummonCreature(NPC_FORGED_IRON_TROGG, RoomPosition[Pos].GetPositionX(), RoomPosition[Pos].GetPositionY(), RoomPosition[Pos].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                    ActivatePipe(Pos);
                     context.Repeat(5s, 7s);
                 });
             });
@@ -158,7 +151,7 @@ public:
                         }
                     }
 
-                    context.Repeat(10s, 20s);
+                    context.Repeat(2s);
                 });
             });
 
@@ -221,15 +214,11 @@ public:
             if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
                 brann->AI()->Talk(SAY_BRANN_SPAWN_TROGG, 20s);
 
-            scheduler.Schedule(20s, GROUP_SUMMONS, [&](TaskContext context) {
-                for (int i = 0; i < 2; i++)
-                {
-                    uint8 Pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
-                    me->SummonCreature(NPC_FORGED_IRON_DWARF, RoomPosition[Pos].GetPositionX(), RoomPosition[Pos].GetPositionY(), RoomPosition[Pos].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                    ActivatePipe(Pos);
-                }
-
-                context.Repeat(5s, 7s);
+            scheduler.Schedule(5s, GROUP_SUMMONS, [&](TaskContext context) {
+                uint8 Pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
+                me->SummonCreature(NPC_FORGED_IRON_DWARF, RoomPosition[Pos].GetPositionX(), RoomPosition[Pos].GetPositionY(), RoomPosition[Pos].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                ActivatePipe(Pos);
+                context.Repeat(30s);
             });
         }
 
