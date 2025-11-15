@@ -6,7 +6,7 @@ SET @REPHULK := 13;
 SET @REPBOSS := 65;
 DELETE FROM `creature_onkill_reputation` WHERE `creature_id` IN (26553, 26554, 26550, 26555, 26668, 26669, 26670, 26672, 26685, 26683, 26684,
 26686, 26687, 26692, 26690, 26691, 26693, 28368, 26696, 26694, 26861);
-INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`,`RewOnKillRepFaction2`, `MaxStanding1`, `RewOnKillRepValue1`, `MaxStanding2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
+INSERT INTO `creature_onkill_reputation` (`creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`, `MaxStanding1`, `RewOnKillRepValue1`, `MaxStanding2`, `RewOnKillRepValue2`, `TeamDependent`) VALUES
 (26550, 1037, 1052, @MAXSTANDING, @REPREGULAR, @MAXSTANDING, @REPREGULAR, 1), -- Dragonflayer Deathseeker
 (26553, 1037, 1052, @MAXSTANDING, @REPREGULAR, @MAXSTANDING, @REPREGULAR, 1), -- Dragonflayer Fanatic
 (26554, 1037, 1052, @MAXSTANDING, @REPREGULAR, @MAXSTANDING, @REPREGULAR, 1), -- Dragonflayer Seer
