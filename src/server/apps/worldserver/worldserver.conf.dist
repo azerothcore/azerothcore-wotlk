@@ -398,6 +398,20 @@ Network.TcpNodelay = 1
 Network.EnableProxyProtocol = 0
 
 #
+#    Network.UseSocketActivation
+#        Description: Enable systemd socket activation support for the worldserver.
+#                     When enabled and the process is started by systemd socket activation,
+#                     the server will use the socket passed by systemd instead of
+#                     creating and binding its own listening socket. Disabled by default.
+#
+#                     When enabled the realm is not automatically set as offline on shutdown.
+#
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.UseSocketActivation = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
