@@ -57,6 +57,7 @@ public:
         void Initialize() override
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
             memset(&Encounter, 0, sizeof(Encounter));
 
             brannAchievement = false;
