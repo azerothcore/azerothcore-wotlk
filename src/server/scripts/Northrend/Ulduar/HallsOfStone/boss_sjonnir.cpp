@@ -242,9 +242,7 @@ public:
         void JustDied(Unit*  /*killer*/) override
         {
             Talk(SAY_DEATH);
-
-            summons.DespawnAll();
-            instance->SetData(BOSS_SJONNIR, DONE);
+            _JustDied();
             if (GameObject* sd = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))
                 sd->SetGoState(GO_STATE_ACTIVE);
 
