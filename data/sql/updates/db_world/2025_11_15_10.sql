@@ -1,3 +1,4 @@
+-- DB update 2025_11_15_09 -> 2025_11_15_10
 --
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` = 54076;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
