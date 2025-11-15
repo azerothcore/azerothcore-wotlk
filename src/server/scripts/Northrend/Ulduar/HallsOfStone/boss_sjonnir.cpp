@@ -28,6 +28,7 @@ enum Spells
     SPELL_LIGHTNING_SHIELD                  = 50831,
     SPELL_STATIC_CHARGE                     = 50834,
     SPELL_LIGHTNING_RING                    = 50840,
+    SPELL_LIGHTNING_RING_5S                 = 51849,
 
     // IRON SLUDGE
     SPELL_TOXIC_VOLLEY                      = 50838,
@@ -64,19 +65,17 @@ enum Events
     EVENT_FORGED_LIGHTNING_TETHER           = 13,
 };
 
-enum Misc
+enum SjonnirMisc
 {
+    GROUP_SUMMONS                           = 1,
+    GROUP_LIGHTNING_RING                    = 2,
+
     POS_GEN_RIGHT                           = 0,
     POS_GEN_LEFT                            = 1,
     POS_ROOM_CENTER                         = 2,
 
     // ACTIONS
     ACTION_SLUG_KILLED                      = 1,
-};
-
-enum SjonnirMisc
-{
-    GROUP_SUMMONS                           = 1,
 };
 
 static Position RoomPosition[] =
@@ -183,8 +182,15 @@ public:
 
                     context.Repeat(5s, 7s);
                 });
+            });
 
-                DoCastSelf(SPELL_FRENZY);
+            ScheduleHealthCheckEvent(20, [&] {
+                scheduler.CancelGroup(GROUP_LIGHTNING_RING);
+                DoCastSelf(SPELL_FRENZY, true);
+
+                ScheduleTimedEvent(1s, [&] {
+                    DoCastSelf(SPELL_LIGHTNING_RING_5S);
+                }, 11s);
             });
         }
 
@@ -203,8 +209,13 @@ public:
             }, 20s);
 
             ScheduleTimedEvent(30s, [&] {
-                DoCastAOE(SPELL_LIGHTNING_RING);
+
             }, 40s);
+
+            scheduler.Schedule(30s, GROUP_LIGHTNING_RING, [&](TaskContext context) {
+                DoCastAOE(SPELL_LIGHTNING_RING);
+                context.Repeat(40s);
+            });
 
             if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
                 brann->AI()->Talk(SAY_BRANN_SPAWN_TROGG, 20s);
