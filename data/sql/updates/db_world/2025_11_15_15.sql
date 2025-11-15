@@ -1,3 +1,4 @@
+-- DB update 2025_11_15_14 -> 2025_11_15_15
 --
 SET @MAXSTANDING := 7;
 SET @REPSUMMONS := 1;
