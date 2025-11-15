@@ -104,9 +104,7 @@ public:
         void Reset() override
         {
             _Reset();
-
             SlugeCount = 0;
-
             instance->SetData(DATA_SJONNIR_ACHIEVEMENT, false);
 
             if (instance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
