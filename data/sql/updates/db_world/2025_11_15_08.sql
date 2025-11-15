@@ -1,3 +1,4 @@
+-- DB update 2025_11_15_07 -> 2025_11_15_08
 
 -- Set Creature Template Addon (Amberpine Woodsman)
 DELETE FROM `creature_template_addon` WHERE (`entry` = 27293);
