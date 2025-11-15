@@ -418,6 +418,7 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
     player->m_taxi.ClearTaxiDestinations();
     player->Dismount();
     player->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
+    player->UpdatePvPState(); // to account for cases such as flying into a PvP territory, as it does not flag on the way in
 
     if (player->m_taxi.empty())
     {
@@ -446,6 +447,9 @@ void FlightPathMovementGenerator::DoReset(Player* player)
         LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::DoReset: trying to start a flypath from the end point. {}", player->GetGUID().ToString());
         return;
     }
+
+    if (player->pvpInfo.EndTimer)
+        player->UpdatePvP(false, true); // PvP flag timer immediately ends when starting taxi
 
     player->getHostileRefMgr().setOnlineOfflineState(false);
     player->AddUnitState(UNIT_STATE_IN_FLIGHT);
