@@ -1068,8 +1068,6 @@ void AddSC_grizzly_hills()
     new npc_emily();
     new npc_mrfloppy();
     new npc_ravenous_worg();
-    new npc_tallhorn_stag();
-    new npc_amberpine_woodsman();
     RegisterCreatureAI(npc_wounded_skirmisher);
     RegisterSpellScript(spell_renew_skirmisher);
     new npc_venture_co_straggler();
