@@ -160,8 +160,11 @@ void PetAI::UpdateAI(uint32 diff)
 
     if (owner && owner->IsPlayer() && !me->GetVictim() && me->CanNotReachTarget())
     {
-        me->NearTeleportTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), me->GetOrientation());
-        me->SetCannotReachTarget(); // Clear flag after teleport
+        if (me->GetDistance(owner) > 20.0f)
+        {
+            me->NearTeleportTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), me->GetOrientation());
+            me->SetCannotReachTarget(); // Clear flag after teleport
+        }
     }
 
     if (me->GetVictim() && me->GetVictim()->IsAlive())
