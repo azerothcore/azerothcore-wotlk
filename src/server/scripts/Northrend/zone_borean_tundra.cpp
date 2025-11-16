@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -694,6 +694,7 @@ public:
 
         void Initialize()
         {
+            me->SetReactState(REACT_PASSIVE);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0ms);
         }
@@ -2175,6 +2176,40 @@ class spell_soul_deflection : public AuraScript
     }
 };
 
+enum SpellBloodHaze
+{
+    SPELL_BLOODSPORE_HAZE = 50380,
+    SPELL_PSYCHOSIS       = 50396
+};
+
+// 50380 - Bloodspore Haze
+class spell_bloodspore_haze : public SpellScript
+{
+    PrepareSpellScript(spell_bloodspore_haze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PSYCHOSIS });
+    }
+
+    void HandleEffectHit(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetHitUnit())
+            return;
+
+        if (GetHitUnit()->GetAuraCount(SPELL_BLOODSPORE_HAZE) >= 5)
+        {
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PSYCHOSIS, true);
+            GetHitUnit()->RemoveAura(SPELL_BLOODSPORE_HAZE);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_bloodspore_haze::HandleEffectHit, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -2201,4 +2236,5 @@ void AddSC_borean_tundra()
     RegisterCreatureAI(npc_jenny);
     RegisterSpellScript(spell_necropolis_beam);
     RegisterSpellScript(spell_soul_deflection);
+    RegisterSpellScript(spell_bloodspore_haze);
 }
