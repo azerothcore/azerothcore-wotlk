@@ -63,23 +63,27 @@ public:
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
         }
 
-        void OnCreatureCreate(Creature* pCreature) override
+        void OnCreatureCreate(Creature* creature) override
         {
-            switch (pCreature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_DRAKOS:
-                    uiDrakosGUID = pCreature->GetGUID();
+                    uiDrakosGUID = creature->GetGUID();
                     break;
                 case NPC_VAROS:
-                    uiVarosGUID = pCreature->GetGUID();
+                    uiVarosGUID = creature->GetGUID();
                     break;
                 case NPC_UROM:
-                    uiUromGUID = pCreature->GetGUID();
+                    uiUromGUID = creature->GetGUID();
                     break;
                 case NPC_EREGOS:
-                    uiEregosGUID = pCreature->GetGUID();
+                    uiEregosGUID = creature->GetGUID();
                     break;
             }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                if (creature->EntryEquals(NPC_AMBER_DRAKE, NPC_EMERALD_DRAKE, NPC_RUBY_DRAKE))
+                    creature->SetFaction(FACTION_FRIENDLY); // Friendly faction to allow interaction from both factions
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
