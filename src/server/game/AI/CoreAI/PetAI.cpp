@@ -158,6 +158,12 @@ void PetAI::UpdateAI(uint32 diff)
     else
         m_updateAlliesTimer -= diff;
 
+    if (owner && owner->IsPlayer() && !me->GetVictim() && me->CanNotReachTarget())
+    {
+        me->NearTeleportTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), me->GetOrientation());
+        me->SetCannotReachTarget();
+    }
+
     if (me->GetVictim() && me->GetVictim()->IsAlive())
     {
         // is only necessary to stop casting, the pet must not exit combat
