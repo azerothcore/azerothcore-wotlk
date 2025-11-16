@@ -618,7 +618,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         if (cannotReachTarget)
         {
-            if (cOwner)
+            if (oPet && followingMaster)
                 cOwner->SetCannotReachTarget(target->GetGUID());
 
             if (!owner->IsStopped())
