@@ -764,10 +764,10 @@ public:
                     break;
             }
 
-            handler->PSendSysMessage(LANG_CMD_QUEST_STATUS, quest->GetTitle(), entry, status.c_str());
+            handler->PSendSysMessage(LANG_CMD_QUEST_STATUS, quest->GetTitle(), entry, status);
 
             if (!player->CanTakeQuest(quest, true))
-                handler->PSendSysMessage(LANG_CMD_QUEST_UNAVAILABLE, entry, status.c_str());
+                handler->PSendSysMessage(LANG_CMD_QUEST_UNAVAILABLE, entry, status);
         }
 
         handler->SetSentErrorMessage(false);
