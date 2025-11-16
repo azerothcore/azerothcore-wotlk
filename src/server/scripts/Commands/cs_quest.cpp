@@ -756,6 +756,9 @@ public:
                 case QUEST_STATUS_FAILED:
                     status = "Failed";
                     break;
+                case QUEST_STATUS_REWARDED:
+                    status = "Rewarded";
+                    break;
                 default:
                     status = "Unknown";
                     break;
