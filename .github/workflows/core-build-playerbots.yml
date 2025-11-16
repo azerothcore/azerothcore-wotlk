@@ -7,6 +7,12 @@ on:
     branches: [ "Playerbot" ]
   pull_request:
     branches: [ "Playerbot" ]
+  workflow_dispatch:
+    inputs:
+      playerbot_branch:
+        description: "Which branch of mod-playerbots should be used?"
+        required: false
+        default: "master"
 
 jobs:
   build:
@@ -46,11 +52,18 @@ jobs:
     # - name: Clone Playerbot Module
     #   run: git clone --depth=1 --branch=master https://github.com/mod-playerbots/mod-playerbots.git modules/mod-playerbots
 
+    # - name: Checkout Playerbot Module
+    #   uses: actions/checkout@v3
+    #   with:
+    #     repository: 'mod-playerbots/mod-playerbots'
+    #     #ref: 'feature/core_update_10_2025' #used on core merge conflicts builds
+    #     path: 'modules/mod-playerbots'
+
     - name: Checkout Playerbot Module
       uses: actions/checkout@v3
       with:
         repository: 'mod-playerbots/mod-playerbots'
-        #ref: 'feature/core_update_10_2025' #used on core merge conflicts builds
+        ref: ${{ github.event.inputs.playerbot_branch || 'master' }}
         path: 'modules/mod-playerbots'
     
     - name: Install Requirements
