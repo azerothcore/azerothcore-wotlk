@@ -824,14 +824,6 @@ void BossAI::ScheduleEnrageTimer(uint32 spellId, Milliseconds timer, uint8 textI
     }, timer);
 }
 
-void BossAI::SetSchedulerValidator()
-{
-    scheduler.SetValidator([this]
-    {
-        return !me->HasUnitState(UNIT_STATE_CASTING);
-    });
-}
-
 // WorldBossAI - for non-instanced bosses
 
 WorldBossAI::WorldBossAI(Creature* creature) :

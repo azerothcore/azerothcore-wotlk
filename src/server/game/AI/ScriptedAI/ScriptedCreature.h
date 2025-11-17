@@ -515,9 +515,6 @@ public:
 
     virtual void ScheduleTasks() { }
 
-    // TaskScheduler update validator. By default prevents update while casting.
-    void SetSchedulerValidator();
-
     void Reset() override { _Reset(); }
     void JustEngagedWith(Unit* /*who*/) override { _JustEngagedWith(); }
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { _EnterEvadeMode(why); }

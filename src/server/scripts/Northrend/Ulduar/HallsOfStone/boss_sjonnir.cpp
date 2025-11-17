@@ -104,6 +104,7 @@ public:
         void Reset() override
         {
             _Reset();
+            scheduler.ClearValidator();
             SlugeCount = 0;
             instance->SetData(DATA_SJONNIR_ACHIEVEMENT, false);
 
@@ -137,7 +138,7 @@ public:
                     brann->AI()->Talk(SAY_BRANN_SPAWN_OOZE);
 
                 scheduler.CancelGroup(GROUP_SUMMONS);
-                scheduler.Schedule(1s, GROUP_SUMMONS, [&](TaskContext context) {
+                scheduler.Schedule(3s, GROUP_SUMMONS, [&](TaskContext context) {
                     uint8 pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
                     if (Creature* ooze = me->SummonCreature(NPC_OOZE, RoomPosition[pos], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
                     {
@@ -147,7 +148,7 @@ public:
                         ooze->SetWalk(true);
                     }
 
-                    context.Repeat(3s);
+                    context.Repeat();
                 });
             });
 
