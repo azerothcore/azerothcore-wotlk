@@ -110,8 +110,6 @@ public:
 
             if (instance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
             {
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
                 if (GameObject* console = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_READY);
 
