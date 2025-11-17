@@ -25,7 +25,6 @@
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
-
 using namespace Grobbulus;
 
 // no custom changes has been made for mod-playerbot other then placing
