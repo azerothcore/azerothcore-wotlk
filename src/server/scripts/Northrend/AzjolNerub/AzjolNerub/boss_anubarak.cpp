@@ -117,7 +117,6 @@ struct boss_anub_arak : public BossAI
         _submergePhase = SUBMERGE_NONE;
 
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
-            ++_submergePhase;
             events.CancelEventGroup(GROUP_EMERGED);
             Talk(SAY_SUBMERGE);
             DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
@@ -132,6 +131,8 @@ struct boss_anub_arak : public BossAI
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->RemoveAurasDueToSpell(SPELL_LEECHING_SWARM);
             DoCastSelf(SPELL_IMPALE_PERIODIC, true);
+
+            ++_submergePhase;
             ScheduleSubmerged();
         }
     }
