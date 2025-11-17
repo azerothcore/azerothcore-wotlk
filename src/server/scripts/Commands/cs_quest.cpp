@@ -770,7 +770,6 @@ public:
                 handler->PSendSysMessage(LANG_CMD_QUEST_UNAVAILABLE, entry, status);
         }
 
-        handler->SetSentErrorMessage(false);
         return true;
     }
 };
