@@ -138,18 +138,16 @@ public:
 
                 scheduler.CancelGroup(GROUP_SUMMONS);
                 scheduler.Schedule(1s, GROUP_SUMMONS, [&](TaskContext context) {
-                    for (uint8 i = POS_GEN_RIGHT; i <= POS_GEN_LEFT; i++)
+                    uint8 pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
+                    if (Creature* ooze = me->SummonCreature(NPC_OOZE, RoomPosition[pos], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
                     {
-                        if (Creature* ooze = me->SummonCreature(NPC_OOZE, RoomPosition[i].GetPositionX(), RoomPosition[i].GetPositionY(), RoomPosition[i].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
-                        {
-                            ActivatePipe(i);
-                            ooze->GetMotionMaster()->MovePoint(0, RoomPosition[POS_ROOM_CENTER].GetPositionX(), RoomPosition[POS_ROOM_CENTER].GetPositionY(), RoomPosition[POS_ROOM_CENTER].GetPositionZ());
-                            ooze->SetReactState(REACT_PASSIVE);
-                            ooze->SetWalk(true);
-                        }
+                        ActivatePipe(pos);
+                        ooze->GetMotionMaster()->MovePoint(0, RoomPosition[POS_ROOM_CENTER].GetPositionX(), RoomPosition[POS_ROOM_CENTER].GetPositionY(), RoomPosition[POS_ROOM_CENTER].GetPositionZ());
+                        ooze->SetReactState(REACT_PASSIVE);
+                        ooze->SetWalk(true);
                     }
 
-                    context.Repeat(2s);
+                    context.Repeat(3s);
                 });
             });
 
