@@ -42,7 +42,6 @@ enum Spells
 
 enum Npc
 {
-    NPC_IRON_SLUDGE                         = 28165, // if 2 ooze then spawn 1 iron_sludge
     NPC_DWARFES_FRIENDLY                    = 27980, //after fix the machine by Brann
     NPC_OOZE                                = 27981, //spawn after killing dwarf
     NPC_FORGED_IRON_DWARF                   = 27982,
@@ -313,8 +312,8 @@ public:
         }
         void JustDied(Unit*  /*killer*/) override
         {
-            if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (Creature* sjonnir = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_SJONNIR)))
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (Creature* sjonnir = instance->GetCreature(BOSS_SJONNIR))
                     sjonnir->AI()->DoAction(ACTION_SLUG_KILLED);
         }
         void UpdateAI(uint32 diff) override
