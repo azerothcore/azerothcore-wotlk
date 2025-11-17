@@ -217,14 +217,9 @@ template <> void PointMovementGenerator<Creature>::MovementInform(Creature* unit
     else
     {
         if (TempSummon* tempSummon = unit->ToTempSummon())
-        {
             if (Unit* summoner = tempSummon->GetSummonerUnit())
-            {
                 if (UnitAI* AI = summoner->GetAI())
-                {
                     AI->SummonMovementInform(unit, POINT_MOTION_TYPE, id);
-                }
-            }
         }
     }
 }
