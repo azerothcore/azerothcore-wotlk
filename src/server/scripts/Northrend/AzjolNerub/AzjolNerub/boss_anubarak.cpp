@@ -117,7 +117,6 @@ struct boss_anub_arak : public BossAI
         _submergePhase = SUBMERGE_NONE;
 
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
-            events.Reset();
             Talk(SAY_SUBMERGE);
             DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
             DoCastSelf(SPELL_SUBMERGE, false);
@@ -133,13 +132,13 @@ struct boss_anub_arak : public BossAI
             DoCastSelf(SPELL_IMPALE_PERIODIC, true);
 
             ++_submergePhase;
-            events.Reset();
             ScheduleSubmerged();
         }
     }
 
     void ScheduleEmerged()
     {
+        events.Reset();
         events.SetPhase(PHASE_EMERGED);
         events.ScheduleEvent(EVENT_CARRION_BEETLES, 6500ms, 0, PHASE_EMERGED);
         events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, 0, PHASE_EMERGED);
@@ -148,6 +147,7 @@ struct boss_anub_arak : public BossAI
 
     void ScheduleSubmerged()
     {
+        events.Reset();
         events.SetPhase(PHASE_SUBMERGED);
         events.ScheduleEvent(EVENT_EMERGE, 60s, 0, PHASE_SUBMERGED);
 
@@ -213,9 +213,8 @@ struct boss_anub_arak : public BossAI
         Talk(SAY_AGGRO);
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
 
-        events.SetPhase(PHASE_EMERGED);
-        events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s, 0, PHASE_EMERGED);
         ScheduleEmerged();
+        events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s);
 
         // set up world triggers
         std::list<TempSummon*> summoned;
@@ -285,9 +284,9 @@ struct boss_anub_arak : public BossAI
                 --_remainingLargeSummonsBeforeEmerge;
                 if (_remainingLargeSummonsBeforeEmerge == 0)
                 {
-                        events.Reset();
+                        me->RemoveAurasDueToSpell(SPELL_IMPALE_PERIODIC);
                         events.SetPhase(PHASE_SUBMERGED);
-                        events.ScheduleEvent(EVENT_EMERGE, 5s, 0, PHASE_SUBMERGED);
+                        events.RescheduleEvent(EVENT_EMERGE, 5s, 0, PHASE_SUBMERGED);
                 }
                 break;
             }
