@@ -37,4 +37,5 @@ void AddSC_boss_grobbulus()
     new boss_grobbulus_poison_cloud();
     RegisterSpellScript(spell_grobbulus_mutating_injection_aura);
     RegisterSpellScript(spell_grobbulus_poison);
+    RegisterSpellScript(spell_grobbulus_slime_spray);
 }
