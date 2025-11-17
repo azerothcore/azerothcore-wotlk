@@ -159,13 +159,13 @@ public:
                 scheduler.Schedule(1s, GROUP_SUMMONS, [&](TaskContext context) {
                     for (int i = 0; i < 3; i++)
                     {
-                        uint8 Pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
-                        if (Creature* dwarf = me->SummonCreature(NPC_DWARFES_FRIENDLY, RoomPosition[Pos].GetPositionX(), RoomPosition[Pos].GetPositionY(), RoomPosition[Pos].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
+                        uint8 pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
+                        if (Creature* dwarf = me->SummonCreature(NPC_DWARFES_FRIENDLY, RoomPosition[pos], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
                         {
                             if (Player* plr = SelectTargetFromPlayerList(100.0f))
                                 dwarf->SetFaction(plr->GetFaction());
 
-                            ActivatePipe(Pos);
+                            ActivatePipe(pos);
                             dwarf->AI()->AttackStart(me);
                         }
                     }
@@ -207,9 +207,9 @@ public:
                 brann->AI()->Talk(SAY_BRANN_SPAWN_TROGG, 20s);
 
             scheduler.Schedule(5s, GROUP_SUMMONS, [&](TaskContext context) {
-                uint8 Pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
-                me->SummonCreature(NPC_FORGED_IRON_DWARF, RoomPosition[Pos].GetPositionX(), RoomPosition[Pos].GetPositionY(), RoomPosition[Pos].GetPositionZ(), 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                ActivatePipe(Pos);
+                uint8 pos = urand(POS_GEN_RIGHT, POS_GEN_LEFT);
+                me->SummonCreature(NPC_FORGED_IRON_DWARF, RoomPosition[pos], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
+                ActivatePipe(pos);
                 context.Repeat(30s);
             });
         }
