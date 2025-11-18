@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -37,6 +37,7 @@ public:
             { "complete", HandleQuestComplete, SEC_GAMEMASTER, Console::Yes },
             { "remove",   HandleQuestRemove,   SEC_GAMEMASTER, Console::Yes },
             { "reward",   HandleQuestReward,   SEC_GAMEMASTER, Console::Yes },
+            { "status",   HandleQuestStatus,   SEC_GAMEMASTER, Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -722,6 +723,53 @@ public:
 
         handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle(), entry);
         handler->SetSentErrorMessage(false);
+        return true;
+    }
+
+    static bool HandleQuestStatus(ChatHandler* handler, Quest const* quest, Optional<PlayerIdentifier> playerTarget)
+    {
+        if (!playerTarget)
+            playerTarget = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!playerTarget)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        uint32 entry = quest->GetQuestId();
+        std::string status;
+        if (Player* player = playerTarget->GetConnectedPlayer())
+        {
+            QuestStatus qs = player->GetQuestStatus(entry);
+            switch (qs)
+            {
+                case QUEST_STATUS_NONE:
+                    status = "Not Taken";
+                    break;
+                case QUEST_STATUS_COMPLETE:
+                    status = "Complete";
+                    break;
+                case QUEST_STATUS_INCOMPLETE:
+                    status = "Incomplete";
+                    break;
+                case QUEST_STATUS_FAILED:
+                    status = "Failed";
+                    break;
+                case QUEST_STATUS_REWARDED:
+                    status = "Rewarded";
+                    break;
+                default:
+                    status = "Unknown";
+                    break;
+            }
+
+            handler->PSendSysMessage(LANG_CMD_QUEST_STATUS, quest->GetTitle(), entry, status);
+
+            if (!player->CanTakeQuest(quest, true))
+                handler->PSendSysMessage(LANG_CMD_QUEST_UNAVAILABLE, entry, status);
+        }
+
         return true;
     }
 };

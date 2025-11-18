@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -31,6 +31,7 @@
 enum qSniffingOutThePerpetrator
 {
     NPC_FROSTHOUND                          = 29677,
+    NPC_FROSTBITE                           = 29903,
     SPELL_SUMMON_PURSUERS_PERIODIC          = 54993,
     SPELL_SNIFFING_CREDIT                   = 55477,
     TALK_EMOTE_FROSTHOUND_SNIFF             = 0,
@@ -41,7 +42,7 @@ enum qSniffingOutThePerpetrator
 
 struct npc_frosthound : public npc_escortAI
 {
-    explicit npc_frosthound(Creature* creature) : npc_escortAI(creature), _summons(creature) {}
+    explicit npc_frosthound(Creature* creature) : npc_escortAI(creature), _summons(creature), _completionWaypoint((creature->GetEntry() == NPC_FROSTBITE) ? 19 : 34) { }
 
     void AttackStart(Unit* /*who*/) override {}
     void JustEngagedWith(Unit* /*who*/) override {}
@@ -77,20 +78,15 @@ struct npc_frosthound : public npc_escortAI
         if (!player)
             return;
 
-        switch (waypointId)
+        if (waypointId == 0)
+            Talk(TALK_SEEN, player);
+        else if (waypointId == _completionWaypoint)
         {
-            case 0:
-                Talk(TALK_SEEN, player);
-                break;
-            case 34:
-                Talk(TALK_EMOTE_TRACKED_COMPLETE, me);
-                Talk(TALK_CONFRONT, player);
-                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                    summoner->ToPlayer()->KilledMonsterCredit(NPC_FROSTHOUND);
-                _summons.DespawnAll();
-                break;
-            default:
-                break;
+            Talk(TALK_EMOTE_TRACKED_COMPLETE, me);
+            Talk(TALK_CONFRONT, player);
+            if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                summoner->ToPlayer()->KilledMonsterCredit(NPC_FROSTHOUND); // same credit for Alliance and Horde
+            _summons.DespawnAll();
         }
     }
 
@@ -112,6 +108,7 @@ struct npc_frosthound : public npc_escortAI
 
 private:
     SummonList _summons;
+    uint32 _completionWaypoint;
 };
 
 enum eIronWatcher
