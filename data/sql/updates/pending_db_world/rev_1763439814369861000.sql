@@ -16,7 +16,7 @@ SET @CGUID := 12758;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+8;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`,`dynamicflags`, `VerifiedBuild`) VALUES
-(@CGUID+0, 28731, 601, 4277, 4405, 3, 1, 0, 543.82611083984375, 665.12335205078125, 776.24530029296875, 1.553343057632446289, 7200, 0, 0, 11210, 0, 0, 0, 0, 0, 64395), -- 28731 (Area: 4405 - Difficulty: 1) CreateObject1 -- slithink
+(@CGUID+0, 28731, 601, 4277, 4405, 3, 1, 0, 543.82611083984375, 665.12335205078125, 776.24530029296875, 1.553343057632446289, 7200, 0, 0, 11210, 0, 0, 0, 0, 0, 64395), -- 28731 (Area: 4405 - Difficulty: 1) CreateObject1 -- silthik
 (@CGUID+1, 28730, 601, 4277, 4405, 3, 1, 0, 526.66357421875, 663.6053466796875, 775.80523681640625, 1.239183783531188964, 7200, 0, 0, 11210, 0, 0, 0, 0, 0, 64395), -- 28730 (Area: 4405 - Difficulty: 1) CreateObject1 gashra
 (@CGUID+2, 28729, 601, 4277, 4405, 3, 1,  0, 511.809722900390625, 666.493408203125, 776.27813720703125, 0.977384388446807861, 7200, 0, 0, 11210, 0, 0, 0, 0, 0, 64395), -- 28729 (Area: 4405 - Difficulty: 1) CreateObject1 -- narjil
 (@CGUID+3, 28733, 601, 4277, 4405, 3, 1, 0, 549.69268798828125, 662.0069580078125, 776.99273681640625, 1.640609502792358398,7200, 0, 0, 5028, 6525, 0, 0, 0, 0, 64395),
