@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -35,10 +35,8 @@ enum GuardSays
 
 enum Spells
 {
-    SPELL_IMPALE_10                 = 28783,
-    SPELL_IMPALE_25                 = 56090,
-    SPELL_LOCUST_SWARM_10           = 28785,
-    SPELL_LOCUST_SWARM_25           = 54021,
+    SPELL_IMPALE                    = 28783,
+    SPELL_LOCUST_SWARM              = 28785,
     SPELL_SUMMON_CORPSE_SCRABS_5    = 29105,
     SPELL_SUMMON_CORPSE_SCRABS_10   = 28864,
     SPELL_BERSERK                   = 26662
@@ -138,12 +136,12 @@ public:
             }
 
             ScheduleTimedEvent(15s, [&] {
-                DoCastRandomTarget(RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25));
+                DoCastRandomTarget(SPELL_IMPALE);
             }, 20s);
 
             ScheduleTimedEvent(70s, 2min, [&] {
                 Talk(EMOTE_LOCUST);
-                DoCastSelf(RAID_MODE(SPELL_LOCUST_SWARM_10, SPELL_LOCUST_SWARM_25));
+                DoCastSelf(SPELL_LOCUST_SWARM);
 
                 me->m_Events.AddEventAtOffset([&]
                 {

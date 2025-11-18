@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -105,6 +105,13 @@ void WorldSession::HandleMoveWorldportAck()
     GetPlayer()->UpdatePositionData();
 
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
+
+    if (GetPlayer()->GetPendingFlightChange() <= GetPlayer()->GetMapChangeOrderCounter())
+    {
+        if (!GetPlayer()->HasIncreaseMountedFlightSpeedAura() && !GetPlayer()->HasFlyAura())
+            GetPlayer()->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
+    }
+
     if (!GetPlayer()->GetMap()->AddPlayerToMap(GetPlayer()))
     {
         LOG_ERROR("network.opcode", "WORLD: failed to teleport player {} ({}) to map {} because of unknown reason!",
@@ -679,6 +686,10 @@ void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
         return;
     }
 
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
+
     if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
     {
         recvData.rfinish();                     // prevent warnings spam
@@ -990,6 +1001,10 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         if (mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT))
             return;
     }
+
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
 
     if (!ProcessMovementInfo(movementInfo, mover, _player, recvData))
         return;

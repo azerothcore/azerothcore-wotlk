@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -141,8 +141,7 @@ enum Spells
 {
     // Combat spells
     SPELL_ARTHAS_AURA                       = 52442,
-    SPELL_ARTHAS_EXORCISM_N                 = 52445,
-    SPELL_ARTHAS_EXORCISM_H                 = 58822,
+    SPELL_ARTHAS_EXORCISM                   = 52445,
     SPELL_ARTHAS_HOLY_LIGHT                 = 52444,
 
     // Visuals
@@ -1178,7 +1177,7 @@ public:
             {
                 case EVENT_COMBAT_EXORCISM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_ARTHAS_EXORCISM_N, SPELL_ARTHAS_EXORCISM_H), false);
+                        me->CastSpell(target, SPELL_ARTHAS_EXORCISM, false);
 
                     combatEvents.Repeat(7300ms);
                     break;

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -45,7 +45,6 @@ public:
         ObjectGuid goSjonnirDoorGUID;
         ObjectGuid goLeftPipeGUID;
         ObjectGuid goRightPipeGUID;
-        ObjectGuid goTribunalDoorGUID;
 
         ObjectGuid SjonnirGUID;
         ObjectGuid BrannGUID;
@@ -96,10 +95,6 @@ public:
                 case GO_TRIBUNAL_CONSOLE:
                     goTribunalConsoleGUID = go->GetGUID();
                     break;
-                case GO_TRIBUNAL_ACCESS_DOOR:
-                    goTribunalDoorGUID = go->GetGUID();
-                    go->SetGoState(GO_STATE_READY);
-                    break;
                 case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
@@ -141,8 +136,6 @@ public:
             {
                 case GO_TRIBUNAL_CONSOLE:
                     return goTribunalConsoleGUID;
-                case GO_TRIBUNAL_ACCESS_DOOR:
-                    return goTribunalDoorGUID;
                 case GO_SJONNIR_CONSOLE:
                     return goSjonnirConsoleGUID;
                 case GO_SJONNIR_DOOR:
@@ -207,10 +200,6 @@ public:
                 isMaidenOfGriefDead = type == BOSS_MAIDEN_OF_GRIEF || isMaidenOfGriefDead;
                 isKrystalusDead = type == BOSS_KRYSTALLUS || isKrystalusDead;
             }
-
-            if (isMaidenOfGriefDead && isKrystalusDead)
-                if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
-                    tribunalDoor->SetGoState(GO_STATE_ACTIVE);
 
             if (type == BOSS_TRIBUNAL_OF_AGES && data == SPECIAL)
             {

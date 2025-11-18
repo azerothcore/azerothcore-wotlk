@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -486,7 +486,7 @@ struct npc_harrison_jones : public ScriptedAI
     void MovementInform(uint32 type, uint32 id) override
     {
         // at gong
-        if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GONG)
+        if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GONG)
         {
             if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                 me->SetFacingToObject(gong);
@@ -503,13 +503,13 @@ struct npc_harrison_jones : public ScriptedAI
             });
         }
         // to the massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 1 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetEntry(NPC_HARRISON_JONES_1);
             Talk(SAY_HARRISON_2);
         }
         // at massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             Talk(SAY_HARRISON_3);
@@ -599,7 +599,7 @@ struct npc_amanishi_lookout : public NullCreatureAI
     void MovementInform(uint32 type, uint32 id) override
     {
         // at boss
-        if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
+        if (type == WAYPOINT_MOTION_TYPE && id == 9) // should despawn with waypoint script
             me->DespawnOrUnsummon(0s, 0s);
     }
 private:

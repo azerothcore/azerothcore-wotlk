@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -37,15 +37,7 @@ enum Misc
     NPC_DRAKKARI_SCYTHECLAW             = 26628,
     NPC_DRAKKARI_GUTRIPPER              = 26641,
 
-    SAY_CLAW_EMOTE                      = 0,
-
-    EVENT_SPELL_BELLOWING_ROAR          = 1,
-    EVENT_SPELL_GRIEVOUS_BITE           = 2,
-    EVENT_SPELL_MANGLING_SLASH          = 3,
-    EVENT_SPELL_FEARSOME_ROAR           = 4,
-    EVENT_SPELL_PIERCING_SLASH          = 5,
-    EVENT_SPELL_RAPTOR_CALL             = 6,
-    EVENT_MENACING_CLAW                 = 7
+    SAY_CLAW_EMOTE                      = 0
 };
 
 class boss_dred : public CreatureScript
@@ -60,14 +52,52 @@ public:
 
     struct boss_dredAI : public BossAI
     {
-        boss_dredAI(Creature* creature) : BossAI(creature, DATA_DRED)
-        {
-        }
+        boss_dredAI(Creature* creature) : BossAI(creature, DATA_DRED) { }
 
         void Reset() override
         {
             BossAI::Reset();
             _raptorCount = 0;
+
+            ScheduleHealthCheckEvent({ 67, 34 }, [&] {
+                DoCastAOE(SPELL_BELLOWING_ROAR);
+            }, false);
+        }
+
+        void ScheduleTasks() override
+        {
+            ScheduleTimedEvent(20s, [&] {
+                DoCastVictim(SPELL_GRIEVOUS_BITE);
+            }, 20s);
+
+            ScheduleTimedEvent(18s + 500ms, [&] {
+                DoCastVictim(SPELL_MANGLING_SLASH);
+            }, 20s);
+
+            ScheduleTimedEvent(10s, 20s, [&] {
+                DoCastAOE(SPELL_FEARSOME_ROAR);
+            }, 17s);
+
+            ScheduleTimedEvent(17s, [&] {
+                DoCastVictim(SPELL_PIERCING_SLASH);
+            }, 20s);
+
+            if (IsHeroic())
+            {
+                ScheduleTimedEvent(16s, [&] {
+                    DoCastSelf(SPELL_RAPTOR_CALL);
+                }, 30s);
+
+                ScheduleTimedEvent(21s, [&] {
+                    Talk(SAY_CLAW_EMOTE);
+                    me->setAttackTimer(BASE_ATTACK, 2000);
+                    me->AttackerStateUpdate(me->GetVictim());
+                    if (me->GetVictim())
+                        me->AttackerStateUpdate(me->GetVictim());
+                    if (me->GetVictim())
+                        me->AttackerStateUpdate(me->GetVictim());
+                }, 20s);
+            }
         }
 
         uint32 GetData(uint32 data) const override
@@ -87,67 +117,6 @@ public:
         {
             BossAI::JustEngagedWith(who);
             _raptorCount = 0;
-
-            events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 33s);
-            events.ScheduleEvent(EVENT_SPELL_GRIEVOUS_BITE, 20s);
-            events.ScheduleEvent(EVENT_SPELL_MANGLING_SLASH, 18s + 500ms);
-            events.ScheduleEvent(EVENT_SPELL_FEARSOME_ROAR, 10s, 20s);
-            events.ScheduleEvent(EVENT_SPELL_PIERCING_SLASH, 17s);
-            if (IsHeroic())
-            {
-                events.ScheduleEvent(EVENT_MENACING_CLAW, 21s);
-                events.ScheduleEvent(EVENT_SPELL_RAPTOR_CALL, 20s, 25s);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_BELLOWING_ROAR:
-                    me->CastSpell(me, SPELL_BELLOWING_ROAR, false);
-                    events.ScheduleEvent(EVENT_SPELL_BELLOWING_ROAR, 40s);
-                    break;
-                case EVENT_SPELL_GRIEVOUS_BITE:
-                    me->CastSpell(me->GetVictim(), SPELL_GRIEVOUS_BITE, false);
-                    events.ScheduleEvent(EVENT_SPELL_GRIEVOUS_BITE, 20s);
-                    break;
-                case EVENT_SPELL_MANGLING_SLASH:
-                    me->CastSpell(me->GetVictim(), SPELL_MANGLING_SLASH, false);
-                    events.ScheduleEvent(EVENT_SPELL_MANGLING_SLASH, 20s);
-                    break;
-                case EVENT_SPELL_FEARSOME_ROAR:
-                    me->CastSpell(me, SPELL_FEARSOME_ROAR, false);
-                    events.ScheduleEvent(EVENT_SPELL_FEARSOME_ROAR, 17s);
-                    break;
-                case EVENT_SPELL_PIERCING_SLASH:
-                    me->CastSpell(me->GetVictim(), SPELL_PIERCING_SLASH, false);
-                    events.ScheduleEvent(EVENT_SPELL_PIERCING_SLASH, 20s);
-                    break;
-                case EVENT_SPELL_RAPTOR_CALL:
-                    me->CastSpell(me, SPELL_RAPTOR_CALL, false);
-                    events.ScheduleEvent(EVENT_SPELL_RAPTOR_CALL, 20s);
-                    break;
-                case EVENT_MENACING_CLAW:
-                    Talk(SAY_CLAW_EMOTE);
-                    me->setAttackTimer(BASE_ATTACK, 2000);
-                    me->AttackerStateUpdate(me->GetVictim());
-                    if (me->GetVictim())
-                        me->AttackerStateUpdate(me->GetVictim());
-                    if (me->GetVictim())
-                        me->AttackerStateUpdate(me->GetVictim());
-                    events.ScheduleEvent(EVENT_MENACING_CLAW, 20s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
         }
 
     private:
@@ -181,7 +150,23 @@ class spell_dred_raptor_call : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        GetCaster()->SummonCreature(RAND(NPC_DRAKKARI_GUTRIPPER, NPC_DRAKKARI_SCYTHECLAW), -522.02f, -718.89f, 30.26f, 2.41f);
+        std::list<Creature*> raptors;
+        GetCaster()->GetCreatureListWithEntryInGrid(raptors, { NPC_DRAKKARI_SCYTHECLAW, NPC_DRAKKARI_GUTRIPPER }, 100.0f);
+
+        raptors.remove_if([](Creature* raptor)
+        {
+            return !raptor->IsAlive() || raptor->IsInCombat();
+        });
+
+        if (raptors.empty())
+            return;
+
+        Creature* raptor = Acore::Containers::SelectRandomContainerElement(raptors);
+        if (!raptor)
+            return;
+
+        if (GetCaster()->GetVictim())
+            raptor->AI()->AttackStart(GetCaster()->GetVictim());
     }
 
     void Register() override
@@ -193,16 +178,14 @@ class spell_dred_raptor_call : public SpellScript
 class achievement_better_off_dred : public AchievementCriteriaScript
 {
 public:
-    achievement_better_off_dred() : AchievementCriteriaScript("achievement_better_off_dred")
-    {
-    }
+    achievement_better_off_dred() : AchievementCriteriaScript("achievement_better_off_dred") { }
 
     bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (!target)
             return false;
 
-        return target->GetAI()->GetData(target->GetEntry());
+        return target->GetAI()->GetData(target->GetEntry()) >= 6;
     }
 };
 
