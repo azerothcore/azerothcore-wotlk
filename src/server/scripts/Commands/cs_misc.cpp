@@ -656,6 +656,15 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
+        handler->PSendSysMessage(
+            ".go xyz {} {} {} {} {}",
+            object->GetPositionX(),
+            object->GetPositionY(),
+            object->GetPositionZ(),
+            object->GetMapId(),
+            object->GetOrientation()
+        );
+
         LiquidData const& liquidData = object->GetLiquidData();
 
         if (liquidData.Status)
