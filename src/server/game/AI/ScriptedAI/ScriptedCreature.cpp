@@ -758,21 +758,18 @@ void BossAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason r
 
 void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
 {
-    ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
-
     if (!_nextHealthCheck.HasBeenProcessed())
     {
         if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
-            if (!_nextHealthCheck._allowedWhileCasting && me->HasUnitState(UNIT_STATE_CASTING))
-            {
+            if (_nextHealthCheck._allowedWhileCasting || !me->HasUnitState(UNIT_STATE_CASTING))
+                ProcessHealthCheck();
+            else
                 _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PENDING);
-                return;
-            }
-
-            ProcessHealthCheck();
         }
     }
+
+    ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 }
 
 /**
