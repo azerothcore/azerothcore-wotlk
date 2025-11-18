@@ -1,0 +1,18 @@
+version: "2"
+
+services:
+  site:
+    build:
+      context: ./site
+      dockerfile: Dockerfile
+    container_name: ac-site
+    ports:
+      - "8080:80"
+    networks:
+      - ac-network
+    depends_on:
+      - ac-database
+    restart: unless-stopped
+
+networks:
+  ac-network:

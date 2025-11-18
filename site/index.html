@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="author" content="Micael Santana" />
+<meta http-equiv="ngrok-skip-browser-warning" content="true" />
+<title>Servidor WoW do Micael - Criar Conta</title>
+<script>
+  // Configurar headers para pular aviso do ngrok
+  if (window.location.hostname.includes('ngrok')) {
+    // Definir User-Agent personalizado para evitar página de aviso
+    Object.defineProperty(navigator, 'userAgent', {
+      get: function() { return 'WoWServer-CustomApp/1.0'; },
+      configurable: true
+    });
+    
+    // Interceptar todas as requisições fetch para adicionar header
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      if (args[1]) {
+        args[1].headers = {
+          ...args[1].headers,
+          'ngrok-skip-browser-warning': 'true',
+          'User-Agent': 'WoWServer-CustomApp/1.0'
+        };
+      } else {
+        args[1] = {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+            'User-Agent': 'WoWServer-CustomApp/1.0'
+          }
+        };
+      }
+      return originalFetch.apply(this, args);
+    };
+  }
+</script>
+<style>
+  /* Font Face Declarations */
+  @font-face {
+    font-family: 'FuturaEF-Book';
+    src: url('fonts/FuturaEF-Book.woff') format('woff'),
+         url('fonts/FuturaEF-Book.ttf') format('truetype'),
+         url('fonts/FuturaEF-Book.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  /* Gaming Theme Variables - Matching PvP Calculator */
+  :root{
+    --bg-primary: #0F0F0F;
+    --bg-secondary: #090909;
+    --bg-tertiary: #131313;
+    --border-primary: #1e1e1e;
+    --border-secondary: #333;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --text-muted: #606060;
+    --accent-gold: #c1b575;
+    --accent-blue: #6185aa;
+    --accent-green: #7e8d09;
+    --accent-yellow: #d79602;
+    --accent-red: #ec0303;
+    --shadow-dark: rgba(0, 0, 0, 0.8);
+    --shadow-light: rgba(0, 0, 0, 0.5);
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  html {
+    height: 100%;
+    overflow-x: hidden;
+    background-color: var(--bg-primary);
+  }
+  
+  body {
+    font-family: 'FuturaEF-Book', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('/image.png') center center fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: var(--text-primary);
+    min-height: 100vh;
+    height: 100%;
+    padding: 15px;
+    padding-top: 70px;
+    line-height: 1.5;
+    font-size: 14px;
+    font-weight: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    letter-spacing: 0.02em;
+    /* REMOVER display: flex, align-items: center, justify-content: center */
+  }
+  
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('/image.png') center center fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: -1;
+  }
+  
+  /* Navigation Bar - Matching PvP Calculator */
+  .navigation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(9, 9, 9, 0.95) 100%);
+    border-bottom: 1px solid var(--border-primary);
+    padding: 0;
+    z-index: 1001;
+    backdrop-filter: blur(10px);
+  }
+  
+  .navbits {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    max-width: 1000px;
+    margin: 0 auto;
+    height: 50px;
+  }
+  
+  .navbits li {
+    margin: 0;
+  }
+  
+  .navbits li a {
+    display: block;
+    padding: 15px 20px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    height: 50px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    font-family: 'FuturaEF-Book', sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .navbits li a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(193, 181, 117, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .navbits li a:hover {
+    color: var(--accent-gold);
+    background: rgba(193, 181, 117, 0.1);
+    border-bottom-color: var(--accent-gold);
+  }
+  
+  .navbits li a:hover::before {
+    left: 100%;
+  }
+  
+  .navbits li a:active,
+  .navbits li a.active {
+    color: var(--text-primary);
+    background: rgba(193, 181, 117, 0.15);
+    border-bottom-color: var(--accent-gold);
+  }
+  
+  .wrap {
+    /* REMOVER width: min(700px, 95vw); */
+    animation: slideIn 0.8s ease-out;
+    position: relative;
+    z-index: 1;
+  }
+  
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Container - Matching PvP Calculator */
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: rgba(15, 15, 15, 0.92);
+    padding: 25px;
+    border-radius: 6px;
+    margin-top: 15px;
+    box-shadow: 0 4px 20px var(--shadow-dark);
+    border: 1px solid var(--border-primary);
+    position: relative;
+    backdrop-filter: blur(10px);
+    z-index: 1;
+  }
+  
+  .container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+    border-radius: 6px 6px 0 0;
+  }
+  
+  /* Header - Matching PvP Calculator */
+  .header {
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--border-primary);
+    padding-bottom: 15px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+  }
+  
+  .badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    border: 1px solid var(--border-secondary);
+    color: var(--accent-gold);
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(193, 181, 117, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(193, 181, 117, 0.3);
+  }
+  
+  h1 {
+    color: var(--text-primary);
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+    font-family: 'FuturaEF-Book', sans-serif;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px var(--shadow-dark);
+    position: relative;
+  }
+  
+  h1::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--accent-gold);
+    border-radius: 1px;
+  }
+  
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: normal;
+    font-family: 'FuturaEF-Book', sans-serif;
+    letter-spacing: 0.05em;
+    margin-top: 12px;
+  }
+  
+  /* Server Info Section */
+  .server-info {
+    background: linear-gradient(135deg, rgba(19, 19, 19, 0.8) 0%, rgba(9, 9, 9, 0.8) 100%);
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+    padding: 20px;
+    margin: 20px 0;
+    font-size: 0.9rem;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .server-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent-blue);
+    border-radius: 0 6px 6px 0;
+  }
+  
+  .server-info:hover {
+    border-color: var(--accent-gold);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(193, 181, 117, 0.15);
+  }
+  
+  .server-info h3 {
+    margin: 0 0 12px 0;
+    color: var(--accent-gold);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: bold;
+    font-family: 'FuturaEF-Book', sans-serif;
+  }
+  
+  /* Realmlist Box */
+  .realmlist-box {
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
+    border: 1px solid var(--border-secondary);
+    border-radius: 6px;
+    padding: 16px;
+    margin: 16px 0;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .realmlist-box:hover {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 2px rgba(193, 181, 117, 0.2);
+  }
+  
+  .realmlist-code {
+    font-family: 'Courier New', monospace;
+    color: var(--accent-blue);
+    font-size: 0.9rem;
+    user-select: all;
+    word-break: break-all;
+    font-weight: bold;
+    text-shadow: 0 1px 2px var(--shadow-light);
+  }
+  
+  .copy-btn {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    background: linear-gradient(135deg, var(--accent-gold) 0%, #a89960 100%);
+    color: var(--bg-primary);
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: 'FuturaEF-Book', sans-serif;
+  }
+  
+  .copy-btn:hover {
+    background: linear-gradient(135deg, #a89960 0%, var(--accent-gold) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(193, 181, 117, 0.4);
+  }
+  
+  .copy-btn.copied {
+    background: linear-gradient(135deg, var(--accent-green) 0%, #6a7a08 100%);
+    color: var(--text-primary);
+  }
+  
+  /* Form Styling - Matching PvP Calculator */
+  label {
+    display: block;
+    color: var(--text-secondary);
+    font-weight: bold;
+    margin: 0.8rem 0 0.4rem;
+    font-size: 0.85rem;
+    cursor: help;
+    font-family: 'FuturaEF-Book', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    transition: color 0.2s ease;
+  }
+  
+  label:hover {
+    color: var(--accent-gold);
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border-secondary);
+    border-radius: 4px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-family: 'FuturaEF-Book', sans-serif;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+  
+  input:focus {
+    border-color: var(--accent-gold);
+    background: var(--bg-tertiary);
+    box-shadow: 0 0 0 2px rgba(193, 181, 117, 0.2);
+  }
+  
+  input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'FuturaEF-Book', sans-serif;
+  }
+  
+  .pw-wrap {
+    position: relative;
+  }
+  
+  .pw-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-secondary);
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-secondary) 100%);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    font-family: 'FuturaEF-Book', sans-serif;
+  }
+  
+  .pw-toggle:hover {
+    border-color: var(--accent-gold);
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  }
+  
+  /* Button Styling - Matching PvP Calculator */
+  .btn {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    color: #000000;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: 'FuturaEF-Book', sans-serif;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .btn:hover {
+    background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+  
+  .btn:hover::before {
+    left: 100%;
+  }
+  
+  .btn:active {
+    transform: translateY(0);
+  }
+  
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
+  /* Author Section */
+  .author {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-primary);
+    position: relative;
+  }
+  
+  .author::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 1px;
+    background: var(--accent-gold);
+  }
+  
+  /* Toast Notifications - Matching PvP Calculator */
+  .toasts {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  
+  .toast {
+    min-width: 280px;
+    max-width: 400px;
+    padding: 16px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--border-secondary);
+    background: linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(9, 9, 9, 0.95) 100%);
+    color: var(--text-primary);
+    box-shadow: 0 15px 50px var(--shadow-dark);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    animation: toastPop 0.4s ease forwards;
+    backdrop-filter: blur(10px);
+    font-family: 'FuturaEF-Book', sans-serif;
+  }
+  
+  @keyframes toastPop {
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .toast.ok {
+    border-color: rgba(126, 141, 9, 0.5);
+    background: linear-gradient(135deg, rgba(126, 141, 9, 0.15) 0%, rgba(106, 122, 8, 0.15) 100%);
+  }
+  
+  .toast.err {
+    border-color: rgba(236, 3, 3, 0.5);
+    background: linear-gradient(135deg, rgba(236, 3, 3, 0.15) 0%, rgba(200, 3, 3, 0.15) 100%);
+  }
+  
+  .toast .title {
+    font-weight: bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .toast .msg {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+  
+  .toast .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 2px;
+  }
+  
+  .toast.ok .dot {
+    background: var(--accent-green);
+  }
+  
+  .toast.err .dot {
+    background: var(--accent-red);
+  }
+  
+  /* Animations */
+  @keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  
+  .pulse-animation {
+    animation: pulse 0.6s ease-in-out;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 480px) {
+    body {
+      padding: 120px 8px 8px 8px;
+    }
+    
+    .wrap {
+      width: min(100%, 95vw);
+    }
+    
+    .container {
+      padding: 18px;
+      border-radius: 4px;
+    }
+    
+    .header {
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    h1 {
+      font-size: 1.2rem;
+    }
+    
+    .badge {
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+    
+    .copy-btn {
+      position: static;
+      margin-top: 8px;
+      width: 100%;
+    }
+    
+    .realmlist-box {
+      padding-right: 16px;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Navigation Bar - Matching PvP Calculator -->
+  <nav class="navigation">
+    <ul class="navbits">
+      <li><a href="/" title="Registro" class="active">REGISTRO</a></li>
+    </ul>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <div class="badge">⚔️</div>
+      <div>
+        <h1>Servidor WoW do Micael</h1>
+        <div class="subtitle">Wrath of the Lich King (3.3.5a) — Criar Conta</div>
+      </div>
+    </div>
+
+    <div class="server-info">
+      <h3>🎮 Bem-vindos ao Servidor Privado de WoW do Micael!</h3>
+      <p>Este é um servidor <strong>apenas para amigos</strong> do World of Warcraft: Wrath of the Lich King criado para diversão e nostalgia. Junte-se à nossa pequena comunidade e reviva a era dourada do WoW!</p>
+      
+      <h3>🌐 Realmlist do Servidor:</h3>
+      <p>Para conectar ao servidor, use o seguinte realmlist:</p>
+      <div class="realmlist-box">
+        <div class="realmlist-code" id="realmlist">set realmlist 0.tcp.sa.ngrok.io:18769</div>
+        <button class="copy-btn" id="copyBtn" onclick="copyRealmlist()">Copiar</button>
+      </div>
+      <p><strong>Nota:</strong> Este servidor é hospedado localmente e compartilhado via túnel seguro. Foi projetado para fins educacionais e diversão entre amigos. Respeitamos a propriedade intelectual da Blizzard.</p>
+    </div>
+
+    <form id="f" autocomplete="off" novalidate>
+      <label for="u">Nome de Usuário</label>
+      <input id="u" name="username" maxlength="20" required placeholder="Digite seu nome de usuário" />
+      <div class="input-hint">Apenas letras, números e underscore (_). Mínimo 3 caracteres, deve começar com letra. Caracteres como @, %, ', ", ; são proibidos por segurança.</div>
+
+      <div class="pw-wrap">
+        <label for="p">Senha</label>
+        <input id="p" name="password" type="password" required placeholder="••••••••" />
+        <button type="button" id="pwToggle" class="pw-toggle" aria-label="Mostrar senha">Mostrar</button>
+      </div>
+      <div class="input-hint">Mínimo 6 caracteres.</div>
+
+      <label for="e">Email <span class="hint">(opcional)</span></label>
+      <input id="e" name="email" type="email" placeholder="seu@email.com" />
+
+      <button id="btn" class="btn">Criar Conta</button>
+    </form>
+
+    <div class="author">
+      <p>🛠️ <strong>Administrador do Servidor:</strong> Micael Santana</p>
+      <p>Criado com ❤️ para amigos e entusiastas do WoW</p>
+    </div>
+  </div>
+
+  <!-- Notificações -->
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+  const f = document.getElementById('f');
+  const btn = document.getElementById('btn');
+  const u = document.getElementById('u');
+  const p = document.getElementById('p');
+  const pwToggle = document.getElementById('pwToggle');
+  const toasts = document.getElementById('toasts');
+  const copyBtn = document.getElementById('copyBtn');
+
+  function toast(kind, title, text, ms=4500){
+    const el = document.createElement('div');
+    el.className = `toast ${kind}`;
+    el.innerHTML = `
+      <div class="dot"></div>
+      <div>
+        <div class="title">${title}</div>
+        ${text ? `<div class="msg">${text}</div>` : ''}
+      </div>`;
+    toasts.appendChild(el);
+    setTimeout(()=>{ 
+      el.style.transition='opacity .3s, transform .3s';
+      el.style.opacity=0; 
+      el.style.transform='translateY(10px) scale(.95)';
+      setTimeout(()=>el.remove(), 300);
+    }, ms);
+  }
+
+  function copyRealmlist() {
+    const realmlistText = document.getElementById('realmlist').textContent;
+    
+    navigator.clipboard.writeText(realmlistText).then(() => {
+      copyBtn.textContent = 'Copiado!';
+      copyBtn.classList.add('copied');
+      copyBtn.classList.add('pulse-animation');
+      toast('ok', 'Realmlist copiado!', 'Cole no seu arquivo realmlist.wtf');
+      
+      setTimeout(() => {
+        copyBtn.textContent = 'Copiar';
+        copyBtn.classList.remove('copied');
+        copyBtn.classList.remove('pulse-animation');
+      }, 2500);
+    }).catch(() => {
+      // Fallback para navegadores mais antigos
+      const textArea = document.createElement('textarea');
+      textArea.value = realmlistText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      copyBtn.textContent = 'Copiado!';
+      copyBtn.classList.add('copied');
+      copyBtn.classList.add('pulse-animation');
+      toast('ok', 'Realmlist copiado!', 'Cole no seu arquivo realmlist.wtf');
+      
+      setTimeout(() => {
+        copyBtn.textContent = 'Copiar';
+        copyBtn.classList.remove('copied');
+        copyBtn.classList.remove('pulse-animation');
+      }, 2500);
+    });
+  }
+
+  function validate() {
+    const user = u.value.trim();
+    if (!user) return 'Nome de usuário é obrigatório.';
+    if (user.length < 3) return 'Nome de usuário deve ter pelo menos 3 caracteres.';
+    if (user.length > 20) return 'Nome de usuário deve ter ≤ 20 caracteres.';
+    
+    // Validação rigorosa: apenas letras, números e underscore, não pode começar com número
+    if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(user)) {
+      return 'Nome de usuário deve conter apenas letras, números e underscore (_), e não pode começar com número.';
+    }
+    
+    // Bloquear caracteres perigosos para SQL injection
+    if (/[@%'"`;\\<>{}\[\]\(\)\|&\$\*\+\?\^=!~`]/.test(user)) {
+      return 'Nome de usuário contém caracteres não permitidos.';
+    }
+    
+    const pass = p.value;
+    if (!pass) return 'Senha é obrigatória.';
+    if (pass.length < 6) return 'Senha deve ter pelo menos 6 caracteres.';
+    
+    // Validação da senha - bloquear caracteres perigosos
+    if (/['"`;\\<>{}\[\]\|&\$]/.test(pass)) {
+      return 'Senha contém caracteres não permitidos.';
+    }
+    
+    // Validação do email se fornecido
+    const email = document.getElementById('e').value.trim();
+    if (email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+      return 'Email deve ter um formato válido.';
+    }
+    
+    return '';
+  }
+
+  pwToggle.addEventListener('click', () => {
+    const isPwd = p.type === 'password';
+    p.type = isPwd ? 'text' : 'password';
+    pwToggle.textContent = isPwd ? 'Ocultar' : 'Mostrar';
+    pwToggle.classList.add('pulse-animation');
+    setTimeout(() => pwToggle.classList.remove('pulse-animation'), 600);
+  });
+
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = validate();
+    if (err) { toast('err','Erro no formulário', err); return; }
+
+    btn.disabled = true; 
+    btn.textContent = 'Criando…';
+    btn.classList.add('pulse-animation');
+
+    try {
+      const fd = new FormData(f);
+      
+      // Adicionar headers para pular aviso do ngrok
+      const fetchOptions = {
+        method: 'POST',
+        body: fd,
+        headers: {
+          'ngrok-skip-browser-warning': 'true',
+          'User-Agent': 'WoWServer-CustomApp/1.0'
+        }
+      };
+      
+      const res = await fetch('register.php', fetchOptions);
+      let data;
+      try { data = await res.json(); } catch { data = {ok:false, error: await res.text()} }
+
+      if (data.ok) {
+        toast('ok','Conta criada','Você já pode fazer login.');
+        f.reset(); u.focus();
+      } else {
+        toast('err','Falhou', data.error || 'Erro desconhecido');
+      }
+    } catch (e2) {
+      toast('err','Erro de rede', 'Tente novamente.');
+    } finally {
+      btn.disabled = false; 
+      btn.textContent = 'Criar Conta';
+      btn.classList.remove('pulse-animation');
+    }
+  });
+  
+  // Adicionar efeitos de hover nos inputs
+  [u, p, document.getElementById('e')].forEach(input => {
+    input.addEventListener('focus', () => {
+      input.parentElement.classList.add('pulse-animation');
+      setTimeout(() => input.parentElement.classList.remove('pulse-animation'), 600);
+    });
+  });
+  
+  // Image preloading logic - Matching PvP Calculator
+  document.addEventListener('DOMContentLoaded', function() {
+    // Preload background image
+    const img = new Image();
+    img.onload = function() {
+      document.body.classList.add('loaded');
+    };
+    img.onerror = function() {
+      // Fallback: show background anyway after 2 seconds
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 2000);
+    };
+    img.src = '/image.png';
+    
+    // Fallback timeout in case image takes too long
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        document.body.classList.add('loaded');
+      }
+    }, 3000);
+  });
+</script>
+</body>
+</html>
