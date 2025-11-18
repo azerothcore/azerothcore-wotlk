@@ -120,17 +120,22 @@ public:
             {
                 _minionInCombat = true;
 
-                for (Seconds const& timer : { 10s, 40s, 70s })
+                Talk(SAY_SEND_GROUP, 10s);
+
+                for (Seconds const& timer : { 60s, 120s })
                 {
                     me->m_Events.AddEventAtOffset([this] {
-                        me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
                         Talk(SAY_SEND_GROUP);
+
+                        me->m_Events.AddEventAtOffset([this] {
+                            me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                        }, 5s);
                     }, timer);
                 }
 
                 me->m_Events.AddEventAtOffset([this] {
                     me->SetInCombatWithZone();
-                }, 100s);
+                }, IsHeroic() ? 200s : 180s);
             }
         }
 
