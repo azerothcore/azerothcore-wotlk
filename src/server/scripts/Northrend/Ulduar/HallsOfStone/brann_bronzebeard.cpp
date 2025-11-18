@@ -886,8 +886,6 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 4);
                 me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_SJONNIR)))
-                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetOrientation(3.132660f);
                 DoCast(me, 58506, false);
                 me->SendMovementFlagUpdate();
