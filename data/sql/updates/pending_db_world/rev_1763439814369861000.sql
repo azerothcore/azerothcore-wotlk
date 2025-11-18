@@ -28,3 +28,17 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 
 -- Prevent combat assist
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|33554432 WHERE `entry` IN (28732, 28733, 28734, 28731, 28730, 28729, 28684, 31612, 31616, 31615, 31617, 31608, 31605, 31606);
+
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (12758, 12759, 12760);
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
+(12758, 12758, 11),
+(12758, 12762, 11),
+(12758, 12761, 11),
+
+(12759, 12759, 11),
+(12759, 12763, 11),
+(12759, 12764, 11),
+
+(12760, 12760, 11),
+(12760, 12765, 11),
+(12760, 12766, 11);
