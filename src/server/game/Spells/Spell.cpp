@@ -2623,6 +2623,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         {
             m_reflectionTarget = nullptr;
             m_reflectionTargetGuid.Clear();
+            m_reflectionTargetPosition = Position();
         }
 
         SpellMissInfo missInfo2 = DoSpellHitOnUnit(spellHitTarget, mask, target->scaleAura);
