@@ -2629,6 +2629,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         m_reflectionTarget = nullptr;
         m_reflectionTargetGuid.Clear();
+        m_reflectionTargetPosition = Position();
         if (missInfo2 != SPELL_MISS_NONE)
         {
             if (missInfo2 != SPELL_MISS_MISS)
