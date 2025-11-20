@@ -175,7 +175,7 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
                 !me->IsWithinDist(who, ATTACK_DISTANCE, true, false, false))                      // if in combat and in dist - neutral to all can actually assist other creatures
             return;
 
-    if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
+    if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who) && (me->IsAggroGracePeriodExpired() || me->GetMap()->Instanceable()))
         AttackStart(who);
 }
 
