@@ -94,9 +94,6 @@ public:
             _canTalk = true;
             _minionInCombat = false;
 
-            if (me->IsInEvadeMode())
-                return;
-
             Creature* narjil = instance->GetCreature(DATA_NARJIL);
             Creature* gashra = instance->GetCreature(DATA_GASHRA);
             Creature* silthik = instance->GetCreature(DATA_SILTHIK);
@@ -212,7 +209,14 @@ public:
                 DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE);
             }, 27s, 35s);
 
-            summons.DoZoneInCombat();
+            if (Creature* narjil = instance->GetCreature(DATA_NARJIL))
+                narjil->SetInCombatWithZone();
+
+            if (Creature* gashra = instance->GetCreature(DATA_GASHRA))
+                gashra->SetInCombatWithZone();
+
+            if (Creature* silthik = instance->GetCreature(DATA_SILTHIK))
+                silthik->SetInCombatWithZone();
         }
 
         void JustDied(Unit* killer) override
