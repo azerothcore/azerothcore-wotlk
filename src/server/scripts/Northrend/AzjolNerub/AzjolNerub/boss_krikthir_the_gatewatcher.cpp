@@ -50,7 +50,6 @@ enum Yells
 enum MiscActions
 {
     ACTION_MINION_ENGAGED               = 1,
-    ACTION_MINION_DIED                  = 2,
     GROUP_SWARM                         = 1,
     GROUP_WATCHERS                      = 2
 };

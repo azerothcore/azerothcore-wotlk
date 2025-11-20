@@ -99,6 +99,26 @@ public:
                         formation->DespawnFormation(0s, 20s);
             }
         }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (unit->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK, NPC_ANUBAR_SHADOWCASTER, NPC_ANUBAR_SKIRMISHER, NPC_ANUBAR_WARRIOR))
+            {
+                if (Creature* creature = unit->ToCreature())
+                    if (CreatureGroup* formation = creature->GetFormation())
+                    {
+                        scheduler.CancelAll();
+                        scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
+                        {
+                            if (!formation->IsAnyMemberAlive())
+                            {
+                                if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
+                                    krikthir->AI()->DoAction(ACTION_MINION_DIED);
+                            }
+                        });
+                    }
+            }
+        }
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
