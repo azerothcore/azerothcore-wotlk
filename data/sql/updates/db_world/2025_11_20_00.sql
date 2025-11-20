@@ -1,3 +1,4 @@
+-- DB update 2025_11_18_02 -> 2025_11_20_00
 --
 DELETE FROM `creature_summon_groups` WHERE `summonerId` = 29310 AND `summonerType` = 0 AND `groupId` = 2;
 INSERT INTO `creature_summon_groups`(`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
