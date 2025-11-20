@@ -66,6 +66,7 @@ public:
             _initTalk = false;
             _canTalk = true;
             _minionInCombat = false;
+            _minionPulledRecently = false;
 
             scheduler.SetValidator([this]
             {
@@ -92,6 +93,7 @@ public:
 
             _canTalk = true;
             _minionInCombat = false;
+            _minionPulledRecently = false;
 
             if (me->IsInEvadeMode())
                 return;
@@ -121,6 +123,14 @@ public:
 
         void DoAction(int32 actionId) override
         {
+            if (actionId == ACTION_MINION_ENGAGED)
+            {
+                _minionPulledRecently = true;
+                me->m_Events.AddEventAtOffset([this] {
+                    _minionPulledRecently = false;
+                }, 5s);
+            }
+
             if (actionId == ACTION_MINION_ENGAGED && !_minionInCombat)
             {
                 _minionInCombat = true;
@@ -248,6 +258,7 @@ public:
         bool _initTalk;
         bool _canTalk;
         bool _minionInCombat;
+        bool _minionPulledRecently;
 
         [[nodiscard]] bool IsInFrenzy() const { return me->HasAura(SPELL_FRENZY); }
     };
