@@ -231,6 +231,13 @@ public:
                 silthik->SetInCombatWithZone();
         }
 
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_SUBBOSS_AGGRO_TRIGGER && !_minionPulledRecently)
+                if (Creature* creature = target->ToCreature())
+                    creature->SetInCombatWithZone();
+        }
+
         void JustDied(Unit* killer) override
         {
             BossAI::JustDied(killer);
