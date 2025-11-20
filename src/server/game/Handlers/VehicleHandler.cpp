@@ -53,7 +53,7 @@ void WorldSession::HandleDismissControlledVehicle(WorldPacket& recvData)
     if (_player->m_mover->IsRooted()) // for some reason client sends it without it even if rooted
         mi.AddMovementFlag(MOVEMENTFLAG_ROOT);
 
-    _player->m_mover->m_movementInfo = mi;
+    ProcessMovementInfo(mi, _player->m_mover, _player->m_mover->ToPlayer(), recvData);
 
     _player->ExitVehicle();
 }
