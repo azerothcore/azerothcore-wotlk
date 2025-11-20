@@ -1,23 +1,8 @@
 --
-
 -- Quest: Thrusting Hodir's Spear - 13003
 SET @ENTRY := 30275;
-SET @PATH := @ENTRY * 10;
 
 UPDATE `creature_template` SET `HoverHeight`=5.2 WHERE `entry`=@ENTRY;
-
--- -- Condition for source Spell implicit target condition type Object entry guid
--- DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry` IN (56673,60863,60713,60810) AND `SourceId`=0;
--- INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
--- (13, 1, 56673, 0, 0, 31, 0, 3, 30275, 0, 0, 0, 0, '', 'Spell Fight Wyrm (effect 0) will hit the potential target of the spell if target is unit Wild Wyrm.'),
--- (13, 1, 60863, 0, 0, 31, 0, 3, 30275, 0, 0, 0, 0, '', 'Spell Fight Wyrm (effect 0) will hit the potential target of the spell if target is unit Wild Wyrm.'),
--- (13, 1, 60713, 0, 0, 31, 0, 3, 30275, 0, 0, 0, 0, '', 'Spell Visual: Grab On (effect 0) will hit the potential target of the spell if target is unit Wild Wyrm.'),
--- (13, 1, 60810, 0, 0, 31, 0, 3, 30275, 0, 0, 0, 0, '', 'Spell Visual: Thrust Spear (effect 0) will hit the potential target of the spell if target is unit Wild Wyrm.');
-
--- -- Condition for source Spell condition type Object entry guid
--- DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=17 AND `SourceGroup`=0 AND `SourceEntry`=56671 AND `SourceId`=0;
--- INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
--- (17, 0, 56671, 0, 0, 31, 1, 3, 30275, 0, 0, 0, 0, '', 'Spell Spear of Hodir will hit the explicit target of the spell if target is unit Wild Wyrm.');
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (60603, 56689, 60533, 56690, 60586, 60596, 60864, 60776, 56705, 60587, 55795, 56672);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
@@ -42,24 +27,5 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 (60881, 0x8000),
 (60864, 0x8000);
 
-DELETE FROM `creature_text` WHERE `creatureID` =@ENTRY;
-INSERT INTO `creature_text` (`creatureID`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `comment`, `BroadcastTextID`) VALUES
-(@ENTRY, 0, 0, '%s swipes at you with his claws!', 42, 0, 100, 0, 0, 0, 'Wild Wyrm - SAY_SWIPE', 32763),
-(@ENTRY, 1, 0, 'DODGED!', 42, 0, 100, 0, 0, 0, 'Wild Wyrm - SAY_DODGED', 32794),
-(@ENTRY, 2, 0, '%s shrieks in pain and twists around, grabbing you with his mouth!', 42, 0, 100, 0, 0, 0, 'Wild Wyrm - SAY_PHASE_2', 32813),
-(@ENTRY, 3, 0, 'Your Grip is Failing!', 42, 0, 100, 0, 0, 0, 'Wild Wyrm - SAY_GRIP_WARN', 32784),
-(@ENTRY, 4, 0, 'FATAL STRIKE MISSED! KEEP PRYING!', 42, 0, 100, 0, 0, 0, 'Wild Wyrm - SAY_STRIKE_MISS', 32795);
+DELETE FROM `creature_template_spell` WHERE (`CreatureID` = 30275) AND (`Index` IN (4, 5));
 
--- Pathing for Wild Wyrm Entry: 30275 'TDB FORMAT' 
-DELETE FROM `waypoint_data` WHERE `id`=@PATH;
-INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,1,7323.32,-2434.555,785.0732,0,0,0,0,100,0), -- 02:32:47
-(@PATH,2,7323.309,-2434.542,785.0561,0,0,0,0,100,0), -- 02:32:47
-(@PATH,3,7323.297,-2434.528,785.038,0,0,0,0,100,0), -- 02:32:47
-(@PATH,4,7335.602,-2376.98,812.4385,0,0,0,0,100,0), -- 02:32:48
-(@PATH,5,7325.237,-2359.835,825.4155,0,0,0,0,100,0), -- 02:32:51
-(@PATH,6,7325.253,-2359.815,825.4035,0,0,0,0,100,0), -- 02:32:51
-(@PATH,7,7238.397,-2307.871,926.4048,0,0,0,0,100,0), -- 02:32:52
-(@PATH,8,7441.65,-1691.336,1315.965,0,0,0,0,100,0), -- 02:33:52
-(@PATH,9,7441.65,-1691.336,1315.965,0,0,0,0,100,0), -- 02:33:56
-(@PATH,10,7441.65,-1691.336,1315.965,4.5961,0,0,0,100,0); -- 02:33:59

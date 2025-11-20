@@ -878,8 +878,6 @@ class spell_feed_stormcrest_eagle : public SpellScript
 
 enum WildWyrm
 {
-    PATH_WILD_WYRM                      = 30275 * 10,
-
     // Phase 1
     SPELL_PLAYER_MOUNT_WYRM             = 56672,
     SPELL_FIGHT_WYRM                    = 56673,
@@ -931,8 +929,8 @@ enum WildWyrm
     PHASE_MAX                           = 3
 };
 
-uint8 const ControllableSpellsCount = 4;
-uint32 const WyrmControlSpells[PHASE_MAX][ControllableSpellsCount] =
+constexpr uint8 ControllableSpellsCount = 4;
+constexpr uint32 WyrmControlSpells[PHASE_MAX][ControllableSpellsCount] =
 {
     { SPELL_GRAB_ON,       SPELL_DODGE_CLAWS, SPELL_THRUST_SPEAR, SPELL_MIGHTY_SPEAR_THRUST },
     { SPELL_PRY_JAWS_OPEN, 0,                 SPELL_FATAL_STRIKE, 0                         },
@@ -941,16 +939,7 @@ uint32 const WyrmControlSpells[PHASE_MAX][ControllableSpellsCount] =
 
 struct npc_wild_wyrm : public VehicleAI
 {
-    npc_wild_wyrm(Creature* creature) : VehicleAI(creature)
-    {
-        Initialize();
-    }
-
-    void Initialize()
-    {
-        _phase = PHASE_INITIAL;
-        _playerCheckTimer = 1 * IN_MILLISECONDS;
-    }
+    explicit npc_wild_wyrm(Creature* creature) : VehicleAI(creature) { }
 
     void InitSpellsForPhase()
     {
@@ -961,10 +950,10 @@ struct npc_wild_wyrm : public VehicleAI
 
     void Reset() override
     {
-        Initialize();
+        _phase = PHASE_INITIAL;
 
         _playerGuid.Clear();
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
 
         InitSpellsForPhase();
 
@@ -990,7 +979,6 @@ struct npc_wild_wyrm : public VehicleAI
                 break;
             case ACTION_GRIP_LOST:
                 DoCastAOE(SPELL_EJECT_PASSENGER_1, true);
-                EnterEvadeMode();
                 break;
             case ACTION_FATAL_STRIKE_MISS:
                 Talk(SAY_STRIKE_MISS, player);
@@ -1000,7 +988,7 @@ struct npc_wild_wyrm : public VehicleAI
         }
     }
 
-    void OnSpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (!_playerGuid.IsEmpty() || spellInfo->Id != SPELL_SPEAR_OF_HODIR)
             return;
@@ -1038,7 +1026,7 @@ struct npc_wild_wyrm : public VehicleAI
         }
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellInfo const* /*spellInfo = nullptr*/) override
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         if (damage >= me->GetHealth())
         {
@@ -1048,8 +1036,7 @@ struct npc_wild_wyrm : public VehicleAI
                 return;
 
             _phase = PHASE_DEAD;
-            _scheduler.CancelAll()
-                .Async([this]
+            scheduler.CancelAll().Async([this]
             {
                 InitSpellsForPhase();
 
@@ -1064,76 +1051,63 @@ struct npc_wild_wyrm : public VehicleAI
 
                 me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
-                me->GetMotionMaster()->MoveFall(POINT_FALL);
+                me->GetMotionMaster()->MoveFall(POINT_FALL, true);
             });
         }
     }
 
     void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
     {
-        if (!apply || passenger->GetGUID() != _playerGuid)
+        if (!apply)
+        {
+            // The player is automatically moved from SEAT_INITIAL to SEAT_MOUTH during phase transition.
+            // Only evade if player exits during the respective active phase.
+            bool initialPhaseExit = (seatId == SEAT_INITIAL && _phase == PHASE_INITIAL);
+            bool mouthPhaseExit = (seatId == SEAT_MOUTH && _phase == PHASE_MOUTH);
+            if (initialPhaseExit || mouthPhaseExit)
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
             return;
-
-        if (seatId != SEAT_INITIAL)
-            return;
-
-        me->CastSpell(nullptr, SPELL_GRIP, CastSpellExtraArgs().AddSpellMod(SPELLVALUE_AURA_STACK, 50));
-        DoCastAOE(SPELL_CLAW_SWIPE_PERIODIC);
-
-        _scheduler.Async([this]
-        {
-            me->GetMotionMaster()->MovePath(PATH_WILD_WYRM, true);
-        })
-            .Schedule(Milliseconds(500), [this](TaskContext context)
-        {
-            if (_phase == PHASE_MOUTH)
-                return;
-
-            if (me->HealthBelowPct(25))
-            {
-                _phase = PHASE_MOUTH;
-                context.Async([this]
-                {
-                    InitSpellsForPhase();
-                    DoCastAOE(SPELL_LOW_HEALTH_TRIGGER, true);
-                    me->RemoveAurasDueToSpell(SPELL_CLAW_SWIPE_PERIODIC);
-                    me->RemoveAurasDueToSpell(SPELL_GRIP);
-
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGuid))
-                        Talk(SAY_PHASE_2, player);
-
-                    DoCastAOE(SPELL_EJECT_PASSENGER_1, true);
-                    DoCastAOE(SPELL_JAWS_OF_DEATH_PERIODIC);
-                    DoCastAOE(SPELL_FLY_STATE_VISUAL);
-                });
-                return;
-            }
-
-            context.Repeat();
-        });
-    }
-
-    bool EvadeCheck() const
-    {
-        Player* player = ObjectAccessor::GetPlayer(*me, _playerGuid);
-        if (!player)
-            return false;
-
-        switch (_phase)
-        {
-            case PHASE_INITIAL:
-            case PHASE_MOUTH:
-                if (!player->IsAlive())
-                    return false;
-                break;
-            case PHASE_DEAD:
-                break;
-            default:
-                ABORT();
-                break;
         }
 
-        return true;
+        if (passenger->GetGUID() != _playerGuid)
+            return;
+
+        if (seatId == SEAT_INITIAL)
+        {
+            me->CastCustomSpell(SPELL_GRIP, SPELLVALUE_AURA_STACK, 50);
+            DoCastAOE(SPELL_CLAW_SWIPE_PERIODIC, true);
+
+            scheduler.Async([this]
+            {
+                me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
+            }).Schedule(500ms, [this](TaskContext context)
+            {
+                if (_phase == PHASE_MOUTH)
+                    return;
+
+                if (me->HealthBelowPct(25))
+                {
+                    _phase = PHASE_MOUTH;
+                    context.Async([this]
+                    {
+                        InitSpellsForPhase();
+                        DoCastAOE(SPELL_LOW_HEALTH_TRIGGER, true);
+                        me->RemoveAurasDueToSpell(SPELL_CLAW_SWIPE_PERIODIC);
+                        me->RemoveAurasDueToSpell(SPELL_GRIP);
+
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGuid))
+                            Talk(SAY_PHASE_2, player);
+
+                        DoCastAOE(SPELL_EJECT_PASSENGER_1, true);
+                        DoCastAOE(SPELL_JAWS_OF_DEATH_PERIODIC);
+                        DoCastAOE(SPELL_FLY_STATE_VISUAL);
+                    });
+                    return;
+                }
+
+                context.Repeat();
+            });
+        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -1145,33 +1119,20 @@ struct npc_wild_wyrm : public VehicleAI
             return;
         }
 
-        if (_playerCheckTimer <= diff)
-        {
-            if (!EvadeCheck())
-                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-
-            _playerCheckTimer = 1 * IN_MILLISECONDS;
-        }
-        else
-            _playerCheckTimer -= diff;
-
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
 private:
-    uint8 _phase;
-    uint32 _playerCheckTimer;
+    uint8 _phase{PHASE_INITIAL};
     ObjectGuid _playerGuid;
-    TaskScheduler _scheduler;
 };
-
 
 // 56689 - Grip
 class spell_grip : public AuraScript
 {
     PrepareAuraScript(spell_grip);
 
-    void DummyTick(AuraEffect const* /*aurEff*/)
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         ++_tickNumber;
 
@@ -1203,7 +1164,7 @@ class spell_grip : public AuraScript
             _warning = false;
     }
 
-    void HandleDrop(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
             return;
@@ -1213,9 +1174,9 @@ class spell_grip : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_grip::DummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_grip::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
 
-        AfterEffectRemove += AuraEffectRemoveFn(spell_grip::HandleDrop, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_grip::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 
     // tick number in the AuraEffect gets reset each time we stack the aura, so keep track of it locally
@@ -1227,7 +1188,7 @@ class spell_grip : public AuraScript
 // 60533 - Grab On
 class spell_grab_on : public SpellScript
 {
-   PrepareSpellScript(spell_grab_on);
+    PrepareSpellScript(spell_grab_on);
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
@@ -1243,15 +1204,19 @@ class spell_grab_on : public SpellScript
 
 // 56690 - Thrust Spear
 // 60586 - Mighty Spear Thrust
-template <int8 StacksToLose>
 class spell_loosen_grip : public SpellScript
 {
-   PrepareSpellScript(spell_loosen_grip);
+    PrepareSpellScript(spell_loosen_grip);
+
+public:
+    explicit spell_loosen_grip(int8 stacksToLose) : SpellScript(), _stacksToLose(stacksToLose) { }
+private:
+    int32 _stacksToLose;
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Aura* grip = GetCaster()->GetAura(SPELL_GRIP))
-            grip->ModStackAmount(-StacksToLose, AURA_REMOVE_BY_EXPIRE);
+            grip->ModStackAmount(-_stacksToLose, AURA_REMOVE_BY_EXPIRE);
     }
 
     void Register() override
@@ -1272,7 +1237,7 @@ class spell_low_health_trigger : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        GetHitUnit()->CastSpell(nullptr, GetEffectValue(), true);
+        GetHitUnit()->CastSpell(static_cast<Unit*>(nullptr), GetEffectValue(), true);
     }
 
     void Register() override
@@ -1322,7 +1287,7 @@ class spell_claw_swipe_check : public AuraScript
             }
         }
 
-        GetTarget()->CastSpell(nullptr, aurEff->GetAmount(), false);
+        GetTarget()->CastSpell(nullptr, aurEff->GetAmount());
     }
 
     void Register() override
@@ -1354,7 +1319,7 @@ class spell_fatal_strike : public SpellScript
             return;
         }
 
-        GetCaster()->CastSpell(nullptr, SPELL_FATAL_STRIKE_DAMAGE, true);
+        GetCaster()->CastSpell(static_cast<Unit*>(nullptr), SPELL_FATAL_STRIKE_DAMAGE, true);
     }
 
     void Register() override
@@ -1375,7 +1340,7 @@ class spell_player_mount_wyrm : public AuraScript
 
     void HandleDummy(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->CastSpell(nullptr, SPELL_FIGHT_WYRM, true);
+        GetTarget()->CastSpell(static_cast<Unit*>(nullptr), SPELL_FIGHT_WYRM, true);
     }
 
     void Register() override
@@ -1384,6 +1349,26 @@ class spell_player_mount_wyrm : public AuraScript
     }
 };
 
+// 60603 - Eject Passenger 1
+class spell_eject_passenger_wild_wyrm : public SpellScript
+{
+    PrepareSpellScript(spell_eject_passenger_wild_wyrm);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FIGHT_WYRM });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_FIGHT_WYRM);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_eject_passenger_wild_wyrm::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
 
 void AddSC_storm_peaks()
 {
@@ -1400,15 +1385,15 @@ void AddSC_storm_peaks()
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
     RegisterSpellScript(spell_feed_stormcrest_eagle);
-
     RegisterCreatureAI(npc_wild_wyrm);
     RegisterSpellScript(spell_grip);
     RegisterSpellScript(spell_grab_on);
-    RegisterSpellScriptWithArgs(spell_loosen_grip<5>, "spell_thrust_spear");
-    RegisterSpellScriptWithArgs(spell_loosen_grip<15>, "spell_mighty_spear_thrust");
+    RegisterSpellScriptWithArgs(spell_loosen_grip, "spell_thrust_spear", 5);
+    RegisterSpellScriptWithArgs(spell_loosen_grip, "spell_mighty_spear_thrust", 15);
     RegisterSpellScript(spell_low_health_trigger);
     RegisterSpellScript(spell_jaws_of_death_claw_swipe_pct_damage);
     RegisterSpellScript(spell_claw_swipe_check);
     RegisterSpellScript(spell_fatal_strike);
     RegisterSpellScript(spell_player_mount_wyrm);
+    RegisterSpellScript(spell_eject_passenger_wild_wyrm);
 }
