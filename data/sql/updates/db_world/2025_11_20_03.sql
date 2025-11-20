@@ -1,3 +1,4 @@
+-- DB update 2025_11_20_02 -> 2025_11_20_03
 --
 UPDATE `creature_template` SET `AIName` = '', `npcflag` = 16777216 WHERE `entry` = 26809;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 26809) AND (`source_type` = 0);
