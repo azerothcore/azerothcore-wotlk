@@ -413,6 +413,7 @@ public:
                     DoCast(me, 58506, false);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
                     me->SendMovementFlagUpdate();
+                    me->SetImmuneToAll(true);
                     break;
                 case ACTION_START_SJONNIR_FIGHT:
                     SetEscortPaused(false);
