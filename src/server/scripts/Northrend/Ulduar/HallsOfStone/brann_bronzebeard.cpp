@@ -551,7 +551,7 @@ public:
 
                                 darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ());
 
-                                if (darkMatterTarget->GetDistance(plr) < 15.0f)
+                                if (darkMatterTarget->GetDistance(plr) < 5.0f)
                                 {
                                     events.RescheduleEvent(EVENT_DARK_MATTER_END, 3s);
                                 }
