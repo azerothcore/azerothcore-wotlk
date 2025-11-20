@@ -94,9 +94,6 @@ public:
             _canTalk = true;
             _minionInCombat = false;
 
-            if (!me->IsInEvadeMode())
-                return;
-
             Creature* narjil = instance->GetCreature(DATA_NARJIL);
             Creature* gashra = instance->GetCreature(DATA_GASHRA);
             Creature* silthik = instance->GetCreature(DATA_SILTHIK);
