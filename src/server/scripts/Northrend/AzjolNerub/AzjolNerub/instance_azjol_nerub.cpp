@@ -80,23 +80,38 @@ public:
 
         void OnCreatureEvade(Creature* creature) override
         {
-            if (creature->EntryEquals(NPC_WATCHER_NARJIL, NPC_WATCHER_GASHRA, NPC_WATCHER_SILTHIK))
-                if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
-                    krikthir->AI()->EnterEvadeMode();
-
-            if (creature->GetEntry() == NPC_KRIKTHIR_THE_GATEWATCHER)
+            switch (creature->GetEntry())
             {
-                if (Creature* narjil = GetCreature(DATA_NARJIL))
-                    if (CreatureGroup* formation = narjil->GetFormation())
-                        formation->DespawnFormation(0s, 20s);
+                case NPC_WATCHER_NARJIL:
+                case NPC_WATCHER_GASHRA:
+                case NPC_WATCHER_SILTHIK:
+                    if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
+                        krikthir->AI()->EnterEvadeMode();
+                    break;
+                case NPC_ANUBAR_SHADOWCASTER:
+                case NPC_ANUBAR_SKIRMISHER:
+                case NPC_ANUBAR_WARRIOR:
+                    if (CreatureGroup* formation = creature->GetFormation())
+                        if (Creature* leader = formation->GetLeader())
+                            if (leader->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK))
+                                if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
+                                    krikthir->AI()->EnterEvadeMode();
+                    break;
+                case NPC_KRIKTHIR_THE_GATEWATCHER:
+                    if (Creature* narjil = GetCreature(DATA_NARJIL))
+                        if (CreatureGroup* formation = narjil->GetFormation())
+                            formation->DespawnFormation(0s, 20s);
 
-                if (Creature* gashra = GetCreature(DATA_GASHRA))
-                    if (CreatureGroup* formation = gashra->GetFormation())
-                        formation->DespawnFormation(0s, 20s);
+                    if (Creature* gashra = GetCreature(DATA_GASHRA))
+                        if (CreatureGroup* formation = gashra->GetFormation())
+                            formation->DespawnFormation(0s, 20s);
 
-                if (Creature* silthik = GetCreature(DATA_SILTHIK))
-                    if (CreatureGroup* formation = silthik->GetFormation())
-                        formation->DespawnFormation(0s, 20s);
+                    if (Creature* silthik = GetCreature(DATA_SILTHIK))
+                        if (CreatureGroup* formation = silthik->GetFormation())
+                            formation->DespawnFormation(0s, 20s);
+                    break;
+                default:
+                    break;
             }
         }
 
