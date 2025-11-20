@@ -88,15 +88,15 @@ public:
             {
                 if (Creature* narjil = GetCreature(DATA_NARJIL))
                     if (CreatureGroup* formation = narjil->GetFormation())
-                        formation->DespawnFormation(0s, 30s);
+                        formation->DespawnFormation(0s, 20s);
 
                 if (Creature* gashra = GetCreature(DATA_GASHRA))
                     if (CreatureGroup* formation = gashra->GetFormation())
-                        formation->DespawnFormation(0s, 30s);
+                        formation->DespawnFormation(0s, 20s);
 
                 if (Creature* silthik = GetCreature(DATA_SILTHIK))
                     if (CreatureGroup* formation = silthik->GetFormation())
-                        formation->DespawnFormation(0s, 30s);
+                        formation->DespawnFormation(0s, 20s);
             }
         }
     };
