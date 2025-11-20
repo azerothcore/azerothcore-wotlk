@@ -120,18 +120,18 @@ public:
             if (unit->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK, NPC_ANUBAR_SHADOWCASTER, NPC_ANUBAR_SKIRMISHER, NPC_ANUBAR_WARRIOR))
             {
                 if (Creature* creature = unit->ToCreature())
-                    if (CreatureGroup* formation = creature->GetFormation())
+                {
+                    ObjectGuid creatureGuid = creature->GetGUID();
+                    scheduler.CancelAll();
+                    scheduler.Schedule(1s, [this, creatureGuid](TaskContext /*context*/)
                     {
-                        scheduler.CancelAll();
-                        scheduler.Schedule(1s, [this, formation](TaskContext /*context*/)
-                        {
-                            if (!formation->IsAnyMemberAlive())
-                            {
-                                if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
-                                    krikthir->AI()->DoAction(ACTION_MINION_DIED);
-                            }
-                        });
-                    }
+                        if (Creature* creature = instance->GetCreature(creatureGuid))
+                            if (CreatureGroup* formation = creature->GetFormation())
+                                if (!formation->IsAnyMemberAlive())
+                                    if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
+                                        krikthir->AI()->DoAction(ACTION_MINION_DIED);
+                    });
+                }
             }
         }
     };
