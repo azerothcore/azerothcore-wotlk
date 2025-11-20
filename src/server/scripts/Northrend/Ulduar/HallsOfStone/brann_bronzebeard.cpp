@@ -549,12 +549,7 @@ public:
                                 if (!plr)
                                     return; //no target
 
-                                float speed = 10.0f;
-                                float tooFarAwaySpeed = me->GetDistance(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ()) / (5000.0f * 0.001f);
-                                if (speed < tooFarAwaySpeed)
-                                    speed = tooFarAwaySpeed;
-
-                                darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), FORCED_MOVEMENT_NONE, speed);
+                                darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ());
 
                                 if (darkMatterTarget->GetDistance(plr) < 15.0f)
                                 {
