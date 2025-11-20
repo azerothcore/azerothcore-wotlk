@@ -94,18 +94,20 @@ public:
             _canTalk = true;
             _minionInCombat = false;
 
-            if (!me->IsInEvadeMode())
+            if (me->IsInEvadeMode())
                 return;
 
-            Creature* narjil = instance->GetCreature(DATA_NARJIL);
-            Creature* gashra = instance->GetCreature(DATA_GASHRA);
-            Creature* silthik = instance->GetCreature(DATA_SILTHIK);
+            me->m_Events.AddEventAtOffset([this] {
+                Creature* narjil = instance->GetCreature(DATA_NARJIL);
+                Creature* gashra = instance->GetCreature(DATA_GASHRA);
+                Creature* silthik = instance->GetCreature(DATA_SILTHIK);
 
-            for (Creature* watcher : { narjil, gashra, silthik })
-            {
-                if (watcher && watcher->GetFormation())
-                    watcher->GetFormation()->RespawnFormation(true);
-            }
+                for (Creature* watcher : { narjil, gashra, silthik })
+                {
+                    if (watcher && watcher->GetFormation())
+                        watcher->GetFormation()->RespawnFormation(true);
+                }
+            }, 3s);
         }
 
         void MoveInLineOfSight(Unit* who) override
