@@ -67,7 +67,6 @@ public:
             _initTalk = false;
             _canTalk = true;
             _minionInCombat = false;
-            _minionPulledRecently = false;
 
             scheduler.SetValidator([this]
             {
@@ -94,7 +93,8 @@ public:
 
             _canTalk = true;
             _minionInCombat = false;
-            _minionPulledRecently = false;
+            _firstCall = true;
+            _minionsEngaged = 0;
 
             if (me->IsInEvadeMode())
                 return;
@@ -125,12 +125,7 @@ public:
         void DoAction(int32 actionId) override
         {
             if (actionId == ACTION_MINION_ENGAGED)
-            {
-                _minionPulledRecently = true;
-                me->m_Events.AddEventAtOffset([this] {
-                    _minionPulledRecently = false;
-                }, 5s);
-            }
+                ++_minionsEngaged;
 
             if (actionId == ACTION_MINION_ENGAGED && !_minionInCombat)
             {
@@ -168,6 +163,7 @@ public:
         void CallWatcher(Seconds timer)
         {
             me->m_Events.AddEventAtOffset([this] {
+                _firstCall = false;
                 Talk(SAY_SEND_GROUP);
                 SummonWatcher();
             }, timer, GROUP_WATCHERS);
@@ -177,6 +173,7 @@ public:
         {
             me->m_Events.AddEventAtOffset([this] {
                 me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                _firstCall = false;
             }, 5s);
         }
 
@@ -234,9 +231,14 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == SPELL_SUBBOSS_AGGRO_TRIGGER && !_minionPulledRecently)
+            if (spellInfo->Id == SPELL_SUBBOSS_AGGRO_TRIGGER)
+            {
+                if (_minionsEngaged == 2 && _firstCall)
+                    return;
+
                 if (Creature* creature = target->ToCreature())
                     creature->SetInCombatWithZone();
+            }
         }
 
         void JustDied(Unit* killer) override
@@ -266,7 +268,8 @@ public:
         bool _initTalk;
         bool _canTalk;
         bool _minionInCombat;
-        bool _minionPulledRecently;
+        uint8 _minionsEngaged;
+        bool _firstCall;
 
         [[nodiscard]] bool IsInFrenzy() const { return me->HasAura(SPELL_FRENZY); }
     };
