@@ -50,7 +50,9 @@ enum Yells
 enum MiscActions
 {
     ACTION_MINION_ENGAGED               = 1,
-    GROUP_SWARM                         = 1
+    ACTION_MINION_DIED                  = 2,
+    GROUP_SWARM                         = 1,
+    GROUP_WATCHERS                      = 2
 };
 
 class boss_krik_thir : public CreatureScript
@@ -92,6 +94,9 @@ public:
             _canTalk = true;
             _minionInCombat = false;
 
+            if (me->IsInEvadeMode())
+                return;
+
             Creature* narjil = instance->GetCreature(DATA_NARJIL);
             Creature* gashra = instance->GetCreature(DATA_GASHRA);
             Creature* silthik = instance->GetCreature(DATA_SILTHIK);
@@ -124,20 +129,45 @@ public:
                 Talk(SAY_SEND_GROUP, 10s);
 
                 for (Seconds const& timer : { 60s, 120s })
-                {
-                    me->m_Events.AddEventAtOffset([this] {
-                        Talk(SAY_SEND_GROUP);
-
-                        me->m_Events.AddEventAtOffset([this] {
-                            me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
-                        }, 5s);
-                    }, timer);
-                }
+                    CallWatcher(timer);
 
                 me->m_Events.AddEventAtOffset([this] {
                     me->SetInCombatWithZone();
                 }, IsHeroic() ? 200s : 180s);
             }
+            else if (actionId == ACTION_MINION_DIED)
+            {
+                me->m_Events.CancelEventGroup(GROUP_WATCHERS);
+
+                // Check if any of the watchers is alive
+                if (!me->FindNearestCreature(NPC_WATCHER_SILTHIK, 100.0f) &&
+                    !me->FindNearestCreature(NPC_WATCHER_NARJIL, 100.0f) &&
+                    !me->FindNearestCreature(NPC_WATCHER_GASHRA, 100.0f))
+                    return;
+
+                Talk(SAY_SEND_GROUP, 5s);
+                me->m_Events.AddEventAtOffset([this] {
+                    SummonWatcher();
+                }, 5s, GROUP_WATCHERS);
+
+                // Schedule the next (10s + 60s)
+                CallWatcher(70s);
+            }
+        }
+
+        void CallWatcher(Seconds timer)
+        {
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_SEND_GROUP);
+                SummonWatcher();
+            }, timer, GROUP_WATCHERS);
+        }
+
+        void SummonWatcher()
+        {
+            me->m_Events.AddEventAtOffset([this] {
+                me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
+            }, 5s);
         }
 
         uint32 GetData(uint32 data) const override
