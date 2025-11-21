@@ -18,7 +18,6 @@
 #include "utgarde_keep.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
-#include "MotionMaster.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
