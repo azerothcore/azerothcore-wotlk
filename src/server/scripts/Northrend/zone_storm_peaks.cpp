@@ -1186,14 +1186,14 @@ class spell_mammoth_explosion : public SpellScript
 
     void HandleOnEffectHit(SpellEffIndex effIndex)
     {
-        if (GetHitUnit())
+        if (Unit* target = GetHitUnit())
         {
-            for (uint32 spellId : { SPELL_MAMMOTH_EXPL_1, SPELL_MAMMOTH_EXPL_2, SPELL_MAMMOTH_EXPL_3, SPELL_MAMMOTH_MAIN_MAMMOTH_MEAT })
-            {
-                GetHitUnit()->CastSpell(GetHitUnit(), spellId, true);
-            }
+            for (uint32 spellId : { SPELL_MAMMOTH_EXPL_1, SPELL_MAMMOTH_EXPL_2, SPELL_MAMMOTH_EXPL_3 })
+                target->CastSpell(GetHitUnit(), spellId, true);
 
-            GetHitUnit()->SetVisible(false);
+            target->CastSpell(GetHitUnit(), SPELL_MAMMOTH_MAIN_MAMMOTH_MEAT, true);
+
+            target->SetVisible(false);
         }
     }
 
