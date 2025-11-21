@@ -1,3 +1,4 @@
+-- DB update 2025_11_21_02 -> 2025_11_21_03
 -- Update gameobject 'Everfrost Chip' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (193997)) AND (`guid` IN (1161, 1162, 1163, 1164, 1165, 1167, 1168, 1169, 1170, 221001, 221003));
