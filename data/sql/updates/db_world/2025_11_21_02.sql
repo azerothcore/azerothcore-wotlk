@@ -1,3 +1,4 @@
+-- DB update 2025_11_21_01 -> 2025_11_21_02
 --
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` = 54581;
 DELETE FROM `spell_script_names` WHERE `spell_id` = 54581;
