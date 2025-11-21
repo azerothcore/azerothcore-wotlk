@@ -833,11 +833,28 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, Spell
             // Check tick numbers
             if (procEvent_procEx & PROC_EX_ONLY_FIRST_TICK)
             {
-                if (Spell const* procSpell = eventInfo.GetProcSpell())
+                // Special case: Arcane Concentration should proc on every tick of Blizzard
+                // but only on first tick of other spells (like Arcane Missiles)
+                bool skipFirstTickCheck = false;
+
+                // Arcane Concentration (IconID 212)
+                if (spellProto->SpellIconID == 212)
                 {
-                    if (procSpell->GetTriggeredByAuraTickNumber() > 1)
+                    // Check if triggering spell is Blizzard (SpellFamilyFlags[0] & 0x80080)
+                    if (procSpellInfo && procSpellInfo->SpellFamilyFlags[0] & 0x80080)
                     {
-                        return false;
+                        skipFirstTickCheck = true;
+                    }
+                }
+
+                if (!skipFirstTickCheck)
+                {
+                    if (Spell const* procSpell = eventInfo.GetProcSpell())
+                    {
+                        if (procSpell->GetTriggeredByAuraTickNumber() > 1)
+                        {
+                            return false;
+                        }
                     }
                 }
             }
