@@ -789,7 +789,11 @@ class spell_q12237_rescue_villager : public SpellScript
             result = SPELL_FAILED_CUSTOM_ERROR;
         }
 
-        if (!GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_A, 5.0f) && !GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_B, 5.0f))
+        std::list<Creature*> villagers;
+        GetCaster()->GetCreatureListWithEntryInGrid(villagers, { NPC_HELPLESS_VILLAGER_A, NPC_HELPLESS_VILLAGER_B }, 5.0f);
+        villagers.remove_if([](Creature* c) { return !c->IsAlive() || c->HasAura(SPELL_RIDE_VEHICLE); });
+
+        if (villagers.empty())
         {
             extension = SPELL_CUSTOM_ERROR_MUST_BE_NEAR_HELPLESS_VILLAGER;
             result = SPELL_FAILED_CUSTOM_ERROR;
