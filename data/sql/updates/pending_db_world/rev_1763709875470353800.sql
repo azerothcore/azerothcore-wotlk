@@ -69,3 +69,6 @@ DELETE FROM `game_event_gameobject` WHERE (`eventEntry` = 0) AND (`guid` IN (221
 
 -- update phasemask of remaining spawns
 UPDATE `gameobject` SET `phaseMask` = 1 WHERE (`id` IN (193997)) AND (`guid` IN (221000, 221002, 1166));
+
+-- clear existing pool (pooling probably needs to be set up from scratch for all the new spawns instead if necessary)
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = 383 AND (`guid` IN (221000, 221001, 221002, 221003, 221004));
