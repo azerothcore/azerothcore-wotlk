@@ -256,8 +256,8 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPackets::Item::AutoEquipItem& 
         }
 
         // now do moves, remove...
-        _player->RemoveItem(dstbag, dstslot, true, true);
-        _player->RemoveItem(packet.SourceBag, packet.SourceSlot, true, true);
+        _player->RemoveItem(dstbag, dstslot, true);
+        _player->RemoveItem(packet.SourceBag, packet.SourceSlot, true);
 
         // add to dest
         _player->EquipItem(dest, pSrcItem, true);

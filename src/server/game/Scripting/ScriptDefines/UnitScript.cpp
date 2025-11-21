@@ -84,21 +84,6 @@ bool ScriptMgr::IfNormalReaction(Unit const* unit, Unit const* target, Reputatio
     CALL_ENABLED_BOOLEAN_HOOKS(UnitScript, UNITHOOK_IF_NORMAL_REACTION, !script->IfNormalReaction(unit, target, repRank));
 }
 
-bool ScriptMgr::IsNeedModSpellDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
-{
-    CALL_ENABLED_BOOLEAN_HOOKS(UnitScript, UNITHOOK_IS_NEEDMOD_SPELL_DAMAGE_PERCENT, !script->IsNeedModSpellDamagePercent(unit, auraEff, doneTotalMod, spellProto));
-}
-
-bool ScriptMgr::IsNeedModMeleeDamagePercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
-{
-    CALL_ENABLED_BOOLEAN_HOOKS(UnitScript, UNITHOOK_IS_NEEDMOD_MELEE_DAMAGE_PERCENT, !script->IsNeedModMeleeDamagePercent(unit, auraEff, doneTotalMod, spellProto));
-}
-
-bool ScriptMgr::IsNeedModHealPercent(Unit const* unit, AuraEffect* auraEff, float& doneTotalMod, SpellInfo const* spellProto)
-{
-    CALL_ENABLED_BOOLEAN_HOOKS(UnitScript, UNITHOOK_IS_NEEDMOD_HEAL_PERCENT, !script->IsNeedModHealPercent(unit, auraEff, doneTotalMod, spellProto));
-}
-
 bool ScriptMgr::CanSetPhaseMask(Unit const* unit, uint32 newPhaseMask, bool update)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(UnitScript, UNITHOOK_CAN_SET_PHASE_MASK, !script->CanSetPhaseMask(unit, newPhaseMask, update));

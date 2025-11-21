@@ -1334,7 +1334,7 @@ public:
     {
         return StoreItem(dest, pItem, update);
     }
-    void RemoveItem(uint8 bag, uint8 slot, bool update, bool swap = false);
+    void RemoveItem(uint8 bag, uint8 slot, bool update);
     void MoveItemFromInventory(uint8 bag, uint8 slot, bool update);
     // in trade, auction, guild bank, mail....
     void MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB = false);
@@ -2187,11 +2187,19 @@ public:
     [[nodiscard]] bool CanTameExoticPets() const { return IsGameMaster() || HasAuraType(SPELL_AURA_ALLOW_TAME_PET_TYPE); }
 
     void SetRegularAttackTime();
-    void SetBaseModValue(BaseModGroup modGroup, BaseModType modType, float value) { m_auraBaseMod[modGroup][modType] = value; }
-    void HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply);
+
+    void HandleBaseModFlatValue(BaseModGroup modGroup, float amount, bool apply);
+    void ApplyBaseModPctValue(BaseModGroup modGroup, float pct);
+
+    void SetBaseModFlatValue(BaseModGroup modGroup, float val);
+    void SetBaseModPctValue(BaseModGroup modGroup, float val);
+
+    void UpdateDamageDoneMods(WeaponAttackType attackType, int32 skipEnchantSlot = -1) override;
+    void UpdateBaseModGroup(BaseModGroup modGroup);
+
     [[nodiscard]] float GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const;
     [[nodiscard]] float GetTotalBaseModValue(BaseModGroup modGroup) const;
-    [[nodiscard]] float GetTotalPercentageModValue(BaseModGroup modGroup) const { return m_auraBaseMod[modGroup][FLAT_MOD] + m_auraBaseMod[modGroup][PCT_MOD]; }
+
     void _ApplyAllStatBonuses();
     void _RemoveAllStatBonuses();
 
@@ -2203,9 +2211,13 @@ public:
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
-    void _ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply);
-    void _ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
-    void _ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
+    void UpdateWeaponDependentAuras(WeaponAttackType attackType);
+    void ApplyItemDependentAuras(Item* item, bool apply);
+
+    bool CheckAttackFitToAuraRequirement(WeaponAttackType attackType, AuraEffect const* aurEff) const override;
+
+    void UpdateWeaponDependentCritAuras(WeaponAttackType attackType);
+    void UpdateAllWeaponDependentCritAuras();
 
     void _ApplyItemMods(Item* item, uint8 slot, bool apply);
     void _RemoveAllItemMods();
@@ -2829,7 +2841,8 @@ protected:
 
     ActionButtonList m_actionButtons;
 
-    float m_auraBaseMod[BASEMOD_END][MOD_END];
+    float m_auraBaseFlatMod[BASEMOD_END];
+    float m_auraBasePctMod[BASEMOD_END];
     int32 m_baseRatingValue[MAX_COMBAT_RATING];
     uint32 m_baseSpellPower;
     uint32 m_baseSpellDamage;

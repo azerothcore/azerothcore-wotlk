@@ -109,7 +109,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         pInstance = pCreature->GetInstanceScript();
         me->SetReactState(REACT_PASSIVE);
-        me->SetModifierValue(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
+        me->SetStatPctModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
         me->UpdateDamagePhysical(OFF_ATTACK);
         LastSynchroHP = (int32)me->GetMaxHealth();
         SpecialMask = 0;
