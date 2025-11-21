@@ -1,3 +1,4 @@
+-- DB update 2025_11_21_04 -> 2025_11_21_05
 --
 -- Megalith
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24371;

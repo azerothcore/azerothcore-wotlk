@@ -1,3 +1,4 @@
+-- DB update 2025_11_21_05 -> 2025_11_21_06
 --
 -- Warbear Matriarch
 -- Disable AA
