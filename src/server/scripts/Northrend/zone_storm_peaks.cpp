@@ -1168,10 +1168,10 @@ class spell_feed_stormcrest_eagle : public SpellScript
 
 enum MammothExplosion
 {
-    SPELL_MAMMOTH_EXPL_1       = 54627,
-    SPELL_MAMMOTH_EXPL_2       = 54628,
-    SPELL_MAMMOTH_EXPL_3       = 54623,
-    SPELL_MAMMOTH_MAIN_MAMMOTH_MEAT = 57444
+    SPELL_MAMMOTH_EXPL_1    = 54627,
+    SPELL_MAMMOTH_EXPL_2    = 54628,
+    SPELL_MAMMOTH_EXPL_3    = 54623,
+    SPELL_MAIN_MAMMOTH_MEAT = 57444
 };
 
 // 54581 - Mammoth Explosion Spell Spawner
