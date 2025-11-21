@@ -16,6 +16,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2531600, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 11, 45625, 0, 524023, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Beryl Sorcerer - Actionlist - Cast \'Arcane Chains: Character Force Cast\''),
 (2531600, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 33, 25474, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Beryl Sorcerer - Actionlist - Quest Credit \'null\''),
 (2531600, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Beryl Sorcerer - Actionlist - Despawn Instant'),
-(2547400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Beryl Sorcerer - Actionlist - Set Flags Immune To Players & Immune To NPC\'s'),
-(2547400, 9, 1, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 0, 11, 45632, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Beryl Sorcerer - Actionlist - Cast \'Enslaved Arcane Chains: Character Force Cast\''),
-(2547400, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 29, 2, 180, 25262, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Beryl Sorcerer - Actionlist - Start Follow Owner Or Summoner');
+(2547400, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Beryl Sorcerer - Actionlist - Set Flags Not Attackable & Player Controlled'),
+(2547400, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Beryl Sorcerer - Actionlist - Set Reactstate Passive'),
+(2547400, 9, 2, 0, 0, 0, 100, 0, 200, 200, 0, 0, 0, 0, 11, 45632, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Beryl Sorcerer - Actionlist - Cast \'Enslaved Arcane Chains: Character Force Cast\''),
+(2547400, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 29, 2, 180, 25262, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Captured Beryl Sorcerer - Actionlist - Start Follow Owner Or Summoner');
