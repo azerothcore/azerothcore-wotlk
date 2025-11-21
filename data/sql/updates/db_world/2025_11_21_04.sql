@@ -1,3 +1,4 @@
+-- DB update 2025_11_21_03 -> 2025_11_21_04
 
 -- Clean Script Name & add SmartAI (Beryl Sorcerer, Captured Beryl Sorcerer)
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` IN (25316, 25474));
