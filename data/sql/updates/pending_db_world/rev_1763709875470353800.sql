@@ -62,7 +62,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 -- remove duplicate spawns
 DELETE FROM `gameobject` WHERE (`id` IN (193997)) AND (`guid` IN (221003, 221004));
 DELETE FROM `gameobject_addon` WHERE (`guid` IN (221003, 221004));
-DELETE FROM `game_event_gameobject` WHERE (`eventEntry` = 0) AND (`guid` IN (221003, 221004));
 
 -- remaining spawns (no sniffed values available)
 -- (`guid` IN (221000, 221002, 1166))
