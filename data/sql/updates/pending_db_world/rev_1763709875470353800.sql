@@ -71,3 +71,4 @@ UPDATE `gameobject` SET `phaseMask` = 1 WHERE (`id` IN (193997)) AND (`guid` IN 
 
 -- clear existing pool (pooling probably needs to be set up from scratch for all the new spawns instead if necessary)
 DELETE FROM `pool_gameobject` WHERE `pool_entry` = 383 AND (`guid` IN (221000, 221001, 221002, 221003, 221004));
+DELETE FROM `pool_template` WHERE `entry` = 383;
