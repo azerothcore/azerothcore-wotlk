@@ -1184,7 +1184,7 @@ class spell_mammoth_explosion : public SpellScript
         return ValidateSpellInfo({ SPELL_MAMMOTH_EXPL_1, SPELL_MAMMOTH_EXPL_2,  SPELL_MAMMOTH_EXPL_3, SPELL_MAIN_MAMMOTH_MEAT });
     }
 
-    void HandleOnEffectHit(SpellEffIndex effIndex)
+    void HandleOnEffectHit(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
         {
