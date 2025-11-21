@@ -1,3 +1,4 @@
+-- DB update 2025_11_20_04 -> 2025_11_21_00
 --
 SET @GUID := 1161;
 DELETE FROM `gameobject` WHERE `id` = 193997 AND `guid` BETWEEN @GUID AND @GUID+9;
