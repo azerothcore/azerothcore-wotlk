@@ -965,6 +965,24 @@ class spell_pal_lay_on_hands : public SpellScript
         return true;
     }
 
+    void HandleMaxHealthHeal(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetExplTargetUnit();
+
+        if (target == nullptr || caster == nullptr)
+            return;
+
+        uint32 baseHeal = caster->GetMaxHealth();
+        uint32 modifiedHeal = target->SpellHealingBonusTaken(caster, GetSpellInfo(), baseHeal, HEAL);
+
+        // EffectHealMaxHealth() ignores healing modifiers, so we pre-apply the
+        // difference here; this delta will be added on top of the raw heal.
+        int64 healAdjustment = int64(modifiedHeal) - int64(baseHeal);
+
+        SetHitHeal(healAdjustment);
+    }
+
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
@@ -1004,6 +1022,7 @@ class spell_pal_lay_on_hands : public SpellScript
     {
         OnCheckCast += SpellCheckCastFn(spell_pal_lay_on_hands::CheckCast);
         AfterHit += SpellHitFn(spell_pal_lay_on_hands::HandleScript);
+        OnEffectHitTarget += SpellEffectFn(spell_pal_lay_on_hands::HandleMaxHealthHeal, EFFECT_0, SPELL_EFFECT_HEAL_MAX_HEALTH);
     }
 
     int32 _manaAmount;
