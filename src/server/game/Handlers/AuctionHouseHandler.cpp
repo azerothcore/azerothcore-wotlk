@@ -35,6 +35,10 @@ void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recvData)
     ObjectGuid guid;                                            //NPC guid
     recvData >> guid;
 
+    if (guid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(guid))
+            creature->SendMirrorSound(_player, 0);
+
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!unit)
     {

@@ -822,6 +822,10 @@ void WorldSession::HandlePetitionShowListOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
+    if (guid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(guid))
+            creature->SendMirrorSound(_player, 0);
+
     SendPetitionShowList(guid);
 }
 
