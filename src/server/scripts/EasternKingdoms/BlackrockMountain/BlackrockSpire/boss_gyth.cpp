@@ -69,12 +69,9 @@ public:
                 me->DespawnOrUnsummon();
             }
 
-            SetInvincibility(true); // Don't let boss die before summoning Rend.
-
             ScheduleHealthCheckEvent(25, [&] {
                 DoCastAOE(SPELL_SUMMON_REND, true);
                 me->RemoveAura(SPELL_REND_MOUNTS);
-                SetInvincibility(false);
             });
         }
 
