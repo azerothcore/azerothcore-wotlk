@@ -28,4 +28,3 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 (60864, 0x8000);
 
 DELETE FROM `creature_template_spell` WHERE (`CreatureID` = 30275) AND (`Index` IN (4, 5));
-
