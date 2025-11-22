@@ -460,6 +460,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
 
             transport->RemovePassenger(mover);
             mover->SetTransport(nullptr);
+            movementInfo.transport.Reset();
         }
     }
 
