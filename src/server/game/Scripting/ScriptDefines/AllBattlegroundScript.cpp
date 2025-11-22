@@ -104,6 +104,16 @@ void ScriptMgr::OnBattlegroundCreate(Battleground* bg)
     CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_CREATE, script->OnBattlegroundCreate(bg));
 }
 
+bool ScriptMgr::CanAddGroupToMatchingPool(BattlegroundQueue* queue, GroupQueueInfo* group, uint32 poolPlayerCount, Battleground* bg, BattlegroundBracketId bracketId)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_CAN_ADD_GROUP_TO_MATCHING_POOL, !script->CanAddGroupToMatchingPool(queue, group, poolPlayerCount, bg, bracketId));
+}
+
+bool ScriptMgr::GetPlayerMatchmakingRating(ObjectGuid playerGuid, BattlegroundTypeId bgTypeId, float& outRating)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_GET_PLAYER_MATCHMAKING_RATING, script->GetPlayerMatchmakingRating(playerGuid, bgTypeId, outRating));
+}
+
 AllBattlegroundScript::AllBattlegroundScript(char const* name, std::vector<uint16> enabledHooks) :
     ScriptObject(name, ALLBATTLEGROUNDHOOK_END)
 {
