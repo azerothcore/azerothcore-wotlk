@@ -299,6 +299,8 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 
     plMover->UpdatePosition(dest, true);
 
+    plMover->SetFallInformation(GameTime::GetGameTime().count(), dest.GetPositionZ());
+
     // xinef: teleport pets if they are not unsummoned
     if (Pet* pet = plMover->GetPet())
     {
