@@ -121,4 +121,3 @@ UPDATE `npc_spellclick_spells` SET `spell_id` = 46598 WHERE `npc_entry` = 28061 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 28061);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (28061, 0, 0, 0, 0, 0, 0, '49303');
-
