@@ -444,6 +444,26 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
                 }
             }
         }
+        else if (Creature* creatureMover = mover->ToCreature())
+        {
+            // Handle creature movers (like vehicle mounts) on transports
+            if (!creatureMover->GetTransport())
+            {
+                if (Transport* transport = creatureMover->GetMap()->GetTransport(movementInfo.transport.guid))
+                {
+                    transport->AddPassenger(creatureMover, true);
+                }
+            }
+            else if (creatureMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
+            {
+                // Switching transports
+                creatureMover->GetTransport()->RemovePassenger(creatureMover, true);
+                if (Transport* transport = creatureMover->GetMap()->GetTransport(movementInfo.transport.guid))
+                {
+                    transport->AddPassenger(creatureMover, true);
+                }
+            }
+        }
 
         if (!mover->GetTransport() && !mover->GetVehicle())
         {
@@ -454,18 +474,17 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
             }
         }
     }
-    else if (mover->IsPlayer())
+    else
     {
-        if (Player* plrMover = mover->ToPlayer())
+        // if we were on a transport, leave (handles both players and creatures)
+        if (Transport* transport = mover->GetTransport())
         {
-            if (plrMover->GetTransport()) // if we were on a transport, leave
+            if (mover->IsPlayer())
             {
-                sScriptMgr->AnticheatSetUnderACKmount(plrMover); // just for safe
-
-                plrMover->m_transport->RemovePassenger(plrMover);
-                plrMover->m_transport = nullptr;
-                movementInfo.transport.Reset();
+                sScriptMgr->AnticheatSetUnderACKmount(mover->ToPlayer()); // just for safe
             }
+
+            transport->RemovePassenger(mover, true);
         }
     }
 
