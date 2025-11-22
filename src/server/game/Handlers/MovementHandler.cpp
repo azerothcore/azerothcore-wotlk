@@ -447,9 +447,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
         {
             GameObject* go = mover->GetMap()->GetGameObject(movementInfo.transport.guid);
             if (!go || go->GetGoType() != GAMEOBJECT_TYPE_TRANSPORT)
-            {
                 movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-            }
         }
     }
     else
@@ -458,9 +456,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
         if (Transport* transport = mover->GetTransport())
         {
             if (mover->IsPlayer())
-            {
                 sScriptMgr->AnticheatSetUnderACKmount(mover->ToPlayer()); // just for safe
-            }
 
             transport->RemovePassenger(mover);
             mover->SetTransport(nullptr);
