@@ -978,7 +978,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     return false;
 }
 
-void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item /*= nullptr*/)
+void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, ObjectGuid const& itemGuid /*= ObjectGuid::Empty*/)
 {
     if (IsInFeralForm())
         return; // always maximized SKILL_FERAL_COMBAT in fact
@@ -992,9 +992,12 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
 
     Item* tmpitem = GetWeaponForAttack(attType, true);
-    if (item && item != tmpitem && !item->IsBroken())
+    ObjectGuid tmpitemGUID = tmpitem ? tmpitem->GetGUID() : ObjectGuid::Empty;
+    if (itemGuid != ObjectGuid::Empty && itemGuid != tmpitemGUID)
     {
-        tmpitem = item;
+        Item* item = GetItemByGuid(itemGuid);
+        if (item && !item->IsBroken())
+            tmpitem = item;
     }
 
     if (!tmpitem && attType == BASE_ATTACK)
@@ -1022,7 +1025,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     UpdateAllCritPercentages();
 }
 
-void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
+void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, ObjectGuid const& itemGuid /*= ObjectGuid::Empty*/)
 {
     uint8  playerLevel = GetLevel();
     uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
@@ -1071,7 +1074,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
         }
         else
         {
-            UpdateWeaponSkill(victim, attType, item);
+            UpdateWeaponSkill(victim, attType, itemGuid);
         }
     }
 }
