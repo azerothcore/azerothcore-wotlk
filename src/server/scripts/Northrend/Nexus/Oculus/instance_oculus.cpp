@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,27 +63,23 @@ public:
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
         }
 
-        void OnCreatureCreate(Creature* creature) override
+        void OnCreatureCreate(Creature* pCreature) override
         {
-            switch (creature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_DRAKOS:
-                    uiDrakosGUID = creature->GetGUID();
+                    uiDrakosGUID = pCreature->GetGUID();
                     break;
                 case NPC_VAROS:
-                    uiVarosGUID = creature->GetGUID();
+                    uiVarosGUID = pCreature->GetGUID();
                     break;
                 case NPC_UROM:
-                    uiUromGUID = creature->GetGUID();
+                    uiUromGUID = pCreature->GetGUID();
                     break;
                 case NPC_EREGOS:
-                    uiEregosGUID = creature->GetGUID();
+                    uiEregosGUID = pCreature->GetGUID();
                     break;
             }
-
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                if (creature->EntryEquals(NPC_AMBER_DRAKE, NPC_EMERALD_DRAKE, NPC_RUBY_DRAKE))
-                    creature->SetFaction(FACTION_FRIENDLY); // Friendly faction to allow interaction from both factions
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
