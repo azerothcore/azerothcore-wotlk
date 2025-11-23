@@ -1,0 +1,712 @@
+commit 96ad17fd71d599b78a11e0ff635eccb7d2f6d649
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-02-21
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-02-21
+
+    Bump package and library versions
+
+commit 80a2353416d2157eb8097ce77bfd93ed66f05605
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-02-21
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-02-21
+
+    Update AUTHORS
+
+commit 730e8d9a757b83fd8e6a60c65ce6c441e828e2a7
+Merge: 39f6998 288aba6
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-29
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-29
+
+    Merge pull request #321 from ngtcp2/fix-fuzzer
+    
+    fuzz: Submit response if nghttp3_conn is server
+
+commit 288aba61b2fe5933fe5641bd78caf450d8510520
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-29
+
+    fuzz: Submit response if nghttp3_conn is server
+
+commit 39f6998cd0d6710788d48a23c76df65a18234424
+Merge: a3a7237 24d4344
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-23
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-23
+
+    Merge pull request #320 from moritzbuhl/stop_sending-fin
+    
+    Avoid STOP_SENDING for unknown stream type in case fin is set.
+
+commit 24d43447d57008c114788f1501f08ebb76fe70d9
+Author:     mbuhl <git@moritzbuhl.de>
+AuthorDate: 2025-01-23
+Commit:     mbuhl <git@moritzbuhl.de>
+CommitDate: 2025-01-23
+
+    Avoid STOP_SENDING for unknown stream type in case fin is set.
+
+commit a3a7237af6399bbb5476ae495cf801b118615c32
+Merge: 6274305 53fc7a6
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-16
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-16
+
+    Merge pull request #318 from amirlivneh/fuzz-request
+    
+    fuzz_http3serverreq: Send requests
+
+commit 62743057dbe607f5d65ce65416efeaa2b792090e
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-16
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-16
+
+    Fix double free on out of memory (#319)
+
+commit 53fc7a6e7b13e8312d74f24e1f500430ab3eaeb7
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-14
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-15
+
+    fuzz_http3serverreq: Send requests
+
+commit a298c0d1da1f68b1a7a2e8058e8630e5b58636c1
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-15
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-15
+
+    fuzz_http3serverreq: Fuzz client (#317)
+    
+    Co-authored-by: Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+
+commit 00e53bf1d3389663a864bebaee5fbd7f9cf72269
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-14
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-14
+
+    Remove redundant condition in nghttp3_conn_submit_request() (#316)
+    
+    The preceding assertion for nghttp3_client_stream_bidi() ensures that nghttp3_stream_uni() always returns false.
+
+commit 458a8c2500c3c0f97812bf6f627d8ef7853eceb9
+Merge: 1c3fe9a b7e5ced
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-14
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-14
+
+    Merge pull request #315 from amirlivneh/fuzz-shutdown-streams
+    
+    fuzz_http3serverreq: Fuzz stream shutdown
+
+commit b7e5ced51a2f5cc2cddcdc28afd386096ae3cc68
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-13
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-13
+
+    fuzz_http3serverreq: Fuzz stream shutdown
+
+commit 1c3fe9aed23585ab99acd6769e1114399884a097
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-09
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-10
+
+    fuzz: Fuzz connection shutdown (#314)
+
+commit 0fd649a81166abeeb97e4009c5c00adbdc0a0e4f
+Merge: 980349b f95defc
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-08
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-08
+
+    Merge pull request #313 from amirlivneh/pass-by-reference
+    
+    fuzz: Pass FuzzedDataProvider by reference
+
+commit f95defcbd835e17fcffa707062705429f49ce0b5
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-08
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-08
+
+    fuzz: Pass FuzzedDataProvider by reference
+
+commit 980349bc0a1191adbd05e597742b1d3dbc6c8d6a
+Merge: aaa6e77 4aae1ea
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-08
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-08
+
+    Merge pull request #312 from ngtcp2/fuzz-cpp
+    
+    fuzz: More like a C++ source
+
+commit 4aae1ea72df5816b1692919f67d3b5f7d88f9f09
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-08
+
+    fuzz: More like a C++ source
+
+commit aaa6e77b4493ecd697efb334a5ffc7d4071227e5
+Merge: 0566254 e41c92a
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-07
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-07
+
+    Merge pull request #311 from ngtcp2/assert-stream-id-type
+    
+    Assert incoming stream ID type
+
+commit e41c92a927dea90387a1b46a495804302ba9d47c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-07
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-07
+
+    Assert incoming stream ID type
+
+commit 056625410c5fb20d825880fd8b2c8f484965f065
+Merge: bf76262 02280cf
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-06
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-06
+
+    Merge pull request #310 from amirlivneh/fuzz-no-server-uni-stream
+    
+    fuzz_http3serverreq: Don't generate server unidirectional stream ID
+
+commit 02280cfaaafe4abe81ca42079a33b71aeac461e3
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-05
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-05
+
+    fuzz_http3serverreq: Don't generate server unidirectional stream ID
+
+commit bf7626229b1772654e02cfe7f8ccb865cc76e2e8
+Merge: a585cd5 eb6a93c
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-04
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-04
+
+    Merge pull request #309 from amirlivneh/fuzz-multiple-reads
+    
+    fuzz_http3serverreq: Read multiple times before sending data
+
+commit eb6a93cddbffc7e4f1a19ec1f52bb68e51928b41
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-03
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-03
+
+    fuzz_http3serverreq: Read multiple times before sending data
+
+commit 9ef874f45b4db8d5c9f952b6080d9dd464c56923
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-03
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-03
+
+    fuzz_http3serverreq: Use for loop instead of while
+
+commit a585cd506e0802ba7847ed411ae0fff398897f7c
+Merge: 5bde0d1 1b776fa
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-03
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-03
+
+    Merge pull request #308 from ngtcp2/bump-munit
+    
+    Bump munit
+
+commit 5bde0d13f9b21519ad5447485eee0425350516c4
+Merge: f172d66 247ebc4
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-03
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-03
+
+    Merge pull request #307 from ngtcp2/clang-format
+    
+    clang-format
+
+commit 1b776fac04c2a46a88315dc5288be9fbb4e1dd80
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-03
+
+    Bump munit
+
+commit 247ebc468c580b04b90bef7981334e90090805f5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-03
+
+    clang-format
+
+commit f172d66de810b17e8ce06ca13e6991abae95776f
+Merge: 3d7fbd1 3cbff4a
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-03
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-03
+
+    Merge pull request #306 from amirlivneh/fuzz-priority
+    
+    fuzz_http3serverreq: Fuzz stream priority
+
+commit 3d7fbd12d116d084e19cb8a6d81ab24eb5a34a28
+Merge: 005e0ae 9d775e2
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-03
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-03
+
+    Merge pull request #305 from amirlivneh/fuzz-max-client-streams-bidi
+    
+    fuzz_http3serverreq: Fuzz max_client_streams_bidi
+
+commit 005e0ae386f68f3cfa41408185179fc3683a2049
+Merge: 99d6382 883a1e0
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-03
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-03
+
+    Merge pull request #304 from amirlivneh/typo
+    
+    Fix typo in nghttp3.h
+
+commit 3cbff4a7a0e767453034dea79114d7f187b8a1d6
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-02
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-02
+
+    fuzz_http3serverreq: Fuzz stream priority
+
+commit 9d775e27156e30fdc3a48f7d47ecf2df9bcbb57c
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-02
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2025-01-02
+
+    fuzz_http3serverreq: Fuzz max_client_streams_bidi
+
+commit 883a1e0571ae6f89008ad655dd698447da8354d0
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2025-01-02
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-02
+
+    Fix typo in nghttp3.h
+
+commit 99d6382336614b5e57ad7edf484c3614a3a61f3e
+Merge: 6e7031f fa8a6ce
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-02
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-02
+
+    Merge pull request #303 from ngtcp2/qpack-lazy-ringbuf-allocation
+    
+    qpack: Lazy ring buffer allocation
+
+commit fa8a6ce606aeb68e86953a0c72e5813374dc115b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-02
+
+    qpack: Lazy ring buffer allocation
+
+commit 6e7031f75662dcee3b6d6dca629e777be2b33bed
+Merge: ca962ba c299839
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-02
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-02
+
+    Merge pull request #302 from ngtcp2/fuzz-qpack-memory-alloc
+    
+    fuzz_qpackdecoder: Fuzz memory allocator
+
+commit c2998391eea62a4580e96cb4b34f91f93806317a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-02
+
+    fuzz_qpackdecoder: Fuzz memory allocator
+
+commit ca962ba864cded9a70de7d5d233eb4ee1cb73020
+Merge: 83c1ec5 ecfae7a
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-01
+
+    Merge pull request #301 from ngtcp2/fix-null-dereference
+    
+    Fix null dereference
+
+commit ecfae7acf1813f83843b78b607a6abd1fd47be86
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-01
+
+    Fix null dereference
+    
+    decoder->rstate.name and decoder->rstate.value are nullified after
+    processing each encoder instruction.  If they need to be kept, their
+    reference count should be nonzero, and stored in the dynamic table.
+    This null deference occurs when memory allocation fails.
+
+commit 83c1ec573552f0690e88825a8e3d8dd10b040fa4
+Merge: 77b88de 880cf9c
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-01
+
+    Merge pull request #300 from amirlivneh/fuzz-memory-alloc
+    
+    fuzz: Exercise memory allocation failures
+
+commit 880cf9cff6461c3ce7452726979b8b2f66816c98
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-30
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2024-12-31
+
+    fuzz: Exercise memory allocation failures
+
+commit 77b88dedf5a0ca3cc247dbe29173d9558007466c
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-01
+
+    fuzz: Exercise sending response headers (#298)
+
+commit 0de58047f3eea5c0cd2a8668191115cb88e8c8cb
+Merge: 14b7a44 3e9b44a
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-01
+
+    Merge pull request #299 from ngtcp2/fuzz-qpack-dataprovider
+    
+    Rewrite fuzz_qpackdecoder with FuzzedDataProvider
+
+commit 3e9b44a3dfe80ca9fad1248c59dca95de3047b1e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2025-01-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2025-01-01
+
+    Rewrite fuzz_qpackdecoder with FuzzedDataProvider
+
+commit 14b7a44850916289f8e083ce5c6586786ef6fe80
+Merge: a1bd05a 75fe5b7
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2025-01-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2025-01-01
+
+    Merge pull request #296 from amirlivneh/fuzz-callbacks
+    
+    fuzz: Exercise callback failure handling
+
+commit a1bd05a055ce43efe19c1080f400c1752e44b140
+Merge: 5741652 4a7a922
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #297 from ngtcp2/fix-fuzz-build
+    
+    Fix fuzzer build
+
+commit 4a7a9221ac2142f57ce76c4bb014d357129d93a5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-31
+
+    Fix fuzzer build
+
+commit 75fe5b77d9bda51eab82b97951b76bac39645295
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-29
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2024-12-31
+
+    fuzz: Exercise callback failure handling
+
+commit 5741652cad08dc0148b3992f57ce05cdef7248da
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Fuzz settings in fuzz_http3serverreq (#289)
+
+commit 7a34a9d9b9738334aa7d333041f11e37450f70b9
+Merge: e7e6627 3b4eadd
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #295 from ngtcp2/assert-stream-id-range
+    
+    Assert stream_id range in public API
+
+commit 3b4eadda7203d694098b2afa2b35c2f2d37d2944
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-31
+
+    Assert stream_id range in public API
+
+commit e7e66279245d0e7598845e1de441660e45eabb92
+Merge: 3496e2b 5833788
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #294 from ngtcp2/assert-ksl-it-end
+    
+    nghttp3_gaptr: Assert !nghttp3_ksl_it_end
+
+commit 583378853a0d5f35e5d4515b278b79c528393d43
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-31
+
+    nghttp3_gaptr: Assert !nghttp3_ksl_it_end
+    
+    Assert !nghttp3_ksl_it_end in nghttp3_gaptr_is_pushed just like we do
+    in the other functions
+
+commit 3496e2b2c23c9f1b6701c2b1ba139d803b847bef
+Merge: 4583d56 0290b2f
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #293 from ngtcp2/fuzz-non-negative-stream-id
+    
+    fuzz: Make stream_id non-negative integer
+
+commit 0290b2f4d541eff4f30e8ef403d0aaeb56c348cd
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-31
+
+    fuzz: Make stream_id non-negative integer
+
+commit 4583d56c7b8494afbcdbd47f0938b65250dcf41b
+Merge: 616c09a 9107daa
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #292 from ngtcp2/revert-291
+    
+    Revert "nghttp3_gaptr: Check iterator"
+
+commit 9107daa4d03be6518ab7263ff119b68e985fce26
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-31
+
+    Revert "nghttp3_gaptr: Check iterator"
+    
+    This reverts commit d610739ae761d7eece6fe89b64a3a30c5f5c8792.
+
+commit 616c09aae66609bdbf9fb05226f1bf84d0a41e88
+Merge: 81686ae d610739
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #291 from ngtcp2/gaptr-check-it-end
+    
+    nghttp3_gaptr: Check iterator
+
+commit d610739ae761d7eece6fe89b64a3a30c5f5c8792
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-31
+
+    nghttp3_gaptr: Check iterator
+    
+    In practice, we never pass the number larger than NGHTTP3_MAX_VARINT,
+    but it should check whether the iterator is beyond the range as an API
+    contract.
+
+commit 81686aea9ea59e41326e39f9792251a185b6b81f
+Merge: dcec26f a2ece3e
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #290 from amirlivneh/clang-format
+    
+    clang-format
+
+commit dcec26f10f2e89c57039a04e99b7685c68400be1
+Merge: 693af7e 081fa36
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #288 from amirlivneh/coverage-report
+    
+    Generate periodic fuzzing coverage reports
+
+commit 693af7ec1a530a7101350cf8eb1eff5931b1915b
+Merge: 87bb001 c8b28c7
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-31
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-31
+
+    Merge pull request #287 from amirlivneh/assert-settings
+    
+    Assert settings
+
+commit a2ece3e50fadfdf5fb24e14e130356f4224f9f67
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-29
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2024-12-29
+
+    clang-format
+
+commit c8b28c7a1fbf583d77604299b0878c65779261c0
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-29
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2024-12-29
+
+    Assert settings
+
+commit 87bb00176ed510bf4facdd7abc36c2930877edbf
+Merge: 444f491 d35c8f8
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-29
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-29
+
+    Merge pull request #286 from ngtcp2/deny-new-server-bidi-stream
+    
+    Explicitly deny new server-initiated bidirectional stream
+
+commit d35c8f881e08d9cd02a3842828313e8854228d29
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-29
+
+    Explicitly deny new server-initiated bidirectional stream
+    
+    Vanilla HTTP/3 does not allow server to create bidirectional stream.
+    libnghttp3 expects that application configures the QUIC stack like so.
+    Still it would be nice to explicitly deny new server-initiated
+    bidirectional stream for clarity.
+
+commit 444f491480909090656d84f8d24e43fc0fb0b958
+Merge: dcec8f1 282c7b9
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-29
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-29
+
+    Merge pull request #285 from amirlivneh/http3serverreq-fuzzed-data-provider
+    
+    Use FuzzedDataProvider in fuzz_http3serverreq
+
+commit 282c7b9b0da1257a9430efcb05d4b0d602641201
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-28
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2024-12-28
+
+    Use FuzzedDataProvider in fuzz_http3serverreq
+
+commit 081fa36086ec03f9876400b559b9bc4a58534625
+Author:     Amir Livneh <alivneh@fb.com>
+AuthorDate: 2024-12-28
+Commit:     Amir Livneh <alivneh@fb.com>
+CommitDate: 2024-12-28
+
+    Generate periodic fuzzing coverage reports
+
+commit dcec8f1df3d371a101a3e977ff4e917601db3155
+Merge: f24d533 eb1ab44
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2024-12-23
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2024-12-23
+
+    Merge pull request #283 from ngtcp2/designated-initializers
+    
+    C99 designated initializers
+
+commit eb1ab4455976e7744d5a114b9767fbd3b280bf3c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-23
+
+    C99 designated initializers
+    
+    Prefer {0} to memset.
+
+commit f24d5335675f0f8914cee5baf741a9bb6f09321e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2024-12-19
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2024-12-19
+
+    Bump package version
