@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -5131,6 +5131,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_TURNING;
     });
 
+    // Summon Scourged Captive
+    ApplySpellFix({ 51597 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 1;
+        spellInfo->Effects[EFFECT_0].DieSides = 0;
+    });
+
     // The Green Tower
     ApplySpellFix({ 18097 }, [](SpellInfo* spellInfo)
     {
@@ -5155,6 +5162,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 52446, 59363 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
+    });
+
+    // King Mrlg-Mrgl's Spare Suit
+    ApplySpellFix({ 45278 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
