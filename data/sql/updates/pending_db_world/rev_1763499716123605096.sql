@@ -16,7 +16,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (60776, 'spell_jaws_of_death_claw_swipe_pct_damage'),
 (56705, 'spell_claw_swipe_check'),
 (60587, 'spell_fatal_strike'),
-(55795, 'spell_falling_dragon_feign_death'),
+(55795, 'spell_gen_feign_death_all_flags'),
 (56672, 'spell_player_mount_wyrm');
 
 DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (56690,60586,60776,60881,60864);
