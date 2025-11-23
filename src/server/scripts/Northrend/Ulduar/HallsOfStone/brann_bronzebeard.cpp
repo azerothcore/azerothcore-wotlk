@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -355,7 +355,6 @@ public:
             SetDespawnAtEnd(false);
             ResetEvent();
 
-            me->SetFaction(FACTION_FRIENDLY);
             me->SetReactState(REACT_PASSIVE);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
@@ -387,21 +386,12 @@ public:
                 case ACTION_START_ESCORT_EVENT:
                     Start(false, ObjectGuid::Empty, 0, true, false);
                     Talk(SAY_BRANN_ESCORT_START);
-                    me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                     me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetRegeneratingHealth(false);
+                    me->SetRegeneratingHealth(true);
                     break;
                 case ACTION_START_TRIBUNAL:
                 {
                     me->SetReactState(REACT_PASSIVE);
-                    Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-                    if (!PlayerList.IsEmpty())
-                        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        {
-                            me->SetFaction(i->GetSource()->GetFaction());
-                            break;
-                        }
-
                     SetEscortPaused(false);
                     InitializeEvent();
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
@@ -415,7 +405,6 @@ public:
                     break;
                 case ACTION_GO_TO_SJONNIR:
                     Talk(SAY_BRANN_ENTRANCE_MEET);
-                    me->SetFaction(FACTION_FRIENDLY);
                     me->SetReactState(REACT_PASSIVE);
                     me->SetRegeneratingHealth(true);
                     SetEscortPaused(false);
@@ -424,9 +413,9 @@ public:
                     DoCast(me, 58506, false);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
                     me->SendMovementFlagUpdate();
+                    me->SetImmuneToAll(true);
                     break;
                 case ACTION_START_SJONNIR_FIGHT:
-                    me->SetFaction(FACTION_FRIENDLY);
                     SetEscortPaused(false);
                     break;
                 case ACTION_SJONNIR_DEAD:
@@ -560,14 +549,9 @@ public:
                                 if (!plr)
                                     return; //no target
 
-                                float speed = 10.0f;
-                                float tooFarAwaySpeed = me->GetDistance(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ()) / (5000.0f * 0.001f);
-                                if (speed < tooFarAwaySpeed)
-                                    speed = tooFarAwaySpeed;
+                                darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ());
 
-                                darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), FORCED_MOVEMENT_NONE, speed);
-
-                                if (darkMatterTarget->GetDistance(plr) < 15.0f)
+                                if (darkMatterTarget->GetDistance(plr) < 5.0f)
                                 {
                                     events.RescheduleEvent(EVENT_DARK_MATTER_END, 3s);
                                 }
@@ -616,15 +600,8 @@ public:
                     {
                         if (!canExecuteEvents)
                             return;
-                        uint32 Time = 40000 - (2500 * WaveNum);
                         SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3, 0);
-                        if (WaveNum > 2)
-                            events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
-                        if (WaveNum > 5)
-                            events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, Seconds(urand(10 - WaveNum, 15 - WaveNum)));
-
-                        WaveNum++;
-                        events.Repeat(Milliseconds(Time));
+                        events.Repeat(IsHeroic() ? 23500ms : 32500ms);
                         break;
                     }
                     case EVENT_SUMMON_STORMCALLER:
@@ -633,7 +610,7 @@ public:
                             return;
 
                         SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2, 1);
-
+                        events.Repeat(IsHeroic() ? 32s : 41500ms);
                         break;
                     }
                     case EVENT_SUMMON_CUSTODIAN:
@@ -642,7 +619,7 @@ public:
                             return;
 
                         SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1, 1);
-
+                        events.Repeat(IsHeroic() ? 32s : 45s);
                         break;
                     }
                     case EVENT_TRIBUNAL_END:
@@ -836,17 +813,14 @@ void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
     Creature* cr = nullptr;
     if ((cr = me->SummonCreature(NPC_KADDRAK, 923.7f, 326.9f, 219.5f, 2.1f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
-        cr->SetInCombatWithZone();
         KaddrakGUID = cr->GetGUID();
     }
     if ((cr = me->SummonCreature(NPC_MARNAK, 895.974f, 363.571f, 219.337f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
-        cr->SetInCombatWithZone();
         MarnakGUID = cr->GetGUID();
     }
     if ((cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86f, 0.6f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
     {
-        cr->SetInCombatWithZone();
         AbedneumGUID = cr->GetGUID();
     }
 
@@ -859,8 +833,9 @@ void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
     events.ScheduleEvent(EVENT_MARNAK_VISUAL, 105s);
     events.ScheduleEvent(EVENT_ABEDNEUM_VISUAL, 207s);
 
-    // Fight
-    events.ScheduleEvent(EVENT_SUMMON_MONSTERS, 47s);
+    events.ScheduleEvent(EVENT_SUMMON_MONSTERS, 52s);
+    events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, 122s);
+    events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, 228s);
     events.ScheduleEvent(EVENT_KADDRAK_HEAD, 47s);
     events.ScheduleEvent(EVENT_MARNAK_HEAD, 115s);
     events.ScheduleEvent(EVENT_ABEDNEUM_HEAD, 217s);
@@ -907,8 +882,6 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 4);
                 me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_SJONNIR)))
-                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetOrientation(3.132660f);
                 DoCast(me, 58506, false);
                 me->SendMovementFlagUpdate();
@@ -981,7 +954,6 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.ScheduleEvent(EVENT_DRP_CHARGE, 10s);
             events.ScheduleEvent(EVENT_DRP_CLEAVE, 7s);
         }
 
@@ -996,20 +968,20 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_DRP_CHARGE:
-                    {
-                        if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
-                            me->CastSpell(tgt, SPELL_DRP_CHARGE, false);
-
-                        events.Repeat(10s);
-                        break;
-                    }
                 case EVENT_DRP_CLEAVE:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
                         events.Repeat(7s);
                         break;
                     }
+            }
+
+            if (Unit* victim = me->GetVictim())
+            {
+                if (!me->IsWithinMeleeRange(victim) && !me->HasUnitState(UNIT_STATE_CHARGING))
+                {
+                    me->CastSpell(victim, SPELL_DRP_CHARGE, false);
+                }
             }
 
             DoMeleeAttackIfReady();
@@ -1095,7 +1067,7 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_IGC_CRUSH, 6s);
-            events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 4s);
+            events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 20s);
         }
         void UpdateAI(uint32 diff) override
         {
@@ -1117,7 +1089,7 @@ public:
                 case EVENT_IGC_GROUND_SMASH:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_IGC_GROUND_SMASH, false);
-                        events.Repeat(5s);
+                        events.Repeat(20s, 40s);
                         break;
                     }
             }
