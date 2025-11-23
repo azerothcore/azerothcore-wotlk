@@ -1,0 +1,24 @@
+Authors of and contributors to libpsl.
+Thank you very much for spending your time !
+
+Also many thanks for anyone who contributed ideas,
+took part in discussions or 'just' asked questions.
+
+Please drop me a note if you feel you should have
+been mentioned here.
+
+Tim Ruehsen (Implementation of libpsl)
+Daniel Kahn Gillmor (Discussion, Ideas, Organization, Code)
+Daniel Stenberg (Discussion, Ideas)
+Darshit Shah (Patching Wget to work with libpsl)
+Dagobert Michelsen (Fixed Solaris building)
+Christopher Meng (Fedora building)
+Jakub Čajka
+Giuseppe Scrivano
+Ryan Sleevi (Discussion, Requested DAFSA format and ICANN/PRIVATE support)
+Daurnimator (Code review, discussion, reports)
+Olle Liljenzin (Original DAFSA implementation and UTF-8 patch)
+Claudio Saveedra (Add support for PSL_TYPE_NO_STAR_RULE)
+Chun-wei Fan (Add NMake files)
+Xavier Claessens (Add Meson build system)
+Ignacio Casal Quinteiro (Improve Meson build)
