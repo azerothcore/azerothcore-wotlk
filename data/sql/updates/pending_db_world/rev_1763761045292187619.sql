@@ -11,10 +11,12 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28061;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28061);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28061, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2806100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Just Summoned - Run Script'),
-(28061, 0, 1, 0, 40, 0, 100, 0, 10, 0, 0, 0, 0, 0, 80, 2806101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Waypoint 10 Reached - Run Script'),
-(28061, 0, 2, 0, 40, 0, 100, 0, 21, 0, 0, 0, 0, 0, 80, 2806102, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Waypoint 21 Reached - Run Script'),
-(28061, 0, 3, 0, 40, 0, 100, 0, 31, 0, 0, 0, 0, 0, 80, 2806103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Waypoint 31 Reached - Run Script'),
-(28061, 0, 4, 0, 40, 0, 100, 0, 33, 0, 0, 0, 0, 0, 80, 2806104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Waypoint 33 Reached - Run Script');
+(28061, 0, 1, 0, 40, 0, 100, 0, 10, 0, 0, 0, 0, 0, 80, 2806101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Point 10 of Path Any Reached - Run Script'),
+(28061, 0, 2, 0, 40, 0, 100, 0, 21, 0, 0, 0, 0, 0, 80, 2806102, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Point 21 of Path Any Reached - Run Script'),
+(28061, 0, 3, 0, 40, 0, 100, 0, 22, 0, 0, 0, 0, 0, 54, 4000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Point 22 of Path Any Reached - Pause Waypoint'),
+(28061, 0, 4, 5, 40, 0, 100, 0, 31, 0, 0, 0, 0, 0, 54, 7000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Point 31 of Path Any Reached - Pause Waypoint'),
+(28061, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2806103, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Point 31 of Path Any Reached - Run Script'),
+(28061, 0, 6, 0, 40, 0, 100, 0, 33, 0, 0, 0, 0, 0, 80, 2806104, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Point 33 of Path Any Reached - Run Script');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` BETWEEN 2806100 AND 2806104 AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -34,6 +36,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2806104, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 28065, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Script - Despawn Instant Closest Creature \'Wintergarde Gryphon Rider\''),
 (2806104, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wintergarde Gryphon - On Script - Despawn (3000)');
 
+-- SmartAI ignores 'delay' column
 DELETE FROM `waypoints` WHERE `entry` = 28061;
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
 (28061, 1, 3699.6936, -721.9221, 219.29805, 0, 0, 'Wintergarde Gryphon'),
@@ -45,7 +48,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (28061, 7, 3816.714, -1052.798, 218.93703, 0, 0, 'Wintergarde Gryphon'),
 (28061, 8, 3674.9307, -1234.0061, 169.63153, 0, 0, 'Wintergarde Gryphon'),
 (28061, 9, 3562.7188, -1421.7626, 169.63153, 0, 0, 'Wintergarde Gryphon'),
-(28061, 10, 3549.2375, -1556.2838, 169.63153, 0, 1000, 'Wintergarde Gryphon'),
+(28061, 10, 3549.2375, -1556.2838, 169.63153, 0, 0, 'Wintergarde Gryphon'),
 (28061, 11, 3494.7446, -1667.5358, 166.7296, 0, 0, 'Wintergarde Gryphon'),
 (28061, 12, 3469.591, -1731.115, 160.06296, 0, 0, 'Wintergarde Gryphon'),
 (28061, 13, 3398.6677, -1834.3002, 160.06296, 0, 0, 'Wintergarde Gryphon'),
@@ -56,7 +59,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (28061, 18, 3349.7534, -2368.1155, 174.61842, 0, 0, 'Wintergarde Gryphon'),
 (28061, 19, 3273.5618, -2401.9539, 174.61842, 0, 0, 'Wintergarde Gryphon'),
 (28061, 20, 3236.3962, -2316.1958, 174.61842, 0, 0, 'Wintergarde Gryphon'),
-(28061, 21, 3353.9648, -2232.0115, 170.36844, 0, 4000, 'Wintergarde Gryphon'),
+(28061, 21, 3353.9648, -2232.0115, 170.36844, 0, 0, 'Wintergarde Gryphon'), -- delay: 4000
 (28061, 22, 3406.751, -2232.2563, 159.57182, 0, 0, 'Wintergarde Gryphon'),
 (28061, 23, 3484.2961, -2251.2778, 147.90515, 0, 0, 'Wintergarde Gryphon'),
 (28061, 24, 3584.2512, -2299.296, 147.90515, 0, 0, 'Wintergarde Gryphon'),
@@ -66,7 +69,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (28061, 28, 3769.2024, -2553.0325, 213.62839, 0, 0, 'Wintergarde Gryphon'),
 (28061, 29, 3692.256, -2609.5562, 206.48958, 0, 0, 'Wintergarde Gryphon'),
 (28061, 30, 3558.7239, -2723.1643, 213.62839, 0, 0, 'Wintergarde Gryphon'),
-(28061, 31, 3439.4553, -2757.1624, 223.79466, 0, 7000, 'Wintergarde Gryphon'),
+(28061, 31, 3439.4553, -2757.1624, 223.79466, 0, 0, 'Wintergarde Gryphon'), -- delay: 7000
 (28061, 32, 3406.0881, -2755.1821, 227.184, 0, 0, 'Wintergarde Gryphon'),
 (28061, 33, 3390.089, -2773.591, 227.184, 0, 0, 'Wintergarde Gryphon');
 
@@ -79,11 +82,12 @@ DELETE FROM `vehicle_template_accessory` WHERE `entry` = 28061;
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`) VALUES
 (28061, 28065, 0, 1, 'Wintergarde Gryphon - Wintergarde Gryphon Rider', 8, 0);
 
-DELETE FROM `spell_script_names` WHERE `spell_id` = 49261 AND `ScriptName` = 'spell_gen_eject_passenger';
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (49261, 49259) AND `ScriptName` = 'spell_gen_eject_passenger';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(49261, 'spell_gen_eject_passenger');
+(49261, 'spell_gen_eject_passenger'),
+(49259, 'spell_gen_eject_passenger');
 
--- Wintergarde Gryphon SAI
+-- Conquest Hold Windrager SAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28063;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28063);
