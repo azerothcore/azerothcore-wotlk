@@ -16434,7 +16434,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 -- Source : https://www.wowhead.com/wotlk/es/item=31851
 DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 31851;
 INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES (31851,'esES','QATest +150 Defense Ring',NULL,0);
--- OLD name : Gran piedra del alba 
+-- OLD name : Gran piedra del alba
 -- Source : https://www.wowhead.com/wotlk/es/item=31861
 UPDATE `item_template_locale` SET `Name` = 'Gran piedra del alba', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 31861;
 -- OLD name : Boceto: piedra lunar azur rígida
