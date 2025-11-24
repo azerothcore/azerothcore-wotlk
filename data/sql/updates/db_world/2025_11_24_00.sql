@@ -1,3 +1,4 @@
+-- DB update 2025_11_23_00 -> 2025_11_24_00
 --
 -- Set GOSSIP flag
 UPDATE `creature_template` SET `npcflag` = `npcflag` | 1 WHERE (`entry` IN (34712, 34713, 34714, 34786, 34785));
