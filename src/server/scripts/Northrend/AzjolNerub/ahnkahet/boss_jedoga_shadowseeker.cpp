@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -90,6 +90,7 @@ enum SummonGroups
 {
     SUMMON_GROUP_OOC                        = 0,
     SUMMON_GROUP_OOC_TRIGGERS               = 1,
+    SUMMON_GROUP_IC_WORSHIPPERS             = 2
 };
 
 enum Points
@@ -217,7 +218,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        if (summon->GetEntry() == NPC_JEDOGA_CONTROLLER)
+        if (summon->EntryEquals(NPC_JEDOGA_CONTROLLER, NPC_TWILIGHT_WORSHIPPER))
         {
             summons.Summon(summon);
         }
@@ -326,6 +327,17 @@ struct boss_jedoga_shadowseeker : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
         ReschedulleCombatEvents();
+
+        std::list<TempSummon*> tempSummons;
+        me->SummonCreatureGroup(SUMMON_GROUP_IC_WORSHIPPERS, &tempSummons);
+        if (!tempSummons.empty())
+        {
+            for (TempSummon* summon : tempSummons)
+            {
+                if (summon)
+                    summon->SetStandState(UNIT_STAND_STATE_KNEEL);
+            }
+        }
     }
 
     void KilledUnit(Unit* who) override

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -420,6 +420,8 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
     sScriptMgr->OnConstructPlayer(this);
 
     _expectingChangeTransport = false;
+    _pendingFlightChangeCounter = 0;
+    _mapChangeOrderCounter = 0;
 }
 
 Player::~Player()
@@ -4409,28 +4411,6 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
     }
 }
 
-void Player::SetMovement(PlayerMovementType pType)
-{
-    WorldPacket data;
-    const PackedGuid& guid = GetPackGUID();
-    switch (pType)
-    {
-        case MOVE_WATER_WALK:
-            data.Initialize(SMSG_MOVE_WATER_WALK, guid.size() + 4);
-            break;
-        case MOVE_LAND_WALK:
-            data.Initialize(SMSG_MOVE_LAND_WALK, guid.size() + 4);
-            break;
-        default:
-            LOG_ERROR("entities.player", "Player::SetMovement: Unsupported move type ({}), data not sent to client.", pType);
-            return;
-    }
-    data << guid;
-    data << GetSession()->GetOrderCounter(); // movement counter
-    SendDirectMessage(&data);
-    GetSession()->IncrementOrderCounter();
-}
-
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4466,7 +4446,6 @@ void Player::BuildPlayerRepop()
     }
     GetMap()->AddToMap(corpse);
     SetHealth(1); // convert player body to ghost
-    SetMovement(MOVE_WATER_WALK);
     SetWaterWalking(true);
 
     if (!IsImmobilizedState())
@@ -4507,7 +4486,6 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
     setDeathState(DeathState::Alive);
-    SetMovement(MOVE_LAND_WALK);
     SendMoveRoot(false);
     SetWaterWalking(false);
     m_deathTimer = 0;
@@ -9409,11 +9387,7 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
 {
     std::string _text(text);
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
@@ -9435,11 +9409,7 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_YELL, language, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
@@ -9461,11 +9431,7 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
@@ -9494,11 +9460,7 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
@@ -11705,7 +11667,7 @@ void Player::SendInitialPacketsAfterAddToMap()
         GetSession()->IncrementOrderCounter();
     }
 
-    if (HasAuraType(SPELL_AURA_WATER_WALK))
+    if (HasAuraType(SPELL_AURA_WATER_WALK) || HasAura(8326))
     {
         uint32 const counter = GetSession()->GetOrderCounter();
         setCompoundState << uint8(2 + GetPackGUID().size() + 4);
@@ -12111,18 +12073,6 @@ void Player::GetAurasForTarget(Unit* target, bool force /*= false*/)
 {
     if (!target || (!force && target->GetVisibleAuras()->empty()))    // speedup things
         return;
-
-    /*! Blizz sends certain movement packets sometimes even before CreateObject
-        These movement packets are usually found in SMSG_COMPRESSED_MOVES
-    */
-    if (target->HasFeatherFallAura())
-        target->SendMovementFeatherFall(this);
-
-    if (target->HasWaterWalkAura())
-        target->SendMovementWaterWalking(this);
-
-    if (target->HasHoverAura())
-        target->SendMovementHover(this);
 
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data<< target->GetPackGUID();

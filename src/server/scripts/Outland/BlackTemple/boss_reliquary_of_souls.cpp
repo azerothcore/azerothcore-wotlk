@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -141,13 +141,15 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() || me->GetDistance2d(who) > 90.0f || who->ToPlayer()->IsGameMaster())
+            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() ||
+                who->ToPlayer()->IsGameMaster() || me->GetDistance2d(who) > 90.0f ||
+                !me->isInFront(who, M_PI / 4.0f) || !me->IsWithinLOSInMap(who))
                 return;
 
             me->SetInCombatWithZone();
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
-            ScheduleUniqueTimedEvent(5s, [&] { // 15s
+            ScheduleUniqueTimedEvent(5s, [&] {
                 me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
                 DoCastSelf(SPELL_SUMMON_ESSENCE_OF_SUFFERING);
             }, EVENT_ESSENCE_OF_SUFFERING);
