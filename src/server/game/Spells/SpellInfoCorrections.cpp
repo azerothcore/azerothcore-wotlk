@@ -5131,6 +5131,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_TURNING;
     });
 
+    // Summon Scourged Captive
+    ApplySpellFix({ 51597 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 1;
+        spellInfo->Effects[EFFECT_0].DieSides = 0;
+    });
+
     // The Green Tower
     ApplySpellFix({ 18097 }, [](SpellInfo* spellInfo)
     {

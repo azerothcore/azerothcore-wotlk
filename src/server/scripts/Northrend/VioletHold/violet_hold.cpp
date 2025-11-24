@@ -182,7 +182,7 @@ public:
                 case EVENT_SUMMON_KEEPER_OR_GUARDIAN:
                     bKorG = true;
                     spawned = true;
-                    if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
+                    if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER_1, NPC_PORTAL_KEEPER_2), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
                         me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
                     events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20s);
                     break;
@@ -220,11 +220,12 @@ public:
                     if (pInstance)
                         for (SummonList::iterator itr = listOfMobs.begin(); itr != listOfMobs.end(); ++itr)
                             if (Creature* c = pInstance->instance->GetCreature(*itr))
-                                if (c->IsAlive() && (c->GetEntry() == NPC_PORTAL_GUARDIAN || c->GetEntry() == NPC_PORTAL_KEEPER))
+                                if (c->IsAlive() && c->EntryEquals(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER_1, NPC_PORTAL_KEEPER_2))
                                 {
                                     me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
                                     return;
                                 }
+
                     Unit::Kill(me, me, false);
                 }
             }

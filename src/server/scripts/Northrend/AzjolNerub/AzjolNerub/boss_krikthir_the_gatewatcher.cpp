@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "azjol_nerub.h"
@@ -75,16 +76,6 @@ public:
         {
             BossAI::Reset();
 
-            me->SummonCreature(NPC_WATCHER_NARJIL, 511.8f, 666.493f, 776.278f, 0.977f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SHADOWCASTER, 511.63f, 672.44f, 775.71f, 0.90f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WARRIOR, 506.75f, 670.7f, 776.24f, 0.92f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WATCHER_GASHRA, 526.66f, 663.605f, 775.805f, 1.23f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SKIRMISHER, 522.91f, 660.18f, 776.19f, 1.28f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WARRIOR, 528.14f, 659.72f, 776.14f, 1.37f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WATCHER_SILTHIK, 543.826f, 665.123f, 776.245f, 1.55f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SKIRMISHER, 547.5f, 669.96f, 776.1f, 2.3f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SHADOWCASTER, 548.64f, 664.27f, 776.74f, 1.77f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-
             ScheduleHealthCheckEvent(25, [&] {
                 DoCastSelf(SPELL_FRENZY, true);
 
@@ -100,6 +91,16 @@ public:
 
             _canTalk = true;
             _minionInCombat = false;
+
+            Creature* narjil = instance->GetCreature(DATA_NARJIL);
+            Creature* gashra = instance->GetCreature(DATA_GASHRA);
+            Creature* silthik = instance->GetCreature(DATA_SILTHIK);
+
+            for (Creature* watcher : { narjil, gashra, silthik })
+            {
+                if (watcher && watcher->GetFormation())
+                    watcher->GetFormation()->RespawnFormation(true);
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -120,24 +121,39 @@ public:
             {
                 _minionInCombat = true;
 
-                for (Seconds const& timer : { 10s, 40s, 70s })
+                Talk(SAY_SEND_GROUP, 10s);
+
+                for (Seconds const& timer : { 60s, 120s })
                 {
                     me->m_Events.AddEventAtOffset([this] {
-                        me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
                         Talk(SAY_SEND_GROUP);
+
+                        me->m_Events.AddEventAtOffset([this] {
+                            me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                        }, 5s);
                     }, timer);
                 }
 
                 me->m_Events.AddEventAtOffset([this] {
                     me->SetInCombatWithZone();
-                }, 100s);
+                }, IsHeroic() ? 200s : 180s);
             }
         }
 
         uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
-                return summons.HasEntry(NPC_WATCHER_NARJIL) && summons.HasEntry(NPC_WATCHER_GASHRA) && summons.HasEntry(NPC_WATCHER_SILTHIK);
+            {
+                Creature* narjil = instance->GetCreature(DATA_NARJIL);
+                Creature* gashra = instance->GetCreature(DATA_GASHRA);
+                Creature* silthik = instance->GetCreature(DATA_SILTHIK);
+
+                if (!narjil || !gashra || !silthik)
+                    return false;
+
+                return narjil->IsAlive() && gashra->IsAlive() && silthik->IsAlive();
+            }
+
             return 0;
         }
 
@@ -185,12 +201,6 @@ public:
                     _canTalk = true;
                 }, 6s);
             }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summon->SetNoCallAssistance(true);
-            summons.Summon(summon);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit*) override

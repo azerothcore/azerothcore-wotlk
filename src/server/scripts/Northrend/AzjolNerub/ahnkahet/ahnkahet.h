@@ -44,6 +44,7 @@ enum AhnKahetCreatures
     NPC_AMANITAR                    = 30258,
     // Teldaram and Jedoga encounter related
     NPC_JEDOGA_CONTROLLER           = 30181,
+    NPC_TWILIGHT_WORSHIPPER         = 30111
 };
 
 enum AhnkahetSpells

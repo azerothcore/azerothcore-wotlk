@@ -80,10 +80,10 @@ enum CreatureIds
     NPC_ANUBAR_VENOMANCER               = 29217,
 };
 
-enum Phases : uint8
+enum Groups : uint8
 {
-    PHASE_EMERGED = 1,
-    PHASE_SUBMERGED
+    GROUP_EMERGED = 1,
+    GROUP_SUBMERGED
 };
 
 enum SubPhase : uint8
@@ -117,7 +117,7 @@ struct boss_anub_arak : public BossAI
         _submergePhase = SUBMERGE_NONE;
 
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
-            events.Reset();
+            events.CancelEventGroup(GROUP_EMERGED);
             Talk(SAY_SUBMERGE);
             DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
             DoCastSelf(SPELL_SUBMERGE, false);
@@ -133,75 +133,74 @@ struct boss_anub_arak : public BossAI
             DoCastSelf(SPELL_IMPALE_PERIODIC, true);
 
             ++_submergePhase;
-            events.Reset();
             ScheduleSubmerged();
         }
     }
 
     void ScheduleEmerged()
     {
-        events.SetPhase(PHASE_EMERGED);
-        events.ScheduleEvent(EVENT_CARRION_BEETLES, 6500ms, 0, PHASE_EMERGED);
-        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, 0, PHASE_EMERGED);
-        events.ScheduleEvent(EVENT_POUND, 15s, 0, PHASE_EMERGED);
+        events.CancelEventGroup(GROUP_SUBMERGED);
+        events.ScheduleEvent(EVENT_CARRION_BEETLES, 6500ms, GROUP_EMERGED);
+        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, GROUP_EMERGED);
+        events.ScheduleEvent(EVENT_POUND, 15s, GROUP_EMERGED);
     };
 
     void ScheduleSubmerged()
     {
-        events.SetPhase(PHASE_SUBMERGED);
-        events.ScheduleEvent(EVENT_EMERGE, 60s, 0, PHASE_SUBMERGED);
+        events.CancelEventGroup(GROUP_EMERGED);
+        events.ScheduleEvent(EVENT_EMERGE, 60s, GROUP_SUBMERGED);
 
         switch (_submergePhase)
         {
             case SUBMERGE_75:
-                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, GROUP_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, GROUP_SUBMERGED);
 
                 _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 2 : 1;
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, GROUP_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, GROUP_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, GROUP_SUBMERGED);
                 break;
             case SUBMERGE_50:
-                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, GROUP_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, GROUP_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, GROUP_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 29s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 29s, GROUP_SUBMERGED);
 
                 _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 4 : 2;
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, GROUP_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, GROUP_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, GROUP_SUBMERGED);
                 break;
             case SUBMERGE_25:
-                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s, GROUP_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 7s, GROUP_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 24s, GROUP_SUBMERGED);
                 if (IsHeroic())
-                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 29s, 0, PHASE_SUBMERGED);
+                    events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 29s, GROUP_SUBMERGED);
 
                 _remainingLargeSummonsBeforeEmerge = IsHeroic() ? 4 : 2;
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 4s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 4s, GROUP_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 4s, GROUP_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 12s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 12s, GROUP_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 26s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 24s, GROUP_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 26s, GROUP_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 32s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 32s, GROUP_SUBMERGED);
 
-                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, 0, PHASE_SUBMERGED);
-                events.ScheduleEvent(EVENT_SUMMON_DARTER, 45s, 0, PHASE_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 44s, GROUP_SUBMERGED);
+                events.ScheduleEvent(EVENT_SUMMON_DARTER, 45s, GROUP_SUBMERGED);
                 break;
             default:
                 break;
@@ -213,9 +212,8 @@ struct boss_anub_arak : public BossAI
         Talk(SAY_AGGRO);
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
 
-        events.SetPhase(PHASE_EMERGED);
-        events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s, 0, PHASE_EMERGED);
         ScheduleEmerged();
+        events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s);
 
         // set up world triggers
         std::list<TempSummon*> summoned;
@@ -285,9 +283,8 @@ struct boss_anub_arak : public BossAI
                 --_remainingLargeSummonsBeforeEmerge;
                 if (_remainingLargeSummonsBeforeEmerge == 0)
                 {
-                        events.Reset();
-                        events.SetPhase(PHASE_SUBMERGED);
-                        events.ScheduleEvent(EVENT_EMERGE, 5s, 0, PHASE_SUBMERGED);
+                    me->RemoveAurasDueToSpell(SPELL_IMPALE_PERIODIC);
+                    events.RescheduleEvent(EVENT_EMERGE, 5s, GROUP_SUBMERGED);
                 }
                 break;
             }
@@ -319,12 +316,12 @@ struct boss_anub_arak : public BossAI
                 break;
             case EVENT_CARRION_BEETLES:
                 DoCastSelf(SPELL_CARRION_BEETLES);
-                events.ScheduleEvent(EVENT_CARRION_BEETLES, 25s, 0, PHASE_EMERGED);
+                events.ScheduleEvent(EVENT_CARRION_BEETLES, 25s, GROUP_EMERGED);
                 break;
             case EVENT_LEECHING_SWARM:
                 Talk(SAY_LOCUST);
                 DoCastSelf(SPELL_LEECHING_SWARM);
-                events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, 0, PHASE_EMERGED);
+                events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s, GROUP_EMERGED);
                 break;
             case EVENT_POUND:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
@@ -332,10 +329,10 @@ struct boss_anub_arak : public BossAI
                     DoCastSelf(SPELL_SELF_ROOT, true);
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
-                    events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms, 0, PHASE_EMERGED);
+                    events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms, GROUP_EMERGED);
                     DoCast(target, SPELL_POUND);
                 }
-                events.ScheduleEvent(EVENT_POUND, 18s, 0, PHASE_EMERGED);
+                events.ScheduleEvent(EVENT_POUND, 18s, GROUP_EMERGED);
                 break;
             case EVENT_ENABLE_ROTATE:
                 me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
@@ -376,10 +373,10 @@ struct boss_anub_arak : public BossAI
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
     {
+        BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
+
         if (me->HasAura(SPELL_SUBMERGE) && damage >= me->GetHealth())
             damage = me->GetHealth() - 1;
-
-        BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
     }
 
     private:
