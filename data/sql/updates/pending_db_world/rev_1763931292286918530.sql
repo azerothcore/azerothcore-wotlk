@@ -139,10 +139,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (2772600, 2772601));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2772600, 9, 0, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Say Line 0'),
-(2772600, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Say Line 1'),
-(2772600, 9, 2, 0, 0, 0, 100, 0, 18000, 18000, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Say Line 2'),
-(2772600, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 117, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Disable Evade'),
+(2772600, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Remove Npc Flags Questgiver'),
+(2772600, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 117, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Disable Evade'),
+(2772600, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Say Line 0'),
+(2772600, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Say Line 1'),
+(2772600, 9, 4, 0, 0, 0, 100, 0, 18000, 18000, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Say Line 2'),
 (2772601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 81, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Set Npc Flags Questgiver'),
 (2772601, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Set Flag Standstate Kneel'),
 (2772601, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 30000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gorgonna - Actionlist - Despawn In 25000 ms'),
@@ -159,6 +160,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (27719, 6, 0, 'In the other corner, a serial killer, mass defenestrator, sentenced to death multiple times by noose and by blunt instrument!  Horgrenn... Hellcleave!  Ladies and gentlemen... place your bets!', 14, 0, 100, 0, 0, 0, 27016, 0, 'Grennix Shivwiggle - Spawn'),
 (27719, 7, 0, 'Ladies and gentlemen!  Well... let\'s just say you don\'t want to miss this one!', 14, 0, 100, 0, 0, 0, 27032, 0, 'Grennix Shivwiggle - Quest Accepted');
 
+UPDATE `creature_template` SET `npcflag` = `npcflag` | 2 WHERE (`entry` = 27726);
 DELETE FROM `creature_questender` WHERE (`id` = 27726 AND `quest` = 12431);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (27726, 12431);
