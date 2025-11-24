@@ -2696,8 +2696,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (me && me->FindMap())
                 me->FindMap()->LoadGrid(e.target.x, e.target.y);
-            else if (go && go->FindMap())
-                go->FindMap()->LoadGrid(e.target.x, e.target.y);
             break;
         }
         case SMART_ACTION_PLAYER_TALK:
