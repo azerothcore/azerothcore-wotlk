@@ -47,7 +47,7 @@ enum Spells
     SPELL_COPY_OF_SUMMON_MINIONS        = 59933,
     SPELL_BLIZZARD                      = 49034,
     SPELL_FROSTBOLT                     = 49037,
-    SPELL_WRATH_OF_MISERY               = 50089
+    SPELL_TOUCH_OF_MISERY               = 50090
 };
 
 enum Misc
@@ -56,7 +56,14 @@ enum Misc
     NPC_CRYSTAL_HANDLER                     = 26627,
     NPC_SUMMON_CRYSTAL_HANDLER_TARGET       = 27583,
 
-    EVENT_KILL_TALK                         = 1,
+    EVENT_SUMMON_FETID_TROLL                = 1,
+    EVENT_SUMMON_SHADOWCASTER               = 2,
+    EVENT_SUMMON_HULKING_CORPSE             = 3,
+    EVENT_SUMMON_CRYSTAL_HANDLER            = 4,
+    EVENT_CAST_OFFENSIVE_SPELL              = 5,
+    EVENT_KILL_TALK                         = 6,
+    EVENT_CHECK_PHASE                       = 7,
+    EVENT_SPELL_SUMMON_MINIONS              = 8,
 
     ROOM_RIGHT  = 0,
     ROOM_LEFT   = 1,
@@ -72,7 +79,8 @@ std::unordered_map<uint32, std::tuple <uint32, Position>> const npcSummon =
 
 class boss_novos : public CreatureScript
 {
-    boss_novos(Creature* creature) : BossAI(creature, DATA_NOVOS) { }
+public:
+    boss_novos() : CreatureScript("boss_novos") { }
 
     struct boss_novosAI : public BossAI
     {
@@ -110,95 +118,39 @@ class boss_novos : public CreatureScript
                 _achievement = false;
         }
 
-    void JustEngagedWith(Unit* who) override
-    {
-        Talk(SAY_AGGRO);
-        BossAI::JustEngagedWith(who);
-        scheduler.ClearValidator();
+        void MoveInLineOfSight(Unit*  /*who*/) override { }
 
-        ScheduleTimedEvent(3s, [&] {
-            if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
-                trigger->CastSpell(trigger, SPELL_SUMMON_FETID_TROLL_CORPSE, true, nullptr, nullptr, me->GetGUID());
-        }, 3s);
-
-        ScheduleTimedEvent(9s, [&] {
-            if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
-                trigger->CastSpell(trigger, SPELL_SUMMON_RISEN_SHADOWCASTER, true, nullptr, nullptr, me->GetGUID());
-        }, 10s);
-
-        ScheduleTimedEvent(30s, [&] {
-            if (Creature* trigger = summons.GetCreatureWithEntry(NPC_CRYSTAL_CHANNEL_TARGET))
-                trigger->CastSpell(trigger, SPELL_SUMMON_HULKING_CORPSE, true, nullptr, nullptr, me->GetGUID());
-        }, 30s);
-
-        scheduler.Schedule(70s, [this](TaskContext context) {
-            if (me->HasAura(SPELL_BEAM_CHANNEL))
-            {
-                context.Repeat(2s);
-                return;
-            }
-
-            scheduler.CancelAll();
-
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
-            me->InterruptNonMeleeSpells(false);
-
-            scheduler.SetValidator([this] {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-
-            ScheduleTimedEvent(5s, 10s, [&] {
-                DoCastRandomTarget(SPELL_BLIZZARD);
-            }, 12s, 25s);
-
-            ScheduleTimedEvent(5s, 10s, [&] {
-                DoCastRandomTarget(SPELL_WRATH_OF_MISERY);
-            }, 8s, 16s);
-
-            if (IsHeroic())
-            {
-                ScheduleTimedEvent(10s, [&] {
-                    DoCastAOE(SPELL_SUMMON_MINIONS);
-                }, 37s, 55s);
-            }
-        });
-
-        for (Seconds timer : { 16s, 32s, 48s, 64s })
+        void JustEngagedWith(Unit* who) override
         {
-            me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_SUMMONING_ADDS);
-                Talk(EMOTE_SUMMONING_ADDS);
-                if (Creature* target = ObjectAccessor::GetCreature(*me, _stage ? _summonTargetLeftGUID : _summonTargetRightGUID))
-                    target->CastSpell(target, SPELL_SUMMON_CRYSTAL_HANDLER, true, nullptr, nullptr, me->GetGUID());
-                _stage = _stage ? 0 : 1;
-            }, timer);
-        }
+            Talk(SAY_AGGRO);
+            BossAI::JustEngagedWith(who);
 
-        me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
-        me->RemoveAllAuras();
-        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            events.ScheduleEvent(EVENT_SUMMON_FETID_TROLL, 3s);
+            events.ScheduleEvent(EVENT_SUMMON_SHADOWCASTER, 9s);
+            events.ScheduleEvent(EVENT_SUMMON_HULKING_CORPSE, 30s);
+            events.ScheduleEvent(EVENT_SUMMON_CRYSTAL_HANDLER, 20s);
+            events.ScheduleEvent(EVENT_CHECK_PHASE, 80s);
 
-        DoCastSelf(SPELL_ARCANE_BLAST, true);
-        DoCastSelf(SPELL_ARCANE_FIELD, true);
-        DoCastSelf(SPELL_DESPAWN_CRYSTAL_HANDLER, true);
+            me->CastSpell(me, SPELL_ARCANE_BLAST, true);
+            me->CastSpell(me, SPELL_ARCANE_FIELD, true);
+            me->CastSpell(me, SPELL_DESPAWN_CRYSTAL_HANDLER, true);
 
-        for (auto& itr : npcSummon)
-        {
-            uint32 summonEntry;
-            Position summonPos;
-            std::tie(summonEntry, summonPos) = itr.second;
-            if (Creature* creature = me->SummonCreature(summonEntry, summonPos))
-                switch (itr.first)
-                {
-                    case ROOM_LEFT:
-                        _summonTargetLeftGUID = creature->GetGUID();
-                        break;
-                    case ROOM_RIGHT:
-                        _summonTargetRightGUID = creature->GetGUID();
-                        break;
-                }
-        }
-    }
+            for (auto& itr : npcSummon)
+            {
+                uint32 summonEntry;
+                Position summonPos;
+                std::tie(summonEntry, summonPos) = itr.second;
+                if (Creature* creature = me->SummonCreature(summonEntry, summonPos))
+                    switch (itr.first)
+                    {
+                        case ROOM_LEFT:
+                            _summonTargetLeftGUID = creature->GetGUID();
+                            break;
+                        case ROOM_RIGHT:
+                            _summonTargetRightGUID = creature->GetGUID();
+                            break;
+                    }
+            }
 
             me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
             me->RemoveAllAuras();
@@ -215,7 +167,7 @@ class boss_novos : public CreatureScript
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
+            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -227,11 +179,7 @@ class boss_novos : public CreatureScript
             summons.Summon(summon);
             if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET && summon->GetEntry() != NPC_CRYSTAL_HANDLER)
                 summon->SetReactState(REACT_DEFENSIVE);
-
-            if (summon->GetEntry() == NPC_FETID_TROLL_CORPSE)
-                summon->GetMotionMaster()->MovePoint(1, -373.56f, -770.86f, 28.59f);
-
-            if (summon->EntryEquals(NPC_CRYSTAL_HANDLER))
+            else if (summon->GetEntry() != NPC_CRYSTAL_CHANNEL_TARGET)
                 summon->SetInCombatWithZone();
         }
 
@@ -301,12 +249,10 @@ class boss_novos : public CreatureScript
             }
         }
 
-        scheduler.Update(diff);
-        events.Update(diff);
-
-        if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-            DoSpellAttackIfReady(SPELL_FROSTBOLT);
-    }
+        bool CheckEvadeIfOutOfCombatArea() const override
+        {
+            return !SelectTargetFromPlayerList(80.0f);
+        }
 
     private:
         uint8 _crystalCounter;
