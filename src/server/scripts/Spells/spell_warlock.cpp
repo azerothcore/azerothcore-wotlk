@@ -321,7 +321,7 @@ class spell_warl_generic_scaling : public AuraScript
         }
     }
 
-    void CalculateAPAmount(AuraEffect const*  aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateAPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* pet = GetUnitOwner())
         {

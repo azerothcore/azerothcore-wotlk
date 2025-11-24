@@ -784,9 +784,9 @@ SpellGroupStackRule SpellMgr::GetSpellGroupStackRule(SpellGroup group) const
     return SPELL_GROUP_STACK_RULE_DEFAULT;
 }
 
-SpellProcEventEntry const* SpellMgr::GetSpellProcEvent(uint32 spell_id) const
+SpellProcEventEntry const* SpellMgr::GetSpellProcEvent(uint32 spellId) const
 {
-    SpellProcEventMap::const_iterator itr = mSpellProcEventMap.find(spell_id);
+    SpellProcEventMap::const_iterator itr = mSpellProcEventMap.find(spellId);
     if (itr != mSpellProcEventMap.end())
         return &itr->second;
     return nullptr;

@@ -5009,7 +5009,8 @@ void Player::HandleBaseModFlatValue(BaseModGroup modGroup, float amount, bool ap
 {
     if (modGroup >= BASEMOD_END)
     {
-        LOG_ERROR("entities.player", "ERROR in HandleBaseModValue(): non existed BaseModGroup!");
+        LOG_ERROR("entities.player", "Player::HandleBaseModFlatValue: Invalid BaseModGroup/BaseModType ({}/{}) for player '{}' ({})",
+            modGroup, FLAT_MOD, GetName(), GetGUID().ToString());
         return;
     }
 
@@ -5021,7 +5022,8 @@ void Player::ApplyBaseModPctValue(BaseModGroup modGroup, float pct)
 {
     if (modGroup >= BASEMOD_END)
     {
-        LOG_ERROR("entities.player", "ERROR in ApplyBaseModValue(): non existed BaseModGroup!");
+        LOG_ERROR("entities.player", "Player::ApplyBaseModPctValue: Invalid BaseModGroup/BaseModType ({}/{}) for player '{}' ({})",
+            modGroup, PCT_MOD, GetName(), GetGUID().ToString());
         return;
     }
 
@@ -6657,7 +6659,7 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
 
     ApplyItemDependentAuras(item, apply);
 
-    WeaponAttackType const attackType = WeaponAttackType(Player::GetAttackBySlot(slot));
+    WeaponAttackType const attackType = Player::GetAttackBySlot(slot);
     if (attackType != MAX_ATTACK)
         UpdateWeaponDependentAuras(attackType);
 
@@ -7648,7 +7650,7 @@ void Player::_ApplyAllItemMods()
             ApplyItemDependentAuras(m_items[i], false);
             _ApplyItemBonuses(proto, i, true);
 
-            WeaponAttackType const attackType = WeaponAttackType(Player::GetAttackBySlot(i));
+            WeaponAttackType const attackType = Player::GetAttackBySlot(i);
             if (attackType != MAX_ATTACK)
                 UpdateWeaponDependentAuras(attackType);
 

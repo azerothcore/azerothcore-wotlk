@@ -34,6 +34,7 @@
 #include "CreatureGroups.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
+#include "Errors.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
@@ -4798,6 +4799,7 @@ void Unit::_RemoveNoStackAurasDueToAura(Aura* aura, bool owned)
     // if (spellProto->IsPassiveStackableWithRanks())
     //    return;
 
+    ASSERT(aura);
     if (!IsHighestExclusiveAura(aura))
     {
         aura->Remove();
@@ -6056,8 +6058,8 @@ int32 Unit::GetTotalAuraModifier(AuraType auraType, std::function<bool(AuraEffec
     }
 
     // Add the highest of the Same Effect Stack Rule SpellGroups to the accumulator
-    for (auto itr = sameEffectSpellGroup.begin(); itr != sameEffectSpellGroup.end(); ++itr)
-        modifier += itr->second;
+    for (auto const& [_, amount] : sameEffectSpellGroup)
+        modifier += amount;
 
     return modifier;
 }

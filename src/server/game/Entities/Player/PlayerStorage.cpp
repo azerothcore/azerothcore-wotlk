@@ -4348,7 +4348,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                     break;
                 case ITEM_ENCHANTMENT_TYPE_DAMAGE:
                 {
-                    WeaponAttackType const attackType = WeaponAttackType(Player::GetAttackBySlot(item->GetSlot()));
+                    WeaponAttackType const attackType = Player::GetAttackBySlot(item->GetSlot());
                     if (attackType != MAX_ATTACK)
                         UpdateDamageDoneMods(attackType, apply ? -1 : slot);
                     break;
@@ -4622,7 +4622,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 }
                 case ITEM_ENCHANTMENT_TYPE_TOTEM:           // Shaman Rockbiter Weapon
                 {
-                    WeaponAttackType const attackType = WeaponAttackType(Player::GetAttackBySlot(item->GetSlot()));
+                    WeaponAttackType const attackType = Player::GetAttackBySlot(item->GetSlot());
                     if (attackType != MAX_ATTACK)
                         UpdateDamageDoneMods(attackType);
                     break;
