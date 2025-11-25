@@ -562,31 +562,6 @@ private:
     Position _fezzix;
 };
 
-// NPC 25342: Dead Caravan Guard
-// NPC 25343: Dead Caravan Worker
-class npc_dead_caravan_guard_model : public ScriptedAI
-{
-public:
-    npc_dead_caravan_guard_model(Creature* creature) : ScriptedAI(creature) {}
-
-    void Reset() override
-    {
-        switch (me->GetEntry())
-        {
-            case 25342:
-                me->SetDisplayId(23250);
-                break;
-
-            case 25343:
-            {
-                static const uint32 models[] = { 23246, 23247, 23248, 23249 };
-                me->SetDisplayId(models[urand(0, 3)]);
-                break;
-            }
-        }
-    }
-};
-
 /*######
 ## Quest 11590: Abduction
 ######*/
@@ -2259,7 +2234,6 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
     RegisterCreatureAI(npc_jenny);
-    RegisterCreatureAI(npc_dead_caravan_guard_model);
     RegisterSpellScript(spell_necropolis_beam);
     RegisterSpellScript(spell_soul_deflection);
     RegisterSpellScript(spell_bloodspore_haze);
