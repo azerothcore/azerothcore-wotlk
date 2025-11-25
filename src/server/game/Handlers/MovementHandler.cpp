@@ -415,33 +415,31 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
 
     if (mover->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ONTRANSPORT))
     {
-        // if we boarded a transport, add us to it
-        if (Player* plrMover = mover->ToPlayer())
+        // if we boarded a transport, add us to it (generalized for both players and creatures)
+        if (!mover->GetTransport())
         {
-            if (!plrMover->GetTransport())
+            if (Transport* transport = mover->GetMap()->GetTransport(movementInfo.transport.guid))
             {
-                if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
-                {
-                    plrMover->m_transport = transport;
-                    transport->AddPassenger(plrMover);
-                }
+                mover->SetTransport(transport);
+                transport->AddPassenger(mover);
             }
-            else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
+        }
+        else if (mover->GetTransport()->GetGUID() != movementInfo.transport.guid)
+        {
+            // Switching transports
+            bool foundNewTransport = false;
+            mover->GetTransport()->RemovePassenger(mover);
+            if (Transport* transport = mover->GetMap()->GetTransport(movementInfo.transport.guid))
             {
-                bool foundNewTransport = false;
-                plrMover->m_transport->RemovePassenger(plrMover);
-                if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))
-                {
-                    foundNewTransport = true;
-                    plrMover->m_transport = transport;
-                    transport->AddPassenger(plrMover);
-                }
+                foundNewTransport = true;
+                mover->SetTransport(transport);
+                transport->AddPassenger(mover);
+            }
 
-                if (!foundNewTransport)
-                {
-                    plrMover->m_transport = nullptr;
-                    movementInfo.transport.Reset();
-                }
+            if (!foundNewTransport)
+            {
+                mover->SetTransport(nullptr);
+                movementInfo.transport.Reset();
             }
         }
 
@@ -449,23 +447,20 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
         {
             GameObject* go = mover->GetMap()->GetGameObject(movementInfo.transport.guid);
             if (!go || go->GetGoType() != GAMEOBJECT_TYPE_TRANSPORT)
-            {
                 movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
-            }
         }
     }
-    else if (mover->IsPlayer())
+    else
     {
-        if (Player* plrMover = mover->ToPlayer())
+        // if we were on a transport, leave (handles both players and creatures)
+        if (Transport* transport = mover->GetTransport())
         {
-            if (plrMover->GetTransport()) // if we were on a transport, leave
-            {
-                sScriptMgr->AnticheatSetUnderACKmount(plrMover); // just for safe
+            if (mover->IsPlayer())
+                sScriptMgr->AnticheatSetUnderACKmount(mover->ToPlayer()); // just for safe
 
-                plrMover->m_transport->RemovePassenger(plrMover);
-                plrMover->m_transport = nullptr;
-                movementInfo.transport.Reset();
-            }
+            transport->RemovePassenger(mover);
+            mover->SetTransport(nullptr);
+            movementInfo.transport.Reset();
         }
     }
 
