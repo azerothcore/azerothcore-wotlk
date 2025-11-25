@@ -1,3 +1,4 @@
+
 -- Set right factions (sniffed)
 UPDATE `creature_template` SET `faction` = 2068 WHERE (`entry` = 31301);
 UPDATE `creature_template` SET `faction` = 1770 WHERE (`entry` = 31306);
