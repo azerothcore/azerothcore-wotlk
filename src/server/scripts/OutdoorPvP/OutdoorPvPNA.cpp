@@ -32,7 +32,6 @@
 #include "WorldSessionMgr.h"
 #include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
-#include "World.h"
 
 OutdoorPvPNA::OutdoorPvPNA()
 {
