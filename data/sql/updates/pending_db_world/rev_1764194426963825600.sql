@@ -10,7 +10,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (@ENTRY, @ITEM, 0, 100, 0, 1, 1, 1, 1, 'Pattern: Robes of Arcana');
 
 -- Deletes "Pattern: Robes of Arcana" from every creature's loot
-DELETE FROM `creature_loot_template` WHERE `item` = 5773;
+DELETE FROM `creature_loot_template` WHERE `item` = @ITEM;
 
 -- Adds reference loot for "Pattern: Robes of Arcana" for each creature below
 DELETE FROM `creature_loot_template` WHERE `Reference` = @ENTRY AND `Entry` IN (910, 2337, 10760);
