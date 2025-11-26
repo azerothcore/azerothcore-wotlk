@@ -25,7 +25,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "WorldPacket.h"
-#include "Config.h"
+#include "World.h"
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp) :
     _pvp(pvp)
@@ -350,12 +350,12 @@ bool OPvPCapturePoint::Update(uint32 diff)
     }
 
     // get the difference of numbers
-    float factDiff = (((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * float(diff) / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL) * sConfigMgr->GetOption<float>("OutdoorPvPCaptureRate", 1.0);
+    float factDiff = (((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * float(diff) / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL) * sWorld->getFloatConfig(CONFIG_OUTDOOR_PVP_CAPTURE_RATE);
     if (factDiff == 0.f)
         return false;
 
     TeamId ChallengerId = TEAM_NEUTRAL;
-    float maxDiff = (_maxSpeed * float(diff)) * sConfigMgr->GetOption<float>("OutdoorPvPCaptureRate", 1.0);
+    float maxDiff = (_maxSpeed * float(diff)) * sWorld->getFloatConfig(CONFIG_OUTDOOR_PVP_CAPTURE_RATE);
 
     if (factDiff < 0.f)
     {
