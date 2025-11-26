@@ -87,7 +87,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27716, 0, 3, 0, 0, 0, 100, 0, 1000, 3000, 6000, 8000, 0, 0, 11, 16033, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Torgg Thundertotem - In Combat - Cast \'Chain Lightning\''),
 (27716, 0, 4, 0, 0, 0, 100, 0, 10000, 20000, 5000, 15000, 0, 0, 11, 15982, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Torgg Thundertotem - In Combat - Cast \'Healing Wave\''),
 (27716, 0, 5, 0, 0, 0, 100, 0, 0, 0, 21000, 21000, 0, 0, 11, 31991, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Torgg Thundertotem - In Combat - Cast \'Corrupted Nova Totem\''),
-(27716, 0, 6, 0, 0, 0, 100, 0, 4000, 4000, 12000, 12000, 0, 0, 11, 15501, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Torgg Thundertotem - In Combat - Cast \'Earth Shock\''),
+(27716, 0, 6, 0, 0, 0, 100, 0, 4000, 4000, 12000, 12000, 0, 0, 11, 15501, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Torgg Thundertotem - In Combat - Cast \'Earth Shock\''),
 (27717, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 2, 1, 0, 0, 0, 0, 10, 102451, 27719, 0, 0, 0, 0, 0, 0, 'Rustblood - On Just Died - Set Data 2 1 on Grennix'),
 (27717, 0, 1, 2, 1, 0, 100, 1, 30000, 30000, 0, 0, 0, 0, 45, 2, 2, 0, 0, 0, 0, 10, 102451, 27719, 0, 0, 0, 0, 0, 0, 'Rustblood - Out of Combat - Set Data 2 2 on Grennix (No Repeat)'),
 (27717, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Rustblood - Out of Combat - Despawn Instant (No Repeat)'),
