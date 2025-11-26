@@ -1,3 +1,4 @@
+-- DB update 2025_11_26_02 -> 2025_11_26_03
 
 -- Set right factions (sniffed)
 UPDATE `creature_template` SET `faction` = 2068 WHERE (`entry` = 31301);
