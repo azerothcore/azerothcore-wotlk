@@ -1,3 +1,4 @@
+-- DB update 2025_11_26_01 -> 2025_11_26_02
 --
 -- Quest item Ahunae's Knife can target dead Heb'Drakkar Headhunter or dead Heb'Drakkar Striker
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceEntry` = 52090);
