@@ -1,3 +1,4 @@
+-- DB update 2025_11_26_00 -> 2025_11_26_01
 --
 DELETE FROM `waypoint_data` WHERE `id`=125946;
 
