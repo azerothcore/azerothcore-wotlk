@@ -1,3 +1,4 @@
+-- DB update 2025_11_25_02 -> 2025_11_26_00
 --
 SET @link = 8;
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 28948 AND `source_type` = 0 AND `id` = @link;
