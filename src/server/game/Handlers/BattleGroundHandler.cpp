@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -265,7 +265,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             {
                 WorldPacket data;
                 sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-                member->GetSession()->SendPacket(&data);
+                member->SendDirectMessage(&data);
             });
 
             return;
@@ -283,10 +283,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
             // send status packet
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member->AddBattlegroundQueueId(bgQueueTypeId), STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
-            member->GetSession()->SendPacket(&data);
+            member->SendDirectMessage(&data);
 
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-            member->GetSession()->SendPacket(&data);
+            member->SendDirectMessage(&data);
 
             sScriptMgr->OnPlayerJoinBG(member);
         });
@@ -879,7 +879,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
             if (err <= 0)
             {
                 sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-                member->GetSession()->SendPacket(&data);
+                member->SendDirectMessage(&data);
                 continue;
             }
 
@@ -887,10 +887,10 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
             // send status packet
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, arenatype, TEAM_NEUTRAL, isRated);
-            member->GetSession()->SendPacket(&data);
+            member->SendDirectMessage(&data);
 
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
-            member->GetSession()->SendPacket(&data);
+            member->SendDirectMessage(&data);
 
             LOG_DEBUG("bg.battleground", "Battleground: player joined queue for arena as group bg queue type {} bg type {}: {}, NAME {}", bgQueueTypeId, bgTypeId, member->GetGUID().ToString(), member->GetName());
 

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -57,10 +57,8 @@ enum MovementInformPoints
 enum MalygosSpells
 {
     SPELL_BERSERK                       = 64238,
-    SPELL_ARCANE_BREATH_N               = 56272,
-    SPELL_ARCANE_BREATH_H               = 60072,
-    SPELL_ARCANE_STORM_N                = 61693,
-    SPELL_ARCANE_STORM_H                = 61694,
+    SPELL_ARCANE_BREATH                 = 56272,
+    SPELL_ARCANE_STORM                  = 61693,
 
     SPELL_VORTEX_VISUAL                 = 55873,
     SPELL_VORTEX_CONTROL_VEHICLE        = 56263,
@@ -80,18 +78,13 @@ enum MalygosSpells
     SPELL_DESTROY_PLATFORM_VISUAL       = 59084,
 
     SPELL_ARCANE_PULSE                  = 57432,
-    SPELL_PH3_SURGE_OF_POWER_N          = 57407,
-    SPELL_PH3_SURGE_OF_POWER_H          = 60936,
+    SPELL_PH3_SURGE_OF_POWER            = 57407,
 
     SPELL_STATIC_FIELD_MAIN             = 57430,
     SPELL_STATIC_FIELD_SUMMON           = 57431,
     SPELL_STATIC_FIELD_AURA             = 57428,
     SPELL_STATIC_FIELD_DAMAGE           = 57429,
 };
-
-#define SPELL_ARCANE_BREATH             DUNGEON_MODE(SPELL_ARCANE_BREATH_N, SPELL_ARCANE_BREATH_H)
-#define SPELL_ARCANE_STORM              DUNGEON_MODE(SPELL_ARCANE_STORM_N, SPELL_ARCANE_STORM_H)
-#define SPELL_PH3_SURGE_OF_POWER        DUNGEON_MODE(SPELL_PH3_SURGE_OF_POWER_N, SPELL_PH3_SURGE_OF_POWER_H)
 
 enum MalygosEvents
 {
