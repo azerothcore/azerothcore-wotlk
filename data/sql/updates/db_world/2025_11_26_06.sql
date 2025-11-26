@@ -1,3 +1,4 @@
+-- DB update 2025_11_26_05 -> 2025_11_26_06
 
 -- Remove row 5 (set range 100) and update comments.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 32769;
