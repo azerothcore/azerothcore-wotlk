@@ -7,7 +7,7 @@ DELETE FROM `reference_loot_template` WHERE `Entry` = 24704 AND `Item` = @ITEM;
 -- Creates a reference loot for "Pattern: Robes of Arcana"
 DELETE FROM `reference_loot_template` WHERE `Entry` = @ENTRY AND `Item` = @ITEM;
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(@ENTRY, @ITEM, 0, 100, 0, 1, 0, 1, 1, 'Pattern: Robes of Arcana');
+(@ENTRY, @ITEM, 0, 100, 0, 1, 1, 1, 1, 'Pattern: Robes of Arcana');
 
 DELETE FROM `creature_loot_template` WHERE `item` = 5773;
 
