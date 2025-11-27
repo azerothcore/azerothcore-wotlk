@@ -1,3 +1,4 @@
+-- DB update 2025_11_27_00 -> 2025_11_27_01
 --
 -- Setthek Talon Lord wields a sword, but shares id1 with War Hawk (no equipment)
 -- workaround for error: Table `creature` have creature (Entries: 18321, 21904, 0) one or more with equipment_id 1 not found in table `creature_equip_template`, set to no equipment.
