@@ -1,3 +1,4 @@
+-- DB update 2025_11_27_07 -> 2025_11_27_08
 
 -- Set respawn time to 120 secs.
 UPDATE `creature` SET `spawntimesecs` = 120 WHERE `id1` = 31306 AND `guid` = 74974;

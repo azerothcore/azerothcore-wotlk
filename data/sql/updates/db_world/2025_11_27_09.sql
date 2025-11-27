@@ -1,3 +1,4 @@
+-- DB update 2025_11_27_08 -> 2025_11_27_09
 -- Update SAI Comments (Image of Megalith)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24381;
 
