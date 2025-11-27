@@ -1,3 +1,4 @@
+-- DB update 2025_11_27_01 -> 2025_11_27_02
 -- Fix Plagued Proto-Drake Egg not despawning after being frozen
 -- https://github.com/azerothcore/azerothcore-wotlk/issues/23851
 -- Quests: Aberrations (12925), The Aberrations Must Die (13425)
