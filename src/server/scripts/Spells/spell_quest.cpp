@@ -247,34 +247,6 @@ class spell_q10525_vision_guide : public AuraScript
     }
 };
 
-enum eTheCleansing
-{
-    SPELL_CLEANSE_THE_SOUL = 50167,
-    QUEST_THE_CLEANSING_H = 11317,
-    QUEST_THE_CLEANSING_A = 11322,
-};
-
-class spell_q11322_q11317_the_cleansing : public AuraScript
-{
-    PrepareAuraScript(spell_q11322_q11317_the_cleansing)
-
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* ar = GetCaster();
-        if (ar && ar->ToPlayer())
-        {
-            if (ar->ToPlayer()->GetQuestStatus(QUEST_THE_CLEANSING_H) == QUEST_STATUS_INCOMPLETE || ar->ToPlayer()->GetQuestStatus(QUEST_THE_CLEANSING_A) == QUEST_STATUS_INCOMPLETE)
-                ar->CastSpell(ar, SPELL_CLEANSE_THE_SOUL, true);
-            ar->SetStandState(UNIT_STAND_STATE_SIT);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_q11322_q11317_the_cleansing::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class spell_q10714_on_spirits_wings : public SpellScript
 {
     PrepareSpellScript(spell_q10714_on_spirits_wings);
@@ -2505,7 +2477,6 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q12014_steady_as_a_rock);
     RegisterSpellAndAuraScriptPair(spell_q11026_a11051_banish_the_demons, spell_q11026_a11051_banish_the_demons_aura);
     RegisterSpellScript(spell_q10525_vision_guide);
-    RegisterSpellScript(spell_q11322_q11317_the_cleansing);
     RegisterSpellScript(spell_q10714_on_spirits_wings);
     RegisterSpellScript(spell_q10720_the_smallest_creature);
     RegisterSpellScript(spell_q13086_last_line_of_defence);

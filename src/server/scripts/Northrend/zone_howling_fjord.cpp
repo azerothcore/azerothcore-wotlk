@@ -66,109 +66,6 @@ public:
     }
 };
 
-// The cleansing
-enum TurmoilTexts
-{
-    SAY_TURMOIL_0                = 0,
-    SAY_TURMOIL_1                = 1,
-    SAY_TURMOIL_HALF_HP          = 2,
-    SAY_TURMOIL_DEATH            = 3,
-};
-
-class npc_your_inner_turmoil : public CreatureScript
-{
-public:
-    npc_your_inner_turmoil() : CreatureScript("npc_your_inner_turmoil") { }
-
-    struct npc_your_inner_turmoilAI : public ScriptedAI
-    {
-        npc_your_inner_turmoilAI(Creature* creature) : ScriptedAI(creature) {}
-
-        uint32 timer;
-        short phase;
-        bool health50;
-
-        void Reset() override
-        {
-            timer = 0;
-            phase = 0;
-            health50 = false;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (timer >= 6000 && phase < 2)
-            {
-                phase++;
-                setphase(phase);
-                timer = 0;
-            }
-
-            timer += diff;
-
-            DoMeleeAttackIfReady();
-        }
-
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType  /*damagetype*/, SpellSchoolMask  /*damageSchoolMask*/) override
-        {
-            if (HealthBelowPct(50) && !health50)
-            {
-                if (TempSummon const* tempSummon = me->ToTempSummon())
-                {
-                    if (WorldObject* summoner = tempSummon->GetSummonerUnit())
-                    {
-                        Talk(SAY_TURMOIL_HALF_HP, summoner);
-                    }
-                }
-
-                health50 = true;
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (TempSummon const* tempSummon = me->ToTempSummon())
-            {
-                if (WorldObject* summoner = tempSummon->GetSummonerUnit())
-                {
-                    Talk(SAY_TURMOIL_DEATH, summoner);
-                }
-            }
-        }
-
-        void setphase(short newPhase)
-        {
-            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
-            if (!summoner || !summoner->IsPlayer())
-                return;
-
-            switch (newPhase)
-            {
-                case 1:
-                    Talk(SAY_TURMOIL_0, summoner->ToPlayer());
-                    return;
-                case 2:
-                {
-                    Talk(SAY_TURMOIL_1, summoner->ToPlayer());
-                    me->SetLevel(summoner->GetLevel());
-                    me->SetFaction(FACTION_MONSTER);
-                    if (me->GetExactDist(summoner) < 50.0f)
-                    {
-                        me->UpdatePosition(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), 0.0f, true);
-                        summoner->CastSpell(me, 50218, true); // clone caster
-                        AttackStart(summoner);
-                    }
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_your_inner_turmoilAI(creature);
-    }
-};
-
 /*######
 ## npc_apothecary_hanes
 ######*/
@@ -577,7 +474,7 @@ class spell_the_cleansing_on_death_cast_on_master : public SpellScript
         if (Unit* caster = GetCaster())
             if (TempSummon* casterSummon = caster->ToTempSummon())
                 if (Unit* summoner = casterSummon->GetSummonerUnit())
-                    summoner->CastSpell(summoner, GetEffectInfo().CalcValue(), true);
+                    summoner->CastSpell(summoner, GetSpellInfo()->Effects[EFFECT_0].CalcValue(), true);
     }
 
     void Register() override
@@ -589,7 +486,6 @@ class spell_the_cleansing_on_death_cast_on_master : public SpellScript
 void AddSC_howling_fjord()
 {
     new npc_attracted_reef_bull();
-    new npc_your_inner_turmoil();
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();
