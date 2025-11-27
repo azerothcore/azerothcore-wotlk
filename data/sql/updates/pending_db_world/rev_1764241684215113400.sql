@@ -1,2 +1,2 @@
--- Sets all Everfrost Gameobjects to be able to seen in phase 1, 2, 4, 8 and 12 (this may need to be adjusted if someonem reports) currently latest information that complenting hodir questline takes you up to 12 phase.
+-- Sets all Everfrost Gameobjects to be able to seen in phase 1, 2, 4, 8 and 12
 UPDATE `gameobject` SET `phaseMask` = 15 WHERE `id` = 193997;
