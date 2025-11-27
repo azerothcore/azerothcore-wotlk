@@ -1,4 +1,7 @@
 
+-- Set respawn time to 120 secs.
+UPDATE `creature` SET `spawntimesecs` = 120 WHERE `id1` = 31306 AND `guid` = 74974;
+
 -- Add row exit vehicle on Death (Margrave Dhakar)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 31306;
 
