@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -37,6 +37,9 @@ ObjectData const creatureData[] =
     { NPC_KRIKTHIR_THE_GATEWATCHER, DATA_KRIKTHIR },
     { NPC_HADRONOX,                 DATA_HADRONOX },
     { NPC_ANUBARAK,                 DATA_ANUBARAK },
+    { NPC_WATCHER_GASHRA,           DATA_GASHRA   },
+    { NPC_WATCHER_NARJIL,           DATA_NARJIL   },
+    { NPC_WATCHER_SILTHIK,          DATA_SILTHIK  },
     { 0,                            0             }
 };
 
