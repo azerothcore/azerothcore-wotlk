@@ -1,5 +1,5 @@
 
--- Added row 5 & updated comments
+--  Updated SAI & comments
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27587;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27587);
@@ -9,4 +9,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27587, 0, 2, 0, 1, 0, 100, 512, 30000, 30000, 50000, 50000, 0, 0, 1, 1, 0, 0, 0, 0, 0, 19, 27588, 10, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - Out of Combat - Say Line 1'),
 (27587, 0, 3, 0, 8, 0, 100, 512, 49081, 0, 0, 0, 0, 0, 80, 2758700, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - On Spellhit \'Drop Off Soldier\' - Run Script'),
 (27587, 0, 4, 0, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - On Reset - Set Run On'),
-(27587, 0, 5, 0, 28, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 6000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - On Passenger Removed - Despawn In 6000 ms');
+(27587, 0, 5, 6, 28, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 6000, 0, 0, 0, 0, 0, 29, 1, 0, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - On Passenger Removed - Despawn In 6000 ms'),
+(27587, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 6000, 0, 0, 0, 0, 0, 29, 2, 0, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - On Passenger Removed - Despawn In 6000 ms'),
+(27587, 0, 7, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 6000, 0, 0, 0, 0, 0, 29, 3, 0, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - On Passenger Removed - Despawn In 6000 ms'),
+(27587, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 6000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Alliance Steam Tank - On Passenger Removed - Despawn In 6000 ms');
