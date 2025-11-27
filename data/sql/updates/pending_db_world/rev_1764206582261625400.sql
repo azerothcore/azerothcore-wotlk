@@ -100,8 +100,8 @@ INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `Ver
 -- https://www.wowhead.com/quest=24919/the-lightbringers-redemption
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` = 24919  AND `locale` IN ('esMX', 'esES');
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
-(24919, 'esMX', '<Uther mira la medalla, sin palabras por un momento.>$B$BAl medalla de Arthas.$B$B Recuerdo bien el día que se la entregué...$B$BMe has hecho un gran favor, héroe. Mi alma puede descansar en paz. Te ofrezco un recuerdo perdido en el tiempo. Haz lo que quieras con él, pero no olvides a quienes te ayudaron en esta hazaña monumental.', 12340),
-(24919, 'esES', '<Uther mira la medalla, sin palabras por un momento.>$B$BAl medalla de Arthas.$B$B Recuerdo bien el día que se la entregué...$B$BMe has hecho un gran favor, héroe. Mi alma puede descansar en paz. Te ofrezco un recuerdo perdido en el tiempo. Haz lo que quieras con él, pero no olvides a quienes te ayudaron en esta hazaña monumental.', 12340);
+(24919, 'esMX', '<Uther mira la medalla, sin palabras por un momento.>$B$BLa medalla de Arthas.$B$B Recuerdo bien el día que se la entregué...$B$BMe has hecho un gran favor, héroe. Mi alma puede descansar en paz. Te ofrezco un recuerdo perdido en el tiempo. Haz lo que quieras con él, pero no olvides a quienes te ayudaron en esta hazaña monumental.', 12340),
+(24919, 'esES', '<Uther mira la medalla, sin palabras por un momento.>$B$BLa medalla de Arthas.$B$B Recuerdo bien el día que se la entregué...$B$BMe has hecho un gran favor, héroe. Mi alma puede descansar en paz. Te ofrezco un recuerdo perdido en el tiempo. Haz lo que quieras con él, pero no olvides a quienes te ayudaron en esta hazaña monumental.', 12340);
 
 DELETE FROM `quest_request_items_locale` WHERE `ID` = 24919  AND `locale` IN ('esMX', 'esES');
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
