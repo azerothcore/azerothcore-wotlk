@@ -6,5 +6,5 @@ UPDATE `gameobject` SET `phaseMask` = 255 WHERE `id` = 193997;
 UPDATE `gameobject` SET `spawntimesecs` = 3600 WHERE `id` IN (189973, 190169, 190170, 190171, 190172, 190173, 190174, 190175, 191019, 190176) AND `SpawnMask` != 3;
 
 -- Sets all Ore Veins spawn time to be 1 hour (as they are currently not pooled).
--- Colbat Deposit, Rich Cobalt Deposit, Sranoite Depoist, Rich Saronite Deposit, Titatinum Vein and Pure Sarotine Depoist
-UPDATE `gameobject` SET `spawntimesecs` = 3600 WHERE `id` IN (189980, 189981, 189978, 189979, 191133, 195036) AND `SpawnMask` != 3;
+-- Colbat Deposit, Rich Cobalt Deposit, Sranoite Depoist, Rich Saronite Deposit and Titatinum Vein
+UPDATE `gameobject` SET `spawntimesecs` = 3600 WHERE `id` IN (189980, 189981, 189978, 189979, 191133) AND `SpawnMask` != 3;
