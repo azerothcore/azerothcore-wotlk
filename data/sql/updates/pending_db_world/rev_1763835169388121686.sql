@@ -6,4 +6,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27234, 0, 4, 0, 6, 2, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Blacksmith Goodman - On Just Died - Say Line 0 (Phase 2)'),
 (27234, 0, 5, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 173, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Blacksmith Goodman - On Reset - Set Emote State 173');
 -- Location is Non sniffed
-UPDATE `creature` SET `position_x` = 2938.843, `position_y` = -333.74777, `position_z` = 114.74067, `orientation` = 0.645771801471710205 WHERE `guid` = 104699 AND `id1` = 27234;
+UPDATE `creature` SET `position_x` = 2938.843, `position_y` = -333.74777, `position_z` = 114.74067, `orientation` = 0.645771801471710205, `VerifiedBuild` = 64481 WHERE `guid` = 104699 AND `id1` = 27234;
