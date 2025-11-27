@@ -915,72 +915,40 @@ public:
     }
 };
 
-class npc_hyldsmeet_protodrake : public CreatureScript
+enum HyldsmeetProtoDrake
 {
-    enum NPCs
+    NPC_HYLDSMEET_DRAKERIDER = 29694
+};
+
+struct npc_hyldsmeet_protodrake : public CreatureAI
+{
+    explicit npc_hyldsmeet_protodrake(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0) { }
+
+    void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
     {
-        NPC_HYLDSMEET_DRAKERIDER = 29694
-    };
+        if (apply)
+            return;
 
-public:
-    npc_hyldsmeet_protodrake() : CreatureScript("npc_hyldsmeet_protodrake") { }
-
-    class npc_hyldsmeet_protodrakeAI : public CreatureAI
-    {
-    public:
-        npc_hyldsmeet_protodrakeAI(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0), _vehicleKit(creature->GetVehicleKit()) { }
-
-        void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
-        {
-            if (apply)
-            {
-                class DelayedTransportPositionOffsets : public BasicEvent
-                {
-                    public:
-                        DelayedTransportPositionOffsets(Unit* owner) : _owner(owner) { }
-
-                        bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
-                        {
-                            _owner->m_movementInfo.transport.pos.Relocate(-3.5f, 0.f, -0.2f, 0.f);
-                            return true;
-                        }
-
-                    private:
-                        Unit* _owner;
-                };
-
-                if (who->IsPlayer())
-                    who->m_Events.AddEventAtOffset(new DelayedTransportPositionOffsets(who), 500ms);
-
-                return;
-            }
-
-            if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
-                _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
-            //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
-            if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && _vehicleKit)
-            {
-                _vehicleKit->InstallAllAccessories(true);
-                _accessoryRespawnTimer = 0;
-            }
-            else
-                _accessoryRespawnTimer -= diff;
-        }
-
-    private:
-        uint32 _accessoryRespawnTimer;
-        Vehicle* _vehicleKit;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_hyldsmeet_protodrakeAI(creature);
+        if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
+            _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
+        //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+        Vehicle* vehicleKit = me->GetVehicleKit();
+        if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && vehicleKit)
+        {
+            vehicleKit->InstallAllAccessories(true);
+            _accessoryRespawnTimer = 0;
+        }
+        else
+            _accessoryRespawnTimer -= diff;
+    }
+
+private:
+    uint32 _accessoryRespawnTimer;
 };
 
 enum CloseRift
@@ -1215,7 +1183,7 @@ void AddSC_storm_peaks()
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();
     new npc_icefang();
-    new npc_hyldsmeet_protodrake();
+    RegisterCreatureAI(npc_hyldsmeet_protodrake);
     RegisterSpellScript(spell_close_rift_aura);
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
