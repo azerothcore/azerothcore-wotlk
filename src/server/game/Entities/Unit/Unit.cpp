@@ -18388,7 +18388,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     }
 
     // dismount players when charmed
-    if (IsPlayer())
+    if (IsPlayer() && type != CHARM_TYPE_POSSESS)
         RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     if (charmer->IsPlayer())
