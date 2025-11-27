@@ -563,10 +563,6 @@ public:
             if (!SpawnAssoc)
                 return;
 
-            // check if they're hostile
-            if (!(me->IsHostileTo(who) || who->IsHostileTo(me)))
-                return;
-
             if (me->IsValidAttackTarget(who))
             {
                 Player* playerTarget = who->ToPlayer();
