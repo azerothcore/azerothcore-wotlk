@@ -394,7 +394,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->SetFacingTo(5.66f);
                 if (!summons.empty())
                 {
-                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_WORSHIPPER))
+                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_VOLUNTEER))
                     {
                         sacrificeTargetGUID = creature->GetGUID();
                         events.ScheduleEvent(EVENT_JEDGA_START_RITUAL, 3s, 0, PHASE_RITUAL);
@@ -517,7 +517,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 }
                 case EVENT_JEDGA_START_RITUAL:
                 {
-                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_WORSHIPPER))
+                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_VOLUNTEER))
                     {
                         sacrificeTargetGUID = creature->GetGUID();
                         Talk(SAY_SACRIFICE_1);
