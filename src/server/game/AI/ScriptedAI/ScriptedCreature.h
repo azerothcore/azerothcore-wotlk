@@ -157,6 +157,7 @@ public:
     uint32 GetEntryCount(uint32 entry) const;
     void Respawn();
     Creature* GetCreatureWithEntry(uint32 entry) const;
+    Creature* GetRandomCreatureWithEntry(uint32 entry) const;
 
 private:
     Creature* me;
