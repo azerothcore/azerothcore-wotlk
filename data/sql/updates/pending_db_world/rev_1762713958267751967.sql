@@ -1,6067 +1,1812 @@
--- Update zhCN ; from WowHead WOTLK+ / Retail
--- OLD subname : NPC
--- Source : https://www.wowhead.com/wotlk/cn/npc=19
-UPDATE `creature_template_locale` SET `Title` = '非玩家角色',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19;
--- OLD name : Kanrethad, subname : Master of Death
--- Source : https://www.wowhead.com/wotlk/cn/npc=29
-UPDATE `creature_template_locale` SET `Name` = 'Dragon Spawn',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29;
--- OLD name : 暴徒
--- Source : https://www.wowhead.com/wotlk/cn/npc=38
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚暴徒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38;
--- OLD name : [UNUSED] Lower Class Citizen (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=70
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 70;
--- OLD subname : Questgiver
--- Source : https://www.wowhead.com/wotlk/cn/npc=73
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 73;
--- OLD name : [UNUSED] Vashaum Nightwither (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=75
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 75;
--- OLD name : [UNUSED] Luglar the Clogger (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=81
-UPDATE `creature_template_locale` SET `Name` = '节日 - 万圣节 -要塞 - 幽灵啤酒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 81;
--- OLD name : 小偷
--- Source : https://www.wowhead.com/wotlk/cn/npc=94
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚小偷',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 94;
--- OLD name : 强盗
--- Source : https://www.wowhead.com/wotlk/cn/npc=116
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚强盗',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 116;
--- OLD name : [UNUSED] Small Black Dragon Whelp (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=149
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 149;
--- OLD name : [UNUSED] Ander the Monk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=161
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 161;
--- OLD name : [UNUSED] Destitute Farmer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=163
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 163;
--- OLD name : [UNUSED] Small Child (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=165
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 165;
--- OLD name : Ice Troll
--- Source : https://www.wowhead.com/wotlk/cn/npc=192
-UPDATE `creature_template_locale` SET `Name` = '冰雪巨魔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 192;
--- OLD name : 腐烂恐魔
--- Source : https://www.wowhead.com/wotlk/cn/npc=202
-UPDATE `creature_template_locale` SET `Name` = '恐怖骸骨',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 202;
--- OLD name : [UNUSED] Cackle Flamebone (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=204
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 204;
--- OLD name : [UNUSED] Riverpaw Hideflayer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=207
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 207;
--- OLD name : [UNUSED] Riverpaw Pack Warder (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=208
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 208;
--- OLD name : [UNUSED] Riverpaw Bone Chanter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=209
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 209;
--- OLD name : Thornton Fellwood, subname : Woodcrafter
--- Source : https://www.wowhead.com/wotlk/cn/npc=230
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 230;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (230, 'zhCN','索恩顿·菲尔伍德','木工',0);
--- OLD name : 治安官格里安·斯托曼
--- Source : https://www.wowhead.com/wotlk/cn/npc=234
-UPDATE `creature_template_locale` SET `Name` = '格里安·斯托曼',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 234;
--- OLD name : [UNUSED] Elwynn Tower Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=260
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 260;
--- OLD name : [DND] Wounded Lion's Footman
--- Source : https://www.wowhead.com/wotlk/cn/npc=262
-UPDATE `creature_template_locale` SET `Name` = '被吃掉一半的尸体',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 262;
--- OLD name : [UNUSED] Goodmother Jans (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=296
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 296;
--- OLD name : 幼狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=299
-UPDATE `creature_template_locale` SET `Name` = '染病的幼狼',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 299;
--- OLD name : [UNUSED] Brog'Mud (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=301
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 301;
--- OLD name : 白马
--- Source : https://www.wowhead.com/wotlk/cn/npc=305
-UPDATE `creature_template_locale` SET `Name` = '骑乘用马（白色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 305;
--- OLD name : 褐色马
--- Source : https://www.wowhead.com/wotlk/cn/npc=306
-UPDATE `creature_template_locale` SET `Name` = '骑乘用马（褐色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 306;
--- OLD name : 黑马
--- Source : https://www.wowhead.com/wotlk/cn/npc=308
-UPDATE `creature_template_locale` SET `Name` = '骑乘用马（黑色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 308;
--- OLD name : "Buried Upside-Down" Vehicle
--- Source : https://www.wowhead.com/wotlk/cn/npc=309
-UPDATE `creature_template_locale` SET `Name` = '罗尔夫的尸体',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 309;
--- OLD name : [UNUSED] Brother Akil (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=318
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 318;
--- OLD name : [UNUSED] Brother Benthas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=319
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 319;
--- OLD name : [UNUSED] Brother Cryus (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=320
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 320;
--- OLD name : [UNUSED] Brother Deros (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=321
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 321;
--- OLD name : [UNUSED] Brother Enoch (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=322
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 322;
--- OLD name : [UNUSED] Brother Farthing (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=323
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 323;
--- OLD name : [UNUSED] Brother Greishan (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=324
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 324;
--- OLD name : [UNUSED] Brother Ictharin (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=326
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 326;
--- OLD name : 马迪亚斯·肖尔大师
--- Source : https://www.wowhead.com/wotlk/cn/npc=332
-UPDATE `creature_template_locale` SET `Name` = '马迪亚斯·肖尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 332;
--- OLD name : [UNUSED] Edwardo the Jester (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=333
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 333;
--- OLD name : [UNUSED] Rin Tal'Vara (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=336
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 336;
--- OLD name : [UNUSED] Helgor the Pugilist (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=339
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 339;
--- OLD name : 森林狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=358
-UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（棕色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 358;
--- OLD name : 冬狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=359
-UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（白色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 359;
--- OLD name : 达希·帕克, subname : 女招待
--- Source : https://www.wowhead.com/wotlk/cn/npc=379
-UPDATE `creature_template_locale` SET `Name` = '达希',`Title` = '女服务生',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 379;
--- OLD name : [UNUSED] Waldin Thorbatt (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=380
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 380;
--- OLD name : 大魔导师杜内
--- Source : https://www.wowhead.com/wotlk/cn/npc=397
-UPDATE `creature_template_locale` SET `Name` = '莫甘斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 397;
--- OLD name : Chubbs (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=444
-UPDATE `creature_template_locale` SET `Name` = '小猪大人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 444;
--- OLD name : 卫兵队长帕克
--- Source : https://www.wowhead.com/wotlk/cn/npc=464
-UPDATE `creature_template_locale` SET `Name` = '卫兵帕克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 464;
--- OLD name : [UNUSED] Scribe Colburg (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=470
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 470;
--- OLD name : 流浪巫师
--- Source : https://www.wowhead.com/wotlk/cn/npc=474
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚流浪巫师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 474;
--- OLD name : [UNUSED] Watcher Kleeman (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=496
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 496;
--- OLD name : [UNUSED] Watcher Benjamin (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=497
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 497;
--- OLD name : [UNUSED] Watcher Larsen (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=498
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 498;
--- OLD name : [UNUSED] Long Fang (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=509
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 509;
--- OLD name : [UNUSED] Riverpaw Hunter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=516
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 516;
--- OLD name : [UNUSED] Savar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=535
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 535;
--- OLD name : [UNUSED] Rhal'Del (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=536
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 536;
--- OLD name : [UNUSED] Buk'Cha (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=538
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 538;
--- OLD subname : 兽栏管理员
--- Source : https://www.wowhead.com/wotlk/cn/npc=543
-UPDATE `creature_template_locale` SET `Title` = '宠物训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 543;
--- OLD name : 伏击者
--- Source : https://www.wowhead.com/wotlk/cn/npc=583
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚伏击者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 583;
--- OLD name : [UNUSED] Watcher Kern (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=586
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 586;
--- OLD name : [UNUSED] Defias Arsonist (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=592
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 592;
--- OLD name : 魔理莎·杜派格
--- Source : https://www.wowhead.com/wotlk/cn/npc=599
-UPDATE `creature_template_locale` SET `Name` = '玛里莎·杜派格',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 599;
--- OLD name : [UNUSED] Rabid Gina Whipple (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=610
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 610;
--- OLD subname : Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=693
-UPDATE `creature_template_locale` SET `Title` = '训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 693;
--- OLD name : 范高雷将军
--- Source : https://www.wowhead.com/wotlk/cn/npc=703
-UPDATE `creature_template_locale` SET `Name` = '范高雷中尉',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 703;
--- OLD name : 霜鬃巨魔新兵
--- Source : https://www.wowhead.com/wotlk/cn/npc=706
-UPDATE `creature_template_locale` SET `Name` = '霜鬃巨魔幼崽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 706;
--- OLD name : 壮实的石腭穴居人
--- Source : https://www.wowhead.com/wotlk/cn/npc=724
-UPDATE `creature_template_locale` SET `Name` = '壮实的石腭怪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 724;
--- OLD name : 龙人长者
--- Source : https://www.wowhead.com/wotlk/cn/npc=746
-UPDATE `creature_template_locale` SET `Name` = '刃鳞龙人长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 746;
--- OLD name : [UNUSED] Rebel Soldier (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=753
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 753;
--- OLD name : 反叛军哨兵
--- Source : https://www.wowhead.com/wotlk/cn/npc=754
-UPDATE `creature_template_locale` SET `Name` = '叛军哨兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 754;
--- OLD subname : 弓箭商
--- Source : https://www.wowhead.com/wotlk/cn/npc=789
-UPDATE `creature_template_locale` SET `Title` = '造箭师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 789;
--- OLD name : 自由的飓风
--- Source : https://www.wowhead.com/wotlk/cn/npc=832
-UPDATE `creature_template_locale` SET `Name` = '尘魔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 832;
--- OLD name : Harl Cutter, subname : Woodcrafting Supplies
--- Source : https://www.wowhead.com/wotlk/cn/npc=841
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 841;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (841, 'zhCN','哈尔·卡特','木工物资供应商',0);
--- OLD name : 悲伤沼泽织网蛛
--- Source : https://www.wowhead.com/wotlk/cn/npc=858
-UPDATE `creature_template_locale` SET `Name` = '沼泽纺丝蛛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 858;
--- OLD name : [UNUSED] Lesser Arachnid (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=924
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 924;
--- OLD name : 艾瑞克·都德斯三世
--- Source : https://www.wowhead.com/wotlk/cn/npc=996
-UPDATE `creature_template_locale` SET `Name` = '高级裁缝',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 996;
--- OLD name : Unkillable Test Dummy, subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=1000
-UPDATE `creature_template_locale` SET `Name` = '守夜人布洛伯格',`Title` = '守夜人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1000;
--- OLD name : 野蛮的安纳希克, subname : 劈颅部族酋长
--- Source : https://www.wowhead.com/wotlk/cn/npc=1059
-UPDATE `creature_template_locale` SET `Name` = '残忍的安纳希克',`Title` = '碎颅酋长',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1059;
--- OLD subname : 劈颅部族巫医
--- Source : https://www.wowhead.com/wotlk/cn/npc=1060
-UPDATE `creature_template_locale` SET `Title` = '碎颅部族巫医',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1060;
--- OLD name : 翡翠龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=1063
-UPDATE `creature_template_locale` SET `Name` = '玉龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1063;
--- OLD name : 坚毅者长须
--- Source : https://www.wowhead.com/wotlk/cn/npc=1071
-UPDATE `creature_template_locale` SET `Name` = '布莱德·长须',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1071;
--- OLD name : 锤脊
--- Source : https://www.wowhead.com/wotlk/cn/npc=1119
-UPDATE `creature_template_locale` SET `Name` = '雪盲石腭怪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1119;
--- OLD name : 黑熊
--- Source : https://www.wowhead.com/wotlk/cn/npc=1186
-UPDATE `creature_template_locale` SET `Name` = '老黑熊',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1186;
--- OLD name : 老黑炭
--- Source : https://www.wowhead.com/wotlk/cn/npc=1225
-UPDATE `creature_template_locale` SET `Name` = '奥尔苏迪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1225;
--- OLD subname : 弓箭商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=1298
-UPDATE `creature_template_locale` SET `Title` = '弓箭商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1298;
--- OLD name : 劳伦斯·瑟尼德
--- Source : https://www.wowhead.com/wotlk/cn/npc=1300
-UPDATE `creature_template_locale` SET `Name` = '劳伦斯·斯涅德',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1300;
--- OLD name : 巡山人雷矛
--- Source : https://www.wowhead.com/wotlk/cn/npc=1343
-UPDATE `creature_template_locale` SET `Name` = '巡山人卡尔·雷矛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1343;
--- OLD name : [UNUSED] Kern the Enforcer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=1361
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 1361;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=1382
-UPDATE `creature_template_locale` SET `Title` = '高级厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1382;
--- OLD name : 卡布
--- Source : https://www.wowhead.com/wotlk/cn/npc=1425
-UPDATE `creature_template_locale` SET `Name` = '格瑞兹拉克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1425;
--- OLD name : 雷玛·施涅德
--- Source : https://www.wowhead.com/wotlk/cn/npc=1428
-UPDATE `creature_template_locale` SET `Name` = '雷玛·斯涅德',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1428;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=1430
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1430;
--- OLD subname : Fletching Supplies
--- Source : https://www.wowhead.com/wotlk/cn/npc=1455
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 1455;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (1455, 'zhCN',NULL,'造箭师',0);
--- OLD subname : 弓箭商
--- Source : https://www.wowhead.com/wotlk/cn/npc=1462
-UPDATE `creature_template_locale` SET `Title` = '造箭师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1462;
--- OLD name : 切割者摩卡什
--- Source : https://www.wowhead.com/wotlk/cn/npc=1493
-UPDATE `creature_template_locale` SET `Name` = '摩卡什',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1493;
--- OLD name : 无脑的食尸鬼
--- Source : https://www.wowhead.com/wotlk/cn/npc=1502
-UPDATE `creature_template_locale` SET `Name` = '丑陋的僵尸',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1502;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=1518
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1518;
--- OLD name : 送葬者摩尔多
--- Source : https://www.wowhead.com/wotlk/cn/npc=1568
-UPDATE `creature_template_locale` SET `Name` = '管理员摩尔多',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1568;
--- OLD name : Slim's Test Rogue
--- Source : https://www.wowhead.com/wotlk/cn/npc=1601
-UPDATE `creature_template_locale` SET `Name` = 'Rogue 40',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1601;
--- OLD name : [UNUSED] Elwynn Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=1643
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 1643;
--- OLD name : [UNUSED] Redridge Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=1644
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 1644;
--- OLD subname : Cook
--- Source : https://www.wowhead.com/wotlk/cn/npc=1677
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1677;
--- OLD name : 囚徒
--- Source : https://www.wowhead.com/wotlk/cn/npc=1706
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚囚徒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1706;
--- OLD name : 罪犯
--- Source : https://www.wowhead.com/wotlk/cn/npc=1711
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚罪犯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1711;
--- OLD name : 叛军
--- Source : https://www.wowhead.com/wotlk/cn/npc=1715
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚叛军',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1715;
--- OLD name : 亡灵卫兵莫里斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=1745
-UPDATE `creature_template_locale` SET `Name` = '亡灵卫兵莫瑞斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1745;
--- OLD name : 疯狂的座狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=1766
-UPDATE `creature_template_locale` SET `Name` = '杂斑座狼',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1766;
--- OLD name : 掠网阔步蛛
--- Source : https://www.wowhead.com/wotlk/cn/npc=1780
-UPDATE `creature_template_locale` SET `Name` = '苔藓阔步者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1780;
--- OLD name : 掠网潜伏者
--- Source : https://www.wowhead.com/wotlk/cn/npc=1781
-UPDATE `creature_template_locale` SET `Name` = '迷雾爬行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1781;
--- OLD name : 疯狂的巨熊
--- Source : https://www.wowhead.com/wotlk/cn/npc=1797
-UPDATE `creature_template_locale` SET `Name` = '巨型灰斑熊',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1797;
--- OLD name : 天灾秃鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=1811
-UPDATE `creature_template_locale` SET `Name` = '瘟疫秃鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1811;
--- OLD name : 天灾潜伏者
--- Source : https://www.wowhead.com/wotlk/cn/npc=1824
-UPDATE `creature_template_locale` SET `Name` = '瘟疫潜伏者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1824;
--- OLD name : 安伯米尔卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=1888
-UPDATE `creature_template_locale` SET `Name` = '达拉然卫士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1888;
--- OLD name : 安伯米尔巫师
--- Source : https://www.wowhead.com/wotlk/cn/npc=1889
-UPDATE `creature_template_locale` SET `Name` = '达拉然巫师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1889;
--- OLD name : 安伯米尔保卫者
--- Source : https://www.wowhead.com/wotlk/cn/npc=1912
-UPDATE `creature_template_locale` SET `Name` = '达拉然保卫者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1912;
--- OLD name : 安伯米尔守卫
--- Source : https://www.wowhead.com/wotlk/cn/npc=1913
-UPDATE `creature_template_locale` SET `Name` = '达拉然守卫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1913;
--- OLD name : 安伯米尔魔导师
--- Source : https://www.wowhead.com/wotlk/cn/npc=1914
-UPDATE `creature_template_locale` SET `Name` = '达拉然法师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1914;
--- OLD name : 安伯米尔咒术师
--- Source : https://www.wowhead.com/wotlk/cn/npc=1915
-UPDATE `creature_template_locale` SET `Name` = '达拉然咒术师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1915;
--- OLD name : 安伯米尔书记员
--- Source : https://www.wowhead.com/wotlk/cn/npc=1920
-UPDATE `creature_template_locale` SET `Name` = '达拉然书记员',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1920;
--- OLD subname : Immune to Fire
--- Source : https://www.wowhead.com/wotlk/cn/npc=1925
-UPDATE `creature_template_locale` SET `Title` = '对火焰免疫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1925;
--- OLD subname : Immune to Frost
--- Source : https://www.wowhead.com/wotlk/cn/npc=1926
-UPDATE `creature_template_locale` SET `Title` = '对冰霜免疫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1926;
--- OLD subname : Immune to Holy
--- Source : https://www.wowhead.com/wotlk/cn/npc=1927
-UPDATE `creature_template_locale` SET `Title` = '对神圣免疫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1927;
--- OLD subname : Immune to Shadow
--- Source : https://www.wowhead.com/wotlk/cn/npc=1928
-UPDATE `creature_template_locale` SET `Title` = '对暗影免疫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1928;
--- OLD subname : Immune to Nature
--- Source : https://www.wowhead.com/wotlk/cn/npc=1929
-UPDATE `creature_template_locale` SET `Title` = '对自然免疫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1929;
--- OLD subname : Immune to Physical
--- Source : https://www.wowhead.com/wotlk/cn/npc=1930
-UPDATE `creature_template_locale` SET `Title` = '对物理免疫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1930;
--- OLD name : 被俘虏的血色狂热者
--- Source : https://www.wowhead.com/wotlk/cn/npc=1931
-UPDATE `creature_template_locale` SET `Name` = '血色十字军俘虏',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1931;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=1937
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1937;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=2055
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2055;
--- OLD name : 伊尔萨莱恩
--- Source : https://www.wowhead.com/wotlk/cn/npc=2079
-UPDATE `creature_template_locale` SET `Name` = '管理员伊尔萨莱恩',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2079;
--- OLD name : 被诅咒的上层精灵
--- Source : https://www.wowhead.com/wotlk/cn/npc=2176
-UPDATE `creature_template_locale` SET `Name` = '被诅咒的贵族',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2176;
--- OLD name : 痛苦的上层精灵
--- Source : https://www.wowhead.com/wotlk/cn/npc=2177
-UPDATE `creature_template_locale` SET `Name` = '挣扎的贵族',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2177;
--- OLD name : 哀嚎的上层精灵鬼魂
--- Source : https://www.wowhead.com/wotlk/cn/npc=2178
-UPDATE `creature_template_locale` SET `Name` = '哀嚎的贵族',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2178;
--- OLD name : [UNUSED] Crier Kirton (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2197
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2197;
--- OLD name : [UNUSED] Crier Backus (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2199
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2199;
--- OLD name : [UNUSED] Crier Pierce (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2200
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2200;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=2216
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2216;
--- OLD subname : Blacksmith Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=2220
-UPDATE `creature_template_locale` SET `Title` = '锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2220;
--- OLD subname : Cooking Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=2223
-UPDATE `creature_template_locale` SET `Title` = '烹饪训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2223;
--- OLD name : 玛格拉克
--- Source : https://www.wowhead.com/wotlk/cn/npc=2258
-UPDATE `creature_template_locale` SET `Name` = '狂怒的石元素',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2258;
--- OLD name : 辛迪加盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=2260
-UPDATE `creature_template_locale` SET `Name` = '辛迪加潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2260;
--- OLD name : 琳妮·羽歌
--- Source : https://www.wowhead.com/wotlk/cn/npc=2303
-UPDATE `creature_template_locale` SET `Name` = '琳妮·梅',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2303;
--- OLD name : [UNUSED] Kir'Nazz (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2313
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2313;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=2326
-UPDATE `creature_template_locale` SET `Title` = '医师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2326;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=2329
-UPDATE `creature_template_locale` SET `Title` = '医师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2329;
--- OLD name : 被驯养的食苔蛛
--- Source : https://www.wowhead.com/wotlk/cn/npc=2349
-UPDATE `creature_template_locale` SET `Name` = '巨型食苔蛛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2349;
--- OLD name : 森林爬行者
--- Source : https://www.wowhead.com/wotlk/cn/npc=2350
-UPDATE `creature_template_locale` SET `Name` = '森林食苔蛛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2350;
--- OLD name : 凋零灰熊
--- Source : https://www.wowhead.com/wotlk/cn/npc=2351
-UPDATE `creature_template_locale` SET `Name` = '灰熊',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2351;
--- OLD name : 丘陵猎手
--- Source : https://www.wowhead.com/wotlk/cn/npc=2385
-UPDATE `creature_template_locale` SET `Name` = '野生山地狮',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2385;
--- OLD name : 联盟卫兵
--- Source : https://www.wowhead.com/wotlk/cn/npc=2386
-UPDATE `creature_template_locale` SET `Name` = '南海镇卫兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2386;
--- OLD name : 格什哈尔迪
--- Source : https://www.wowhead.com/wotlk/cn/npc=2476
-UPDATE `creature_template_locale` SET `Name` = '大型洛克鳄',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2476;
--- OLD name : 舰队指挥官卡拉·海角
--- Source : https://www.wowhead.com/wotlk/cn/npc=2487
-UPDATE `creature_template_locale` SET `Name` = '舰队指挥官海角',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2487;
--- OLD name : “海狼”马克基雷
--- Source : https://www.wowhead.com/wotlk/cn/npc=2501
-UPDATE `creature_template_locale` SET `Name` = '"海狼"马克基雷',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2501;
--- OLD name : “病鬼”菲利普
--- Source : https://www.wowhead.com/wotlk/cn/npc=2502
-UPDATE `creature_template_locale` SET `Name` = '"病鬼"菲利普',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2502;
--- OLD subname : 赞吉尔的使节
--- Source : https://www.wowhead.com/wotlk/cn/npc=2530
-UPDATE `creature_template_locale` SET `Title` = '暗矛部族人质',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2530;
--- OLD name : 杜内的爪牙
--- Source : https://www.wowhead.com/wotlk/cn/npc=2531
-UPDATE `creature_template_locale` SET `Name` = '莫甘斯的爪牙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2531;
--- OLD name : “畸形足”玛雷·维尔金斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=2535
-UPDATE `creature_template_locale` SET `Name` = '"畸形足"玛雷·维尔金斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2535;
--- OLD name : 安伯米尔毒蛇
--- Source : https://www.wowhead.com/wotlk/cn/npc=2540
-UPDATE `creature_template_locale` SET `Name` = '达拉然毒蛇',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2540;
--- OLD name : 激流堡士兵
--- Source : https://www.wowhead.com/wotlk/cn/npc=2585
-UPDATE `creature_template_locale` SET `Name` = '激流堡仲裁者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2585;
--- OLD subname : Shadow Council Warlock
--- Source : https://www.wowhead.com/wotlk/cn/npc=2598
-UPDATE `creature_template_locale` SET `Title` = '暗影议会术士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2598;
--- OLD name : [UNUSED] Archmage Detrae (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2617
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2617;
--- OLD name : Port Master Szik, subname : Boat Vendor
--- Source : https://www.wowhead.com/wotlk/cn/npc=2662
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2662;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (2662, 'zhCN','码头管理员斯奇克','船商',0);
--- OLD name : 弗拉德·飞轮
--- Source : https://www.wowhead.com/wotlk/cn/npc=2682
-UPDATE `creature_template_locale` SET `Name` = '弗拉德',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2682;
--- OLD subname : 远古巨石卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=2748
-UPDATE `creature_template_locale` SET `Title` = '远古石卫士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2748;
--- OLD name : 路障
--- Source : https://www.wowhead.com/wotlk/cn/npc=2749
-UPDATE `creature_template_locale` SET `Name` = '攻城傀儡',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2749;
--- OLD name : 麦格尼·铜须国王, subname : 铁炉堡之王
--- Source : https://www.wowhead.com/wotlk/cn/npc=2784
-UPDATE `creature_template_locale` SET `Name` = '国王麦格尼·铜须',`Title` = '铁炉堡国王',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2784;
--- OLD name : “巧手”雷尼·麦考伊
--- Source : https://www.wowhead.com/wotlk/cn/npc=2795
-UPDATE `creature_template_locale` SET `Name` = '"巧手"雷尼·麦考伊',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2795;
--- OLD subname : 杂货供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=2808
-UPDATE `creature_template_locale` SET `Title` = '杂货商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2808;
--- OLD name : 口渴的兀鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=2830
-UPDATE `creature_template_locale` SET `Name` = '秃鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2830;
--- OLD name : [PH] Tallstrider Trainer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2871
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2871;
--- OLD name : [PH] Raptor Trainer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2873
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2873;
--- OLD name : [PH] Horse Trainer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2874
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2874;
--- OLD name : [PH] Gorilla Trainer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2875
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2875;
--- OLD subname : Crocilisk Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=2876
-UPDATE `creature_template_locale` SET `Title` = '鳄鱼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2876;
--- OLD name : [PH] Crawler Trainer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=2877
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2877;
--- OLD subname : Ranged Skills Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=2886
-UPDATE `creature_template_locale` SET `Title` = '远程武器训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2886;
--- OLD name : 首席考古学家杜瑟·灰胡
--- Source : https://www.wowhead.com/wotlk/cn/npc=2912
-UPDATE `creature_template_locale` SET `Name` = '首席考古学家杜瑟·灰须',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2912;
--- OLD name : 勘察员雷塔维
--- Source : https://www.wowhead.com/wotlk/cn/npc=2917
-UPDATE `creature_template_locale` SET `Name` = '勘察员雷姆塔维尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2917;
--- OLD subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=2935
-UPDATE `creature_template_locale` SET `Title` = '恶魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2935;
--- OLD subname : Bear Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=2938
-UPDATE `creature_template_locale` SET `Title` = '野熊训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2938;
--- OLD name : Jackson Bayne, subname : Boar Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=2939
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 2939;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (2939, 'zhCN','杰克逊·贝恩','野猪训练师',0);
--- OLD subname : Wolf Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=2942
-UPDATE `creature_template_locale` SET `Title` = '狼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2942;
--- OLD name : 刺背入侵者
--- Source : https://www.wowhead.com/wotlk/cn/npc=2952
-UPDATE `creature_template_locale` SET `Name` = '刺背野猪人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2952;
--- OLD name : 年幼的斗猪
--- Source : https://www.wowhead.com/wotlk/cn/npc=2966
-UPDATE `creature_template_locale` SET `Name` = '斗猪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2966;
--- OLD subname : 裁缝供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=3005
-UPDATE `creature_template_locale` SET `Title` = '制皮和裁缝供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3005;
--- OLD subname : 制皮供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=3008
-UPDATE `creature_template_locale` SET `Title` = '初级制皮师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3008;
--- OLD name : 泰戈·晨行者
--- Source : https://www.wowhead.com/wotlk/cn/npc=3011
-UPDATE `creature_template_locale` SET `Name` = '泰戈·黎明行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3011;
--- OLD name : 霍高尔·雷蹄
--- Source : https://www.wowhead.com/wotlk/cn/npc=3018
-UPDATE `creature_template_locale` SET `Name` = '霍高尔·雷角',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3018;
--- OLD name : 德尔贡·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=3019
-UPDATE `creature_template_locale` SET `Name` = '德尔贡·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3019;
--- OLD name : 伊图·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=3020
-UPDATE `creature_template_locale` SET `Name` = '伊图·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3020;
--- OLD name : 卡德·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=3021
-UPDATE `creature_template_locale` SET `Name` = '卡德·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3021;
--- OLD name : 苏恩·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=3022
-UPDATE `creature_template_locale` SET `Name` = '苏恩·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3022;
--- OLD name : 托姆·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=3041
-UPDATE `creature_template_locale` SET `Name` = '托姆·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3041;
--- OLD name : 萨尔克·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=3042
-UPDATE `creature_template_locale` SET `Name` = '萨尔克·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3042;
--- OLD name : 科尔·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=3043
-UPDATE `creature_template_locale` SET `Name` = '科尔·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3043;
--- OLD name : 扎尔曼·双月
--- Source : https://www.wowhead.com/wotlk/cn/npc=3054
-UPDATE `creature_template_locale` SET `Name` = '扎尔曼-双月',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3054;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=3067
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3067;
--- OLD subname : 中级炼金师
--- Source : https://www.wowhead.com/wotlk/cn/npc=3070
-UPDATE `creature_template_locale` SET `Title` = '炼金师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3070;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=3071
-UPDATE `creature_template_locale` SET `Title` = '采药人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3071;
--- OLD name : 海浪蟹
--- Source : https://www.wowhead.com/wotlk/cn/npc=3106
-UPDATE `creature_template_locale` SET `Name` = '小海浪蟹',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3106;
--- OLD name : 成熟海浪蟹
--- Source : https://www.wowhead.com/wotlk/cn/npc=3107
-UPDATE `creature_template_locale` SET `Name` = '海浪蟹',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3107;
--- OLD subname : 舵手 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=3151
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3151;
--- OLD subname : 舵手
--- Source : https://www.wowhead.com/wotlk/cn/npc=3152
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3152;
--- OLD name : Scott Mercer
--- Source : https://www.wowhead.com/wotlk/cn/npc=3201
-UPDATE `creature_template_locale` SET `Name` = 'SM Test Mob',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3201;
--- OLD name : 费滋尔·黑爪
--- Source : https://www.wowhead.com/wotlk/cn/npc=3203
-UPDATE `creature_template_locale` SET `Name` = '费索·暗雷',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3203;
--- OLD name : 尖叫者刺鬃
--- Source : https://www.wowhead.com/wotlk/cn/npc=3229
-UPDATE `creature_template_locale` SET `Name` = '尖叫者索恩曼图',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3229;
--- OLD name : 钢鬃掠夺者
--- Source : https://www.wowhead.com/wotlk/cn/npc=3267
-UPDATE `creature_template_locale` SET `Name` = '钢鬃寻水者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3267;
--- OLD name : 淤泥畸体
--- Source : https://www.wowhead.com/wotlk/cn/npc=3295
-UPDATE `creature_template_locale` SET `Name` = '淤泥兽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3295;
--- OLD subname : 布甲商
--- Source : https://www.wowhead.com/wotlk/cn/npc=3317
-UPDATE `creature_template_locale` SET `Title` = '轻甲商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3317;
--- OLD subname : 弓箭和枪械商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=3322
-UPDATE `creature_template_locale` SET `Title` = '枪械和弹药商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3322;
--- OLD subname : 材料与毒药
--- Source : https://www.wowhead.com/wotlk/cn/npc=3405
-UPDATE `creature_template_locale` SET `Title` = '草药学供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3405;
--- OLD name : 双辫将军
--- Source : https://www.wowhead.com/wotlk/cn/npc=3414
-UPDATE `creature_template_locale` SET `Name` = '塔文布莱德将军',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3414;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=3419
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3419;
--- OLD subname : 独立承包人
--- Source : https://www.wowhead.com/wotlk/cn/npc=3442
-UPDATE `creature_template_locale` SET `Title` = '工匠协会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3442;
--- OLD name : 老艾玛
--- Source : https://www.wowhead.com/wotlk/cn/npc=3520
-UPDATE `creature_template_locale` SET `Name` = '艾玛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3520;
--- OLD name : 安伯米尔酿酒师
--- Source : https://www.wowhead.com/wotlk/cn/npc=3577
-UPDATE `creature_template_locale` SET `Name` = '达拉然酿酒师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3577;
--- OLD name : 安伯米尔矿工
--- Source : https://www.wowhead.com/wotlk/cn/npc=3578
-UPDATE `creature_template_locale` SET `Name` = '达拉然矿工',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3578;
--- OLD name : [UNUSED] Kolkar Observer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=3651
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 3651;
--- OLD name : 安娜雅·晨行者
--- Source : https://www.wowhead.com/wotlk/cn/npc=3667
-UPDATE `creature_template_locale` SET `Name` = '安娜雅·晨路',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3667;
--- OLD name : 被折磨的上层精灵的灵魂
--- Source : https://www.wowhead.com/wotlk/cn/npc=3668
-UPDATE `creature_template_locale` SET `Name` = '被折磨的贵族精灵的灵魂',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3668;
--- OLD name : 穆约
--- Source : https://www.wowhead.com/wotlk/cn/npc=3678
-UPDATE `creature_template_locale` SET `Name` = '纳拉雷克斯的信徒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3678;
--- OLD name : Kyln Longclaw, subname : Boar Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=3697
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 3697;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (3697, 'zhCN','凯林·长爪','野猪训练师',0);
--- OLD subname : Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=3698
-UPDATE `creature_template_locale` SET `Title` = '宠物训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3698;
--- OLD subname : Cat Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=3699
-UPDATE `creature_template_locale` SET `Title` = '豹训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3699;
--- OLD name : 兽人监工
--- Source : https://www.wowhead.com/wotlk/cn/npc=3734
-UPDATE `creature_template_locale` SET `Name` = '亡灵暴徒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3734;
--- OLD name : 萨维亚盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=3752
-UPDATE `creature_template_locale` SET `Name` = '萨维亚潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3752;
--- OLD name : 魔草盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=3759
-UPDATE `creature_template_locale` SET `Name` = '魔草潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3759;
--- OLD name : 被烧焦的沼泽兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=3780
-UPDATE `creature_template_locale` SET `Name` = '食苔沼泽兽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3780;
--- OLD name : 特尔迪娜·月羽
--- Source : https://www.wowhead.com/wotlk/cn/npc=3841
-UPDATE `creature_template_locale` SET `Name` = '凯莱斯·月羽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3841;
--- OLD name : 痛苦的军官
--- Source : https://www.wowhead.com/wotlk/cn/npc=3873
-UPDATE `creature_template_locale` SET `Name` = '痛苦的文官',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3873;
--- OLD name : 珍奈·羽风
--- Source : https://www.wowhead.com/wotlk/cn/npc=3957
-UPDATE `creature_template_locale` SET `Name` = '詹奈·轻羽微风',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3957;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=3966
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3966;
--- OLD subname : 毒药商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=3969
-UPDATE `creature_template_locale` SET `Title` = '工具和补给品',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3969;
--- OLD name : 风险投资公司顽徒
--- Source : https://www.wowhead.com/wotlk/cn/npc=3992
-UPDATE `creature_template_locale` SET `Name` = '风险投资公司工程师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3992;
--- OLD name : 堕落的腐蚀兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=4021
-UPDATE `creature_template_locale` SET `Name` = '腐蚀性的腐蚀兽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4021;
--- OLD name : JEFF CHOW TEST
--- Source : https://www.wowhead.com/wotlk/cn/npc=4045
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4045;
--- OLD name : 玛加萨·恐怖图腾, subname : 巫婆长老
--- Source : https://www.wowhead.com/wotlk/cn/npc=4046
-UPDATE `creature_template_locale` SET `Name` = '玛加萨·野性图腾',`Title` = '长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4046;
--- OLD name : 尖啸的鹰身人
--- Source : https://www.wowhead.com/wotlk/cn/npc=4100
-UPDATE `creature_template_locale` SET `Name` = '尖啸鹰身人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4100;
--- OLD name : 尖啸的游荡者
--- Source : https://www.wowhead.com/wotlk/cn/npc=4101
-UPDATE `creature_template_locale` SET `Name` = '尖啸游荡者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4101;
--- OLD name : 克尔克斯克
--- Source : https://www.wowhead.com/wotlk/cn/npc=4132
-UPDATE `creature_template_locale` SET `Name` = '异种破坏者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4132;
--- OLD subname : Foraging Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4149
-UPDATE `creature_template_locale` SET `Title` = '食物搜寻训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4149;
--- OLD subname : Cat Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4153
-UPDATE `creature_template_locale` SET `Title` = '豹训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4153;
--- OLD name : zzOLDKitari Farseeker, subname : Cartography Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4157
-UPDATE `creature_template_locale` SET `Name` = '基塔利',`Title` = '制图训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4157;
--- OLD name : 埃莉萨·杜马斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=4165
-UPDATE `creature_template_locale` SET `Name` = '埃莉萨',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4165;
--- OLD name : Siannai, subname : Arrow Merchant
--- Source : https://www.wowhead.com/wotlk/cn/npc=4174
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 4174;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (4174, 'zhCN','希亚奈恩','弓箭商',0);
--- OLD name : 莎尔蒂
--- Source : https://www.wowhead.com/wotlk/cn/npc=4185
-UPDATE `creature_template_locale` SET `Name` = '沙尔迪恩',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4185;
--- OLD name : 玛芙琳
--- Source : https://www.wowhead.com/wotlk/cn/npc=4186
-UPDATE `creature_template_locale` SET `Name` = '马弗拉林',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4186;
--- OLD subname : Bear Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4206
-UPDATE `creature_template_locale` SET `Title` = '野熊训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4206;
--- OLD subname : Wolf Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4207
-UPDATE `creature_template_locale` SET `Title` = '狼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4207;
--- OLD name : Talegon, subname : Cartography Supplies
--- Source : https://www.wowhead.com/wotlk/cn/npc=4224
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 4224;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (4224, 'zhCN','塔雷贡','制图供应商',0);
--- OLD name : 灰狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=4268
-UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（灰色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4268;
--- OLD name : 栗色马
--- Source : https://www.wowhead.com/wotlk/cn/npc=4269
-UPDATE `creature_template_locale` SET `Name` = '骑乘用马（栗色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4269;
--- OLD name : 赤狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=4270
-UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（红色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4270;
--- OLD name : 恐狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=4271
-UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（暗灰色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4271;
--- OLD name : 棕狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=4272
-UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（暗棕色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4272;
--- OLD name : 高尔姆·恐怖图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=4309
-UPDATE `creature_template_locale` SET `Name` = '高尔姆·野性图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4309;
--- OLD name : 考尔·恐怖图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=4310
-UPDATE `creature_template_locale` SET `Name` = '考尔·野性图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4310;
--- OLD name : [UNUSED] [PH] Ambassador Saylaton Gravehoof (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=4313
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 4313;
--- OLD name : Wazza, subname : Totem Merchent
--- Source : https://www.wowhead.com/wotlk/cn/npc=4443
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 4443;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (4443, 'zhCN','瓦萨','图腾商人',0);
--- OLD name : 黑腮寒冰召唤者
--- Source : https://www.wowhead.com/wotlk/cn/npc=4460
-UPDATE `creature_template_locale` SET `Name` = '黑腮首领',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4460;
--- OLD name : 莫雷·贝茨
--- Source : https://www.wowhead.com/wotlk/cn/npc=4571
-UPDATE `creature_template_locale` SET `Name` = '莫雷·巴特斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4571;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=4578
-UPDATE `creature_template_locale` SET `Title` = '大师级暗纹裁缝',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4578;
--- OLD subname : Cartography Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4579
-UPDATE `creature_template_locale` SET `Title` = '制图训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4579;
--- OLD subname : Raptor Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4621
-UPDATE `creature_template_locale` SET `Title` = '迅猛龙训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4621;
--- OLD name : 怨怒盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=4670
-UPDATE `creature_template_locale` SET `Name` = '怨怒潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4670;
--- OLD name : 拉乌·峭壁信使
--- Source : https://www.wowhead.com/wotlk/cn/npc=4722
-UPDATE `creature_template_locale` SET `Name` = '劳恩·峭壁行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4722;
--- OLD name : 霜山羊
--- Source : https://www.wowhead.com/wotlk/cn/npc=4778
-UPDATE `creature_template_locale` SET `Name` = '骑乘用山羊（蓝色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4778;
--- OLD name : 黑山羊
--- Source : https://www.wowhead.com/wotlk/cn/npc=4780
-UPDATE `creature_template_locale` SET `Name` = '骑乘用山羊（黑色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4780;
--- OLD name : 斥候塞尔瑞德, subname : The Argent Dawn
--- Source : https://www.wowhead.com/wotlk/cn/npc=4787
-UPDATE `creature_template_locale` SET `Name` = '银月守卫塞尔瑞德',`Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4787;
--- OLD name : “沼泽之眼”加尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=4792
-UPDATE `creature_template_locale` SET `Name` = '"沼泽之眼"加尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4792;
--- OLD name : 暮光领主克尔里斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=4832
-UPDATE `creature_template_locale` SET `Name` = '梦游者克尔里斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4832;
--- OLD subname : Turtle Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4881
-UPDATE `creature_template_locale` SET `Title` = '海龟训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4881;
--- OLD subname : 护甲和武器供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=4886
-UPDATE `creature_template_locale` SET `Title` = '护甲和盾牌供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4886;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=4888
-UPDATE `creature_template_locale` SET `Title` = '武器锻造师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4888;
--- OLD subname : 猎人训练师兼弓箭商
--- Source : https://www.wowhead.com/wotlk/cn/npc=4892
-UPDATE `creature_template_locale` SET `Title` = '弓箭商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4892;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=4894
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4894;
--- OLD subname : 杂货和材料商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=4896
-UPDATE `creature_template_locale` SET `Title` = '杂货商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4896;
--- OLD name : 塞拉摩训练假人
--- Source : https://www.wowhead.com/wotlk/cn/npc=4952
-UPDATE `creature_template_locale` SET `Name` = '塞拉摩训练假人 1',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4952;
--- OLD name : 水蛇
--- Source : https://www.wowhead.com/wotlk/cn/npc=4953
-UPDATE `creature_template_locale` SET `Name` = '噬鱼蛇',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4953;
--- OLD name : 塞拉摩训练假人
--- Source : https://www.wowhead.com/wotlk/cn/npc=4957
-UPDATE `creature_template_locale` SET `Name` = '塞拉摩训练假人 4',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4957;
--- OLD name : “干柴”塔伯克·贾恩
--- Source : https://www.wowhead.com/wotlk/cn/npc=4962
-UPDATE `creature_template_locale` SET `Name` = '"干柴"塔伯克·贾恩',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4962;
--- OLD subname : Wolf Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=4994
-UPDATE `creature_template_locale` SET `Title` = '狼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4994;
--- OLD subname : Bird Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5001
-UPDATE `creature_template_locale` SET `Title` = '猛禽训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5001;
--- OLD subname : Boar Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5002
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5002;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (5002, 'zhCN',NULL,'野猪训练师',0);
--- OLD subname : Cat Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5003
-UPDATE `creature_template_locale` SET `Title` = '豹训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5003;
--- OLD subname : Crawler Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5004
-UPDATE `creature_template_locale` SET `Title` = '螃蟹训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5004;
--- OLD subname : Crocodile Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5005
-UPDATE `creature_template_locale` SET `Title` = '鳄鱼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5005;
--- OLD name : World Demon Trainer - old, subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=5006
-UPDATE `creature_template_locale` SET `Name` = 'World Demon Trainer',`Title` = '恶魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5006;
--- OLD subname : Gorilla Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5008
-UPDATE `creature_template_locale` SET `Title` = '猩猩训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5008;
--- OLD subname : Horse Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5009
-UPDATE `creature_template_locale` SET `Title` = '马训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5009;
--- OLD subname : Raptor Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5011
-UPDATE `creature_template_locale` SET `Title` = '迅猛龙训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5011;
--- OLD subname : Scorpid Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5012
-UPDATE `creature_template_locale` SET `Title` = '蝎子训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5012;
--- OLD subname : Spider Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5013
-UPDATE `creature_template_locale` SET `Title` = '蜘蛛训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5013;
--- OLD subname : Tallstrider Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5015
-UPDATE `creature_template_locale` SET `Title` = '陆行鸟训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5015;
--- OLD subname : Turtle Pet Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5017
-UPDATE `creature_template_locale` SET `Title` = '海龟训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5017;
--- OLD subname : Horse Riding Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5026
-UPDATE `creature_template_locale` SET `Title` = '马骑术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5026;
--- OLD subname : Lockpicking Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5027
-UPDATE `creature_template_locale` SET `Title` = '开锁训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5027;
--- OLD subname : Survival Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5029
-UPDATE `creature_template_locale` SET `Title` = '生存技能训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5029;
--- OLD subname : Tiger Riding Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5030
-UPDATE `creature_template_locale` SET `Title` = '豹骑术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5030;
--- OLD subname : Brewing Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5034
-UPDATE `creature_template_locale` SET `Title` = '酿酒训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5034;
--- OLD subname : Cartography Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5035
-UPDATE `creature_template_locale` SET `Title` = '制图训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5035;
--- OLD subname : 术士训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=5039
-UPDATE `creature_template_locale` SET `Title` = '追踪训练商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5039;
--- OLD name : 暴徒
--- Source : https://www.wowhead.com/wotlk/cn/npc=5043
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚暴徒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5043;
--- OLD subname : 公会徽章设计师
--- Source : https://www.wowhead.com/wotlk/cn/npc=5047
-UPDATE `creature_template_locale` SET `Title` = '公会徽章商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5047;
--- OLD name : World Guild Tabard Vendor
--- Source : https://www.wowhead.com/wotlk/cn/npc=5061
-UPDATE `creature_template_locale` SET `Name` = 'World Guild Tabbard Vendor',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5061;
--- OLD name : 出纳员兰德里
--- Source : https://www.wowhead.com/wotlk/cn/npc=5083
-UPDATE `creature_template_locale` SET `Name` = '书记员伦德瑞',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5083;
--- OLD subname : Gun Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5104
-UPDATE `creature_template_locale` SET `Title` = '枪械训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5104;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=5164
-UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5164;
--- OLD subname : 战袍商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=5191
-UPDATE `creature_template_locale` SET `Title` = '公会徽章商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5191;
--- OLD subname : 战袍商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=5192
-UPDATE `creature_template_locale` SET `Title` = '公会徽章商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5192;
--- OLD name : 极地座狼
--- Source : https://www.wowhead.com/wotlk/cn/npc=5198
-UPDATE `creature_template_locale` SET `Name` = '白毛座狼',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5198;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=5204
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5204;
--- OLD name : Jeremy's Test Monster
--- Source : https://www.wowhead.com/wotlk/cn/npc=5326
-UPDATE `creature_template_locale` SET `Name` = '海滩响钳龙虾人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5326;
--- OLD name : 因格·绒套, subname : 珠宝加工训练师兼供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=5388
-UPDATE `creature_template_locale` SET `Name` = '因格',`Title` = '探险者协会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5388;
--- OLD name : 白马
--- Source : https://www.wowhead.com/wotlk/cn/npc=5403
-UPDATE `creature_template_locale` SET `Name` = '白马坐骑',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5403;
--- OLD name : 被奴役的收割者
--- Source : https://www.wowhead.com/wotlk/cn/npc=5409
-UPDATE `creature_template_locale` SET `Name` = '工蝎群',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5409;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=5414
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5414;
--- OLD subname : Tallstrider Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=5507
-UPDATE `creature_template_locale` SET `Title` = '陆行鸟训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5507;
--- OLD name : [UNUSED] Yuriv Adhem (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5544
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5544;
--- OLD name : [PH] Mine Boss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5548
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5548;
--- OLD name : [PH] Mine Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5549
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5549;
--- OLD name : [PH] PVP Peasent (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5550
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5550;
--- OLD name : [PH] PVP Peon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5552
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5552;
--- OLD name : [PH] PVP Wildlife (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5554
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5554;
--- OLD name : [PH] Alliance Commander (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5556
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5556;
--- OLD name : [PH] Horde Commander (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5557
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5557;
--- OLD name : [PH] Alliance Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5558
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5558;
--- OLD name : [PH] Horde Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5559
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5559;
--- OLD name : [PH] Alliance Raider (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5560
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5560;
--- OLD name : [PH] Horde Raider (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5561
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5561;
--- OLD name : [PH] Alliance Archer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5562
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5562;
--- OLD name : [PH] Horde Archer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5563
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5563;
--- OLD name : [PH] Alliance Mine Boss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5587
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5587;
--- OLD name : [PH] Alliance Mine Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5588
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5588;
--- OLD name : [PH] Horde Mine Boss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5589
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5589;
--- OLD name : [PH] Horde Mine Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5590
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5590;
--- OLD name : [UNUSED] [PH] Orcish Barfly (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5604
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5604;
--- OLD name : 科马·韦拉德
--- Source : https://www.wowhead.com/wotlk/cn/npc=5683
-UPDATE `creature_template_locale` SET `Name` = '科玛·韦拉德',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5683;
--- OLD subname : 杰勒德的奴仆
--- Source : https://www.wowhead.com/wotlk/cn/npc=5697
-UPDATE `creature_template_locale` SET `Title` = '杰勒德的实验品',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5697;
--- OLD name : 耶瑟莉的地狱战马
--- Source : https://www.wowhead.com/wotlk/cn/npc=5727
-UPDATE `creature_template_locale` SET `Name` = '耶瑟莉的梦魇',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5727;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=5731
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5731;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=5732
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5732;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=5733
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5733;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=5734
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5734;
--- OLD name : [PH] Party Bot (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5801
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5801;
--- OLD name : 科提斯中士
--- Source : https://www.wowhead.com/wotlk/cn/npc=5809
-UPDATE `creature_template_locale` SET `Name` = '指挥官萨拉菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5809;
--- OLD name : “跳跃者”塔克
--- Source : https://www.wowhead.com/wotlk/cn/npc=5842
-UPDATE `creature_template_locale` SET `Name` = '"跳跃者"塔克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5842;
--- OLD subname : Far Watch Sparrer (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=5876
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5876;
--- OLD name : [UNUSED] Yar'luk, subname : Far Watch Sparrer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=5877
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 5877;
--- OLD name : 元素抵抗图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=5927
-UPDATE `creature_template_locale` SET `Name` = '抗火图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5927;
--- OLD name : 流放者阿切鲁斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=5933
-UPDATE `creature_template_locale` SET `Name` = '被流放的阿切鲁斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5933;
--- OLD name : 锐爪飞心
--- Source : https://www.wowhead.com/wotlk/cn/npc=5934
-UPDATE `creature_template_locale` SET `Name` = '哈特拉斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5934;
--- OLD name : 拾骨邪饲者
--- Source : https://www.wowhead.com/wotlk/cn/npc=5983
-UPDATE `creature_template_locale` SET `Name` = '拾骨者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5983;
--- OLD name : 魔誓仪祭师
--- Source : https://www.wowhead.com/wotlk/cn/npc=6004
-UPDATE `creature_template_locale` SET `Name` = '魔誓祭司',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6004;
--- OLD name : 条纹霜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=6074
-UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（乳白色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6074;
--- OLD name : 绿色迅猛龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=6075
-UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（绿色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6075;
--- OLD name : 亚考罗克的仆从
--- Source : https://www.wowhead.com/wotlk/cn/npc=6143
-UPDATE `creature_template_locale` SET `Name` = '阿考洛克的仆从',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6143;
--- OLD name : [UNUSED] Briton Kilras (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=6183
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 6183;
--- OLD name : 雷加什萨特
--- Source : https://www.wowhead.com/wotlk/cn/npc=6200
-UPDATE `creature_template_locale` SET `Name` = '雷加斯萨特',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6200;
--- OLD name : 雷加什盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=6201
-UPDATE `creature_template_locale` SET `Name` = '雷加斯潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6201;
--- OLD name : 雷加什唤魔者
--- Source : https://www.wowhead.com/wotlk/cn/npc=6202
-UPDATE `creature_template_locale` SET `Name` = '雷加斯唤魔者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6202;
--- OLD name : 耗子
--- Source : https://www.wowhead.com/wotlk/cn/npc=6271
-UPDATE `creature_template_locale` SET `Name` = '老鼠',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6271;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=6286
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6286;
--- OLD name : 骸骨军马
--- Source : https://www.wowhead.com/wotlk/cn/npc=6346
-UPDATE `creature_template_locale` SET `Name` = '骸骨战马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6346;
--- OLD name : 赫纳·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=6393
-UPDATE `creature_template_locale` SET `Name` = '赫纳·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6393;
--- OLD name : 鲁迦·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=6394
-UPDATE `creature_template_locale` SET `Name` = '鲁迦·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6394;
--- OLD name : 黑色骸骨军马
--- Source : https://www.wowhead.com/wotlk/cn/npc=6486
-UPDATE `creature_template_locale` SET `Name` = '骑乘用骸骨战马（黑色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6486;
--- OLD name : 勇敢的强生
--- Source : https://www.wowhead.com/wotlk/cn/npc=6626
-UPDATE `creature_template_locale` SET `Name` = '胆大的约翰森',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6626;
--- OLD name : 护门者拉格罗尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=6651
-UPDATE `creature_template_locale` SET `Name` = '拉格罗尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6651;
--- OLD name : 强生的人类形态
--- Source : https://www.wowhead.com/wotlk/cn/npc=6666
-UPDATE `creature_template_locale` SET `Name` = '约翰森的人类形态',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6666;
--- OLD subname : 宗师级盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=6707
-UPDATE `creature_template_locale` SET `Title` = '祖师级潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6707;
--- OLD name : 旅店老板贝茨
--- Source : https://www.wowhead.com/wotlk/cn/npc=6739
-UPDATE `creature_template_locale` SET `Name` = '旅店老板拜特斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6739;
--- OLD name : 艾玛
--- Source : https://www.wowhead.com/wotlk/cn/npc=6749
-UPDATE `creature_template_locale` SET `Name` = '旅店老板艾玛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6749;
--- OLD subname : 刺客联盟的宗师级盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=6767
-UPDATE `creature_template_locale` SET `Title` = '刺客联盟的祖师级潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6767;
--- OLD name : 罗瑞克·贝尔姆 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=6783
-UPDATE `creature_template_locale` SET `Name` = 'Gorgrond Smokebelcher Depot NPC Invisible Stalker "Our Gun''s Bigger" Quest Target ELM',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6783;
--- OLD name : 海湾蟹
--- Source : https://www.wowhead.com/wotlk/cn/npc=6827
-UPDATE `creature_template_locale` SET `Name` = '螃蟹',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6827;
--- OLD name : 码头主管
--- Source : https://www.wowhead.com/wotlk/cn/npc=6846
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚码头主管',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6846;
--- OLD name : 雅尔达
--- Source : https://www.wowhead.com/wotlk/cn/npc=6887
-UPDATE `creature_template_locale` SET `Name` = '哈尔伦',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6887;
--- OLD name : 码头工人
--- Source : https://www.wowhead.com/wotlk/cn/npc=6927
-UPDATE `creature_template_locale` SET `Name` = '迪菲亚码头工人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6927;
--- OLD name : “剃刀”雷吉克
--- Source : https://www.wowhead.com/wotlk/cn/npc=6946
-UPDATE `creature_template_locale` SET `Name` = '"剃刀"雷吉克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6946;
--- OLD name : 黑石卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=7013
-UPDATE `creature_template_locale` SET `Name` = '黑石狂暴者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7013;
--- OLD name : 黑色龙人
--- Source : https://www.wowhead.com/wotlk/cn/npc=7041
-UPDATE `creature_template_locale` SET `Name` = '火鳞龙人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7041;
--- OLD name : 火鳞龙人
--- Source : https://www.wowhead.com/wotlk/cn/npc=7042
-UPDATE `creature_template_locale` SET `Name` = '黑色龙族',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7042;
--- OLD name : 风险投资公司闲工
--- Source : https://www.wowhead.com/wotlk/cn/npc=7067
-UPDATE `creature_template_locale` SET `Name` = '风险投资公司雄蜂',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7067;
--- OLD name : 碧火盗贼
--- Source : https://www.wowhead.com/wotlk/cn/npc=7106
-UPDATE `creature_template_locale` SET `Name` = '碧火潜行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7106;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7174
-UPDATE `creature_template_locale` SET `Title` = '铸甲训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7174;
--- OLD name : 远古巨石卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=7206
-UPDATE `creature_template_locale` SET `Name` = '古代的石头看守者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7206;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7230
-UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7230;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7231
-UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7231;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7232
-UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7232;
--- OLD name : 黑色夜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=7322
-UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（黑色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7322;
--- OLD name : 无瑕的德莱尼水晶球
--- Source : https://www.wowhead.com/wotlk/cn/npc=7364
-UPDATE `creature_template_locale` SET `Name` = '无暇的德莱尼水晶球',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7364;
--- OLD name : 无瑕的德莱尼水晶碎片
--- Source : https://www.wowhead.com/wotlk/cn/npc=7365
-UPDATE `creature_template_locale` SET `Name` = '无暇的德莱尼水晶碎片',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7365;
--- OLD name : 幽暗城蟑螂
--- Source : https://www.wowhead.com/wotlk/cn/npc=7395
-UPDATE `creature_template_locale` SET `Name` = '蟑螂',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7395;
--- OLD name : 泰姆·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=7427
-UPDATE `creature_template_locale` SET `Name` = '泰姆·狂暴图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7427;
--- OLD name : 幼霜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=7430
-UPDATE `creature_template_locale` SET `Name` = '霜刃豹幼崽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7430;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7525
-UPDATE `creature_template_locale` SET `Title` = '龙鳞制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7525;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7526
-UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7526;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7528
-UPDATE `creature_template_locale` SET `Title` = '部族制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7528;
--- OLD name : Cottontail Rabbit
--- Source : https://www.wowhead.com/wotlk/cn/npc=7558
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 7558;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (7558, 'zhCN','黄毛兔',NULL,0);
--- OLD name : Spotted Rabbit
--- Source : https://www.wowhead.com/wotlk/cn/npc=7559
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 7559;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (7559, 'zhCN','斑点兔',NULL,0);
--- OLD name : Slim's Test Death Knight
--- Source : https://www.wowhead.com/wotlk/cn/npc=7624
-UPDATE `creature_template_locale` SET `Name` = 'Test Death Knight',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7624;
--- OLD name : 猎豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=7684
-UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（黄色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7684;
--- OLD name : 丛林虎
--- Source : https://www.wowhead.com/wotlk/cn/npc=7686
-UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（红色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7686;
--- OLD name : 斑点霜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=7687
-UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（雪白色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7687;
--- OLD name : 斑点夜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=7689
-UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（黑色斑点）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7689;
--- OLD name : 黑色迅猛龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=7703
-UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（黑色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7703;
--- OLD name : 杂斑红色迅猛龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=7704
-UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（红色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7704;
--- OLD name : 白色迅猛龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=7706
-UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（黄色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7706;
--- OLD name : 青色迅猛龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=7707
-UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（绿色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7707;
--- OLD name : 比鲁拉, subname : 前旅店老板
--- Source : https://www.wowhead.com/wotlk/cn/npc=7714
-UPDATE `creature_template_locale` SET `Name` = '旅店老板比鲁拉',`Title` = '旅店老板',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7714;
--- OLD name : 红色机械陆行鸟
--- Source : https://www.wowhead.com/wotlk/cn/npc=7739
-UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（黄色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7739;
--- OLD name : 蓝色机械陆行鸟
--- Source : https://www.wowhead.com/wotlk/cn/npc=7749
-UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（蓝色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7749;
--- OLD name : 机械师瑟玛普拉格
--- Source : https://www.wowhead.com/wotlk/cn/npc=7800
-UPDATE `creature_template_locale` SET `Name` = '麦克尼尔·瑟玛普拉格',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7800;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7866
-UPDATE `creature_template_locale` SET `Title` = '龙鳞制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7866;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7867
-UPDATE `creature_template_locale` SET `Title` = '龙鳞制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7867;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7868
-UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7868;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7869
-UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7869;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7870
-UPDATE `creature_template_locale` SET `Title` = '部族制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7870;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7871
-UPDATE `creature_template_locale` SET `Title` = '部族制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7871;
--- OLD subname : 骑术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=7954
-UPDATE `creature_template_locale` SET `Title` = '机械陆行鸟驾驶员',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7954;
--- OLD name : 纳拉其营地卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=7975
-UPDATE `creature_template_locale` SET `Name` = '莫高雷卫士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7975;
--- OLD name : 月溪旅卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=8096
-UPDATE `creature_template_locale` SET `Name` = '人民军卫兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8096;
--- OLD name : 余烬之翼
--- Source : https://www.wowhead.com/wotlk/cn/npc=8207
-UPDATE `creature_template_locale` SET `Name` = '巨型火鸟',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8207;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=8306
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8306;
--- OLD name : 卡拉然·温布雷
--- Source : https://www.wowhead.com/wotlk/cn/npc=8479
-UPDATE `creature_template_locale` SET `Name` = '威拉罗克·温布雷',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8479;
--- OLD name : 天灾破坏者
--- Source : https://www.wowhead.com/wotlk/cn/npc=8520
-UPDATE `creature_template_locale` SET `Name` = '瘟疫破坏者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8520;
--- OLD name : 天灾水元素
--- Source : https://www.wowhead.com/wotlk/cn/npc=8522
-UPDATE `creature_template_locale` SET `Name` = '瘟疫水元素',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8522;
--- OLD subname : 诅咒教派
--- Source : https://www.wowhead.com/wotlk/cn/npc=8547
-UPDATE `creature_template_locale` SET `Title` = '诅咒神教',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8547;
--- OLD subname : 诅咒教派
--- Source : https://www.wowhead.com/wotlk/cn/npc=8549
-UPDATE `creature_template_locale` SET `Title` = '诅咒神教',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8549;
--- OLD subname : 诅咒教派
--- Source : https://www.wowhead.com/wotlk/cn/npc=8550
-UPDATE `creature_template_locale` SET `Title` = '诅咒神教',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8550;
--- OLD subname : 诅咒教派
--- Source : https://www.wowhead.com/wotlk/cn/npc=8552
-UPDATE `creature_template_locale` SET `Title` = '诅咒神教',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8552;
--- OLD subname : 诅咒教派
--- Source : https://www.wowhead.com/wotlk/cn/npc=8553
-UPDATE `creature_template_locale` SET `Title` = '诅咒神教',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8553;
--- OLD name : 锋牙·刺鬃酋长
--- Source : https://www.wowhead.com/wotlk/cn/npc=8554
-UPDATE `creature_template_locale` SET `Name` = '刺鬃酋长',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8554;
--- OLD name : 失心的护林者
--- Source : https://www.wowhead.com/wotlk/cn/npc=8563
-UPDATE `creature_template_locale` SET `Name` = '护林者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8563;
--- OLD name : 失心的游侠
--- Source : https://www.wowhead.com/wotlk/cn/npc=8564
-UPDATE `creature_template_locale` SET `Name` = '游侠',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8564;
--- OLD name : 失心的巡路者
--- Source : https://www.wowhead.com/wotlk/cn/npc=8565
-UPDATE `creature_template_locale` SET `Name` = '巡路者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8565;
--- OLD name : 天灾巨犬
--- Source : https://www.wowhead.com/wotlk/cn/npc=8599
-UPDATE `creature_template_locale` SET `Name` = '瘟疫巨犬',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8599;
--- OLD name : 烈日行者赛恩
--- Source : https://www.wowhead.com/wotlk/cn/npc=8664
-UPDATE `creature_template_locale` SET `Name` = '赛恩',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8664;
--- OLD name : 朱比·加基斯宾
--- Source : https://www.wowhead.com/wotlk/cn/npc=8678
-UPDATE `creature_template_locale` SET `Name` = '朱比',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8678;
--- OLD name : 怒炉将军
--- Source : https://www.wowhead.com/wotlk/cn/npc=9033
-UPDATE `creature_template_locale` SET `Name` = '安格弗将军',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9033;
--- OLD name : 格尔洛普
--- Source : https://www.wowhead.com/wotlk/cn/npc=9176
-UPDATE `creature_template_locale` SET `Name` = '戈泰什',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9176;
--- OLD name : 出土的化石
--- Source : https://www.wowhead.com/wotlk/cn/npc=9397
-UPDATE `creature_template_locale` SET `Name` = '活风暴',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9397;
--- OLD name : [UNUSED] dun garok test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=9557
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 9557;
--- OLD name : Stormwind Talent Master
--- Source : https://www.wowhead.com/wotlk/cn/npc=9576
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9576;
--- OLD name : Ironforge Talent Master
--- Source : https://www.wowhead.com/wotlk/cn/npc=9578
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9578;
--- OLD subname : 天赋大师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=9579
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9579;
--- OLD subname : 天赋大师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=9580
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9580;
--- OLD subname : 天赋大师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=9581
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9581;
--- OLD subname : 天赋大师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=9582
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9582;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=9584
-UPDATE `creature_template_locale` SET `Title` = '大师级暗纹裁缝',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9584;
--- OLD name : [PH] TESTTAUREN (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=9686
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 9686;
--- OLD name : [UNUSED] [PH] Cheese Servant Floh (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=9820
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 9820;
--- OLD subname : 前兽栏管理员
--- Source : https://www.wowhead.com/wotlk/cn/npc=9983
-UPDATE `creature_template_locale` SET `Title` = '兽栏管理员',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9983;
--- OLD name : [PH] Raid Testing Peon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=10044
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 10044;
--- OLD name : 荧光机械陆行鸟
--- Source : https://www.wowhead.com/wotlk/cn/npc=10178
-UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（粉绿色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10178;
--- OLD name : 白色机械陆行鸟B型
--- Source : https://www.wowhead.com/wotlk/cn/npc=10179
-UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（黑色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10179;
--- OLD name : 尤尔, subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=10237
-UPDATE `creature_template_locale` SET `Name` = 'Yor',`Title` = 'UNUSED',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10237;
--- OLD subname : Dagger Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10292
-UPDATE `creature_template_locale` SET `Title` = '匕首训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10292;
--- OLD subname : Fist Weapons Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10294
-UPDATE `creature_template_locale` SET `Title` = '拳套训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10294;
--- OLD name : 阿克莱德
--- Source : https://www.wowhead.com/wotlk/cn/npc=10296
-UPDATE `creature_template_locale` SET `Name` = '维埃兰',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10296;
--- OLD subname : Bow Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10297
-UPDATE `creature_template_locale` SET `Title` = '弓箭训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10297;
--- OLD name : 阿克莱德
--- Source : https://www.wowhead.com/wotlk/cn/npc=10299
-UPDATE `creature_template_locale` SET `Name` = '裂盾渗透者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10299;
--- OLD name : 加隆·塑石者
--- Source : https://www.wowhead.com/wotlk/cn/npc=10301
-UPDATE `creature_template_locale` SET `Name` = '加隆·石矛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10301;
--- OLD name : 古代霜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=10322
-UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (White)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10322;
--- OLD name : 原始猎豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=10336
-UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Leopard)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10336;
--- OLD name : 茶色刃齿豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=10337
-UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Orange)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10337;
--- OLD name : 金色锋刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=10338
-UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Gold)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10338;
--- OLD name : [UNUSED] Xur'gyl (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=10370
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 10370;
--- OLD name : 奥索巴·暴怒图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=10379
-UPDATE `creature_template_locale` SET `Name` = '奥索巴·狂怒图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10379;
--- OLD name : [UNUSED] Thuzadin Shadow Lord (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=10401
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 10401;
--- OLD name : [UNUSED] Cannibal Wight (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=10402
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 10402;
--- OLD name : [UNUSED] Devouring Wight (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=10403
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 10403;
--- OLD name : 复生的卫兵
--- Source : https://www.wowhead.com/wotlk/cn/npc=10418
-UPDATE `creature_template_locale` SET `Name` = '红衣卫兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10418;
--- OLD name : 复生的魔术师
--- Source : https://www.wowhead.com/wotlk/cn/npc=10419
-UPDATE `creature_template_locale` SET `Name` = '红衣魔术师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10419;
--- OLD name : 复生的新兵
--- Source : https://www.wowhead.com/wotlk/cn/npc=10420
-UPDATE `creature_template_locale` SET `Name` = '红衣新兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10420;
--- OLD name : 复生的防御者
--- Source : https://www.wowhead.com/wotlk/cn/npc=10421
-UPDATE `creature_template_locale` SET `Name` = '红衣防御者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10421;
--- OLD name : 复生的法术师
--- Source : https://www.wowhead.com/wotlk/cn/npc=10422
-UPDATE `creature_template_locale` SET `Name` = '红衣法术师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10422;
--- OLD name : 复生的牧师
--- Source : https://www.wowhead.com/wotlk/cn/npc=10423
-UPDATE `creature_template_locale` SET `Name` = '红衣牧师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10423;
--- OLD name : 复生的豪侠
--- Source : https://www.wowhead.com/wotlk/cn/npc=10424
-UPDATE `creature_template_locale` SET `Name` = '红衣豪侠',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10424;
--- OLD name : 复生的战斗法师
--- Source : https://www.wowhead.com/wotlk/cn/npc=10425
-UPDATE `creature_template_locale` SET `Name` = '红衣战斗法师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10425;
--- OLD name : 复生的审查者
--- Source : https://www.wowhead.com/wotlk/cn/npc=10426
-UPDATE `creature_template_locale` SET `Name` = '红衣审查者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10426;
--- OLD name : 帕奥卡·迅山
--- Source : https://www.wowhead.com/wotlk/cn/npc=10427
-UPDATE `creature_template_locale` SET `Name` = '波卡·雨山',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10427;
--- OLD name : 天灾鼠
--- Source : https://www.wowhead.com/wotlk/cn/npc=10441
-UPDATE `creature_template_locale` SET `Name` = '瘟疫鼠',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10441;
--- OLD subname : Crossbow Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10446
-UPDATE `creature_template_locale` SET `Title` = '弩训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10446;
--- OLD subname : Crossbow Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10450
-UPDATE `creature_template_locale` SET `Title` = '弩训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10450;
--- OLD subname : Mace Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10452
-UPDATE `creature_template_locale` SET `Title` = '锤训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10452;
--- OLD subname : Axe Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10453
-UPDATE `creature_template_locale` SET `Title` = '斧训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10453;
--- OLD subname : Crossbow Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=10454
-UPDATE `creature_template_locale` SET `Title` = '弩训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10454;
--- OLD name : 天灾虫
--- Source : https://www.wowhead.com/wotlk/cn/npc=10461
-UPDATE `creature_template_locale` SET `Name` = '瘟疫虫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10461;
--- OLD name : 通灵学院新生
--- Source : https://www.wowhead.com/wotlk/cn/npc=10470
-UPDATE `creature_template_locale` SET `Name` = '通灵学院新学徒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10470;
--- OLD name : 阿雷克斯·巴罗夫领主
--- Source : https://www.wowhead.com/wotlk/cn/npc=10504
-UPDATE `creature_template_locale` SET `Name` = '阿雷克斯·巴罗夫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10504;
--- OLD name : 天灾软泥怪
--- Source : https://www.wowhead.com/wotlk/cn/npc=10510
-UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥怪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10510;
--- OLD name : 天灾蛆
--- Source : https://www.wowhead.com/wotlk/cn/npc=10536
-UPDATE `creature_template_locale` SET `Name` = '瘟疫蛆',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10536;
--- OLD subname : 见习巫医
--- Source : https://www.wowhead.com/wotlk/cn/npc=10578
-UPDATE `creature_template_locale` SET `Title` = '训练中的巫医',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10578;
--- OLD name : [UNUSED] Siralnaya (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=10607
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 10607;
--- OLD subname : 皇家药剂师协会
--- Source : https://www.wowhead.com/wotlk/cn/npc=10665
-UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10665;
--- OLD name : 天灾龙崽
--- Source : https://www.wowhead.com/wotlk/cn/npc=10678
-UPDATE `creature_template_locale` SET `Name` = '瘟疫龙崽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10678;
--- OLD name : [UNUSED] Deathcaller Majestis (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=10810
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 10810;
--- OLD name : 督军塔雷金
--- Source : https://www.wowhead.com/wotlk/cn/npc=10822
-UPDATE `creature_template_locale` SET `Name` = '塔雷什森',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10822;
--- OLD name : 死亡猎人霍克斯比尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=10824
-UPDATE `creature_template_locale` SET `Name` = '游侠之王霍克斯比尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10824;
--- OLD name : 莉尼亚·阿比迪斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=10828
-UPDATE `creature_template_locale` SET `Name` = '阿比迪斯将军',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10828;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=10839
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10839;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=10840
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10840;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=10857
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10857;
--- OLD name : 希望破坏者威利
--- Source : https://www.wowhead.com/wotlk/cn/npc=10997
-UPDATE `creature_template_locale` SET `Name` = '炮手威利',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10997;
--- OLD name : 冬泉霜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=11021
-UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Winterspring)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11021;
--- OLD name : 指挥官玛洛尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=11032
-UPDATE `creature_template_locale` SET `Name` = '狂热的玛洛尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11032;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=11034
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11034;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=11036
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11036;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=11039
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11039;
--- OLD name : 复生的僧侣
--- Source : https://www.wowhead.com/wotlk/cn/npc=11043
-UPDATE `creature_template_locale` SET `Name` = '红衣僧侣',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11043;
--- OLD name : 复生的火枪手
--- Source : https://www.wowhead.com/wotlk/cn/npc=11054
-UPDATE `creature_template_locale` SET `Name` = '红衣火枪手',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11054;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=11063
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11063;
--- OLD name : [PH[ Combat Tester (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=11080
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 11080;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=11102
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11102;
--- OLD name : 复生的铸锤师
--- Source : https://www.wowhead.com/wotlk/cn/npc=11120
-UPDATE `creature_template_locale` SET `Name` = '红衣铸锤师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11120;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=11146
-UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11146;
--- OLD name : 绿色机械陆行鸟
--- Source : https://www.wowhead.com/wotlk/cn/npc=11147
-UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Green/Gray)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11147;
--- OLD name : 紫色机械陆行鸟
--- Source : https://www.wowhead.com/wotlk/cn/npc=11148
-UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Purple)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11148;
--- OLD name : 红蓝两色机械陆行鸟
--- Source : https://www.wowhead.com/wotlk/cn/npc=11149
-UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Red/Blue)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11149;
--- OLD name : 冰蓝色机械陆行鸟A型
--- Source : https://www.wowhead.com/wotlk/cn/npc=11150
-UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Icy Blue)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11150;
--- OLD name : 红色骸骨军马
--- Source : https://www.wowhead.com/wotlk/cn/npc=11153
-UPDATE `creature_template_locale` SET `Name` = 'Riding Skeletal Horse (Red)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11153;
--- OLD name : 蓝色骸骨军马
--- Source : https://www.wowhead.com/wotlk/cn/npc=11154
-UPDATE `creature_template_locale` SET `Name` = 'Riding Skeletal Horse (Blue)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11154;
--- OLD name : 棕色骸骨军马
--- Source : https://www.wowhead.com/wotlk/cn/npc=11155
-UPDATE `creature_template_locale` SET `Name` = 'Riding Skeletal Horse (Brown)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11155;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=11177
-UPDATE `creature_template_locale` SET `Title` = '护甲锻造师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11177;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=11178
-UPDATE `creature_template_locale` SET `Title` = '武器锻造师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11178;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=11194
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11194;
--- OLD name : 死亡战马
--- Source : https://www.wowhead.com/wotlk/cn/npc=11195
-UPDATE `creature_template_locale` SET `Name` = '黑色骸骨战马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11195;
--- OLD name : 跳虫
--- Source : https://www.wowhead.com/wotlk/cn/npc=11327
-UPDATE `creature_template_locale` SET `Name` = '跳跳虫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11327;
--- OLD subname : 劈颅巨魔大使
--- Source : https://www.wowhead.com/wotlk/cn/npc=11390
-UPDATE `creature_template_locale` SET `Title` = '碎颅巨魔大使',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11390;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=11466
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11466;
--- OLD name : 奥术恐兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=11479
-UPDATE `creature_template_locale` SET `Name` = '奥术恶兽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11479;
--- OLD subname : 辛德拉的统治者
--- Source : https://www.wowhead.com/wotlk/cn/npc=11486
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11486;
--- OLD name : 荒野变形者奥兹恩
--- Source : https://www.wowhead.com/wotlk/cn/npc=11492
-UPDATE `creature_template_locale` SET `Name` = '奥兹恩',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11492;
--- OLD name : 沮丧的斯卡尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=11498
-UPDATE `creature_template_locale` SET `Name` = '无敌的斯卡尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11498;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=11536
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11536;
--- OLD name : [UNUSED] Molten Colossus (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=11660
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 11660;
--- OLD name : 火妖
--- Source : https://www.wowhead.com/wotlk/cn/npc=11661
-UPDATE `creature_template_locale` SET `Name` = '烈焰行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11661;
--- OLD name : 火妖祭司
--- Source : https://www.wowhead.com/wotlk/cn/npc=11662
-UPDATE `creature_template_locale` SET `Name` = '烈焰行者祭司',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11662;
--- OLD name : 火妖医师
--- Source : https://www.wowhead.com/wotlk/cn/npc=11663
-UPDATE `creature_template_locale` SET `Name` = '烈焰行者医师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11663;
--- OLD name : 火妖精英
--- Source : https://www.wowhead.com/wotlk/cn/npc=11664
-UPDATE `creature_template_locale` SET `Name` = '烈焰行者精英',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11664;
--- OLD name : [UNUSED] Flame Shrieker (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=11670
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 11670;
--- OLD name : 熔火恶犬
--- Source : https://www.wowhead.com/wotlk/cn/npc=11673
-UPDATE `creature_template_locale` SET `Name` = '上古熔火恶犬',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11673;
--- OLD name : 战歌伐木工
--- Source : https://www.wowhead.com/wotlk/cn/npc=11681
-UPDATE `creature_template_locale` SET `Name` = '部落伐木工',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11681;
--- OLD name : 地精伐木机
--- Source : https://www.wowhead.com/wotlk/cn/npc=11684
-UPDATE `creature_template_locale` SET `Name` = '战歌伐木机',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11684;
--- OLD name : 棕色科多兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=11689
-UPDATE `creature_template_locale` SET `Name` = '骑乘用科多兽（棕色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11689;
--- OLD name : 黑木追踪者
--- Source : https://www.wowhead.com/wotlk/cn/npc=11713
-UPDATE `creature_template_locale` SET `Name` = '黑幕追踪者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11713;
--- OLD name : 塞雷布拉斯姐妹
--- Source : https://www.wowhead.com/wotlk/cn/npc=11794
-UPDATE `creature_template_locale` SET `Name` = '塞雷布拉斯的姐妹',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11794;
--- OLD name : 格鲁迪格·黑云
--- Source : https://www.wowhead.com/wotlk/cn/npc=11858
-UPDATE `creature_template_locale` SET `Name` = '格鲁迪格·暗云',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11858;
--- OLD name : 滚岩护石者
--- Source : https://www.wowhead.com/wotlk/cn/npc=11915
-UPDATE `creature_template_locale` SET `Name` = '高戈护石者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11915;
--- OLD name : 滚岩地卜师
--- Source : https://www.wowhead.com/wotlk/cn/npc=11917
-UPDATE `creature_template_locale` SET `Name` = '高戈地卜师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11917;
--- OLD name : 滚岩裂石者
--- Source : https://www.wowhead.com/wotlk/cn/npc=11918
-UPDATE `creature_template_locale` SET `Name` = '高戈裂石者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11918;
--- OLD name : [PH] Northshire Gift Dispenser (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=11926
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 11926;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=12020
-UPDATE `creature_template_locale` SET `Title` = '高级炼金师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12020;
--- OLD name : 格蕾拉·石拳
--- Source : https://www.wowhead.com/wotlk/cn/npc=12036
-UPDATE `creature_template_locale` SET `Name` = '鹰巢山杂货商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12036;
--- OLD name : 布朗尼克·铁胃
--- Source : https://www.wowhead.com/wotlk/cn/npc=12040
-UPDATE `creature_template_locale` SET `Name` = '鹰巢山锁甲商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12040;
--- OLD name : 火妖护卫
--- Source : https://www.wowhead.com/wotlk/cn/npc=12119
-UPDATE `creature_template_locale` SET `Name` = '烈焰行者护卫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12119;
--- OLD name : 天灾白蚁
--- Source : https://www.wowhead.com/wotlk/cn/npc=12120
-UPDATE `creature_template_locale` SET `Name` = '瘟疫白蚁',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12120;
--- OLD name : 德拉卡
--- Source : https://www.wowhead.com/wotlk/cn/npc=12121
-UPDATE `creature_template_locale` SET `Name` = '德拉坎',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12121;
--- OLD name : 火妖卫兵
--- Source : https://www.wowhead.com/wotlk/cn/npc=12142
-UPDATE `creature_template_locale` SET `Name` = '烈焰行者卫兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12142;
--- OLD name : 蓝色科多兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=12148
-UPDATE `creature_template_locale` SET `Name` = 'Riding Kodo (Teal)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12148;
--- OLD name : 灰色科多兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=12149
-UPDATE `creature_template_locale` SET `Name` = '骑乘用科多兽（灰色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12149;
--- OLD name : 绿色科多兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=12151
-UPDATE `creature_template_locale` SET `Name` = '骑乘用科多兽（绿色）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12151;
--- OLD name : 人类徽记
--- Source : https://www.wowhead.com/wotlk/cn/npc=12202
-UPDATE `creature_template_locale` SET `Name` = '人类颅骨',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12202;
--- OLD name : 杂斑赤色迅猛龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=12345
-UPDATE `creature_template_locale` SET `Name` = '红色迅猛龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12345;
--- OLD name : 绿色迅猛龙坐骑
--- Source : https://www.wowhead.com/wotlk/cn/npc=12346
-UPDATE `creature_template_locale` SET `Name` = '绿色迅猛龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12346;
--- OLD name : 青色迅猛龙坐骑
--- Source : https://www.wowhead.com/wotlk/cn/npc=12349
-UPDATE `creature_template_locale` SET `Name` = '青色迅猛龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12349;
--- OLD name : 紫色骑乘迅猛龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=12350
-UPDATE `creature_template_locale` SET `Name` = '紫色迅猛龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12350;
--- OLD name : 骑乘用条纹夜刃豹
--- Source : https://www.wowhead.com/wotlk/cn/npc=12360
-UPDATE `creature_template_locale` SET `Name` = '骑乘用斑纹夜刃豹',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12360;
--- OLD name : 暗网编织者克雷希斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=12433
-UPDATE `creature_template_locale` SET `Name` = '克雷希斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12433;
--- OLD name : 死爪龙人护卫
--- Source : https://www.wowhead.com/wotlk/cn/npc=12460
-UPDATE `creature_template_locale` SET `Name` = '黑翼龙人护卫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12460;
--- OLD name : 死爪监工
--- Source : https://www.wowhead.com/wotlk/cn/npc=12461
-UPDATE `creature_template_locale` SET `Name` = '黑翼监工',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12461;
--- OLD name : 翡翠智者
--- Source : https://www.wowhead.com/wotlk/cn/npc=12476
-UPDATE `creature_template_locale` SET `Name` = '翡翠圣贤',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12476;
--- OLD name : 尖爪
--- Source : https://www.wowhead.com/wotlk/cn/npc=12676
-UPDATE `creature_template_locale` SET `Name` = '沙普塔隆',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12676;
--- OLD name : 猎影
--- Source : https://www.wowhead.com/wotlk/cn/npc=12677
-UPDATE `creature_template_locale` SET `Name` = '萨杜布拉',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12677;
--- OLD name : 潘兰希尔女士
--- Source : https://www.wowhead.com/wotlk/cn/npc=12792
-UPDATE `creature_template_locale` SET `Name` = '帕兰蒂尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12792;
--- OLD name : [PH] TEST Fire God (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=12804
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 12804;
--- OLD subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=12807
-UPDATE `creature_template_locale` SET `Title` = '恶魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12807;
--- OLD name : 碎木岗哨守卫
--- Source : https://www.wowhead.com/wotlk/cn/npc=12903
-UPDATE `creature_template_locale` SET `Name` = '碎木岗哨卫兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12903;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=12939
-UPDATE `creature_template_locale` SET `Title` = '外科医疗队',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12939;
--- OLD name : 布里莫·加基斯宾
--- Source : https://www.wowhead.com/wotlk/cn/npc=12957
-UPDATE `creature_template_locale` SET `Name` = '布里莫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12957;
--- OLD name : 戈多克猎犬
--- Source : https://www.wowhead.com/wotlk/cn/npc=13036
-UPDATE `creature_template_locale` SET `Name` = '戈多克驯狼',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13036;
--- OLD name : Commander Dardosh <old>
--- Source : https://www.wowhead.com/wotlk/cn/npc=13140
-UPDATE `creature_template_locale` SET `Name` = '指挥官达多什',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13140;
--- OLD name : Lieutenant Murp <old>
--- Source : https://www.wowhead.com/wotlk/cn/npc=13146
-UPDATE `creature_template_locale` SET `Name` = '莫普中尉',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13146;
--- OLD name : 乔雷克·铁盾
--- Source : https://www.wowhead.com/wotlk/cn/npc=13219
-UPDATE `creature_template_locale` SET `Name` = '耶克里·弗兰迪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13219;
--- OLD name : 小青蛙
--- Source : https://www.wowhead.com/wotlk/cn/npc=13321
-UPDATE `creature_template_locale` SET `Name` = '青蛙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13321;
--- OLD name : 赞巴莱, subname : 德鲁伊训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=13476
-UPDATE `creature_template_locale` SET `Name` = '巴莱·洛克维',`Title` = '药剂、卷轴和材料',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13476;
--- OLD name : 讨厌的格林奇
--- Source : https://www.wowhead.com/wotlk/cn/npc=13602
-UPDATE `creature_template_locale` SET `Name` = '格林奇',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13602;
--- OLD name : [PH] Graveyard Herald (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=14181
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 14181;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14358
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14358;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14364
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14364;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14368
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14368;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14369
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14369;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14371
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14371;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14381
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14381;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14382
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14382;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14383
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14383;
--- OLD name : 暴怒图腾捕猎者
--- Source : https://www.wowhead.com/wotlk/cn/npc=14441
-UPDATE `creature_template_locale` SET `Name` = '捕猎者拉图特',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14441;
--- OLD name : 维尔玛克中尉
--- Source : https://www.wowhead.com/wotlk/cn/npc=14445
-UPDATE `creature_template_locale` SET `Name` = '维尔玛克将军',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14445;
--- OLD name : 被感染的农夫
--- Source : https://www.wowhead.com/wotlk/cn/npc=14485
-UPDATE `creature_template_locale` SET `Name` = '感染瘟疫的农夫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14485;
--- OLD subname : 克尔苏加德的爪牙
--- Source : https://www.wowhead.com/wotlk/cn/npc=14486
-UPDATE `creature_template_locale` SET `Title` = '科尔苏加德的爪牙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14486;
--- OLD name : 雷角中士
--- Source : https://www.wowhead.com/wotlk/cn/npc=14581
-UPDATE `creature_template_locale` SET `Name` = '军士霍斯·雷角',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14581;
--- OLD name : [PH] Horde spell thrower (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=14641
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 14641;
--- OLD name : [PH] Alliance Spell thrower (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=14642
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 14642;
--- OLD name : [PH] Alliance Herald (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=14643
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 14643;
--- OLD name : [PH] Horde Herald (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=14644
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 14644;
--- OLD name : 萨杜瓦尔王子
--- Source : https://www.wowhead.com/wotlk/cn/npc=14688
-UPDATE `creature_template_locale` SET `Name` = '萨杜瓦尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14688;
--- OLD name : 蛛魔织网者
--- Source : https://www.wowhead.com/wotlk/cn/npc=14705
-UPDATE `creature_template_locale` SET `Name` = '尼拉布织网者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14705;
--- OLD name : [PH] Alliance Tower Lieutenant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=14719
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 14719;
--- OLD name : 艾法希比元帅
--- Source : https://www.wowhead.com/wotlk/cn/npc=14721
-UPDATE `creature_template_locale` SET `Name` = '斯托布里奇元帅',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14721;
--- OLD name : [PH] Horde Tower Lieutenant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=14746
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 14746;
--- OLD subname : 纪念品与玩具奖励
--- Source : https://www.wowhead.com/wotlk/cn/npc=14828
-UPDATE `creature_template_locale` SET `Title` = '暗月马戏团奖券兑换员',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14828;
--- OLD subname : 饮料商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=14844
-UPDATE `creature_template_locale` SET `Title` = '暗月马戏团饮料商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14844;
--- OLD subname : 食品商
--- Source : https://www.wowhead.com/wotlk/cn/npc=14845
-UPDATE `creature_template_locale` SET `Title` = '暗月马戏团食品商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14845;
--- OLD subname : 宠物与坐骑奖励
--- Source : https://www.wowhead.com/wotlk/cn/npc=14846
-UPDATE `creature_template_locale` SET `Title` = '暗月马戏团特殊商品',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14846;
--- OLD subname : 暗月卡片商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=14847
-UPDATE `creature_template_locale` SET `Title` = '暗月马戏团卡片和特殊商品销售员',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14847;
--- OLD name : 暗月艺人
--- Source : https://www.wowhead.com/wotlk/cn/npc=14849
-UPDATE `creature_template_locale` SET `Name` = '暗月马戏团艺人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14849;
--- OLD name : 迷你鸡蛇兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=14869
-UPDATE `creature_template_locale` SET `Name` = '派格米',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14869;
--- OLD subname : 新潮服装设计师
--- Source : https://www.wowhead.com/wotlk/cn/npc=15165
-UPDATE `creature_template_locale` SET `Title` = '新潮设计师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15165;
--- OLD name : [PH] Luis Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15167
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15167;
--- OLD name : 希尔瓦娜斯·风行者
--- Source : https://www.wowhead.com/wotlk/cn/npc=15193
-UPDATE `creature_template_locale` SET `Name` = '女妖之王',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15193;
--- OLD name : 梦境之雾
--- Source : https://www.wowhead.com/wotlk/cn/npc=15224
-UPDATE `creature_template_locale` SET `Name` = '梦雾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15224;
--- OLD name : [UNUSED] Vekniss Hiveshaper (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15227
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15227;
--- OLD name : [UNUSED] Vekniss Wellborer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15228
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15228;
--- OLD name : [UNUSED] Vekniss Patroller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15231
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15231;
--- OLD name : [UNUSED] Vekniss Eradicator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15232
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15232;
--- OLD name : 玛克希玛·雷管
--- Source : https://www.wowhead.com/wotlk/cn/npc=15303
-UPDATE `creature_template_locale` SET `Name` = '玛克希玛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15303;
--- OLD name : [UNUSED] Hive'Zara Ambusher (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15322
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15322;
--- OLD name : [UNUSED] Hive'Zara Swarmer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15326
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15326;
--- OLD name : [UNUSED] Hive'Zara Scout (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15329
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15329;
--- OLD name : [UNUSED] Sand Borer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15330
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15330;
--- OLD name : [UNUSED] Dune Tunneler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15331
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15331;
--- OLD name : [UNUSED] Crystal Feeder (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15332
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15332;
--- OLD name : [UNUSED] Sand Mold (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15337
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15337;
--- OLD name : [UNUSED] Sphinx (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15342
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15342;
--- OLD name : [UNUSED] Daughter of Hecate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15345
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15345;
--- OLD name : [UNUSED] Qiraji Wasprider (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15346
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15346;
--- OLD name : [UNUSED] Qiraji Wasplord (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15347
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15347;
--- OLD name : RC Blimp <PH>, subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=15349
-UPDATE `creature_template_locale` SET `Name` = 'RC Blimp',`Title` = 'PH',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15349;
--- OLD name : RC Mortar Tank <PH>, subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=15364
-UPDATE `creature_template_locale` SET `Name` = 'RC Mortar Tank',`Title` = 'PH',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15364;
--- OLD name : 阿瑞苟斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=15380
-UPDATE `creature_template_locale` SET `Name` = '亚雷戈斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15380;
--- OLD name : 阿瑞苟斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=15411
-UPDATE `creature_template_locale` SET `Name` = '亚雷戈斯龙类形态',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15411;
--- OLD name : [UNUSED] Deep Ooze (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15472
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15472;
--- OLD name : 甲虫
--- Source : https://www.wowhead.com/wotlk/cn/npc=15475
-UPDATE `creature_template_locale` SET `Name` = '甲壳虫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15475;
--- OLD name : 火焰新星图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=15483
-UPDATE `creature_template_locale` SET `Name` = '火焰新星图腾 VII',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15483;
--- OLD name : 石头守卫陶蹄
--- Source : https://www.wowhead.com/wotlk/cn/npc=15532
-UPDATE `creature_template_locale` SET `Name` = '尼根·陶蹄',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15532;
--- OLD name : 长者伊萨·麦蹄
--- Source : https://www.wowhead.com/wotlk/cn/npc=15580
-UPDATE `creature_template_locale` SET `Name` = '傲角长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15580;
--- OLD name : 星眼长者
--- Source : https://www.wowhead.com/wotlk/cn/npc=15584
-UPDATE `creature_template_locale` SET `Name` = '星灵长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15584;
--- OLD name : 晨行者长者
--- Source : https://www.wowhead.com/wotlk/cn/npc=15585
-UPDATE `creature_template_locale` SET `Name` = '晨行长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15585;
--- OLD name : 迷雾行者长者
--- Source : https://www.wowhead.com/wotlk/cn/npc=15587
-UPDATE `creature_template_locale` SET `Name` = '迷雾长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15587;
--- OLD name : 袭月长者
--- Source : https://www.wowhead.com/wotlk/cn/npc=15594
-UPDATE `creature_template_locale` SET `Name` = '月击长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15594;
--- OLD name : 刃叶长者
--- Source : https://www.wowhead.com/wotlk/cn/npc=15595
-UPDATE `creature_template_locale` SET `Name` = '锋叶长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15595;
--- OLD name : 月卫长者
--- Source : https://www.wowhead.com/wotlk/cn/npc=15597
-UPDATE `creature_template_locale` SET `Name` = '月光长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15597;
--- OLD name : 塞纳里奥斥候加莉亚
--- Source : https://www.wowhead.com/wotlk/cn/npc=15611
-UPDATE `creature_template_locale` SET `Name` = '塞纳里奥斥候佳莉亚',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15611;
--- OLD name : 加洛德·影歌
--- Source : https://www.wowhead.com/wotlk/cn/npc=15627
-UPDATE `creature_template_locale` SET `Name` = '亚罗德·影歌',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15627;
--- OLD subname : 艾露恩的高阶女祭司
--- Source : https://www.wowhead.com/wotlk/cn/npc=15633
-UPDATE `creature_template_locale` SET `Title` = '艾露恩的高阶祭司',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15633;
--- OLD name : [Unused] Auctioneer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=15672
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15672;
--- OLD name : Blue Qiraji Battle Tank
--- Source : https://www.wowhead.com/wotlk/cn/npc=15713
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 15713;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15713, 'zhCN','蓝色其拉作战坦克',NULL,0);
--- OLD name : Resonating Crystal Formation 31 - 40
--- Source : https://www.wowhead.com/wotlk/cn/npc=15769
-UPDATE `creature_template_locale` SET `Name` = '小型共鸣水晶',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15769;
--- OLD name : Resonating Crystal Formation 41 - 50
--- Source : https://www.wowhead.com/wotlk/cn/npc=15770
-UPDATE `creature_template_locale` SET `Name` = '强效共鸣水晶',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15770;
--- OLD name : Resonating Crystal Formation 51 - 60
--- Source : https://www.wowhead.com/wotlk/cn/npc=15771
-UPDATE `creature_template_locale` SET `Name` = '大型共鸣水晶',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15771;
--- OLD name : Resonating Crystal Formation 21-30
--- Source : https://www.wowhead.com/wotlk/cn/npc=15804
-UPDATE `creature_template_locale` SET `Name` = '次级共鸣水晶',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15804;
--- OLD name : Resonating Crystal Formation 10 - 20
--- Source : https://www.wowhead.com/wotlk/cn/npc=15805
-UPDATE `creature_template_locale` SET `Name` = '小型共鸣水晶',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15805;
--- OLD subname : 辛德拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=16032
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16032;
--- OLD name : [UNUSED] Bog Beast B [PH]
--- Source : https://www.wowhead.com/wotlk/cn/npc=16035
-UPDATE `creature_template_locale` SET `Name` = 'Bog Beast B [PH]',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16035;
--- OLD name : [UNUSED] Deathhound
--- Source : https://www.wowhead.com/wotlk/cn/npc=16038
-UPDATE `creature_template_locale` SET `Name` = '死亡犬',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16038;
--- OLD name : [PH] Alex's Test DPS Mob (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=16077
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 16077;
--- OLD name : 幽灵狮鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=16081
-UPDATE `creature_template_locale` SET `Name` = '鬼灵狮鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16081;
--- OLD name : 十字军指挥官科尔法克斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=16112
-UPDATE `creature_template_locale` SET `Name` = '科尔法克斯，圣光之勇士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16112;
--- OLD name : 十字军指挥官埃里戈尔·黎明使者
--- Source : https://www.wowhead.com/wotlk/cn/npc=16115
-UPDATE `creature_template_locale` SET `Name` = '指挥官埃里戈尔·黎明使者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16115;
--- OLD name : [UNUSED] Scourge Invasion Guardian (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=16138
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 16138;
--- OLD name : [UNUSED] Necropolis Crystal, Buttress (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=16140
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 16140;
--- OLD name : [UNUSED] Buttress Channeler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=16188
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 16188;
--- OLD name : 天灾毒虫
--- Source : https://www.wowhead.com/wotlk/cn/npc=16233
-UPDATE `creature_template_locale` SET `Name` = '瘟疫毒虫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16233;
--- OLD name : 天灾血肉触须
--- Source : https://www.wowhead.com/wotlk/cn/npc=16235
-UPDATE `creature_template_locale` SET `Name` = '瘟疫血肉触须',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16235;
--- OLD subname : Rogue Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=16279
-UPDATE `creature_template_locale` SET `Title` = '潜行者训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16279;
--- OLD name : 变形蟑螂
--- Source : https://www.wowhead.com/wotlk/cn/npc=16374
-UPDATE `creature_template_locale` SET `Name` = '小强',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16374;
--- OLD subname : 银色北伐军
--- Source : https://www.wowhead.com/wotlk/cn/npc=16378
-UPDATE `creature_template_locale` SET `Title` = '银色黎明',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16378;
--- OLD name : 大法师塔希斯·基莫迪尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=16381
-UPDATE `creature_template_locale` SET `Name` = '大法师塔希斯-基莫迪尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16381;
--- OLD name : 调酒师日灼
--- Source : https://www.wowhead.com/wotlk/cn/npc=16442
-UPDATE `creature_template_locale` SET `Name` = '调酒师桑塔基德',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16442;
--- OLD name : [UNUSED] Death Knight Vindicator
--- Source : https://www.wowhead.com/wotlk/cn/npc=16451
-UPDATE `creature_template_locale` SET `Name` = '死亡骑士辩护者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16451;
--- OLD name : 妖女
--- Source : https://www.wowhead.com/wotlk/cn/npc=16461
-UPDATE `creature_template_locale` SET `Name` = '狂热情人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16461;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=16527
-UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16527;
--- OLD name : 接种疫苗的木巢枭兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=16534
-UPDATE `creature_template_locale` SET `Name` = '感染的木巢枭兽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16534;
--- OLD name : 扭扭先生
--- Source : https://www.wowhead.com/wotlk/cn/npc=16548
-UPDATE `creature_template_locale` SET `Name` = '哼哼先生',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16548;
--- OLD name : 蘑菇兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=16565
-UPDATE `creature_template_locale` SET `Name` = 'Myconite Warrior (PH)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16565;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=16583
-UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16583;
--- OLD name : 药剂师安东尼维奇, subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=16588
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16588;
--- OLD name : Bri's Test Character
--- Source : https://www.wowhead.com/wotlk/cn/npc=16605
-UPDATE `creature_template_locale` SET `Name` = 'Brianna Schneider',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16605;
--- OLD name : [PH] Goblin Savage (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=16608
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 16608;
--- OLD name : 拍卖师伊西利安, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=16627
-UPDATE `creature_template_locale` SET `Name` = '伊西利安',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16627;
--- OLD name : 拍卖师塞多里, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=16628
-UPDATE `creature_template_locale` SET `Name` = '塞多里',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16628;
--- OLD name : 拍卖师坦德隆, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=16629
-UPDATE `creature_template_locale` SET `Name` = '坦德隆',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16629;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=16676
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16676;
--- OLD name : 拍卖师艾欧克, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=16707
-UPDATE `creature_template_locale` SET `Name` = '艾欧克',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16707;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=16719
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16719;
--- OLD subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=16720
-UPDATE `creature_template_locale` SET `Title` = '恶魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16720;
--- OLD subname : Weapon Master
--- Source : https://www.wowhead.com/wotlk/cn/npc=16773
-UPDATE `creature_template_locale` SET `Title` = '武器大师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16773;
--- OLD name : 天灾软泥（蓝）
--- Source : https://www.wowhead.com/wotlk/cn/npc=16783
-UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥（蓝）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16783;
--- OLD name : 天灾软泥（红）
--- Source : https://www.wowhead.com/wotlk/cn/npc=16784
-UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥（红）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16784;
--- OLD name : 天灾软泥（绿）
--- Source : https://www.wowhead.com/wotlk/cn/npc=16785
-UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥（绿）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16785;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=16823
-UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16823;
--- OLD name : [UNUSED] Death Lord
--- Source : https://www.wowhead.com/wotlk/cn/npc=16861
-UPDATE `creature_template_locale` SET `Name` = '死亡领主',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16861;
--- OLD name : 闻巽
--- Source : https://www.wowhead.com/wotlk/cn/npc=16868
-UPDATE `creature_template_locale` SET `Name` = '嘲颅斩杀者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16868;
--- OLD name : 纪辛
--- Source : https://www.wowhead.com/wotlk/cn/npc=16869
-UPDATE `creature_template_locale` SET `Name` = '嘲颅新兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16869;
--- OLD name : [Unused] Marauding Crust Burster Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=16914
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 16914;
--- OLD name : 天灾卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=16981
-UPDATE `creature_template_locale` SET `Name` = '瘟疫卫士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16981;
--- OLD name : 天灾构造体
--- Source : https://www.wowhead.com/wotlk/cn/npc=16982
-UPDATE `creature_template_locale` SET `Name` = '瘟疫构造体',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16982;
--- OLD name : [Unused] Crust Burster Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17001
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17001;
--- OLD name : “利爪”安吉拉·凯斯提尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=17002
-UPDATE `creature_template_locale` SET `Name` = '"利爪"安吉拉·凯斯提尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17002;
--- OLD subname : Weapon Master
--- Source : https://www.wowhead.com/wotlk/cn/npc=17005
-UPDATE `creature_template_locale` SET `Title` = '武器大师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17005;
--- OLD name : 顾问萨苏恩·誓日
--- Source : https://www.wowhead.com/wotlk/cn/npc=17100
-UPDATE `creature_template_locale` SET `Name` = '顾问萨苏恩·火盟',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17100;
--- OLD subname : Mage Trainer
--- Source : https://www.wowhead.com/wotlk/cn/npc=17105
-UPDATE `creature_template_locale` SET `Title` = '法师训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17105;
--- OLD name : [Unused] Tunneler Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17234
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17234;
--- OLD name : [PH] Plaguelands Herald (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17239
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17239;
--- OLD subname : 锻造训练师与供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=17245
-UPDATE `creature_template_locale` SET `Title` = '锻造训练师和商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17245;
--- OLD name : “曲奇”米维克索斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=17246
-UPDATE `creature_template_locale` SET `Name` = '"曲奇"米维克索斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17246;
--- OLD name : 天灾波
--- Source : https://www.wowhead.com/wotlk/cn/npc=17293
-UPDATE `creature_template_locale` SET `Name` = '瘟疫波',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17293;
--- OLD name : Slim's Unkillable Test Dummy
--- Source : https://www.wowhead.com/wotlk/cn/npc=17313
-UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy Spammer',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17313;
--- OLD name : [UNUSED] Shadowmoon Firestarter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17463
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17463;
--- OLD name : 地狱火训练假人
--- Source : https://www.wowhead.com/wotlk/cn/npc=17578
-UPDATE `creature_template_locale` SET `Name` = '训练假人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17578;
--- OLD name : [PH] Captain Obvious Jr. (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17597
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17597;
--- OLD subname : Ammunition Vendor
--- Source : https://www.wowhead.com/wotlk/cn/npc=17598
-UPDATE `creature_template_locale` SET `Title` = '军火商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17598;
--- OLD name : 拍卖师耶纳斯, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=17627
-UPDATE `creature_template_locale` SET `Name` = '耶纳斯',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17627;
--- OLD name : 拍卖师维纳, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=17628
-UPDATE `creature_template_locale` SET `Name` = '维纳',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17628;
--- OLD name : 拍卖师菲恩娜, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=17629
-UPDATE `creature_template_locale` SET `Name` = '菲恩娜',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17629;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=17634
-UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17634;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=17637
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17637;
--- OLD name : [UNUSED] Lykul Larva (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=17733
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17733;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (17733, 'zhCN','NPC',NULL,0);
--- OLD name : [UNUSED] Lost Goblin [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17813
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17813;
--- OLD name : [DND]Sunhawk Portal Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17886
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17886;
--- OLD name : [UNUSED] Coilfang Watcher [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=17939
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 17939;
--- OLD subname : 艾露恩的高阶女祭司
--- Source : https://www.wowhead.com/wotlk/cn/npc=17948
-UPDATE `creature_template_locale` SET `Title` = '艾露恩的高阶祭司',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17948;
--- OLD name : Open Portal Target
--- Source : https://www.wowhead.com/wotlk/cn/npc=17965
-UPDATE `creature_template_locale` SET `Name` = 'Dark Portal Target UNUSED',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17965;
--- OLD name : Doomfire Spirit
--- Source : https://www.wowhead.com/wotlk/cn/npc=18104
-UPDATE `creature_template_locale` SET `Name` = 'Doomfire Targeting',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18104;
--- OLD name : 堕落新星图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=18179
-UPDATE `creature_template_locale` SET `Name` = '腐化新星图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18179;
--- OLD name : “好儿子”沙度·远行者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18200
-UPDATE `creature_template_locale` SET `Name` = '"好儿子"沙度·远行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18200;
--- OLD name : “伯爵”昂古拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=18285
-UPDATE `creature_template_locale` SET `Name` = '"伯爵"昂古拉',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18285;
--- OLD name : 迷失的占卜者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18319
-UPDATE `creature_template_locale` SET `Name` = '迷时的占卜者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18319;
--- OLD name : 迷失的暗影法师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18320
-UPDATE `creature_template_locale` SET `Name` = '迷时的暗影法师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18320;
--- OLD name : 迷失的控制者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18327
-UPDATE `creature_template_locale` SET `Name` = '迷时的控制者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18327;
--- OLD name : [UNUSED] Sethekk Magelord (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=18329
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 18329;
--- OLD name : 拍卖师凡尼, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=18348
-UPDATE `creature_template_locale` SET `Name` = '凡尼',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18348;
--- OLD name : 拍卖师伊蕾萨, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=18349
-UPDATE `creature_template_locale` SET `Name` = '伊蕾萨',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18349;
--- OLD name : [UNUSED] Dusty Skeleton [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=18355
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 18355;
--- OLD name : 迅捷紫色狮鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=18362
-UPDATE `creature_template_locale` SET `Name` = 'Outland Gryphon Mount Armored (Purple)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18362;
--- OLD name : 蓝色驭风者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18364
-UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount (Blue)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18364;
--- OLD name : 绿色驭风者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18365
-UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount (Green)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18365;
--- OLD name : [UNUSED] Draenei Spirit [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=18367
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 18367;
--- OLD name : 迅捷红色驭风者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18377
-UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Standard)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18377;
--- OLD name : 迅捷绿色驭风者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18378
-UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Green)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18378;
--- OLD name : 迅捷紫色驭风者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18379
-UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Purple)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18379;
--- OLD name : 迅捷黄色驭风者
--- Source : https://www.wowhead.com/wotlk/cn/npc=18380
-UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Yellow)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18380;
--- OLD name : 迅捷蓝色狮鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=18406
-UPDATE `creature_template_locale` SET `Name` = 'Outland Gryphon Mount Armored (Standard)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18406;
--- OLD name : 奥的灰烬
--- Source : https://www.wowhead.com/wotlk/cn/npc=18545
-UPDATE `creature_template_locale` SET `Name` = 'Peep the Outland Phoenix',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18545;
--- OLD name : [UNUSED]Anchorite Lyteera (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=18674
-UPDATE `creature_template_locale` SET `Name` = '召唤炸药包',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18674;
--- OLD subname : 采矿训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18747
-UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18747;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18748
-UPDATE `creature_template_locale` SET `Title` = '大师级草药学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18748;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18749
-UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18749;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18751
-UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18751;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18752
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18752;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18753
-UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18753;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18754
-UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18754;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18755
-UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18755;
--- OLD name : 拍卖师达莉丝, subname : Auctioneer
--- Source : https://www.wowhead.com/wotlk/cn/npc=18761
-UPDATE `creature_template_locale` SET `Name` = '达莉丝',`Title` = '拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18761;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18771
-UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18771;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18772
-UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18772;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18773
-UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18773;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18774
-UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18774;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18775
-UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18775;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18776
-UPDATE `creature_template_locale` SET `Title` = '大师级草药学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18776;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18777
-UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18777;
--- OLD subname : 采矿训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18779
-UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18779;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18802
-UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18802;
--- OLD name : “国王”唐金
--- Source : https://www.wowhead.com/wotlk/cn/npc=18897
-UPDATE `creature_template_locale` SET `Name` = '"国王"唐金',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18897;
--- OLD name : 伊克普罗迪·菲兹普特, subname : 竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=18898
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18898;
--- OLD subname : 钓鱼训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18911
-UPDATE `creature_template_locale` SET `Title` = '大师级钓鱼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18911;
--- OLD name : [PH] Gossip NPC, Human Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=18935
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 18935;
--- OLD name : [PH] Gossip NPC, Human Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=18936
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 18936;
--- OLD name : [PH] Gossip NPC, Human, Specific Look (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=18941
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 18941;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18987
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18987;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18988
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18988;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18990
-UPDATE `creature_template_locale` SET `Title` = '医师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18990;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=18991
-UPDATE `creature_template_locale` SET `Title` = '医师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18991;
--- OLD subname : 烹饪训练师和商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=18993
-UPDATE `creature_template_locale` SET `Title` = '烹饪供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18993;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19052
-UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19052;
--- OLD name : [PH] Gossip NPC Human Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19057
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19057;
--- OLD name : [PH] Gossip NPC Human Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19058
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19058;
--- OLD name : [PH] Gossip NPC Human Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19059
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19059;
--- OLD name : [PH] Gossip NPC Human Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19060
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19060;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19063
-UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19063;
--- OLD name : [PH] Gossip NPC Dwarf Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19078
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19078;
--- OLD name : [PH] Gossip NPC Dwarf Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19079
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19079;
--- OLD name : [PH] Gossip NPC Night Elf Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19080
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19080;
--- OLD name : [PH] Gossip NPC Night Elf Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19081
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19081;
--- OLD name : [PH] Gossip NPC Draenei Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19082
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19082;
--- OLD name : [PH] Gossip NPC Draenei Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19083
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19083;
--- OLD name : [PH] Gossip NPC Blood Elf Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19084
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19084;
--- OLD name : [PH] Gossip NPC Blood Elf Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19085
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19085;
--- OLD name : [PH] Gossip NPC Orc Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19086
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19086;
--- OLD name : [PH] Gossip NPC Orc Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19087
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19087;
--- OLD name : [PH] Gossip NPC Tauren Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19088
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19088;
--- OLD name : [PH] Gossip NPC Tauren Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19089
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19089;
--- OLD name : [PH] Gossip NPC Undead Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19090
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19090;
--- OLD name : [PH] Gossip NPC Undead Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19091
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19091;
--- OLD name : [PH] Gossip NPC Dwarf Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19092
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19092;
--- OLD name : [PH] Gossip NPC Night Elf Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19093
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19093;
--- OLD name : [PH] Gossip NPC Draenei Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19094
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19094;
--- OLD name : [PH] Gossip NPC Blood Elf Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19095
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19095;
--- OLD name : [PH] Gossip NPC Orc Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19096
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19096;
--- OLD name : [PH] Gossip NPC Tauren Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19097
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19097;
--- OLD name : [PH] Gossip NPC Undead Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19098
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19098;
--- OLD name : [PH] Gossip NPC Blood Elf Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19099
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19099;
--- OLD name : [PH] Gossip NPC Draenei Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19100
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19100;
--- OLD name : [PH] Gossip NPC Dwarf Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19101
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19101;
--- OLD name : [PH] Gossip NPC Night Elf Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19102
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19102;
--- OLD name : [PH] Gossip NPC Orc Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19103
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19103;
--- OLD name : [PH] Gossip NPC Tauren Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19104
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19104;
--- OLD name : [PH] Gossip NPC Undead Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19105
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19105;
--- OLD name : [PH] Gossip NPC, Blood Elf Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19106
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19106;
--- OLD name : [PH] Gossip NPC, Draenei Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19107
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19107;
--- OLD name : [PH] Gossip NPC, Dwarf Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19108
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19108;
--- OLD name : [PH] Gossip NPC, Orc Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19109
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19109;
--- OLD name : [PH] Gossip NPC, Undead Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19110
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19110;
--- OLD name : [PH] Gossip NPC, Tauren Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19111
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19111;
--- OLD name : [PH] Gossip NPC, Night Elf Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19112
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19112;
--- OLD name : [PH] Gossip NPC, Blood Elf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19113
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19113;
--- OLD name : [PH] Gossip NPC, Draenei Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19114
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19114;
--- OLD name : [PH] Gossip NPC, Dwarf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19115
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19115;
--- OLD name : [PH] Gossip NPC, Night Elf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19116
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19116;
--- OLD name : [PH] Gossip NPC, Orc Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19117
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19117;
--- OLD name : [PH] Gossip NPC, Tauren Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19118
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19118;
--- OLD name : [PH] Gossip NPC, Undead Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19119
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19119;
--- OLD name : [PH] Gossip NPC, Gnome Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19121
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19121;
--- OLD name : [PH] Gossip NPC, Gnome Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19122
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19122;
--- OLD name : [PH] Gossip NPC, Troll Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19123
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19123;
--- OLD name : [PH] Gossip NPC, Troll Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19124
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19124;
--- OLD name : [PH] Gossip NPC Gnome Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19125
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19125;
--- OLD name : [PH] Gossip NPC Gnome Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19126
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19126;
--- OLD name : [PH] Gossip NPC Troll Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19127
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19127;
--- OLD name : [PH] Gossip NPC Troll Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19128
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19128;
--- OLD name : [PH] Gossip NPC Gnome Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19129
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19129;
--- OLD name : [PH] Gossip NPC Troll Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19130
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19130;
--- OLD name : [PH] Gossip NPC Gnome Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19131
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19131;
--- OLD name : [PH] Gossip NPC Troll Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19132
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19132;
--- OLD name : “猎枪”琼斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=19137
-UPDATE `creature_template_locale` SET `Name` = '"猎枪"琼斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19137;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19180
-UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19180;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19184
-UPDATE `creature_template_locale` SET `Title` = '医师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19184;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19185
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19185;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19187
-UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19187;
--- OLD name : 熔岩涌动图腾
--- Source : https://www.wowhead.com/wotlk/cn/npc=19222
-UPDATE `creature_template_locale` SET `Name` = '熔岩喷涌图腾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19222;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19252
-UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19252;
--- OLD name : Barnu Cragcrush, subname : Stable Master
--- Source : https://www.wowhead.com/wotlk/cn/npc=19325
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19325;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (19325, 'zhCN','巴儿努·碎岩','兽栏管理员',0);
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19341
-UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19341;
--- OLD subname : 枪械商
--- Source : https://www.wowhead.com/wotlk/cn/npc=19351
-UPDATE `creature_template_locale` SET `Title` = '枪械和弹药商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19351;
--- OLD name : “尖嗓子”斯克里·拉克希德
--- Source : https://www.wowhead.com/wotlk/cn/npc=19367
-UPDATE `creature_template_locale` SET `Name` = '"尖嗓子"斯克里·拉克希德',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19367;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19369
-UPDATE `creature_template_locale` SET `Title` = '厨师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19369;
--- OLD name : “暗眼”格里洛克
--- Source : https://www.wowhead.com/wotlk/cn/npc=19457
-UPDATE `creature_template_locale` SET `Name` = '"暗眼"格里洛克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19457;
--- OLD subname : 投掷武器商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=19473
-UPDATE `creature_template_locale` SET `Title` = '投掷武器和弹药',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19473;
--- OLD subname : 兽栏管理员
--- Source : https://www.wowhead.com/wotlk/cn/npc=19491
-UPDATE `creature_template_locale` SET `Title` = '马骑术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19491;
--- OLD subname : 兽栏管理员
--- Source : https://www.wowhead.com/wotlk/cn/npc=19492
-UPDATE `creature_template_locale` SET `Title` = '马骑术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19492;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19539
-UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19539;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19540
-UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19540;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=19576
-UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19576;
--- OLD name : [PH]Sunfury Caster - Sunfury Hold (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19650
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19650;
--- OLD name : 重型精英雷象
--- Source : https://www.wowhead.com/wotlk/cn/npc=19659
-UPDATE `creature_template_locale` SET `Name` = '重型雷象',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19659;
--- OLD name : “杂学家”玛姆迪
--- Source : https://www.wowhead.com/wotlk/cn/npc=19669
-UPDATE `creature_template_locale` SET `Name` = '"杂学家"玛姆迪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19669;
--- OLD name : “上尉”卡弗提兹
--- Source : https://www.wowhead.com/wotlk/cn/npc=19676
-UPDATE `creature_template_locale` SET `Name` = '"上尉"卡弗提兹',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19676;
--- OLD name : “瘦子”
--- Source : https://www.wowhead.com/wotlk/cn/npc=19679
-UPDATE `creature_template_locale` SET `Name` = '"瘦子"',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19679;
--- OLD name : “脏鬼”拉瑞
--- Source : https://www.wowhead.com/wotlk/cn/npc=19720
-UPDATE `creature_template_locale` SET `Name` = '"脏鬼"拉瑞',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19720;
--- OLD name : “史诗”马龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=19725
-UPDATE `creature_template_locale` SET `Name` = '"史诗"马龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19725;
--- OLD name : 纳斯雷兹姆顾问
--- Source : https://www.wowhead.com/wotlk/cn/npc=19743
-UPDATE `creature_template_locale` SET `Name` = '纳斯雷兹姆议员',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19743;
--- OLD name : 日蚀百夫长
--- Source : https://www.wowhead.com/wotlk/cn/npc=19792
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19792;
--- OLD name : [PH] Illidari Overseer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19819
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19819;
--- OLD name : 黑暗教团乌鸦卫士
--- Source : https://www.wowhead.com/wotlk/cn/npc=19827
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19827;
--- OLD name : [PH] Horn Ghost (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=19846
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 19846;
--- OLD name : 卡翠欧娜·沃宁迪女伯爵
--- Source : https://www.wowhead.com/wotlk/cn/npc=19872
-UPDATE `creature_template_locale` SET `Name` = '卡翠欧娜·冯因迪女伯爵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19872;
--- OLD name : 拉弗·德鲁格尔男爵
--- Source : https://www.wowhead.com/wotlk/cn/npc=19874
-UPDATE `creature_template_locale` SET `Name` = '拉弗·杜格尔男爵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19874;
--- OLD name : 杜萝希·米尔斯迪普女伯爵
--- Source : https://www.wowhead.com/wotlk/cn/npc=19875
-UPDATE `creature_template_locale` SET `Name` = '杜萝希·米尔斯提女伯爵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19875;
--- OLD name : 罗宾·达尼斯伯爵
--- Source : https://www.wowhead.com/wotlk/cn/npc=19876
-UPDATE `creature_template_locale` SET `Name` = '罗宾·达瑞斯伯爵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19876;
--- OLD name : 白色树苗
--- Source : https://www.wowhead.com/wotlk/cn/npc=19958
-UPDATE `creature_template_locale` SET `Name` = '白色幼苗',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19958;
--- OLD name : 蓝色树苗
--- Source : https://www.wowhead.com/wotlk/cn/npc=19962
-UPDATE `creature_template_locale` SET `Name` = '蓝色幼苗',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19962;
--- OLD name : 红色树苗
--- Source : https://www.wowhead.com/wotlk/cn/npc=19964
-UPDATE `creature_template_locale` SET `Name` = '红色幼苗',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19964;
--- OLD name : 绿色树苗
--- Source : https://www.wowhead.com/wotlk/cn/npc=19969
-UPDATE `creature_template_locale` SET `Name` = '绿色幼苗',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19969;
--- OLD name : 萨拉斯战马
--- Source : https://www.wowhead.com/wotlk/cn/npc=20029
-UPDATE `creature_template_locale` SET `Name` = '奎尔萨拉斯军马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20029;
--- OLD name : 萨拉斯军马
--- Source : https://www.wowhead.com/wotlk/cn/npc=20030
-UPDATE `creature_template_locale` SET `Name` = '奎尔萨拉斯战马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20030;
--- OLD name : [PH] Gossip NPC Goblin Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=20103
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 20103;
--- OLD name : [PH] Gossip NPC, Goblin Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=20104
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 20104;
--- OLD name : [PH] Gossip NPC Goblin Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=20105
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 20105;
--- OLD name : [PH] Gossip NPC Goblin Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=20106
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 20106;
--- OLD name : [PH] Gossip NPC, Goblin Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=20107
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 20107;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=20124
-UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20124;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=20125
-UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20125;
--- OLD subname : 传承竞技场护甲
--- Source : https://www.wowhead.com/wotlk/cn/npc=20278
-UPDATE `creature_template_locale` SET `Title` = '野蛮竞技场商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20278;
--- OLD subname : 驭风者饲养员
--- Source : https://www.wowhead.com/wotlk/cn/npc=20494
-UPDATE `creature_template_locale` SET `Title` = '驭风者管理员',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20494;
--- OLD subname : 飞行训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=20500
-UPDATE `creature_template_locale` SET `Title` = '骑术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20500;
--- OLD name : 雪色狮鹫坐骑
--- Source : https://www.wowhead.com/wotlk/cn/npc=20505
-UPDATE `creature_template_locale` SET `Name` = '雪色狮鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20505;
--- OLD name : 迅捷绿色骑乘狮鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=20506
-UPDATE `creature_template_locale` SET `Name` = '迅捷绿色狮鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20506;
--- OLD name : 迅捷紫色骑乘狮鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=20507
-UPDATE `creature_template_locale` SET `Name` = '迅捷紫色狮鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20507;
--- OLD name : 迅捷红色骑乘狮鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=20508
-UPDATE `creature_template_locale` SET `Name` = '迅捷红色狮鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20508;
--- OLD name : 迅捷蓝色骑乘狮鹫
--- Source : https://www.wowhead.com/wotlk/cn/npc=20509
-UPDATE `creature_template_locale` SET `Name` = '迅捷蓝色狮鹫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20509;
--- OLD subname : 飞行训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=20511
-UPDATE `creature_template_locale` SET `Title` = '骑术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20511;
--- OLD name : 阿拉加的幼崽
--- Source : https://www.wowhead.com/wotlk/cn/npc=20615
-UPDATE `creature_template_locale` SET `Name` = '暗喉山猫幼崽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20615;
--- OLD name : Coilfang Door Controller
--- Source : https://www.wowhead.com/wotlk/cn/npc=20926
-UPDATE `creature_template_locale` SET `Name` = 'Invisible Stalker Coilfang Doors',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20926;
--- OLD name : QA Test Dummy 73 Raid Debuff (High Armor)
--- Source : https://www.wowhead.com/wotlk/cn/npc=21003
-UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy 73 Raid Debuffed Warrior',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21003;
--- OLD name : [PH] Arcane Guardian (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21031
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21031;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=21087
-UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21087;
--- OLD name : 欧鲁诺克·裂心
--- Source : https://www.wowhead.com/wotlk/cn/npc=21183
-UPDATE `creature_template_locale` SET `Name` = '欧鲁诺克-裂心',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21183;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=21209
-UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21209;
--- OLD name : “背刺者”宾度·盖布
--- Source : https://www.wowhead.com/wotlk/cn/npc=21235
-UPDATE `creature_template_locale` SET `Name` = '"背刺者"宾度·盖布',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21235;
--- OLD name : 埃米
--- Source : https://www.wowhead.com/wotlk/cn/npc=21317
-UPDATE `creature_template_locale` SET `Name` = '艾米',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21317;
--- OLD name : [PH]Test Skunk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21333
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21333;
--- OLD name : 炽热战马
--- Source : https://www.wowhead.com/wotlk/cn/npc=21354
-UPDATE `creature_template_locale` SET `Name` = '火焰战马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21354;
--- OLD name : 漂浮的徽记
--- Source : https://www.wowhead.com/wotlk/cn/npc=21365
-UPDATE `creature_template_locale` SET `Name` = '漂浮的颅骨',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21365;
--- OLD name : [UNUSED]Test Nether Whelp (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21378
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21378;
--- OLD name : Tempixx Finagler
--- Source : https://www.wowhead.com/wotlk/cn/npc=21444
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21444;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (21444, 'zhCN','泰匹希·芬纳格',NULL,0);
--- OLD name : [Unused] Greater Crust Burster Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21457
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21457;
--- OLD subname : Ammunition
--- Source : https://www.wowhead.com/wotlk/cn/npc=21483
-UPDATE `creature_template_locale` SET `Title` = '弹药商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21483;
--- OLD subname : Ammunition
--- Source : https://www.wowhead.com/wotlk/cn/npc=21488
-UPDATE `creature_template_locale` SET `Title` = '弹药商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21488;
--- OLD name : [DND]Kaliri Aura Dispel (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21511
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21511;
--- OLD name : Forest Strider
--- Source : https://www.wowhead.com/wotlk/cn/npc=21634
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21634;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (21634, 'zhCN','森林阔步者',NULL,0);
--- OLD name : 森林陆行鸟
--- Source : https://www.wowhead.com/wotlk/cn/npc=21635
-UPDATE `creature_template_locale` SET `Name` = '阿弗拉斯森林陆行鸟',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21635;
--- OLD name : [UNUSED]Death's Deliverer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21658
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21658;
--- OLD name : 欧鲁诺克·裂心
--- Source : https://www.wowhead.com/wotlk/cn/npc=21685
-UPDATE `creature_template_locale` SET `Name` = '欧鲁诺克-裂心',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21685;
--- OLD name : [DND]Mok'Nathal Wand 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21713
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21713;
--- OLD name : [DND]Mok'Nathal Wand 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21714
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21714;
--- OLD name : [DND]Mok'Nathal Wand 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21715
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21715;
--- OLD name : [DND]Mok'Nathal Wand 4 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=21716
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 21716;
--- OLD name : 大型爆盐炸弹
--- Source : https://www.wowhead.com/wotlk/cn/npc=21848
-UPDATE `creature_template_locale` SET `Name` = 'ZZOLD - Bone Burster Visual[PH]',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21848;
--- OLD name : 加姆·狼脉
--- Source : https://www.wowhead.com/wotlk/cn/npc=21950
-UPDATE `creature_template_locale` SET `Name` = '加姆·狼兄',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21950;
--- OLD name : [DND]Spirit 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22023
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22023;
--- OLD name : [PH] bat target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22039
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22039;
--- OLD name : [ph] cave ant [not used] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22048
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22048;
--- OLD name : Coilfang Raid Control Emote Stalker
--- Source : https://www.wowhead.com/wotlk/cn/npc=22057
-UPDATE `creature_template_locale` SET `Name` = 'Invisible Stalker Coilfang Raid Console Emotes',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22057;
--- OLD name : [DND]Whisper Spying Credit Marker 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22116
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22116;
--- OLD name : [DND]Whisper Spying Credit Marker 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22117
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22117;
--- OLD name : [DND]Whisper Spying Credit Marker 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22118
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22118;
--- OLD subname : 月布裁缝大师
--- Source : https://www.wowhead.com/wotlk/cn/npc=22208
-UPDATE `creature_template_locale` SET `Title` = '月布大师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22208;
--- OLD subname : 暗纹裁缝大师
--- Source : https://www.wowhead.com/wotlk/cn/npc=22212
-UPDATE `creature_template_locale` SET `Title` = '暗纹大师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22212;
--- OLD subname : 魔焰裁缝大师
--- Source : https://www.wowhead.com/wotlk/cn/npc=22213
-UPDATE `creature_template_locale` SET `Title` = '魔焰大师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22213;
--- OLD name : [PH] Wrath Clefthoof [not used] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22284
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22284;
--- OLD name : [DND]Green Spot Grog Keg Relay (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22349
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22349;
--- OLD name : [DND]Green Spot Grog Keg Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22356
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22356;
--- OLD name : [DND]Ripe Moonshine Keg Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22367
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22367;
--- OLD name : [DND]Fermented Seed Beer Keg Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22368
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22368;
--- OLD name : [DND]Bloodmaul Chatter Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22383
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22383;
--- OLD name : [PH]Altar of Shadows target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22395
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22395;
--- OLD name : [PH]Altar of Shadows caster (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22417
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22417;
--- OLD name : [DND]Ogre Pike Planted Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22434
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22434;
--- OLD name : [DND]Rexxar's Wyvern Freed Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22435
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22435;
--- OLD name : [DND]Sablemane's Trap Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22447
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22447;
--- OLD name : 暗色骑乘塔布羊
--- Source : https://www.wowhead.com/wotlk/cn/npc=22511
-UPDATE `creature_template_locale` SET `Name` = '黑暗骑乘塔布羊',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22511;
--- OLD name : [DND]Prophecy 1 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22798
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22798;
--- OLD name : [DND]Prophecy 2 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22799
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22799;
--- OLD name : [DND]Prophecy 3 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22800
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22800;
--- OLD name : [DND]Prophecy 4 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22801
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22801;
--- OLD subname : 猛禽德鲁伊
--- Source : https://www.wowhead.com/wotlk/cn/npc=22832
-UPDATE `creature_template_locale` SET `Title` = '利爪德鲁伊',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22832;
--- OLD name : 神殿女妖
--- Source : https://www.wowhead.com/wotlk/cn/npc=22939
-UPDATE `creature_template_locale` SET `Name` = '神殿助祭',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22939;
--- OLD name : 妩媚女妖
--- Source : https://www.wowhead.com/wotlk/cn/npc=22955
-UPDATE `creature_template_locale` SET `Name` = '有魅力的客人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22955;
--- OLD name : 痛苦之女
--- Source : https://www.wowhead.com/wotlk/cn/npc=22956
-UPDATE `creature_template_locale` SET `Name` = '苦痛祭司',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22956;
--- OLD name : 狂乱祭司
--- Source : https://www.wowhead.com/wotlk/cn/npc=22957
-UPDATE `creature_template_locale` SET `Name` = '狂乱女士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22957;
--- OLD name : 缚法随从
--- Source : https://www.wowhead.com/wotlk/cn/npc=22959
-UPDATE `creature_template_locale` SET `Name` = '热忱的招待',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22959;
--- OLD name : [UNUSED] Harem Girl 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=22961
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 22961;
--- OLD name : 欢愉祭司
--- Source : https://www.wowhead.com/wotlk/cn/npc=22962
-UPDATE `creature_template_locale` SET `Name` = '悲伤女士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22962;
--- OLD name : 快乐之女
--- Source : https://www.wowhead.com/wotlk/cn/npc=22964
-UPDATE `creature_template_locale` SET `Name` = '欢愉祭司',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22964;
--- OLD name : 被奴役的仆从
--- Source : https://www.wowhead.com/wotlk/cn/npc=22965
-UPDATE `creature_template_locale` SET `Name` = '虔诚的管家',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22965;
--- OLD name : [PH]Knockdown Fel Cannon Dummy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23077
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23077;
--- OLD name : 萨尔拉
--- Source : https://www.wowhead.com/wotlk/cn/npc=23108
-UPDATE `creature_template_locale` SET `Name` = '萨拉',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23108;
--- OLD name : [PH]Fel Hound (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23138
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23138;
--- OLD name : 负法奴仆
--- Source : https://www.wowhead.com/wotlk/cn/npc=23154
-UPDATE `creature_template_locale` SET `Name` = '法力奴仆',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23154;
--- OLD name : 破坏魔刺客
--- Source : https://www.wowhead.com/wotlk/cn/npc=23220
-UPDATE `creature_template_locale` SET `Name` = '希瓦魔刺客',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23220;
--- OLD name : [UNUSED] Mutant Commander [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23238
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23238;
--- OLD name : [PH]Wrath Hound Transform (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23276
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23276;
--- OLD name : Akama Event Stalker
--- Source : https://www.wowhead.com/wotlk/cn/npc=23288
-UPDATE `creature_template_locale` SET `Name` = 'Invisible Stalker (Akama)',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23288;
--- OLD name : 矿车
--- Source : https://www.wowhead.com/wotlk/cn/npc=23289
-UPDATE `creature_template_locale` SET `Name` = 'Mine Cart',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23289;
--- OLD name : [PH] PvP Cannon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23314
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23314;
--- OLD name : [PH] PvP Cannon Shot Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23315
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23315;
--- OLD name : [PH] PvP Cannon Targetting Reticle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23317
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23317;
--- OLD subname : 经典旧世联盟锁甲及板甲
--- Source : https://www.wowhead.com/wotlk/cn/npc=23396
-UPDATE `creature_template_locale` SET `Title` = '竞技场商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23396;
--- OLD name : 饥饿灵魂碎块
--- Source : https://www.wowhead.com/wotlk/cn/npc=23401
-UPDATE `creature_template_locale` SET `Name` = '饥饿的灵魂碎块',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23401;
--- OLD name : Flaskataur, subname : NONE
--- Source : https://www.wowhead.com/wotlk/cn/npc=23405
-UPDATE `creature_template_locale` SET `Name` = '弗拉斯卡托',`Title` = '测试服消耗品',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23405;
--- OLD name : 乌鸦之神
--- Source : https://www.wowhead.com/wotlk/cn/npc=23408
-UPDATE `creature_template_locale` SET `Name` = '迅捷鸦神坐骑',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23408;
--- OLD name : [PH] Brewfest Dwarf Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23479
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23479;
--- OLD name : [PH] Brewfest Human Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23480
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23480;
--- OLD name : [PH] Brewfest Garden D Vendor (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23532
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23532;
--- OLD name : [PH] Brewfest Goblin Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23540
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23540;
--- OLD name : 巴德
--- Source : https://www.wowhead.com/wotlk/cn/npc=23559
-UPDATE `creature_template_locale` SET `Name` = '巴德·奈德雷克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23559;
--- OLD subname : 潜行者训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=23566
-UPDATE `creature_template_locale` SET `Title` = '军情七处',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23566;
--- OLD name : 美酒节座羊
--- Source : https://www.wowhead.com/wotlk/cn/npc=23588
-UPDATE `creature_template_locale` SET `Name` = '座羊（美酒节）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23588;
--- OLD name : [PH] New Hinterlands NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23599
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23599;
--- OLD name : 日灼的学徒
--- Source : https://www.wowhead.com/wotlk/cn/npc=23606
-UPDATE `creature_template_locale` SET `Name` = '血精灵酿酒学徒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23606;
--- OLD name : [PH] Brewfest Orc Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23607
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23607;
--- OLD name : [PH] Brewfest Tauren Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23608
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23608;
--- OLD name : [PH] Brewfest Troll Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23609
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23609;
--- OLD name : [PH] Brewfest Blood Elf Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23610
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23610;
--- OLD name : [PH] Brewfest Undead Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23611
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23611;
--- OLD name : [PH] Brewfest Draenei Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23613
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23613;
--- OLD name : [PH] Brewfest Gnome Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23614
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23614;
--- OLD name : [PH] Brewfest Night Elf Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23615
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23615;
--- OLD name : [PH] Darkmoon Faire Carnie APPEARANCE A (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23629
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23629;
--- OLD name : [PH] Darkmoon Faire Carnie APPEARANCE B (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23630
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23630;
--- OLD name : [PH] Darkmoon Faire Carnie APPEARANCE C (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23631
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23631;
--- OLD name : [PH] Darkmoon Faire Carnie APPEARANCE D (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23632
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23632;
--- OLD name : [PH] Darkmoon Faire Carnie APPEARANCE E (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23633
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23633;
--- OLD name : [PH] Darkmoon Faire Carnie APPEARANCE F (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23634
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23634;
--- OLD name : 斯克恩长矛手 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23653
-UPDATE `creature_template_locale` SET `Name` = '蔑冬长矛手',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23653;
--- OLD name : 斯克恩碾骨者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23655
-UPDATE `creature_template_locale` SET `Name` = '蔑冬碾骨者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23655;
--- OLD name : 斯克恩吟游诗人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23657
-UPDATE `creature_template_locale` SET `Name` = '蔑冬吟游诗人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23657;
--- OLD name : 斯克恩预言者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23669
-UPDATE `creature_template_locale` SET `Name` = '蔑冬预言者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23669;
--- OLD name : 斯克恩长者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23670
-UPDATE `creature_template_locale` SET `Name` = '蔑冬长者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23670;
--- OLD subname : 斯克恩的领主 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23671
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23671;
--- OLD name : [DND] Brewfest Dark Iron Event Generator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23703
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23703;
--- OLD subname : QA (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23715
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23715;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=23734
-UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23734;
--- OLD name : 库塞尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=23748
-UPDATE `creature_template_locale` SET `Name` = '库尔基',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23748;
--- OLD subname : 皇家药剂师协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23781
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23781;
--- OLD subname : 皇家药剂师协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23782
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23782;
--- OLD subname : 皇家药剂师协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23784
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23784;
--- OLD name : [DND] Brewfest Keg Move to Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23808
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23808;
--- OLD subname : 蝙蝠管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=23816
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23816;
--- OLD name : [PH] Brewfest Dwarf Male Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23819
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23819;
--- OLD name : [PH] Brewfest Dwarf Female Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23820
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23820;
--- OLD name : [PH] Brewfest Goblin Female Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23824
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23824;
--- OLD name : [PH] Brewfest Goblin Male Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23825
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23825;
--- OLD name : [DND] L70ETC FX Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23830
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23830;
--- OLD name : [DND] L70ETC Bergrisst Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23845
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23845;
--- OLD name : [DND] L70ETC Concert Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23850
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23850;
--- OLD name : [DND] L70ETC Mai'Kyl Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23852
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23852;
--- OLD name : [DND] L70ETC Samuro Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23853
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23853;
--- OLD name : [DND] L70ETC Sig Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23854
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23854;
--- OLD name : [DND] L70ETC Chief Thunder-Skins Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23855
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23855;
--- OLD name : [DND] Brewfest Dark Iron Spawn Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23894
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23894;
--- OLD name : “脏鬼”迈克尔·克罗维, subname : 钓鱼训练师兼鱼商
--- Source : https://www.wowhead.com/wotlk/cn/npc=23896
-UPDATE `creature_template_locale` SET `Name` = '"脏鬼"迈克尔·克罗维',`Title` = '鱼商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23896;
--- OLD name : [DNT]TEST Pet Moth (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=23936
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 23936;
--- OLD name : 掠夺者因格瓦尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=23954
-UPDATE `creature_template_locale` SET `Name` = '劫掠者因格瓦尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23954;
--- OLD name : 幽灵虎
--- Source : https://www.wowhead.com/wotlk/cn/npc=24003
-UPDATE `creature_template_locale` SET `Name` = '幽灵狼',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24003;
--- OLD name : 围城工人
--- Source : https://www.wowhead.com/wotlk/cn/npc=24005
-UPDATE `creature_template_locale` SET `Name` = '磨坊工人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24005;
--- OLD name : 斯克恩防御者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24015
-UPDATE `creature_template_locale` SET `Name` = '蔑冬防御者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24015;
--- OLD subname : 萨莱因 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24041
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24041;
--- OLD name : 掷杯训练器, subname : 掷杯训练器
--- Source : https://www.wowhead.com/wotlk/cn/npc=24108
-UPDATE `creature_template_locale` SET `Name` = '自动搅拌工具',`Title` = '烈酒',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24108;
--- OLD name : [DND] Brewfest Target Dummy Move To Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24109
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24109;
--- OLD subname : 斯克恩的领主 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24119
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24119;
--- OLD name : [DND] Darkmoon Faire Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24171
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24171;
--- OLD name : [UNUSED]Ghost of Explorer Jaren (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24181
-UPDATE `creature_template_locale` SET `Name` = '召唤炸药包',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24181;
--- OLD name : [DND] Brewfest Barker Bunny 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24202
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24202;
--- OLD name : [DND] Brewfest Barker Bunny 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24203
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24203;
--- OLD name : [DND] Brewfest Barker Bunny 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24204
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24204;
--- OLD name : [DND] Brewfest Barker Bunny 4 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24205
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24205;
--- OLD name : 亡者大军
--- Source : https://www.wowhead.com/wotlk/cn/npc=24207
-UPDATE `creature_template_locale` SET `Name` = '亡者军团食尸鬼',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24207;
--- OLD name : “小个子”洛戈克
--- Source : https://www.wowhead.com/wotlk/cn/npc=24208
-UPDATE `creature_template_locale` SET `Name` = '"小个子"洛戈克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24208;
--- OLD name : [DND] Darkmoon Faire Target Bunny Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24220
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24220;
--- OLD subname : 斯克恩的酋长 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24238
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24238;
--- OLD name : [DND] Brewfest Speed Bunny Green (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24263
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24263;
--- OLD name : [DND] Brewfest Speed Bunny Yellow (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24264
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24264;
--- OLD name : [DND] Brewfest Speed Bunny Red (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24265
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24265;
--- OLD subname : Winterskorn Chieftain (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24275
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24275;
--- OLD subname : Winterskorn Chieftain (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24276
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24276;
--- OLD name : [PH] Gossip NPC Human Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24292
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24292;
--- OLD name : [PH] Gossip NPC Human Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24293
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24293;
--- OLD name : [PH] Gossip NPC Blood Elf Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24294
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24294;
--- OLD name : [PH] Gossip NPC Blood Elf Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24295
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24295;
--- OLD name : [PH] Gossip NPC Draenei Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24296
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24296;
--- OLD name : [PH] Gossip NPC Draenei Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24297
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24297;
--- OLD name : [PH] Gossip NPC Dwarf Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24298
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24298;
--- OLD name : [PH] Gossip NPC Dwarf Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24299
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24299;
--- OLD name : [PH] Gossip NPC Undead Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24300
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24300;
--- OLD name : [PH] Gossip NPC Undead Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24301
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24301;
--- OLD name : [PH] Gossip NPC Gnome Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24302
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24302;
--- OLD name : [PH] Gossip NPC Gnome Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24303
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24303;
--- OLD name : [PH] Gossip NPC Goblin Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24304
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24304;
--- OLD name : [PH] Gossip NPC Goblin Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24305
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24305;
--- OLD name : [PH] Gossip NPC Night Elf Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24306
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24306;
--- OLD name : [PH] Gossip NPC Night Elf Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24307
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24307;
--- OLD name : [PH] Gossip NPC Orc Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24308
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24308;
--- OLD name : [PH] Gossip NPC Orc Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24309
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24309;
--- OLD name : [PH] Gossip NPC Tauren Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24310
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24310;
--- OLD name : [PH] Gossip NPC Tauren Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24311
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24311;
--- OLD name : [DND] Brewfest Delivery Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24337
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24337;
--- OLD subname : 商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24341
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24341;
--- OLD subname : 旅店老板 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24342
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24342;
--- OLD subname : 屠夫 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24343
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24343;
--- OLD subname : 护甲锻造师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24347
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24347;
--- OLD subname : 杂货商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24348
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24348;
--- OLD subname : 材料和毒药商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24349
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24349;
--- OLD subname : 兽栏管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24350
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24350;
--- OLD name : [PH] Gossip NPC Troll Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24351
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24351;
--- OLD name : [PH] Gossip NPC Troll Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24352
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24352;
--- OLD name : [PH] Gossip NPC Troll Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24360
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24360;
--- OLD name : [PH] Gossip NPC Troll Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24361
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24361;
--- OLD name : 哈里森的尸体
--- Source : https://www.wowhead.com/wotlk/cn/npc=24365
-UPDATE `creature_template_locale` SET `Name` = '威利的尸体',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24365;
--- OLD name : 迅捷美酒节赛羊
--- Source : https://www.wowhead.com/wotlk/cn/npc=24368
-UPDATE `creature_template_locale` SET `Name` = '迅捷座羊（美酒节）',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24368;
--- OLD name : [UNUSED]Vazruden Kill Credit (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24377
-UPDATE `creature_template_locale` SET `Name` = '召唤炸药包',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24377;
--- OLD name : [UNUSED]Nazan Kill Credit (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24378
-UPDATE `creature_template_locale` SET `Name` = '"Back To Bladespire Fortress" Flight Kill Credit',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24378;
--- OLD name : [VO]Nalorakk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24382
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24382;
--- OLD name : [VO]Akil'Zon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24383
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24383;
--- OLD name : [VO]Halazzi (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24384
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24384;
--- OLD name : [VO]Jan'alai (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24386
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24386;
--- OLD name : 雷尼·“招牌微笑”·斯莫
--- Source : https://www.wowhead.com/wotlk/cn/npc=24392
-UPDATE `creature_template_locale` SET `Name` = '雷尼·斯莫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24392;
--- OLD subname : 竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=24395
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24395;
--- OLD name : Invisible Man - No Weapons (Server Only/Hide Body)
--- Source : https://www.wowhead.com/wotlk/cn/npc=24417
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24417;
--- OLD name : 霍莉
--- Source : https://www.wowhead.com/wotlk/cn/npc=24455
-UPDATE `creature_template_locale` SET `Name` = '霍里',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24455;
--- OLD name : [PH] Maldonado's Test Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24470
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24470;
--- OLD name : 熔炉火焰
--- Source : https://www.wowhead.com/wotlk/cn/npc=24471
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24471;
--- OLD name : 塞纳里奥作战角鹰兽
--- Source : https://www.wowhead.com/wotlk/cn/npc=24488
-UPDATE `creature_template_locale` SET `Name` = '绿色装甲角鹰兽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24488;
--- OLD name : [UNUSED] Riplash Flayer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24575
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24575;
--- OLD name : [UNUSED] Riplash Tidehunter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24577
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24577;
--- OLD name : [UNUSED] Riplash Serpent Guard (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24578
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24578;
--- OLD name : [UNUSED] Riplash Tidelord (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24579
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24579;
--- OLD name : [UNUSED] Tundra Wolf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24617
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24617;
--- OLD name : [UNUSED] Tundra Wolf Alpha (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24620
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24620;
--- OLD subname : 伪装大师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24643
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24643;
--- OLD name : [PH] BLB Blue Blood Elf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24658
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24658;
--- OLD name : [UNUSED] Riplash Hydra (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24661
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24661;
--- OLD name : 约格莫夫·冰锤中尉
--- Source : https://www.wowhead.com/wotlk/cn/npc=24665
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24665;
--- OLD subname : 探险者协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24717
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24717;
--- OLD subname : 探险者协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24718
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24718;
--- OLD subname : 探险者协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24719
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24719;
--- OLD subname : 探险者协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24720
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24720;
--- OLD subname : 希达尔格的伙伴 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24751
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24751;
--- OLD name : 小丸子
--- Source : https://www.wowhead.com/wotlk/cn/npc=24753
-UPDATE `creature_template_locale` SET `Name` = '粉色小雷象',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24753;
--- OLD name : [DND] Brewfest Face Me Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24766
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24766;
--- OLD name : “鼠胆船长”托格雷
--- Source : https://www.wowhead.com/wotlk/cn/npc=24833
-UPDATE `creature_template_locale` SET `Name` = '"鼠胆船长"托格雷',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24833;
--- OLD name : 女性迪菲亚海盗
--- Source : https://www.wowhead.com/wotlk/cn/npc=24860
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24860;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=24868
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24868;
--- OLD subname : 格雷兹克斯的大副 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=24897
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24897;
--- OLD name : [PH]Avalanche (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=24912
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 24912;
--- OLD name : 弗拉斯卡萨, subname : Mate of the Flaskataur
--- Source : https://www.wowhead.com/wotlk/cn/npc=24982
-UPDATE `creature_template_locale` SET `Name` = '弗拉斯卡托夫人',`Title` = '测试服附魔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24982;
--- OLD name : 小孢子蝠
--- Source : https://www.wowhead.com/wotlk/cn/npc=25062
-UPDATE `creature_template_locale` SET `Name` = '迷你孢子蝠',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25062;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=25099
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25099;
--- OLD name : [PH] Bri's Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25139
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25139;
--- OLD subname : Specialty Ammunition Vendor
--- Source : https://www.wowhead.com/wotlk/cn/npc=25195
-UPDATE `creature_template_locale` SET `Title` = '特殊弹药商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25195;
--- OLD subname : Specialty Ammunition Vendor
--- Source : https://www.wowhead.com/wotlk/cn/npc=25196
-UPDATE `creature_template_locale` SET `Title` = '特殊弹药商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25196;
--- OLD name : [PH] Torch Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25218
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25218;
--- OLD subname : 铭文训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=25263
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25263;
--- OLD subname : 双足飞龙管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=25288
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25288;
--- OLD subname : 图波尔的伙伴 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=25290
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25290;
--- OLD name : 烈焰舞娘
--- Source : https://www.wowhead.com/wotlk/cn/npc=25305
-UPDATE `creature_template_locale` SET `Name` = '火焰舞娘',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25305;
--- OLD subname : 施法材料与毒药商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=25312
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25312;
--- OLD subname : Software Engineer
--- Source : https://www.wowhead.com/wotlk/cn/npc=25323
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25323;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25323, 'zhCN',NULL,'软件工程师',0);
--- OLD name : 碾压者格尔基
--- Source : https://www.wowhead.com/wotlk/cn/npc=25329
-UPDATE `creature_template_locale` SET `Name` = 'Annihilator Grek''lor',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25329;
--- OLD subname : Software Engineer
--- Source : https://www.wowhead.com/wotlk/cn/npc=25406
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25406;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25406, 'zhCN',NULL,'软件工程师',0);
--- OLD subname : Software Engineer
--- Source : https://www.wowhead.com/wotlk/cn/npc=25411
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25411;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25411, 'zhCN',NULL,'软件工程师',0);
--- OLD name : [PH] Festival Fire Juggler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25515
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25515;
--- OLD subname : 兽栏管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=25519
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25519;
--- OLD name : [DNT] Torch Tossing Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25535
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25535;
--- OLD name : [DNT] Torch Tossing Target Bunny Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25536
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25536;
--- OLD name : Craig's Test Human A
--- Source : https://www.wowhead.com/wotlk/cn/npc=25537
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25537;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25537, 'zhCN','Craig''s Test Human',NULL,0);
--- OLD subname : 材料供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=25633
-UPDATE `creature_template_locale` SET `Title` = '材料商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25633;
--- OLD subname : 大地之环
--- Source : https://www.wowhead.com/wotlk/cn/npc=25697
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25697;
--- OLD name : 灼烧焰灵
--- Source : https://www.wowhead.com/wotlk/cn/npc=25706
-UPDATE `creature_template_locale` SET `Name` = '灼烧元素',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25706;
--- OLD name : 考达拉鳞誓龙人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=25717
-UPDATE `creature_template_locale` SET `Name` = '考达拉鳞誓龙兽',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25717;
--- OLD name : [ph] Coldarra Blue Dragon Patroller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25723
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25723;
--- OLD name : 晋升法师猎手
--- Source : https://www.wowhead.com/wotlk/cn/npc=25724
-UPDATE `creature_template_locale` SET `Name` = '晋升的法师猎手',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25724;
--- OLD name : [PH] Coldarra Leyliner, subname : PH MODEL: TASK 23362 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25734
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25734;
--- OLD name : [PH] Ahune Summon Loc Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25745
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25745;
--- OLD name : [PH] Ahune Loot Loc Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=25746
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 25746;
--- OLD subname : 大地之环
--- Source : https://www.wowhead.com/wotlk/cn/npc=25754
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25754;
--- OLD subname : 母狼 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=25774
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25774;
--- OLD name : 影刃狂暴者
--- Source : https://www.wowhead.com/wotlk/cn/npc=25798
-UPDATE `creature_template_locale` SET `Name` = '暗誓狂暴者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25798;
--- OLD name : 影刃怒火法师
--- Source : https://www.wowhead.com/wotlk/cn/npc=25799
-UPDATE `creature_template_locale` SET `Name` = '暗誓怒火法师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25799;
--- OLD name : 荆棘谷海角护火者
--- Source : https://www.wowhead.com/wotlk/cn/npc=25915
-UPDATE `creature_template_locale` SET `Name` = '荆棘谷护火者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25915;
--- OLD name : 荆棘谷海角护焰者
--- Source : https://www.wowhead.com/wotlk/cn/npc=25920
-UPDATE `creature_template_locale` SET `Name` = '荆棘谷护焰者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25920;
--- OLD name : 北贫瘠之地护焰者
--- Source : https://www.wowhead.com/wotlk/cn/npc=25943
-UPDATE `creature_template_locale` SET `Name` = '贫瘠之地护焰者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25943;
--- OLD name : 可驯服的猛禽
--- Source : https://www.wowhead.com/wotlk/cn/npc=26028
-UPDATE `creature_template_locale` SET `Name` = '可驯服的猫头鹰',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26028;
--- OLD subname : 诺格的机械商店 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26078
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26078;
--- OLD name : Craig's Test Human B (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26080
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26080;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (26080, 'zhCN','NPC',NULL,0);
--- OLD subname : 退休人员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26081
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26081;
--- OLD name : 黑暗堕落者亡刃骑士
--- Source : https://www.wowhead.com/wotlk/cn/npc=26103
-UPDATE `creature_template_locale` SET `Name` = '黑暗堕落者弗伦·亡刃',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26103;
--- OLD name : [PH] Tom Test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26176
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26176;
--- OLD name : [PH] Torch Catching Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26188
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26188;
--- OLD name : [PH] Spank Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26190
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26190;
--- OLD name : X-51虚空火箭
--- Source : https://www.wowhead.com/wotlk/cn/npc=26192
-UPDATE `creature_template_locale` SET `Name` = '蓝色火箭坐骑',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26192;
--- OLD name : [PH] Ghost of Ahune (Disguise) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26241
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26241;
--- OLD name : [DND] Midsummer Bonfire Faction Bunny - A (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26258
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26258;
--- OLD name : 大型烈焰舞娘
--- Source : https://www.wowhead.com/wotlk/cn/npc=26267
-UPDATE `creature_template_locale` SET `Name` = '烈焰舞娘',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26267;
--- OLD subname : 皮货商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26269
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26269;
--- OLD name : [PH] Dragonblight Ancient (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26274
-UPDATE `creature_template_locale` SET `Name` = '龙骨荒野古树',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26274;
--- OLD name : [PH] Dragonblight Black Dragon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26275
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26275;
--- OLD name : [PH] Dragonblight Green Dragon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26278
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26278;
--- OLD name : [PH] Dragonblight Elemental Obsidian Dragonshire (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26285
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26285;
--- OLD name : Forgotten Shore Event Trigger
--- Source : https://www.wowhead.com/wotlk/cn/npc=26288
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26288;
--- OLD name : [PH] Dragonblight Scourge Carrion Fields (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26292
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26292;
--- OLD name : [PH] Dragonblight Magma Wyrm (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26294
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26294;
--- OLD name : [PH] Dragonblight Scarlet Onslaught (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26296
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26296;
--- OLD name : 杂货商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26304
-UPDATE `creature_template_locale` SET `Name` = '物资商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26304;
--- OLD name : 板甲商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26305
-UPDATE `creature_template_locale` SET `Name` = '皮甲商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26305;
--- OLD name : 皮甲商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26306
-UPDATE `creature_template_locale` SET `Name` = '锁甲商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26306;
--- OLD name : 锁甲商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26308
-UPDATE `creature_template_locale` SET `Name` = '板甲商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26308;
--- OLD name : [PH] Dragonblight Taunka (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26311
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26311;
--- OLD name : [PH] Dragonblight Taunka Spirit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26312
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26312;
--- OLD name : [PH] Dragonblight Treant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26313
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26313;
--- OLD name : [PH] Dragonblight Scourge Galakrond Rest (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26317
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26317;
--- OLD name : [PH] Dragonblight Scourge Obsidian Dragonshire (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26318
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26318;
--- OLD name : [PH] Dragonblight Scourge Ruby Dragonshrine (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26320
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26320;
--- OLD name : [DND] Midsummer Bonfire Faction Bunny - H (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26355
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26355;
--- OLD name : Test - Brutallus Craig (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26376
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26376;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (26376, 'zhCN','NPC',NULL,0);
--- OLD name : 伊维·考伯斯宾, subname : 竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26378
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26378;
--- OLD name : 格里金·考伯斯宾, subname : 竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26383
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26383;
--- OLD name : 弗里克·布拉斯图, subname : 竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26384
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26384;
--- OLD name : [PH] Ice Chest Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26391
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26391;
--- OLD subname : 丹厄古尔的领主 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26405
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26405;
--- OLD subname : 弗雷哈默尔的卫士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26406
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26406;
--- OLD subname : 赌徒 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26442
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26442;
--- OLD subname : 战歌之子 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26486
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26486;
--- OLD name : [PH] Dragonblight Carrion Field Necromancer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26489
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26489;
--- OLD name : [PH] Dragonblight Carrion Field Zombie (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26490
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26490;
--- OLD name : [PH] Dragonblight Carrion Field Gargoyle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26491
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26491;
--- OLD name : 拉格纳罗斯精魂
--- Source : https://www.wowhead.com/wotlk/cn/npc=26502
-UPDATE `creature_template_locale` SET `Name` = '拉格纳罗斯的烟雾',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26502;
--- OLD subname : 探险者协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26514
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26514;
--- OLD name : [Demo] Craig Amai (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26535
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26535;
--- OLD subname : 嚎风峡湾飞艇管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26541
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26541;
--- OLD subname : 北风苔原飞艇管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26542
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26542;
--- OLD subname : 码头管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26551
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26551;
--- OLD subname : 码头管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26552
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26552;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26564
-UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26564;
--- OLD name : [PH] Justin's Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26576
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26576;
--- OLD name : [PH] Named Condor Shirrak (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26665
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26665;
--- OLD name : Rabid Dire Bear *Unused* (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26671
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26671;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (26671, 'zhCN','NPC',NULL,0);
--- OLD name : 银溪镇猎人
--- Source : https://www.wowhead.com/wotlk/cn/npc=26679
-UPDATE `creature_template_locale` SET `Name` = '银溪镇猎户',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26679;
--- OLD name : 雪原徒工
--- Source : https://www.wowhead.com/wotlk/cn/npc=26705
-UPDATE `creature_template_locale` SET `Name` = '冰原徒工',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26705;
--- OLD name : [DND] TAR Pedestal - Armor, Cloth & Leather (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26724
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26724;
--- OLD name : [dnd] Fizzcrank Paratrooper Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26732
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26732;
--- OLD name : [DND] TAR Pedestal - Accessories (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26738
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26738;
--- OLD name : [DND] TAR Pedestal - Enchantments (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26739
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26739;
--- OLD name : [DND] TAR Pedestal - Gems (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26740
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26740;
--- OLD name : [DND] TAR Pedestal - General Goods (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26741
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26741;
--- OLD name : [DND] TAR Pedestal - Armor, Mail & Plate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26742
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26742;
--- OLD name : [DND] TAR Pedestal - Glyph, Cloth & Leather (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26743
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26743;
--- OLD name : [DND] TAR Pedestal - Glyph, Mail & Plate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26744
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26744;
--- OLD name : [DND] TAR Pedestal - Weapons (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26745
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26745;
--- OLD name : [DND] TAR Pedestal - Arena Organizer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26747
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26747;
--- OLD name : [DND] TAR Pedestal - Beastmaster (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26748
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26748;
--- OLD name : [DND] TAR Pedestal - Paymaster (-> Monk) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26749
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26749;
--- OLD name : [DND] TAR Pedestal - Teleporter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26750
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26750;
--- OLD name : [DND] TAR Pedestal - Trainer, Druid (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26751
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26751;
--- OLD name : [DND] TAR Pedestal - Trainer, Hunter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26752
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26752;
--- OLD name : [DND] TAR Pedestal - Trainer, Mage (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26753
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26753;
--- OLD name : [DND] TAR Pedestal - Trainer, Paladin (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26754
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26754;
--- OLD name : [DND] TAR Pedestal - Trainer, Priest (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26755
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26755;
--- OLD name : [DND] TAR Pedestal - Trainer, Rogue (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26756
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26756;
--- OLD name : [DND] TAR Pedestal - Trainer, Shaman (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26757
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26757;
--- OLD name : [DND] TAR Pedestal - Trainer, Warlock (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26758
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26758;
--- OLD name : [DND] TAR Pedestal - Trainer, Warrior (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26759
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26759;
--- OLD name : [DND] TAR Pedestal - Fight Promoter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26765
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26765;
--- OLD name : [PH] Dragonblight Shoveltusk Scavenger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26835
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26835;
--- OLD name : [PH] Dragonblight Named Frost Wyrm Horde (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26840
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26840;
--- OLD name : [PH] Vanguard Landing Flight Master, subname : 双足飞龙管理员 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=26842
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 26842;
--- OLD subname : 双足飞龙管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26846
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26846;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26903
-UPDATE `creature_template_locale` SET `Title` = '宗师级炼金术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26903;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26904
-UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26904;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26905
-UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26905;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26906
-UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26906;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26907
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26907;
--- OLD subname : 钓鱼训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26909
-UPDATE `creature_template_locale` SET `Title` = '宗师级钓鱼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26909;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26910
-UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26910;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26911
-UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26911;
--- OLD subname : 采矿训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26912
-UPDATE `creature_template_locale` SET `Title` = '宗师级采矿训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26912;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26913
-UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26913;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26914
-UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26914;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26915
-UPDATE `creature_template_locale` SET `Title` = '宗师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26915;
--- OLD subname : 铭文训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26916
-UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26916;
--- OLD subname : 探险者协会供给员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26934
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26934;
--- OLD subname : 自救教材商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26947
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26947;
--- OLD subname : 炼金术训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26951
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26951;
--- OLD subname : 锻造训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26952
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26952;
--- OLD subname : 烹饪训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26953
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26953;
--- OLD subname : 附魔训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26954
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26954;
--- OLD subname : 工程学训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26955
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26955;
--- OLD subname : 急救训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26956
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26956;
--- OLD subname : 钓鱼训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26957
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26957;
--- OLD subname : 草药学训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26958
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26958;
--- OLD subname : 铭文训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26959
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26959;
--- OLD subname : 珠宝加工训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26960
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26960;
--- OLD subname : 制皮训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26961
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26961;
--- OLD subname : 采矿训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26962
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26962;
--- OLD subname : 剥皮训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26963
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26963;
--- OLD subname : 裁缝训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=26964
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26964;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26986
-UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26986;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26987
-UPDATE `creature_template_locale` SET `Title` = '宗师级炼金术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26987;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26989
-UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26989;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26990
-UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26990;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26991
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26991;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26992
-UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26992;
--- OLD subname : 钓鱼训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26993
-UPDATE `creature_template_locale` SET `Title` = '宗师级钓鱼训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26993;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26994
-UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26994;
--- OLD subname : 铭文训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26995
-UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26995;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26996
-UPDATE `creature_template_locale` SET `Title` = '宗师级制皮匠',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26996;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26997
-UPDATE `creature_template_locale` SET `Title` = '宗师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26997;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26998
-UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26998;
--- OLD subname : 采矿训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=26999
-UPDATE `creature_template_locale` SET `Title` = '宗师级采矿训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26999;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=27000
-UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27000;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=27001
-UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27001;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=27023
-UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27023;
--- OLD subname : 商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27026
-UPDATE `creature_template_locale` SET `Title` = '材料供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27026;
--- OLD subname : 探险者协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27114
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27114;
--- OLD subname : 探险者协会 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27115
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27115;
--- OLD name : 雪掌
--- Source : https://www.wowhead.com/wotlk/cn/npc=27119
-UPDATE `creature_template_locale` SET `Name` = '雪爪',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27119;
--- OLD subname : 食物与饮料 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27137
-UPDATE `creature_template_locale` SET `Title` = '餐饮供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27137;
--- OLD subname : 材料供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27138
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27138;
--- OLD name : 无头骑士的坐骑
--- Source : https://www.wowhead.com/wotlk/cn/npc=27152
-UPDATE `creature_template_locale` SET `Name` = 'Headless Horseman Mount, Player',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27152;
--- OLD name : 无头骑士的坐骑
--- Source : https://www.wowhead.com/wotlk/cn/npc=27153
-UPDATE `creature_template_locale` SET `Name` = 'Headless Horseman Mount, Player, Ground',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27153;
--- OLD name : [PH] New Hearthglen Scarlet Footman (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27205
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27205;
--- OLD name : [PH] New Hearthglen Scarlet Commander (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27208
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27208;
--- OLD name : 拷问者里克拉夫
--- Source : https://www.wowhead.com/wotlk/cn/npc=27209
-UPDATE `creature_template_locale` SET `Name` = '拷问者阿方斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27209;
--- OLD name : [PH] New Hearthglen Scarlet Scout (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27218
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27218;
--- OLD subname : Assured Quality (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27231
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27231;
--- OLD name : 雪原狂战士
--- Source : https://www.wowhead.com/wotlk/cn/npc=27278
-UPDATE `creature_template_locale` SET `Name` = '冰原狂战士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27278;
--- OLD name : 雪原萨满祭司
--- Source : https://www.wowhead.com/wotlk/cn/npc=27279
-UPDATE `creature_template_locale` SET `Name` = '冰原萨满祭司',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27279;
--- OLD subname : 蝙蝠管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27344
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27344;
--- OLD name : [DND] Stabled Pet Appearance (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27368
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27368;
--- OLD name : 首席抄写员巴里加
--- Source : https://www.wowhead.com/wotlk/cn/npc=27378
-UPDATE `creature_template_locale` SET `Name` = '首席抄写员基尼迪乌斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27378;
--- OLD name : Wintergarde Inner Gate Attack Trigger
--- Source : https://www.wowhead.com/wotlk/cn/npc=27380
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27380;
--- OLD name : 黄昏使者塞尔赞
--- Source : https://www.wowhead.com/wotlk/cn/npc=27384
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27384;
--- OLD name : [DND] Valiance Keep Footman Spectator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27387
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27387;
--- OLD name : 纳兹戈林中士
--- Source : https://www.wowhead.com/wotlk/cn/npc=27388
-UPDATE `creature_template_locale` SET `Name` = '纳兹格利姆中士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27388;
--- OLD name : Utgarde Duo Trigger
--- Source : https://www.wowhead.com/wotlk/cn/npc=27404
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27404;
--- OLD name : Clayton Dubin - TEST COPY DATA (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27527
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27527;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (27527, 'zhCN','NPC',NULL,0);
--- OLD name : 阿弗拉沙斯塔兹
--- Source : https://www.wowhead.com/wotlk/cn/npc=27575
-UPDATE `creature_template_locale` SET `Name` = '德弗雷斯塔兹领主',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27575;
--- OLD subname : 阿鲁高之手 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27579
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27579;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27586
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27586;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27590
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27590;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27591
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27591;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27592
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27592;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27595
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27595;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27596
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27596;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27599
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27599;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27601
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27601;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27609
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27609;
--- OLD name : [UNUSED] Wrath Gate Crypt Fiend (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27630
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27630;
--- OLD subname : 拜狼教新兵 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27632
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27632;
--- OLD name : [DND] Aldor Mailbox Malfunction Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27723
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27723;
--- OLD subname : 风险硬币商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27730
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27730;
--- OLD subname : 风险硬币商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27760
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27760;
--- OLD subname : 第七军团 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27833
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27833;
--- OLD name : Patty's test vehicle (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27862
-UPDATE `creature_template_locale` SET `Name` = 'PattyMack''s test vehicle TEST',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27862;
--- OLD subname : 死亡骑士训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27916
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27916;
--- OLD subname : PH MODEL: TASK 17271 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=27968
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27968;
--- OLD name : [PH] Warp Stalker Mount (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=27976
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 27976;
--- OLD name : 约格莫夫·冰锤中尉
--- Source : https://www.wowhead.com/wotlk/cn/npc=27994
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27994;
--- OLD subname : 远征队领袖 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28088
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28088;
--- OLD subname : 泰坦的意志 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28115
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28115;
--- OLD name : [ph] exploding barrel (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28173
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28173;
--- OLD name : [ph] Goblin Construction Crew (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28180
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28180;
--- OLD name : [DND] under water construction crew (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28184
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28184;
--- OLD subname : 萨莱因 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28189
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28189;
--- OLD name : [DND] L70ETC Drums (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28206
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28206;
--- OLD subname : 医师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28245
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28245;
--- OLD name : Searing Gaze
--- Source : https://www.wowhead.com/wotlk/cn/npc=28265
-UPDATE `creature_template_locale` SET `Name` = '灼热凝视',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28265;
--- OLD name : [DND] taxi flavor eagle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28292
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28292;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28310
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28310;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28311
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28311;
--- OLD name : 大战熊
--- Source : https://www.wowhead.com/wotlk/cn/npc=28363
-UPDATE `creature_template_locale` SET `Name` = '大型战熊',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28363;
--- OLD name : 第七军团攻城坦克 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28370
-UPDATE `creature_template_locale` SET `Name` = '第七军团攻城技师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28370;
--- OLD subname : 制皮训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28400
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28400;
--- OLD name : [UNUSED]Altar of Quetz'lun Gateway - Real World (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28469
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28469;
--- OLD subname : 冰霜女王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28499
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28499;
--- OLD name : Ronakada (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28501
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28501;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (28501, 'zhCN','NPC',NULL,0);
--- OLD name : 拷问者里克拉夫 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28554
-UPDATE `creature_template_locale` SET `Name` = '拷问者阿方斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28554;
--- OLD subname : 码头管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28650
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28650;
--- OLD name : 奎丝鲁恩先知
--- Source : https://www.wowhead.com/wotlk/cn/npc=28671
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28671;
--- OLD subname : 银行职员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28678
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28678;
--- OLD subname : 银行职员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28679
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28679;
--- OLD subname : 银行职员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28680
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28680;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28693
-UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28693;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28694
-UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28694;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28696
-UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28696;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28697
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28697;
--- OLD subname : 采矿训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28698
-UPDATE `creature_template_locale` SET `Title` = '宗师级采矿训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28698;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28699
-UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28699;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28700
-UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28700;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28701
-UPDATE `creature_template_locale` SET `Title` = '宗师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28701;
--- OLD subname : 铭文训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28702
-UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28702;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28703
-UPDATE `creature_template_locale` SET `Title` = '宗师级炼金术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28703;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28704
-UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28704;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28705
-UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28705;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=28706
-UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28706;
--- OLD subname : Hit Me! (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28712
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28712;
--- OLD subname : Hit Me! (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28720
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28720;
--- OLD subname : 钓鱼训练师和供应商
--- Source : https://www.wowhead.com/wotlk/cn/npc=28742
-UPDATE `creature_template_locale` SET `Title` = '宗师级钓鱼训练师和补给商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28742;
--- OLD name : 哈古斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=28760
-UPDATE `creature_template_locale` SET `Name` = '恶鬼哈古斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28760;
--- OLD name : [Phase 1] Scarlet Crusade Proxy Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28763
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28763;
--- OLD name : [Phase 1] Citizen of Havenshire Proxy Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28764
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28764;
--- OLD name : [Phase 1] Havenshrie Horse Credit, Step 01 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28767
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28767;
--- OLD subname : Ammunition
--- Source : https://www.wowhead.com/wotlk/cn/npc=28800
-UPDATE `creature_template_locale` SET `Title` = '弹药',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28800;
--- OLD subname : Ammunition
--- Source : https://www.wowhead.com/wotlk/cn/npc=28813
-UPDATE `creature_template_locale` SET `Title` = '弹药',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28813;
--- OLD subname : Designer Extraordinaire (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28944
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28944;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28949
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28949;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28950
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28950;
--- OLD name : [Chapter II] Scarlet Crusader Test Dummy Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28957
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28957;
--- OLD name : [Chapter II] Scarlet Crusader Proxy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=28984
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 28984;
--- OLD subname : 守夜人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=28987
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28987;
--- OLD name : [DND] Dockhand w/Bag (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29020
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29020;
--- OLD name : [609] Ebon Hold Duel Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29025
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29025;
--- OLD name : [Chapter II] Torch Toss Dummy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29038
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29038;
--- OLD name : [UNUSED] [ph] Stormwind Gryphon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29039
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29039;
--- OLD subname : 部落 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29045
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29045;
--- OLD subname : 部落 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29046
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29046;
--- OLD name : 库格·铁腭 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29072
-UPDATE `creature_template_locale` SET `Name` = '库格·铁颚',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29072;
--- OLD subname : 食物与饮料 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29121
-UPDATE `creature_template_locale` SET `Title` = '餐饮供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29121;
--- OLD subname : 食物与饮料 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29122
-UPDATE `creature_template_locale` SET `Title` = '餐饮供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29122;
--- OLD subname : 银色黎明 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29174
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29174;
--- OLD name : [Chapter IV] Chapter IV Dummy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29192
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29192;
--- OLD subname : 材料商
--- Source : https://www.wowhead.com/wotlk/cn/npc=29203
-UPDATE `creature_template_locale` SET `Title` = '尸尘商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29203;
--- OLD name : 通往暗影界的传送门 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29218
-UPDATE `creature_template_locale` SET `Name` = '通往暗影领域的传送门',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29218;
--- OLD subname : 急救训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29233
-UPDATE `creature_template_locale` SET `Title` = '绷带训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29233;
--- OLD name : [Chapter IV] Light of Dawn Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29245
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29245;
--- OLD subname : 兽栏管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29250
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29250;
--- OLD subname : 兽栏管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29251
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29251;
--- OLD subname : 锻造供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29252
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29252;
--- OLD subname : 锻造供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29253
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29253;
--- OLD subname : 二手攻城车商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29260
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29260;
--- OLD subname : 二手攻城车商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29262
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29262;
--- OLD subname : Hit Me! (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29265
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29265;
--- OLD subname : 银行职员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29283
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29283;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29318
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29318;
--- OLD subname : 炼金术与毒药供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29339
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29339;
--- OLD subname : 炼金术与毒药供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29348
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29348;
--- OLD name : [PH]TEST Skater (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29361
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29361;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29381
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29381;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29383
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29383;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29385
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29385;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29386
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29386;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29387
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29387;
--- OLD subname : 银色黎明 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29441
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29441;
--- OLD subname : 银色黎明 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29442
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29442;
--- OLD subname : Specialty Ammunition
--- Source : https://www.wowhead.com/wotlk/cn/npc=29493
-UPDATE `creature_template_locale` SET `Title` = '特殊弹药商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29493;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=29505
-UPDATE `creature_template_locale` SET `Title` = '武器锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29505;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=29506
-UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29506;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=29507
-UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29507;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=29508
-UPDATE `creature_template_locale` SET `Title` = '龙鳞制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29508;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=29509
-UPDATE `creature_template_locale` SET `Title` = '部族制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29509;
--- OLD name : “伯爵夫人”莱娜, subname : 竞技场组织者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29534
-UPDATE `creature_template_locale` SET `Name` = '“男爵夫人”莱娜',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29534;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29539
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29539;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29540
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29540;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29541
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29541;
--- OLD name : 艾美
--- Source : https://www.wowhead.com/wotlk/cn/npc=29548
-UPDATE `creature_template_locale` SET `Name` = '艾蜜',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29548;
--- OLD subname : 暴风城国王
--- Source : https://www.wowhead.com/wotlk/cn/npc=29611
-UPDATE `creature_template_locale` SET `Title` = '暴风城的国王',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29611;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=29631
-UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29631;
--- OLD name : 高阶奥术师西瓦
--- Source : https://www.wowhead.com/wotlk/cn/npc=29657
-UPDATE `creature_template_locale` SET `Name` = '高阶奥术师达斯克·阿尔希斯',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29657;
--- OLD subname : 阿卡里的高阶先知 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29681
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29681;
--- OLD subname : PH Texture (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29734
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29734;
--- OLD subname : 犸托斯的高阶先知 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29741
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29741;
--- OLD subname : 飞行管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29749
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29749;
--- OLD subname : 双足飞龙管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29762
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29762;
--- OLD name : [DND] Dalaran Toy Store Plane String Hook (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29807
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29807;
--- OLD name : [DND] Dalaran Toy Store Plane String Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29812
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29812;
--- OLD subname : 斯巴索克的骄傲与快乐 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29841
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29841;
--- OLD subname : 幽灵之狼 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29850
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29850;
--- OLD subname : 风暴巨人之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29884
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29884;
--- OLD subname : 希望的终结者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29895
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29895;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=29924
-UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29924;
--- OLD subname : PH: Name, Model (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29933
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29933;
--- OLD name : [UNUSED] [ph] Ulduar Camp (H) Flight Master, subname : 飞行管理员 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=29952
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 29952;
--- OLD subname : 兽栏管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29967
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29967;
--- OLD subname : 毒药与材料 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29968
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29968;
--- OLD subname : 锻造供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29969
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29969;
--- OLD subname : 杂货商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29970
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29970;
--- OLD subname : 旅店老板 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=29971
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29971;
--- OLD name : [DND]Wyrmrest Temple Beam Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30078
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30078;
--- OLD name : 暮光新教徒
--- Source : https://www.wowhead.com/wotlk/cn/npc=30114
-UPDATE `creature_template_locale` SET `Name` = '暮光新兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30114;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30149
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30149;
--- OLD subname : 兽栏管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30155
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30155;
--- OLD name : [DND] Anguish Spectator Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30156
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30156;
--- OLD subname : 杰希卡·莫里斯的伙伴 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30157
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30157;
--- OLD subname : 妮可·莫里斯的伙伴 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30158
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30158;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30171
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30171;
--- OLD subname : 霜脉矮人之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30182
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30182;
--- OLD subname : 食物与饮料 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30254
-UPDATE `creature_template_locale` SET `Title` = '餐饮供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30254;
--- OLD subname : 洛肯的仆从 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30296
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30296;
--- OLD subname : 旅店老板 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30308
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30308;
--- OLD subname : 食物与饮料 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30309
-UPDATE `creature_template_locale` SET `Title` = '餐饮供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30309;
--- OLD subname : 商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30311
-UPDATE `creature_template_locale` SET `Title` = '材料供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30311;
--- OLD subname : 见证者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30381
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30381;
--- OLD subname : 霜脉矮人之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30408
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30408;
--- OLD subname : 铁炉堡国王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30411
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30411;
--- OLD subname : 女妖之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30426
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30426;
--- OLD subname : 女妖之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30427
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30427;
--- OLD subname : 女妖之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30428
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30428;
--- OLD subname : 洛肯的仆从 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30429
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30429;
--- OLD subname : Ammunition
--- Source : https://www.wowhead.com/wotlk/cn/npc=30437
-UPDATE `creature_template_locale` SET `Title` = '弹药',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30437;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (A) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30476
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30476;
--- OLD name : [UNUSED] Wrathstrike Gargoyle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30545
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30545;
--- OLD name : [UNUSED] Reanimated Crusader, subname : PH MODEL: Task 25946 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30546
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30546;
--- OLD name : 弗拉斯·希亚比
--- Source : https://www.wowhead.com/wotlk/cn/npc=30552
-UPDATE `creature_template_locale` SET `Name` = '艾兹拉·格里姆',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30552;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (A) Teleport Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30559
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30559;
--- OLD subname : 远古海滩军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30578
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30578;
--- OLD subname : 远古海滩军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30579
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30579;
--- OLD subname : 远古海滩军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30580
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30580;
--- OLD subname : 远古海滩军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30581
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30581;
--- OLD subname : 远古海滩军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30583
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30583;
--- OLD subname : 远古海滩军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30584
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30584;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (H) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30588
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30588;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (H) Teleport Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30589
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30589;
--- OLD subname : 远古海滩军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30590
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30590;
--- OLD name : [UNUSED] Forgotten Depths High Priest (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30594
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30594;
--- OLD subname : 莫洛戈的宠物 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30613
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30613;
--- OLD name : [DND] Icecrown Airship (A) - Cannon Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30640
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30640;
--- OLD name : [DND] Icecrown Airship (A) - Cannon, Even (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30646
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30646;
--- OLD name : [DND] Icecrown Airship (H) - Cannon Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30649
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30649;
--- OLD name : [DND] Icecrown Airship (A) - Cannon, Odd (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30651
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30651;
--- OLD name : [DND] Icecrown Airship (A) - Cannon Controller 01 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30655
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30655;
--- OLD subname : 问讯员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30678
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30678;
--- OLD name : [DND] Icecrown Airship (H) - Flak Cannon, Odd (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30690
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30690;
--- OLD name : [DND] Icecrown Airship (H) - Flak Cannon, Even (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30699
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30699;
--- OLD name : [DND] Icecrown Airship (H) - Cannon, Neutral (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30700
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30700;
--- OLD name : [DND] Icecrown Airship (H) - Cannon Controller 01 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30707
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30707;
--- OLD subname : 铭文训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=30721
-UPDATE `creature_template_locale` SET `Title` = '大师级铭文训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30721;
--- OLD name : [DND] Icecrown Airship (H) - Cannon Target, Shield (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30749
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30749;
--- OLD name : [DND] Icecrown Airship (A) - Cannon Target, Shield (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=30832
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 30832;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30835
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30835;
--- OLD subname : 古代英雄 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30884
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30884;
--- OLD subname : 传承竞技场护甲
--- Source : https://www.wowhead.com/wotlk/cn/npc=30885
-UPDATE `creature_template_locale` SET `Title` = '饮料商人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30885;
--- OLD subname : 古代英雄 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30886
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30886;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30888
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30888;
--- OLD subname : 古代英雄 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30924
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30924;
--- OLD subname : 冰霜骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=30956
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30956;
--- OLD name : [UNUSED] The Lich King (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=31014
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 31014;
--- OLD subname : 尤顿海姆的主宰 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31016
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31016;
--- OLD subname : 女招待 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31026
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31026;
--- OLD name : Russell Bernau Test NPC (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31060
-UPDATE `creature_template_locale` SET `Name` = 'Ali Garchanter [TEST]',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31060;
--- OLD subname : Emporium of AWESOME (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31076
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31076;
--- OLD subname : Emporium of AWESOME (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31116
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31116;
--- OLD name : 血腥的肉 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31119
-UPDATE `creature_template_locale` SET `Name` = '血淋淋的肉',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31119;
--- OLD name : Reinforced Training Dummy (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31143
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 31143;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (31143, 'zhCN','NPC',NULL,0);
--- OLD name : 训练假人
--- Source : https://www.wowhead.com/wotlk/cn/npc=31144
-UPDATE `creature_template_locale` SET `Name` = '宗师的训练假人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31144;
--- OLD name : 团队副本训练假人
--- Source : https://www.wowhead.com/wotlk/cn/npc=31146
-UPDATE `creature_template_locale` SET `Name` = '英雄训练假人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31146;
--- OLD subname : 邪恶骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31160
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31160;
--- OLD subname : 冰霜骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31161
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31161;
--- OLD subname : 萨芙的坐骑 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31163
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31163;
--- OLD subname : 贝洛克的坐骑 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31221
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31221;
--- OLD subname : 萨芙的坐骑 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31224
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31224;
--- OLD name : 林地活木
--- Source : https://www.wowhead.com/wotlk/cn/npc=31228
-UPDATE `creature_template_locale` SET `Name` = '林地行者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31228;
--- OLD subname : Emporium of AWESOME (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31234
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31234;
--- OLD name : [DND] Icecrown Airship Cannon Explosion Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=31246
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 31246;
--- OLD subname : 飞行训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=31247
-UPDATE `creature_template_locale` SET `Title` = '寒冷天气飞行训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31247;
--- OLD subname : 飞行训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31248
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31248;
--- OLD subname : 死亡一击 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31277
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31277;
--- OLD subname : 传承正义军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31300
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31300;
--- OLD subname : 英雄纹章军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31302
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31302;
--- OLD subname : 传承正义军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31305
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31305;
--- OLD subname : 黑锋骑士团 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31306
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31306;
--- OLD subname : 勇气纹章军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31307
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31307;
--- OLD subname : Emporium of AWESOME (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31331
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31331;
--- OLD name : [DND] Icecrown Airship (N) - Attack Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=31353
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 31353;
--- OLD subname : 枪械商
--- Source : https://www.wowhead.com/wotlk/cn/npc=31423
-UPDATE `creature_template_locale` SET `Title` = '枪械和弹药商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31423;
--- OLD subname : 荣誉军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31545
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31545;
--- OLD subname : 精锐荣誉军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31549
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31549;
--- OLD subname : 精锐荣誉军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31551
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31551;
--- OLD subname : 荣誉军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31552
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31552;
--- OLD subname : 炮手 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31648
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31648;
--- OLD name : Bronze Drake (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31696
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 31696;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (31696, 'zhCN','NPC',NULL,0);
--- OLD name : 暮光幼龙
--- Source : https://www.wowhead.com/wotlk/cn/npc=31698
-UPDATE `creature_template_locale` SET `Name` = '暮光幼龙坐骑',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31698;
--- OLD subname : Hit Me! (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31744
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31744;
--- OLD subname : 绿背岛 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31804
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31804;
--- OLD subname : 绿背岛 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31806
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31806;
--- OLD name : 蓝龙卵 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31836
-UPDATE `creature_template_locale` SET `Name` = '蓝龙蛋',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31836;
--- OLD subname : 炮手 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31839
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31839;
--- OLD name : 纳格尔·拉斯克, subname : 精锐竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=31863
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31863;
--- OLD name : 佐姆·波克, subname : 见习竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=31865
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31865;
--- OLD subname : Emporium of AWESOME (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=31872
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31872;
--- OLD name : 堕落英雄之魂 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32149
-UPDATE `creature_template_locale` SET `Name` = '陨落英雄之魂',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32149;
--- OLD name : 迷失始祖幼龙 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32153
-UPDATE `creature_template_locale` SET `Name` = '迷时始祖幼龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32153;
--- OLD name : [DND] Icecrown Airship Bomb (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32193
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32193;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32293
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32293;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32300
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32300;
--- OLD subname : 暴风城国王
--- Source : https://www.wowhead.com/wotlk/cn/npc=32303
-UPDATE `creature_template_locale` SET `Title` = '暴风城的国王',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32303;
--- OLD name : [DND] Dalaran Sewer Arena - Controller - Death (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32328
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32328;
--- OLD subname : 竞技场组织者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32329
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32329;
--- OLD name : [DND] Dalaran Sewer Arena - Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32339
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32339;
--- OLD subname : 塞拉摩的统治者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32346
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32346;
--- OLD name : 雷尼·“招牌微笑”·斯莫
--- Source : https://www.wowhead.com/wotlk/cn/npc=32354
-UPDATE `creature_template_locale` SET `Name` = '雷尼·斯莫',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32354;
--- OLD name : 阿吉克斯·艾鲁加, subname : 精锐竞技场商人
--- Source : https://www.wowhead.com/wotlk/cn/npc=32359
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32359;
--- OLD subname : 塞拉摩的统治者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32364
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32364;
--- OLD subname : 女妖之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32365
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32365;
--- OLD subname : 珠宝加工军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32384
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32384;
--- OLD name : 桃丽丝·沃兰休斯, subname : 精锐护甲军需官
--- Source : https://www.wowhead.com/wotlk/cn/npc=32385
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32385;
--- OLD subname : 暴风城国王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32401
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32401;
--- OLD subname : 塞拉摩的统治者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32402
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32402;
--- OLD subname : 冰霜女王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32446
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32446;
--- OLD name : 迷失始祖幼龙 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32491
-UPDATE `creature_template_locale` SET `Name` = '迷时始祖幼龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32491;
--- OLD subname : 酋长 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32518
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32518;
--- OLD name : [UNUSED] Spirit Healer (WGA) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32536
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32536;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32556
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32556;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32557
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32557;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32558
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32558;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32559
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32559;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32560
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32560;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32561
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32561;
--- OLD subname : 部落远征军军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32565
-UPDATE `creature_template_locale` SET `Title` = '部落先遣军军需官',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32565;
--- OLD name : [DND] Cosmetic Book (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32606
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32606;
--- OLD subname : 旅行商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32649
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32649;
--- OLD subname : 破霜号的船长 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32657
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32657;
--- OLD subname : 优雅女神号的船长 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32658
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32658;
--- OLD subname : 运棺船的船长 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32659
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32659;
--- OLD subname : 荒芜使者号的船长 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32660
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32660;
--- OLD name : 训练假人
--- Source : https://www.wowhead.com/wotlk/cn/npc=32666
-UPDATE `creature_template_locale` SET `Name` = '专家的训练假人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32666;
--- OLD name : 训练假人
--- Source : https://www.wowhead.com/wotlk/cn/npc=32667
-UPDATE `creature_template_locale` SET `Name` = '大师的训练假人',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32667;
--- OLD name : 克拉提库斯·曼比德尔
--- Source : https://www.wowhead.com/wotlk/cn/npc=32686
-UPDATE `creature_template_locale` SET `Name` = '托马斯·里约加因',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32686;
--- OLD subname : 死亡骑士雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32753
-UPDATE `creature_template_locale` SET `Title` = '死亡骑士补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32753;
--- OLD subname : 德鲁伊雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32754
-UPDATE `creature_template_locale` SET `Title` = '德鲁伊补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32754;
--- OLD subname : 猎人雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32755
-UPDATE `creature_template_locale` SET `Title` = '猎人补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32755;
--- OLD subname : 法师雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32756
-UPDATE `creature_template_locale` SET `Title` = '法师补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32756;
--- OLD subname : 圣骑士雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32757
-UPDATE `creature_template_locale` SET `Title` = '圣骑士补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32757;
--- OLD subname : 牧师雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32758
-UPDATE `creature_template_locale` SET `Title` = '牧师补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32758;
--- OLD subname : 潜行者雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32759
-UPDATE `creature_template_locale` SET `Title` = '潜行者补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32759;
--- OLD subname : 萨满祭司雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32760
-UPDATE `creature_template_locale` SET `Title` = '萨满祭司补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32760;
--- OLD subname : 术士雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32761
-UPDATE `creature_template_locale` SET `Title` = '术士补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32761;
--- OLD subname : 战士雕文
--- Source : https://www.wowhead.com/wotlk/cn/npc=32762
-UPDATE `creature_template_locale` SET `Title` = '战士补给',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32762;
--- OLD subname : 部落远征军军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32774
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32774;
--- OLD name : Web Wrap Visual
--- Source : https://www.wowhead.com/wotlk/cn/npc=32785
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32785;
--- OLD subname : QA Punching Bag (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32794
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32794;
--- OLD name : [PH] Pilgrim's Bounty Table - Turkey (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32824
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32824;
--- OLD name : [PH] Pilgrim's Bounty Table - Yams (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32825
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32825;
--- OLD name : [PH] Pilgrim's Bounty Table - Cranberry Sauce (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32827
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32827;
--- OLD name : [PH] Pilgrim's Bounty Table - Pie (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32829
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32829;
--- OLD name : [PH] Pilgrim's Bounty Table - Stuffing (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=32831
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 32831;
--- OLD name : 骑士中尉袭月
--- Source : https://www.wowhead.com/wotlk/cn/npc=32834
-UPDATE `creature_template_locale` SET `Name` = '骑士中尉穆斯塔克',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32834;
--- OLD subname : 牧师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32848
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32848;
--- OLD subname : Warrior (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32849
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32849;
--- OLD subname : 剑圣 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=32870
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32870;
--- OLD name : 坍缩之星
--- Source : https://www.wowhead.com/wotlk/cn/npc=32955
-UPDATE `creature_template_locale` SET `Name` = '坍缩星',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32955;
--- OLD name : [ph] justin test backstab target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33049
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33049;
--- OLD name : [PH] Joust Horse (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33130
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33130;
--- OLD name : [PH] Joust Knight (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33135
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33135;
--- OLD name : [DND] TAR Pedestal - Trainer, Death Knight (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33252
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33252;
--- OLD subname : The Cutest McWeaksauce (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33290
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33290;
--- OLD name : [DND] Tournament - TEST NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33305
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33305;
--- OLD name : [DND] Tournament - Ranged Target Dummy - Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33339
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33339;
--- OLD name : [DND] Tournament - Mounted Melee - Target Dummy - Charge Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33340
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33340;
--- OLD name : [DND] Tournament - Mounted Melee - Target Dummy - Block Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33341
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33341;
--- OLD name : Morgan Test (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33351
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33351;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (33351, 'zhCN','NPC',NULL,0);
--- OLD name : [ph] Tournament War Elekk - NPC Only (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33415
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33415;
--- OLD subname : 暴风城的骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33439
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33439;
--- OLD name : [ph] Tournament War Kodo - NPC Only (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33450
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33450;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 01 - Weak Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33489
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33489;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 02 -Speedy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33490
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33490;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 03 - Block Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33491
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33491;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 04 - Strong Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33492
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33492;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 05 - Ultimate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33493
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33493;
--- OLD name : [ph] Tournament - Daily Combatant Summoner (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33501
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33501;
--- OLD name : [ph] Tournament - Mounted Combatant - Valiant Test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33520
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33520;
--- OLD name : [ph] Tournament - Mounted Combatant - Champion Test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33521
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33521;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33537
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33537;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33580
-UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33580;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33581
-UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33581;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33583
-UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33583;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33586
-UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33586;
--- OLD subname : 烹饪训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33587
-UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33587;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33588
-UPDATE `creature_template_locale` SET `Title` = '宗师级炼金训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33588;
--- OLD subname : 急救训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33589
-UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33589;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33591
-UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33591;
--- OLD subname : 珠宝供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33602
-UPDATE `creature_template_locale` SET `Title` = '珠宝加工供应商',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33602;
--- OLD subname : 铭文训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33603
-UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33603;
--- OLD name : 急救 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33621
-UPDATE `creature_template_locale` SET `Name` = '绷带图样',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33621;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33631
-UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33631;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33633
-UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33633;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33634
-UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33634;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33635
-UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33635;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33636
-UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33636;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33637
-UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33637;
--- OLD subname : 铭文训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33638
-UPDATE `creature_template_locale` SET `Title` = '大师级铭文训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33638;
--- OLD subname : 采矿训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33640
-UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33640;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33641
-UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33641;
--- OLD name : 阿玛里尔·誓日
--- Source : https://www.wowhead.com/wotlk/cn/npc=33658
-UPDATE `creature_template_locale` SET `Name` = '阿玛里尔·火盟',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33658;
--- OLD subname : Shirt of Uber Vendor (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33665
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33665;
--- OLD subname : 企鹅王子 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33673
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33673;
--- OLD subname : 炼金术训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33674
-UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33674;
--- OLD subname : 锻造训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33675
-UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33675;
--- OLD subname : 附魔训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33676
-UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33676;
--- OLD subname : 工程学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33677
-UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33677;
--- OLD subname : 草药学训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33678
-UPDATE `creature_template_locale` SET `Title` = '大师级草药学训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33678;
--- OLD subname : 铭文训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33679
-UPDATE `creature_template_locale` SET `Title` = '大师级铭文训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33679;
--- OLD subname : 珠宝加工训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33680
-UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33680;
--- OLD subname : 制皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33681
-UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33681;
--- OLD subname : 采矿训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33682
-UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33682;
--- OLD subname : 剥皮训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33683
-UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33683;
--- OLD subname : 裁缝训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=33684
-UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33684;
--- OLD subname : 钓鱼大师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33685
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33685;
--- OLD name : 银色冠军 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33707
-UPDATE `creature_template_locale` SET `Name` = '银色勇士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33707;
--- OLD subname : 烈酒 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33708
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33708;
--- OLD name : [ph] test tournament charger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=33784
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 33784;
--- OLD name : Mimiron Focus Points
--- Source : https://www.wowhead.com/wotlk/cn/npc=33835
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33835;
--- OLD subname : 饮料商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33867
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33867;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33915
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33915;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33916
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33916;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33917
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33917;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33918
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33918;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33919
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33919;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33920
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33920;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33921
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33921;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33922
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33922;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33923
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33923;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33924
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33924;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33925
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33925;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33926
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33926;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33927
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33927;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33928
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33928;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33929
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33929;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33930
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33930;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33931
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33931;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33932
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33932;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33933
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33933;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33934
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33934;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33935
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33935;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33936
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33936;
--- OLD subname : 竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33937
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33937;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33938
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33938;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33939
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33939;
--- OLD subname : 精锐竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33940
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33940;
--- OLD subname : 见习竞技场商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33941
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33941;
--- OLD subname : Emporium of AWESOME (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33946
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33946;
--- OLD name : 爆炸的地精凿石器
--- Source : https://www.wowhead.com/wotlk/cn/npc=33958
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33958;
--- OLD subname : 钓鱼大师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=33992
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33992;
--- OLD subname : 见习护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34036
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34036;
--- OLD subname : 见习护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34037
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34037;
--- OLD subname : 见习护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34038
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34038;
--- OLD subname : 珠宝加工军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34039
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34039;
--- OLD subname : 珠宝加工军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34040
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34040;
--- OLD subname : Designer Extraordinaire (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34042
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34042;
--- OLD name : 布莱恩·铜须的电台
--- Source : https://www.wowhead.com/wotlk/cn/npc=34054
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34054;
--- OLD subname : 精锐护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34058
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34058;
--- OLD subname : 精锐护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34059
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34059;
--- OLD subname : 精锐护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34060
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34060;
--- OLD subname : 诺森德护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34061
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34061;
--- OLD subname : 诺森德护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34062
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34062;
--- OLD subname : 诺森德护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34063
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34063;
--- OLD subname : 见习护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34073
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34073;
--- OLD subname : 见习护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34074
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34074;
--- OLD subname : 见习护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34075
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34075;
--- OLD subname : 精锐护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34076
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34076;
--- OLD subname : 精锐护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34077
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34077;
--- OLD subname : 精锐护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34078
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34078;
--- OLD subname : 珠宝加工军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34080
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34080;
--- OLD subname : 珠宝加工军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34081
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34081;
--- OLD subname : 护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34082
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34082;
--- OLD subname : 诺森德护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34083
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34083;
--- OLD subname : 诺森德护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34084
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34084;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34087
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34087;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34088
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34088;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34089
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34089;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34090
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34090;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34091
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34091;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34092
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34092;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34093
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34093;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34094
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34094;
--- OLD subname : 优质竞技场装备 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34095
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34095;
--- OLD subname : Ulduar 10 Vehicle Test Gear (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34168
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34168;
--- OLD subname : The Flaming Falcon (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34172
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34172;
--- OLD subname : Future Loot Tier Vendor (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34173
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34173;
--- OLD name : 黑色骸骨军马
--- Source : https://www.wowhead.com/wotlk/cn/npc=34238
-UPDATE `creature_template_locale` SET `Name` = '黑色骷髅战马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34238;
--- OLD name : [DND]Azeroth Children's Week Trigger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34281
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34281;
--- OLD name : [DND] Champion Go-To Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34319
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34319;
--- OLD name : [DND]Northrend Children's Week Trigger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34381
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34381;
--- OLD subname : 萨满祭司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34444
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34444;
--- OLD subname : 法师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34449
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34449;
--- OLD subname : 德鲁伊 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34451
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34451;
--- OLD subname : 圣骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34456
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34456;
--- OLD subname : 德鲁伊 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34460
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34460;
--- OLD subname : 死亡骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34461
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34461;
--- OLD subname : 圣骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34465
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34465;
--- OLD subname : 猎人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34467
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34467;
--- OLD subname : 萨满祭司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34470
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34470;
--- OLD subname : 圣骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34471
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34471;
--- OLD subname : 牧师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34473
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34473;
--- OLD subname : 战士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34475
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34475;
--- OLD name : ScottM Test Creature (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34533
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34533;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (34533, 'zhCN','NPC',NULL,0);
--- OLD name : 白骨战马 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34552
-UPDATE `creature_template_locale` SET `Name` = '白色骷髅战马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34552;
--- OLD name : 迅捷灰色战马 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34557
-UPDATE `creature_template_locale` SET `Name` = '迅捷灰马',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34557;
--- OLD name : [DND] Stink Bomb Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34562
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34562;
--- OLD name : [DND] Battle-Bot - Blue (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34588
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34588;
--- OLD name : [DND] Battle-Bot - Red (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34589
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34589;
--- OLD name : 爱德华·文斯洛 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34644
-UPDATE `creature_template_locale` SET `Name` = '爱德华·温斯洛',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34644;
--- OLD subname : 烹饪训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34712
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34712;
--- OLD subname : 烹饪训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34714
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34714;
--- OLD subname : 西风号
--- Source : https://www.wowhead.com/wotlk/cn/npc=34715
-UPDATE `creature_template_locale` SET `Title` = '塞菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34715;
--- OLD subname : 西风号
--- Source : https://www.wowhead.com/wotlk/cn/npc=34717
-UPDATE `creature_template_locale` SET `Title` = '塞菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34717;
--- OLD subname : 西风号
--- Source : https://www.wowhead.com/wotlk/cn/npc=34718
-UPDATE `creature_template_locale` SET `Title` = '塞菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34718;
--- OLD subname : 西风号
--- Source : https://www.wowhead.com/wotlk/cn/npc=34719
-UPDATE `creature_template_locale` SET `Title` = '塞菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34719;
--- OLD subname : 西风号
--- Source : https://www.wowhead.com/wotlk/cn/npc=34721
-UPDATE `creature_template_locale` SET `Title` = '塞菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34721;
--- OLD subname : 西风号
--- Source : https://www.wowhead.com/wotlk/cn/npc=34723
-UPDATE `creature_template_locale` SET `Title` = '塞菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34723;
--- OLD subname : 西风号
--- Source : https://www.wowhead.com/wotlk/cn/npc=34730
-UPDATE `creature_template_locale` SET `Title` = '塞菲尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34730;
--- OLD name : [DND] Magic Rooster (Draenei Male) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34731
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34731;
--- OLD name : [DND] Magic Rooster (Tauren Male) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34732
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34732;
--- OLD name : 瓦萨林·赤晨
--- Source : https://www.wowhead.com/wotlk/cn/npc=34772
-UPDATE `creature_template_locale` SET `Name` = '瓦萨林·彤曦',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34772;
--- OLD subname : 烹饪训练师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34786
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34786;
--- OLD subname : 感恩节商人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34787
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34787;
--- OLD name : 狗头人奴隶 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34800
-UPDATE `creature_template_locale` SET `Name` = '雪地狗头人奴隶',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34800;
--- OLD name : 糖心甜薯席位
--- Source : https://www.wowhead.com/wotlk/cn/npc=34824
-UPDATE `creature_template_locale` SET `Name` = '糖心甜土豆席位',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34824;
--- OLD name : [ph] Argent Raid Spectator - FX - Horde (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34883
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34883;
--- OLD name : [ph] Argent Raid Spectator - FX - Alliance (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34887
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34887;
--- OLD name : [PH] Goss Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34889
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34889;
--- OLD name : [PH] Tournament Hippogryph Quest Mount (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34891
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34891;
--- OLD name : [PH] Stabled Argent Hippogryph (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34893
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34893;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34895
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34895;
--- OLD name : [ph] Argent Raid Spectator - FX - Human (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34900
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34900;
--- OLD name : [ph] Argent Raid Spectator - FX - Orc (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34901
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34901;
--- OLD name : [ph] Argent Raid Spectator - FX - Troll (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34902
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34902;
--- OLD name : [ph] Argent Raid Spectator - FX - Tauren (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34903
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34903;
--- OLD name : [ph] Argent Raid Spectator - FX - Blood Elf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34904
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34904;
--- OLD name : [ph] Argent Raid Spectator - FX - Undead (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34905
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34905;
--- OLD name : [ph] Argent Raid Spectator - FX - Dwarf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34906
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34906;
--- OLD name : [ph] Argent Raid Spectator - FX - Draenei (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34908
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34908;
--- OLD name : [ph] Argent Raid Spectator - FX - Night Elf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34909
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34909;
--- OLD name : [ph] Argent Raid Spectator - FX - Gnome (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=34910
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 34910;
--- OLD subname : 第七军团 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34924
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34924;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34971
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34971;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34972
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34972;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34973
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34973;
--- OLD subname : 破海者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34980
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34980;
--- OLD subname : 暴风城国王
--- Source : https://www.wowhead.com/wotlk/cn/npc=34990
-UPDATE `creature_template_locale` SET `Title` = '暴风城的国王',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34990;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=34993
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34993;
--- OLD name : [ph] Argent Raid Spectator - Generic Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=35016
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 35016;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35017
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35017;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35019
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35019;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35020
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35020;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35021
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35021;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35022
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35022;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35023
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35023;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35024
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35024;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35025
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35025;
--- OLD subname : 征服之岛战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35026
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35026;
--- OLD name : [ph] Argent Raid Spectator - FX - Alliance Fireworks NOT USED (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=35066
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 35066;
--- OLD subname : 飞行训练师
--- Source : https://www.wowhead.com/wotlk/cn/npc=35100
-UPDATE `creature_template_locale` SET `Title` = '骑术训练师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35100;
--- OLD subname : 诅咒神教 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35116
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35116;
--- OLD subname : 诅咒神教 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35127
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35127;
--- OLD subname : 感恩节供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35341
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35341;
--- OLD subname : 感恩节供应商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35343
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35343;
--- OLD name : 地精技师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35346
-UPDATE `creature_template_locale` SET `Name` = '地精机械师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35346;
--- OLD name : 库卡隆的精英卫士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35460
-UPDATE `creature_template_locale` SET `Name` = '库卡隆精英',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35460;
--- OLD name : 特拉格·高山 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35462
-UPDATE `creature_template_locale` SET `Name` = '特拉格·高岭',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35462;
--- OLD subname : 西风号 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35492
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35492;
--- OLD name : 魔导师维莎拉, subname : 凯旋纹章军需官
--- Source : https://www.wowhead.com/wotlk/cn/npc=35495
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35495;
--- OLD subname : 银月城的总冠军 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35569
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35569;
--- OLD subname : 奥格瑞玛的总冠军 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35572
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35572;
--- OLD subname : 凯旋护甲商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35573
-UPDATE `creature_template_locale` SET `Title` = '传承正义军需官',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35573;
--- OLD subname : 凯旋护甲商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35574
-UPDATE `creature_template_locale` SET `Title` = '传承正义军需官',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35574;
--- OLD name : 银色守卫 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35587
-UPDATE `creature_template_locale` SET `Name` = '银色维和者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35587;
--- OLD subname : 冬拥湖战斗法师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35600
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35600;
--- OLD subname : 蒸汽动能拍卖师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35607
-UPDATE `creature_template_locale` SET `Title` = '蒸汽动力拍卖师',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35607;
--- OLD name : [DND] Dalaran Argent Tournament Herald Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=35608
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 35608;
--- OLD subname : 冬拥湖战斗法师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35611
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35611;
--- OLD subname : 冬拥湖战斗法师 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35612
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35612;
--- OLD subname : 银色演武场统领 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35895
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35895;
--- OLD subname : 银色演武场统领 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35909
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35909;
--- OLD subname : 银色演武场统领 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=35910
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35910;
--- OLD name : [DNT] Test Dragonhawk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=35983
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 35983;
--- OLD name : [DND] Argent Charger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36071
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36071;
--- OLD name : [DND] Swift Burgundy Wolf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36072
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36072;
--- OLD name : [DND] Swift Horde Wolf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36074
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36074;
--- OLD name : [DND] White Stallion (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36075
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36075;
--- OLD name : [DND] Swift Alliance Steed (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36076
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36076;
--- OLD name : [DND] Forsaken Mariner (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36148
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36148;
--- OLD name : [DND] Valgarde Peon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36154
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36154;
--- OLD name : 库卡隆掠夺者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36164
-UPDATE `creature_template_locale` SET `Name` = '库卡隆劫掠者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36164;
--- OLD name : [DND] Bor'gorok Wolf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36167
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36167;
--- OLD name : [DND] Bor'gorok Peon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36169
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36169;
--- OLD name : [DND]Northrend Children's Week Trigger 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36209
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36209;
--- OLD name : [DND] Crazed Apothecary Generator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36212
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36212;
--- OLD name : 库卡隆监视者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36213
-UPDATE `creature_template_locale` SET `Name` = '幽暗城守护者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36213;
--- OLD name : 监督者克拉加什 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36217
-UPDATE `creature_template_locale` SET `Name` = '残缺的躯体',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36217;
--- OLD subname : 库拉隆将领 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36273
-UPDATE `creature_template_locale` SET `Title` = '酋长之手',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36273;
--- OLD subname : 银行职员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36284
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36284;
--- OLD subname : 银行职员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36351
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36351;
--- OLD subname : 银行职员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36352
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36352;
--- OLD subname : 科瑞克的奴仆 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36476
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36476;
--- OLD name : [DND] Valentine Boss - Vial Bunny (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36530
-UPDATE `creature_template_locale` SET `Name` = '情人节首领',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36530;
--- OLD name : [DND] Valentine Boss Manager (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36643
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36643;
--- OLD subname : 大酋长 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36648
-UPDATE `creature_template_locale` SET `Title` = '牛头人大酋长',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36648;
--- OLD name : [DND] Apothecary Table (Spell Effect) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36710
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36710;
--- OLD name : [PH] Icecrown Reanimated Crusader (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36726
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36726;
--- OLD subname : 暗夜精灵莫霍克的小伙伴 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36778
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36778;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36788
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36788;
--- OLD name : [PH] Unused Quarry Overseer (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36792
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36792;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (36792, 'zhCN','NPC',NULL,0);
--- OLD name : 天灾领主泰兰努斯
--- Source : https://www.wowhead.com/wotlk/cn/npc=36795
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36795;
--- OLD name : [DND] Love Boat Summoner (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36817
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36817;
--- OLD name : 奥妮克希亚座龙 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36837
-UPDATE `creature_template_locale` SET `Name` = '奥妮克希亚幼龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36837;
--- OLD name : [PH] Icecrown Gauntlet Ghoul (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36875
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36875;
--- OLD name : Gryphon Hatchling 3.3.0 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36904
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36904;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (36904, 'zhCN','NPC',NULL,0);
--- OLD name : [PH] Scaling Fire Elemental (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36949
-UPDATE `creature_template_locale` SET `Name` = '灼热元素',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36949;
--- OLD name : 破天号陆战队员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36950
-UPDATE `creature_template_locale` SET `Name` = '破天号士兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36950;
--- OLD name : 库卡隆收割者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36957
-UPDATE `creature_template_locale` SET `Name` = '库卡隆劫掠者',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36957;
--- OLD name : [DND] World Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=36966
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 36966;
--- OLD subname : 女妖之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=36990
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36990;
--- OLD name : [DND]Ground Cover Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37039
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37039;
--- OLD name : [PH] Icecrown Shade (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37128
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37128;
--- OLD name : [DND] Summon Bunny 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37168
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37168;
--- OLD name : 伯瓦尔·弗塔根公爵 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37183
-UPDATE `creature_template_locale` SET `Name` = '大领主伯瓦尔·弗塔根',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37183;
--- OLD name : [PH] Ice Stone 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37191
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37191;
--- OLD name : [PH] Ice Stone 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37192
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37192;
--- OLD name : [DND] Summon Bunny 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37201
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37201;
--- OLD name : [DND] Summon Bunny 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37202
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37202;
--- OLD subname : 女妖之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37223
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37223;
--- OLD subname : 白银之手骑士团 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37225
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37225;
--- OLD subname : 游侠将军 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37527
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37527;
--- OLD name : [DND] Shaker (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37543
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37543;
--- OLD name : [DND]Something Stinks Kill Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37558
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37558;
--- OLD name : [DND] Shaker - Small (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37574
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37574;
--- OLD subname : 银色北伐军军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37693
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37693;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37712
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37712;
--- OLD subname : 诅咒教派 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37713
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37713;
--- OLD subname : 冰霜女王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37755
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37755;
--- OLD subname : 奎尔萨拉斯的摄政王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37764
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37764;
--- OLD subname : 高等精灵代表 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37765
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37765;
--- OLD name : [PH] Runner Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37788
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37788;
--- OLD name : [TEST] High Overlord Omar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37820
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37820;
--- OLD subname : 巨龙的女王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37829
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37829;
--- OLD name : [PH] Captain (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37831
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37831;
--- OLD subname : 萨莱因 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37846
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37846;
--- OLD subname : 杂货商 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37935
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37935;
--- OLD subname : 铁匠 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37936
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37936;
--- OLD name : [DND] Love Boat Summoner 02 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37964
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37964;
--- OLD name : [DND] Love Boat Summoner 03 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37981
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37981;
--- OLD name : [DND] Sample Quest Kill Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=37990
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 37990;
--- OLD name : 黑锋骑士团勇士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=37996
-UPDATE `creature_template_locale` SET `Name` = '黑锋勇士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37996;
--- OLD subname : 皇冠药剂公司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38040
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38040;
--- OLD subname : 皇冠药剂公司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38043
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38043;
--- OLD subname : 皇冠药剂公司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38044
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38044;
--- OLD subname : 血骑士领袖 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38052
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38052;
--- OLD name : [DND] Fire Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38053
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38053;
--- OLD name : [PH] Captain (Orgrimmar) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38164
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38164;
--- OLD subname : 女妖之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38189
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38189;
--- OLD name : 银色盟约专员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38200
-UPDATE `creature_template_locale` SET `Name` = '银色盟约密探',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38200;
--- OLD name : 爱情火箭 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38207
-UPDATE `creature_template_locale` SET `Name` = 'X-45偷心火箭',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38207;
--- OLD name : [DND] Fire Wall - No Scaling (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38226
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38226;
--- OLD name : [DND] Fire Wall (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38230
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38230;
--- OLD name : [DND] Fire Strat (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38236
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38236;
--- OLD subname : 风险投资公司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38334
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38334;
--- OLD subname : 风险投资公司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38335
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38335;
--- OLD subname : 风险投资公司 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38336
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38336;
--- OLD name : [DND] Holiday - Love - Bank Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38340
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38340;
--- OLD name : [DND] Holiday - Love - AH Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38341
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38341;
--- OLD name : [DND] Holiday - Love - Barber Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38342
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38342;
--- OLD name : 黑锋骑士团骑士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38505
-UPDATE `creature_template_locale` SET `Name` = '黑锋骑士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38505;
--- OLD name : [PH] Matt Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38580
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38580;
--- OLD name : [PH] Matt Test NPC 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38581
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38581;
--- OLD subname : 烈酒 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38595
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38595;
--- OLD name : 乌瑟尔·光明使者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38608
-UPDATE `creature_template_locale` SET `Name` = '光明使者乌瑟尔',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38608;
--- OLD subname : 灰烬使者 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38610
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38610;
--- OLD name : [PH] Grimtotem Protector (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38830
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38830;
--- OLD name : [PH] Grimtotem Collector (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38843
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38843;
--- OLD name : [PH] Slain Druid (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38846
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38846;
--- OLD subname : 寒冰纹章军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38858
-UPDATE `creature_template_locale` SET `Title` = '传承正义军需官',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38858;
--- OLD name : [DND] Dark Iron Guard Move To Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38870
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38870;
--- OLD name : [DND] Mole Machine Spawner (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38882
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38882;
--- OLD name : ScottG Test (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=38883
-UPDATE `creature_template_locale` SET `Name` = 'Idle Before Scaling',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38883;
--- OLD name : [PH] Grimtotem Vendor (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38905
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38905;
--- OLD name : [PH] Grimtotem Banker, subname : 银行职员 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38919
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38919;
--- OLD name : [PH] Grimtotem Banker 2, subname : 银行职员 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38920
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38920;
--- OLD name : [PH] Grimtotem Banker 3, subname : 银行职员 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=38921
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 38921;
--- OLD name : [DND] TB Event Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39023
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39023;
--- OLD name : [DND] Fire Strat Auto (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39057
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39057;
--- OLD name : [PH] Orc Firefighter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39058
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39058;
--- OLD subname : 大地之环 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39090
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39090;
--- OLD subname : 暮光之锤 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39103
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39103;
--- OLD name : [DND] Flying Machine (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39229
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39229;
--- OLD subname : 侏儒之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39271
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39271;
--- OLD subname : 军医主任 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39273
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39273;
--- OLD subname : 大地之环 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39283
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39283;
--- OLD name : [DND] Salute Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39355
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39355;
--- OLD name : [DND] Roar Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39356
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39356;
--- OLD name : [DND] Dance Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39361
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39361;
--- OLD name : [DND] Cheer Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39362
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39362;
--- OLD name : [DND] Probe Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39420
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39420;
--- OLD name : 森金哨兵 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39633
-UPDATE `creature_template_locale` SET `Name` = '森金村卫兵',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39633;
--- OLD subname : 撰稿人 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39678
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39678;
--- OLD name : [DND] Quest Credit Bunny - Eject (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39683
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39683;
--- OLD name : [DND] Quest Credit Bunny - Move 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39691
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39691;
--- OLD name : [DND] Quest Credit Bunny - Move 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39692
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39692;
--- OLD name : [DND] Quest Credit Bunny - Move 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39695
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39695;
--- OLD name : [DND] Quest Credit Bunny - Attack (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39703
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39703;
--- OLD name : [DND] Attack Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39707
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39707;
--- OLD subname : 侏儒之王 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39712
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39712;
--- OLD name : [DND] GT Bomber Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39743
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39743;
--- OLD name : [DND] GT Bomber Bunny 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39744
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39744;
--- OLD name : [PH] Mother Trogg (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39798
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39798;
--- OLD subname : 暮光之锤首领 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39807
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39807;
--- OLD name : [DND] Summoning Pad (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39817
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39817;
--- OLD name : [DND] Boom Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=39841
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 39841;
--- OLD subname : 暮光之锤 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=39940
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39940;
--- OLD name : 霜娃娃
--- Source : https://www.wowhead.com/wotlk/cn/npc=40198
-UPDATE `creature_template_locale` SET `Name` = '雪孩子',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40198;
--- OLD subname : 蝙蝠管理员 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40204
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40204;
--- OLD subname : 荣誉军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40205
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40205;
--- OLD subname : 征服军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40206
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40206;
--- OLD subname : 精锐征服军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40207
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40207;
--- OLD subname : 荣誉军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40208
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40208;
--- OLD subname : 征服军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40210
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40210;
--- OLD subname : 精锐征服军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40211
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40211;
--- OLD subname : 传承竞技场武器
--- Source : https://www.wowhead.com/wotlk/cn/npc=40212
-UPDATE `creature_template_locale` SET `Title` = '优质竞技场装备',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40212;
--- OLD subname : 荣誉军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40213
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40213;
--- OLD subname : 征服军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40214
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40214;
--- OLD subname : 精锐征服军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40215
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40215;
--- OLD subname : 传承竞技场武器 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40216
-UPDATE `creature_template_locale` SET `Title` = '残忍角斗士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40216;
--- OLD name : 暗矛勇士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40241
-UPDATE `creature_template_locale` SET `Name` = '暗矛战士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40241;
--- OLD name : [DND] Zen'tabra Cat Form (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=40265
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 40265;
--- OLD name : 蓝色发条战士
--- Source : https://www.wowhead.com/wotlk/cn/npc=40295
-UPDATE `creature_template_locale` SET `Name` = '发条战士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40295;
--- OLD name : [DND] Zen'tabra Travel Form (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=40354
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 40354;
--- OLD name : 暗矛勇士 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40392
-UPDATE `creature_template_locale` SET `Name` = '暗矛战士',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40392;
--- OLD subname : 邱碧特的宠物 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40404
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40404;
--- OLD subname : 战场军官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40413
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40413;
--- OLD name : [DND] Quest Credit Bunny - ET Battle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=40428
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 40428;
--- OLD name : 斯提姆维多·塞斯特 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40438
-UPDATE `creature_template_locale` SET `Name` = '热砂港讼棍',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40438;
--- OLD subname : 纳迦异教徒 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40446
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40446;
--- OLD subname : 沃金的鼓手 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40492
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40492;
--- OLD subname : 诺森德护甲军需官 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40607
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40607;
--- OLD name : [DND] Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=40617
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 40617;
--- OLD name : 红玉龙兽 (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40627
-UPDATE `creature_template_locale` SET `Name` = '红玉幼龙',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40627;
--- OLD subname : Do Not Spawn (RETAIL DATAS)
--- Source : https://www.wowhead.com/cn/npc=40724
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40724;
--- OLD name : [DND] Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/cn/npc=41839
-DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` = 41839;
+-- Update npc (zhCN) ; from WowHead Wotlk > TBC > Classic > Cata > Mop > Retail
+-- Disclaimer : Datas of technical NPCs (Theoretically not visible to players) could be wrong, here we strictly align with WoWHead datas
 
--- List of entries using retail datas :
--- 81,444,3151,5876,6783,9579,9580,9581,9582,17733,18674,23653,23655,23657,23669,23670,23671,23715,23781,23782,23784,23816,24015,24041,24119,24181,24238,24275,24276,24341,24342,24343,24347,24348,24349,24350,24377,24378,24643,24717,24718,24719,24720,24751,24897,25263,25288,25290,25312,25519,25717,25774,26078,26080,26081,26269,26274,26376,26405,26406,26442,26486,26514,26541,26542,26551,26552,26671,26846,26934,26947,26951,26952,26953,26954,26955,26956,26957,26958,26959,26960,26961,26962,26963,26964,27026,27114,27115,27137,27138,27231,27344,27527,27579,27586,27590,27591,27592,27595,27596,27599,27601,27609,27632,27730,27760,27833,27862,27916,27968,28088,28115,28189,28245,28310,28311,28370,28400,28499,28501,28554,28650,28678,28679,28680,28712,28720,28944,28949,28950,28987,29045,29046,29072,29121,29122,29174,29218,29233,29250,29251,29252,29253,29260,29262,29265,29283,29318,29339,29348,29381,29383,29385,29386,29387,29441,29442,29534,29539,29540,29541,29681,29734,29741,29749,29762,29841,29850,29884,29895,29933,29967,29968,29969,29970,29971,30149,30155,30157,30158,30171,30182,30254,30296,30308,30309,30311,30381,30408,30411,30426,30427,30428,30429,30578,30579,30580,30581,30583,30584,30590,30613,30678,30835,30884,30886,30888,30924,30956,31016,31026,31060,31076,31116,31119,31143,31160,31161,31163,31221,31224,31234,31248,31277,31300,31302,31305,31306,31307,31331,31545,31549,31551,31552,31648,31696,31744,31804,31806,31836,31839,31872,32149,32153,32293,32300,32329,32346,32364,32365,32384,32401,32402,32446,32491,32518,32556,32557,32558,32559,32560,32561,32565,32649,32657,32658,32659,32660,32774,32794,32848,32849,32870,33290,33351,33439,33537,33602,33621,33665,33673,33685,33707,33708,33867,33915,33916,33917,33918,33919,33920,33921,33922,33923,33924,33925,33926,33927,33928,33929,33930,33931,33932,33933,33934,33935,33936,33937,33938,33939,33940,33941,33946,33992,34036,34037,34038,34039,34040,34042,34058,34059,34060,34061,34062,34063,34073,34074,34075,34076,34077,34078,34080,34081,34082,34083,34084,34087,34088,34089,34090,34091,34092,34093,34094,34095,34168,34172,34173,34444,34449,34451,34456,34460,34461,34465,34467,34470,34471,34473,34475,34533,34552,34557,34644,34712,34714,34786,34787,34800,34895,34924,34971,34972,34973,34980,34993,35017,35019,35020,35021,35022,35023,35024,35025,35026,35116,35127,35341,35343,35346,35460,35462,35492,35569,35572,35573,35574,35587,35600,35607,35611,35612,35895,35909,35910,36164,36213,36217,36273,36284,36351,36352,36476,36530,36648,36778,36788,36792,36837,36904,36949,36950,36957,36990,37183,37223,37225,37527,37693,37712,37713,37755,37764,37765,37829,37846,37935,37936,37996,38040,38043,38044,38052,38189,38200,38207,38334,38335,38336,38505,38595,38608,38610,38858,38883,39090,39103,39271,39273,39283,39633,39678,39712,39807,39940,40204,40205,40206,40207,40208,40210,40211,40213,40214,40215,40216,40241,40392,40404,40413,40438,40446,40492,40607,40627,40724
--- END
+-- Entries without any translation datas, on any version
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25,70,71,75,82,87,93,102,108,109,128,129,130,149,161,163,165,204,207,208);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(209,260,280,281,282,283,287,290,291,296,298,301,318,319,320,321,322,323,324,326);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(333,336,339,361,364,380,399,400,401,402,403,404,405,406,407,408,409,410,411,421);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(470,496,497,498,509,516,535,536,538,586,592,610,631,753,919,924,953,1361,1401,1467);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(1503,1567,1574,1575,1576,1577,1578,1579,1580,1581,1582,1583,1584,1585,1586,1587,1588,1589,1590,1591);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(1592,1593,1594,1595,1596,1597,1598,1599,1600,1602,1603,1604,1605,1606,1607,1608,1609,1613,1614,1615);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(1616,1617,1618,1619,1620,1621,1622,1623,1624,1625,1626,1627,1628,1629,1631,1633,1634,1635,1636,1637);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(1638,1639,1640,1641,1643,1644,1659,1714,1722,1757,1758,1759,1760,1761,1762,1786,1790,1792,1799,1823);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(1825,1857,1858,1897,1945,1979,1980,1987,2095,2138,2154,2197,2199,2200,2286,2313,2334,2614,2615,2617);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(2702,2710,2862,2863,2864,2865,2866,2867,2868,2869,2871,2873,2874,2875,2877,2883,2896,2899,3152,3200);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(3340,3651,3971,3972,3973,4073,4074,4253,4261,4313,4408,4410,4473,4626,4942,5007,5010,5014,5016,5018);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(5019,5020,5021,5022,5023,5063,5201,5544,5548,5549,5550,5552,5554,5556,5557,5558,5559,5560,5561,5562);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(5563,5587,5588,5589,5590,5604,5632,5801,5866,5867,5868,5877,6183,6526,6572,6573,6578,6687,6688,6926);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(6931,7186,7236,7503,7504,7507,7508,7509,7557,7898,7919,7938,8001,8316,8321,8322,8323,8498,8499,8500);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(8501,8502,8611,8662,8796,8935,8999,9095,9180,9275,9276,9557,9567,9579,9580,9581,9582,9623,9658,9659);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(9686,9820,10044,10156,10370,10401,10402,10403,10579,10607,10620,10783,10784,10785,10786,10787,10788,10789,10790,10791);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(10792,10793,10794,10795,10796,10797,10798,10810,11080,11111,11151,11179,11537,11538,11539,11540,11541,11542,11543,11544);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(11545,11660,11670,11926,12146,12244,12249,12251,12252,12253,12254,12255,12256,12317,12516,12517,12537,12741,12758,12804);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(12861,12916,12917,13056,13339,13477,13838,13856,13857,13876,14026,14027,14028,14029,14030,14031,14162,14181,14307,14309);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(14310,14311,14312,14391,14422,14443,14449,14493,14495,14501,14606,14641,14642,14643,14644,14646,14699,14706,14711,14719);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(14732,14735,14746,14758,14830,14831,14885,14906,14913,14941,14966,14967,14968,14994,15001,15002,15003,15004,15005,15073);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(15091,15109,15123,15133,15134,15140,15142,15143,15144,15145,15151,15152,15153,15154,15155,15156,15157,15158,15159,15160);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(15161,15164,15167,15173,15219,15221,15222,15227,15228,15231,15232,15313,15314,15322,15326,15329,15330,15331,15332,15337);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(15342,15345,15346,15347,15415,15425,15426,15454,15468,15472,15507,15590,15619,15631,15632,15672,15695,15717,15730,15778);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(15800,15809,15872,15873,15874,15875,15876,15877,15879,15880,15881,15882,15883,15884,15885,15886,15887,15888,15889,15890);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(15893,15894,15897,15899,15900,15902,15911,15912,15913,15914,15915,15916,15918,15922,15943,15957,15964,15973,15985,15992);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(15993,15996,15997,15998,15999,16006,16026,16039,16040,16044,16045,16046,16047,16048,16077,16078,16079,16082,16084,16086);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(16092,16099,16100,16137,16138,16140,16166,16188,16296,16306,16336,16338,16356,16430,16465,16466,16467,16487,16496,16497);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(16498,16532,16536,16556,16557,16560,16561,16562,16563,16566,16567,16569,16571,16572,16581,16604,16606,16608,16609,16897);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(16914,16922,16999,17001,17042,17047,17059,17060,17063,17064,17065,17066,17090,17091,17107,17124,17125,17126,17161,17163);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17168,17169,17170,17171,17172,17173,17174,17175,17176,17208,17234,17239,17253,17260,17274,17284,17302,17305,17316,17317);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17365,17366,17376,17411,17413,17422,17428,17430,17456,17457,17459,17460,17463,17473,17474,17501,17502,17515,17560,17561);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17562,17563,17564,17565,17566,17567,17568,17569,17570,17571,17572,17573,17574,17575,17576,17577,17579,17580,17581,17583);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17590,17597,17615,17616,17617,17618,17619,17644,17645,17662,17665,17677,17685,17687,17688,17689,17690,17691,17696,17697);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17698,17699,17733,17737,17738,17739,17740,17741,17742,17743,17744,17745,17746,17747,17748,17749,17750,17751,17752,17753);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17754,17755,17756,17757,17758,17759,17760,17761,17762,17763,17764,17774,17775,17776,17777,17778,17779,17780,17781,17782);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17783,17784,17785,17786,17787,17788,17789,17790,17791,17792,17793,17813,17850,17859,17861,17863,17867,17868,17869,17883);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(17886,17889,17939,17971,17972,17974,17984,17985,17988,17992,17997,17998,17999,18000,18002,18048,18049,18050,18051,18052);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(18053,18054,18055,18056,18057,18058,18059,18085,18108,18110,18142,18143,18144,18148,18153,18156,18157,18158,18161,18162);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(18163,18164,18173,18184,18196,18199,18208,18215,18216,18217,18225,18228,18239,18242,18263,18264,18268,18305,18306,18307);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(18308,18329,18354,18355,18361,18366,18367,18388,18392,18393,18395,18410,18412,18425,18432,18433,18434,18435,18436,18444);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(18479,18532,18551,18553,18555,18560,18563,18582,18589,18590,18601,18602,18603,18604,18605,18606,18607,18608,18609,18610);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(18611,18612,18613,18614,18615,18616,18617,18618,18619,18620,18621,18624,18625,18654,18665,18699,18721,18757,18759,18780);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(18782,18793,18814,18820,18828,18840,18841,18842,18843,18844,18890,18928,18932,18935,18936,18941,18955,18961,18967,18968);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19010,19028,19029,19032,19057,19058,19059,19060,19078,19079,19080,19081,19082,19083,19084,19085,19086,19087,19088,19089);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19090,19091,19092,19093,19094,19095,19096,19097,19098,19099,19100,19101,19102,19103,19104,19105,19106,19107,19108,19109);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19110,19111,19112,19113,19114,19115,19116,19117,19118,19119,19121,19122,19123,19124,19125,19126,19127,19128,19129,19130);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19131,19132,19139,19145,19179,19198,19211,19212,19215,19230,19237,19313,19323,19336,19376,19387,19388,19421,19430,19431);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19433,19437,19439,19483,19484,19522,19525,19547,19548,19549,19550,19555,19563,19577,19590,19609,19615,19618,19619,19620);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19646,19650,19652,19654,19655,19660,19680,19681,19691,19695,19703,19711,19714,19717,19723,19724,19727,19819,19838,19841);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19842,19845,19846,19866,19867,19868,19870,19871,19884,19885,19886,19887,19888,19889,19890,19891,19892,19893,19894,19895);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(19896,19897,19898,19899,19900,19901,19902,19903,19904,19913,19924,19927,19939,20001,20002,20003,20010,20011,20012,20013);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20014,20022,20023,20024,20051,20061,20076,20085,20086,20093,20094,20103,20104,20105,20106,20107,20114,20128,20143,20153);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20155,20156,20164,20165,20166,20167,20168,20169,20170,20171,20172,20173,20174,20175,20176,20177,20178,20179,20180,20181);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20182,20183,20184,20185,20186,20187,20188,20189,20190,20191,20192,20193,20212,20213,20219,20226,20229,20230,20239,20251);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20252,20253,20254,20255,20256,20257,20258,20259,20260,20261,20262,20263,20264,20265,20266,20267,20268,20275,20282,20286);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20288,20289,20296,20298,20299,20300,20301,20302,20303,20304,20305,20306,20307,20308,20309,20310,20311,20312,20313,20314);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20315,20316,20317,20318,20319,20320,20321,20322,20323,20333,20336,20337,20338,20391,20392,20412,20425,20431,20469,20473);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20475,20476,20521,20522,20523,20524,20525,20526,20527,20528,20529,20530,20531,20532,20533,20534,20535,20536,20537,20538);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20539,20540,20541,20542,20543,20544,20545,20546,20547,20548,20549,20550,20562,20565,20566,20567,20568,20569,20570,20571);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20572,20573,20574,20575,20576,20577,20578,20579,20580,20581,20582,20583,20584,20585,20586,20587,20588,20589,20590,20591);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20592,20593,20594,20595,20596,20597,20598,20602,20608,20617,20620,20621,20622,20623,20624,20625,20626,20627,20628,20629);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20630,20631,20632,20633,20636,20637,20638,20639,20640,20641,20642,20643,20644,20645,20646,20647,20648,20649,20650,20651);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20652,20653,20654,20655,20656,20657,20658,20659,20660,20661,20662,20663,20664,20665,20666,20670,20675,20686,20687,20688);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20689,20690,20691,20692,20693,20694,20695,20696,20697,20698,20699,20700,20701,20702,20703,20704,20705,20706,20709,20717);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20718,20719,20720,20733,20736,20737,20738,20739,20740,20741,20742,20743,20744,20745,20746,20755,20764,20767,20769,20771);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20781,20782,20796,20804,20809,20813,20814,20815,20816,20817,20818,20819,20820,20821,20822,20823,20824,20825,20826,20827);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20828,20829,20830,20831,20832,20833,20834,20835,20836,20837,20838,20839,20840,20841,20842,20843,20844,20845,20851,20852);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20853,20855,20856,20858,20863,20889,20933,20935,20936,20937,20938,20939,20940,20941,20942,20943,20944,20945,20946,20947);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20948,20949,20950,20951,20952,20953,20954,20955,20956,20957,20958,20959,20960,20961,20962,20963,20964,20965,20966,20967);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(20968,20969,20970,20971,20972,20973,20974,20975,20976,20979,20982,20991,20992,20993,21012,21013,21014,21015,21016,21017);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21025,21031,21035,21039,21041,21051,21052,21053,21054,21067,21068,21069,21070,21074,21075,21092,21093,21094,21095,21096);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21098,21099,21100,21119,21120,21121,21122,21142,21143,21144,21146,21149,21150,21157,21159,21163,21170,21173,21176,21182);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21184,21186,21187,21190,21191,21199,21201,21202,21203,21206,21208,21210,21211,21234,21240,21241,21243,21252,21261,21262);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21278,21281,21288,21297,21310,21320,21321,21329,21333,21334,21348,21351,21352,21353,21355,21356,21358,21360,21361,21363);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21366,21367,21369,21371,21378,21388,21394,21396,21401,21403,21412,21415,21417,21418,21421,21422,21424,21429,21436,21437);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21438,21439,21440,21443,21445,21447,21451,21456,21457,21463,21473,21479,21480,21481,21482,21489,21498,21511,21512,21513);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21521,21522,21523,21524,21525,21526,21527,21528,21529,21530,21531,21532,21533,21534,21535,21536,21537,21538,21539,21540);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21541,21542,21543,21544,21545,21546,21547,21548,21549,21550,21551,21552,21553,21554,21555,21556,21557,21558,21559,21560);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21561,21562,21563,21564,21565,21566,21567,21568,21569,21570,21571,21572,21573,21574,21575,21576,21577,21578,21579,21580);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21581,21582,21583,21584,21585,21586,21587,21588,21589,21590,21591,21592,21593,21594,21595,21596,21597,21598,21599,21600);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21601,21602,21603,21604,21605,21606,21607,21608,21609,21610,21611,21612,21613,21614,21615,21616,21617,21618,21619,21620);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21621,21622,21623,21624,21625,21626,21630,21631,21632,21641,21645,21646,21647,21653,21654,21658,21665,21666,21667,21668);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21669,21670,21671,21672,21673,21674,21675,21676,21677,21678,21679,21680,21681,21712,21713,21714,21715,21716,21758,21759);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21760,21764,21765,21781,21785,21786,21791,21792,21793,21794,21799,21800,21807,21814,21819,21830,21831,21832,21833,21834);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21835,21836,21841,21842,21843,21850,21855,21856,21862,21868,21892,21893,21898,21899,21903,21910,21914,21915,21916,21917);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21918,21919,21921,21924,21926,21929,21933,21934,21939,21940,21943,21947,21957,21959,21967,21972,21973,21974,21987,21988);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(21989,21990,21991,21993,21996,21997,21999,22001,22002,22003,22008,22014,22021,22023,22027,22028,22029,22030,22031,22032);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22033,22034,22039,22048,22049,22050,22051,22058,22063,22065,22066,22068,22069,22070,22071,22078,22079,22080,22086,22087);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22088,22090,22096,22109,22111,22116,22117,22118,22124,22125,22126,22129,22131,22139,22147,22162,22163,22164,22165,22166);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22167,22168,22169,22170,22171,22172,22173,22176,22177,22185,22186,22188,22190,22192,22207,22230,22240,22246,22260,22277);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22284,22288,22290,22296,22300,22316,22317,22320,22322,22335,22340,22345,22346,22348,22349,22350,22351,22353,22356,22358);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22367,22368,22371,22383,22395,22399,22400,22401,22402,22403,22404,22405,22406,22409,22411,22412,22413,22414,22415,22416);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22417,22418,22422,22428,22434,22435,22436,22444,22447,22457,22467,22475,22495,22501,22502,22503,22504,22505,22508,22515);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22517,22519,22520,22521,22523,22524,22525,22526,22527,22528,22529,22530,22531,22532,22533,22534,22535,22536,22537,22538);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22539,22540,22541,22542,22543,22544,22545,22546,22547,22548,22549,22550,22551,22552,22553,22554,22555,22556,22557,22558);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22559,22560,22561,22562,22563,22564,22565,22566,22567,22568,22569,22570,22571,22572,22573,22574,22575,22576,22577,22578);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22579,22580,22581,22582,22583,22584,22585,22586,22587,22588,22589,22590,22591,22592,22593,22594,22595,22596,22597,22598);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22599,22600,22601,22602,22603,22604,22605,22606,22607,22608,22609,22610,22611,22612,22613,22614,22615,22616,22617,22618);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22619,22620,22621,22622,22623,22624,22625,22626,22627,22628,22629,22630,22631,22632,22633,22634,22635,22636,22637,22638);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22639,22640,22641,22642,22643,22644,22645,22646,22647,22648,22649,22650,22651,22652,22653,22654,22655,22656,22657,22658);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22659,22660,22661,22662,22663,22664,22665,22666,22667,22668,22669,22670,22671,22672,22673,22674,22675,22676,22677,22678);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22679,22680,22681,22682,22683,22684,22685,22686,22687,22688,22689,22690,22691,22692,22693,22694,22695,22696,22697,22698);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22699,22700,22701,22702,22703,22704,22705,22706,22707,22708,22709,22710,22711,22712,22713,22714,22715,22716,22717,22718);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22719,22720,22721,22722,22723,22724,22725,22726,22727,22728,22729,22730,22731,22732,22733,22734,22735,22736,22737,22738);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22739,22740,22741,22742,22743,22744,22745,22746,22747,22748,22749,22750,22751,22752,22753,22754,22755,22756,22757,22758);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22759,22760,22761,22762,22763,22764,22765,22766,22767,22768,22769,22770,22771,22772,22773,22774,22775,22776,22777,22778);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22779,22780,22781,22782,22783,22784,22785,22786,22787,22788,22789,22790,22791,22792,22793,22794,22795,22796,22797,22798);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22799,22800,22801,22829,22830,22831,22833,22838,22839,22850,22851,22866,22867,22868,22872,22888,22903,22905,22918,22921);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(22923,22925,22926,22938,22961,22970,22971,22974,22984,22986,22991,23003,23013,23014,23021,23027,23033,23037,23040,23041);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23043,23046,23056,23057,23058,23059,23070,23071,23072,23073,23074,23077,23081,23084,23095,23102,23104,23105,23118,23119);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23122,23124,23125,23137,23138,23155,23156,23181,23182,23183,23184,23185,23186,23189,23190,23203,23209,23210,23211,23214);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23225,23227,23238,23240,23252,23255,23260,23276,23279,23292,23293,23294,23295,23296,23297,23298,23299,23301,23304,23307);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23312,23313,23314,23315,23317,23322,23325,23327,23328,23329,23351,23356,23357,23358,23359,23360,23361,23366,23372,23378);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23379,23382,23385,23395,23409,23412,23416,23417,23424,23425,23438,23442,23443,23444,23445,23448,23451,23454,23468,23470);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23472,23474,23475,23476,23479,23480,23485,23491,23496,23499,23500,23502,23512,23513,23514,23515,23516,23517,23526,23532);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23537,23540,23544,23553,23599,23607,23608,23609,23610,23611,23613,23614,23615,23621,23629,23630,23631,23632,23633,23634);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23686,23703,23715,23717,23727,23746,23758,23759,23800,23803,23805,23807,23808,23810,23813,23814,23815,23819,23820,23821);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23824,23825,23830,23837,23845,23850,23852,23853,23854,23855,23867,23868,23869,23884,23885,23893,23894,23898,23901,23912);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(23913,23914,23915,23916,23917,23921,23922,23923,23924,23925,23936,23947,23957,23968,23972,23974,23996,23997,24000,24008);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24012,24020,24021,24022,24025,24034,24087,24092,24093,24094,24095,24098,24100,24101,24102,24109,24110,24121,24153,24165);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24166,24167,24170,24171,24182,24183,24184,24185,24192,24193,24194,24202,24203,24204,24205,24220,24223,24230,24231,24263);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24264,24265,24266,24267,24268,24269,24274,24275,24276,24278,24281,24288,24289,24290,24292,24293,24294,24295,24296,24297);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24298,24299,24300,24301,24302,24303,24304,24305,24306,24307,24308,24309,24310,24311,24324,24325,24326,24331,24332,24337);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24351,24352,24353,24354,24355,24360,24361,24380,24382,24383,24384,24386,24412,24417,24438,24449,24450,24465,24466,24470);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24472,24481,24482,24505,24506,24507,24508,24509,24513,24521,24526,24550,24551,24575,24577,24578,24579,24617,24620,24630);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24641,24645,24648,24651,24655,24658,24661,24666,24692,24693,24695,24699,24700,24704,24705,24712,24724,24725,24748,24749);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24756,24758,24766,24771,24776,24778,24798,24799,24800,24801,24802,24803,24809,24817,24826,24827,24828,24829,24831,24832);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24845,24853,24857,24861,24862,24865,24883,24887,24888,24889,24890,24893,24902,24903,24904,24908,24912,24915,24925,24928);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(24936,24939,24940,24941,24942,24943,24944,24945,24946,24947,24948,24949,24950,24951,24952,24953,24959,24963,24973,24991);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25006,25008,25029,25041,25042,25065,25066,25067,25086,25090,25091,25092,25114,25116,25117,25118,25119,25120,25121,25122);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25123,25124,25125,25126,25127,25128,25129,25130,25131,25139,25154,25156,25157,25168,25171,25172,25173,25189,25191,25192);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25212,25213,25218,25219,25221,25229,25230,25231,25232,25263,25267,25303,25308,25309,25310,25340,25341,25357,25358,25365);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25366,25382,25388,25389,25402,25403,25404,25405,25410,25412,25413,25466,25471,25472,25473,25491,25495,25499,25500,25505);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25515,25525,25526,25527,25528,25529,25530,25531,25532,25533,25535,25536,25538,25539,25540,25541,25542,25543,25544,25545);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25546,25547,25548,25549,25550,25551,25552,25553,25554,25555,25556,25557,25558,25559,25560,25561,25562,25563,25564,25565);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25566,25567,25568,25569,25570,25571,25572,25573,25574,25575,25576,25577,25578,25579,25581,25594,25640,25654,25669,25670);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25671,25672,25683,25688,25689,25690,25691,25692,25693,25694,25698,25704,25723,25734,25735,25738,25745,25746,25763,25770);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25771,25787,25795,25796,25813,25815,25831,25842,25845,25846,25847,25848,25852,25853,25854,25856,25857,25858,25859,25868);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25869,25870,25871,25872,25873,25874,25875,25876,25877,25878,25952,25953,25963,25964,25965,25966,25971,25972,25973,25985);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(25995,26041,26042,26057,26071,26080,26082,26093,26094,26099,26105,26114,26120,26121,26128,26129,26130,26161,26162,26175);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(26176,26188,26190,26193,26227,26230,26241,26248,26249,26251,26256,26258,26264,26265,26275,26278,26285,26288,26292,26294);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(26296,26298,26311,26312,26313,26317,26318,26320,26337,26338,26339,26340,26341,26342,26346,26355,26364,26368,26372,26373);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(26376,26390,26391,26400,26412,26427,26430,26435,26444,26454,26464,26465,26466,26476,26489,26490,26491,26495,26498,26535);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(26559,26576,26591,26594,26612,26651,26665,26671,26675,26688,26698,26700,26712,26724,26732,26738,26739,26740,26741,26742);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(26743,26744,26745,26747,26748,26749,26750,26751,26752,26753,26754,26755,26756,26757,26758,26759,26765,26773,26774,26775);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(26777,26778,26781,26784,26789,26791,26804,26807,26808,26819,26831,26834,26835,26840,26842,26867,26882,26887,26889,26894);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(26895,26897,26899,26927,26937,27047,27079,27101,27104,27109,27111,27112,27121,27124,27127,27128,27135,27154,27179,27180);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27200,27201,27205,27208,27218,27231,27239,27253,27257,27263,27264,27265,27276,27280,27296,27304,27306,27310,27311,27312);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27313,27321,27322,27323,27324,27326,27327,27331,27338,27341,27353,27366,27368,27369,27372,27375,27380,27387,27394,27396);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27397,27402,27403,27404,27407,27413,27418,27419,27420,27426,27427,27428,27429,27436,27437,27442,27443,27444,27445,27446);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27449,27450,27452,27453,27454,27466,27471,27472,27473,27474,27490,27491,27507,27512,27514,27515,27527,27529,27548,27561);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27569,27572,27583,27586,27589,27590,27591,27592,27595,27596,27599,27601,27609,27622,27625,27630,27634,27660,27663,27669);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27674,27694,27698,27710,27723,27724,27741,27757,27764,27786,27792,27793,27794,27795,27796,27802,27825,27827,27832,27837);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27841,27851,27853,27854,27873,27875,27879,27880,27889,27890,27895,27910,27921,27929,27931,27942,27952,27954,27955,27956);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(27967,27968,27976,27988,27995,27997,27998,27999,28000,28008,28013,28015,28019,28064,28088,28119,28128,28130,28137,28144);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28168,28171,28173,28180,28181,28184,28190,28206,28224,28235,28237,28240,28245,28248,28250,28251,28252,28253,28254,28259);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28270,28271,28273,28279,28280,28282,28289,28292,28293,28294,28295,28296,28299,28300,28301,28304,28305,28307,28310,28311);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28316,28330,28332,28333,28348,28351,28352,28353,28354,28360,28361,28364,28365,28395,28400,28409,28420,28421,28422,28423);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28424,28425,28426,28427,28428,28429,28430,28431,28432,28433,28434,28435,28436,28437,28438,28439,28441,28453,28454,28455);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28456,28457,28458,28459,28460,28461,28462,28463,28466,28469,28478,28481,28482,28483,28485,28492,28501,28507,28509,28520);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28523,28535,28536,28537,28540,28544,28563,28591,28595,28617,28620,28622,28625,28626,28627,28628,28629,28631,28632,28633);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28640,28643,28644,28645,28648,28655,28656,28663,28664,28712,28713,28720,28724,28738,28739,28740,28741,28744,28749,28751);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28753,28755,28757,28758,28761,28762,28763,28764,28767,28770,28773,28775,28777,28778,28780,28783,28786,28789,28815,28816);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28820,28839,28842,28849,28874,28876,28904,28915,28928,28929,28932,28947,28949,28950,28953,28954,28955,28957,28960,28984);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(28986,29002,29003,29004,29009,29010,29020,29025,29027,29038,29039,29045,29046,29054,29055,29056,29057,29058,29059,29060);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29069,29075,29081,29083,29094,29099,29100,29105,29138,29140,29150,29163,29170,29184,29192,29215,29221,29229,29241,29242);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29243,29245,29247,29248,29249,29256,29257,29258,29263,29265,29267,29268,29273,29274,29276,29278,29279,29286,29303,29318);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29320,29322,29324,29326,29342,29353,29354,29355,29356,29357,29359,29360,29361,29362,29363,29367,29371,29373,29379,29381);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29383,29385,29386,29387,29388,29391,29397,29398,29406,29416,29417,29425,29435,29443,29446,29447,29448,29457,29524,29526);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29550,29558,29574,29575,29576,29577,29580,29581,29588,29589,29595,29597,29599,29601,29603,29608,29609,29612,29613,29615);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29627,29629,29632,29633,29634,29635,29682,29685,29701,29718,29741,29758,29759,29760,29761,29763,29764,29765,29766,29772);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29773,29776,29777,29780,29781,29782,29783,29784,29785,29800,29802,29803,29805,29807,29812,29815,29816,29827,29845,29846);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29847,29853,29870,29871,29876,29877,29878,29879,29883,29886,29901,29902,29913,29916,29917,29921,29928,29943,29952,29985);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(29986,29987,29988,29989,29990,29991,29992,29999,30000,30015,30016,30018,30038,30047,30048,30049,30057,30059,30068,30072);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30073,30075,30076,30077,30078,30079,30087,30088,30089,30091,30097,30101,30103,30119,30122,30125,30126,30130,30131,30132);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30133,30138,30139,30149,30153,30155,30156,30169,30183,30201,30207,30210,30214,30215,30220,30221,30246,30264,30296,30297);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30298,30302,30303,30315,30316,30317,30318,30327,30339,30354,30355,30361,30366,30384,30389,30397,30398,30402,30412,30413);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30415,30421,30424,30426,30427,30428,30442,30454,30457,30459,30460,30465,30467,30473,30476,30478,30485,30495,30496,30497);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30498,30508,30509,30510,30511,30512,30513,30514,30515,30516,30517,30518,30519,30520,30521,30522,30524,30525,30526,30527);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30528,30529,30530,30532,30539,30540,30545,30546,30559,30576,30577,30588,30589,30594,30598,30599,30600,30601,30602,30603);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30614,30615,30618,30628,30640,30644,30646,30649,30650,30651,30655,30669,30670,30684,30690,30699,30700,30707,30712,30738);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30743,30747,30748,30749,30750,30756,30757,30758,30759,30760,30761,30762,30763,30764,30765,30766,30767,30768,30769,30770);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30771,30772,30773,30774,30775,30776,30777,30778,30779,30780,30781,30782,30783,30784,30785,30786,30787,30788,30789,30790);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30791,30792,30793,30794,30795,30796,30797,30798,30799,30800,30801,30802,30803,30804,30805,30806,30807,30808,30809,30810);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30811,30812,30813,30814,30815,30816,30817,30818,30819,30820,30821,30822,30823,30832,30878,30880,30883,30888,30889,30901);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30902,30903,30904,30905,30906,30907,30908,30909,30910,30911,30912,30913,30914,30915,30916,30917,30925,30926,30927,30928);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30929,30930,30931,30932,30933,30934,30935,30936,30937,30938,30939,30940,30941,30942,30943,30948,30959,30964,30965,30966);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30967,30968,30969,30970,30971,30972,30973,30974,30975,30976,30977,30978,30979,30980,30981,30982,30983,30990,30991,30995);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(30996,30998,30999,31000,31001,31004,31005,31006,31011,31014,31046,31047,31049,31055,31062,31064,31065,31066,31068,31071);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31072,31073,31074,31076,31077,31086,31092,31093,31100,31103,31105,31116,31117,31128,31138,31143,31156,31168,31178,31179);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31180,31183,31184,31187,31188,31199,31200,31201,31202,31203,31206,31207,31208,31209,31210,31211,31212,31215,31217,31227);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31234,31244,31245,31246,31252,31256,31272,31284,31285,31286,31287,31288,31289,31291,31292,31293,31294,31295,31296,31297);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31298,31299,31308,31309,31311,31312,31315,31317,31329,31331,31335,31336,31337,31338,31339,31340,31341,31342,31343,31344);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31345,31346,31347,31348,31349,31350,31351,31352,31353,31354,31355,31356,31357,31358,31359,31360,31361,31362,31363,31364);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31365,31367,31368,31369,31370,31371,31372,31373,31374,31375,31376,31377,31378,31379,31380,31381,31382,31383,31384,31385);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31386,31387,31388,31389,31390,31391,31392,31394,31400,31405,31415,31441,31442,31443,31445,31446,31447,31448,31449,31450);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31451,31452,31453,31454,31455,31456,31457,31458,31459,31460,31461,31462,31463,31464,31465,31466,31468,31469,31470,31471);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31472,31473,31474,31475,31476,31477,31478,31479,31480,31481,31483,31484,31485,31486,31487,31488,31489,31490,31491,31492);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31493,31494,31495,31496,31497,31498,31499,31500,31501,31502,31503,31504,31505,31506,31507,31508,31509,31510,31511,31512);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31513,31514,31515,31517,31518,31519,31520,31521,31533,31534,31535,31536,31537,31538,31539,31540,31541,31542,31543,31544);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31546,31547,31548,31550,31558,31559,31560,31561,31566,31567,31568,31569,31570,31571,31573,31574,31576,31577,31584,31585);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31588,31593,31597,31598,31600,31603,31618,31619,31620,31621,31623,31624,31625,31626,31627,31628,31629,31630,31631,31633);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31634,31635,31641,31642,31643,31644,31645,31646,31647,31653,31655,31656,31657,31658,31659,31660,31661,31662,31663,31664);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31665,31666,31667,31668,31669,31670,31671,31672,31673,31674,31675,31676,31677,31678,31679,31680,31681,31682,31683,31684);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31696,31709,31710,31711,31712,31713,31714,31719,31722,31728,31729,31730,31732,31733,31734,31735,31740,31741,31742,31743);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31744,31745,31748,31749,31750,31751,31752,31766,31767,31773,31777,31794,31795,31796,31801,31816,31817,31818,31819,31820);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31821,31822,31823,31824,31825,31826,31828,31829,31835,31845,31866,31867,31871,31872,31873,31874,31875,31876,31877,31878);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31879,31880,31888,31903,31904,31905,31906,31907,31908,31909,31913,31915,31917,31918,31919,31920,31921,31922,31923,31924);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31925,31926,31927,31928,31929,31930,31931,31932,31933,31934,31935,31936,31937,31938,31939,31940,31941,31942,31943,31944);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31945,31946,31947,31948,31949,31950,31951,31952,31953,31954,31955,31956,31957,31958,31959,31960,31961,31962,31963,31964);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31965,31966,31967,31968,31969,31970,31971,31972,31973,31974,31975,31976,31977,31978,31979,31980,31981,31982,31983,31984);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(31985,31986,31987,31988,31989,31990,31991,31992,31993,31994,31995,31996,31997,31998,31999,32000,32001,32002,32003,32004);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32005,32006,32007,32008,32009,32010,32011,32012,32013,32014,32015,32016,32017,32018,32019,32020,32021,32022,32023,32024);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32025,32026,32027,32028,32029,32030,32031,32032,32033,32034,32035,32036,32037,32038,32039,32040,32041,32042,32043,32044);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32045,32046,32047,32048,32049,32050,32051,32052,32053,32054,32055,32056,32057,32058,32059,32060,32061,32062,32063,32064);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32065,32066,32067,32068,32069,32070,32071,32072,32073,32074,32075,32076,32077,32078,32079,32080,32081,32082,32083,32084);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32085,32086,32087,32088,32089,32090,32091,32092,32093,32094,32095,32096,32097,32098,32099,32100,32101,32102,32103,32104);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32105,32106,32107,32108,32109,32110,32111,32112,32113,32114,32115,32116,32117,32118,32119,32120,32121,32122,32123,32124);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32125,32126,32127,32128,32129,32130,32131,32132,32133,32134,32135,32136,32137,32138,32139,32140,32141,32142,32143,32144);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32145,32146,32147,32148,32167,32168,32171,32187,32192,32193,32195,32196,32197,32199,32200,32202,32209,32214,32215,32217);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32218,32221,32224,32229,32242,32244,32245,32256,32264,32265,32266,32282,32298,32304,32313,32314,32318,32319,32328,32338);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32339,32347,32366,32368,32427,32431,32442,32445,32452,32465,32508,32520,32525,32527,32528,32530,32531,32532,32536,32549);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32550,32551,32552,32553,32554,32555,32556,32557,32558,32559,32560,32561,32575,32583,32585,32586,32606,32607,32608,32648);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32654,32655,32656,32661,32662,32694,32764,32765,32766,32768,32778,32780,32782,32784,32785,32787,32794,32795,32796,32797);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32819,32821,32822,32824,32825,32827,32828,32829,32831,32846,32847,32848,32849,32853,32854,32866,32887,32892,32931,32942);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(32981,32984,33005,33006,33014,33045,33049,33054,33068,33070,33086,33087,33104,33105,33116,33122,33123,33130,33135,33140);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33141,33146,33147,33148,33149,33150,33151,33152,33153,33154,33155,33156,33157,33158,33159,33160,33161,33162,33163,33164);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33184,33190,33191,33192,33233,33234,33240,33245,33246,33252,33282,33290,33305,33337,33339,33340,33341,33342,33351,33352);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33353,33360,33376,33377,33380,33385,33391,33392,33393,33395,33396,33397,33398,33399,33400,33401,33402,33406,33415,33425);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33426,33449,33450,33489,33490,33491,33492,33493,33500,33501,33503,33520,33521,33551,33570,33571,33575,33576,33632,33661);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33663,33664,33665,33667,33668,33689,33690,33691,33692,33693,33694,33700,33708,33723,33724,33725,33729,33730,33731,33732);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33733,33734,33735,33737,33741,33742,33756,33757,33758,33764,33773,33779,33784,33787,33789,33802,33805,33809,33815,33827);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33828,33829,33830,33831,33832,33835,33839,33850,33851,33852,33856,33883,33885,33886,33887,33888,33906,33907,33908,33909);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(33910,33911,33942,33946,33953,33954,33955,33959,33967,33968,33984,33986,33989,33994,33995,33999,34003,34005,34016,34050);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(34055,34096,34098,34100,34106,34107,34108,34109,34110,34111,34112,34114,34115,34131,34139,34140,34141,34142,34146,34148);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(34150,34151,34152,34153,34157,34159,34162,34166,34168,34169,34170,34171,34172,34173,34174,34175,34186,34188,34189,34200);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(34201,34202,34214,34215,34216,34217,34218,34219,34220,34221,34222,34226,34227,34228,34229,34230,34236,34237,34245,34247);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(34250,34268,34270,34272,34274,34276,34277,34281,34291,34296,34298,34313,34319,34327,34332,34336,34338,34361,34381,34393);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(34434,34436,34442,34443,34533,34548,34562,34566,34579,34580,34581,34588,34589,34648,34649,34650,34704,34720,34731,34732);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(34737,34738,34739,34740,34741,34743,34755,34781,34798,34806,34810,34827,34847,34862,34875,34879,34883,34887,34889,34891);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(34893,34895,34899,34900,34901,34902,34903,34904,34905,34906,34908,34909,34910,34984,35009,35015,35016,35018,35055,35062);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35066,35074,35079,35083,35089,35104,35105,35106,35107,35108,35109,35110,35145,35146,35176,35216,35226,35227,35228,35262);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35263,35264,35265,35266,35267,35268,35269,35270,35271,35272,35278,35279,35280,35297,35306,35308,35310,35339,35347,35348);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35349,35350,35351,35352,35353,35354,35355,35356,35357,35358,35359,35360,35376,35377,35379,35380,35401,35403,35405,35407);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35410,35413,35415,35417,35419,35421,35423,35425,35427,35429,35431,35433,35436,35438,35439,35440,35441,35442,35443,35447);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35448,35449,35490,35511,35512,35513,35514,35515,35516,35517,35518,35519,35520,35521,35522,35523,35524,35525,35527,35528);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35529,35530,35531,35532,35533,35534,35535,35536,35537,35538,35539,35540,35541,35542,35543,35544,35546,35559,35560,35568);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35586,35608,35614,35615,35616,35638,35651,35652,35653,35654,35655,35656,35658,35659,35662,35663,35664,35665,35666,35667);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35668,35669,35670,35671,35672,35673,35674,35675,35676,35680,35681,35682,35683,35684,35685,35686,35687,35688,35689,35690);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35691,35692,35693,35694,35695,35696,35697,35699,35700,35701,35702,35703,35704,35705,35706,35707,35708,35709,35710,35711);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35712,35713,35714,35715,35716,35717,35718,35719,35720,35721,35722,35723,35724,35725,35726,35728,35729,35730,35731,35732);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35733,35734,35735,35736,35737,35738,35739,35740,35741,35742,35743,35744,35745,35746,35747,35748,35749,35774,35775,35776);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(35821,35983,36067,36071,36072,36074,36075,36076,36082,36083,36084,36085,36086,36087,36088,36089,36090,36091,36093,36099);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(36135,36148,36154,36155,36167,36168,36169,36171,36189,36209,36212,36215,36301,36302,36303,36349,36350,36357,36358,36473);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(36474,36475,36495,36498,36508,36537,36538,36543,36547,36549,36553,36566,36571,36572,36573,36574,36617,36643,36659,36677);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(36710,36715,36726,36736,36737,36792,36804,36817,36848,36875,36904,36923,36934,36938,36944,36945,36946,36947,36966,36967);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37000,37013,37014,37039,37071,37074,37100,37101,37128,37131,37168,37191,37192,37201,37202,37222,37231,37233,37234,37235);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37236,37237,37238,37239,37240,37241,37242,37243,37244,37245,37246,37247,37248,37249,37250,37251,37252,37253,37254,37255);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37256,37257,37258,37259,37260,37261,37262,37263,37264,37265,37266,37267,37268,37269,37270,37271,37272,37273,37274,37275);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37276,37277,37278,37279,37280,37281,37282,37283,37284,37285,37286,37287,37288,37289,37290,37291,37292,37293,37295,37296);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37297,37298,37299,37300,37301,37302,37303,37304,37305,37306,37307,37308,37309,37310,37311,37312,37313,37314,37315,37316);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37317,37318,37319,37320,37321,37322,37323,37324,37325,37326,37327,37328,37329,37330,37331,37332,37333,37334,37335,37336);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37337,37338,37339,37340,37341,37342,37343,37344,37345,37346,37347,37348,37349,37350,37351,37352,37353,37354,37355,37356);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37357,37358,37359,37360,37361,37362,37363,37364,37365,37366,37367,37368,37369,37370,37371,37372,37373,37374,37375,37376);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37377,37378,37379,37380,37381,37382,37383,37384,37385,37386,37387,37388,37389,37390,37391,37392,37393,37394,37395,37396);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37397,37398,37399,37400,37401,37402,37403,37404,37405,37406,37407,37408,37409,37410,37411,37412,37413,37414,37415,37416);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37417,37418,37419,37420,37421,37422,37423,37424,37425,37426,37427,37428,37429,37430,37431,37432,37433,37434,37435,37436);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37437,37438,37439,37440,37441,37442,37443,37444,37445,37446,37447,37448,37449,37450,37451,37452,37453,37454,37455,37456);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37457,37458,37459,37460,37461,37462,37463,37464,37465,37466,37467,37468,37469,37470,37471,37472,37473,37474,37475,37476);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37477,37478,37479,37480,37481,37482,37483,37484,37485,37486,37504,37505,37506,37519,37525,37526,37528,37543,37549,37550);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37551,37558,37563,37564,37565,37566,37567,37568,37569,37574,37593,37601,37603,37604,37605,37606,37607,37608,37609,37610);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37611,37612,37613,37614,37615,37616,37617,37618,37619,37620,37621,37622,37623,37624,37625,37626,37627,37628,37629,37630);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37631,37632,37633,37634,37635,37636,37637,37638,37639,37640,37641,37642,37643,37644,37645,37646,37647,37648,37649,37650);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37651,37652,37653,37654,37655,37656,37657,37658,37677,37678,37693,37699,37700,37702,37704,37720,37721,37722,37730,37731);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37746,37788,37797,37801,37809,37814,37820,37824,37827,37831,37832,37852,37871,37878,37883,37894,37947,37948,37952,37957);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(37958,37959,37964,37981,37986,37990,38000,38001,38011,38012,38013,38014,38025,38026,38031,38053,38057,38058,38059,38061);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38062,38063,38064,38072,38073,38074,38075,38076,38077,38078,38079,38080,38081,38082,38083,38084,38085,38086,38087,38088);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38089,38090,38091,38092,38093,38094,38095,38096,38097,38098,38099,38100,38101,38102,38103,38105,38106,38107,38108,38110);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38121,38123,38126,38128,38129,38130,38131,38132,38133,38134,38137,38138,38139,38151,38156,38157,38164,38166,38167,38168);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38169,38170,38171,38174,38185,38186,38193,38197,38198,38211,38219,38220,38226,38230,38233,38234,38236,38249,38256,38257);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38258,38261,38262,38265,38266,38267,38288,38289,38296,38297,38298,38299,38303,38304,38308,38309,38312,38317,38320,38321);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38322,38340,38341,38342,38349,38350,38351,38352,38362,38367,38386,38388,38390,38393,38394,38395,38396,38397,38398,38399);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38400,38401,38402,38403,38404,38405,38406,38407,38408,38418,38419,38429,38431,38434,38435,38436,38439,38444,38445,38446);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38458,38459,38460,38461,38462,38463,38479,38480,38481,38483,38486,38495,38496,38497,38503,38524,38525,38527,38528,38544);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38546,38547,38548,38549,38550,38552,38556,38557,38563,38564,38568,38572,38580,38581,38582,38583,38584,38585,38586,38587);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38588,38590,38595,38596,38597,38598,38599,38600,38601,38602,38603,38604,38605,38625,38626,38628,38629,38630,38631,38632);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38633,38634,38635,38637,38638,38639,38640,38641,38667,38675,38676,38677,38678,38679,38680,38681,38682,38683,38684,38685);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38686,38687,38688,38689,38690,38691,38692,38693,38694,38698,38699,38700,38701,38702,38710,38717,38721,38722,38723,38724);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38725,38726,38727,38733,38734,38735,38736,38737,38751,38752,38758,38759,38760,38761,38769,38770,38771,38772,38773,38774);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38775,38776,38777,38784,38785,38786,38787,38788,38789,38790,38830,38843,38846,38857,38860,38863,38870,38882,38903,38905);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(38907,38919,38920,38921,38970,38971,38972,38973,38974,38975,39000,39001,39010,39011,39012,39013,39019,39023,39057,39058);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(39060,39091,39092,39120,39121,39122,39123,39125,39135,39166,39167,39168,39229,39232,39233,39234,39284,39285,39286,39287);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(39288,39289,39296,39299,39300,39301,39302,39303,39304,39305,39306,39307,39309,39310,39311,39355,39356,39361,39362,39420);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(39454,39462,39581,39672,39683,39691,39692,39695,39703,39707,39743,39744,39794,39798,39805,39815,39817,39821,39823,39841);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(39864,39872,39920,39922,39944,39945,39975,39976,39977,40037,40038,40039,40091,40101,40102,40103,40138,40143,40144,40145);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(40146,40151,40218,40265,40301,40354,40387,40418,40420,40422,40424,40428,40470,40471,40472,40479,40506,40617,40670,40671);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'zhCN' AND `entry` IN(40672,40673,40674,40675,40682,40684,40724,41839,43280,43281,43282,182757,182762,182767,3460602,3460603);
+
+-- Update existing entries, from WOTLK
+UPDATE `creature_template_locale` SET `Title` = '非玩家角色', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19;
+UPDATE `creature_template_locale` SET `Name` = 'Dragon Spawn', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚暴徒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 73;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚小偷', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 94;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚强盗', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 116;
+UPDATE `creature_template_locale` SET `Name` = '冰雪巨魔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 192;
+UPDATE `creature_template_locale` SET `Name` = '恐怖骸骨', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 202;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 219;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 220;
+UPDATE `creature_template_locale` SET `Name` = '格里安·斯托曼', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 234;
+UPDATE `creature_template_locale` SET `Name` = '被吃掉一半的尸体', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 262;
+UPDATE `creature_template_locale` SET `Name` = '染病的幼狼', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 299;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用马（白色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 305;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用马（褐色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 306;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用马（黑色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 308;
+UPDATE `creature_template_locale` SET `Name` = '罗尔夫的尸体', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 309;
+UPDATE `creature_template_locale` SET `Name` = '马迪亚斯·肖尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 332;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（棕色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 358;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（白色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 359;
+UPDATE `creature_template_locale` SET `Name` = '达希', `Title` = '女服务生', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 379;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 386;
+UPDATE `creature_template_locale` SET `Name` = '莫甘斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 397;
+UPDATE `creature_template_locale` SET `Name` = '卫兵帕克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 464;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚流浪巫师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 474;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 534;
+UPDATE `creature_template_locale` SET `Title` = '宠物训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 543;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚伏击者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 583;
+UPDATE `creature_template_locale` SET `Name` = '玛里莎·杜派格', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 599;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 693;
+UPDATE `creature_template_locale` SET `Name` = '范高雷中尉', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 703;
+UPDATE `creature_template_locale` SET `Name` = '霜鬃巨魔幼崽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 706;
+UPDATE `creature_template_locale` SET `Name` = '壮实的石腭怪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 724;
+UPDATE `creature_template_locale` SET `Name` = '刃鳞龙人长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 746;
+UPDATE `creature_template_locale` SET `Name` = '叛军哨兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 754;
+UPDATE `creature_template_locale` SET `Title` = '造箭师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 789;
+UPDATE `creature_template_locale` SET `Name` = '尘魔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 832;
+UPDATE `creature_template_locale` SET `Name` = '沼泽纺丝蛛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 858;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 904;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 946;
+UPDATE `creature_template_locale` SET `Name` = '高级裁缝', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 996;
+UPDATE `creature_template_locale` SET `Name` = '守夜人布洛伯格', `Title` = '守夜人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1000;
+UPDATE `creature_template_locale` SET `Name` = '残忍的安纳希克', `Title` = '碎颅酋长', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1059;
+UPDATE `creature_template_locale` SET `Title` = '碎颅部族巫医', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1060;
+UPDATE `creature_template_locale` SET `Name` = '玉龙', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1063;
+UPDATE `creature_template_locale` SET `Name` = '布莱德·长须', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1071;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1073;
+UPDATE `creature_template_locale` SET `Name` = '雪盲石腭怪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1119;
+UPDATE `creature_template_locale` SET `Name` = '老黑熊', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1186;
+UPDATE `creature_template_locale` SET `Name` = '奥尔苏迪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1225;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1235;
+UPDATE `creature_template_locale` SET `Title` = '弓箭商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1298;
+UPDATE `creature_template_locale` SET `Name` = '劳伦斯·斯涅德', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1300;
+UPDATE `creature_template_locale` SET `Name` = '巡山人卡尔·雷矛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1343;
+UPDATE `creature_template_locale` SET `Title` = '高级厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1382;
+UPDATE `creature_template_locale` SET `Name` = '格瑞兹拉克', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1425;
+UPDATE `creature_template_locale` SET `Name` = '雷玛·斯涅德', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1428;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1430;
+UPDATE `creature_template_locale` SET `Title` = '造箭师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1462;
+UPDATE `creature_template_locale` SET `Name` = '摩卡什', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1493;
+UPDATE `creature_template_locale` SET `Name` = '丑陋的僵尸', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1502;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1518;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1546;
+UPDATE `creature_template_locale` SET `Name` = '管理员摩尔多', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1568;
+UPDATE `creature_template_locale` SET `Name` = 'Rogue 40', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1601;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1677;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚囚徒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1706;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚罪犯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1711;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚叛军', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1715;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1723;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1724;
+UPDATE `creature_template_locale` SET `Name` = '亡灵卫兵莫瑞斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1745;
+UPDATE `creature_template_locale` SET `Name` = '杂斑座狼', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1766;
+UPDATE `creature_template_locale` SET `Name` = '苔藓阔步者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1780;
+UPDATE `creature_template_locale` SET `Name` = '迷雾爬行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1781;
+UPDATE `creature_template_locale` SET `Name` = '巨型灰斑熊', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1797;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫秃鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1811;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫潜伏者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1824;
+UPDATE `creature_template_locale` SET `Name` = '达拉然卫士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1888;
+UPDATE `creature_template_locale` SET `Name` = '达拉然巫师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1889;
+UPDATE `creature_template_locale` SET `Name` = '达拉然保卫者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1912;
+UPDATE `creature_template_locale` SET `Name` = '达拉然守卫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1913;
+UPDATE `creature_template_locale` SET `Name` = '达拉然法师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1914;
+UPDATE `creature_template_locale` SET `Name` = '达拉然咒术师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1915;
+UPDATE `creature_template_locale` SET `Name` = '达拉然书记员', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1920;
+UPDATE `creature_template_locale` SET `Title` = '对火焰免疫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1925;
+UPDATE `creature_template_locale` SET `Title` = '对冰霜免疫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1926;
+UPDATE `creature_template_locale` SET `Title` = '对神圣免疫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1927;
+UPDATE `creature_template_locale` SET `Title` = '对暗影免疫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1928;
+UPDATE `creature_template_locale` SET `Title` = '对自然免疫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1929;
+UPDATE `creature_template_locale` SET `Title` = '对物理免疫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1930;
+UPDATE `creature_template_locale` SET `Name` = '血色十字军俘虏', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1931;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1937;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2055;
+UPDATE `creature_template_locale` SET `Name` = '管理员伊尔萨莱恩', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2079;
+UPDATE `creature_template_locale` SET `Name` = '被诅咒的贵族', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2176;
+UPDATE `creature_template_locale` SET `Name` = '挣扎的贵族', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2177;
+UPDATE `creature_template_locale` SET `Name` = '哀嚎的贵族', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2178;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2216;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2220;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '烹饪训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2223;
+UPDATE `creature_template_locale` SET `Name` = '狂怒的石元素', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2258;
+UPDATE `creature_template_locale` SET `Name` = '辛迪加潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2260;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2295;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2296;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2301;
+UPDATE `creature_template_locale` SET `Name` = '琳妮·梅', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2303;
+UPDATE `creature_template_locale` SET `Title` = '医师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2326;
+UPDATE `creature_template_locale` SET `Title` = '医师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2329;
+UPDATE `creature_template_locale` SET `Name` = '巨型食苔蛛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2349;
+UPDATE `creature_template_locale` SET `Name` = '森林食苔蛛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2350;
+UPDATE `creature_template_locale` SET `Name` = '灰熊', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2351;
+UPDATE `creature_template_locale` SET `Name` = '野生山地狮', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2385;
+UPDATE `creature_template_locale` SET `Name` = '南海镇卫兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2386;
+UPDATE `creature_template_locale` SET `Name` = '大型洛克鳄', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2476;
+UPDATE `creature_template_locale` SET `Name` = '舰队指挥官海角', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2487;
+UPDATE `creature_template_locale` SET `Name` = '"海狼"马克基雷', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2501;
+UPDATE `creature_template_locale` SET `Name` = '"病鬼"菲利普', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2502;
+UPDATE `creature_template_locale` SET `Title` = '暗矛部族人质', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2530;
+UPDATE `creature_template_locale` SET `Name` = '莫甘斯的爪牙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2531;
+UPDATE `creature_template_locale` SET `Name` = '"畸形足"玛雷·维尔金斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2535;
+UPDATE `creature_template_locale` SET `Name` = '达拉然毒蛇', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2540;
+UPDATE `creature_template_locale` SET `Name` = '激流堡仲裁者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2585;
+UPDATE `creature_template_locale` SET `Title` = '暗影议会术士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2598;
+UPDATE `creature_template_locale` SET `Name` = '弗拉德', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2682;
+UPDATE `creature_template_locale` SET `Title` = '远古石卫士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2748;
+UPDATE `creature_template_locale` SET `Name` = '攻城傀儡', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2749;
+UPDATE `creature_template_locale` SET `Name` = '国王麦格尼·铜须', `Title` = '铁炉堡国王', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2784;
+UPDATE `creature_template_locale` SET `Name` = '"巧手"雷尼·麦考伊', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2795;
+UPDATE `creature_template_locale` SET `Title` = '杂货商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2808;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2813;
+UPDATE `creature_template_locale` SET `Name` = '秃鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2830;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2833;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2870;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2872;
+UPDATE `creature_template_locale` SET `Title` = '鳄鱼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2876;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2881;
+UPDATE `creature_template_locale` SET `Title` = '远程武器训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2886;
+UPDATE `creature_template_locale` SET `Name` = '首席考古学家杜瑟·灰须', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2912;
+UPDATE `creature_template_locale` SET `Name` = '勘察员雷姆塔维尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2917;
+UPDATE `creature_template_locale` SET `Title` = '恶魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2935;
+UPDATE `creature_template_locale` SET `Title` = '野熊训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2938;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2940;
+UPDATE `creature_template_locale` SET `Title` = '狼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2942;
+UPDATE `creature_template_locale` SET `Name` = '刺背野猪人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2952;
+UPDATE `creature_template_locale` SET `Name` = '斗猪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2966;
+UPDATE `creature_template_locale` SET `Title` = '制皮和裁缝供应商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3005;
+UPDATE `creature_template_locale` SET `Title` = '初级制皮师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3008;
+UPDATE `creature_template_locale` SET `Name` = '泰戈·黎明行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3011;
+UPDATE `creature_template_locale` SET `Name` = '霍高尔·雷角', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3018;
+UPDATE `creature_template_locale` SET `Name` = '德尔贡·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3019;
+UPDATE `creature_template_locale` SET `Name` = '伊图·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3020;
+UPDATE `creature_template_locale` SET `Name` = '卡德·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3021;
+UPDATE `creature_template_locale` SET `Name` = '苏恩·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3022;
+UPDATE `creature_template_locale` SET `Name` = '托姆·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3041;
+UPDATE `creature_template_locale` SET `Name` = '萨尔克·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3042;
+UPDATE `creature_template_locale` SET `Name` = '科尔·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3043;
+UPDATE `creature_template_locale` SET `Name` = '扎尔曼-双月', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3054;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3067;
+UPDATE `creature_template_locale` SET `Title` = '炼金师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3070;
+UPDATE `creature_template_locale` SET `Title` = '采药人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3071;
+UPDATE `creature_template_locale` SET `Name` = '小海浪蟹', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3106;
+UPDATE `creature_template_locale` SET `Name` = '海浪蟹', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3107;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3148;
+UPDATE `creature_template_locale` SET `Name` = 'SM Test Mob', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3201;
+UPDATE `creature_template_locale` SET `Name` = '费索·暗雷', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3203;
+UPDATE `creature_template_locale` SET `Name` = '尖叫者索恩曼图', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3229;
+UPDATE `creature_template_locale` SET `Name` = '钢鬃寻水者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3267;
+UPDATE `creature_template_locale` SET `Name` = '淤泥兽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3295;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3302;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3303;
+UPDATE `creature_template_locale` SET `Title` = '轻甲商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3317;
+UPDATE `creature_template_locale` SET `Title` = '枪械和弹药商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3322;
+UPDATE `creature_template_locale` SET `Title` = '草药学供应商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3405;
+UPDATE `creature_template_locale` SET `Name` = '塔文布莱德将军', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3414;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3419;
+UPDATE `creature_template_locale` SET `Title` = '工匠协会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3442;
+UPDATE `creature_template_locale` SET `Name` = '艾玛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3520;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3525;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3558;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3565;
+UPDATE `creature_template_locale` SET `Name` = '达拉然酿酒师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3577;
+UPDATE `creature_template_locale` SET `Name` = '达拉然矿工', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3578;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3623;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3628;
+UPDATE `creature_template_locale` SET `Name` = '安娜雅·晨路', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3667;
+UPDATE `creature_template_locale` SET `Name` = '被折磨的贵族精灵的灵魂', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3668;
+UPDATE `creature_template_locale` SET `Name` = '纳拉雷克斯的信徒', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3678;
+UPDATE `creature_template_locale` SET `Title` = '宠物训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3698;
+UPDATE `creature_template_locale` SET `Title` = '豹训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3699;
+UPDATE `creature_template_locale` SET `Name` = '亡灵暴徒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3734;
+UPDATE `creature_template_locale` SET `Name` = '萨维亚潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3752;
+UPDATE `creature_template_locale` SET `Name` = '魔草潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3759;
+UPDATE `creature_template_locale` SET `Name` = '食苔沼泽兽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3780;
+UPDATE `creature_template_locale` SET `Name` = '凯莱斯·月羽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3841;
+UPDATE `creature_template_locale` SET `Name` = '痛苦的文官', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3873;
+UPDATE `creature_template_locale` SET `Name` = '詹奈·轻羽微风', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3957;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3966;
+UPDATE `creature_template_locale` SET `Title` = '工具和补给品', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3969;
+UPDATE `creature_template_locale` SET `Name` = '风险投资公司工程师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3992;
+UPDATE `creature_template_locale` SET `Name` = '腐蚀性的腐蚀兽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4021;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4045;
+UPDATE `creature_template_locale` SET `Name` = '玛加萨·野性图腾', `Title` = '长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4046;
+UPDATE `creature_template_locale` SET `Name` = '尖啸鹰身人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4100;
+UPDATE `creature_template_locale` SET `Name` = '尖啸游荡者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4101;
+UPDATE `creature_template_locale` SET `Name` = '异种破坏者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4132;
+UPDATE `creature_template_locale` SET `Title` = '食物搜寻训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4149;
+UPDATE `creature_template_locale` SET `Title` = '豹训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4153;
+UPDATE `creature_template_locale` SET `Name` = '基塔利', `Title` = '制图训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4157;
+UPDATE `creature_template_locale` SET `Name` = '埃莉萨', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4165;
+UPDATE `creature_template_locale` SET `Name` = '沙尔迪恩', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4185;
+UPDATE `creature_template_locale` SET `Name` = '马弗拉林', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4186;
+UPDATE `creature_template_locale` SET `Title` = '野熊训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4206;
+UPDATE `creature_template_locale` SET `Title` = '狼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4207;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（灰色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4268;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用马（栗色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4269;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（红色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4270;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（暗灰色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4271;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用狼（暗棕色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4272;
+UPDATE `creature_template_locale` SET `Name` = '高尔姆·野性图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4309;
+UPDATE `creature_template_locale` SET `Name` = '考尔·野性图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4310;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4318;
+UPDATE `creature_template_locale` SET `Name` = '黑腮首领', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4460;
+UPDATE `creature_template_locale` SET `Name` = '莫雷·巴特斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4571;
+UPDATE `creature_template_locale` SET `Title` = '大师级暗纹裁缝', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4578;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '制图训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4579;
+UPDATE `creature_template_locale` SET `Title` = '迅猛龙训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4621;
+UPDATE `creature_template_locale` SET `Name` = '怨怒潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4670;
+UPDATE `creature_template_locale` SET `Name` = '劳恩·峭壁行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4722;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用山羊（蓝色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4778;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用山羊（黑色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4780;
+UPDATE `creature_template_locale` SET `Name` = '银月守卫塞尔瑞德', `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4787;
+UPDATE `creature_template_locale` SET `Name` = '"沼泽之眼"加尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4792;
+UPDATE `creature_template_locale` SET `Name` = '梦游者克尔里斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4832;
+UPDATE `creature_template_locale` SET `Title` = '海龟训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4881;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4882;
+UPDATE `creature_template_locale` SET `Title` = '护甲和盾牌供应商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4886;
+UPDATE `creature_template_locale` SET `Title` = '武器锻造师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4888;
+UPDATE `creature_template_locale` SET `Title` = '弓箭商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4892;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4894;
+UPDATE `creature_template_locale` SET `Title` = '杂货商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4896;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4941;
+UPDATE `creature_template_locale` SET `Name` = '塞拉摩训练假人 1', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4952;
+UPDATE `creature_template_locale` SET `Name` = '噬鱼蛇', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4953;
+UPDATE `creature_template_locale` SET `Name` = '塞拉摩训练假人 4', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4957;
+UPDATE `creature_template_locale` SET `Name` = '"干柴"塔伯克·贾恩', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4962;
+UPDATE `creature_template_locale` SET `Title` = '狼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4994;
+UPDATE `creature_template_locale` SET `Title` = '猛禽训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5001;
+UPDATE `creature_template_locale` SET `Title` = '豹训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5003;
+UPDATE `creature_template_locale` SET `Title` = '螃蟹训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5004;
+UPDATE `creature_template_locale` SET `Title` = '鳄鱼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5005;
+UPDATE `creature_template_locale` SET `Name` = 'World Demon Trainer', `Title` = '恶魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5006;
+UPDATE `creature_template_locale` SET `Title` = '猩猩训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5008;
+UPDATE `creature_template_locale` SET `Title` = '马训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5009;
+UPDATE `creature_template_locale` SET `Title` = '迅猛龙训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5011;
+UPDATE `creature_template_locale` SET `Title` = '蝎子训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5012;
+UPDATE `creature_template_locale` SET `Title` = '蜘蛛训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5013;
+UPDATE `creature_template_locale` SET `Title` = '陆行鸟训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5015;
+UPDATE `creature_template_locale` SET `Title` = '海龟训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5017;
+UPDATE `creature_template_locale` SET `Title` = '马骑术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5026;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '开锁训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5027;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '生存技能训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5029;
+UPDATE `creature_template_locale` SET `Title` = '豹骑术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5030;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '酿酒训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5034;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '制图训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5035;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '追踪训练商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5039;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚暴徒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5043;
+UPDATE `creature_template_locale` SET `Title` = '公会徽章商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5047;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5050;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5051;
+UPDATE `creature_template_locale` SET `Name` = 'World Guild Tabbard Vendor', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5061;
+UPDATE `creature_template_locale` SET `Name` = '书记员伦德瑞', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5083;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5098;
+UPDATE `creature_template_locale` SET `Title` = '枪械训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5104;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5131;
+UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5164;
+UPDATE `creature_template_locale` SET `Title` = '公会徽章商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5191;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '公会徽章商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5192;
+UPDATE `creature_template_locale` SET `Name` = '白毛座狼', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5198;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5204;
+UPDATE `creature_template_locale` SET `Name` = '海滩响钳龙虾人', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5326;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5348;
+UPDATE `creature_template_locale` SET `Name` = '因格', `Title` = '探险者协会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5388;
+UPDATE `creature_template_locale` SET `Name` = '白马坐骑', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5403;
+UPDATE `creature_template_locale` SET `Name` = '工蝎群', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5409;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5414;
+UPDATE `creature_template_locale` SET `Title` = '陆行鸟训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5507;
+UPDATE `creature_template_locale` SET `Name` = '科玛·韦拉德', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5683;
+UPDATE `creature_template_locale` SET `Title` = '杰勒德的实验品', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5697;
+UPDATE `creature_template_locale` SET `Name` = '耶瑟莉的梦魇', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5727;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5731;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5732;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5733;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5734;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5750;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5753;
+UPDATE `creature_template_locale` SET `Name` = '指挥官萨拉菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5809;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5813;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5815;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5818;
+UPDATE `creature_template_locale` SET `Name` = '"跳跃者"塔克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5842;
+UPDATE `creature_template_locale` SET `Name` = '抗火图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5927;
+UPDATE `creature_template_locale` SET `Name` = '被流放的阿切鲁斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5933;
+UPDATE `creature_template_locale` SET `Name` = '哈特拉斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5934;
+UPDATE `creature_template_locale` SET `Name` = '拾骨者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5983;
+UPDATE `creature_template_locale` SET `Name` = '魔誓祭司', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6004;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6027;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6032;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（乳白色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6074;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（绿色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6075;
+UPDATE `creature_template_locale` SET `Name` = '阿考洛克的仆从', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6143;
+UPDATE `creature_template_locale` SET `Name` = '雷加斯萨特', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6200;
+UPDATE `creature_template_locale` SET `Name` = '雷加斯潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6201;
+UPDATE `creature_template_locale` SET `Name` = '雷加斯唤魔者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6202;
+UPDATE `creature_template_locale` SET `Name` = '老鼠', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6271;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6286;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6328;
+UPDATE `creature_template_locale` SET `Name` = '骸骨战马', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6346;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6374;
+UPDATE `creature_template_locale` SET `Name` = '赫纳·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6393;
+UPDATE `creature_template_locale` SET `Name` = '鲁迦·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6394;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用骸骨战马（黑色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6486;
+UPDATE `creature_template_locale` SET `Name` = '胆大的约翰森', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6626;
+UPDATE `creature_template_locale` SET `Name` = '拉格罗尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6651;
+UPDATE `creature_template_locale` SET `Name` = '约翰森的人类形态', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6666;
+UPDATE `creature_template_locale` SET `Title` = '祖师级潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6707;
+UPDATE `creature_template_locale` SET `Name` = '旅店老板拜特斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6739;
+UPDATE `creature_template_locale` SET `Name` = '旅店老板艾玛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6749;
+UPDATE `creature_template_locale` SET `Title` = '刺客联盟的祖师级潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6767;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6769;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6770;
+UPDATE `creature_template_locale` SET `Name` = '螃蟹', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6827;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚码头主管', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6846;
+UPDATE `creature_template_locale` SET `Name` = '哈尔伦', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6887;
+UPDATE `creature_template_locale` SET `Name` = '迪菲亚码头工人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6927;
+UPDATE `creature_template_locale` SET `Name` = '"剃刀"雷吉克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6946;
+UPDATE `creature_template_locale` SET `Name` = '黑石狂暴者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7013;
+UPDATE `creature_template_locale` SET `Name` = '火鳞龙人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7041;
+UPDATE `creature_template_locale` SET `Name` = '黑色龙族', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7042;
+UPDATE `creature_template_locale` SET `Name` = '风险投资公司雄蜂', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7067;
+UPDATE `creature_template_locale` SET `Name` = '碧火潜行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7106;
+UPDATE `creature_template_locale` SET `Title` = '铸甲训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7174;
+UPDATE `creature_template_locale` SET `Name` = '古代的石头看守者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7206;
+UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7230;
+UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7231;
+UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7232;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（黑色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7322;
+UPDATE `creature_template_locale` SET `Name` = '无暇的德莱尼水晶球', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7364;
+UPDATE `creature_template_locale` SET `Name` = '无暇的德莱尼水晶碎片', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7365;
+UPDATE `creature_template_locale` SET `Name` = '蟑螂', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7395;
+UPDATE `creature_template_locale` SET `Name` = '泰姆·狂暴图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7427;
+UPDATE `creature_template_locale` SET `Name` = '霜刃豹幼崽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7430;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '龙鳞制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7525;
+UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7526;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '部族制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7528;
+UPDATE `creature_template_locale` SET `Name` = 'Test Death Knight', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7624;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（黄色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7684;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（红色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7686;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（雪白色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7687;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用虎（黑色斑点）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7689;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（黑色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7703;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（红色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7704;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（黄色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7706;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用迅猛龙（绿色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7707;
+UPDATE `creature_template_locale` SET `Name` = '旅店老板比鲁拉', `Title` = '旅店老板', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7714;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（黄色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7739;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（蓝色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7749;
+UPDATE `creature_template_locale` SET `Name` = '麦克尼尔·瑟玛普拉格', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7800;
+UPDATE `creature_template_locale` SET `Title` = '龙鳞制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7866;
+UPDATE `creature_template_locale` SET `Title` = '龙鳞制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7867;
+UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7868;
+UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7869;
+UPDATE `creature_template_locale` SET `Title` = '部族制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7870;
+UPDATE `creature_template_locale` SET `Title` = '部族制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7871;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7876;
+UPDATE `creature_template_locale` SET `Title` = '机械陆行鸟驾驶员', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7954;
+UPDATE `creature_template_locale` SET `Name` = '莫高雷卫士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 7975;
+UPDATE `creature_template_locale` SET `Name` = '人民军卫兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8096;
+UPDATE `creature_template_locale` SET `Name` = '巨型火鸟', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8207;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8306;
+UPDATE `creature_template_locale` SET `Name` = '威拉罗克·温布雷', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8479;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫破坏者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8520;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫水元素', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8522;
+UPDATE `creature_template_locale` SET `Title` = '诅咒神教', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8547;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '诅咒神教', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8549;
+UPDATE `creature_template_locale` SET `Title` = '诅咒神教', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8550;
+UPDATE `creature_template_locale` SET `Title` = '诅咒神教', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8552;
+UPDATE `creature_template_locale` SET `Title` = '诅咒神教', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8553;
+UPDATE `creature_template_locale` SET `Name` = '刺鬃酋长', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8554;
+UPDATE `creature_template_locale` SET `Name` = '护林者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8563;
+UPDATE `creature_template_locale` SET `Name` = '游侠', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8564;
+UPDATE `creature_template_locale` SET `Name` = '巡路者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8565;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫巨犬', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8599;
+UPDATE `creature_template_locale` SET `Name` = '赛恩', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8664;
+UPDATE `creature_template_locale` SET `Name` = '朱比', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 8678;
+UPDATE `creature_template_locale` SET `Name` = '安格弗将军', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9033;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9117;
+UPDATE `creature_template_locale` SET `Name` = '戈泰什', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9176;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9270;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9271;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9272;
+UPDATE `creature_template_locale` SET `Name` = '活风暴', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9397;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9576;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9578;
+UPDATE `creature_template_locale` SET `Title` = '大师级暗纹裁缝', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9584;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9618;
+UPDATE `creature_template_locale` SET `Title` = '兽栏管理员', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9983;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9997;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 9998;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（粉绿色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10178;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用机械陆行鸟（黑色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10179;
+UPDATE `creature_template_locale` SET `Name` = 'Yor', `Title` = 'UNUSED', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10237;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10256;
+UPDATE `creature_template_locale` SET `Title` = '匕首训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10292;
+UPDATE `creature_template_locale` SET `Title` = '拳套训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10294;
+UPDATE `creature_template_locale` SET `Name` = '维埃兰', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10296;
+UPDATE `creature_template_locale` SET `Title` = '弓箭训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10297;
+UPDATE `creature_template_locale` SET `Name` = '裂盾渗透者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10299;
+UPDATE `creature_template_locale` SET `Name` = '加隆·石矛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10301;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10302;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (White)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10322;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Leopard)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10336;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Orange)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10337;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Gold)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10338;
+UPDATE `creature_template_locale` SET `Name` = '奥索巴·狂怒图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10379;
+UPDATE `creature_template_locale` SET `Name` = '红衣卫兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10418;
+UPDATE `creature_template_locale` SET `Name` = '红衣魔术师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10419;
+UPDATE `creature_template_locale` SET `Name` = '红衣新兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10420;
+UPDATE `creature_template_locale` SET `Name` = '红衣防御者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10421;
+UPDATE `creature_template_locale` SET `Name` = '红衣法术师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10422;
+UPDATE `creature_template_locale` SET `Name` = '红衣牧师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10423;
+UPDATE `creature_template_locale` SET `Name` = '红衣豪侠', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10424;
+UPDATE `creature_template_locale` SET `Name` = '红衣战斗法师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10425;
+UPDATE `creature_template_locale` SET `Name` = '红衣审查者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10426;
+UPDATE `creature_template_locale` SET `Name` = '波卡·雨山', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10427;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫鼠', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10441;
+UPDATE `creature_template_locale` SET `Title` = '弩训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10446;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10448;
+UPDATE `creature_template_locale` SET `Title` = '弩训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10450;
+UPDATE `creature_template_locale` SET `Title` = '锤训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10452;
+UPDATE `creature_template_locale` SET `Title` = '斧训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10453;
+UPDATE `creature_template_locale` SET `Title` = '弩训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10454;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫虫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10461;
+UPDATE `creature_template_locale` SET `Name` = '通灵学院新学徒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10470;
+UPDATE `creature_template_locale` SET `Name` = '阿雷克斯·巴罗夫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10504;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥怪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10510;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫蛆', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10536;
+UPDATE `creature_template_locale` SET `Title` = '训练中的巫医', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10578;
+UPDATE `creature_template_locale` SET `Title` = '皇家药剂师学会', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10665;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫龙崽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10678;
+UPDATE `creature_template_locale` SET `Name` = '塔雷什森', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10822;
+UPDATE `creature_template_locale` SET `Name` = '游侠之王霍克斯比尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10824;
+UPDATE `creature_template_locale` SET `Name` = '阿比迪斯将军', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10828;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10839;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10840;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10857;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10977;
+UPDATE `creature_template_locale` SET `Name` = '炮手威利', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10997;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Tiger (Winterspring)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11021;
+UPDATE `creature_template_locale` SET `Name` = '狂热的玛洛尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11032;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11034;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11036;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11039;
+UPDATE `creature_template_locale` SET `Name` = '红衣僧侣', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11043;
+UPDATE `creature_template_locale` SET `Name` = '红衣火枪手', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11054;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11063;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11102;
+UPDATE `creature_template_locale` SET `Name` = '红衣铸锤师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11120;
+UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11146;
+UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Green/Gray)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11147;
+UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Purple)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11148;
+UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Red/Blue)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11149;
+UPDATE `creature_template_locale` SET `Name` = 'Riding MechaStrider (Icy Blue)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11150;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Skeletal Horse (Red)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11153;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Skeletal Horse (Blue)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11154;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Skeletal Horse (Brown)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11155;
+UPDATE `creature_template_locale` SET `Title` = '护甲锻造师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11177;
+UPDATE `creature_template_locale` SET `Title` = '武器锻造师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11178;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11194;
+UPDATE `creature_template_locale` SET `Name` = '黑色骸骨战马', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11195;
+UPDATE `creature_template_locale` SET `Name` = '跳跳虫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11327;
+UPDATE `creature_template_locale` SET `Title` = '碎颅巨魔大使', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11390;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11466;
+UPDATE `creature_template_locale` SET `Name` = '奥术恶兽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11479;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11486;
+UPDATE `creature_template_locale` SET `Name` = '奥兹恩', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11492;
+UPDATE `creature_template_locale` SET `Name` = '无敌的斯卡尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11498;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11536;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11616;
+UPDATE `creature_template_locale` SET `Name` = '烈焰行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11661;
+UPDATE `creature_template_locale` SET `Name` = '烈焰行者祭司', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11662;
+UPDATE `creature_template_locale` SET `Name` = '烈焰行者医师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11663;
+UPDATE `creature_template_locale` SET `Name` = '烈焰行者精英', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11664;
+UPDATE `creature_template_locale` SET `Name` = '上古熔火恶犬', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11673;
+UPDATE `creature_template_locale` SET `Name` = '部落伐木工', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11681;
+UPDATE `creature_template_locale` SET `Name` = '战歌伐木机', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11684;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用科多兽（棕色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11689;
+UPDATE `creature_template_locale` SET `Name` = '黑幕追踪者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11713;
+UPDATE `creature_template_locale` SET `Name` = '塞雷布拉斯的姐妹', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11794;
+UPDATE `creature_template_locale` SET `Name` = '格鲁迪格·暗云', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11858;
+UPDATE `creature_template_locale` SET `Name` = '高戈护石者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11915;
+UPDATE `creature_template_locale` SET `Name` = '高戈地卜师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11917;
+UPDATE `creature_template_locale` SET `Name` = '高戈裂石者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 11918;
+UPDATE `creature_template_locale` SET `Title` = '高级炼金师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12020;
+UPDATE `creature_template_locale` SET `Name` = '鹰巢山杂货商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12036;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12038;
+UPDATE `creature_template_locale` SET `Name` = '鹰巢山锁甲商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12040;
+UPDATE `creature_template_locale` SET `Name` = '烈焰行者护卫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12119;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫白蚁', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12120;
+UPDATE `creature_template_locale` SET `Name` = '德拉坎', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12121;
+UPDATE `creature_template_locale` SET `Name` = '烈焰行者卫兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12142;
+UPDATE `creature_template_locale` SET `Name` = 'Riding Kodo (Teal)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12148;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用科多兽（灰色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12149;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用科多兽（绿色）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12151;
+UPDATE `creature_template_locale` SET `Name` = '人类颅骨', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12202;
+UPDATE `creature_template_locale` SET `Name` = '红色迅猛龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12345;
+UPDATE `creature_template_locale` SET `Name` = '绿色迅猛龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12346;
+UPDATE `creature_template_locale` SET `Name` = '青色迅猛龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12349;
+UPDATE `creature_template_locale` SET `Name` = '紫色迅猛龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12350;
+UPDATE `creature_template_locale` SET `Name` = '骑乘用斑纹夜刃豹', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12360;
+UPDATE `creature_template_locale` SET `Name` = '克雷希斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12433;
+UPDATE `creature_template_locale` SET `Name` = '黑翼龙人护卫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12460;
+UPDATE `creature_template_locale` SET `Name` = '黑翼监工', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12461;
+UPDATE `creature_template_locale` SET `Name` = '翡翠圣贤', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12476;
+UPDATE `creature_template_locale` SET `Name` = '沙普塔隆', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12676;
+UPDATE `creature_template_locale` SET `Name` = '萨杜布拉', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12677;
+UPDATE `creature_template_locale` SET `Name` = '帕兰蒂尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12792;
+UPDATE `creature_template_locale` SET `Title` = '恶魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12807;
+UPDATE `creature_template_locale` SET `Name` = '碎木岗哨卫兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12903;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12918;
+UPDATE `creature_template_locale` SET `Title` = '外科医疗队', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12939;
+UPDATE `creature_template_locale` SET `Name` = '布里莫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12957;
+UPDATE `creature_template_locale` SET `Name` = '戈多克驯狼', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13036;
+UPDATE `creature_template_locale` SET `Name` = '指挥官达多什', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13140;
+UPDATE `creature_template_locale` SET `Name` = '莫普中尉', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13146;
+UPDATE `creature_template_locale` SET `Name` = '耶克里·弗兰迪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13219;
+UPDATE `creature_template_locale` SET `Name` = '青蛙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13321;
+UPDATE `creature_template_locale` SET `Name` = '巴莱·洛克维', `Title` = '药剂、卷轴和材料', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13476;
+UPDATE `creature_template_locale` SET `Name` = '格林奇', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 13602;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14355;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14358;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14361;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14364;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14368;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14369;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14371;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14381;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14382;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14383;
+UPDATE `creature_template_locale` SET `Name` = '捕猎者拉图特', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14441;
+UPDATE `creature_template_locale` SET `Name` = '维尔玛克将军', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14445;
+UPDATE `creature_template_locale` SET `Name` = '感染瘟疫的农夫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14485;
+UPDATE `creature_template_locale` SET `Title` = '科尔苏加德的爪牙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14486;
+UPDATE `creature_template_locale` SET `Name` = '军士霍斯·雷角', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14581;
+UPDATE `creature_template_locale` SET `Name` = '萨杜瓦尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14688;
+UPDATE `creature_template_locale` SET `Name` = '尼拉布织网者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14705;
+UPDATE `creature_template_locale` SET `Name` = '斯托布里奇元帅', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14721;
+UPDATE `creature_template_locale` SET `Title` = '暗月马戏团奖券兑换员', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14828;
+UPDATE `creature_template_locale` SET `Title` = '暗月马戏团饮料商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14844;
+UPDATE `creature_template_locale` SET `Title` = '暗月马戏团食品商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14845;
+UPDATE `creature_template_locale` SET `Title` = '暗月马戏团特殊商品', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14846;
+UPDATE `creature_template_locale` SET `Title` = '暗月马戏团卡片和特殊商品销售员', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14847;
+UPDATE `creature_template_locale` SET `Name` = '暗月马戏团艺人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14849;
+UPDATE `creature_template_locale` SET `Name` = '派格米', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 14869;
+UPDATE `creature_template_locale` SET `Title` = '新潮设计师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15165;
+UPDATE `creature_template_locale` SET `Name` = '女妖之王', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15193;
+UPDATE `creature_template_locale` SET `Name` = '梦雾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15224;
+UPDATE `creature_template_locale` SET `Name` = '玛克希玛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15303;
+UPDATE `creature_template_locale` SET `Name` = 'RC Blimp', `Title` = 'PH', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15349;
+UPDATE `creature_template_locale` SET `Name` = 'RC Mortar Tank', `Title` = 'PH', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15364;
+UPDATE `creature_template_locale` SET `Name` = '亚雷戈斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15380;
+UPDATE `creature_template_locale` SET `Name` = '亚雷戈斯龙类形态', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15411;
+UPDATE `creature_template_locale` SET `Name` = '甲壳虫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15475;
+UPDATE `creature_template_locale` SET `Name` = '火焰新星图腾 VII', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15483;
+UPDATE `creature_template_locale` SET `Name` = '尼根·陶蹄', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15532;
+UPDATE `creature_template_locale` SET `Name` = '傲角长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15580;
+UPDATE `creature_template_locale` SET `Name` = '星灵长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15584;
+UPDATE `creature_template_locale` SET `Name` = '晨行长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15585;
+UPDATE `creature_template_locale` SET `Name` = '迷雾长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15587;
+UPDATE `creature_template_locale` SET `Name` = '月击长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15594;
+UPDATE `creature_template_locale` SET `Name` = '锋叶长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15595;
+UPDATE `creature_template_locale` SET `Name` = '月光长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15597;
+UPDATE `creature_template_locale` SET `Name` = '塞纳里奥斥候佳莉亚', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15611;
+UPDATE `creature_template_locale` SET `Name` = '亚罗德·影歌', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15627;
+UPDATE `creature_template_locale` SET `Title` = '艾露恩的高阶祭司', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15633;
+UPDATE `creature_template_locale` SET `Name` = '小型共鸣水晶', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15769;
+UPDATE `creature_template_locale` SET `Name` = '强效共鸣水晶', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15770;
+UPDATE `creature_template_locale` SET `Name` = '大型共鸣水晶', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15771;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15774;
+UPDATE `creature_template_locale` SET `Name` = '次级共鸣水晶', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15804;
+UPDATE `creature_template_locale` SET `Name` = '小型共鸣水晶', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15805;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16032;
+UPDATE `creature_template_locale` SET `Name` = 'Bog Beast B [PH]', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16035;
+UPDATE `creature_template_locale` SET `Name` = '死亡犬', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16038;
+UPDATE `creature_template_locale` SET `Name` = '鬼灵狮鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16081;
+UPDATE `creature_template_locale` SET `Name` = '科尔法克斯，圣光之勇士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16112;
+UPDATE `creature_template_locale` SET `Name` = '指挥官埃里戈尔·黎明使者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16115;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫毒虫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16233;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫血肉触须', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16235;
+UPDATE `creature_template_locale` SET `Title` = '潜行者训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16279;
+UPDATE `creature_template_locale` SET `Name` = '小强', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16374;
+UPDATE `creature_template_locale` SET `Title` = '银色黎明', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16378;
+UPDATE `creature_template_locale` SET `Name` = '大法师塔希斯-基莫迪尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16381;
+UPDATE `creature_template_locale` SET `Name` = '调酒师桑塔基德', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16442;
+UPDATE `creature_template_locale` SET `Name` = '死亡骑士辩护者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16451;
+UPDATE `creature_template_locale` SET `Name` = '狂热情人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16461;
+UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16527;
+UPDATE `creature_template_locale` SET `Name` = '感染的木巢枭兽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16534;
+UPDATE `creature_template_locale` SET `Name` = '哼哼先生', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16548;
+UPDATE `creature_template_locale` SET `Name` = 'Myconite Warrior (PH)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16565;
+UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16583;
+UPDATE `creature_template_locale` SET `Name` = 'Brianna Schneider', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16605;
+UPDATE `creature_template_locale` SET `Name` = '伊西利安', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16627;
+UPDATE `creature_template_locale` SET `Name` = '塞多里', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16628;
+UPDATE `creature_template_locale` SET `Name` = '坦德隆', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16629;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16649;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16676;
+UPDATE `creature_template_locale` SET `Name` = '艾欧克', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16707;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16719;
+UPDATE `creature_template_locale` SET `Title` = '恶魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16720;
+UPDATE `creature_template_locale` SET `Title` = '武器大师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16773;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥（蓝）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16783;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥（红）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16784;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫软泥（绿）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16785;
+UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16823;
+UPDATE `creature_template_locale` SET `Name` = '死亡领主', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16861;
+UPDATE `creature_template_locale` SET `Name` = '嘲颅斩杀者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16868;
+UPDATE `creature_template_locale` SET `Name` = '嘲颅新兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16869;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫卫士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16981;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫构造体', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16982;
+UPDATE `creature_template_locale` SET `Name` = '"利爪"安吉拉·凯斯提尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17002;
+UPDATE `creature_template_locale` SET `Title` = '武器大师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17005;
+UPDATE `creature_template_locale` SET `Name` = '顾问萨苏恩·火盟', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17100;
+UPDATE `creature_template_locale` SET `Title` = '法师训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17105;
+UPDATE `creature_template_locale` SET `Title` = '锻造训练师和商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17245;
+UPDATE `creature_template_locale` SET `Name` = '"曲奇"米维克索斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17246;
+UPDATE `creature_template_locale` SET `Name` = '瘟疫波', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17293;
+UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy Spammer', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17313;
+UPDATE `creature_template_locale` SET `Name` = '训练假人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17578;
+UPDATE `creature_template_locale` SET `Title` = '军火商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17598;
+UPDATE `creature_template_locale` SET `Name` = '耶纳斯', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17627;
+UPDATE `creature_template_locale` SET `Name` = '维纳', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17628;
+UPDATE `creature_template_locale` SET `Name` = '菲恩娜', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17629;
+UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17634;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17637;
+UPDATE `creature_template_locale` SET `Title` = '艾露恩的高阶祭司', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17948;
+UPDATE `creature_template_locale` SET `Name` = 'Dark Portal Target UNUSED', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 17965;
+UPDATE `creature_template_locale` SET `Name` = 'Doomfire Targeting', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18104;
+UPDATE `creature_template_locale` SET `Name` = '腐化新星图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18179;
+UPDATE `creature_template_locale` SET `Name` = '"好儿子"沙度·远行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18200;
+UPDATE `creature_template_locale` SET `Name` = '"伯爵"昂古拉', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18285;
+UPDATE `creature_template_locale` SET `Name` = '迷时的占卜者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18319;
+UPDATE `creature_template_locale` SET `Name` = '迷时的暗影法师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18320;
+UPDATE `creature_template_locale` SET `Name` = '迷时的控制者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18327;
+UPDATE `creature_template_locale` SET `Name` = '凡尼', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18348;
+UPDATE `creature_template_locale` SET `Name` = '伊蕾萨', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18349;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Gryphon Mount Armored (Purple)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18362;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount (Blue)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18364;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount (Green)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18365;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Standard)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18377;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Green)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18378;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Purple)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18379;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Wyvern Mount Armored (Yellow)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18380;
+UPDATE `creature_template_locale` SET `Name` = 'Outland Gryphon Mount Armored (Standard)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18406;
+UPDATE `creature_template_locale` SET `Name` = 'Peep the Outland Phoenix', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18545;
+UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18747;
+UPDATE `creature_template_locale` SET `Title` = '大师级草药学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18748;
+UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18749;
+UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18751;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18752;
+UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18753;
+UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18754;
+UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18755;
+UPDATE `creature_template_locale` SET `Name` = '达莉丝', `Title` = '拍卖师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18761;
+UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18771;
+UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18772;
+UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18773;
+UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18774;
+UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18775;
+UPDATE `creature_template_locale` SET `Title` = '大师级草药学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18776;
+UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18777;
+UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18779;
+UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18802;
+UPDATE `creature_template_locale` SET `Name` = '"国王"唐金', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18897;
+UPDATE `creature_template_locale` SET `Title` = '大师级钓鱼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18911;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18987;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18988;
+UPDATE `creature_template_locale` SET `Title` = '医师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18990;
+UPDATE `creature_template_locale` SET `Title` = '医师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18991;
+UPDATE `creature_template_locale` SET `Title` = '烹饪供应商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18993;
+UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19052;
+UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19063;
+UPDATE `creature_template_locale` SET `Name` = '"猎枪"琼斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19137;
+UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19180;
+UPDATE `creature_template_locale` SET `Title` = '医师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19184;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19185;
+UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19187;
+UPDATE `creature_template_locale` SET `Name` = '熔岩喷涌图腾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19222;
+UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19252;
+UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19341;
+UPDATE `creature_template_locale` SET `Title` = '枪械和弹药商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19351;
+UPDATE `creature_template_locale` SET `Name` = '"尖嗓子"斯克里·拉克希德', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19367;
+UPDATE `creature_template_locale` SET `Title` = '厨师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19369;
+UPDATE `creature_template_locale` SET `Name` = '"暗眼"格里洛克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19457;
+UPDATE `creature_template_locale` SET `Title` = '投掷武器和弹药', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19473;
+UPDATE `creature_template_locale` SET `Title` = '马骑术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19491;
+UPDATE `creature_template_locale` SET `Title` = '马骑术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19492;
+UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19539;
+UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19540;
+UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19576;
+UPDATE `creature_template_locale` SET `Name` = '重型雷象', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19659;
+UPDATE `creature_template_locale` SET `Name` = '"杂学家"玛姆迪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19669;
+UPDATE `creature_template_locale` SET `Name` = '"上尉"卡弗提兹', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19676;
+UPDATE `creature_template_locale` SET `Name` = '"瘦子"', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19679;
+UPDATE `creature_template_locale` SET `Name` = '"脏鬼"拉瑞', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19720;
+UPDATE `creature_template_locale` SET `Name` = '"史诗"马龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19725;
+UPDATE `creature_template_locale` SET `Name` = '纳斯雷兹姆议员', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19743;
+UPDATE `creature_template_locale` SET `Name` = '卡翠欧娜·冯因迪女伯爵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19872;
+UPDATE `creature_template_locale` SET `Name` = '拉弗·杜格尔男爵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19874;
+UPDATE `creature_template_locale` SET `Name` = '杜萝希·米尔斯提女伯爵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19875;
+UPDATE `creature_template_locale` SET `Name` = '罗宾·达瑞斯伯爵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19876;
+UPDATE `creature_template_locale` SET `Name` = '白色幼苗', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19958;
+UPDATE `creature_template_locale` SET `Name` = '蓝色幼苗', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19962;
+UPDATE `creature_template_locale` SET `Name` = '红色幼苗', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19964;
+UPDATE `creature_template_locale` SET `Name` = '绿色幼苗', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19969;
+UPDATE `creature_template_locale` SET `Name` = '奎尔萨拉斯军马', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20029;
+UPDATE `creature_template_locale` SET `Name` = '奎尔萨拉斯战马', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20030;
+UPDATE `creature_template_locale` SET `Title` = '武器铸造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20124;
+UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20125;
+UPDATE `creature_template_locale` SET `Title` = '野蛮竞技场商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20278;
+UPDATE `creature_template_locale` SET `Title` = '驭风者管理员', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20494;
+UPDATE `creature_template_locale` SET `Title` = '骑术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20500;
+UPDATE `creature_template_locale` SET `Name` = '雪色狮鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20505;
+UPDATE `creature_template_locale` SET `Name` = '迅捷绿色狮鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20506;
+UPDATE `creature_template_locale` SET `Name` = '迅捷紫色狮鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20507;
+UPDATE `creature_template_locale` SET `Name` = '迅捷红色狮鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20508;
+UPDATE `creature_template_locale` SET `Name` = '迅捷蓝色狮鹫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20509;
+UPDATE `creature_template_locale` SET `Title` = '骑术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20511;
+UPDATE `creature_template_locale` SET `Name` = '暗喉山猫幼崽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20615;
+UPDATE `creature_template_locale` SET `Name` = 'Invisible Stalker Coilfang Doors', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 20926;
+UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy 73 Raid Debuffed Warrior', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21003;
+UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21087;
+UPDATE `creature_template_locale` SET `Name` = '欧鲁诺克-裂心', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21183;
+UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21209;
+UPDATE `creature_template_locale` SET `Name` = '"背刺者"宾度·盖布', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21235;
+UPDATE `creature_template_locale` SET `Name` = '艾米', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21317;
+UPDATE `creature_template_locale` SET `Name` = '火焰战马', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21354;
+UPDATE `creature_template_locale` SET `Name` = '漂浮的颅骨', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21365;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21426;
+UPDATE `creature_template_locale` SET `Title` = '弹药商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21483;
+UPDATE `creature_template_locale` SET `Title` = '弹药商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21488;
+UPDATE `creature_template_locale` SET `Name` = '阿弗拉斯森林陆行鸟', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21635;
+UPDATE `creature_template_locale` SET `Name` = '欧鲁诺克-裂心', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21685;
+UPDATE `creature_template_locale` SET `Name` = 'ZZOLD - Bone Burster Visual[PH]', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21848;
+UPDATE `creature_template_locale` SET `Name` = '加姆·狼兄', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 21950;
+UPDATE `creature_template_locale` SET `Name` = 'Invisible Stalker Coilfang Raid Console Emotes', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22057;
+UPDATE `creature_template_locale` SET `Title` = '月布大师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22208;
+UPDATE `creature_template_locale` SET `Title` = '暗纹大师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22212;
+UPDATE `creature_template_locale` SET `Title` = '魔焰大师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22213;
+UPDATE `creature_template_locale` SET `Name` = '黑暗骑乘塔布羊', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22511;
+UPDATE `creature_template_locale` SET `Title` = '利爪德鲁伊', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22832;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22852;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22854;
+UPDATE `creature_template_locale` SET `Name` = '神殿助祭', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22939;
+UPDATE `creature_template_locale` SET `Name` = '有魅力的客人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22955;
+UPDATE `creature_template_locale` SET `Name` = '苦痛祭司', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22956;
+UPDATE `creature_template_locale` SET `Name` = '狂乱女士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22957;
+UPDATE `creature_template_locale` SET `Name` = '热忱的招待', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22959;
+UPDATE `creature_template_locale` SET `Name` = '悲伤女士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22962;
+UPDATE `creature_template_locale` SET `Name` = '欢愉祭司', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22964;
+UPDATE `creature_template_locale` SET `Name` = '虔诚的管家', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22965;
+UPDATE `creature_template_locale` SET `Name` = '萨拉', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23108;
+UPDATE `creature_template_locale` SET `Name` = '法力奴仆', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23154;
+UPDATE `creature_template_locale` SET `Name` = '希瓦魔刺客', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23220;
+UPDATE `creature_template_locale` SET `Name` = 'Invisible Stalker (Akama)', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23288;
+UPDATE `creature_template_locale` SET `Name` = 'Mine Cart', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23289;
+UPDATE `creature_template_locale` SET `Title` = '竞技场商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23396;
+UPDATE `creature_template_locale` SET `Name` = '饥饿的灵魂碎块', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23401;
+UPDATE `creature_template_locale` SET `Name` = '弗拉斯卡托', `Title` = '测试服消耗品', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23405;
+UPDATE `creature_template_locale` SET `Name` = '迅捷鸦神坐骑', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23408;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23535;
+UPDATE `creature_template_locale` SET `Name` = '巴德·奈德雷克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23559;
+UPDATE `creature_template_locale` SET `Title` = '军情七处', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23566;
+UPDATE `creature_template_locale` SET `Name` = '座羊（美酒节）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23588;
+UPDATE `creature_template_locale` SET `Name` = '血精灵酿酒学徒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23606;
+UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23734;
+UPDATE `creature_template_locale` SET `Name` = '库尔基', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23748;
+UPDATE `creature_template_locale` SET `Name` = '"脏鬼"迈克尔·克罗维', `Title` = '鱼商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23896;
+UPDATE `creature_template_locale` SET `Name` = '劫掠者因格瓦尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23954;
+UPDATE `creature_template_locale` SET `Name` = '幽灵狼', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24003;
+UPDATE `creature_template_locale` SET `Name` = '磨坊工人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24005;
+UPDATE `creature_template_locale` SET `Name` = '自动搅拌工具', `Title` = '烈酒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24108;
+UPDATE `creature_template_locale` SET `Name` = '亡者军团食尸鬼', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24207;
+UPDATE `creature_template_locale` SET `Name` = '"小个子"洛戈克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24208;
+UPDATE `creature_template_locale` SET `Name` = '威利的尸体', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24365;
+UPDATE `creature_template_locale` SET `Name` = '迅捷座羊（美酒节）', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24368;
+UPDATE `creature_template_locale` SET `Name` = '雷尼·斯莫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24392;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24395;
+UPDATE `creature_template_locale` SET `Name` = '霍里', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24455;
+UPDATE `creature_template_locale` SET `Name` = '绿色装甲角鹰兽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24488;
+UPDATE `creature_template_locale` SET `Name` = '粉色小雷象', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24753;
+UPDATE `creature_template_locale` SET `Name` = '"鼠胆船长"托格雷', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24833;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24868;
+UPDATE `creature_template_locale` SET `Name` = '弗拉斯卡托夫人', `Title` = '测试服附魔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24982;
+UPDATE `creature_template_locale` SET `Name` = '迷你孢子蝠', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25062;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25099;
+UPDATE `creature_template_locale` SET `Title` = '特殊弹药商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25195;
+UPDATE `creature_template_locale` SET `Title` = '特殊弹药商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25196;
+UPDATE `creature_template_locale` SET `Name` = '火焰舞娘', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25305;
+UPDATE `creature_template_locale` SET `Name` = 'Annihilator Grek''lor', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25329;
+UPDATE `creature_template_locale` SET `Title` = '材料商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25633;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25697;
+UPDATE `creature_template_locale` SET `Name` = '灼烧元素', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25706;
+UPDATE `creature_template_locale` SET `Name` = '晋升的法师猎手', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25724;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25754;
+UPDATE `creature_template_locale` SET `Name` = '暗誓狂暴者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25798;
+UPDATE `creature_template_locale` SET `Name` = '暗誓怒火法师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25799;
+UPDATE `creature_template_locale` SET `Name` = '荆棘谷护火者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25915;
+UPDATE `creature_template_locale` SET `Name` = '荆棘谷护焰者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25920;
+UPDATE `creature_template_locale` SET `Name` = '贫瘠之地护焰者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25943;
+UPDATE `creature_template_locale` SET `Name` = '可驯服的猫头鹰', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26028;
+UPDATE `creature_template_locale` SET `Name` = '黑暗堕落者弗伦·亡刃', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26103;
+UPDATE `creature_template_locale` SET `Name` = '蓝色火箭坐骑', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26192;
+UPDATE `creature_template_locale` SET `Name` = '烈焰舞娘', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26267;
+UPDATE `creature_template_locale` SET `Name` = '物资商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26304;
+UPDATE `creature_template_locale` SET `Name` = '皮甲商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26305;
+UPDATE `creature_template_locale` SET `Name` = '锁甲商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26306;
+UPDATE `creature_template_locale` SET `Name` = '板甲商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26308;
+UPDATE `creature_template_locale` SET `Name` = '拉格纳罗斯的烟雾', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26502;
+UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26564;
+UPDATE `creature_template_locale` SET `Name` = '银溪镇猎户', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26679;
+UPDATE `creature_template_locale` SET `Name` = '冰原徒工', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26705;
+UPDATE `creature_template_locale` SET `Title` = '宗师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26903;
+UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26904;
+UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26905;
+UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26906;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26907;
+UPDATE `creature_template_locale` SET `Title` = '宗师级钓鱼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26909;
+UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26910;
+UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26911;
+UPDATE `creature_template_locale` SET `Title` = '宗师级采矿训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26912;
+UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26913;
+UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26914;
+UPDATE `creature_template_locale` SET `Title` = '宗师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26915;
+UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26916;
+UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26986;
+UPDATE `creature_template_locale` SET `Title` = '宗师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26987;
+UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26989;
+UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26990;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26991;
+UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26992;
+UPDATE `creature_template_locale` SET `Title` = '宗师级钓鱼训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26993;
+UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26994;
+UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26995;
+UPDATE `creature_template_locale` SET `Title` = '宗师级制皮匠', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26996;
+UPDATE `creature_template_locale` SET `Title` = '宗师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26997;
+UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26998;
+UPDATE `creature_template_locale` SET `Title` = '宗师级采矿训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26999;
+UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27000;
+UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27001;
+UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27023;
+UPDATE `creature_template_locale` SET `Name` = '雪爪', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27119;
+UPDATE `creature_template_locale` SET `Name` = 'Headless Horseman Mount, Player', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27152;
+UPDATE `creature_template_locale` SET `Name` = 'Headless Horseman Mount, Player, Ground', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27153;
+UPDATE `creature_template_locale` SET `Name` = '拷问者阿方斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27209;
+UPDATE `creature_template_locale` SET `Name` = '冰原狂战士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27278;
+UPDATE `creature_template_locale` SET `Name` = '冰原萨满祭司', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27279;
+UPDATE `creature_template_locale` SET `Name` = '首席抄写员基尼迪乌斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27378;
+UPDATE `creature_template_locale` SET `Name` = '纳兹格利姆中士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27388;
+UPDATE `creature_template_locale` SET `Name` = '德弗雷斯塔兹领主', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27575;
+UPDATE `creature_template_locale` SET `Name` = '灼热凝视', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28265;
+UPDATE `creature_template_locale` SET `Name` = '大型战熊', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28363;
+UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28693;
+UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28694;
+UPDATE `creature_template_locale` SET `Title` = '宗师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28696;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28697;
+UPDATE `creature_template_locale` SET `Title` = '宗师级采矿训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28698;
+UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28699;
+UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28700;
+UPDATE `creature_template_locale` SET `Title` = '宗师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28701;
+UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28702;
+UPDATE `creature_template_locale` SET `Title` = '宗师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28703;
+UPDATE `creature_template_locale` SET `Title` = '宗师级草药学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28704;
+UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28705;
+UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28706;
+UPDATE `creature_template_locale` SET `Title` = '宗师级钓鱼训练师和补给商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28742;
+UPDATE `creature_template_locale` SET `Name` = '恶鬼哈古斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28760;
+UPDATE `creature_template_locale` SET `Title` = '弹药', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28800;
+UPDATE `creature_template_locale` SET `Title` = '弹药', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28813;
+UPDATE `creature_template_locale` SET `Title` = '尸尘商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29203;
+UPDATE `creature_template_locale` SET `Title` = '特殊弹药商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29493;
+UPDATE `creature_template_locale` SET `Title` = '武器锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29505;
+UPDATE `creature_template_locale` SET `Title` = '护甲锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29506;
+UPDATE `creature_template_locale` SET `Title` = '元素制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29507;
+UPDATE `creature_template_locale` SET `Title` = '龙鳞制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29508;
+UPDATE `creature_template_locale` SET `Title` = '部族制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29509;
+UPDATE `creature_template_locale` SET `Name` = '艾蜜', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29548;
+UPDATE `creature_template_locale` SET `Title` = '暴风城的国王', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29611;
+UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29631;
+UPDATE `creature_template_locale` SET `Name` = '高阶奥术师达斯克·阿尔希斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29657;
+UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29924;
+UPDATE `creature_template_locale` SET `Name` = '暮光新兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30114;
+UPDATE `creature_template_locale` SET `Title` = '弹药', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30437;
+UPDATE `creature_template_locale` SET `Name` = '艾兹拉·格里姆', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30552;
+UPDATE `creature_template_locale` SET `Title` = '大师级铭文训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30721;
+UPDATE `creature_template_locale` SET `Title` = '饮料商人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30885;
+UPDATE `creature_template_locale` SET `Name` = '宗师的训练假人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31144;
+UPDATE `creature_template_locale` SET `Name` = '英雄训练假人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31146;
+UPDATE `creature_template_locale` SET `Name` = '林地行者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31228;
+UPDATE `creature_template_locale` SET `Title` = '寒冷天气飞行训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31247;
+UPDATE `creature_template_locale` SET `Title` = '枪械和弹药商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31423;
+UPDATE `creature_template_locale` SET `Name` = '暮光幼龙坐骑', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31698;
+UPDATE `creature_template_locale` SET `Title` = '暴风城的国王', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32303;
+UPDATE `creature_template_locale` SET `Name` = '雷尼·斯莫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32354;
+UPDATE `creature_template_locale` SET `Name` = '专家的训练假人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32666;
+UPDATE `creature_template_locale` SET `Name` = '大师的训练假人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32667;
+UPDATE `creature_template_locale` SET `Name` = '托马斯·里约加因', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32686;
+UPDATE `creature_template_locale` SET `Title` = '死亡骑士补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32753;
+UPDATE `creature_template_locale` SET `Title` = '德鲁伊补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32754;
+UPDATE `creature_template_locale` SET `Title` = '猎人补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32755;
+UPDATE `creature_template_locale` SET `Title` = '法师补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32756;
+UPDATE `creature_template_locale` SET `Title` = '圣骑士补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32757;
+UPDATE `creature_template_locale` SET `Title` = '牧师补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32758;
+UPDATE `creature_template_locale` SET `Title` = '潜行者补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32759;
+UPDATE `creature_template_locale` SET `Title` = '萨满祭司补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32760;
+UPDATE `creature_template_locale` SET `Title` = '术士补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32761;
+UPDATE `creature_template_locale` SET `Title` = '战士补给', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32762;
+UPDATE `creature_template_locale` SET `Name` = '骑士中尉穆斯塔克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32834;
+UPDATE `creature_template_locale` SET `Name` = '坍缩星', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32955;
+UPDATE `creature_template_locale` SET `Title` = '宗师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33580;
+UPDATE `creature_template_locale` SET `Title` = '宗师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33581;
+UPDATE `creature_template_locale` SET `Title` = '宗师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33583;
+UPDATE `creature_template_locale` SET `Title` = '宗师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33586;
+UPDATE `creature_template_locale` SET `Title` = '宗师级烹饪训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33587;
+UPDATE `creature_template_locale` SET `Title` = '宗师级炼金训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33588;
+UPDATE `creature_template_locale` SET `Title` = '宗师级急救训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33589;
+UPDATE `creature_template_locale` SET `Title` = '宗师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33591;
+UPDATE `creature_template_locale` SET `Title` = '宗师级铭文训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33603;
+UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33631;
+UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33633;
+UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33634;
+UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33635;
+UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33636;
+UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33637;
+UPDATE `creature_template_locale` SET `Title` = '大师级铭文训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33638;
+UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33640;
+UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33641;
+UPDATE `creature_template_locale` SET `Name` = '阿玛里尔·火盟', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33658;
+UPDATE `creature_template_locale` SET `Title` = '大师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33674;
+UPDATE `creature_template_locale` SET `Title` = '大师级锻造训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33675;
+UPDATE `creature_template_locale` SET `Title` = '大师级附魔训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33676;
+UPDATE `creature_template_locale` SET `Title` = '大师级工程学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33677;
+UPDATE `creature_template_locale` SET `Title` = '大师级草药学训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33678;
+UPDATE `creature_template_locale` SET `Title` = '大师级铭文训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33679;
+UPDATE `creature_template_locale` SET `Title` = '大师级珠宝加工训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33680;
+UPDATE `creature_template_locale` SET `Title` = '大师级制皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33681;
+UPDATE `creature_template_locale` SET `Title` = '大师级采矿训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33682;
+UPDATE `creature_template_locale` SET `Title` = '大师级剥皮训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33683;
+UPDATE `creature_template_locale` SET `Title` = '大师级裁缝训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33684;
+UPDATE `creature_template_locale` SET `Name` = '黑色骷髅战马', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34238;
+UPDATE `creature_template_locale` SET `Title` = '塞菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34715;
+UPDATE `creature_template_locale` SET `Title` = '塞菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34717;
+UPDATE `creature_template_locale` SET `Title` = '塞菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34718;
+UPDATE `creature_template_locale` SET `Title` = '塞菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34719;
+UPDATE `creature_template_locale` SET `Title` = '塞菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34721;
+UPDATE `creature_template_locale` SET `Title` = '塞菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34723;
+UPDATE `creature_template_locale` SET `Title` = '塞菲尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34730;
+UPDATE `creature_template_locale` SET `Name` = '瓦萨林·彤曦', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34772;
+UPDATE `creature_template_locale` SET `Name` = '糖心甜土豆席位', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34824;
+UPDATE `creature_template_locale` SET `Title` = '暴风城的国王', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34990;
+UPDATE `creature_template_locale` SET `Title` = '骑术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35100;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37072;
+UPDATE `creature_template_locale` SET `Name` = '雪孩子', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40198;
+UPDATE `creature_template_locale` SET `Title` = '优质竞技场装备', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40212;
+UPDATE `creature_template_locale` SET `Name` = '发条战士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40295;
+
+-- Update existing entries, from TBC
+UPDATE `creature_template_locale` SET `Title` = '宗师级炼金术训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16588;
+UPDATE `creature_template_locale` SET `Name` = 'Netherstorm Trigger', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 19656;
+UPDATE `creature_template_locale` SET `Name` = 'Generic Cosmetic Trigger - LAB', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24921;
+
+-- Update existing entries, from CLASSIC
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3151;
+UPDATE `creature_template_locale` SET `Name` = '黑翼触发器', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 12999;
+UPDATE `creature_template_locale` SET `Name` = '格里雷克', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15081;
+UPDATE `creature_template_locale` SET `Name` = 'World Trigger', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 15384;
+UPDATE `creature_template_locale` SET `Name` = 'Omar the Test Kobold', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16089;
+
+-- Update existing entries, from CATA
+UPDATE `creature_template_locale` SET `Name` = '陨落英雄之魂', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32149;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32385;
+UPDATE `creature_template_locale` SET `Name` = '冬鳍小伙伴', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34489;
+UPDATE `creature_template_locale` SET `Title` = '传承正义军需官', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35495;
+UPDATE `creature_template_locale` SET `Title` = '传承正义军需官', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35573;
+UPDATE `creature_template_locale` SET `Title` = '传承正义军需官', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35574;
+
+-- Update existing entries, from RETAIL
+UPDATE `creature_template_locale` SET `Name` = '节日 - 万圣节 -要塞 - 幽灵啤酒', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 81;
+UPDATE `creature_template_locale` SET `Name` = '小猪大人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 444;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1230;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 1859;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2051;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 2312;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 3202;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 4115;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 5876;
+UPDATE `creature_template_locale` SET `Name` = 'Gorgrond Smokebelcher Depot NPC Invisible Stalker "Our Gun''s Bigger" Quest Target ELM', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 6783;
+UPDATE `creature_template_locale` SET `Name` = '炎怒守卫', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 10265;
+UPDATE `creature_template_locale` SET `Name` = 'Target Dummy Right', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16898;
+UPDATE `creature_template_locale` SET `Name` = 'Target Dummy Left', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 16899;
+UPDATE `creature_template_locale` SET `Name` = '召唤炸药包', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 18674;
+UPDATE `creature_template_locale` SET `Name` = '复仇军囚犯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 22927;
+UPDATE `creature_template_locale` SET `Name` = '蔑冬长矛手', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23653;
+UPDATE `creature_template_locale` SET `Name` = '蔑冬碾骨者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23655;
+UPDATE `creature_template_locale` SET `Name` = '蔑冬吟游诗人', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23657;
+UPDATE `creature_template_locale` SET `Name` = '蔑冬预言者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23669;
+UPDATE `creature_template_locale` SET `Name` = '蔑冬长者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23670;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23671;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23781;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23782;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23784;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 23816;
+UPDATE `creature_template_locale` SET `Name` = '蔑冬防御者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24015;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24041;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24119;
+UPDATE `creature_template_locale` SET `Name` = '召唤炸药包', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24181;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24238;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24341;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24342;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24343;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24347;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24348;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24349;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24350;
+UPDATE `creature_template_locale` SET `Name` = '召唤炸药包', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24377;
+UPDATE `creature_template_locale` SET `Name` = '"Back To Bladespire Fortress" Flight Kill Credit', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24378;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24643;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24717;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24718;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24719;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24720;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24751;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 24897;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25288;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25290;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25312;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25519;
+UPDATE `creature_template_locale` SET `Name` = '考达拉鳞誓龙兽', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25717;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 25774;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26078;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26081;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26269;
+UPDATE `creature_template_locale` SET `Name` = '龙骨荒野古树', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26274;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26378;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26383;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26384;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26405;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26406;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26442;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26486;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26514;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26541;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26542;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26551;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26552;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26846;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26934;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26947;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26951;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26952;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26953;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26954;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26955;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26956;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26957;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26958;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26959;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26960;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26961;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26962;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26963;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 26964;
+UPDATE `creature_template_locale` SET `Title` = '材料供应商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27026;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27114;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27115;
+UPDATE `creature_template_locale` SET `Title` = '餐饮供应商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27137;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27138;
+UPDATE `creature_template_locale` SET `Name` = '烈焰火盆', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27273;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27344;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27579;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27632;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27730;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27760;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27833;
+UPDATE `creature_template_locale` SET `Name` = 'PattyMack''s test vehicle TEST', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27862;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 27916;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28115;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28189;
+UPDATE `creature_template_locale` SET `Name` = '第七军团攻城技师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28370;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28499;
+UPDATE `creature_template_locale` SET `Name` = '拷问者阿方斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28554;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28650;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28678;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28679;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28680;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28944;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 28987;
+UPDATE `creature_template_locale` SET `Name` = '库格·铁颚', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29072;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29174;
+UPDATE `creature_template_locale` SET `Name` = '通往暗影领域的传送门', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29218;
+UPDATE `creature_template_locale` SET `Title` = '绷带训练师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29233;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29250;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29251;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29252;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29253;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29260;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29262;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29283;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29339;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29348;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29441;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29442;
+UPDATE `creature_template_locale` SET `Name` = '“男爵夫人”莱娜', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29534;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29539;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29540;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29541;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29681;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29734;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29749;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29762;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29841;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29884;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29895;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29933;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29967;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29968;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29969;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29970;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 29971;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30157;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30158;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30171;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30182;
+UPDATE `creature_template_locale` SET `Title` = '餐饮供应商', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30254;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30381;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30408;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30411;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30429;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30578;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30579;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30580;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30581;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30583;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30584;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30590;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30613;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 30678;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31026;
+UPDATE `creature_template_locale` SET `Name` = 'Ali Garchanter [TEST]', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31060;
+UPDATE `creature_template_locale` SET `Name` = '血淋淋的肉', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31119;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31160;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31161;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31224;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31248;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31300;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31302;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31305;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31306;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31307;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31545;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31549;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31551;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31552;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31648;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31804;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31806;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 31839;
+UPDATE `creature_template_locale` SET `Name` = '迷时始祖幼龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32153;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32293;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32329;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32346;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32364;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32365;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32384;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32401;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32402;
+UPDATE `creature_template_locale` SET `Name` = '迷时始祖幼龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32491;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32518;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32649;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32657;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32658;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32659;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32660;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32774;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 32870;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33439;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33537;
+UPDATE `creature_template_locale` SET `Name` = '绷带图样', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33621;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33673;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33685;
+UPDATE `creature_template_locale` SET `Name` = '银色勇士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33707;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33867;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33915;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33916;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33917;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33918;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33919;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33920;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33921;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33922;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33923;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33924;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33925;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33926;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33927;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33928;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33929;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33930;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33931;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33932;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33933;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33934;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33935;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33936;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33937;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33938;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33939;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33940;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33941;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 33992;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34036;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34037;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34038;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34039;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34040;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34042;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34058;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34059;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34060;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34061;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34062;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34063;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34073;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34074;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34075;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34076;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34077;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34078;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34080;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34081;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34082;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34083;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34084;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34088;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34089;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34090;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34091;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34092;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34093;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34094;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34095;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34444;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34449;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34451;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34456;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34460;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34461;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34465;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34467;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34470;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34471;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34473;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34475;
+UPDATE `creature_template_locale` SET `Name` = '迅捷灰马', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34557;
+UPDATE `creature_template_locale` SET `Name` = '爱德华·温斯洛', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34644;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34712;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34714;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34786;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34787;
+UPDATE `creature_template_locale` SET `Name` = '雪地狗头人奴隶', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34800;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34924;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34971;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34972;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34973;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34980;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 34993;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35017;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35019;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35020;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35021;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35022;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35023;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35024;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35025;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35026;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35116;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35127;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35341;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35343;
+UPDATE `creature_template_locale` SET `Name` = '地精机械师', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35346;
+UPDATE `creature_template_locale` SET `Name` = '库卡隆精英', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35460;
+UPDATE `creature_template_locale` SET `Name` = '特拉格·高岭', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35462;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35492;
+UPDATE `creature_template_locale` SET `Name` = '银色维和者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35587;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35600;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35611;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35612;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35895;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35909;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 35910;
+UPDATE `creature_template_locale` SET `Name` = '库卡隆劫掠者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36164;
+UPDATE `creature_template_locale` SET `Name` = '幽暗城守护者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36213;
+UPDATE `creature_template_locale` SET `Name` = '残缺的躯体', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36217;
+UPDATE `creature_template_locale` SET `Title` = '酋长之手', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36273;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36284;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36351;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36352;
+UPDATE `creature_template_locale` SET `Name` = '情人节首领', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36530;
+UPDATE `creature_template_locale` SET `Title` = '牛头人大酋长', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36648;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36778;
+UPDATE `creature_template_locale` SET `Name` = '拉克卡斯', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36795;
+UPDATE `creature_template_locale` SET `Name` = '奥妮克希亚幼龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36837;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36857;
+UPDATE `creature_template_locale` SET `Name` = '灼热元素', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36949;
+UPDATE `creature_template_locale` SET `Name` = '破天号士兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36950;
+UPDATE `creature_template_locale` SET `Name` = '库卡隆劫掠者', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 36957;
+UPDATE `creature_template_locale` SET `Name` = '大领主伯瓦尔·弗塔根', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37183;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37223;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37225;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37527;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37764;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37765;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37829;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37846;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37935;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37936;
+UPDATE `creature_template_locale` SET `Name` = '黑锋勇士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 37996;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38040;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38043;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38044;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38052;
+UPDATE `creature_template_locale` SET `Name` = '银色盟约密探', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38200;
+UPDATE `creature_template_locale` SET `Name` = 'X-45偷心火箭', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38207;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38334;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38335;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38336;
+UPDATE `creature_template_locale` SET `Name` = '光明使者乌瑟尔', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38608;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38610;
+UPDATE `creature_template_locale` SET `Title` = '传承正义军需官', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38858;
+UPDATE `creature_template_locale` SET `Name` = 'Idle Before Scaling', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 38883;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39090;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39103;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39271;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39273;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39283;
+UPDATE `creature_template_locale` SET `Name` = '森金村卫兵', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39633;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39678;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39712;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39807;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 39940;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40204;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40205;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40206;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40207;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40208;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40210;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40211;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40213;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40214;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40215;
+UPDATE `creature_template_locale` SET `Title` = '残忍角斗士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40216;
+UPDATE `creature_template_locale` SET `Name` = '暗矛战士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40241;
+UPDATE `creature_template_locale` SET `Name` = '暗矛战士', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40392;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40404;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40413;
+UPDATE `creature_template_locale` SET `Name` = '热砂港讼棍', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40438;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40446;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40492;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40607;
+UPDATE `creature_template_locale` SET `Name` = '红玉幼龙', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `entry` = 40627;
+
+-- Insert new entries, from WOTLK
+DELETE FROM `creature_template_locale` WHERE `entry` IN(230,841,1455,2662,2939,3697,4174,4224,4443,5002,7558,7559,15713,19325,21444,21634,25323,25406,25411,25537) AND `locale` = 'zhCN';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(230,'zhCN','索恩顿·菲尔伍德','木工',0),
+(841,'zhCN','哈尔·卡特','木工物资供应商',0),
+(1455,'zhCN',NULL,'造箭师',0),
+(2662,'zhCN','码头管理员斯奇克','船商',0),
+(2939,'zhCN','杰克逊·贝恩','野猪训练师',0),
+(3697,'zhCN','凯林·长爪','野猪训练师',0),
+(4174,'zhCN','希亚奈恩','弓箭商',0),
+(4224,'zhCN','塔雷贡','制图供应商',0),
+(4443,'zhCN','瓦萨','图腾商人',0),
+(5002,'zhCN','World Boar Trainer','野猪训练师',0),
+(7558,'zhCN','黄毛兔',NULL,0),
+(7559,'zhCN','斑点兔',NULL,0),
+(15713,'zhCN','蓝色其拉作战坦克',NULL,0),
+(19325,'zhCN','巴儿努·碎岩','兽栏管理员',0),
+(21444,'zhCN','泰匹希·芬纳格','Temporary Karazhan Key Vendor',0),
+(21634,'zhCN','森林阔步者',NULL,0),
+(25323,'zhCN','Craig Steele','软件工程师',0),
+(25406,'zhCN','Craig Steele2','软件工程师',0),
+(25411,'zhCN','Craig Steele3','软件工程师',0),
+(25537,'zhCN','Craig''s Test Human',NULL,0);
+
+-- Insert new entries, from MOP
+DELETE FROM `creature_template_locale` WHERE `entry` IN(38440) AND `locale` = 'zhCN';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(38440,'zhCN','托尔图盖',NULL,0);
+
+-- Insert new entries, from RETAIL
+DELETE FROM `creature_template_locale` WHERE `entry` IN(29347,29823,29824,29825,29828,29831,29833,29835,29837,29842,29852,29898,29899,29900,29940,29941,29955,30061,31366,31586) AND `locale` = 'zhCN';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(29347,'zhCN','Patchwork Golem',NULL,0),
+(29823,'zhCN','Death Knight',NULL,0),
+(29824,'zhCN','Death Knight Captain',NULL,0),
+(29825,'zhCN','Shade of Naxxramas',NULL,0),
+(29828,'zhCN','Necro Knight',NULL,0),
+(29831,'zhCN','Risen Squire',NULL,0),
+(29833,'zhCN','Dark Touched Warrior',NULL,0),
+(29835,'zhCN','Bony Construct',NULL,0),
+(29837,'zhCN','Skeletal Smith',NULL,0),
+(29842,'zhCN','Death Knight Cavalier',NULL,0),
+(29852,'zhCN','Deathcharger Steed',NULL,0),
+(29898,'zhCN','Unholy Axe',NULL,0),
+(29899,'zhCN','Unholy Staff',NULL,0),
+(29900,'zhCN','Unholy Swords',NULL,0),
+(29940,'zhCN','Instructor Razuvious',NULL,0),
+(29941,'zhCN','Death Knight Understudy',NULL,0),
+(29955,'zhCN','Gothik the Harvester',NULL,0),
+(30061,'zhCN','Kel''Thuzad',NULL,0),
+(31366,'zhCN','Brann Bronzebeard',NULL,0),
+(31586,'zhCN','Anub''ar Assassin',NULL,0);
+
+DELETE FROM `creature_template_locale` WHERE `entry` IN(31587,31589,31590,31591,31592,31594,31595,31596,31599,31601,31602,31604,31605,31606,31607,31608,31609,31610,31611,31612) AND `locale` = 'zhCN';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(31587,'zhCN','Anub''ar Brood Keeper',NULL,0),
+(31589,'zhCN','Anub''ar Champion',NULL,0),
+(31590,'zhCN','Anub''ar Champion',NULL,0),
+(31591,'zhCN','Anub''ar Champion',NULL,0),
+(31592,'zhCN','Anub''ar Crusher',NULL,0),
+(31594,'zhCN','Anub''ar Crypt Fiend',NULL,0),
+(31595,'zhCN','Anub''ar Crypt Fiend',NULL,0),
+(31596,'zhCN','Anub''ar Crypt Fiend',NULL,0),
+(31599,'zhCN','Anub''ar Guardian',NULL,0),
+(31601,'zhCN','Anub''ar Necromancer',NULL,0),
+(31602,'zhCN','Anub''ar Necromancer',NULL,0),
+(31604,'zhCN','Anub''ar Prime Guard',NULL,0),
+(31605,'zhCN','Anub''ar Shadowcaster',NULL,0),
+(31606,'zhCN','Anub''ar Skirmisher',NULL,0),
+(31607,'zhCN','Anub''ar Venomancer',NULL,0),
+(31608,'zhCN','Anub''ar Warrior',NULL,0),
+(31609,'zhCN','Anub''ar Webspinner',NULL,0),
+(31610,'zhCN','Anub''arak',NULL,0),
+(31611,'zhCN','Hadronox',NULL,0),
+(31612,'zhCN','Krik''thir the Gatewatcher',NULL,0);
+
+DELETE FROM `creature_template_locale` WHERE `entry` IN(31613,31614,31615,31616,31617,34045,34105,34113,34165,34185,34235,34254,34255,34256,34257,37294,70100,179820,182753,182754) AND `locale` = 'zhCN';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(31613,'zhCN','Skittering Infector',NULL,0),
+(31614,'zhCN','Skittering Swarmer',NULL,0),
+(31615,'zhCN','Watcher Gashra',NULL,0),
+(31616,'zhCN','Watcher Narjil',NULL,0),
+(31617,'zhCN','Watcher Silthik',NULL,0),
+(34045,'zhCN','Salvaged Chopper',NULL,0),
+(34105,'zhCN','Ulduar Colossus',NULL,0),
+(34113,'zhCN','Steelforged Defender',NULL,0),
+(34165,'zhCN','Mechagnome Battletank',NULL,0),
+(34185,'zhCN','Molten Colossus',NULL,0),
+(34235,'zhCN','Runeforged Sentry',NULL,0),
+(34254,'zhCN','Expedition Commander',NULL,0),
+(34255,'zhCN','Expedition Defender',NULL,0),
+(34256,'zhCN','Expedition Engineer',NULL,0),
+(34257,'zhCN','Expedition Trapper',NULL,0),
+(37294,'zhCN','Frostwolf',NULL,0),
+(70100,'zhCN','拉希奥',NULL,0),
+(179820,'zhCN','咒罚追猎者',NULL,0),
+(182753,'zhCN','Faerie Dragon',NULL,0),
+(182754,'zhCN','Baby Faerie Dragon',NULL,0);
+
+DELETE FROM `creature_template_locale` WHERE `entry` IN(182755,182756,182758,182759,182760,182761,182763,182764,182765,182766,182768,182769,182770,182771,182772) AND `locale` = 'zhCN';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(182755,'zhCN','Ohn''ir Initiate',NULL,0),
+(182756,'zhCN','Marmoset',NULL,0),
+(182758,'zhCN','红元蛇',NULL,0),
+(182759,'zhCN','红元蛇',NULL,0),
+(182760,'zhCN','帝元蛇',NULL,0),
+(182761,'zhCN','帝元蛇',NULL,0),
+(182763,'zhCN','Kill Credit',NULL,0),
+(182764,'zhCN','大领主达里安·莫格莱尼','黑锋骑士团的骑士',0),
+(182765,'zhCN','克雷雅',NULL,0),
+(182766,'zhCN','裴拉戈斯',NULL,0),
+(182768,'zhCN','绿元蛇',NULL,0),
+(182769,'zhCN','绿元蛇',NULL,0),
+(182770,'zhCN','Ohn''ir Mystic',NULL,0),
+(182771,'zhCN','Ohn''ir Windspeaker',NULL,0),
+(182772,'zhCN','Lasher',NULL,0);
+
+-- List of entries using TBC datas :
+-- 16588,19656,24921
+-- List of entries using CLASSIC datas :
+-- 3151,12999,15081,15384,16089
+-- List of entries using CATA datas :
+-- 32149,32385,34489,35495,35573,35574
+-- List of entries using MOP datas :
+-- 38440
+-- List of entries using RETAIL datas :
+-- 81,444,1230,1859,2051,2312,3202,4115,5876,6783,10265,16898,16899,18674,22927,23653,23655,23657,23669,23670,23671,23781,23782,23784,23816,24015,24041,24119,24181,24238,24341,24342,24343,24347,24348,24349,24350,24377,24378,24643,24717,24718,24719,24720,24751,24897,25288,25290,25312,25519,25717,25774,26078,26081,26269,26274,26378,26383,26384,26405,26406,26442,26486,26514,26541,26542,26551,26552,26846,26934,26947,26951,26952,26953,26954,26955,26956,26957,26958,26959,26960,26961,26962,26963,26964,27026,27114,27115,27137,27138,27273,27344,27579,27632,27730,27760,27833,27862,27916,28115,28189,28370,28499,28554,28650,28678,28679,28680,28944,28987,29072,29174,29218,29233,29250,29251,29252,29253,29260,29262,29283,29339,29348,29441,29442,29534,29539,29540,29541,29681,29734,29749,29762,29841,29884,29895,29933,29967,29968,29969,29970,29971,30157,30158,30171,30182,30254,30381,30408,30411,30429,30578,30579,30580,30581,30583,30584,30590,30613,30678,31026,31060,31119,31160,31161,31224,31248,31300,31302,31305,31306,31307,31545,31549,31551,31552,31648,31804,31806,31839,32153,32293,32329,32346,32364,32365,32384,32401,32402,32491,32518,32649,32657,32658,32659,32660,32774,32870,33439,33537,33621,33673,33685,33707,33867,33915,33916,33917,33918,33919,33920,33921,33922,33923,33924,33925,33926,33927,33928,33929,33930,33931,33932,33933,33934,33935,33936,33937,33938,33939,33940,33941,33992,34036,34037,34038,34039,34040,34042,34058,34059,34060,34061,34062,34063,34073,34074,34075,34076,34077,34078,34080,34081,34082,34083,34084,34088,34089,34090,34091,34092,34093,34094,34095,34444,34449,34451,34456,34460,34461,34465,34467,34470,34471,34473,34475,34557,34644,34712,34714,34786,34787,34800,34924,34971,34972,34973,34980,34993,35017,35019,35020,35021,35022,35023,35024,35025,35026,35116,35127,35341,35343,35346,35460,35462,35492,35587,35600,35611,35612,35895,35909,35910,36164,36213,36217,36273,36284,36351,36352,36530,36648,36778,36795,36837,36857,36949,36950,36957,37183,37223,37225,37527,37764,37765,37829,37846,37935,37936,37996,38040,38043,38044,38052,38200,38207,38334,38335,38336,38608,38610,38858,38883,39090,39103,39271,39273,39283,39633,39678,39712,39807,39940,40204,40205,40206,40207,40208,40210,40211,40213,40214,40215,40216,40241,40392,40404,40413,40438,40446,40492,40607,40627,29347,29823,29824,29825,29828,29831,29833,29835,29837,29842,29852,29898,29899,29900,29940,29941,29955,30061,31366,31586,31587,31589,31590,31591,31592,31594,31595,31596,31599,31601,31602,31604,31605,31606,31607,31608,31609,31610,31611,31612,31613,31614,31615,31616,31617,34045,34105,34113,34165,34185,34235,34254,34255,34256,34257,37294,70100,179820,182753,182754,182755,182756,182758,182759,182760,182761,182763,182764,182765,182766,182768,182769,182770,182771,182772
