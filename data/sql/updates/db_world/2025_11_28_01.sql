@@ -1,3 +1,4 @@
+-- DB update 2025_11_28_00 -> 2025_11_28_01
 --
 -- Modify Target 9 - CREATURE_RANGE (can have multiple targets) to Target 19 - CLOSEST_CREATURE
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 18649100) AND (`source_type` = 9) AND (`id` IN (0, 2));
