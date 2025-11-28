@@ -37,6 +37,9 @@ ObjectData const creatureData[] =
     { NPC_KRIKTHIR_THE_GATEWATCHER, DATA_KRIKTHIR },
     { NPC_HADRONOX,                 DATA_HADRONOX },
     { NPC_ANUBARAK,                 DATA_ANUBARAK },
+    { NPC_WATCHER_GASHRA,           DATA_GASHRA   },
+    { NPC_WATCHER_NARJIL,           DATA_NARJIL   },
+    { NPC_WATCHER_SILTHIK,          DATA_SILTHIK  },
     { 0,                            0             }
 };
 
