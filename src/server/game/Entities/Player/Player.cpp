@@ -420,6 +420,8 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
     sScriptMgr->OnConstructPlayer(this);
 
     _expectingChangeTransport = false;
+    _pendingFlightChangeCounter = 0;
+    _mapChangeOrderCounter = 0;
 }
 
 Player::~Player()
