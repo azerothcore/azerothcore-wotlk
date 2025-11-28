@@ -643,6 +643,8 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     gameObjTarget = nullptr;
     destTarget = nullptr;
     damage = 0;
+    m_reflectionTarget = nullptr;
+    m_reflectionTargetGuid.Clear();
     effectHandleMode = SPELL_EFFECT_HANDLE_LAUNCH;
     m_diminishLevel = DIMINISHING_LEVEL_1;
     m_diminishGroup = DIMINISHING_NONE;
@@ -2591,6 +2593,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     //Spells with this flag cannot trigger if effect is casted on self
     bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_CASTER_PROCS) && unitTarget->CanProc() && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
     bool reflectedSpell = missInfo == SPELL_MISS_REFLECT;
+    Unit* reflectionSource = nullptr;
     Unit* spellHitTarget = nullptr;
 
     if (missInfo == SPELL_MISS_NONE)                          // In case spell hit target, do all effect on that target
@@ -2602,6 +2605,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         {
             spellHitTarget = m_caster;
             unitTarget = m_caster;
+            reflectionSource = effectUnit;
             if (m_caster->IsCreature())
                 m_caster->ToCreature()->LowerPlayerDamageReq(target->damage);
         }
@@ -2609,7 +2613,24 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
     if (spellHitTarget)
     {
+        if (reflectionSource)
+        {
+            m_reflectionTarget = reflectionSource;
+            m_reflectionTargetGuid = reflectionSource->GetGUID();
+            m_reflectionTargetPosition.Relocate(reflectionSource);
+        }
+        else
+        {
+            m_reflectionTarget = nullptr;
+            m_reflectionTargetGuid.Clear();
+            m_reflectionTargetPosition = Position();
+        }
+
         SpellMissInfo missInfo2 = DoSpellHitOnUnit(spellHitTarget, mask, target->scaleAura);
+
+        m_reflectionTarget = nullptr;
+        m_reflectionTargetGuid.Clear();
+        m_reflectionTargetPosition = Position();
         if (missInfo2 != SPELL_MISS_NONE)
         {
             if (missInfo2 != SPELL_MISS_MISS)
@@ -6588,8 +6609,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (target->IsCreature() && target->ToCreature()->IsVehicle())
                             return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
+                        // Allow SPELL_AURA_MOD_POSSESS to work on mounted players,
+                        // but keep the old restriction for everything else.
                         if (target->IsMounted())
-                            return SPELL_FAILED_CANT_BE_CHARMED;
+                        {
+                            if (!(target->IsPlayer() && m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_POSSESS))
+                                return SPELL_FAILED_CANT_BE_CHARMED;
+                        }
 
                         if (target->GetCharmerGUID())
                             return SPELL_FAILED_CHARMED;
@@ -7884,7 +7910,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
         case SPELL_AURA_AOE_CHARM:
             if (target->IsCreature() && target->IsVehicle())
                 return false;
-            if (target->IsMounted())
+            if (target->IsMounted() && m_spellInfo->Effects[eff].ApplyAuraName != SPELL_AURA_MOD_POSSESS)
                 return false;
             if (target->GetCharmerGUID())
                 return false;
