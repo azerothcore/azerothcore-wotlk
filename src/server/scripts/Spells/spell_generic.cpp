@@ -4423,7 +4423,9 @@ class spell_gen_eject_all_passengers : public SpellScript
     }
 };
 
-/* 62539 - Eject Passenger 2
+/* 49259 - Despawn Driver
+   49261 - Dismount Passenger
+   62539 - Eject Passenger 2
    64614 - Eject Passenger 4
    64629 - Eject Passenger 1
    64630 - Eject Passenger 2
