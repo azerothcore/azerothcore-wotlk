@@ -1,3 +1,4 @@
+-- DB update 2025_11_28_03 -> 2025_11_28_04
 
 -- Morbidus send a set data to Dhakar on death.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30698;
