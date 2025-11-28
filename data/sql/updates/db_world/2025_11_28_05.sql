@@ -1,3 +1,4 @@
+-- DB update 2025_11_28_04 -> 2025_11_28_05
 ALTER TABLE `spell_group` DROP `special_flag`;
 ALTER TABLE `spell_group` MODIFY COLUMN `spell_id` int;
 
