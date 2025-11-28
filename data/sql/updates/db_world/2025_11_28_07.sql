@@ -1,3 +1,4 @@
+-- DB update 2025_11_28_06 -> 2025_11_28_07
 --
 -- Gryphon Commander Urik SAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27317;
