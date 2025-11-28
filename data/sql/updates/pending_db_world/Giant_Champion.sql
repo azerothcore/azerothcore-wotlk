@@ -1,5 +1,5 @@
 
--- Morbidus send a do action to Dhakar
+-- Morbidus send a set data to Dhakar on death.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30698;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30698) AND (`source_type` = 0) AND (`id` IN (2));
