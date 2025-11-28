@@ -218,29 +218,22 @@ public:
             switch (m_uiEventId)
             {
                 case EVENT_OZ:
-                    if (OzDialogue[count].textid)
-                        text = OzDialogue[count].textid;
-                    if (OzDialogue[count].timer)
-                        TalkTimer = OzDialogue[count].timer;
+                    text = OzDialogue[count].textid;
+                    TalkTimer = OzDialogue[count].timer;
                     break;
-
                 case EVENT_HOOD:
-                    if (HoodDialogue[count].textid)
-                        text = HoodDialogue[count].textid;
-                    if (HoodDialogue[count].timer)
-                        TalkTimer = HoodDialogue[count].timer;
+                    text = HoodDialogue[count].textid;
+                    TalkTimer = HoodDialogue[count].timer;
                     break;
-
                 case EVENT_RAJ:
-                    if (RAJDialogue[count].textid)
-                        text = RAJDialogue[count].textid;
-                    if (RAJDialogue[count].timer)
-                        TalkTimer = RAJDialogue[count].timer;
+                    text = RAJDialogue[count].textid;
+                    TalkTimer = RAJDialogue[count].timer;
                     break;
+                default:
+                    return;
             }
 
-            if (text)
-                CreatureAI::Talk(text);
+            CreatureAI::Talk(text);
         }
 
         void PrepareEncounter()
