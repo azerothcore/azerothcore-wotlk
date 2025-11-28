@@ -1,4 +1,4 @@
--- Update npc (frFR) ; from WowHead Wotlk > TBC > Classic > Cata > Retail
+-- Update npc (frFR) ; from WowHead Wotlk > TBC > Classic > Cata > Mop > Retail
 -- Disclaimer : Datas of technical NPCs (Theoretically not visible to players) could be wrong, here we strictly align with WoWHead datas
 
 -- Entries without any translation datas, on any version
