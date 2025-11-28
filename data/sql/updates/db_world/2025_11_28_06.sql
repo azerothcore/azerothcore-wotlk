@@ -1,3 +1,4 @@
+-- DB update 2025_11_28_05 -> 2025_11_28_06
 --
 -- Increase despawn timer
 UPDATE `smart_scripts` SET `action_param3`=180000 WHERE `entryorguid` IN (-125414, -123669, -123663, -123660) AND `source_type`=0 AND `id`=0;
