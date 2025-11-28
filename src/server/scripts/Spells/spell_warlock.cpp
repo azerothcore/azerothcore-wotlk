@@ -18,7 +18,6 @@
 #include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Pet.h"
-#include "PetDefines.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
@@ -26,8 +25,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
-#include "Unit.h"
-#include "Util.h"
 /*
  * Scripts for spells with SPELLFAMILY_WARLOCK and SPELLFAMILY_GENERIC spells used by warlock players.
  * Ordered alphabetically using scriptname.
@@ -76,7 +73,6 @@ enum WarlockSpells
     SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083,
     SPELL_WARLOCK_PET_VOID_STAR_TALISMAN            = 37386, // Void Star Talisman
     SPELL_WARLOCK_DEMONIC_PACT_PROC                 = 48090,
-    SPELL_WARLOCK_GLYPH_OF_VOIDWALKER               = 56247,
 };
 
 enum WarlockSpellIcons
@@ -296,7 +292,7 @@ class spell_warl_generic_scaling : public AuraScript
 
     void CalculateResistanceAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // pet inherits 40% of resistance from owner and 35% of armor
+        // xinef: pet inherits 40% of resistance from owner and 35% of armor
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
@@ -312,7 +308,7 @@ class spell_warl_generic_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // by default warlock pet inherits 75% of stamina and 30% of intellect
+        // xinef: by default warlock pet inherits 75% of stamina and 30% of intellect
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
@@ -321,33 +317,21 @@ class spell_warl_generic_scaling : public AuraScript
         }
     }
 
-    void CalculateAPAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    void CalculateAPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (Unit* pet = GetUnitOwner())
+        // xinef: by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
+        if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            // by default warlock pet inherits 57% of max(SP FIRE, SP SHADOW) as AP
-            if (Unit* owner = pet->GetOwner())
-            {
-                int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
-                int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
-                int32 maximum  = (fire > shadow) ? fire : shadow;
-                amount = CalculatePct(std::max<int32>(0, maximum), 57);
-
-                // Glyph of felguard, 99% sure this is a HACK
-                if (pet->GetEntry() == NPC_FELGUARD)
-                {
-                    if (AuraEffect* glyph = owner->GetAuraEffect(SPELL_GLYPH_OF_FELGUARD, EFFECT_0))
-                    {
-                        amount += CalculatePct(pet->GetTotalAuraModValue(UNIT_MOD_ATTACK_POWER) - aurEff->GetAmount() + amount, glyph->GetAmount());
-                    }
-                }
-            }
+            int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
+            int32 shadow = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW);
+            int32 maximum  = (fire > shadow) ? fire : shadow;
+            amount = CalculatePct(std::max<int32>(0, maximum), 57);
         }
     }
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
+        // xinef: by default warlock pet inherits 15% of max(SP FIRE, SP SHADOW) as SP
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
             int32 fire  = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE);
@@ -355,7 +339,7 @@ class spell_warl_generic_scaling : public AuraScript
             int32 maximum  = (fire > shadow) ? fire : shadow;
             amount = CalculatePct(std::max<int32>(0, maximum), 15);
 
-            // Update appropriate player field
+            // xinef: Update appropriate player field
             if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
         }
@@ -1386,27 +1370,81 @@ class spell_warl_shadowburn : public AuraScript
     }
 };
 
-class spell_warl_voidwalker_pet_passive : public AuraScript
+class spell_warl_glyph_of_felguard : public AuraScript
 {
-    PrepareAuraScript(spell_warl_voidwalker_pet_passive);
+    PrepareAuraScript(spell_warl_glyph_of_felguard);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return ValidateSpellInfo({ SPELL_WARLOCK_GLYPH_OF_VOIDWALKER });
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
+                }
+            }
+        }
     }
 
-    void CalculateAmount(AuraEffect const* /* aurEff */, int32& amount, bool& /*canBeRecalculated*/)
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* pet = GetUnitOwner())
-            if (pet->IsPet())
-                if (Unit* owner = pet->ToPet()->GetOwner())
-                    if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_GLYPH_OF_VOIDWALKER, EFFECT_0))
-                        amount += aurEff->GetAmount();
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_FELGUARD)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), false);
+                }
+            }
+        }
     }
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_voidwalker_pet_passive::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
+        OnEffectApply += AuraEffectApplyFn(spell_warl_glyph_of_felguard::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_glyph_of_felguard::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_warl_glyph_of_voidwalker : public AuraScript
+{
+    PrepareAuraScript(spell_warl_glyph_of_voidwalker);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_VOIDWALKER)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), true);
+                }
+            }
+        }
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_VOIDWALKER)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), false);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_warl_glyph_of_voidwalker::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_glyph_of_voidwalker::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1491,6 +1529,7 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_unstable_affliction);
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_shadowburn);
-    RegisterSpellScript(spell_warl_voidwalker_pet_passive);
+    RegisterSpellScript(spell_warl_glyph_of_felguard);
+    RegisterSpellScript(spell_warl_glyph_of_voidwalker);
     RegisterSpellScript(spell_warl_demonic_pact_aura);
 }

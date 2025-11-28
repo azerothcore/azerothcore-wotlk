@@ -1405,7 +1405,9 @@ uint32 Player::CalculateQuestRewardXP(Quest const* quest)
     uint32 xp = uint32(quest->XPValue(GetLevel()) * GetQuestRate(quest->IsDFQuest()));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
-    xp *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
+    Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
+    for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
+        AddPct(xp, (*i)->GetAmount());
 
     return xp;
 }

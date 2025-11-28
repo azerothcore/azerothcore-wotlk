@@ -271,12 +271,12 @@ class spell_astromancer_solarian_transform : public AuraScript
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->ApplyStatPctModifier(UNIT_MOD_ARMOR, TOTAL_PCT, 400.0f);
+        GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, true);
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->ApplyStatPctModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, -80.0f);
+        GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, false);
     }
 
     void Register() override

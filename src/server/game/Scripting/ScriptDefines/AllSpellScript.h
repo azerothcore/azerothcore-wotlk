@@ -24,6 +24,8 @@
 enum AllSpellHook
 {
     ALLSPELLHOOK_ON_CALC_MAX_DURATION,
+    ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_DAMAGE_DONE,
+    ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_MOD_DAMAGE_PERCENT_DONE,
     ALLSPELLHOOK_ON_SPELL_CHECK_CAST,
     ALLSPELLHOOK_CAN_PREPARE,
     ALLSPELLHOOK_CAN_SCALING_EVERYTHING,
@@ -53,6 +55,10 @@ public:
 
     // Calculate max duration in applying aura
     virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
+
+    [[nodiscard]] virtual bool CanModAuraEffectDamageDone(AuraEffect const* /*auraEff*/, Unit* /*target*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/) { return true; }
+
+    [[nodiscard]] virtual bool CanModAuraEffectModDamagePercentDone(AuraEffect const* /*auraEff*/, Unit* /*target*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/) { return true; }
 
     virtual void OnSpellCheckCast(Spell* /*spell*/, bool /*strict*/, SpellCastResult& /*res*/) { }
 

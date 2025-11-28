@@ -69,10 +69,8 @@
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
-#include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "Spell.h"
-#include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
@@ -314,8 +312,8 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
 
     for (uint8 i = 0; i < BASEMOD_END; ++i)
     {
-        m_auraBaseFlatMod[i] = 0.0f;
-        m_auraBasePctMod[i] = 1.0f;
+        m_auraBaseMod[i][FLAT_MOD] = 0.0f;
+        m_auraBaseMod[i][PCT_MOD] = 1.0f;
     }
 
     for (uint8 i = 0; i < MAX_COMBAT_RATING; i++)
@@ -833,7 +831,9 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
                 if (!IsAlive() || HasWaterBreathingAura() || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                     return DISABLED_MIRROR_TIMER;
                 int32 UnderWaterTime = sWorld->getIntConfig(CONFIG_WATER_BREATH_TIMER);
-                UnderWaterTime *= GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING);
+                AuraEffectList const& mModWaterBreathing = GetAuraEffectsByType(SPELL_AURA_MOD_WATER_BREATHING);
+                for (AuraEffectList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
+                    AddPct(UnderWaterTime, (*i)->GetAmount());
                 return UnderWaterTime;
             }
         case FIRE_TIMER:
@@ -1922,7 +1922,10 @@ void Player::Regenerate(Powers power)
     // Mana regen calculated in Player::UpdateManaRegen(), energy regen calculated in Player::UpdateEnergyRegen()
     if (power != POWER_MANA && power != POWER_ENERGY)
     {
-        addvalue *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, power);
+        AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
+        for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
+            if (Powers((*i)->GetMiscValue()) == power)
+                AddPct(addvalue, (*i)->GetAmount());
 
         // Butchery requires combat for this effect
         if (power != POWER_RUNIC_POWER || IsInCombat())
@@ -2005,7 +2008,11 @@ void Player::RegenerateHealth()
             addvalue *= 1.33f;
         }
 
-        addvalue *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
+        AuraEffectList const& mModHealthRegenPct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
+        for (AuraEffectList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
+        {
+            AddPct(addvalue, (*i)->GetAmount());
+        }
 
         if (!IsInCombat())
         {
@@ -2659,14 +2666,14 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // set armor (resistance 0) to original value (create_agility*2)
     SetArmor(int32(m_createStats[STAT_AGILITY] * 2));
-    SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE + AsUnderlyingType(SPELL_SCHOOL_NORMAL), 0.0f);
-    SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE + AsUnderlyingType(SPELL_SCHOOL_NORMAL), 0.0f);
+    SetResistanceBuffMods(SpellSchools(0), true, 0.0f);
+    SetResistanceBuffMods(SpellSchools(0), false, 0.0f);
     // set other resistance to original value (0)
     for (uint8 i = 1; i < MAX_SPELL_SCHOOL; ++i)
     {
         SetResistance(SpellSchools(i), 0);
-        SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE + i, 0.0f);
-        SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE + i, 0.0f);
+        SetResistanceBuffMods(SpellSchools(i), true, 0.0f);
+        SetResistanceBuffMods(SpellSchools(i), false, 0.0f);
     }
 
     SetUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, 0);
@@ -5005,107 +5012,24 @@ void Player::ClearChannelWatch()
         (*itr)->RemoveWatching(this);
 }
 
-void Player::HandleBaseModFlatValue(BaseModGroup modGroup, float amount, bool apply)
+void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply)
 {
     if (modGroup >= BASEMOD_END)
     {
-        LOG_ERROR("entities.player", "Player::HandleBaseModFlatValue: Invalid BaseModGroup/BaseModType ({}/{}) for player '{}' ({})",
-            modGroup, FLAT_MOD, GetName(), GetGUID().ToString());
+        LOG_ERROR("entities.player", "ERROR in HandleBaseModValue(): non existed BaseModGroup!");
         return;
     }
 
-    m_auraBaseFlatMod[modGroup] += apply ? amount : -amount;
-    UpdateBaseModGroup(modGroup);
-}
-
-void Player::ApplyBaseModPctValue(BaseModGroup modGroup, float pct)
-{
-    if (modGroup >= BASEMOD_END)
+    switch (modType)
     {
-        LOG_ERROR("entities.player", "Player::ApplyBaseModPctValue: Invalid BaseModGroup/BaseModType ({}/{}) for player '{}' ({})",
-            modGroup, PCT_MOD, GetName(), GetGUID().ToString());
-        return;
-    }
-
-    m_auraBasePctMod[modGroup] += CalculatePct(1.0f, pct);
-    UpdateBaseModGroup(modGroup);
-}
-
-void Player::SetBaseModFlatValue(BaseModGroup modGroup, float val)
-{
-    if (m_auraBaseFlatMod[modGroup] == val)
-        return;
-
-    m_auraBaseFlatMod[modGroup] = val;
-    UpdateBaseModGroup(modGroup);
-}
-
-void Player::SetBaseModPctValue(BaseModGroup modGroup, float val)
-{
-    if (m_auraBasePctMod[modGroup] == val)
-        return;
-
-    m_auraBasePctMod[modGroup] = val;
-    UpdateBaseModGroup(modGroup);
-}
-
-void Player::UpdateDamageDoneMods(WeaponAttackType attackType, int32 skipEnchantSlot /*= -1*/)
-{
-    Unit::UpdateDamageDoneMods(attackType, skipEnchantSlot);
-
-    UnitMods unitMod;
-    switch (attackType)
-    {
-        case BASE_ATTACK:
-            unitMod = UNIT_MOD_DAMAGE_MAINHAND;
+        case FLAT_MOD:
+            m_auraBaseMod[modGroup][modType] += apply ? amount : -amount;
             break;
-        case OFF_ATTACK:
-            unitMod = UNIT_MOD_DAMAGE_OFFHAND;
-            break;
-        case RANGED_ATTACK:
-            unitMod = UNIT_MOD_DAMAGE_RANGED;
-            break;
-        default:
-            ABORT();
+        case PCT_MOD:
+            ApplyPercentModFloatVar(m_auraBaseMod[modGroup][modType], amount, apply);
             break;
     }
 
-    float amount = 0.0f;
-    Item* item = GetWeaponForAttack(attackType, true);
-    if (!item)
-        return;
-
-    for (uint8 slot = 0; slot < MAX_ENCHANTMENT_SLOT; ++slot)
-    {
-        if (skipEnchantSlot == slot)
-            continue;
-
-        SpellItemEnchantmentEntry const* enchantmentEntry = sSpellItemEnchantmentStore.LookupEntry(item->GetEnchantmentId(EnchantmentSlot(slot)));
-        if (!enchantmentEntry)
-            continue;
-
-        for (uint8 i = 0; i < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++i)
-        {
-            switch (enchantmentEntry->type[i])
-            {
-                case ITEM_ENCHANTMENT_TYPE_DAMAGE:
-                    amount += enchantmentEntry->amount[i];
-                    break;
-                case ITEM_ENCHANTMENT_TYPE_TOTEM:
-                    if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY))
-                        amount += enchantmentEntry->amount[i] * item->GetTemplate()->Delay / 1000.0f;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    HandleStatFlatModifier(unitMod, TOTAL_VALUE, amount, true);
-}
-
-void Player::UpdateBaseModGroup(BaseModGroup modGroup)
-{
     if (!CanModifyStats())
         return;
 
@@ -5136,7 +5060,10 @@ float Player::GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const
         return 0.0f;
     }
 
-    return (modType == FLAT_MOD ? m_auraBaseFlatMod[modGroup] : m_auraBasePctMod[modGroup]);
+    if (modType == PCT_MOD && m_auraBaseMod[modGroup][PCT_MOD] <= 0.0f)
+        return 0.0f;
+
+    return m_auraBaseMod[modGroup][modType];
 }
 
 float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
@@ -5147,15 +5074,15 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
         return 0.0f;
     }
 
-    if (m_auraBasePctMod[modGroup] <= 0.0f)
+    if (m_auraBaseMod[modGroup][PCT_MOD] <= 0.0f)
         return 0.0f;
 
-    return m_auraBaseFlatMod[modGroup] * m_auraBasePctMod[modGroup];
+    return m_auraBaseMod[modGroup][FLAT_MOD] * m_auraBaseMod[modGroup][PCT_MOD];
 }
 
 uint32 Player::GetShieldBlockValue() const
 {
-    float value = (m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE];
+    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
 
     value = (value < 0) ? 0 : value;
 
@@ -5224,7 +5151,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
         return;
 
     /// @todo: research if talents/effects that increase total agility by x% should increase non-diminishing part
-    float base_agility = GetCreateStat(STAT_AGILITY) * GetPctModifierValue(UnitMods(UNIT_MOD_STAT_START + AsUnderlyingType(STAT_AGILITY)), BASE_PCT);
+    float base_agility = GetCreateStat(STAT_AGILITY) * m_auraModifiersGroup[UNIT_MOD_STAT_START + static_cast<uint16>(STAT_AGILITY)][BASE_PCT];
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
 
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
@@ -6647,8 +6574,13 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
 
     LOG_DEBUG("entities.player", "applying mods for item {} ", item->GetGUID().ToString());
 
+    WeaponAttackType attacktype = Player::GetAttackBySlot(slot);
+
     if (item->HasSocket())                              //only (un)equipping of items with sockets can influence metagems, so no need to waste time with normal items
         CorrectMetaGemEnchants(slot, apply);
+
+    if (attacktype < MAX_ATTACK)
+        _ApplyWeaponDependentAuraMods(item, attacktype, apply);
 
     _ApplyItemBonuses(proto, slot, apply);
 
@@ -6656,13 +6588,6 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
         _ApplyAmmoBonuses();
 
     ApplyItemEquipSpell(item, apply);
-
-    ApplyItemDependentAuras(item, apply);
-
-    WeaponAttackType const attackType = Player::GetAttackBySlot(slot);
-    if (attackType != MAX_ATTACK)
-        UpdateWeaponDependentAuras(attackType);
-
     ApplyEnchantment(item, apply);
 
     LOG_DEBUG("entities.player.items", "_ApplyItemMods complete.");
@@ -6733,30 +6658,30 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         switch (statType)
         {
             case ITEM_MOD_MANA:
-                HandleStatFlatModifier(UNIT_MOD_MANA, BASE_VALUE, float(val), apply);
+                HandleStatModifier(UNIT_MOD_MANA, BASE_VALUE, float(val), apply);
                 break;
             case ITEM_MOD_HEALTH:                           // modify HP
-                HandleStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, float(val), apply);
+                HandleStatModifier(UNIT_MOD_HEALTH, BASE_VALUE, float(val), apply);
                 break;
             case ITEM_MOD_AGILITY:                          // modify agility
-                HandleStatFlatModifier(UNIT_MOD_STAT_AGILITY, BASE_VALUE, float(val), apply);
-                UpdateStatBuffMod(STAT_AGILITY);
+                HandleStatModifier(UNIT_MOD_STAT_AGILITY, BASE_VALUE, float(val), apply);
+                ApplyStatBuffMod(STAT_AGILITY, float(val), apply);
                 break;
             case ITEM_MOD_STRENGTH:                         //modify strength
-                HandleStatFlatModifier(UNIT_MOD_STAT_STRENGTH, BASE_VALUE, float(val), apply);
-                UpdateStatBuffMod(STAT_STRENGTH);
+                HandleStatModifier(UNIT_MOD_STAT_STRENGTH, BASE_VALUE, float(val), apply);
+                ApplyStatBuffMod(STAT_STRENGTH, float(val), apply);
                 break;
             case ITEM_MOD_INTELLECT:                        //modify intellect
-                HandleStatFlatModifier(UNIT_MOD_STAT_INTELLECT, BASE_VALUE, float(val), apply);
-                UpdateStatBuffMod(STAT_INTELLECT);
+                HandleStatModifier(UNIT_MOD_STAT_INTELLECT, BASE_VALUE, float(val), apply);
+                ApplyStatBuffMod(STAT_INTELLECT, float(val), apply);
                 break;
             case ITEM_MOD_SPIRIT:                           //modify spirit
-                HandleStatFlatModifier(UNIT_MOD_STAT_SPIRIT, BASE_VALUE, float(val), apply);
-                UpdateStatBuffMod(STAT_SPIRIT);
+                HandleStatModifier(UNIT_MOD_STAT_SPIRIT, BASE_VALUE, float(val), apply);
+                ApplyStatBuffMod(STAT_SPIRIT, float(val), apply);
                 break;
             case ITEM_MOD_STAMINA:                          //modify stamina
-                HandleStatFlatModifier(UNIT_MOD_STAT_STAMINA, BASE_VALUE, float(val), apply);
-                UpdateStatBuffMod(STAT_STAMINA);
+                HandleStatModifier(UNIT_MOD_STAT_STAMINA, BASE_VALUE, float(val), apply);
+                ApplyStatBuffMod(STAT_STAMINA, float(val), apply);
                 break;
             case ITEM_MOD_DEFENSE_SKILL_RATING:
                 ApplyRatingMod(CR_DEFENSE_SKILL, int32(val), apply);
@@ -6845,11 +6770,11 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 ApplyRatingMod(CR_EXPERTISE, int32(val), apply);
                 break;
             case ITEM_MOD_ATTACK_POWER:
-                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(val), apply);
-                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
+                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(val), apply);
+                HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
             case ITEM_MOD_RANGED_ATTACK_POWER:
-                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
+                HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
             //            case ITEM_MOD_FERAL_ATTACK_POWER:
             //                ApplyFeralAPBonus(int32(val), apply);
@@ -6870,7 +6795,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 ApplySpellPenetrationBonus(val, apply);
                 break;
             case ITEM_MOD_BLOCK_VALUE:
-                HandleBaseModFlatValue(SHIELD_BLOCK_VALUE, float(val), apply);
+                HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(val), apply);
                 break;
             /// @deprecated item mods
             case ITEM_MOD_SPELL_HEALING_DONE:
@@ -6900,7 +6825,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
     if (armor)
     {
-        UnitModifierFlatType modType = TOTAL_VALUE;
+        UnitModifierType modType = TOTAL_VALUE;
         if (proto->Class == ITEM_CLASS_ARMOR)
         {
             switch (proto->SubClass)
@@ -6914,33 +6839,33 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                     break;
             }
         }
-        HandleStatFlatModifier(UNIT_MOD_ARMOR, modType, float(armor), apply);
+        HandleStatModifier(UNIT_MOD_ARMOR, modType, float(armor), apply);
     }
 
     // Add armor bonus from ArmorDamageModifier if > 0
     if (proto->ArmorDamageModifier > 0 && sScriptMgr->OnPlayerCanArmorDamageModifier(this))
-        HandleStatFlatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(proto->ArmorDamageModifier), apply);
+        HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(proto->ArmorDamageModifier), apply);
 
     if (proto->Block)
-        HandleBaseModFlatValue(SHIELD_BLOCK_VALUE, float(proto->Block), apply);
+        HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(proto->Block), apply);
 
     if (proto->HolyRes)
-        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, float(proto->HolyRes), apply);
+        HandleStatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, float(proto->HolyRes), apply);
 
     if (proto->FireRes)
-        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, float(proto->FireRes), apply);
+        HandleStatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, float(proto->FireRes), apply);
 
     if (proto->NatureRes)
-        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(proto->NatureRes), apply);
+        HandleStatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(proto->NatureRes), apply);
 
     if (proto->FrostRes)
-        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, float(proto->FrostRes), apply);
+        HandleStatModifier(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, float(proto->FrostRes), apply);
 
     if (proto->ShadowRes)
-        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(proto->ShadowRes), apply);
+        HandleStatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(proto->ShadowRes), apply);
 
     if (proto->ArcaneRes)
-        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(proto->ArcaneRes), apply);
+        HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(proto->ArcaneRes), apply);
 
     WeaponAttackType attType = Player::GetAttackBySlot(slot);
     if (attType != MAX_ATTACK)
@@ -7111,84 +7036,6 @@ void Player::UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot)
         ApplyItemObtainSpells(item, true);
 }
 
-// this one rechecks weapon auras and stores them in BaseModGroup container
-// needed for things like axe specialization applying only to axe weapons in case of dual-wield
-void Player::UpdateWeaponDependentCritAuras(WeaponAttackType attackType)
-{
-    BaseModGroup modGroup;
-    switch (attackType)
-    {
-        case BASE_ATTACK:
-            modGroup = CRIT_PERCENTAGE;
-            break;
-        case OFF_ATTACK:
-            modGroup = OFFHAND_CRIT_PERCENTAGE;
-            break;
-        case RANGED_ATTACK:
-            modGroup = RANGED_CRIT_PERCENTAGE;
-            break;
-        default:
-            ABORT();
-            break;
-    }
-
-    float amount = 0.0f;
-    amount += GetTotalAuraModifier(SPELL_AURA_MOD_WEAPON_CRIT_PERCENT, std::bind(&Unit::CheckAttackFitToAuraRequirement, this, attackType, std::placeholders::_1));
-
-    // these auras don't have item requirement (only Combat Expertise in 3.3.5a)
-    amount += GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_PCT);
-
-    SetBaseModFlatValue(modGroup, amount);
-}
-
-void Player::UpdateAllWeaponDependentCritAuras()
-{
-    for (uint8 i = BASE_ATTACK; i < MAX_ATTACK; ++i)
-        UpdateWeaponDependentCritAuras(WeaponAttackType(i));
-}
-
-void Player::UpdateWeaponDependentAuras(WeaponAttackType attackType)
-{
-    UpdateWeaponDependentCritAuras(attackType);
-    UpdateDamageDoneMods(attackType);
-    UpdateDamagePctDoneMods(attackType);
-}
-
-void Player::ApplyItemDependentAuras(Item* item, bool apply)
-{
-    if (apply)
-    {
-        PlayerSpellMap const& spells = GetSpellMap();
-        for (auto itr = spells.begin(); itr != spells.end(); ++itr)
-        {
-            if (itr->second->State == PLAYERSPELL_REMOVED)
-                continue;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
-            if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
-                continue;
-
-            if (!HasAura(itr->first) && HasItemFitToSpellRequirements(spellInfo))
-                AddAura(itr->first, this);  // no SMSG_SPELL_GO in sniff found
-        }
-    }
-    else
-        RemoveItemDependentAurasAndCasts(item);
-}
-
-bool Player::CheckAttackFitToAuraRequirement(WeaponAttackType attackType, AuraEffect const* aurEff) const
-{
-    SpellInfo const* spellInfo = aurEff->GetSpellInfo();
-    if (spellInfo->EquippedItemClass == -1)
-        return true;
-
-    Item* item = GetWeaponForAttack(attackType, true);
-    if (!item || !item->IsFitToSpellRequirements(spellInfo))
-        return false;
-
-    return true;
-}
-
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const
 {
     if (Item const* weapon = GetWeaponForAttack(attackType, true))
@@ -7197,6 +7044,110 @@ SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*=
     }
 
     return SPELL_SCHOOL_MASK_NORMAL;
+}
+
+void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply)
+{
+    AuraEffectList const& auraCritList = GetAuraEffectsByType(SPELL_AURA_MOD_WEAPON_CRIT_PERCENT);
+    for (AuraEffectList::const_iterator itr = auraCritList.begin(); itr != auraCritList.end(); ++itr)
+        _ApplyWeaponDependentAuraCritMod(item, attackType, *itr, apply);
+
+    AuraEffectList const& auraDamageFlatList = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_DONE);
+    for (AuraEffectList::const_iterator itr = auraDamageFlatList.begin(); itr != auraDamageFlatList.end(); ++itr)
+        _ApplyWeaponDependentAuraDamageMod(item, attackType, *itr, apply);
+
+    AuraEffectList const& auraDamagePctList = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+    for (AuraEffectList::const_iterator itr = auraDamagePctList.begin(); itr != auraDamagePctList.end(); ++itr)
+        _ApplyWeaponDependentAuraDamageMod(item, attackType, *itr, apply);
+}
+
+void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply)
+{
+    // don't apply mod if item is broken or cannot be used
+    if (item->IsBroken() || !CanUseAttackType(attackType))
+        return;
+
+    // generic not weapon specific case processes in aura code
+    if (aura->GetSpellInfo()->EquippedItemClass == -1)
+        return;
+
+    if (!sScriptMgr->OnPlayerCanApplyWeaponDependentAuraDamageMod(this, item, attackType, aura, apply))
+        return;
+
+    BaseModGroup mod = BASEMOD_END;
+    switch (attackType)
+    {
+        case BASE_ATTACK:
+            mod = CRIT_PERCENTAGE;
+            break;
+        case OFF_ATTACK:
+            mod = OFFHAND_CRIT_PERCENTAGE;
+            break;
+        case RANGED_ATTACK:
+            mod = RANGED_CRIT_PERCENTAGE;
+            break;
+        default:
+            return;
+    }
+
+    if (item->IsFitToSpellRequirements(aura->GetSpellInfo()))
+        HandleBaseModValue(mod, FLAT_MOD, float (aura->GetAmount()), apply);
+}
+
+void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply)
+{
+    // don't apply mod if item is broken or cannot be used
+    if (item->IsBroken() || !CanUseAttackType(attackType))
+        return;
+
+    // ignore spell mods for not wands
+    if ((aura->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) == 0 && (getClassMask() & CLASSMASK_WAND_USERS) == 0)
+        return;
+
+    // generic not weapon specific case processes in aura code
+    if (aura->GetSpellInfo()->EquippedItemClass == -1)
+        return;
+
+    UnitMods unitMod = UNIT_MOD_END;
+    switch (attackType)
+    {
+        case BASE_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_MAINHAND;
+            break;
+        case OFF_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_OFFHAND;
+            break;
+        case RANGED_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_RANGED;
+            break;
+        default:
+            return;
+    }
+
+    UnitModifierType unitModType = TOTAL_VALUE;
+    switch (aura->GetAuraType())
+    {
+        case SPELL_AURA_MOD_DAMAGE_DONE:
+            unitModType = TOTAL_VALUE;
+            break;
+        case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
+            unitModType = TOTAL_PCT;
+            break;
+        default:
+            return;
+    }
+
+    if (item->IsFitToSpellRequirements(aura->GetSpellInfo()))
+    {
+        HandleStatModifier(unitMod, unitModType, float(aura->GetAmount()), apply);
+        if (unitModType == TOTAL_VALUE)
+        {
+            if (aura->GetAmount() > 0)
+                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, aura->GetAmount(), apply);
+            else
+                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG, aura->GetAmount(), apply);
+        }
+    }
 }
 
 void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
@@ -7513,6 +7464,12 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
             continue;
         }
 
+        if (!spellInfo->CheckElixirStacking(this))
+        {
+            Spell::SendCastResult(this, spellInfo, cast_count, SPELL_FAILED_AURA_BOUNCED);
+            continue;
+        }
+
         Spell* spell = new Spell(this, spellInfo, (count > 0) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
         spell->m_CastItem = item;
         spell->m_cast_count = cast_count;                   // set count of casts
@@ -7621,7 +7578,10 @@ void Player::_RemoveAllItemMods()
             if (!proto)
                 continue;
 
-            ApplyItemDependentAuras(m_items[i], false);
+            WeaponAttackType attacktype = Player::GetAttackBySlot(i);
+            if (attacktype < MAX_ATTACK)
+                _ApplyWeaponDependentAuraMods(m_items[i], attacktype, false);
+
             _ApplyItemBonuses(proto, i, false);
 
             if (i == EQUIPMENT_SLOT_RANGED)
@@ -7647,12 +7607,11 @@ void Player::_ApplyAllItemMods()
             if (!proto)
                 continue;
 
-            ApplyItemDependentAuras(m_items[i], false);
-            _ApplyItemBonuses(proto, i, true);
+            WeaponAttackType attacktype = Player::GetAttackBySlot(i);
+            if (attacktype < MAX_ATTACK)
+                _ApplyWeaponDependentAuraMods(m_items[i], attacktype, true);
 
-            WeaponAttackType const attackType = Player::GetAttackBySlot(i);
-            if (attackType != MAX_ATTACK)
-                UpdateWeaponDependentAuras(attackType);
+            _ApplyItemBonuses(proto, i, true);
 
             if (i == EQUIPMENT_SLOT_RANGED)
                 _ApplyAmmoBonuses();
@@ -12624,9 +12583,9 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
     {
         Aura* aura = itr->second;
 
-        // skip not self applied auras
+        // skip passive (passive item dependent spells work in another way) and not self applied auras
         SpellInfo const* spellInfo = aura->GetSpellInfo();
-        if (aura->GetCasterGUID() != GetGUID())
+        if (aura->IsPassive() ||  aura->GetCasterGUID() != GetGUID())
         {
             ++itr;
             continue;

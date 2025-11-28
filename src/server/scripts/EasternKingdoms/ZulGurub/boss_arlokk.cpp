@@ -78,10 +78,6 @@ Position const PosMoveOnSpawn[1] =
     { -11561.9f, -1627.868f, 41.29941f, 0.0f }
 };
 
-// hack
-float const DamageIncrease = 35.0f;
-float const DamageDecrease = 100.f / (1.f + DamageIncrease / 100.f) - 100.f;
-
 class boss_arlokk : public CreatureScript
 {
 public:
@@ -94,7 +90,7 @@ public:
         void Reset() override
         {
             if (events.IsInPhase(PHASE_TWO))
-                me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageDecrease); // hack
+                me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
             _Reset();
             _summonCountA = 0;
             _summonCountB = 0;
@@ -257,7 +253,7 @@ public:
                         events.ScheduleEvent(EVENT_RAVAGE, 10s, 14s, 0, PHASE_TWO);
                         events.ScheduleEvent(EVENT_TRANSFORM_BACK, 30s, 40s, 0, PHASE_TWO);
                         events.SetPhase(PHASE_TWO);
-                        me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageIncrease); // hack
+                        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
                         break;
                     case EVENT_RAVAGE:
                         DoCastVictim(SPELL_RAVAGE, true);
@@ -269,7 +265,7 @@ public:
                             DoCast(me, SPELL_VANISH_VISUAL);
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_DAGGER));
                             me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(WEAPON_DAGGER));
-                            me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageDecrease); // hack
+                            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
                             events.ScheduleEvent(EVENT_SHADOW_WORD_PAIN, 4s, 7s, 0, PHASE_ONE);
                             events.ScheduleEvent(EVENT_GOUGE, 12s, 15s, 0, PHASE_ONE);
                             events.ScheduleEvent(EVENT_TRANSFORM, 30s, 0, PHASE_ONE);

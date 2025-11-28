@@ -473,7 +473,11 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
     {
         Unit* target = GetTarget();
         if (Unit* caster = GetCaster())
-            caster->CastSpell(target, SPELL_PALADIN_BLESSING_OF_SANCTUARY_BUFF, true);
+        {
+            // xinef: hack
+            int32 value = 9;
+            caster->CastCustomSpell(target, SPELL_PALADIN_BLESSING_OF_SANCTUARY_BUFF, &value, &value, 0, true);
+        }
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

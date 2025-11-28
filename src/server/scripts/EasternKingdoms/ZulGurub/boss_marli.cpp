@@ -73,10 +73,6 @@ enum Misc
     GO_SPIDER_EGGS            = 179985,
 };
 
-// hack
-float const DamageIncrease = 35.0f;
-float const DamageDecrease = 100.f / (1.f + DamageIncrease / 100.f) - 100.f;
-
 // High Priestess Mar'li (14510)
 struct boss_marli : public BossAI
 {
@@ -88,7 +84,7 @@ public:
         if (_phase == PHASE_SPIDER)
         {
             me->RemoveAura(SPELL_SPIDER_FORM);
-            me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageDecrease);
+            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false);
             _phase = PHASE_TROLL;
         }
 
@@ -147,7 +143,7 @@ private:
             me->RemoveAura(SPELL_SPIDER_FORM);
             DoCastSelf(SPELL_TRANSFORM_BACK, true);
             Talk(SAY_TRANSFORM_BACK);
-            me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageDecrease);
+            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false);
 
             scheduler.CancelGroup(PHASE_SPIDER);
         }
@@ -190,7 +186,7 @@ private:
 
         Talk(SAY_TRANSFORM);
         DoCastSelf(SPELL_SPIDER_FORM, true);
-        me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageIncrease);
+        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true);
 
         scheduler.Schedule(5s, PHASE_SPIDER, [this](TaskContext context)
         {

@@ -21,7 +21,6 @@
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 
 // KillRewarder incapsulates logic of rewarding player upon kill with:
@@ -163,7 +162,9 @@ void KillRewarder::_RewardXP(Player* player, float rate)
     if (xp)
     {
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
-        xp *= player->GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_PCT);
+        Unit::AuraEffectList const& auras = player->GetAuraEffectsByType(SPELL_AURA_MOD_XP_PCT);
+        for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+            AddPct(xp, (*i)->GetAmount());
 
         // 4.2.3. Give XP to player.
         sScriptMgr->OnPlayerGiveXP(player, xp, _victim, PlayerXPSource::XPSOURCE_KILL);
