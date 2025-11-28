@@ -1,4205 +1,1226 @@
--- Update esMX ; from WowHead WOTLK+ / Retail
--- OLD name : Matón sin cerebro
--- Source : https://www.wowhead.com/wotlk/mx/npc=38
-UPDATE `creature_template_locale` SET `Name` = 'Matón Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38;
--- OLD name : [UNUSED] Ciudadano de clase baja (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=70
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 70;
--- OLD name : [UNUSED] Vashaum Nochemustia (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=75
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 75;
--- OLD name : [UNUSED] Luglar el Obstructor (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=81
-UPDATE `creature_template_locale` SET `Name` = 'Vacaciones - Halloween - Fortaleza - Elemental espectral',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 81;
--- OLD name : Ratero
--- Source : https://www.wowhead.com/wotlk/mx/npc=94
-UPDATE `creature_template_locale` SET `Name` = 'Ratero Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 94;
--- OLD name : Bandido
--- Source : https://www.wowhead.com/wotlk/mx/npc=116
-UPDATE `creature_template_locale` SET `Name` = 'Bandido Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 116;
--- OLD name : [UNUSED] Pequeña cría de dragón Negro (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=149
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 149;
--- OLD name : [UNUSED] Ander el Monje (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=161
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 161;
--- OLD name : [UNUSED] Granjero desposeído (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=163
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 163;
--- OLD name : [UNUSED] Niño pequeño (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=165
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 165;
--- OLD name : Horror en podredumbre
--- Source : https://www.wowhead.com/wotlk/mx/npc=202
-UPDATE `creature_template_locale` SET `Name` = 'Horror esquelético',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 202;
--- OLD name : [UNUSED] Risillas Fogóseo (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=204
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 204;
--- OLD name : [UNUSED] Desollador Zarparrío (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=207
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 207;
--- OLD name : [UNUSED] Depositario Zarparrío (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=208
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 208;
--- OLD name : [UNUSED] Huesocorista Garrarío (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=209
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 209;
--- OLD name : Thornton Fellwood (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=230
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 230;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (230, 'esMX','PNJs',NULL,0);
--- OLD name : Alguacil Gryan Mantorrecio, subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=234
-UPDATE `creature_template_locale` SET `Name` = 'Gryan Mantorrecio',`Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 234;
--- OLD name : [UNUSED] Greeby Vellolodo TEST (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=243
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 243;
--- OLD name : [UNUSED] Guardia de Torre de Elwynn (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=260
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 260;
--- OLD name : [DND] Wounded Lion's Footman (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=262
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 262;
--- OLD name : [UNUSED] Jans Buenamadre (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=296
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 296;
--- OLD name : Lobo joven
--- Source : https://www.wowhead.com/wotlk/mx/npc=299
-UPDATE `creature_template_locale` SET `Name` = 'Lobo joven malsano',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 299;
--- OLD name : [UNUSED] Brog'Mud (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=301
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 301;
--- OLD name : [UNUSED] Hermano Akil (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=318
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 318;
--- OLD name : [UNUSED] Hermano Benthas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=319
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 319;
--- OLD name : [UNUSED] Hermano Cryus (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=320
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 320;
--- OLD name : [UNUSED] Hermano Deros (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=321
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 321;
--- OLD name : [UNUSED] Hermano Enoch (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=322
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 322;
--- OLD name : [UNUSED] Hermano Lontananza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=323
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 323;
--- OLD name : [UNUSED] Hermano Greishan (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=324
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 324;
--- OLD name : [UNUSED] Hermano Ictharin (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=326
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 326;
--- OLD name : [UNUSED] Eduardo el Bufón (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=333
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 333;
--- OLD name : [UNUSED] Rin Tal'Vara (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=336
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 336;
--- OLD name : [UNUSED] Helgor el Púgil (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=339
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 339;
--- OLD subname : Waitress
--- Source : https://www.wowhead.com/wotlk/mx/npc=379
-UPDATE `creature_template_locale` SET `Title` = 'Camarera',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 379;
--- OLD name : [UNUSED] Waldin Thorbatt (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=380
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 380;
--- OLD name : Niño - placeholder 05 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=399
-UPDATE `creature_template_locale` SET `Name` = 'Tipo de la patrulla',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 399;
--- OLD name : Niño - placeholder 06 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=400
-UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 400;
--- OLD name : Niño - placeholder 07 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=401
-UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 401;
--- OLD name : Niño - placeholder 08 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=402
-UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 402;
--- OLD name : Niño - placeholder 09 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=403
-UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 403;
--- OLD name : Gocho (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=444
-UPDATE `creature_template_locale` SET `Name` = 'Lord Cerdito',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 444;
--- OLD subname : Instructora de brujos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=461
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 461;
--- OLD name : Capitán de la Avanzada Parker
--- Source : https://www.wowhead.com/wotlk/mx/npc=464
-UPDATE `creature_template_locale` SET `Name` = 'Guardia Parker',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 464;
--- OLD name : [UNUSED] Escriba Colburg (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=470
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 470;
--- OLD name : Zahorí bribón
--- Source : https://www.wowhead.com/wotlk/mx/npc=474
-UPDATE `creature_template_locale` SET `Name` = 'Zahorí bribón de Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 474;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=487
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 487;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=488
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 488;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=489
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 489;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=490
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 490;
--- OLD name : [UNUSED] Vigía Kleeman (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=496
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 496;
--- OLD name : [UNUSED] Vigía Benjamín (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=497
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 497;
--- OLD name : [UNUSED] Vigía Larsen (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=498
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 498;
--- OLD name : [UNUSED] Colmillolargo (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=509
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 509;
--- OLD name : [UNUSED] Cazadir Zarparrío (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=516
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 516;
--- OLD name : [UNUSED] Savar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=535
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 535;
--- OLD name : [UNUSED] Rhal'Del (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=536
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 536;
--- OLD name : [UNUSED] Buk'Cha (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=538
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 538;
--- OLD name : Califex del Bosque profundo, subname : Instructor de druidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=542
-UPDATE `creature_template_locale` SET `Name` = 'PNJs',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 542;
--- OLD name : Emboscador
--- Source : https://www.wowhead.com/wotlk/mx/npc=583
-UPDATE `creature_template_locale` SET `Name` = 'Emboscador Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 583;
--- OLD name : [UNUSED] Vigía Kern (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=586
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 586;
--- OLD name : [UNUSED] Pirómano Defias (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=592
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 592;
--- OLD name : [UNUSED] Sr. Whipple (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=605
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 605;
--- OLD name : [UNUSED] Sra. Whipple (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=606
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 606;
--- OLD name : [UNUSED] Johnny Whipple (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=607
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 607;
--- OLD name : [UNUSED] Abuelo Whipple (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=609
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 609;
--- OLD name : [UNUSED] Gina Whipple rabiosa (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=610
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 610;
--- OLD name : [UNUSED] Sr. Whipple rabioso (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=611
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 611;
--- OLD name : [UNUSED] Sra.Whipple rabiosa (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=612
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 612;
--- OLD name : [UNUSED] Johnny Whipple rabioso (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=613
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 613;
--- OLD name : [UNUSED] Abuelo Whipple rabioso (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=614
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 614;
--- OLD name : Tío de prueba de pnagle (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=631
-UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 631;
--- OLD name : General Fangore
--- Source : https://www.wowhead.com/wotlk/mx/npc=703
-UPDATE `creature_template_locale` SET `Name` = 'Teniente Fangore',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 703;
--- OLD name : [UNUSED] Déspota esquelético (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=725
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 725;
--- OLD name : [UNUSED] Soldado Rebelde (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=753
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 753;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=820
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 820;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=821
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 821;
--- OLD name : Sargento Willem
--- Source : https://www.wowhead.com/wotlk/mx/npc=823
-UPDATE `creature_template_locale` SET `Name` = 'Ayudante de alguacil Willem',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 823;
--- OLD name : Ciclón desatado
--- Source : https://www.wowhead.com/wotlk/mx/npc=832
-UPDATE `creature_template_locale` SET `Name` = 'Diablo de polvo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 832;
--- OLD name : Harl Cutter (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=841
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 841;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (841, 'esMX','PNJs',NULL,0);
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=869
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 869;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=870
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 870;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=874
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 874;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=876
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 876;
--- OLD subname : La Brigada de los Páramos de Poniente
--- Source : https://www.wowhead.com/wotlk/mx/npc=878
-UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 878;
--- OLD name : [UNUSED] Arácnido inferior (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=924
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 924;
--- OLD name : [UNUSED] Truek (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=1058
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 1058;
--- OLD subname : NONE (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=1156
-UPDATE `creature_template_locale` SET `Title` = 'Tabernera',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1156;
--- OLD name : Déspota Mo'grosh (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=1179
-UPDATE `creature_template_locale` SET `Name` = 'Agente Mo''grosh',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1179;
--- OLD name : Oso negro
--- Source : https://www.wowhead.com/wotlk/mx/npc=1186
-UPDATE `creature_template_locale` SET `Name` = 'Oso negro mayor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1186;
--- OLD subname : Mercader de arcos
--- Source : https://www.wowhead.com/wotlk/mx/npc=1298
-UPDATE `creature_template_locale` SET `Title` = 'Mercader de arcos y flechas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1298;
--- OLD name : [UNUSED] Kern el Déspota (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=1361
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1361;
--- OLD subname : Instructor de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=1382
-UPDATE `creature_template_locale` SET `Title` = 'Cocinero superior',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1382;
--- OLD subname : Instructor de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=1430
-UPDATE `creature_template_locale` SET `Title` = 'Cocinero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1430;
--- OLD name : [UNUSED] Grummar Thunk (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=1455
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 1455;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (1455, 'esMX','PNJs',NULL,0);
--- OLD name : Gorila Lomoblanco iracundo
--- Source : https://www.wowhead.com/wotlk/mx/npc=1511
-UPDATE `creature_template_locale` SET `Name` = 'Gorila Lomoplata iracundo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1511;
--- OLD name : Patriarca Lomoblanco
--- Source : https://www.wowhead.com/wotlk/mx/npc=1558
-UPDATE `creature_template_locale` SET `Name` = 'Patriarca Lomoplata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1558;
--- OLD name : [UNUSED] Guardia de Elwynn (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=1643
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 1643;
--- OLD name : [UNUSED] Guardia de Crestagrana (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=1644
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 1644;
--- OLD name : [UNUSED] Curtis Cierreniza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=1677
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 1677;
--- OLD name : Prisionero
--- Source : https://www.wowhead.com/wotlk/mx/npc=1706
-UPDATE `creature_template_locale` SET `Name` = 'Prisionero Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1706;
--- OLD name : Presidiario
--- Source : https://www.wowhead.com/wotlk/mx/npc=1711
-UPDATE `creature_template_locale` SET `Name` = 'Presidiario Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1711;
--- OLD name : Insurgente
--- Source : https://www.wowhead.com/wotlk/mx/npc=1715
-UPDATE `creature_template_locale` SET `Name` = 'Insurgente Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1715;
--- OLD name : Gran almirante Jes-Tereth (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=1750
-UPDATE `creature_template_locale` SET `Name` = 'Gran Almirante Jes-Tereth',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1750;
--- OLD name : Huargo rabioso
--- Source : https://www.wowhead.com/wotlk/mx/npc=1766
-UPDATE `creature_template_locale` SET `Name` = 'Huargo jaspeado',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1766;
--- OLD name : Vigía de Molino Ámbar
--- Source : https://www.wowhead.com/wotlk/mx/npc=1888
-UPDATE `creature_template_locale` SET `Name` = 'Vigía de Dalaran',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1888;
--- OLD name : Zahorí de Molino Ámbar
--- Source : https://www.wowhead.com/wotlk/mx/npc=1889
-UPDATE `creature_template_locale` SET `Name` = 'Zahorí de Dalaran',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1889;
--- OLD name : [UNUSED] Ciudadano de Molino Ámbar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2087
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2087;
--- OLD name : [UNUSED] Pregonero Kirton (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2197
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2197;
--- OLD name : [UNUSED] Pregonero Backus (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2199
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2199;
--- OLD name : [UNUSED] Pregonero Pierce (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2200
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2200;
--- OLD name : [UNUSED] Instructor no-muerto de herreros (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2220
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2220;
--- OLD name : [UNUSED] Instructor no-muerto de cocineros (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2223
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2223;
--- OLD name : Bow Guy (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=2286
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2286;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (2286, 'esMX','PNJs',NULL,0);
--- OLD name : [UNUSED] Kir'Nazz (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2313
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2313;
--- OLD subname : Instructor de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=2326
-UPDATE `creature_template_locale` SET `Title` = 'Médico',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2326;
--- OLD subname : Instructora de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=2329
-UPDATE `creature_template_locale` SET `Title` = 'Médica',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2329;
--- OLD name : Trepador domesticado
--- Source : https://www.wowhead.com/wotlk/mx/npc=2349
-UPDATE `creature_template_locale` SET `Name` = 'Trepamusgo gigante',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2349;
--- OLD name : Trepador del bosque
--- Source : https://www.wowhead.com/wotlk/mx/npc=2350
-UPDATE `creature_template_locale` SET `Name` = 'Trepamusgo del bosque',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2350;
--- OLD name : Oso contagiado
--- Source : https://www.wowhead.com/wotlk/mx/npc=2351
-UPDATE `creature_template_locale` SET `Name` = 'Oso gris',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2351;
--- OLD name : Acechador Trabaloma
--- Source : https://www.wowhead.com/wotlk/mx/npc=2385
-UPDATE `creature_template_locale` SET `Name` = 'León de montaña feral',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2385;
--- OLD name : Guardia de la Alianza
--- Source : https://www.wowhead.com/wotlk/mx/npc=2386
-UPDATE `creature_template_locale` SET `Name` = 'Guardia de Costasur',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2386;
--- OLD name : Guardia de la Muerte de Molino Tarren
--- Source : https://www.wowhead.com/wotlk/mx/npc=2405
-UPDATE `creature_template_locale` SET `Name` = 'Guardia de la Muerte del Molino Tarren',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2405;
--- OLD name : [UNUSED] Ciudadano de Costasur (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2441
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2441;
--- OLD subname : Enviado de Zanzil
--- Source : https://www.wowhead.com/wotlk/mx/npc=2530
-UPDATE `creature_template_locale` SET `Title` = 'Rehén Lanza Negra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2530;
--- OLD name : Soldado de Stromgarde
--- Source : https://www.wowhead.com/wotlk/mx/npc=2585
-UPDATE `creature_template_locale` SET `Name` = 'Vindicador de Stromgarde',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2585;
--- OLD name : [UNUSED] Archimago Detrae (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2617
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2617;
--- OLD name : Crocolisco Quijaforte mayor
--- Source : https://www.wowhead.com/wotlk/mx/npc=2635
-UPDATE `creature_template_locale` SET `Name` = 'Crocolisco marino mayor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2635;
--- OLD name : Port Master Szik (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=2662
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2662;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (2662, 'esMX','PNJs',NULL,0);
--- OLD subname : Suministros generales
--- Source : https://www.wowhead.com/wotlk/mx/npc=2808
-UPDATE `creature_template_locale` SET `Title` = 'Pertrechos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2808;
--- OLD name : [PH] Instructor de zancaaltas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2871
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2871;
--- OLD name : [PH] Instructor de raptores (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2873
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2873;
--- OLD name : [PH] Domador de caballos (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2874
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2874;
--- OLD name : [PH] Instructor de gorilas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2875
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2875;
--- OLD name : Grunenstur Balindom (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=2876
-UPDATE `creature_template_locale` SET `Name` = 'PNJs',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2876;
--- OLD name : [PH] Instructor de reptadores (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2877
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2877;
--- OLD name : Trogg Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=2889
-UPDATE `creature_template_locale` SET `Name` = 'Trogg grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2889;
--- OLD name : [PH] Instructora de poderes mágicos de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2896
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2896;
--- OLD name : [PH] Instructor de resistencia de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2899
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2899;
--- OLD name : Arqueóloga Hollee (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=2913
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2913;
--- OLD name : [PH] Maestro de demonios (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=2935
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2935;
--- OLD name : Jackson Bayne (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=2939
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 2939;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (2939, 'esMX','PNJs',NULL,0);
--- OLD subname : Suministros de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=3005
-UPDATE `creature_template_locale` SET `Title` = 'Suministros de sastrería y peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3005;
--- OLD subname : Suministros de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=3008
-UPDATE `creature_template_locale` SET `Title` = 'Oficial peletero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3008;
--- OLD name : [UNUSED] Guardia Narache (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3082
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3082;
--- OLD name : Reptador de espuma
--- Source : https://www.wowhead.com/wotlk/mx/npc=3106
-UPDATE `creature_template_locale` SET `Name` = 'Reptador de espuma pigmeo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3106;
--- OLD name : Reptador de espuma adulto
--- Source : https://www.wowhead.com/wotlk/mx/npc=3107
-UPDATE `creature_template_locale` SET `Name` = 'Reptador de espuma',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3107;
--- OLD name : Eric's AAA Special Vendor (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3200
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3200;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (3200, 'esMX','PNJs',NULL,0);
--- OLD name : Fizzle Garra Oscura
--- Source : https://www.wowhead.com/wotlk/mx/npc=3203
-UPDATE `creature_template_locale` SET `Name` = 'Fizzle Tormenta Oscura',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3203;
--- OLD name : Desvalijador Crines de Acero
--- Source : https://www.wowhead.com/wotlk/mx/npc=3267
-UPDATE `creature_template_locale` SET `Name` = 'Buscaqua Crines de Acero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3267;
--- OLD name : Anomalía de lodo
--- Source : https://www.wowhead.com/wotlk/mx/npc=3295
-UPDATE `creature_template_locale` SET `Name` = 'Bestia de lodo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3295;
--- OLD subname : Mercader de armaduras de tela
--- Source : https://www.wowhead.com/wotlk/mx/npc=3317
-UPDATE `creature_template_locale` SET `Title` = 'Mercader de armaduras ligeras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3317;
--- OLD subname : Vendedora de arcos y rifles
--- Source : https://www.wowhead.com/wotlk/mx/npc=3322
-UPDATE `creature_template_locale` SET `Title` = 'Mercader de armas de fuego y municiones',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3322;
--- OLD subname : Venenos y componentes
--- Source : https://www.wowhead.com/wotlk/mx/npc=3405
-UPDATE `creature_template_locale` SET `Title` = 'Suministros de herboristería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3405;
--- OLD name : [UNUSED] Vigía Ancestral (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3420
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3420;
--- OLD name : [UNUSED] Kendur (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3427
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3427;
--- OLD name : [UNUSED] Sabio Ancestral (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3440
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3440;
--- OLD subname : Contratista independiente
--- Source : https://www.wowhead.com/wotlk/mx/npc=3442
-UPDATE `creature_template_locale` SET `Title` = 'Gremio de manitas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3442;
--- OLD name : Robovigilante, versión 1
--- Source : https://www.wowhead.com/wotlk/mx/npc=3538
-UPDATE `creature_template_locale` SET `Name` = 'Robovigilante Mark I',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3538;
--- OLD name : [UNUSED] Observador Kolkar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3651
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3651;
--- OLD name : Centinela Elissa Brisa Estelar (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3657
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3657;
--- OLD name : Delgren el Purificador (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3663
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3663;
--- OLD name : Ilkrud Magthrull (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3664
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3664;
--- OLD name : Muyoh
--- Source : https://www.wowhead.com/wotlk/mx/npc=3678
-UPDATE `creature_template_locale` SET `Name` = 'Discípulo de Naralex',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3678;
--- OLD name : Kyln Longclaw (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3697
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3697;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (3697, 'esMX','PNJs',NULL,0);
--- OLD name : Déspota de la Facción Oscura (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3727
-UPDATE `creature_template_locale` SET `Name` = 'Agente de la Facción Oscura',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3727;
--- OLD name : Teldira Plumalunar
--- Source : https://www.wowhead.com/wotlk/mx/npc=3841
-UPDATE `creature_template_locale` SET `Name` = 'Caylais Plumalunar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3841;
--- OLD name : [UNUSED] Aullasangre Colmillo Oscuro (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3852
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3852;
--- OLD name : [UNUSED] Corrupto Colmillo Oscuro (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3860
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3860;
--- OLD name : [UNUSED] Espíritu traumatizado (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=3876
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 3876;
--- OLD name : Tótem abrasador IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3904
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem abrasador IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3904;
--- OLD name : Tótem Corriente de sanación III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3907
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Corriente de sanación III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3907;
--- OLD subname : General del ejército de los centinelas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3936
-UPDATE `creature_template_locale` SET `Title` = 'General del ejército centinela',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3936;
--- OLD subname : Vendedora de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=3961
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3961;
--- OLD name : Corremanadas Galak (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4098
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4098;
--- OLD name : Maleante Galak
--- Source : https://www.wowhead.com/wotlk/mx/npc=4099
-UPDATE `creature_template_locale` SET `Name` = 'Merodeador Galak',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4099;
--- OLD name : Emboscador Gravamorro (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4115
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4115;
--- OLD name : Invasor silítido (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4131
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4131;
--- OLD name : Tortuga Brillavalva (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=4142
-UPDATE `creature_template_locale` SET `Name` = 'Tortuga brillavalva',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4142;
--- OLD name : Sacudidor Brillavalva
--- Source : https://www.wowhead.com/wotlk/mx/npc=4143
-UPDATE `creature_template_locale` SET `Name` = 'Mordedor brillavalva',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4143;
--- OLD name : Cavapozos Brillavalva
--- Source : https://www.wowhead.com/wotlk/mx/npc=4144
-UPDATE `creature_template_locale` SET `Name` = 'Cazapozos brillavalva',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4144;
--- OLD name : Basilisco Gapo Salino
--- Source : https://www.wowhead.com/wotlk/mx/npc=4147
-UPDATE `creature_template_locale` SET `Name` = 'Basilisco Piedra de sal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4147;
--- OLD name : Observador Gapo Salino
--- Source : https://www.wowhead.com/wotlk/mx/npc=4150
-UPDATE `creature_template_locale` SET `Name` = 'Observador Piedra de sal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4150;
--- OLD name : Vitropiel Gapo Salino
--- Source : https://www.wowhead.com/wotlk/mx/npc=4151
-UPDATE `creature_template_locale` SET `Name` = 'Vitropiel Piedra de sal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4151;
--- OLD name : Kitari Buscalongo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4157
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDKitari Buscalongo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4157;
--- OLD subname : Vendedora de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4167
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4167;
--- OLD name : Siannai (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4174
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 4174;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (4174, 'esMX','PNJs',NULL,0);
--- OLD subname : Vendedora de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4181
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4181;
--- OLD subname : Vendedora de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4191
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4191;
--- OLD subname : Vendedora de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4195
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4195;
--- OLD subname : Instructor de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4211
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4211;
--- OLD name : Talegon (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4224
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 4224;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (4224, 'esMX','PNJs',NULL,0);
--- OLD subname : Vendedora de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4266
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4266;
--- OLD name : Adivino Escarlata
--- Source : https://www.wowhead.com/wotlk/mx/npc=4291
-UPDATE `creature_template_locale` SET `Name` = 'Adivinador Escarlata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4291;
--- OLD name : [UNUSED] [PH] Embajador Saylaton Pezuñamorta (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=4313
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 4313;
--- OLD name : [UNUSED] Guthrin Pezuñamorta (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=4315
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 4315;
--- OLD name : Delyka (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4318
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4318;
--- OLD name : Bestia de lodazal Parramustia
--- Source : https://www.wowhead.com/wotlk/mx/npc=4387
-UPDATE `creature_template_locale` SET `Name` = 'Lodobestia Parramustia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4387;
--- OLD name : Rondador Colmiumbrío (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4411
-UPDATE `creature_template_locale` SET `Name` = 'Rondador Colmillo umbrío',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4411;
--- OLD name : Araña Colmiumbrío (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4413
-UPDATE `creature_template_locale` SET `Name` = 'Araña Colmillo umbrío',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4413;
--- OLD name : Race Master Kronkrider
--- Source : https://www.wowhead.com/wotlk/mx/npc=4419
-UPDATE `creature_template_locale` SET `Name` = 'Maestro del circuito Kronkpiloto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4419;
--- OLD name : Wazza (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4443
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 4443;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (4443, 'esMX','PNJs',NULL,0);
--- OLD name : Griznak (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4445
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4445;
--- OLD name : Mazzer Quitaclavos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4446
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4446;
--- OLD name : Crazzle Engranágil (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4449
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4449;
--- OLD name : Alfombriz (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4450
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4450;
--- OLD name : Visión mortificadora
--- Source : https://www.wowhead.com/wotlk/mx/npc=4472
-UPDATE `creature_template_locale` SET `Name` = 'Visión encantada',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4472;
--- OLD subname : Instructora de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=4578
-UPDATE `creature_template_locale` SET `Title` = 'Sastre de tejido de sombra maestra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4578;
--- OLD name : Alexander Lister (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4579
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDAlexander Lister',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4579;
--- OLD name : Guardia Argenta Thaelrid, subname : El Alba Argenta (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4787
-UPDATE `creature_template_locale` SET `Name` = 'Explorador Thaelrid',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4787;
--- OLD name : Rondador Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4850
-UPDATE `creature_template_locale` SET `Name` = 'Rondador grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4850;
--- OLD name : Masticapiedras Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4851
-UPDATE `creature_template_locale` SET `Name` = 'Masticapiedras grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4851;
--- OLD name : Oráculo Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4852
-UPDATE `creature_template_locale` SET `Name` = 'Oráculo grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4852;
--- OLD name : Geomántico Grutacanto (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4853
-UPDATE `creature_template_locale` SET `Name` = 'Geomante grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4853;
--- OLD subname : Jefe Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4854
-UPDATE `creature_template_locale` SET `Title` = 'Jefe grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4854;
--- OLD name : Camorrista Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4855
-UPDATE `creature_template_locale` SET `Name` = 'Camorrista grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4855;
--- OLD name : Cazador de las cuevas Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=4856
-UPDATE `creature_template_locale` SET `Name` = 'Cazador de las cuevas grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4856;
--- OLD subname : Instructora de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=4888
-UPDATE `creature_template_locale` SET `Title` = 'Forjadora de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4888;
--- OLD subname : Instructor de cazadores y arquero
--- Source : https://www.wowhead.com/wotlk/mx/npc=4892
-UPDATE `creature_template_locale` SET `Title` = 'Fabricante de arcos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4892;
--- OLD subname : Instructor de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=4894
-UPDATE `creature_template_locale` SET `Title` = 'Cocinero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4894;
--- OLD subname : Pertrechos y componentes
--- Source : https://www.wowhead.com/wotlk/mx/npc=4896
-UPDATE `creature_template_locale` SET `Title` = 'Pertrechos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4896;
--- OLD name : Culebra de agua
--- Source : https://www.wowhead.com/wotlk/mx/npc=4953
-UPDATE `creature_template_locale` SET `Name` = 'Mocasín',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4953;
--- OLD name : World Boar Trainer (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5002
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5002;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (5002, 'esMX','PNJs',NULL,0);
--- OLD name : [PH] Barrera de dolor mogu (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5027
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5027;
--- OLD name : Instructora mundial de cartografía (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5035
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWorld Cartography Trainer',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5035;
--- OLD name : Alborotador
--- Source : https://www.wowhead.com/wotlk/mx/npc=5043
-UPDATE `creature_template_locale` SET `Name` = 'Alborotador Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5043;
--- OLD subname : Diseñadora de tabardos de hermandad (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5047
-UPDATE `creature_template_locale` SET `Title` = 'Diseñadora de tabardos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5047;
--- OLD name : Pagador Lendry
--- Source : https://www.wowhead.com/wotlk/mx/npc=5083
-UPDATE `creature_template_locale` SET `Name` = 'Secretario Lendry',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5083;
--- OLD name : Dolkin Yelmorrisco
--- Source : https://www.wowhead.com/wotlk/mx/npc=5125
-UPDATE `creature_template_locale` SET `Name` = 'Dolkin Yelmorisco',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5125;
--- OLD name : Olthran Yelmorrisco
--- Source : https://www.wowhead.com/wotlk/mx/npc=5126
-UPDATE `creature_template_locale` SET `Name` = 'Olthran Yelmorisco',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5126;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=5164
-UPDATE `creature_template_locale` SET `Title` = 'Forjador de armaduras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5164;
--- OLD name : Déspota Gordunni (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5231
-UPDATE `creature_template_locale` SET `Name` = 'Agente Gordunni',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5231;
--- OLD name : depositario arbóreo Jademir (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=5319
-UPDATE `creature_template_locale` SET `Name` = 'Depositario arbóreo Jademir',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5319;
--- OLD subname : Instructor de joyería y suministros
--- Source : https://www.wowhead.com/wotlk/mx/npc=5388
-UPDATE `creature_template_locale` SET `Title` = 'Liga de Expedicionarios',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5388;
--- OLD name : Déspota Machacaduna (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5472
-UPDATE `creature_template_locale` SET `Name` = 'Agente Machacaduna',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5472;
--- OLD subname : Instructora de brujos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5495
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5495;
--- OLD subname : Instructor de brujos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5496
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5496;
--- OLD subname : Instructor de druidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5504
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5504;
--- OLD subname : Instructor de druidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5505
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5505;
--- OLD subname : Instructor de druidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5506
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5506;
--- OLD name : [UNUSED] Yuriv Adhem (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5544
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5544;
--- OLD name : [PH] Capataz de mina (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5548
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5548;
--- OLD name : [PH] Guardia de mina (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5549
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5549;
--- OLD name : [PH] Campesino JcJ (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5550
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5550;
--- OLD name : [PH] Guardia de caravana (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5551
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5551;
--- OLD name : [PH] Peón JcJ (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5552
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5552;
--- OLD name : [PH] Explorador de caravana (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5553
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5553;
--- OLD name : [PH] Fauna JcJ (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5554
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5554;
--- OLD name : [PH] Rocín de caravana ogra (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5555
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5555;
--- OLD name : [PH] Comandante de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5556
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5556;
--- OLD name : [PH] Comandante de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5557
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5557;
--- OLD name : [PH] Guardia de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5558
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5558;
--- OLD name : [PH] Guardia de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5559
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5559;
--- OLD name : [PH] Asaltante de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5560
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5560;
--- OLD name : [PH] Asaltante de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5561
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5561;
--- OLD name : [PH] Arquero de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5562
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5562;
--- OLD name : [PH] Arquero de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5563
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5563;
--- OLD name : [PH] Capataz de mina de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5587
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5587;
--- OLD name : [PH] Guardia de mina de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5588
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5588;
--- OLD name : [PH] Capataz de mina de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5589
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5589;
--- OLD name : [PH] Guardia de mina de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5590
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5590;
--- OLD name : [UNUSED] [PH] Verbenero orco (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5604
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5604;
--- OLD name : [UNUSED] Lawrence Sierra (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5671
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5671;
--- OLD name : [UNUSED] Charles Brewton (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5672
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5672;
--- OLD name : [UNUSED] Mortacechador Vincent DEBUG (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5678
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5678;
--- OLD name : Comar Villardo
--- Source : https://www.wowhead.com/wotlk/mx/npc=5683
-UPDATE `creature_template_locale` SET `Name` = 'Corma Villardo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5683;
--- OLD name : Sumo hechicero Andromath (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=5694
-UPDATE `creature_template_locale` SET `Name` = 'Sumo Hechicero Andromath',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5694;
--- OLD subname : Esclava mental de Gerard
--- Source : https://www.wowhead.com/wotlk/mx/npc=5697
-UPDATE `creature_template_locale` SET `Title` = 'Experimento de Gerard',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5697;
--- OLD name : Déspota Emilgund (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5787
-UPDATE `creature_template_locale` SET `Name` = 'Agente Emilgund',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5787;
--- OLD name : [PH] Robot de grupo (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5801
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5801;
--- OLD name : Tótem Nova de Fuego (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5879
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5879;
--- OLD name : [UNUSED] Hurll Kans (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=5904
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 5904;
--- OLD subname : Instructora de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=5939
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5939;
--- OLD name : Escarbador Alimentavil
--- Source : https://www.wowhead.com/wotlk/mx/npc=5983
-UPDATE `creature_template_locale` SET `Name` = 'Escarbador',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5983;
--- OLD name : Ritualista Sombra Jurada
--- Source : https://www.wowhead.com/wotlk/mx/npc=6004
-UPDATE `creature_template_locale` SET `Name` = 'Cultor Sombra Jurada',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6004;
--- OLD name : Déspota Sombra Jurada (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6007
-UPDATE `creature_template_locale` SET `Name` = 'Agente jurasombras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6007;
--- OLD name : Brujo Sombra Jurada (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6008
-UPDATE `creature_template_locale` SET `Name` = 'Brujo jurasombras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6008;
--- OLD name : Tejetinieblas Sombra Jurada (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6009
-UPDATE `creature_template_locale` SET `Name` = 'Tejetinieblas jurasombras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6009;
--- OLD name : Tótem Lengua de Fuego II (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6012
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Lengua de Fuego II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6012;
--- OLD name : [UNUSED] Gozwin Dentovil (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=6046
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 6046;
--- OLD name : [UNUSED] Meritt Herrion (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=6067
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 6067;
--- OLD subname : Vendedora de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6091
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6091;
--- OLD subname : Instructora de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6094
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6094;
--- OLD name : Tótem Nova de Fuego II (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6110
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6110;
--- OLD name : Tótem Nova de Fuego III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6111
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6111;
--- OLD name : [UNUSED] Briton Kilras (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=6183
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 6183;
--- OLD name : Fantasma mortificador
--- Source : https://www.wowhead.com/wotlk/mx/npc=6427
-UPDATE `creature_template_locale` SET `Name` = 'Fantasma encantado',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6427;
--- OLD subname : NONE (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6566
-UPDATE `creature_template_locale` SET `Title` = '"Conservador" de reliquias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6566;
--- OLD name : Forma felina (elfo de la noche druida) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6571
-UPDATE `creature_template_locale` SET `Name` = 'Forma felina',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6571;
--- OLD name : Forma felina (tauren druida) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6572
-UPDATE `creature_template_locale` SET `Name` = 'Forma felina',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6572;
--- OLD name : Brienna Brillastrella
--- Source : https://www.wowhead.com/wotlk/mx/npc=6576
-UPDATE `creature_template_locale` SET `Name` = 'Brienna Brillaestrella',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6576;
--- OLD name : Campesino (bosque) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6578
-UPDATE `creature_template_locale` SET `Name` = 'Campesino (madera)',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6578;
--- OLD name : "Desplumado" Johnson
--- Source : https://www.wowhead.com/wotlk/mx/npc=6626
-UPDATE `creature_template_locale` SET `Name` = 'Johnson el "Desplumado"',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6626;
--- OLD name : "Desplumado" Forma humana de Johnson (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6666
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6666;
--- OLD name : [UNUSED] Lorek Belm (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=6783
-UPDATE `creature_template_locale` SET `Name` = 'Gorgrond Smokebelcher Depot NPC Invisible Stalker "Our Gun''s Bigger" Quest Target ELM',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6783;
--- OLD name : Cangrejo de playa
--- Source : https://www.wowhead.com/wotlk/mx/npc=6827
-UPDATE `creature_template_locale` SET `Name` = 'Cangrejo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6827;
--- OLD name : Maestro de embarcadero
--- Source : https://www.wowhead.com/wotlk/mx/npc=6846
-UPDATE `creature_template_locale` SET `Name` = 'Maestro de embarcadero Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6846;
--- OLD name : Trabajador de embarcadero
--- Source : https://www.wowhead.com/wotlk/mx/npc=6927
-UPDATE `creature_template_locale` SET `Name` = 'Trabajador de embarcadero Defias',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6927;
--- OLD name : Comandante Kartak Profanenanos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7014
-UPDATE `creature_template_locale` SET `Name` = 'Comandante Marzuk Machacaenanos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7014;
--- OLD name : Lechuza Picoférreo
--- Source : https://www.wowhead.com/wotlk/mx/npc=7097
-UPDATE `creature_template_locale` SET `Name` = 'Lechuza Cortezaférrea',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7097;
--- OLD name : Déspota Jaedenar (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7114
-UPDATE `creature_template_locale` SET `Name` = 'Agente Jaedenar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7114;
--- OLD name : Emboscador Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7175
-UPDATE `creature_template_locale` SET `Name` = 'Emboscador grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7175;
--- OLD subname : Instructora de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=7230
-UPDATE `creature_template_locale` SET `Title` = 'Forjadora de armaduras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7230;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=7231
-UPDATE `creature_template_locale` SET `Title` = 'Artesano de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7231;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=7232
-UPDATE `creature_template_locale` SET `Title` = 'Artesano de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7232;
--- OLD name : [UNUSED] Drayl (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=7293
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 7293;
--- OLD name : Aplastador Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7320
-UPDATE `creature_template_locale` SET `Name` = 'Aplastador grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7320;
--- OLD name : Tejedor de fuego Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7321
-UPDATE `creature_template_locale` SET `Name` = 'Tejedor de fuego grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7321;
--- OLD name : Déspota Vientomuerto (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7373
-UPDATE `creature_template_locale` SET `Name` = 'Agente Vientomuerto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7373;
--- OLD name : Curiana de Entrañas
--- Source : https://www.wowhead.com/wotlk/mx/npc=7395
-UPDATE `creature_template_locale` SET `Name` = 'Cucaracha',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7395;
--- OLD name : Rompepedras terráneo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7396
-UPDATE `creature_template_locale` SET `Name` = 'Rompepiedras terráneo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7396;
--- OLD name : Tótem Garra de piedra V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7398
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Garra de piedra V',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7398;
--- OLD name : Guardia de las llamas Galak
--- Source : https://www.wowhead.com/wotlk/mx/npc=7404
-UPDATE `creature_template_locale` SET `Name` = 'Guardia Flama Galak',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7404;
--- OLD name : Tótem de resistencia a la escarcha II (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=7412
-UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia a la Escarcha II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7412;
--- OLD name : Tótem de resistencia a la escarcha III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7413
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la escarcha III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7413;
--- OLD name : Tótem Lengua de Fuego III (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=7423
-UPDATE `creature_template_locale` SET `Name` = 'Tótem Lengua de fuego III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7423;
--- OLD name : Tótem de resistencia al fuego II (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=7424
-UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia al Fuego II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7424;
--- OLD name : Tótem de resistencia al fuego III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7425
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia al fuego III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7425;
--- OLD name : Tótem de resistencia a la Naturaleza II (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7468
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la Naturaleza II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7468;
--- OLD name : Tótem de resistencia a la Naturaleza III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7469
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la Naturaleza III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7469;
--- OLD name : Tótem Viento furioso II (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7483
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWindfury Totem II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7483;
--- OLD name : Tótem Viento furioso III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7484
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWindfury Totem III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7484;
--- OLD name : Tótem Gracia del Aire (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7486
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Gracia del Aire',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7486;
--- OLD name : Tótem Gracia del Aire II (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7487
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Gracia del Aire II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7487;
--- OLD name : Cottontail Rabbit
--- Source : https://www.wowhead.com/wotlk/mx/npc=7558
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 7558;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (7558, 'esMX','Conejo cola de algodón',NULL,0);
--- OLD name : Spotted Rabbit
--- Source : https://www.wowhead.com/wotlk/mx/npc=7559
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 7559;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (7559, 'esMX','Conejo moteado',NULL,0);
--- OLD name : Byula, subname : Antiguo tabernero
--- Source : https://www.wowhead.com/wotlk/mx/npc=7714
-UPDATE `creature_template_locale` SET `Name` = 'Tabernero Byula',`Title` = 'Tabernero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7714;
--- OLD name : Forajido Vagayermo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7805
-UPDATE `creature_template_locale` SET `Name` = 'Forajido Vagayermos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7805;
--- OLD name : Tótem Nova de Fuego IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7844
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7844;
--- OLD name : Tótem Nova de Fuego V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=7845
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego V',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7845;
--- OLD subname : Instructora de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=7868
-UPDATE `creature_template_locale` SET `Title` = 'Peletera elemental maestra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7868;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=7869
-UPDATE `creature_template_locale` SET `Title` = 'Peletero elemental maestro',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7869;
--- OLD subname : Instructora de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=7870
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de peletería tribal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7870;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=7871
-UPDATE `creature_template_locale` SET `Title` = 'Peletero tribal maestro',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7871;
--- OLD subname : Instructor de equitación
--- Source : https://www.wowhead.com/wotlk/mx/npc=7954
-UPDATE `creature_template_locale` SET `Title` = 'Piloto de mecazancudo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7954;
--- OLD name : Guardia de Los Baldíos
--- Source : https://www.wowhead.com/wotlk/mx/npc=8016
-UPDATE `creature_template_locale` SET `Name` = 'Guarda de Los Baldíos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8016;
--- OLD name : Guardia de la Brigada de los Páramos de Poniente, subname : The People's Militia
--- Source : https://www.wowhead.com/wotlk/mx/npc=8096
-UPDATE `creature_template_locale` SET `Name` = 'Protector del pueblo',`Title` = 'La Milicia Popular',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8096;
--- OLD name : Kalaran Espada del Viento
--- Source : https://www.wowhead.com/wotlk/mx/npc=8479
-UPDATE `creature_template_locale` SET `Name` = 'Velarok Espada del Viento',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8479;
--- OLD name : Kalaran el Falsario (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=8480
-UPDATE `creature_template_locale` SET `Name` = 'Velarok, el Falsario',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8480;
--- OLD name : Caminasol Saern
--- Source : https://www.wowhead.com/wotlk/mx/npc=8664
-UPDATE `creature_template_locale` SET `Name` = 'Saern Correorgullo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8664;
--- OLD name : Ensamblaje belisario (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=8905
-UPDATE `creature_template_locale` SET `Name` = 'Ensamblaje Belisario',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8905;
--- OLD name : [UNUSED] dun garok test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9557
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9557;
--- OLD name : [UNUSED] Gorilla Test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9577
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9577;
--- OLD name : [UNUSED] Eyan Mulcom (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9617
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9617;
--- OLD name : [PH] TESTTAUREN (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9686
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9686;
--- OLD name : Tótem Muro de viento (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=9687
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWindwall Totem',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9687;
--- OLD name : Tótem Muro de viento II (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=9688
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWindwall Totem II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9688;
--- OLD name : Tótem Muro de viento III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=9689
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWindwall Totem III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9689;
--- OLD name : [UNUSED] Grurk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9702
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9702;
--- OLD name : [UNUSED] Il'thurk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9703
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9703;
--- OLD name : [UNUSED] Lumurk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9704
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9704;
--- OLD name : Duende flamante
--- Source : https://www.wowhead.com/wotlk/mx/npc=9777
-UPDATE `creature_template_locale` SET `Name` = 'Duente flamante',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9777;
--- OLD name : [UNUSED] [PH] Sirviente del queso Floh (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=9820
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 9820;
--- OLD subname : Antiguo maestro de establos
--- Source : https://www.wowhead.com/wotlk/mx/npc=9983
-UPDATE `creature_template_locale` SET `Title` = 'Maestro de establos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9983;
--- OLD name : [PH] Alex's Raid Testing Peon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10044
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10044;
--- OLD name : Acride
--- Source : https://www.wowhead.com/wotlk/mx/npc=10299
-UPDATE `creature_template_locale` SET `Name` = 'Infiltrado del Escudo del Estigma',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10299;
--- OLD name : [UNUSED] Xur'gyl (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10370
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10370;
--- OLD name : [UNUSED] Guerrero Guardia Negra (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10395
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10395;
--- OLD name : [UNUSED] Verdugo Guardia Negra (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10397
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10397;
--- OLD name : [UNUSED] Señor de las Sombras Thuzadin (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10401
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10401;
--- OLD name : [UNUSED] Wight el Caníbal (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10402
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10402;
--- OLD name : [UNUSED] Ente devorador (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10403
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10403;
--- OLD name : [UNUSED] Elliott Jacks (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10446
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10446;
--- OLD name : [UNUSED] Paul Burges (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10450
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10450;
--- OLD name : Tótem Lengua de Fuego IV (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=10557
-UPDATE `creature_template_locale` SET `Name` = 'Tótem Lengua de fuego IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10557;
--- OLD name : Arikara joven (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=10581
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10581;
--- OLD name : Déspota Urok (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=10601
-UPDATE `creature_template_locale` SET `Name` = 'Agente Urok',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10601;
--- OLD name : [UNUSED] Siralnaya (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10607
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10607;
--- OLD name : Finkle Einhorn (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=10776
-UPDATE `creature_template_locale` SET `Name` = 'Pip Perspicaz',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10776;
--- OLD name : [UNUSED] Hija de Majestis (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=10810
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 10810;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=10839
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10839;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=10840
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10840;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=10857
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10857;
--- OLD name : Discípulo de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=10949
-UPDATE `creature_template_locale` SET `Name` = 'Discípulo de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10949;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=11034
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11034;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=11036
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11036;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=11039
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11039;
--- OLD name : Fras Siabi (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11058
-UPDATE `creature_template_locale` SET `Name` = 'Ezra Grimm',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11058;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=11063
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11063;
--- OLD name : [PH[ Probador de combate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11080
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11080;
--- OLD name : Tótem Marea de maná II (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11100
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Marea de maná II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11100;
--- OLD name : Tótem Marea de maná III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11101
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Marea de maná III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11101;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=11102
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11102;
--- OLD name : Alma inquieta (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11122
-UPDATE `creature_template_locale` SET `Name` = 'Alma sin descanso',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11122;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=11146
-UPDATE `creature_template_locale` SET `Title` = 'Artesano de armas especiales',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11146;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=11177
-UPDATE `creature_template_locale` SET `Title` = 'Forjador de armaduras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11177;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=11178
-UPDATE `creature_template_locale` SET `Title` = 'Forjador de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11178;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=11194
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11194;
--- OLD name : Déspota Hoja Abrasadora (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11323
-UPDATE `creature_template_locale` SET `Name` = 'Agente Hoja Abrasadora',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11323;
--- OLD name : [UNUSED] Rabioso Hakkar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11341
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11341;
--- OLD name : [UNUSED] Hija de Hakkar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11358
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11358;
--- OLD name : Cachorro Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11360
-UPDATE `creature_template_locale` SET `Name` = 'Cachorro zulian',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11360;
--- OLD name : [UNUSED] Tigresa Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11364
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11364;
--- OLD name : Pantera Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11365
-UPDATE `creature_template_locale` SET `Name` = 'Pantera zulian',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11365;
--- OLD name : [UNUSED] Matriarca Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11366
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11366;
--- OLD name : [UNUSED] Patriarca Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11367
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11367;
--- OLD name : [UNUSED] buscasangre Oculto (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11369
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11369;
--- OLD name : [UNUSED] Zath (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11375
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11375;
--- OLD name : [UNUSED] Lor'khan (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11376
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11376;
--- OLD name : [UNUSED] Hak'tharr el Cazamentes (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11377
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11377;
--- OLD name : [UNUSED] Nik'reesh (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11379
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11379;
--- OLD name : [UNUSED] T'kashra viejo (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11384
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11384;
--- OLD name : [UNUSED] Mogwhi el Implacable (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11385
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11385;
--- OLD name : [UNUSED] Janook el Furiafilada (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11386
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11386;
--- OLD subname : Instructora de sacerdotes (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11397
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11397;
--- OLD name : Déspota Gordok (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11440
-UPDATE `creature_template_locale` SET `Name` = 'Agente Gordok',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11440;
--- OLD name : [UNUSED] Mago de Batalla Gordok (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11449
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11449;
--- OLD name : [UNUSED] Escarbador Tuercemadera (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11463
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11463;
--- OLD name : [UNUSED] Eldreth Exanimato (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11468
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11468;
--- OLD name : [UNUSED] Bestia de maná (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11478
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11478;
--- OLD name : [UNUSED] Horror Arcano (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11479
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11479;
--- OLD name : [UNUSED] Terror Arcano (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11481
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11481;
--- OLD name : [UNUSED] Sentius (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11493
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11493;
--- OLD name : [UNUSED] Avidus (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11495
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11495;
--- OLD name : [UNUSED] Comandante Gormaul (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11499
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11499;
--- OLD name : [UNUSED] Majordomo Bagrosh (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11500
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11500;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=11536
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11536;
--- OLD name : [UNUSED] Coloso fundido (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11660
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11660;
--- OLD name : [UNUSED] Escupefuego (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11670
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11670;
--- OLD name : Can del Núcleo
--- Source : https://www.wowhead.com/wotlk/mx/npc=11673
-UPDATE `creature_template_locale` SET `Name` = 'Can del Núcleo anciano',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11673;
--- OLD subname : Maestra de Armas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=11866
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11866;
--- OLD name : [PH] Dispensador de regalos de Villanorte (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11926
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11926;
--- OLD name : [UNUSED] Vigía obsidiano (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11959
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11959;
--- OLD name : [NOT USED] Neltharion (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=11978
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 11978;
--- OLD subname : Mercader de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=12019
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12019;
--- OLD name : Instructor de alquimia de Claro de la Luna (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=12020
-UPDATE `creature_template_locale` SET `Name` = 'Alquimista de Claro de la Luna',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12020;
--- OLD subname : Mercader de alimentos y bebidas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=12026
-UPDATE `creature_template_locale` SET `Title` = 'Comida y bebida',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12026;
--- OLD subname : Orden de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=12126
-UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12126;
--- OLD name : Raptor de montar de esmeralda
--- Source : https://www.wowhead.com/wotlk/mx/npc=12346
-UPDATE `creature_template_locale` SET `Name` = 'Raptor de montar esmeralda',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12346;
--- OLD name : Raptor de turquesa de montar
--- Source : https://www.wowhead.com/wotlk/mx/npc=12349
-UPDATE `creature_template_locale` SET `Name` = 'Raptor turquesa de montar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12349;
--- OLD name : [NOT USED] cría Garraletal (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=12417
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 12417;
--- OLD name : [NOT USED] Señor de la guerra Alanegra (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=12462
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 12462;
--- OLD name : [NOT USED] Horrocrusto Garraletal (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=12466
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 12466;
--- OLD name : [NOT USED] Sacudetierra Garraletal (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=12469
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 12469;
--- OLD name : [NOT USED] Lenguaflama Garraletal (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=12470
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 12470;
--- OLD name : [PH] TEST Dios de fuego (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=12804
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 12804;
--- OLD name : Espíritu de redención (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=12904
-UPDATE `creature_template_locale` SET `Name` = 'Espíritu redentor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12904;
--- OLD subname : Instructor de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=12939
-UPDATE `creature_template_locale` SET `Title` = 'Cirujano del dispensario',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12939;
--- OLD subname : Maestra de Armas (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=13084
-UPDATE `creature_template_locale` SET `Title` = 'Maestra de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13084;
--- OLD name : Comandante Dardosh <old> (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=13140
-UPDATE `creature_template_locale` SET `Name` = 'Comandante Dardosh',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13140;
--- OLD name : Teniente Murp <old> (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=13146
-UPDATE `creature_template_locale` SET `Name` = 'Teniente Murp',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13146;
--- OLD name : Rana pequeña
--- Source : https://www.wowhead.com/wotlk/mx/npc=13321
-UPDATE `creature_template_locale` SET `Name` = 'Rana',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13321;
--- OLD name : Grinch el Abominable (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=13602
-UPDATE `creature_template_locale` SET `Name` = 'Rancun Pelele',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13602;
--- OLD name : Lobo Gélido de establo (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=13618
-UPDATE `creature_template_locale` SET `Name` = 'Lobo gélido de establo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13618;
--- OLD name : [PH] Heraldo del cementerio (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14181
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14181;
--- OLD name : [UNUSED] Sid Stuco (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14201
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14201;
--- OLD name : Príncipe Truenoraan (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=14435
-UPDATE `creature_template_locale` SET `Name` = 'Príncipe Thunderaan',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14435;
--- OLD name : Ayudante de cámara Pilaprieta (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=14636
-UPDATE `creature_template_locale` SET `Name` = 'Almohadestro Hierro Negro',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14636;
--- OLD name : [PH] Taumaturgo de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14641
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14641;
--- OLD name : [PH] Taumaturgo de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14642
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14642;
--- OLD name : [PH] Heraldo de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14643
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14643;
--- OLD name : [PH] Heraldo de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14644
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14644;
--- OLD name : [PH] Lugarteniente de torre de la Alianza (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14719
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14719;
--- OLD name : Mariscal de campo Afrasiabi
--- Source : https://www.wowhead.com/wotlk/mx/npc=14721
-UPDATE `creature_template_locale` SET `Name` = 'Mariscal de campo Petraponte',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14721;
--- OLD name : Bandera de prueba de Ggoodman (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=14735
-UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14735;
--- OLD name : Aullador Lobo Gélido (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=14744
-UPDATE `creature_template_locale` SET `Name` = 'Aullador lobo gélido',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14744;
--- OLD name : [PH] Lugarteniente de torre de la Horda (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=14746
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 14746;
--- OLD subname : Recuerdos y juguetes
--- Source : https://www.wowhead.com/wotlk/mx/npc=14828
-UPDATE `creature_template_locale` SET `Title` = 'Canje de vales de la Feria de la Luna Negra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14828;
--- OLD name : Muñeco-diana Guerrero 60 invencible (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=14830
-UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy Warrior',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14830;
--- OLD subname : Vendedora de bebidas
--- Source : https://www.wowhead.com/wotlk/mx/npc=14844
-UPDATE `creature_template_locale` SET `Title` = 'Vendedora de bebidas de la Feria de la Luna Negra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14844;
--- OLD subname : Vendedor de alimentos
--- Source : https://www.wowhead.com/wotlk/mx/npc=14845
-UPDATE `creature_template_locale` SET `Title` = 'Vendedor de alimentos de la Feria de la Luna Negra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14845;
--- OLD subname : Premios de mascotas y monturas
--- Source : https://www.wowhead.com/wotlk/mx/npc=14846
-UPDATE `creature_template_locale` SET `Title` = 'Objetos exóticos de la Feria de la Luna Negra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14846;
--- OLD subname : Cartas de la Luna Negra
--- Source : https://www.wowhead.com/wotlk/mx/npc=14847
-UPDATE `creature_template_locale` SET `Title` = 'Cartas de la Feria de la Luna Negra y objetos exóticos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14847;
--- OLD name : Feriante de la Luna Negra
--- Source : https://www.wowhead.com/wotlk/mx/npc=14849
-UPDATE `creature_template_locale` SET `Name` = 'Feriante de la Feria de la Luna Negra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14849;
--- OLD name : Déspota Zandalar (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=14911
-UPDATE `creature_template_locale` SET `Name` = 'Agente Zandalar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14911;
--- OLD name : Acechador Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15067
-UPDATE `creature_template_locale` SET `Name` = 'Acechador zulian',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15067;
--- OLD name : Guardián Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15068
-UPDATE `creature_template_locale` SET `Name` = 'Guardián zulian',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15068;
--- OLD name : Merodeador Zulian (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15101
-UPDATE `creature_template_locale` SET `Name` = 'Merodeador zulian',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15101;
--- OLD name : Tigre Zulian presto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15104
-UPDATE `creature_template_locale` SET `Name` = 'Tigre zulian presto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15104;
--- OLD name : Enviado Grito de Guerra
--- Source : https://www.wowhead.com/wotlk/mx/npc=15105
-UPDATE `creature_template_locale` SET `Name` = 'Emisario Grito de Guerra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15105;
--- OLD name : Enviado Lobo Gélido
--- Source : https://www.wowhead.com/wotlk/mx/npc=15106
-UPDATE `creature_template_locale` SET `Name` = 'Emisaria Lobo Gélido',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15106;
--- OLD name : Luis Barriga (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15166
-UPDATE `creature_template_locale` SET `Name` = 'Wayneth Antonius',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15166;
--- OLD name : [PH] Luis Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15167
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15167;
--- OLD name : Alto mariscal Eje Torbellino (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15204
-UPDATE `creature_template_locale` SET `Name` = 'Alto mariscal Whirlaxis',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15204;
--- OLD name : [UNUSED] Constructor Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15226
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15226;
--- OLD name : [UNUSED] Moldador de la colmena Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15227
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15227;
--- OLD name : [UNUSED] Cavaguas Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15228
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15228;
--- OLD name : [UNUSED] Patrulla Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15231
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15231;
--- OLD name : [UNUSED] Erradicador Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15232
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15232;
--- OLD name : [UNUSED] Enjambrista Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15234
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15234;
--- OLD name : [UNUSED] Picaira Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15237
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15237;
--- OLD name : [UNUSED] Atracador de la colmena Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15238
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15238;
--- OLD name : [UNUSED] Rondador de la colmena Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15239
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15239;
--- OLD name : [UNUSED] Infrargullo Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15243
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15243;
--- OLD name : [UNUSED] Asaltante de la colmena Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15244
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15244;
--- OLD name : [UNUSED] Guardavispa Vekniss (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15245
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15245;
--- OLD name : [UNUSED] Doblegador de almas qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15248
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15248;
--- OLD name : [UNUSED] Asesino qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15251
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15251;
--- OLD name : [UNUSED] Campeón qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15253
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15253;
--- OLD name : [UNUSED] Capitán qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15254
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15254;
--- OLD name : [UNUSED] Oficial qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15255
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15255;
--- OLD name : [UNUSED] Comandante qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15256
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15256;
--- OLD name : [UNUSED] Guardia de Honor qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15257
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15257;
--- OLD name : [UNUSED] Pretoriano qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15258
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15258;
--- OLD name : [UNUSED] Emperador qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15259
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15259;
--- OLD name : Acechacaminos Kariel
--- Source : https://www.wowhead.com/wotlk/mx/npc=15285
-UPDATE `creature_template_locale` SET `Name` = 'Acechacaminos Avokor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15285;
--- OLD name : [UNUSED] Emboscador Colmen'Zara (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15322
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15322;
--- OLD name : [UNUSED] Enjambrista Colmen'Zara (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15326
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15326;
--- OLD name : [UNUSED] Explorador Colmen'Zara (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15329
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15329;
--- OLD name : [UNUSED] Cavarenas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15330
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15330;
--- OLD name : [UNUSED] Tunelador de las Dunas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15331
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15331;
--- OLD name : [UNUSED] Comecristales (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15332
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15332;
--- OLD name : [UNUSED] Moldearena (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15337
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15337;
--- OLD name : [UNUSED] Esfinge (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15342
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15342;
--- OLD name : [UNUSED] Hija de Hecate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15345
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15345;
--- OLD name : [UNUSED] Infrargullo qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15346
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15346;
--- OLD name : [UNUSED] Avispón qiraji (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15347
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15347;
--- OLD name : Capitana Pirata de Halloween (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15375
-UPDATE `creature_template_locale` SET `Name` = 'Pirata de Halloween',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15375;
--- OLD name : [UNUSED] Ruinas del Gladiador qiraji nombrado 7 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15393
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15393;
--- OLD name : Tótem Gracia del Aire III (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15463
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Gracia del Aire III',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15463;
--- OLD name : Tótem Fuerza de la tierra V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15464
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Fuerza de la tierra V',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15464;
--- OLD name : Tótem Piel de piedra VII (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=15470
-UPDATE `creature_template_locale` SET `Name` = 'Tótem piel de piedra VII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15470;
--- OLD name : [UNUSED] Mocohondo (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15472
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15472;
--- OLD name : Tótem Piel de piedra VIII (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=15474
-UPDATE `creature_template_locale` SET `Name` = 'Tótem piel de piedra VIII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15474;
--- OLD name : Escórpido
--- Source : https://www.wowhead.com/wotlk/mx/npc=15476
-UPDATE `creature_template_locale` SET `Name` = 'Escorpión',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15476;
--- OLD name : Tótem Nova de Fuego VI (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15482
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego VI',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15482;
--- OLD name : Tótem Nova de Fuego
--- Source : https://www.wowhead.com/wotlk/mx/npc=15483
-UPDATE `creature_template_locale` SET `Name` = 'Tótem Nova de Fuego VII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15483;
--- OLD name : Tótem de resistencia a la escarcha IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15486
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la escarcha IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15486;
--- OLD name : Tótem de resistencia al fuego IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15487
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia al fuego IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15487;
--- OLD name : Tótem de resistencia a la Naturaleza IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15490
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la Naturaleza IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15490;
--- OLD name :  Tótem Muro de viento IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15492
-UPDATE `creature_template_locale` SET `Name` = 'zzOLD Tótem Muro de viento IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15492;
--- OLD name : Tótem Viento furioso IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15496
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWindfury Totem IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15496;
--- OLD name : Tótem Viento furioso V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15497
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDWindfury Totem V',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15497;
--- OLD name : Déspota Arcano (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15640
-UPDATE `creature_template_locale` SET `Name` = 'Agente Arcano',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15640;
--- OLD name : [Unused] Mana Leech (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15646
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15646;
--- OLD name : [Unused] Auctioneer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15672
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15672;
--- OLD name : Blue Qiraji Battle Tank (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15713
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15713;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15713, 'esMX','PNJs',NULL,0);
--- OLD name : Alto comandante Lynore Ventostryke (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15866
-UPDATE `creature_template_locale` SET `Name` = 'Alta comandante Lynore Ventostryke',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15866;
--- OLD name : Avispón Colmen'Zara (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15934
-UPDATE `creature_template_locale` SET `Name` = 'Zumbador Colmen''Zara',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15934;
--- OLD name : Guardés Wyllithen
--- Source : https://www.wowhead.com/wotlk/mx/npc=15969
-UPDATE `creature_template_locale` SET `Name` = 'Encargado Wyllithen',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15969;
--- OLD name : [PH] Juerguista San Valentín, hombre (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15982
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15982;
--- OLD name : [PH] Juerguista de San Valentín, mujer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=15983
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15983;
--- OLD name : Sam's Test Dummy 1 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15992
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15992;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15992, 'esMX','PNJs',NULL,0);
--- OLD name : Sam's Test Dummy 2 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15993
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15993;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15993, 'esMX','PNJs',NULL,0);
--- OLD name : Sam's Test Dummy 1 (1) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15996
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15996;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15996, 'esMX','PNJs',NULL,0);
--- OLD name : Sam's Test Dummy 2 (1) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15997
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15997;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15997, 'esMX','PNJs',NULL,0);
--- OLD name : Sam's Test Dummy 1 (2) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15998
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15998;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15998, 'esMX','PNJs',NULL,0);
--- OLD name : Sam's Test Dummy 2 (2) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=15999
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 15999;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (15999, 'esMX','PNJs',NULL,0);
--- OLD name : [UNUSED] Bog Beast B [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16035
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16035;
--- OLD name : [UNUSED] Deathhound (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16038
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16038;
--- OLD name : [PH] Alex's Test DPS Mob (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16077
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16077;
--- OLD name : Comandante de Cruzada Korfax
--- Source : https://www.wowhead.com/wotlk/mx/npc=16112
-UPDATE `creature_template_locale` SET `Name` = 'Korfax, Campeón de la Luz',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16112;
--- OLD name : Comandante de Cruzada Eligor Albar
--- Source : https://www.wowhead.com/wotlk/mx/npc=16115
-UPDATE `creature_template_locale` SET `Name` = 'Comandante Eligor Albar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16115;
--- OLD name : [UNUSED] Guardián de la Invasión de la Plaga (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16138
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16138;
--- OLD name : [UNUSED] Necópolis de Cristal, Contrafuerte (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16140
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16140;
--- OLD name : [UNUSED] Contrafuerte Arbotante (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16188
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16188;
--- OLD subname : Rogue Trainer
--- Source : https://www.wowhead.com/wotlk/mx/npc=16279
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de pícaros',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16279;
--- OLD subname : La Cruzada Argenta
--- Source : https://www.wowhead.com/wotlk/mx/npc=16378
-UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16378;
--- OLD name : [UNUSED] Death Knight Vindicator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16451
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16451;
--- OLD name : Concubina nocturna (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16460
-UPDATE `creature_template_locale` SET `Name` = 'Dueña de la noche',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16460;
--- OLD name : Concubina (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16461
-UPDATE `creature_template_locale` SET `Name` = 'Amante ferviente',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16461;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=16583
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16583;
--- OLD name : Boticario Antonivich, subname : Instructor de alquimia
--- Source : https://www.wowhead.com/wotlk/mx/npc=16588
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16588;
--- OLD name : [PH] Goblin Savage (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16608
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16608;
--- OLD subname : Maestra de Armas (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=16621
-UPDATE `creature_template_locale` SET `Title` = 'Maestra de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16621;
--- OLD subname : Instructor de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=16676
-UPDATE `creature_template_locale` SET `Title` = 'Cocinera',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16676;
--- OLD name : Espíritu de verano
--- Source : https://www.wowhead.com/wotlk/mx/npc=16701
-UPDATE `creature_template_locale` SET `Name` = 'Espíritu del Verano',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16701;
--- OLD name : Eoch, subname : Subastador (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16707
-UPDATE `creature_template_locale` SET `Name` = 'Subastador Eoch',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16707;
--- OLD subname : Instructora de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=16719
-UPDATE `creature_template_locale` SET `Title` = 'Cocinera',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16719;
--- OLD subname : Maestro de armas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16773
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16773;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=16823
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16823;
--- OLD name : [UNUSED] Death Lord (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16861
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16861;
--- OLD name : Brujo Foso Sangrante (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16872
-UPDATE `creature_template_locale` SET `Name` = 'Alajet',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16872;
--- OLD name : Taumaturgo umbrío Foso Sangrante (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16874
-UPDATE `creature_template_locale` SET `Name` = 'Velonieve',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16874;
--- OLD name : Caníbal Mascahuesos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16875
-UPDATE `creature_template_locale` SET `Name` = 'Picoabisal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16875;
--- OLD name : Depellejador sangrevil (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16882
-UPDATE `creature_template_locale` SET `Name` = 'Consola numérica',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16882;
--- OLD name : Hambriento sangrevil (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16883
-UPDATE `creature_template_locale` SET `Name` = 'Montura de Silas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16883;
--- OLD name : Atracador Mascahuesos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16908
-UPDATE `creature_template_locale` SET `Name` = 'Arielle Azoterraudo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16908;
--- OLD name : Salvaje Mascahuesos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16909
-UPDATE `creature_template_locale` SET `Name` = 'Niko',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16909;
--- OLD name : [Unused] Marauding Crust Burster Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=16914
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 16914;
--- OLD name : Lobo de guerra Mascahuesos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16926
-UPDATE `creature_template_locale` SET `Name` = 'Vívica Salvaestelar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16926;
--- OLD name : Uñagrieta enfurecido (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=16930
-UPDATE `creature_template_locale` SET `Name` = 'Rata gigante',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16930;
--- OLD name : [Unused] Crust Burster Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17001
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17001;
--- OLD name : Déspota del Consejo de la Sombra (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17023
-UPDATE `creature_template_locale` SET `Name` = 'Agente del Consejo de la Sombra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17023;
--- OLD name : Tótem Marea de maná IV (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17061
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Marea de maná IV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17061;
--- OLD name : Concubine Transform Visual (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17065
-UPDATE `creature_template_locale` SET `Name` = 'Zealous Paramour Transform Visual',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17065;
--- OLD name : Magistrix Elosai desdichada (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17162
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17162;
--- OLD subname : Caballero de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17233
-UPDATE `creature_template_locale` SET `Title` = 'Caballero de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17233;
--- OLD name : [Unused] Tunneler Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17234
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17234;
--- OLD name : [PH] Heraldo de las Tierras de la Peste (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17239
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17239;
--- OLD name : Robot triturador (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17299
-UPDATE `creature_template_locale` SET `Name` = 'Robotito chocón',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17299;
--- OLD subname : Instructor de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17424
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17424;
--- OLD name : [UNUSED] Shadowmoon Firestarter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17463
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17463;
--- OLD name : Samantha LeCraft (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17515
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17515;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (17515, 'esMX','PNJs',NULL,0);
--- OLD name : Jinete de lobos Fuego Infernal
--- Source : https://www.wowhead.com/wotlk/mx/npc=17593
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17593;
--- OLD name : [PH] Captain Obvious Jr. (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17597
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17597;
--- OLD subname : Instructora de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=17634
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17634;
--- OLD name : Jessera de Mac'Aree (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17663
-UPDATE `creature_template_locale` SET `Name` = 'Maatparm',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17663;
--- OLD name : [UNUSED] Lykul Larva (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17733
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17733;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (17733, 'esMX','PNJs',NULL,0);
--- OLD name : [UNUSED] Lost Goblin [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17813
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17813;
--- OLD name : [UNUSED] Huargen enloquecido (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17823
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17823;
--- OLD name : [DND]Sunhawk Portal Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17886
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17886;
--- OLD subname : Orden de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17910
-UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17910;
--- OLD subname : Orden de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17911
-UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17911;
--- OLD subname : Orden de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17912
-UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17912;
--- OLD subname : Orden de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17913
-UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17913;
--- OLD subname : Orden de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=17914
-UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17914;
--- OLD name : [UNUSED] Coilfang Watcher [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=17939
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 17939;
--- OLD name : Grom Grito Infernal (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=18076
-UPDATE `creature_template_locale` SET `Name` = 'Grommash Grito Infernal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18076;
--- OLD name : [UNUSED] Sethekk Magelord (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=18329
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 18329;
--- OLD name : Fanin, subname : Subastador (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=18348
-UPDATE `creature_template_locale` SET `Name` = 'Subastador Fanin',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18348;
--- OLD name : Iressa, subname : Subastadora (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=18349
-UPDATE `creature_template_locale` SET `Name` = 'Subastadora Iressa',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18349;
--- OLD name : [UNUSED] Dusty Skeleton [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=18355
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 18355;
--- OLD name : UNUSED Outland Wyvern Mount (Armored) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=18366
-UPDATE `creature_template_locale` SET `Name` = 'Sigilo de prueba',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18366;
--- OLD name : [UNUSED] Draenei Spirit [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=18367
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 18367;
--- OLD name : [UNUSED]Anchorite Lyteera (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=18674
-UPDATE `creature_template_locale` SET `Name` = 'Summoned Satchel Charge A',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18674;
--- OLD subname : Instructor de minería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18747
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de minería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18747;
--- OLD subname : Instructor de herboristería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18748
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de herboristería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18748;
--- OLD subname : Instructora de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18749
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra sastre',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18749;
--- OLD subname : Instructor de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18751
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18751;
--- OLD subname : Instructor de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18752
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18752;
--- OLD subname : Instructora de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=18753
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de encantamientos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18753;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18754
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18754;
--- OLD subname : Instructor de desuello
--- Source : https://www.wowhead.com/wotlk/mx/npc=18755
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de desuello',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18755;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18771
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18771;
--- OLD subname : Instructora de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18772
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de sastrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18772;
--- OLD subname : Instructor de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=18773
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de encantamientos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18773;
--- OLD subname : Instructora de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18774
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18774;
--- OLD subname : Instructor de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18775
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18775;
--- OLD subname : Instructora de herboristería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18776
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de herboristería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18776;
--- OLD subname : Instructora de desuello
--- Source : https://www.wowhead.com/wotlk/mx/npc=18777
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de desuello',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18777;
--- OLD subname : Instructor de minería
--- Source : https://www.wowhead.com/wotlk/mx/npc=18779
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de minería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18779;
--- OLD subname : Instructor de alquimia
--- Source : https://www.wowhead.com/wotlk/mx/npc=18802
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de alquimia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18802;
--- OLD name : Embajador Semprepino Frasaboo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=18803
-UPDATE `creature_template_locale` SET `Name` = 'Embajador Semprepino Olorg',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18803;
--- OLD subname : Instructor de pesca
--- Source : https://www.wowhead.com/wotlk/mx/npc=18911
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de pesca',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18911;
--- OLD name : [PH] Gossip NPC, Human Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=18935
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 18935;
--- OLD name : [PH] Gossip NPC, Human Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=18936
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 18936;
--- OLD name : [PH] Gossip NPC, Human, Specific Look (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=18941
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 18941;
--- OLD name : Bruto Rompepedras (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=18973
-UPDATE `creature_template_locale` SET `Name` = 'Bruto Rompepiedras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18973;
--- OLD name : Guardia de cólera (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=18975
-UPDATE `creature_template_locale` SET `Name` = 'Guardia de Cólera',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18975;
--- OLD name : Duende dardo vil
--- Source : https://www.wowhead.com/wotlk/mx/npc=18978
-UPDATE `creature_template_locale` SET `Name` = 'Duente dardo vil',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18978;
--- OLD subname : Instructor de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=18990
-UPDATE `creature_template_locale` SET `Title` = 'Médico militar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18990;
--- OLD subname : Instructora de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=18991
-UPDATE `creature_template_locale` SET `Title` = 'Médico militar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18991;
--- OLD subname : Instructora de cocina y suministros
--- Source : https://www.wowhead.com/wotlk/mx/npc=18993
-UPDATE `creature_template_locale` SET `Title` = 'Suministros de cocina',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18993;
--- OLD name : Peón Rompepedras (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19048
-UPDATE `creature_template_locale` SET `Name` = 'Peón Rompepiedras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19048;
--- OLD subname : Instructor de alquimia
--- Source : https://www.wowhead.com/wotlk/mx/npc=19052
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de alquimia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19052;
--- OLD name : [PH] Gossip NPC Human Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19057
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19057;
--- OLD name : [PH] Gossip NPC Human Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19058
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19058;
--- OLD name : [PH] Gossip NPC Human Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19059
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19059;
--- OLD name : [PH] Gossip NPC Human Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19060
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19060;
--- OLD subname : Instructor de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=19063
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19063;
--- OLD name : [PH] Gossip NPC Dwarf Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19078
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19078;
--- OLD name : [PH] Gossip NPC Dwarf Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19079
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19079;
--- OLD name : [PH] Gossip NPC Night Elf Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19080
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19080;
--- OLD name : [PH] Gossip NPC Night Elf Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19081
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19081;
--- OLD name : [PH] Gossip NPC Draenei Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19082
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19082;
--- OLD name : [PH] Gossip NPC Draenei Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19083
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19083;
--- OLD name : [PH] Gossip NPC Blood Elf Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19084
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19084;
--- OLD name : [PH] Gossip NPC Blood Elf Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19085
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19085;
--- OLD name : [PH] Gossip NPC Orc Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19086
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19086;
--- OLD name : [PH] Gossip NPC Orc Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19087
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19087;
--- OLD name : [PH] Gossip NPC Tauren Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19088
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19088;
--- OLD name : [PH] Gossip NPC Tauren Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19089
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19089;
--- OLD name : [PH] Gossip NPC Undead Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19090
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19090;
--- OLD name : [PH] Gossip NPC Undead Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19091
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19091;
--- OLD name : [PH] Gossip NPC Dwarf Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19092
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19092;
--- OLD name : [PH] Gossip NPC Night Elf Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19093
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19093;
--- OLD name : [PH] Gossip NPC Draenei Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19094
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19094;
--- OLD name : [PH] Gossip NPC Blood Elf Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19095
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19095;
--- OLD name : [PH] Gossip NPC Orc Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19096
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19096;
--- OLD name : [PH] Gossip NPC Tauren Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19097
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19097;
--- OLD name : [PH] Gossip NPC Undead Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19098
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19098;
--- OLD name : [PH] Gossip NPC Blood Elf Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19099
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19099;
--- OLD name : [PH] Gossip NPC Draenei Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19100
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19100;
--- OLD name : [PH] Gossip NPC Dwarf Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19101
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19101;
--- OLD name : [PH] Gossip NPC Night Elf Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19102
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19102;
--- OLD name : [PH] Gossip NPC Orc Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19103
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19103;
--- OLD name : [PH] Gossip NPC Tauren Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19104
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19104;
--- OLD name : [PH] Gossip NPC Undead Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19105
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19105;
--- OLD name : [PH] Gossip NPC, Blood Elf Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19106
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19106;
--- OLD name : [PH] Gossip NPC, Draenei Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19107
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19107;
--- OLD name : [PH] Gossip NPC, Dwarf Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19108
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19108;
--- OLD name : [PH] Gossip NPC, Orc Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19109
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19109;
--- OLD name : [PH] Gossip NPC, Undead Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19110
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19110;
--- OLD name : [PH] Gossip NPC, Tauren Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19111
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19111;
--- OLD name : [PH] Gossip NPC, Night Elf Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19112
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19112;
--- OLD name : [PH] Gossip NPC, Blood Elf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19113
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19113;
--- OLD name : [PH] Gossip NPC, Draenei Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19114
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19114;
--- OLD name : [PH] Gossip NPC, Dwarf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19115
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19115;
--- OLD name : [PH] Gossip NPC, Night Elf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19116
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19116;
--- OLD name : [PH] Gossip NPC, Orc Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19117
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19117;
--- OLD name : [PH] Gossip NPC, Tauren Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19118
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19118;
--- OLD name : [PH] Gossip NPC, Undead Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19119
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19119;
--- OLD name : [PH] Gossip NPC, Gnome Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19121
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19121;
--- OLD name : [PH] Gossip NPC, Gnome Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19122
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19122;
--- OLD name : [PH] Gossip NPC, Troll Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19123
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19123;
--- OLD name : [PH] Gossip NPC, Troll Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19124
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19124;
--- OLD name : [PH] Gossip NPC Gnome Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19125
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19125;
--- OLD name : [PH] Gossip NPC Gnome Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19126
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19126;
--- OLD name : [PH] Gossip NPC Troll Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19127
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19127;
--- OLD name : [PH] Gossip NPC Troll Male, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19128
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19128;
--- OLD name : [PH] Gossip NPC Gnome Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19129
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19129;
--- OLD name : [PH] Gossip NPC Troll Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19130
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19130;
--- OLD name : [PH] Gossip NPC Gnome Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19131
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19131;
--- OLD name : [PH] Gossip NPC Troll Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19132
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19132;
--- OLD name : Defensor Guardia de cólera (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19160
-UPDATE `creature_template_locale` SET `Name` = 'Vigía diligente',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19160;
--- OLD subname : Instructor de desuello
--- Source : https://www.wowhead.com/wotlk/mx/npc=19180
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de desuello',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19180;
--- OLD name : Cría de uñagrieta
--- Source : https://www.wowhead.com/wotlk/mx/npc=19183
-UPDATE `creature_template_locale` SET `Name` = 'Cachorro de uñagrieta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19183;
--- OLD subname : Instructora de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=19184
-UPDATE `creature_template_locale` SET `Title` = 'Médico',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19184;
--- OLD subname : Instructor de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=19185
-UPDATE `creature_template_locale` SET `Title` = 'Cocinero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19185;
--- OLD subname : Instructora de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=19187
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19187;
--- OLD name : Berudan Jurallave, subname : Banquero
--- Source : https://www.wowhead.com/wotlk/mx/npc=19246
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19246;
--- OLD subname : Instructor de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=19252
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de encantamientos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19252;
--- OLD name : Bruto Mascahuesos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19269
-UPDATE `creature_template_locale` SET `Name` = 'Insectógrafo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19269;
--- OLD name : Barnu Cragcrush (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19325
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19325;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (19325, 'esMX','PNJs',NULL,0);
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=19341
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19341;
--- OLD subname : Armas de fuego
--- Source : https://www.wowhead.com/wotlk/mx/npc=19351
-UPDATE `creature_template_locale` SET `Title` = 'Armas de fuego y munición',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19351;
--- OLD subname : Instructora de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=19369
-UPDATE `creature_template_locale` SET `Title` = 'Cocinera',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19369;
--- OLD subname : Armas arrojadizas
--- Source : https://www.wowhead.com/wotlk/mx/npc=19473
-UPDATE `creature_template_locale` SET `Title` = 'Armas arrojadizas y munición',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19473;
--- OLD subname : Familiar de Ravandwyr
--- Source : https://www.wowhead.com/wotlk/mx/npc=19482
-UPDATE `creature_template_locale` SET `Title` = 'Pariente de Ravandwyr',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19482;
--- OLD subname : Instructor de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=19539
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19539;
--- OLD subname : Instructor de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=19540
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de encantamientos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19540;
--- OLD subname : Instructor de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=19576
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19576;
--- OLD name : [PH]Sunfury Caster - Sunfury Hold (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19650
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19650;
--- OLD name : Príncipe-nexo Haramad (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19675
-UPDATE `creature_template_locale` SET `Name` = 'Príncipe del Nexo Haramad',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19675;
--- OLD name : Mechanar Ripper (UNUSED) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19711
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19711;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (19711, 'esMX','PNJs',NULL,0);
--- OLD name : Mechanar Pulverizer (UNUSED) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19714
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19714;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (19714, 'esMX','PNJs',NULL,0);
--- OLD name : Centurión eclipsiano
--- Source : https://www.wowhead.com/wotlk/mx/npc=19792
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19792;
--- OLD name : Extiendepavor Illidari (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19799
-UPDATE `creature_template_locale` SET `Name` = 'Clamaterror illidari',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19799;
--- OLD name : [PH] Illidari Overseer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19819
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19819;
--- OLD name : [PH] Horn Ghost (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=19846
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 19846;
--- OLD name : Clamallamas abismal (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=19973
-UPDATE `creature_template_locale` SET `Name` = 'Evocallamas abismal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19973;
--- OLD name : Espécimen de Avizor de Lordaeron (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=20053
-UPDATE `creature_template_locale` SET `Name` = 'Espécimen de avizor de Lordaeron',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20053;
--- OLD name : [PH] Gossip NPC Goblin Female, Christmas (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=20103
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 20103;
--- OLD name : [PH] Gossip NPC, Goblin Female (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=20104
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 20104;
--- OLD name : [PH] Gossip NPC Goblin Female, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=20105
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 20105;
--- OLD name : [PH] Gossip NPC Goblin Male, Lunar Festival (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=20106
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 20106;
--- OLD name : [PH] Gossip NPC, Goblin Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=20107
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 20107;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=20124
-UPDATE `creature_template_locale` SET `Title` = 'Instructor forjador de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20124;
--- OLD subname : Instructora de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=20125
-UPDATE `creature_template_locale` SET `Title` = 'Instructora forjadora de armaduras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20125;
--- OLD name : Kaliri domado
--- Source : https://www.wowhead.com/wotlk/mx/npc=20127
-UPDATE `creature_template_locale` SET `Name` = 'Kaliri de doma',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20127;
--- OLD name : Hermana loba Maka
--- Source : https://www.wowhead.com/wotlk/mx/npc=20276
-UPDATE `creature_template_locale` SET `Name` = 'Hermana lobo Maka',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20276;
--- OLD subname : Armadura de arena de legado
--- Source : https://www.wowhead.com/wotlk/mx/npc=20278
-UPDATE `creature_template_locale` SET `Title` = 'Vendedor de arena brutal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20278;
--- OLD name : Hidra mustia
--- Source : https://www.wowhead.com/wotlk/mx/npc=20324
-UPDATE `creature_template_locale` SET `Name` = 'Hidra sedienta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20324;
--- OLD subname : Instructor de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=20500
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de equitación',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20500;
--- OLD subname : Instructora de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=20511
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de equitación',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20511;
--- OLD name : [PH] Arcane Guardian (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21031
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21031;
--- OLD subname : Instructora de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=21087
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21087;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=21209
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21209;
--- OLD name : Transformación de guía de visión (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=21320
-UPDATE `creature_template_locale` SET `Name` = 'Guía de visión',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21320;
--- OLD name : [PH]Test Skunk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21333
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21333;
--- OLD name : [UNUSED]Test Nether Whelp (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21378
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21378;
--- OLD name : Rey-nexo Salhadaar (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=21425
-UPDATE `creature_template_locale` SET `Name` = 'Rey del Nexo Salhadaar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21425;
--- OLD name : Tempixx Finagler (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=21444
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21444;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (21444, 'esMX','PNJs',NULL,0);
--- OLD name : [Unused] Greater Crust Burster Visual (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21457
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21457;
--- OLD subname : Ammunition
--- Source : https://www.wowhead.com/wotlk/mx/npc=21488
-UPDATE `creature_template_locale` SET `Title` = 'Munición',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21488;
--- OLD name : [DND]Kaliri Aura Dispel (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21511
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21511;
--- OLD name : Forest Strider (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=21634
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21634;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (21634, 'esMX','PNJs',NULL,0);
--- OLD name : [UNUSED]Death's Deliverer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21658
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21658;
--- OLD name : [DND]Mok'Nathal Wand 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21713
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21713;
--- OLD name : [DND]Mok'Nathal Wand 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21714
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21714;
--- OLD name : [DND]Mok'Nathal Wand 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21715
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21715;
--- OLD name : [DND]Mok'Nathal Wand 4 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=21716
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 21716;
--- OLD name : [DND]Spirit 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22023
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22023;
--- OLD name : [PH] bat target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22039
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22039;
--- OLD name : [ph] cave ant [not used] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22048
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22048;
--- OLD name : [DND]Whisper Spying Credit Marker 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22116
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22116;
--- OLD name : [DND]Whisper Spying Credit Marker 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22117
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22117;
--- OLD name : [DND]Whisper Spying Credit Marker 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22118
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22118;
--- OLD name : Cría negra del Barón Sablecrín (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=22130
-UPDATE `creature_template_locale` SET `Name` = 'Cría negra del barón Sablecrín',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22130;
--- OLD name : Uñagrieta domada
--- Source : https://www.wowhead.com/wotlk/mx/npc=22135
-UPDATE `creature_template_locale` SET `Name` = 'Uñagrieta de doma',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22135;
--- OLD subname : Especialista en sastrería de tela lunar
--- Source : https://www.wowhead.com/wotlk/mx/npc=22208
-UPDATE `creature_template_locale` SET `Title` = 'Especialista en tela lunar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22208;
--- OLD subname : Especialista en sastrería de tejido de sombra
--- Source : https://www.wowhead.com/wotlk/mx/npc=22212
-UPDATE `creature_template_locale` SET `Title` = 'Especialista en tejido de sombra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22212;
--- OLD subname : Especialista en sastrería de fuego de hechizo
--- Source : https://www.wowhead.com/wotlk/mx/npc=22213
-UPDATE `creature_template_locale` SET `Title` = 'Especialista en fuego de hechizo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22213;
--- OLD name : [PH] Wrath Clefthoof [not used] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22284
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22284;
--- OLD name : [DND]Green Spot Grog Keg Relay (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22349
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22349;
--- OLD name : [DND]Green Spot Grog Keg Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22356
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22356;
--- OLD name : [DND]Ripe Moonshine Keg Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22367
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22367;
--- OLD name : [DND]Fermented Seed Beer Keg Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22368
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22368;
--- OLD name : [DND]Bloodmaul Chatter Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22383
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22383;
--- OLD name : [PH]Altar of Shadows target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22395
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22395;
--- OLD name : [PH]Altar of Shadows caster (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22417
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22417;
--- OLD name : [DND]Ogre Pike Planted Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22434
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22434;
--- OLD name : [DND]Rexxar's Wyvern Freed Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22435
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22435;
--- OLD name : [DND]Sablemane's Trap Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22447
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22447;
--- OLD name : [DND]Prophecy 1 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22798
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22798;
--- OLD name : [DND]Prophecy 2 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22799
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22799;
--- OLD name : [DND]Prophecy 3 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22800
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22800;
--- OLD name : [DND]Prophecy 4 Quest Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22801
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22801;
--- OLD name : Wodin, el sirviente trol
--- Source : https://www.wowhead.com/wotlk/mx/npc=22893
-UPDATE `creature_template_locale` SET `Name` = 'Wodin el sirviente trol',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22893;
--- OLD name : Prisionero de El Etereum (Dungeon Energy Ball) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22927
-UPDATE `creature_template_locale` SET `Name` = 'Prisionero de El Etereum',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22927;
--- OLD name : Concubina del templo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22939
-UPDATE `creature_template_locale` SET `Name` = 'Acólito del templo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22939;
--- OLD name : [UNUSED] Illidari Hound [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22944
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22944;
--- OLD name : Cortesana encantadora (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22955
-UPDATE `creature_template_locale` SET `Name` = 'Parroquiano encantador',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22955;
--- OLD name : Hermana del dolor (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22956
-UPDATE `creature_template_locale` SET `Name` = 'Sacerdotisa del tormento',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22956;
--- OLD name : Sacerdotisa de la demencia (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22957
-UPDATE `creature_template_locale` SET `Name` = 'Señora de la demencia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22957;
--- OLD name : Auxiliar vinculado a hechizo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22959
-UPDATE `creature_template_locale` SET `Name` = 'Anfitrión ardiente',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22959;
--- OLD name : [UNUSED] Harem Girl 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=22961
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 22961;
--- OLD name : Sacerdotisa de los placeres (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22962
-UPDATE `creature_template_locale` SET `Name` = 'Señora del infortunio',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22962;
--- OLD name : Hermana del placer (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22964
-UPDATE `creature_template_locale` SET `Name` = 'Sacerdotisa de los placeres',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22964;
--- OLD name : Siervo esclavizado (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=22965
-UPDATE `creature_template_locale` SET `Name` = 'Administrador devoto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22965;
--- OLD name : Sacerdote de la garra Ishaal (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=23066
-UPDATE `creature_template_locale` SET `Name` = 'Sacerdote de la Garra Ishaal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23066;
--- OLD name : [PH]Knockdown Fel Cannon Dummy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23077
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23077;
--- OLD name : [UNUSED] Jefe Teron Sanguino (montado) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23126
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23126;
--- OLD name : [PH]Fel Hound (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23138
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23138;
--- OLD subname : NONE (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=23151
-UPDATE `creature_template_locale` SET `Title` = 'SPAWNING IS INCOMPLETE HERE, BROTHER!',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23151;
--- OLD name : [UNUSED] Mutant Commander [PH] (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23238
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23238;
--- OLD name : [PH]Wrath Hound Transform (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23276
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23276;
--- OLD name : [PH] PvP Cannon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23314
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23314;
--- OLD name : [PH] PvP Cannon Shot Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23315
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23315;
--- OLD name : [PH] PvP Cannon Targetting Reticle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23317
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23317;
--- OLD name : Carga Arcana (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=23429
-UPDATE `creature_template_locale` SET `Name` = 'Carga arcana',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23429;
--- OLD name : [PH] Brewfest Dwarf Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23479
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23479;
--- OLD name : [PH] Brewfest Human Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23480
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23480;
--- OLD name : Gentío de la Fiesta de la Cerveza (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=23488
-UPDATE `creature_template_locale` SET `Name` = 'Gentío de la Fiesta de la cerveza',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23488;
--- OLD name : Equipo de montaje de la Fiesta de la Cerveza (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=23504
-UPDATE `creature_template_locale` SET `Name` = 'Equipo de montaje de la Fiesta de la cerveza',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23504;
--- OLD name : [PH] Brewfest Garden D Vendor (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23532
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23532;
--- OLD name : [PH] Brewfest Goblin Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23540
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23540;
--- OLD name : Budd
--- Source : https://www.wowhead.com/wotlk/mx/npc=23559
-UPDATE `creature_template_locale` SET `Name` = 'Budd Magallenas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23559;
--- OLD subname : Instructora de pícaros
--- Source : https://www.wowhead.com/wotlk/mx/npc=23566
-UPDATE `creature_template_locale` SET `Title` = 'IV:7',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23566;
--- OLD name : [PH] New Hinterlands NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23599
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23599;
--- OLD name : [PH] Brewfest Orc Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23607
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23607;
--- OLD name : [PH] Brewfest Tauren Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23608
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23608;
--- OLD name : [PH] Brewfest Troll Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23609
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23609;
--- OLD name : [PH] Brewfest Blood Elf Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23610
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23610;
--- OLD name : [PH] Brewfest Undead Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23611
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23611;
--- OLD name : [PH] Brewfest Draenei Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23613
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23613;
--- OLD name : [PH] Brewfest Gnome Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23614
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23614;
--- OLD name : [PH] Brewfest Night Elf Reveler (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23615
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23615;
--- OLD name : [PH] Darkmoon Carnie APPEARANCE A (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23629
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23629;
--- OLD name : [PH] Darkmoon Carnie APPEARANCE B (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23630
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23630;
--- OLD name : [PH] Darkmoon Carnie APPEARANCE C (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23631
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23631;
--- OLD name : [PH] Darkmoon Carnie APPEARANCE D (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23632
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23632;
--- OLD name : [PH] Darkmoon Carnie APPEARANCE E (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23633
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23633;
--- OLD name : [PH] Darkmoon Carnie APPEARANCE F (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23634
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23634;
--- OLD name : Voceador de cerveza Gordok
--- Source : https://www.wowhead.com/wotlk/mx/npc=23685
-UPDATE `creature_template_locale` SET `Name` = 'Charlatán de cerveza Gordok',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23685;
--- OLD name : Águila Alaocaso (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=23693
-UPDATE `creature_template_locale` SET `Name` = 'Águila alaocaso',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23693;
--- OLD name : Juerguista de la Fiesta de la Cerveza borracho (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=23698
-UPDATE `creature_template_locale` SET `Name` = 'Juerguista de la Fiesta de la cerveza borracho',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23698;
--- OLD name : [DND] Brewfest Dark Iron Event Generator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23703
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23703;
--- OLD subname : Instructora de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=23734
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23734;
--- OLD name : [DND] Brewfest Keg Move to Target (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=23808
-UPDATE `creature_template_locale` SET `Name` = 'Brewfest Keg Move to Target',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23808;
--- OLD name : [PH] Brewfest Dwarf Male Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23819
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23819;
--- OLD name : [PH] Brewfest Dwarf Female Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23820
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23820;
--- OLD name : [PH] Brewfest Goblin Female Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23824
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23824;
--- OLD name : [PH] Brewfest Goblin Male Celebrant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23825
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23825;
--- OLD name : [DND] L70ETC FX Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23830
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23830;
--- OLD name : [DND] L70ETC Bergrisst Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23845
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23845;
--- OLD name : [DND] L70ETC Concert Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23850
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23850;
--- OLD name : [DND] L70ETC Mai'Kyl Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23852
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23852;
--- OLD name : [DND] L70ETC Samuro Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23853
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23853;
--- OLD name : [DND] L70ETC Sig Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23854
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23854;
--- OLD name : [DND] L70ETC Chief Thunder-Skins Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23855
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23855;
--- OLD name : Zul'jin, subname : NONE (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=23863
-UPDATE `creature_template_locale` SET `Name` = 'Daakara',`Title` = 'El Invencible',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23863;
--- OLD name : [DND] Brewfest Dark Iron Spawn Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23894
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23894;
--- OLD subname : Instructor de pesca y suministros
--- Source : https://www.wowhead.com/wotlk/mx/npc=23896
-UPDATE `creature_template_locale` SET `Title` = 'Mercader de pescado',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23896;
--- OLD name : [DNT]TEST Pet Moth (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=23936
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 23936;
--- OLD subname : G.U.A.O.
--- Source : https://www.wowhead.com/wotlk/mx/npc=24108
-UPDATE `creature_template_locale` SET `Title` = 'G.U.A.O',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24108;
--- OLD name : [DND] Brewfest Target Dummy Move To Target (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24109
-UPDATE `creature_template_locale` SET `Name` = 'Brewfest Target Dummy Move To Target',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24109;
--- OLD name : Micah Rompepedras (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24168
-UPDATE `creature_template_locale` SET `Name` = 'Micah Rompepiedras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24168;
--- OLD name : [DND] Darkmoon Faire Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24171
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24171;
--- OLD name : [UNUSED]Fantasma de expedicionario Jaren (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24181
-UPDATE `creature_template_locale` SET `Name` = 'Summoned Satchel Charge B',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24181;
--- OLD name : [DND] Brewfest Barker Bunny 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24202
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24202;
--- OLD name : [DND] Brewfest Barker Bunny 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24203
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24203;
--- OLD name : [DND] Brewfest Barker Bunny 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24204
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24204;
--- OLD name : [DND] Brewfest Barker Bunny 4 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24205
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24205;
--- OLD name : Ejército de muertos
--- Source : https://www.wowhead.com/wotlk/mx/npc=24207
-UPDATE `creature_template_locale` SET `Name` = 'Necrófago del Ejército de muertos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24207;
--- OLD name : [DND] Darkmoon Faire Target Bunny Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24220
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24220;
--- OLD name : [DND] Brewfest Speed Bunny Green (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24263
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24263;
--- OLD name : [DND] Brewfest Speed Bunny Yellow (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24264
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24264;
--- OLD name : [DND] Brewfest Speed Bunny Red (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24265
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24265;
--- OLD name : [PH] Gossip NPC Human Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24292
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24292;
--- OLD name : [PH] Gossip NPC Human Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24293
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24293;
--- OLD name : [PH] Gossip NPC Blood Elf Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24294
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24294;
--- OLD name : [PH] Gossip NPC Blood Elf Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24295
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24295;
--- OLD name : [PH] Gossip NPC Draenei Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24296
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24296;
--- OLD name : [PH] Gossip NPC Draenei Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24297
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24297;
--- OLD name : [PH] Gossip NPC Dwarf Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24298
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24298;
--- OLD name : [PH] Gossip NPC Dwarf Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24299
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24299;
--- OLD name : [PH] Gossip NPC Undead Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24300
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24300;
--- OLD name : [PH] Gossip NPC Undead Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24301
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24301;
--- OLD name : [PH] Gossip NPC Gnome Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24302
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24302;
--- OLD name : [PH] Gossip NPC Gnome Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24303
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24303;
--- OLD name : [PH] Gossip NPC Goblin Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24304
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24304;
--- OLD name : [PH] Gossip NPC Goblin Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24305
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24305;
--- OLD name : [PH] Gossip NPC Night Elf Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24306
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24306;
--- OLD name : [PH] Gossip NPC Night Elf Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24307
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24307;
--- OLD name : [PH] Gossip NPC Orc Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24308
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24308;
--- OLD name : [PH] Gossip NPC Orc Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24309
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24309;
--- OLD name : [PH] Gossip NPC Tauren Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24310
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24310;
--- OLD name : [PH] Gossip NPC Tauren Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24311
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24311;
--- OLD name : [PH] Creepy Rag Doll (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24319
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24319;
--- OLD name : [DND] Brewfest Delivery Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24337
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24337;
--- OLD name : [PH] Gossip NPC Troll Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24351
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24351;
--- OLD name : [PH] Gossip NPC Troll Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24352
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24352;
--- OLD name : [PH] Gossip NPC Troll Female, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24360
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24360;
--- OLD name : [PH] Gossip NPC Troll Male, Halloween (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24361
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24361;
--- OLD name : Barril festivo de la Destilería de Drohn
--- Source : https://www.wowhead.com/wotlk/mx/npc=24372
-UPDATE `creature_template_locale` SET `Name` = 'Barril festivo de destilería de Drohn',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24372;
--- OLD name : [UNUSED]Vazruden Kill Credit (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24377
-UPDATE `creature_template_locale` SET `Name` = 'Summoned Satchel Charge C',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24377;
--- OLD name : [UNUSED]Nazan Kill Credit (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24378
-UPDATE `creature_template_locale` SET `Name` = '"Back To Bladespire Fortress" Flight Kill Credit',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24378;
--- OLD name : [VO]Nalorakk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24382
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24382;
--- OLD name : [VO]Akil'Zon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24383
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24383;
--- OLD name : [VO]Halazzi (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24384
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24384;
--- OLD name : [VO]Jan'alai (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24386
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24386;
--- OLD name : Invisible Man - No Weapons (Server Only/Hide Body)
--- Source : https://www.wowhead.com/wotlk/mx/npc=24417
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24417;
--- OLD name : Imagen del príncipe-nexo Shaffar (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24423
-UPDATE `creature_template_locale` SET `Name` = 'Imagen del Príncipe del Nexo Shaffar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24423;
--- OLD name : [PH] Maldonado's Test Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24470
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24470;
--- OLD name : Fuego de forja
--- Source : https://www.wowhead.com/wotlk/mx/npc=24471
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24471;
--- OLD name : Juerguista de la Fiesta de la Cerveza (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=24484
-UPDATE `creature_template_locale` SET `Name` = 'Juerguista de la Fiesta de la cerveza',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24484;
--- OLD name : Voceador de la Destilería de Drohn
--- Source : https://www.wowhead.com/wotlk/mx/npc=24492
-UPDATE `creature_template_locale` SET `Name` = 'Charlatán de destilería de Drohn',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24492;
--- OLD name : Voceador de la Cervecería vudú de T'chali
--- Source : https://www.wowhead.com/wotlk/mx/npc=24493
-UPDATE `creature_template_locale` SET `Name` = 'Charlatán de cervecería vudú de T''chali',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24493;
--- OLD name : Aprendiz de la Destilería de Drohn, subname : Vendedor de cerveza de la Destilería de Drohn (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=24501
-UPDATE `creature_template_locale` SET `Name` = 'Aprendiz de destilería de Drohn',`Title` = 'Vendedor de cerveza de la destilería de Drohn',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24501;
--- OLD name : Perito Marea de Hierro (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24581
-UPDATE `creature_template_locale` SET `Name` = 'Perito mareaférrea',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24581;
--- OLD name : Maquinista Marea de Hierro (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24582
-UPDATE `creature_template_locale` SET `Name` = 'Maquinista mareaférrea',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24582;
--- OLD name : Ingeniero Marea de Hierro (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24583
-UPDATE `creature_template_locale` SET `Name` = 'Ingeniero mareaférrea',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24583;
--- OLD name : [PH] BLB Blue Blood Elf Male (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24658
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24658;
--- OLD name : Teniente Martillo de Hielo
--- Source : https://www.wowhead.com/wotlk/mx/npc=24665
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24665;
--- OLD subname : Organizador de la Fiesta de la Cerveza (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=24710
-UPDATE `creature_template_locale` SET `Title` = 'Organizador de la Fiesta de la cerveza',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24710;
--- OLD subname : Organizador de la Fiesta de la Cerveza (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=24711
-UPDATE `creature_template_locale` SET `Title` = 'Organizador de la Fiesta de la cerveza',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24711;
--- OLD name : [DND] Brewfest Face Me Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24766
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24766;
--- OLD name : Saqueador Grutacanto (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=24830
-UPDATE `creature_template_locale` SET `Name` = 'Saqueador grutacanto',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24830;
--- OLD name : Pirata Defias, femenino
--- Source : https://www.wowhead.com/wotlk/mx/npc=24860
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24860;
--- OLD subname : Instructora de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=24868
-UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24868;
--- OLD name : [PH]Avalanche (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=24912
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 24912;
--- OLD subname : Instructor de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=25099
-UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25099;
--- OLD name : [PH] Bri's Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=25139
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25139;
--- OLD subname : Specialty Ammunition Vendor
--- Source : https://www.wowhead.com/wotlk/mx/npc=25195
-UPDATE `creature_template_locale` SET `Title` = 'Vendedor de munición especial',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25195;
--- OLD subname : Specialty Ammunition Vendor
--- Source : https://www.wowhead.com/wotlk/mx/npc=25196
-UPDATE `creature_template_locale` SET `Title` = 'Vendedor de munición especial',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25196;
--- OLD name : [PH] Torch Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=25218
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25218;
--- OLD subname : Matriarca Caballero de sangre (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25246
-UPDATE `creature_template_locale` SET `Title` = 'Matriarca de los Caballeros de sangre',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25246;
--- OLD name : Craig Steele (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25323
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25323;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25323, 'esMX','PNJs',NULL,0);
--- OLD name : Garganta el Moledor de Cadáveres (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25329
-UPDATE `creature_template_locale` SET `Name` = 'Aniquilador Grek''lor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25329;
--- OLD name : Draco guardián rojo
--- Source : https://www.wowhead.com/wotlk/mx/npc=25364
-UPDATE `creature_template_locale` SET `Name` = 'Draco rojo guardián',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25364;
--- OLD name : Craig Steele2 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25406
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25406;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25406, 'esMX','PNJs',NULL,0);
--- OLD name : Craig Steele3 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25411
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25411;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25411, 'esMX','PNJs',NULL,0);
--- OLD name : Espíritu del clarividente Caminante Siniestro
--- Source : https://www.wowhead.com/wotlk/mx/npc=25425
-UPDATE `creature_template_locale` SET `Name` = 'Espíritu de clarividente Caminante Siniestro',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25425;
--- OLD name : PattyMack: La Muñeco (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25499
-UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - The Dummy',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25499;
--- OLD name : PattyMack - Flying Dummy (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25500
-UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - Flying Dummy',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25500;
--- OLD name : [DNT] Torch Tossing Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=25535
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25535;
--- OLD name : [DNT] Torch Tossing Target Bunny Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=25536
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25536;
--- OLD name : Craig's Test Human A (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25537
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25537;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (25537, 'esMX','Craig''s Test Human',NULL,0);
--- OLD name : Enviado Cornopúa (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25658
-UPDATE `creature_template_locale` SET `Name` = 'Enviado cuernopúa',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25658;
--- OLD name : Agostizo abrasador
--- Source : https://www.wowhead.com/wotlk/mx/npc=25706
-UPDATE `creature_template_locale` SET `Name` = 'Agostizo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25706;
--- OLD name : [ph] Coldarra Blue Dragon Patroller (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25723
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25723;
--- OLD name : [PH] Coldarra Leyliner (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25734
-UPDATE `creature_template_locale` SET `Name` = NULL,`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25734;
--- OLD name : [PH] Ahune Summon Loc Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=25745
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25745;
--- OLD name : [PH] Ahune Loot Loc Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=25746
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 25746;
--- OLD name : Engendro de vacío (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=25824
-UPDATE `creature_template_locale` SET `Name` = 'Engendro del vacío',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25824;
--- OLD name : Craig's Test Human B (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26080
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26080;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (26080, 'esMX','PNJs',NULL,0);
--- OLD name : [PH] Tom Test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26176
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26176;
--- OLD name : [PH] Torch Catching Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26188
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26188;
--- OLD name : [PH] Spank Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26190
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26190;
--- OLD name : [PH] Ghost of Ahune (Disguise) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26241
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26241;
--- OLD subname : Matriarca Caballero de sangre (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26247
-UPDATE `creature_template_locale` SET `Title` = 'Matriarca de los Caballeros de sangre',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26247;
--- OLD name : [DND] Midsummer Bonfire Faction Bunny - A (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26258
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26258;
--- OLD name : [PH] Dragonblight Ancient (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26274
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26274;
--- OLD name : [PH] Dragonblight Black Dragon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26275
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26275;
--- OLD name : [PH] Dragonblight Green Dragon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26278
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26278;
--- OLD name : [PH] Dragonblight Elemental Obsidian Dragonshire (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26285
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26285;
--- OLD name : Forgotten Shore Event Trigger
--- Source : https://www.wowhead.com/wotlk/mx/npc=26288
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26288;
--- OLD name : [PH] Dragonblight Scourge Carrion Fields (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26292
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26292;
--- OLD name : [PH] Dragonblight Magma Wyrm (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26294
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26294;
--- OLD name : [PH] Dragonblight Scarlet Onslaught (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26296
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26296;
--- OLD name : [PH] Dragonblight taunka (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26311
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26311;
--- OLD name : [PH] Dragonblight taunka Spirit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26312
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26312;
--- OLD name : [PH] Dragonblight Treant (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26313
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26313;
--- OLD name : [PH] Dragonblight Scourge Galakrond Rest (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26317
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26317;
--- OLD name : [PH] Dragonblight Scourge Obsidian Dragonshire (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26318
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26318;
--- OLD name : [PH] Dragonblight Scourge Ruby Dragonshrine (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26320
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26320;
--- OLD name : Instructora de brujos (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26331
-UPDATE `creature_template_locale` SET `Name` = 'Instructor de brujos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26331;
--- OLD name : [DND] Midsummer Bonfire Faction Bunny - H (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26355
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26355;
--- OLD name : Test - Brutallus Craig (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26376
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26376;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (26376, 'esMX','PNJs',NULL,0);
--- OLD name : Evee Muellecobre, subname : Vendedora de arena
--- Source : https://www.wowhead.com/wotlk/mx/npc=26378
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26378;
--- OLD name : Grikkin Muellecobre, subname : Vendedor de arena
--- Source : https://www.wowhead.com/wotlk/mx/npc=26383
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26383;
--- OLD name : Frixee Cabriolatón, subname : Vendedora de arena
--- Source : https://www.wowhead.com/wotlk/mx/npc=26384
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26384;
--- OLD name : [PH] Ice Chest Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26391
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26391;
--- OLD name : [PH] Dragonblight Carrion Field Necromancer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26489
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26489;
--- OLD name : [PH] Dragonblight Carrion Field Zombie (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26490
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26490;
--- OLD name : [PH] Dragonblight Carrion Field Gargoyle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26491
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26491;
--- OLD name : Curiana
--- Source : https://www.wowhead.com/wotlk/mx/npc=26525
-UPDATE `creature_template_locale` SET `Name` = 'Cucaracha',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26525;
--- OLD subname : Caballero de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26528
-UPDATE `creature_template_locale` SET `Title` = 'Caballero de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26528;
--- OLD name : [Demo] Craig Amai (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26535
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26535;
--- OLD name : [PH] Justin's Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26576
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26576;
--- OLD name : Transformación de Percepción espiritual (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26594
-UPDATE `creature_template_locale` SET `Name` = 'Visión espiritual',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26594;
--- OLD name : [PH] Named Condor Shirrak (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26665
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26665;
--- OLD name : Rabid Dire Bear *Unused* (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26671
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26671;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (26671, 'esMX','PNJs',NULL,0);
--- OLD name : Habitante de Arroyoplata (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26708
-UPDATE `creature_template_locale` SET `Name` = 'Habitante de Arroyoplata recordado',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26708;
--- OLD name : Espía de la Fiesta de la Cerveza (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=26719
-UPDATE `creature_template_locale` SET `Name` = 'Espía de la Fiesta de la cerveza',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26719;
--- OLD name : [DND] TAR Pedestal - Armor, Cloth & Leather (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26724
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26724;
--- OLD name : [dnd] Fizzcrank Paratrooper Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26732
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26732;
--- OLD name : Déspota azur (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26734
-UPDATE `creature_template_locale` SET `Name` = 'Agente azur',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26734;
--- OLD name : [DND] TAR Pedestal - Accessories (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26738
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26738;
--- OLD name : [DND] TAR Pedestal - Enchantments (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26739
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26739;
--- OLD name : [DND] TAR Pedestal - Gems (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26740
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26740;
--- OLD name : [DND] TAR Pedestal - General Goods (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26741
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26741;
--- OLD name : [DND] TAR Pedestal - Armor, Mail & Plate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26742
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26742;
--- OLD name : [DND] TAR Pedestal - Glyph, Cloth & Leather (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26743
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26743;
--- OLD name : [DND] TAR Pedestal - Glyph, Mail & Plate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26744
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26744;
--- OLD name : [DND] TAR Pedestal - Weapons (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26745
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26745;
--- OLD name : [DND] TAR Pedestal - Arena Organizer (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26747
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26747;
--- OLD name : [DND] TAR Pedestal - Beastmaster (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26748
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26748;
--- OLD name : [DND] TAR Pedestal - Paymaster (-> Monk) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26749
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26749;
--- OLD name : [DND] TAR Pedestal - Teleporter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26750
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26750;
--- OLD name : [DND] TAR Pedestal - Trainer, Druid (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26751
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26751;
--- OLD name : [DND] TAR Pedestal - Trainer, Hunter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26752
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26752;
--- OLD name : [DND] TAR Pedestal - Trainer, Mage (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26753
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26753;
--- OLD name : [DND] TAR Pedestal - Trainer, Paladin (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26754
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26754;
--- OLD name : [DND] TAR Pedestal - Trainer, Priest (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26755
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26755;
--- OLD name : [DND] TAR Pedestal - Trainer, Rogue (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26756
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26756;
--- OLD name : [DND] TAR Pedestal - Trainer, Shaman (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26757
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26757;
--- OLD name : [DND] TAR Pedestal - Trainer, Warlock (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26758
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26758;
--- OLD name : [DND] TAR Pedestal - Trainer, Warrior (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26759
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26759;
--- OLD name : [DND] TAR Pedestal - Fight Promoter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26765
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26765;
--- OLD name : Scott Keenan (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26791
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26791;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (26791, 'esMX','PNJs',NULL,0);
--- OLD name : [PH] Dragonblight Shoveltusk Scavenger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26835
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26835;
--- OLD name : [PH] Dragonblight Named Frost Wyrm Horde (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=26840
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 26840;
--- OLD subname : Instructora de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26956
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26956;
--- OLD subname : Instructora de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=26992
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26992;
--- OLD name : Tonraq, subname : Fabricante de lanzas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27188
-UPDATE `creature_template_locale` SET `Name` = 'Kah''chu',`Title` = 'Reparaciones',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27188;
--- OLD name : [PH] New Hearthglen Scarlet Footman (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=27205
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27205;
--- OLD name : [PH] New Hearthglen Scarlet Commander (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=27208
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27208;
--- OLD name : Torturador LeCraft (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27209
-UPDATE `creature_template_locale` SET `Name` = 'Torturador Alphonse',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27209;
--- OLD name : [PH] New Hearthglen Scarlet Scout (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=27218
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27218;
--- OLD name : Clayton Dubin J, subname : Calidad garantizada (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27231
-UPDATE `creature_template_locale` SET `Name` = 'Clayton Dubin Test J',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27231;
--- OLD name : Clamallamas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27292
-UPDATE `creature_template_locale` SET `Name` = 'Evocallamas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27292;
--- OLD name : Cadena de Clamallamas (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27297
-UPDATE `creature_template_locale` SET `Name` = 'Cadena de Evocallamas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27297;
--- OLD name : [DND] Stabled Pet Appearance (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=27368
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27368;
--- OLD name : Escribano jefe Barriga (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27378
-UPDATE `creature_template_locale` SET `Name` = 'Escribano jefe Kinnedius',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27378;
--- OLD name : Wintergarde Inner Gate Attack Trigger
--- Source : https://www.wowhead.com/wotlk/mx/npc=27380
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27380;
--- OLD name : Thel'zan el Portador del Ocaso
--- Source : https://www.wowhead.com/wotlk/mx/npc=27384
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27384;
--- OLD name : [DND] Valiance Keep Footman Spectator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=27387
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27387;
--- OLD name : Utgarde Duo Trigger
--- Source : https://www.wowhead.com/wotlk/mx/npc=27404
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27404;
--- OLD name : Clayton Dubin - TEST COPY DATA (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27527
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27527;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (27527, 'esMX','PNJs',NULL,0);
--- OLD name : Lord Afrasastrasz
--- Source : https://www.wowhead.com/wotlk/mx/npc=27575
-UPDATE `creature_template_locale` SET `Name` = 'Lord Devrestrasz',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27575;
--- OLD name : Coche de carreras triturador (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27664
-UPDATE `creature_template_locale` SET `Name` = 'Autito chocón',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27664;
--- OLD name : Piloto de coche de carreras triturador (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27697
-UPDATE `creature_template_locale` SET `Name` = 'Piloto de autito chocón',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27697;
--- OLD name : Gran kodo de la Fiesta de la Cerveza (CASE ONLY)
--- Source : https://www.wowhead.com/wotlk/mx/npc=27707
-UPDATE `creature_template_locale` SET `Name` = 'Gran kodo de la Fiesta de la cerveza',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27707;
--- OLD name : [DND] Aldor Mailbox Malfunction Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=27723
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27723;
--- OLD name : Patty's test vehicle (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=27862
-UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - vehicle',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27862;
--- OLD name : [PH] Warp Stalker Mount (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=27976
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 27976;
--- OLD name : Teniente Martillo de Hielo
--- Source : https://www.wowhead.com/wotlk/mx/npc=27994
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27994;
--- OLD name : [ph] exploding barrel (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28173
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28173;
--- OLD name : [ph] Goblin Construction Crew (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28180
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28180;
--- OLD name : [DND] under water construction crew (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28184
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28184;
--- OLD name : [DND] L70ETC Drums (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28206
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28206;
--- OLD name : [DND] taxi flavor eagle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28292
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28292;
--- OLD name : [UNUSED]Altar of Quetz'lun Gateway - Real World (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28469
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28469;
--- OLD name : Ronakada (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=28501
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28501;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (28501, 'esMX','PNJs',NULL,0);
--- OLD name : Torturador LeCraft
--- Source : https://www.wowhead.com/wotlk/mx/npc=28554
-UPDATE `creature_template_locale` SET `Name` = 'Torturador Alphonse',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28554;
--- OLD name : Caballero de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=28612
-UPDATE `creature_template_locale` SET `Name` = 'Caballero de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28612;
--- OLD name : Cíngara misteriosa (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=28652
-UPDATE `creature_template_locale` SET `Name` = 'Comerciante misterioso',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28652;
--- OLD name : Profeta de Quetz'lun
--- Source : https://www.wowhead.com/wotlk/mx/npc=28671
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28671;
--- OLD subname : Instructor de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=28693
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de encantamiento',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28693;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=28694
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de herrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28694;
--- OLD subname : Instructor de desuello
--- Source : https://www.wowhead.com/wotlk/mx/npc=28696
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de desuello',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28696;
--- OLD subname : Instructor de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=28697
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28697;
--- OLD subname : Instructor de minería
--- Source : https://www.wowhead.com/wotlk/mx/npc=28698
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de minería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28698;
--- OLD subname : Instructor de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=28699
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de sastrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28699;
--- OLD subname : Instructora de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=28700
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28700;
--- OLD subname : Instructor de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=28701
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28701;
--- OLD subname : Instructor de inscripción
--- Source : https://www.wowhead.com/wotlk/mx/npc=28702
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de inscripción',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28702;
--- OLD subname : Instructora de alquimia
--- Source : https://www.wowhead.com/wotlk/mx/npc=28703
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de alquimia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28703;
--- OLD subname : Instructora de herboristería
--- Source : https://www.wowhead.com/wotlk/mx/npc=28704
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de herboristería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28704;
--- OLD subname : Instructora de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=28705
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de cocina',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28705;
--- OLD subname : Instructora de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=28706
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de primeros auxilios',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28706;
--- OLD subname : Instructora de pesca y suministros
--- Source : https://www.wowhead.com/wotlk/mx/npc=28742
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de pesca y suministros',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28742;
--- OLD subname : Instructor de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=28746
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de vuelo en clima frío',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28746;
--- OLD name : [Phase 1] Scarlet Crusade Proxy Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28763
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28763;
--- OLD name : [Phase 1] Citizen of Havenshire Proxy Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28764
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28764;
--- OLD name : [Phase 1] Havenshrie Horse Credit, Step 01 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28767
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28767;
--- OLD name : Vaino (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=28871
-UPDATE `creature_template_locale` SET `Name` = 'Vaina',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28871;
--- OLD name : [Chapter II] Scarlet Crusader Test Dummy Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28957
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28957;
--- OLD name : Señor Escarlata Jesseriah McCree
--- Source : https://www.wowhead.com/wotlk/mx/npc=28964
-UPDATE `creature_template_locale` SET `Name` = 'Señor Escarlata Borugh',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28964;
--- OLD name : [Chapter II] Scarlet Crusader Proxy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=28984
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 28984;
--- OLD subname : Fabricante de arcos
--- Source : https://www.wowhead.com/wotlk/mx/npc=29014
-UPDATE `creature_template_locale` SET `Title` = 'Flechero',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29014;
--- OLD name : [DND] Dockhand w/Bag (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29020
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29020;
--- OLD name : [609] Ebon Hold Duel Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29025
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29025;
--- OLD name : [Chapter II] Torch Toss Dummy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29038
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29038;
--- OLD name : [UNUSED] [ph] Stormwind Gryphon (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=29039
-UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29039;
--- OLD name : PattyMacks La Doble (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=29083
-UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - The Duece',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29083;
--- OLD name : Totally Generic Bunny x8.0 (JSB) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=29100
-UPDATE `creature_template_locale` SET `Name` = 'Universal Bunny - DNT',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29100;
--- OLD name : Dama de batalla Val'kyr (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=29111
-UPDATE `creature_template_locale` SET `Name` = 'Doncella de batalla Val''kyr',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29111;
--- OLD name : [Chapter IV] Chapter IV Dummy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29192
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29192;
--- OLD subname : Vendedor de componentes
--- Source : https://www.wowhead.com/wotlk/mx/npc=29203
-UPDATE `creature_template_locale` SET `Title` = 'Vendedor de polvo de cadáver',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29203;
--- OLD name : Guerrero de los Baldíos Helados
--- Source : https://www.wowhead.com/wotlk/mx/npc=29206
-UPDATE `creature_template_locale` SET `Name` = 'Guerrero de los Páramos Congelados',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29206;
--- OLD subname : Instructora de primeros auxilios (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=29233
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de vendajes',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29233;
--- OLD name : [Chapter IV] Light of Dawn Credit (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29245
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29245;
--- OLD name : PattyMacks Hovering Dummy (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=29263
-UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - Hovering Dummy',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29263;
--- OLD name : [PH]TEST Skater (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29361
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29361;
--- OLD name : Venerador Veloneve
--- Source : https://www.wowhead.com/wotlk/mx/npc=29407
-UPDATE `creature_template_locale` SET `Name` = 'Devoto Veloneve',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29407;
--- OLD subname : Specialty Ammunition
--- Source : https://www.wowhead.com/wotlk/mx/npc=29493
-UPDATE `creature_template_locale` SET `Title` = 'Munición especial',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29493;
--- OLD subname : Instructora de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=29505
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de forja de armas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29505;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=29506
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de forja de armaduras',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29506;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=29507
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de peletería elemental',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29507;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=29508
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de peletería de escamas de dragón',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29508;
--- OLD subname : Instructora de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=29509
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de peletería tribal',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29509;
--- OLD subname : Instructor de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=29631
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de cocina',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29631;
--- OLD name : Alto arcanista Savor
--- Source : https://www.wowhead.com/wotlk/mx/npc=29657
-UPDATE `creature_template_locale` SET `Name` = 'Alto arcanista Sabor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29657;
--- OLD subname : Maestro de vuelo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=29749
-UPDATE `creature_template_locale` SET `Title` = 'Maestra de vuelo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29749;
--- OLD name : Espíritu de rinoceronte
--- Source : https://www.wowhead.com/wotlk/mx/npc=29791
-UPDATE `creature_template_locale` SET `Name` = 'Espíritu de Rhino',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29791;
--- OLD name : [DND] Dalaran Toy Store Plane String Hook (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29807
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29807;
--- OLD name : [DND] Dalaran Toy Store Plane String Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=29812
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 29812;
--- OLD name : Sacudetierra Drakkari
--- Source : https://www.wowhead.com/wotlk/mx/npc=29829
-UPDATE `creature_template_locale` SET `Name` = 'Tiemblatérrea Drakkari',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29829;
--- OLD name : [DND]Wyrmrest Temple Beam Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30078
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30078;
--- OLD name : [DND] Anguish Spectator Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30156
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30156;
--- OLD name : Lanudal Cornoplata (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=30241
-UPDATE `creature_template_locale` SET `Name` = 'Lanudal cuernoplata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30241;
--- OLD name : Jormuttar
--- Source : https://www.wowhead.com/wotlk/mx/npc=30340
-UPDATE `creature_template_locale` SET `Name` = 'Jorcuttar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30340;
--- OLD subname : Reina alma en pena (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=30426
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30426;
--- OLD subname : Reina alma en pena (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=30427
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30427;
--- OLD subname : Reina alma en pena (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=30428
-UPDATE `creature_template_locale` SET `Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30428;
--- OLD subname : Ammunition
--- Source : https://www.wowhead.com/wotlk/mx/npc=30437
-UPDATE `creature_template_locale` SET `Title` = 'Munición',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30437;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (A) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30476
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30476;
--- OLD name : [UNUSED] Wrathstrike Gargoyle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30545
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30545;
--- OLD name : Fras Siabi (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=30552
-UPDATE `creature_template_locale` SET `Name` = 'Ezra Grimm',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30552;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (A) Teleport Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30559
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30559;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (H) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30588
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30588;
--- OLD name : [DND] Icecrown Flight To Airship Bunny (H) Teleport Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30589
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30589;
--- OLD name : [UNUSED] Forgotten Depths High Priest (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30594
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30594;
--- OLD name : [DND] Icecrown Airship (A) - Cannon Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30640
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30640;
--- OLD name : [DND] Icecrown Airship (A) - Cannon, Even (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30646
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30646;
--- OLD name : [DND] Icecrown Airship (H) - Cannon Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30649
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30649;
--- OLD name : [DND] Icecrown Airship (A) - Cannon, Odd (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30651
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30651;
--- OLD name : [DND] Icecrown Airship (A) - Cannon Controller 01 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30655
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30655;
--- OLD name : Hechicero azur (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=30667
-UPDATE `creature_template_locale` SET `Name` = 'Hechicera azur',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30667;
--- OLD name : [DND] Icecrown Airship (H) - Flak Cannon, Odd (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30690
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30690;
--- OLD name : [DND] Icecrown Airship (H) - Flak Cannon, Even (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30699
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30699;
--- OLD name : [DND] Icecrown Airship (H) - Cannon, Neutral (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30700
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30700;
--- OLD name : [DND] Icecrown Airship (H) - Cannon Controller 01 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30707
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30707;
--- OLD subname : Instructor de inscripción
--- Source : https://www.wowhead.com/wotlk/mx/npc=30721
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de inscripción',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30721;
--- OLD subname : Instructora de inscripción
--- Source : https://www.wowhead.com/wotlk/mx/npc=30722
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de inscripción',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30722;
--- OLD name : [DND] Icecrown Airship (H) - Cannon Target, Shield (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30749
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30749;
--- OLD name : Tripulante del Martillo de Orgrim
--- Source : https://www.wowhead.com/wotlk/mx/npc=30754
-UPDATE `creature_template_locale` SET `Name` = 'Tripulación del Martillo de Orgrim',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30754;
--- OLD name : [DND] Icecrown Airship (A) - Cannon Target, Shield (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=30832
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 30832;
--- OLD subname : Armadura de arena de legado
--- Source : https://www.wowhead.com/wotlk/mx/npc=30885
-UPDATE `creature_template_locale` SET `Title` = 'Vendedor de agua',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30885;
--- OLD name : QA Test Dummy 80 Hostile Low Damage (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=30888
-UPDATE `creature_template_locale` SET `Name` = 'Andrew Test Dummy 80 Hostile Low Damage',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30888;
--- OLD name : Iniciada caballero de la Muerte, subname : Anfitriona de sufrimiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=30958
-UPDATE `creature_template_locale` SET `Name` = 'Iniciado caballero de la Muerte',`Title` = 'Anfitrión de sufrimiento',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30958;
--- OLD name : [UNUSED] The Lich King (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=31014
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 31014;
--- OLD name : Russell Bernau Test NPC (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31060
-UPDATE `creature_template_locale` SET `Name` = 'Ali Garchanter [TEST]',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31060;
--- OLD name : Tótem Garra de piedra VIII (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31120
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Garra de piedra VIII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31120;
--- OLD name : Tótem Lengua de Fuego VI (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31132
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Lengua de Fuego VI',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31132;
--- OLD name : Reinforced Training Dummy (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31143
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 31143;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (31143, 'esMX','PNJs',NULL,0);
--- OLD name : Muñeco de entrenamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=31144
-UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento de maestro mayor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31144;
--- OLD name : Muñeco de entrenamiento de asaltante
--- Source : https://www.wowhead.com/wotlk/mx/npc=31146
-UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento heroico',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31146;
--- OLD name : Tótem Lengua de Fuego VII (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31158
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Lengua de Fuego VII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31158;
--- OLD name : Tótem abrasador VIII (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31162
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem abrasador VIII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31162;
--- OLD name : Tótem abrasador IX (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31164
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem abrasador IX',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31164;
--- OLD name : Tótem de magma VI (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31166
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de magma VI',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31166;
--- OLD name : V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31168
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDV',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31168;
--- OLD name : Tótem de resistencia al fuego V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31169
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia al fuego V',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31169;
--- OLD name : Tótem de resistencia al fuego VI (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31170
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia al fuego VI',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31170;
--- OLD name : Tótem de resistencia a la escarcha V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31171
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la escarcha V',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31171;
--- OLD name : Tótem de resistencia a la Naturaleza V (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31173
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la Naturaleza V',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31173;
--- OLD name : Tótem Piel de piedra IX (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31175
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Piel de piedra IX',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31175;
--- OLD name : Tótem Corriente de sanación VIII (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31182
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Corriente de sanación VIII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31182;
--- OLD name : Tótem Fuente de maná VI (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31186
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Fuente de maná VI',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31186;
--- OLD name : [DND] Icecrown Airship Cannon Explosion Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=31246
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 31246;
--- OLD subname : Instructora de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=31247
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de vuelo en clima frío',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31247;
--- OLD name : [DND] Icecrown Airship (N) - Attack Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=31353
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 31353;
--- OLD name : Refugiado Renegado (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31467
-UPDATE `creature_template_locale` SET `Name` = 'Refugiada Renegada',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31467;
--- OLD subname : Emblema de intendente de honor
--- Source : https://www.wowhead.com/wotlk/mx/npc=31579
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de valor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31579;
--- OLD subname : Emblema del heroísmo intendente
--- Source : https://www.wowhead.com/wotlk/mx/npc=31580
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de heroísmo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31580;
--- OLD subname : Emblema de intendente de honor
--- Source : https://www.wowhead.com/wotlk/mx/npc=31581
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de valor',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31581;
--- OLD subname : Emblema del heroísmo intendente
--- Source : https://www.wowhead.com/wotlk/mx/npc=31582
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de heroísmo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31582;
--- OLD name : Imagen de profeta Tharon'ja
--- Source : https://www.wowhead.com/wotlk/mx/npc=31621
-UPDATE `creature_template_locale` SET `Name` = 'Imagen del profeta Tharon''ja',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31621;
--- OLD name : Bronze Drake (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31696
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 31696;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (31696, 'esMX','PNJs',NULL,0);
--- OLD name : Mancha de petróleo
--- Source : https://www.wowhead.com/wotlk/mx/npc=31786
-UPDATE `creature_template_locale` SET `Name` = 'Aceite resbaladizo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31786;
--- OLD subname : Bombardero (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=31839
-UPDATE `creature_template_locale` SET `Title` = 'Bombardera',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31839;
--- OLD name : Nargle Trallacable, subname : Vendedor de arena experto
--- Source : https://www.wowhead.com/wotlk/mx/npc=31863
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31863;
--- OLD name : Zom Bocom, subname : Aprendiz de vendedor de arena
--- Source : https://www.wowhead.com/wotlk/mx/npc=31865
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31865;
--- OLD name : [DND] Icecrown Airship Bomb (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32193
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32193;
--- OLD name : [DND] Dalaran Sewer Arena - Controller - Death (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32328
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32328;
--- OLD name : [DND] Dalaran Sewer Arena - Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32339
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32339;
--- OLD name : Ecton Cabriolatón, subname : Aprendiz de vendedor de arena
--- Source : https://www.wowhead.com/wotlk/mx/npc=32360
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32360;
--- OLD name : Doris Volanthius, subname : Intendente experta de armaduras
--- Source : https://www.wowhead.com/wotlk/mx/npc=32385
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32385;
--- OLD name : [UNUSED] Spirit Healer (WGA) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32536
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32536;
--- OLD name : [DND] Cosmetic Book (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32606
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32606;
--- OLD name : Muñeco de entrenamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=32666
-UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento para expertos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32666;
--- OLD name : Muñeco de entrenamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=32667
-UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento de maestro',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32667;
--- OLD name : Crafticus Dominomente
--- Source : https://www.wowhead.com/wotlk/mx/npc=32686
-UPDATE `creature_template_locale` SET `Name` = 'Tomas Riogain',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32686;
--- OLD name : Tótem Nova de Fuego IX (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=32775
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego IX',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32775;
--- OLD name : Tótem Nova de Fuego VIII (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=32776
-UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego VIII',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32776;
--- OLD name : Trampa arácnida visual
--- Source : https://www.wowhead.com/wotlk/mx/npc=32785
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32785;
--- OLD name : [PH] Pilgrim's Bounty Table - Turkey (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32824
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32824;
--- OLD name : [PH] Pilgrim's Bounty Table - Yams (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32825
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32825;
--- OLD name : [PH] Pilgrim's Bounty Table - Cranberry Sauce (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32827
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32827;
--- OLD name : [PH] Pilgrim's Bounty Table - Pie (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32829
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32829;
--- OLD name : [PH] Pilgrim's Bounty Table - Stuffing (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=32831
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 32831;
--- OLD name : [ph] justin test backstab target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33049
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33049;
--- OLD name : [PH] Joust Horse (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33130
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33130;
--- OLD name : [PH] Joust Knight (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33135
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33135;
--- OLD name : [DND] TAR Pedestal - Trainer, Death Knight (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33252
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33252;
--- OLD name : [DND] Tournament - TEST NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33305
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33305;
--- OLD name : [DND] Tournament - Ranged Target Dummy - Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33339
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33339;
--- OLD name : [DND] Tournament - Mounted Melee - Target Dummy - Charge Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33340
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33340;
--- OLD name : [DND] Tournament - Mounted Melee - Target Dummy - Block Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33341
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33341;
--- OLD name : Morgan Test (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=33351
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33351;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (33351, 'esMX','PNJs',NULL,0);
--- OLD name : [ph] Tournament War Elekk - NPC Only (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33415
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33415;
--- OLD name : Mk II de leviatán (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=33432
-UPDATE `creature_template_locale` SET `Name` = 'Leviatán Mk II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33432;
--- OLD name : [ph] Tournament War Kodo - NPC Only (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33450
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33450;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 01 - Weak Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33489
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33489;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 02 -Speedy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33490
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33490;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 03 - Block Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33491
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33491;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 04 - Strong Guy (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33492
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33492;
--- OLD name : [DND] Tournament - Mounted Melee - Kill Credit - 05 - Ultimate (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33493
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33493;
--- OLD name : [ph] Tournament - Daily Combatant Summoner (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33501
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33501;
--- OLD name : [ph] Tournament - Mounted Combatant - Valiant Test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33520
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33520;
--- OLD name : [ph] Tournament - Mounted Combatant - Champion Test (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33521
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33521;
--- OLD name : Animus de saronita (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=33524
-UPDATE `creature_template_locale` SET `Name` = 'Ánimus de saronita',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33524;
--- OLD name : Channel Stalker Freya (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=33575
-UPDATE `creature_template_locale` SET `Name` = 'Acechadora de canales Freya',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33575;
--- OLD subname : Instructor de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33580
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de sastrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33580;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33581
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33581;
--- OLD subname : Instructor de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=33583
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de encantamiento',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33583;
--- OLD subname : Instructora de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33586
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33586;
--- OLD subname : Instructora de cocina
--- Source : https://www.wowhead.com/wotlk/mx/npc=33587
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de cocina',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33587;
--- OLD subname : Instructora de alquimia
--- Source : https://www.wowhead.com/wotlk/mx/npc=33588
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de alquimia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33588;
--- OLD subname : Instructor de primeros auxilios
--- Source : https://www.wowhead.com/wotlk/mx/npc=33589
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de primeros auxilios',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33589;
--- OLD subname : Instructor de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33590
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33590;
--- OLD subname : Instructora de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33591
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de herrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33591;
--- OLD subname : Instructor de inscripción
--- Source : https://www.wowhead.com/wotlk/mx/npc=33603
-UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de inscripción',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33603;
--- OLD subname : Instructor de alquimia
--- Source : https://www.wowhead.com/wotlk/mx/npc=33630
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de alquimia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33630;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33631
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de herrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33631;
--- OLD subname : Instructora de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=33633
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de encantamiento',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33633;
--- OLD subname : Instructora de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33634
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33634;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33635
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33635;
--- OLD subname : Instructora de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33636
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de sastrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33636;
--- OLD subname : Instructora de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33637
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33637;
--- OLD subname : Instructor de inscripción
--- Source : https://www.wowhead.com/wotlk/mx/npc=33638
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de inscripción',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33638;
--- OLD subname : Instructora de herboristería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33639
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de herboristería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33639;
--- OLD subname : Instructor de minería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33640
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de minería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33640;
--- OLD subname : Instructor de desuello
--- Source : https://www.wowhead.com/wotlk/mx/npc=33641
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de desuello',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33641;
--- OLD name : Acechador de Barrido con brazo de Kologarn (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=33661
-UPDATE `creature_template_locale` SET `Name` = 'Kologarn acechador barrebrazos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33661;
--- OLD subname : Instructor de alquimia
--- Source : https://www.wowhead.com/wotlk/mx/npc=33674
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de alquimia',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33674;
--- OLD subname : Instructor de herrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33675
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de herrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33675;
--- OLD subname : Instructora de encantamiento
--- Source : https://www.wowhead.com/wotlk/mx/npc=33676
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de encantamiento',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33676;
--- OLD subname : Instructora de ingeniería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33677
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de ingeniería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33677;
--- OLD subname : Instructora de herboristería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33678
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de herboristería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33678;
--- OLD subname : Instructor de inscripción
--- Source : https://www.wowhead.com/wotlk/mx/npc=33679
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de inscripción',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33679;
--- OLD subname : Instructora de joyería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33680
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de joyería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33680;
--- OLD subname : Instructor de peletería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33681
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de peletería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33681;
--- OLD subname : Instructor de minería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33682
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de minería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33682;
--- OLD subname : Instructor de desuello
--- Source : https://www.wowhead.com/wotlk/mx/npc=33683
-UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de desuello',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33683;
--- OLD subname : Instructora de sastrería
--- Source : https://www.wowhead.com/wotlk/mx/npc=33684
-UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de sastrería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33684;
--- OLD name : Vigilante de tormenta templado (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=33722
-UPDATE `creature_template_locale` SET `Name` = 'Vigilante de tormenta templada',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33722;
--- OLD name : [ph] test tournament charger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=33784
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 33784;
--- OLD name : Acechador de escombros de Kologarn (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=33809
-UPDATE `creature_template_locale` SET `Name` = 'Acechador de escombros Kologarn',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33809;
--- OLD name : Puntos de enfoque de Mimiron
--- Source : https://www.wowhead.com/wotlk/mx/npc=33835
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33835;
--- OLD name : Cincel goblin detonante
--- Source : https://www.wowhead.com/wotlk/mx/npc=33958
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33958;
--- OLD name : Magister Sarien, subname : Emblema de intendencia de conquista
--- Source : https://www.wowhead.com/wotlk/mx/npc=33963
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33963;
--- OLD subname : Emblema de intendencia de conquista
--- Source : https://www.wowhead.com/wotlk/mx/npc=33964
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de conquista',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33964;
--- OLD name : Radio de Barbabronce
--- Source : https://www.wowhead.com/wotlk/mx/npc=34054
-UPDATE `creature_template_locale` SET `Name` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 34054;
--- OLD name : Mk II de leviatán (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=34071
-UPDATE `creature_template_locale` SET `Name` = 'Leviatán Mk II',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 34071;
--- OLD name : [DND]Azeroth Children's Week Trigger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34281
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34281;
--- OLD name : Bomba de tiempo
--- Source : https://www.wowhead.com/wotlk/mx/npc=34307
-UPDATE `creature_template_locale` SET `Name` = 'Bomba de relojería',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 34307;
--- OLD name : [DND] Champion Go-To Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34319
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34319;
--- OLD name : [DND]Northrend Children's Week Trigger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34381
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34381;
--- OLD name : ScottM Test Creature (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=34533
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34533;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (34533, 'esMX','PNJs',NULL,0);
--- OLD name : [DND] Stink Bomb Target (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34562
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34562;
--- OLD name : [DND] Warbot - Blue (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34588
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34588;
--- OLD name : [DND] Warbot - Red (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34589
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34589;
--- OLD name : [DND] Magic Rooster (Draenei Male) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34731
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34731;
--- OLD name : [DND] Magic Rooster (Tauren Male) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34732
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34732;
--- OLD name : [ph] Argent Raid Spectator - FX - Horde (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34883
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34883;
--- OLD name : [ph] Argent Raid Spectator - FX - Alliance (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34887
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34887;
--- OLD name : [PH] Goss Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34889
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34889;
--- OLD name : [PH] Tournament Hippogryph Quest Mount (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34891
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34891;
--- OLD name : [PH] Stabled Argent Hippogryph (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34893
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34893;
--- OLD name : [ph] Argent Raid Spectator - FX - Human (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34900
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34900;
--- OLD name : [ph] Argent Raid Spectator - FX - Orc (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34901
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34901;
--- OLD name : [ph] Argent Raid Spectator - FX - Troll (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34902
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34902;
--- OLD name : [ph] Argent Raid Spectator - FX - Tauren (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34903
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34903;
--- OLD name : [ph] Argent Raid Spectator - FX - Blood Elf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34904
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34904;
--- OLD name : [ph] Argent Raid Spectator - FX - Undead (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34905
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34905;
--- OLD name : [ph] Argent Raid Spectator - FX - Dwarf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34906
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34906;
--- OLD name : [ph] Argent Raid Spectator - FX - Draenei (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34908
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34908;
--- OLD name : [ph] Argent Raid Spectator - FX - Night Elf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34909
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34909;
--- OLD name : [ph] Argent Raid Spectator - FX - Gnome (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=34910
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 34910;
--- OLD name : [ph] Argent Raid Spectator - Generic Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=35016
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 35016;
--- OLD name : Rememoración de Truenoraan (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=35032
-UPDATE `creature_template_locale` SET `Name` = 'Rememoración de Thunderaan',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35032;
--- OLD name : [ph] Argent Raid Spectator - FX - Alliance Fireworks NOT USED (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=35066
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 35066;
--- OLD subname : Instructor de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=35093
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de equitación',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35093;
--- OLD subname : Instructor de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=35100
-UPDATE `creature_template_locale` SET `Title` = 'Instructor de equitación',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35100;
--- OLD subname : Instructora de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=35133
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de equitación',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35133;
--- OLD subname : Instructora de vuelo
--- Source : https://www.wowhead.com/wotlk/mx/npc=35135
-UPDATE `creature_template_locale` SET `Title` = 'Instructora de equitación',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35135;
--- OLD subname : Emblema del intendente de triunfo
--- Source : https://www.wowhead.com/wotlk/mx/npc=35494
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de triunfo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35494;
--- OLD name : Magistrix Vesara, subname : Emblema del intendente de triunfo
--- Source : https://www.wowhead.com/wotlk/mx/npc=35495
-UPDATE `creature_template_locale` SET `Name` = '',`Title` = '',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35495;
--- OLD subname : Intendente de justicia de legado
--- Source : https://www.wowhead.com/wotlk/mx/npc=35573
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de triunfo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35573;
--- OLD subname : Intendente de justicia de legado
--- Source : https://www.wowhead.com/wotlk/mx/npc=35574
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de triunfo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35574;
--- OLD name : [DND] Dalaran Argent Tournament Herald Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=35608
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 35608;
--- OLD name : [DNT] Test Dragonhawk (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=35983
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 35983;
--- OLD name : [DND] Argent Charger (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36071
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36071;
--- OLD name : [DND] Swift Burgundy Wolf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36072
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36072;
--- OLD name : [DND] Swift Horde Wolf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36074
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36074;
--- OLD name : [DND] White Stallion (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36075
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36075;
--- OLD name : [DND] Swift Alliance Steed (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36076
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36076;
--- OLD name : [DND] Forsaken Mariner (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36148
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36148;
--- OLD name : [DND] Valgarde Peon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36154
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36154;
--- OLD name : [DND] Bor'gorok Wolf (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36167
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36167;
--- OLD name : [DND] Bor'gorok Peon (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36169
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36169;
--- OLD name : [DND]Northrend Children's Week Trigger 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36209
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36209;
--- OLD name : [DND] Crazed Apothecary Generator (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36212
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36212;
--- OLD name : Sobrestante Kor'kron (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=36213
-UPDATE `creature_template_locale` SET `Name` = 'Guardián de Entrañas',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36213;
--- OLD name : Sobrestante Kraggosh (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=36217
-UPDATE `creature_template_locale` SET `Name` = 'Cuerpo mutilado',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36217;
--- OLD subname : Capitán Kor'kron (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=36273
-UPDATE `creature_template_locale` SET `Title` = 'Mano del Jefe de Guerra',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36273;
--- OLD name : [DND] Valentine Boss - Vial Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36530
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36530;
--- OLD name : Unstable Fire Elemental [mini] (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=36553
-UPDATE `creature_template_locale` SET `Name` = 'Elemental de fuego inestable [mini]',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36553;
--- OLD name : Púa ósea
--- Source : https://www.wowhead.com/wotlk/mx/npc=36619
-UPDATE `creature_template_locale` SET `Name` = 'Púa osaria',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36619;
--- OLD name : [DND] Valentine Boss Manager (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36643
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36643;
--- OLD name : [DND] Apothecary Table (Spell Effect) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36710
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36710;
--- OLD name : [PH] Icecrown Reanimated Crusader (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36726
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36726;
--- OLD name : [PH] Unused Quarry Overseer (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=36792
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36792;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (36792, 'esMX','PNJs',NULL,0);
--- OLD name : [PH] Icecrown Gauntlet Ghoul (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36875
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36875;
--- OLD name : Gryphon Hatchling 3.3.0 (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=36904
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36904;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (36904, 'esMX','PNJs',NULL,0);
--- OLD name : [DND] World Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=36966
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 36966;
--- OLD name : [DND]Ground Cover Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37039
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37039;
--- OLD name : [PH] Icecrown Shade (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37128
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37128;
--- OLD name : [DND] Summon Bunny 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37168
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37168;
--- OLD name : [PH] Ice Stone 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37191
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37191;
--- OLD name : [PH] Ice Stone 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37192
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37192;
--- OLD name : [DND] Summon Bunny 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37201
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37201;
--- OLD name : [DND] Summon Bunny 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37202
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37202;
--- OLD subname : Caballero de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=37225
-UPDATE `creature_template_locale` SET `Title` = 'Caballero de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37225;
--- OLD subname : General Forestal (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=37527
-UPDATE `creature_template_locale` SET `Title` = 'General forestal de Lunargenta',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37527;
--- OLD name : [DND] Shaker (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37543
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37543;
--- OLD name : [DND]Something Stinks Kill Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37558
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37558;
--- OLD name : [DND] Shaker - Small (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37574
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37574;
--- OLD name : [PH] Runner Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37788
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37788;
--- OLD name : Pacificador de El Exodar (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=37798
-UPDATE `creature_template_locale` SET `Name` = 'Pacificador del Exodar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37798;
--- OLD name : [TEST] High Overlord Omar (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37820
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37820;
--- OLD name : [PH] Captain (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37831
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37831;
--- OLD subname : Emblema del intendente de escarcha
--- Source : https://www.wowhead.com/wotlk/mx/npc=37941
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de Escarcha',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37941;
--- OLD subname : Emblema del intendente de escarcha
--- Source : https://www.wowhead.com/wotlk/mx/npc=37942
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de Escarcha',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37942;
--- OLD name : [DND] Love Boat Summoner 02 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37964
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37964;
--- OLD name : [DND] Love Boat Summoner 03 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37981
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37981;
--- OLD name : [DND] Sample Quest Kill Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=37990
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 37990;
--- OLD subname : Matriarca Caballero de sangre (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=38052
-UPDATE `creature_template_locale` SET `Title` = 'Matriarca de los Caballeros de sangre',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38052;
--- OLD name : [DND] Fire Creature (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38053
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38053;
--- OLD name : [PH] Captain (Orgrimmar) (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38164
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38164;
--- OLD name : Gran cohete de amor (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=38204
-UPDATE `creature_template_locale` SET `Name` = 'Rompecorazones X-45',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38204;
--- OLD name : Gran cohete de amor (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=38207
-UPDATE `creature_template_locale` SET `Name` = 'Rompecorazones X-45',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38207;
--- OLD name : [DND] Fire Wall - No Scaling (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38226
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38226;
--- OLD name : [DND] Fire Wall (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38230
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38230;
--- OLD name : [DND] Fire Strat (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38236
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38236;
--- OLD name : [DND] Holiday - Love - Bank Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38340
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38340;
--- OLD name : [DND] Holiday - Love - AH Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38341
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38341;
--- OLD name : [DND] Holiday - Love - Barber Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38342
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38342;
--- OLD name : [PH] Matt Test NPC (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38580
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38580;
--- OLD name : [PH] Matt Test NPC 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38581
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38581;
--- OLD subname : Caballero de la Mano de Plata (CASE ONLY) (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=38608
-UPDATE `creature_template_locale` SET `Title` = 'Caballero de la Mano de plata',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38608;
--- OLD name : Vencedor Razaescarcha vinculado al hielo (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=38695
-UPDATE `creature_template_locale` SET `Name` = 'Vencedor Razaescarcha vínculado al hielo',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38695;
--- OLD name : Púa ósea
--- Source : https://www.wowhead.com/wotlk/mx/npc=38711
-UPDATE `creature_template_locale` SET `Name` = 'Púa osaria',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38711;
--- OLD name : Púa ósea
--- Source : https://www.wowhead.com/wotlk/mx/npc=38712
-UPDATE `creature_template_locale` SET `Name` = 'Púa osaria',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38712;
--- OLD name : [PH] Grimtotem Protector (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38830
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38830;
--- OLD name : [PH] Grimtotem Collector (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38843
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38843;
--- OLD name : [PH] Slain Druid (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38846
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38846;
--- OLD name : PattyMacks LK (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=38857
-UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - LK',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38857;
--- OLD subname : Intendente de justicia de legado
--- Source : https://www.wowhead.com/wotlk/mx/npc=38858
-UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de Escarcha',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38858;
--- OLD name : [DND] Dark Iron Guard Move To Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38870
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38870;
--- OLD name : [DND] Mole Machine Spawner (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38882
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38882;
--- OLD name : ScottG Test (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=38883
-UPDATE `creature_template_locale` SET `Name` = 'Parado antes de ascender',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38883;
--- OLD name : [PH] Grimtotem Vendor (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=38905
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 38905;
--- OLD name : Martyr Stalker (Reputation)
--- Source : https://www.wowhead.com/wotlk/mx/npc=39010
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39010;
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES (39010, 'esMX','Acechador mártir',NULL,0);
--- OLD name : [DND] TB Event Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39023
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39023;
--- OLD name : [DND] Fire Strat Auto (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39057
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39057;
--- OLD name : [PH] Orc Firefighter (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39058
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39058;
--- OLD name : [DND] Flying Machine (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39229
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39229;
--- OLD name : [DND] Salute Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39355
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39355;
--- OLD name : [DND] Roar Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39356
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39356;
--- OLD name : [DND] Dance Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39361
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39361;
--- OLD name : [DND] Cheer Quest Credit Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39362
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39362;
--- OLD name : [DND] Probe Target Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39420
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39420;
--- OLD name : Póster: Orgrimmar (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=39581
-UPDATE `creature_template_locale` SET `Name` = 'Marcador de cartel: Orgrimmar',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 39581;
--- OLD name : [DND] Quest Credit Bunny - Eject (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39683
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39683;
--- OLD name : [DND] Quest Credit Bunny - Move 1 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39691
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39691;
--- OLD name : [DND] Quest Credit Bunny - Move 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39692
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39692;
--- OLD name : [DND] Quest Credit Bunny - Move 3 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39695
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39695;
--- OLD name : [DND] Quest Credit Bunny - Attack (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39703
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39703;
--- OLD name : [DND] Attack Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39707
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39707;
--- OLD name : [DND] GT Bomber Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39743
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39743;
--- OLD name : [DND] GT Bomber Bunny 2 (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39744
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39744;
--- OLD name : [PH] Mother Trogg (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39798
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39798;
--- OLD name : [DND] Summoning Pad (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39817
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39817;
--- OLD name : [DND] Boom Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=39841
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 39841;
--- OLD subname : Armas de arena de legado (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40212
-UPDATE `creature_template_locale` SET `Title` = 'Gladiador indómito',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40212;
--- OLD subname : Armas de arena de legado (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40216
-UPDATE `creature_template_locale` SET `Title` = 'Gladiador sañoso',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40216;
--- OLD name : [DND] Zen'tabra Cat Form (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=40265
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 40265;
--- OLD name : Coche de carreras triturador (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40281
-UPDATE `creature_template_locale` SET `Name` = 'Autito chocón',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40281;
--- OLD name : Robot cohete de cuerda azul
--- Source : https://www.wowhead.com/wotlk/mx/npc=40295
-UPDATE `creature_template_locale` SET `Name` = 'Robot cohete de cuerda',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40295;
--- OLD name : [DND] Zen'tabra Travel Form (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=40354
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 40354;
--- OLD name : [DND] Quest Credit Bunny - ET Battle (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=40428
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 40428;
--- OLD subname : Maestro de mazmorras (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40435
-UPDATE `creature_template_locale` SET `Title` = 'Maestro de calabozos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40435;
--- OLD subname : Maestro de mazmorras (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40436
-UPDATE `creature_template_locale` SET `Title` = 'Maestra de calabozos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40436;
--- OLD subname : Maestro de mazmorras (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40438
-UPDATE `creature_template_locale` SET `Title` = 'Maestro de calabozos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40438;
--- OLD subname : Maestra de mazmorras (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40443
-UPDATE `creature_template_locale` SET `Title` = 'Maestra de calabozos',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40443;
--- OLD subname : Tambor de guerra de Vol'jin (RETAIL DATAS)
--- Source : https://www.wowhead.com/mx/npc=40492
-UPDATE `creature_template_locale` SET `Title` = 'Tamborilero bélico de Vol''jin',`VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40492;
--- OLD name : [DND] Bunny (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=40617
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 40617;
--- OLD name : [DND] Controller (NO TRANSLATION EXIST, EVEN ON RETAIL)
--- Source : https://www.wowhead.com/mx/npc=41839
-DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` = 41839;
+-- Update npc (esMX) ; from WowHead Wotlk > TBC > Classic > Cata > Mop > Retail
+-- Disclaimer : Datas of technical NPCs (Theoretically not visible to players) could be wrong, here we strictly align with WoWHead datas
 
--- List of entries using retail datas :
--- 81,230,399,400,401,402,403,444,461,542,631,725,841,1156,1179,1361,1455,2286,2662,2876,2889,2913,2939,3200,3657,3663,3664,3697,3727,3904,3907,3936,3961,4098,4115,4131,4157,4167,4174,4181,4191,4195,4211,4224,4266,4318,4411,4413,4443,4445,4446,4449,4450,4579,4787,4850,4851,4852,4853,4854,4855,4856,5002,5035,5047,5231,5472,5495,5496,5504,5505,5506,5787,5879,5939,6007,6008,6009,6012,6091,6094,6110,6111,6566,6571,6572,6578,6666,6783,7014,7114,7175,7320,7321,7373,7396,7398,7413,7425,7468,7469,7483,7484,7486,7487,7805,7844,7845,8480,9687,9688,9689,10581,10601,10776,10949,11058,11100,11101,11122,11323,11360,11364,11365,11366,11367,11397,11440,11866,12019,12020,12026,12126,12904,13140,13146,13602,13618,14435,14636,14735,14744,14830,14911,15067,15068,15101,15104,15166,15204,15375,15463,15464,15482,15486,15487,15490,15492,15496,15497,15640,15713,15866,15934,15992,15993,15996,15997,15998,15999,16460,16461,16707,16773,16872,16874,16875,16882,16883,16908,16909,16926,16930,17023,17061,17065,17162,17233,17299,17424,17515,17663,17733,17910,17911,17912,17913,17914,18076,18348,18349,18366,18674,18803,18973,19048,19160,19269,19325,19675,19711,19714,19799,19973,20053,21320,21425,21444,21634,22927,22939,22955,22956,22957,22959,22962,22964,22965,23066,23151,23429,23693,23734,23808,23863,24109,24168,24181,24377,24378,24423,24581,24582,24583,24830,25246,25323,25329,25406,25411,25499,25500,25537,25658,25723,25734,25824,26080,26247,26331,26376,26528,26594,26671,26708,26734,26791,26956,26992,27188,27209,27231,27292,27297,27378,27527,27664,27697,27862,28501,28612,28652,28871,29039,29083,29100,29111,29233,29263,29749,30241,30426,30427,30428,30552,30667,30888,31060,31120,31132,31143,31158,31162,31164,31166,31168,31169,31170,31171,31173,31175,31182,31186,31467,31696,31839,32775,32776,33351,33432,33524,33575,33661,33722,33809,34071,34533,35032,36213,36217,36273,36553,36792,36904,37225,37527,37798,38052,38204,38207,38608,38695,38857,38883,39581,40212,40216,40281,40435,40436,40438,40443,40492
--- END
+-- Entries without any translation datas, on any version
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25,70,75,89,107,128,149,161,163,165,204,207,208,209,230,235,243,247,250,251);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(255,260,262,272,275,276,278,296,300,301,306,307,311,318,319,320,321,322,323,324);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(325,326,333,336,339,342,343,348,361,380,395,421,448,462,470,472,486,496,497,498);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(502,503,507,509,516,520,521,522,535,536,538,542,566,572,574,584,586,592,599,605);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(606,607,609,610,611,612,613,614,633,661,663,664,717,718,725,728,729,730,737,753);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(773,794,795,796,797,798,799,800,801,802,804,805,806,807,810,811,818,834,841,847);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(848,849,850,851,881,893,924,1058,1068,1074,1075,1130,1135,1155,1210,1242,1266,1361,1365,1366);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(1367,1368,1370,1371,1379,1380,1388,1392,1402,1405,1413,1414,1415,1416,1427,1428,1429,1433,1437,1443);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(1445,1446,1447,1455,1476,1477,1478,1479,1482,1484,1492,1494,1497,1500,1503,1516,1521,1560,1601,1643);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(1644,1654,1655,1656,1657,1663,1667,1677,1679,1714,1716,1717,1721,1722,1749,1754,1775,1776,1786,1790);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(1792,1799,1823,1825,1848,1880,1881,1897,1910,1911,1916,1917,1918,1919,1946,1988,1990,1991,1992,2038);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(2052,2057,2080,2087,2094,2097,2107,2112,2153,2162,2191,2197,2199,2200,2220,2223,2227,2229,2230,2238);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(2239,2274,2278,2286,2308,2309,2310,2311,2313,2315,2316,2317,2320,2330,2331,2332,2392,2395,2396,2400);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(2402,2411,2412,2413,2414,2420,2422,2423,2425,2430,2438,2441,2447,2452,2453,2473,2474,2495,2497,2499);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(2519,2532,2533,2541,2551,2603,2611,2617,2624,2662,2695,2703,2706,2711,2712,2713,2737,2753,2754,2755);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(2759,2763,2765,2773,2787,2789,2792,2796,2799,2802,2871,2873,2874,2875,2876,2877,2888,2896,2899,2921);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(2922,2931,2935,2939,2942,2943,2945,3058,3068,3082,3139,3143,3144,3189,3190,3193,3200,3201,3202,3204);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(3205,3208,3257,3281,3287,3294,3340,3371,3372,3391,3398,3402,3420,3427,3428,3429,3431,3432,3434,3436);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(3440,3446,3464,3470,3472,3473,3474,3475,3476,3504,3505,3507,3508,3509,3511,3512,3521,3580,3582,3584);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(3585,3626,3627,3629,3650,3651,3653,3664,3674,3679,3692,3693,3697,3698,3699,3773,3846,3852,3860,3876);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(3897,3901,3916,3920,3943,3971,3972,3973,3981,3982,3984,3996,4063,4066,4073,4074,4078,4088,4098,4149);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(4153,4174,4197,4201,4206,4224,4313,4315,4443,4473,4479,4480,4481,4483,4486,4487,4488,4501,4502,4509);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(4511,4545,4546,4572,4612,4619,4621,4630,4706,4708,4709,4794,4829,4831,4881,4891,4901,4902,4926,4943);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(4959,4972,4980,4983,5002,5027,5082,5087,5088,5089,5312,5314,5343,5349,5350,5353,5398,5400,5402,5405);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(5406,5428,5507,5543,5544,5548,5549,5550,5551,5552,5553,5554,5555,5556,5557,5558,5559,5560,5561,5562);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(5563,5587,5588,5589,5590,5591,5592,5593,5600,5601,5602,5604,5605,5606,5607,5608,5609,5610,5613,5614);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(5621,5622,5626,5627,5639,5640,5643,5644,5651,5653,5654,5655,5656,5658,5659,5660,5663,5664,5665,5667);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(5668,5669,5670,5671,5672,5675,5678,5679,5693,5696,5698,5699,5700,5701,5702,5703,5704,5705,5706,5707);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(5712,5713,5715,5716,5717,5718,5719,5722,5724,5744,5745,5746,5747,5760,5765,5782,5801,5810,5827,5865);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(5900,5904,5907,5909,5910,5917,5936,5955,5956,6034,6046,6067,6089,6109,6113,6121,6134,6140,6142,6168);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(6171,6172,6173,6174,6175,6177,6183,6243,6245,6246,6247,6251,6269,6270,6293,6408,6446,6467,6494,6497);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(6522,6526,6546,6548,6569,6570,6583,6585,6607,6648,6649,6666,6667,6687,6688,6728,6732,6780,6781,6785);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(6786,6826,6886,6887,6906,6908,6910,6926,6966,7007,7016,7104,7137,7167,7168,7186,7207,7208,7273,7293);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(7294,7295,7296,7297,7319,7355,7361,7389,7507,7508,7509,7557,7624,7643,7667,7766,7777,7790,7797,7825);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(7850,7881,7951,7977,8001,8136,8196,8197,8198,8277,8278,8280,8378,8381,8395,8400,8405,8420,8421,8439);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(8503,8507,8516,8578,8579,8582,8584,8587,8613,8617,8659,8696,8737,8767,8963,8965,8976,8977,8978,8979);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(8999,9016,9017,9025,9031,9042,9076,9095,9118,9119,9177,9238,9273,9274,9296,9299,9454,9518,9520,9550);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(9557,9577,9598,9602,9604,9617,9620,9622,9659,9677,9678,9681,9684,9686,9702,9703,9704,9796,9820,9837);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(9860,9861,9916,9938,9990,9999,10000,10044,10082,10119,10176,10184,10196,10200,10201,10202,10203,10204,10216,10219);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(10220,10236,10238,10239,10257,10260,10262,10265,10300,10356,10359,10363,10370,10373,10393,10395,10397,10401,10402,10403);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(10432,10437,10446,10450,10456,10502,10503,10504,10538,10540,10559,10607,10620,10639,10642,10648,10666,10718,10740,10741);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(10806,10810,10813,10917,10918,10929,10942,10976,10978,11018,11033,11080,11111,11140,11192,11216,11217,11282,11283,11285);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(11317,11337,11341,11342,11343,11344,11345,11349,11354,11358,11364,11366,11367,11369,11375,11376,11377,11379,11381,11384);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(11385,11386,11392,11394,11395,11396,11399,11400,11403,11404,11407,11408,11409,11410,11412,11414,11415,11416,11447,11449);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(11463,11467,11468,11478,11479,11481,11487,11493,11495,11496,11499,11500,11502,11519,11546,11548,11554,11556,11557,11558);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(11583,11597,11615,11625,11626,11657,11660,11670,11706,11707,11710,11715,11750,11751,11752,11753,11756,11757,11758,11776);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(11799,11801,11814,11815,11816,11817,11818,11819,11820,11824,11825,11826,11827,11828,11829,11835,11861,11862,11884,11896);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(11902,11903,11904,11905,11906,11907,11908,11909,11916,11919,11920,11921,11926,11939,11943,11945,11959,11978,11979,11982);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(11994,11996,12034,12037,12057,12118,12122,12180,12217,12259,12264,12369,12386,12397,12417,12421,12462,12466,12469,12470);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(12516,12517,12537,12580,12581,12656,12657,12658,12677,12678,12716,12717,12719,12720,12721,12723,12756,12757,12803,12804);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(12816,12857,12858,12867,12899,12900,12902,12919,13078,13079,13156,13157,13159,13277,13281,13282,13620,13697,13699,13756);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(13778,13796,13798,13936,14020,14041,14181,14201,14222,14226,14227,14234,14268,14270,14277,14278,14306,14308,14327,14344);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(14349,14427,14428,14432,14446,14447,14464,14467,14471,14472,14473,14474,14475,14476,14477,14478,14488,14490,14491,14498);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(14500,14506,14522,14523,14641,14642,14643,14644,14684,14685,14686,14690,14694,14719,14732,14746,14822,14827,14834,14841);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(14850,14851,14852,14853,14854,14855,14856,14857,14858,14860,14865,14867,14868,14871,14872,14873,14874,14878,14887,14888);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(14889,14890,14908,14988,15001,15002,15003,15004,15005,15012,15047,15065,15066,15081,15082,15083,15084,15085,15114,15167);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(15186,15226,15227,15228,15231,15232,15234,15237,15238,15239,15243,15244,15245,15248,15251,15253,15254,15255,15256,15257);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(15258,15259,15278,15281,15299,15310,15322,15326,15329,15330,15331,15332,15337,15340,15341,15342,15345,15346,15347,15348);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(15358,15361,15379,15380,15393,15395,15406,15418,15468,15472,15511,15517,15520,15544,15552,15608,15623,15646,15672,15713);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(15727,15893,15894,15928,15929,15930,15931,15932,15943,15952,15956,15970,15982,15983,15985,15989,15990,15991,15992,15993);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(15996,15997,15998,15999,16002,16004,16011,16012,16013,16016,16031,16033,16035,16038,16042,16053,16054,16055,16058,16059);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(16061,16063,16065,16068,16069,16077,16090,16097,16101,16102,16105,16106,16108,16109,16110,16118,16138,16140,16144,16166);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(16188,16199,16204,16205,16237,16239,16245,16291,16292,16296,16329,16357,16393,16445,16451,16456,16465,16466,16467,16475);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(16476,16477,16496,16497,16498,16539,16543,16546,16554,16556,16557,16560,16561,16562,16563,16564,16566,16567,16571,16572);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(16577,16581,16605,16608,16720,16793,16799,16821,16833,16854,16855,16858,16860,16861,16862,16897,16914,16922,17000,17001);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17006,17008,17010,17042,17047,17052,17064,17079,17084,17085,17093,17107,17119,17124,17125,17162,17207,17208,17218,17229);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17234,17236,17239,17250,17253,17257,17260,17274,17294,17300,17302,17305,17311,17312,17313,17316,17317,17318,17355,17365);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17366,17376,17380,17386,17388,17394,17402,17413,17426,17428,17431,17435,17449,17450,17456,17457,17459,17460,17463,17473);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17474,17475,17494,17501,17502,17515,17516,17518,17528,17530,17533,17534,17535,17537,17538,17544,17545,17548,17551,17552);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17558,17559,17568,17569,17570,17571,17572,17573,17574,17575,17576,17577,17579,17580,17581,17583,17590,17597,17599,17602);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17615,17616,17617,17618,17619,17665,17676,17677,17678,17683,17701,17733,17737,17738,17739,17740,17741,17742,17743,17744);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17745,17746,17747,17748,17749,17750,17751,17752,17753,17754,17756,17757,17758,17759,17760,17761,17762,17763,17764,17774);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17775,17776,17777,17778,17779,17780,17781,17782,17783,17784,17785,17786,17787,17788,17789,17790,17791,17792,17793,17808);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17813,17823,17842,17850,17856,17857,17859,17861,17863,17866,17867,17868,17876,17877,17880,17881,17883,17886,17888,17889);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(17925,17939,17942,17947,17953,17956,17968,17972,17974,17980,17984,17985,17988,17989,17992,17997,17998,17999,18000,18002);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18007,18008,18009,18012,18016,18044,18048,18049,18050,18051,18052,18053,18054,18055,18056,18057,18058,18059,18075,18080);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18085,18097,18105,18108,18110,18142,18143,18144,18148,18154,18156,18157,18158,18161,18162,18163,18164,18180,18183,18184);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18216,18217,18221,18228,18230,18231,18242,18246,18247,18248,18249,18252,18258,18259,18263,18264,18268,18273,18276,18282);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18286,18288,18298,18305,18306,18307,18308,18329,18332,18333,18341,18343,18345,18355,18361,18367,18369,18383,18384,18385);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18386,18387,18388,18389,18390,18392,18393,18395,18401,18410,18418,18425,18432,18433,18434,18435,18436,18438,18444,18445);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18447,18448,18471,18475,18481,18482,18494,18496,18525,18526,18528,18529,18532,18539,18540,18541,18543,18544,18551,18553);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18554,18555,18560,18563,18582,18584,18586,18588,18589,18590,18601,18602,18603,18604,18605,18606,18607,18608,18609,18610);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18611,18612,18613,18614,18615,18616,18617,18618,18619,18620,18621,18622,18624,18625,18645,18646,18652,18653,18654,18655);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18668,18675,18680,18685,18692,18696,18699,18707,18721,18723,18724,18727,18729,18743,18744,18757,18759,18769,18778,18780);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18782,18812,18813,18814,18828,18840,18841,18842,18843,18887,18890,18899,18900,18901,18902,18903,18916,18917,18918,18919);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(18920,18928,18932,18933,18935,18936,18941,18955,18956,18958,18967,18968,18974,18976,18979,18980,19010,19028,19029,19032);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19035,19036,19037,19039,19040,19051,19057,19058,19059,19060,19064,19078,19079,19080,19081,19082,19083,19084,19085,19086);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19087,19088,19089,19090,19091,19092,19093,19094,19095,19096,19097,19098,19099,19100,19101,19102,19103,19104,19105,19106);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19107,19108,19109,19110,19111,19112,19113,19114,19115,19116,19117,19118,19119,19121,19122,19123,19124,19125,19126,19127);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19128,19129,19130,19131,19132,19139,19159,19198,19215,19228,19230,19237,19255,19293,19313,19323,19325,19361,19376,19387);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19388,19393,19412,19421,19430,19431,19433,19437,19439,19458,19459,19469,19483,19484,19485,19494,19525,19547,19548,19549);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19550,19555,19577,19590,19604,19605,19606,19609,19613,19619,19626,19627,19628,19629,19630,19631,19646,19648,19650,19652);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19653,19654,19655,19660,19691,19693,19695,19696,19697,19703,19708,19711,19714,19715,19717,19723,19724,19727,19763,19764);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19766,19819,19838,19841,19842,19845,19846,19860,19862,19866,19867,19868,19870,19871,19872,19873,19876,19884,19885,19886);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19887,19888,19889,19890,19891,19892,19893,19894,19895,19896,19897,19898,19899,19900,19901,19902,19903,19904,19922,19924);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(19934,19939,20001,20002,20003,20010,20011,20012,20013,20014,20022,20023,20024,20051,20055,20061,20066,20067,20068,20073);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20076,20085,20086,20093,20094,20098,20099,20100,20103,20104,20105,20106,20107,20110,20114,20128,20132,20138,20144,20153);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20155,20156,20159,20162,20164,20165,20166,20167,20168,20169,20170,20171,20172,20173,20174,20175,20176,20177,20178,20179);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20180,20181,20182,20183,20184,20185,20186,20187,20188,20189,20190,20191,20192,20193,20195,20212,20213,20215,20219,20226);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20229,20230,20239,20244,20246,20251,20252,20253,20254,20255,20256,20257,20258,20259,20260,20261,20262,20263,20264,20265);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20266,20267,20268,20275,20281,20282,20286,20288,20289,20296,20297,20298,20299,20300,20301,20302,20303,20304,20305,20306);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20307,20308,20309,20310,20311,20312,20313,20314,20315,20316,20317,20318,20319,20320,20321,20322,20323,20333,20336,20337);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20338,20339,20342,20344,20346,20347,20353,20354,20356,20358,20361,20364,20365,20366,20367,20371,20372,20375,20376,20391);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20412,20425,20431,20441,20464,20469,20470,20473,20475,20476,20483,20521,20522,20523,20524,20525,20526,20527,20528,20529);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20530,20531,20532,20533,20534,20535,20536,20537,20538,20539,20540,20541,20542,20543,20544,20545,20546,20547,20548,20549);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20550,20565,20566,20567,20568,20569,20570,20571,20572,20573,20574,20575,20576,20577,20578,20579,20580,20581,20582,20583);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20584,20585,20586,20587,20588,20589,20590,20591,20592,20593,20594,20595,20596,20597,20598,20602,20608,20617,20620,20621);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20622,20623,20624,20625,20626,20627,20628,20629,20630,20631,20632,20633,20636,20637,20638,20639,20640,20641,20642,20643);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20644,20645,20646,20647,20648,20649,20650,20651,20652,20653,20654,20655,20656,20657,20658,20659,20660,20661,20662,20663);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20664,20665,20666,20670,20675,20684,20686,20687,20688,20689,20690,20691,20692,20693,20694,20695,20696,20697,20698,20699);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20700,20701,20702,20703,20704,20705,20706,20723,20726,20730,20731,20736,20737,20738,20739,20740,20741,20742,20743,20744);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20745,20746,20753,20755,20757,20767,20768,20769,20771,20775,20776,20780,20781,20782,20801,20804,20809,20810,20812,20813);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20814,20815,20816,20817,20818,20819,20820,20821,20822,20823,20824,20826,20827,20828,20829,20830,20831,20832,20833,20834);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20835,20836,20837,20838,20839,20840,20841,20842,20843,20844,20845,20851,20852,20853,20855,20856,20863,20894,20895,20913);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(20920,20931,20932,20933,20979,20982,20991,20992,20993,21003,21012,21013,21014,21015,21016,21017,21025,21030,21031,21039);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21051,21052,21053,21054,21067,21068,21069,21070,21074,21075,21092,21094,21095,21096,21098,21099,21100,21102,21117,21120);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21121,21122,21142,21157,21163,21169,21173,21174,21176,21182,21186,21187,21188,21190,21191,21192,21193,21194,21203,21206);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21208,21210,21211,21219,21234,21240,21243,21252,21261,21262,21278,21281,21288,21297,21310,21317,21321,21329,21333,21334);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21341,21342,21343,21344,21345,21348,21351,21352,21353,21355,21356,21358,21360,21361,21363,21366,21367,21369,21371,21378);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21388,21390,21391,21394,21396,21399,21400,21401,21403,21412,21413,21415,21417,21418,21421,21422,21424,21429,21434,21436);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21437,21438,21439,21440,21443,21444,21445,21447,21451,21456,21457,21458,21463,21465,21469,21473,21479,21480,21481,21482);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21489,21490,21496,21498,21500,21501,21506,21511,21512,21513,21515,21521,21522,21523,21524,21525,21526,21527,21528,21529);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21530,21531,21532,21533,21534,21535,21536,21537,21538,21539,21540,21541,21542,21543,21544,21545,21546,21547,21548,21549);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21550,21551,21552,21553,21554,21555,21556,21557,21558,21559,21560,21561,21562,21563,21564,21565,21566,21567,21568,21569);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21570,21571,21572,21573,21574,21575,21576,21577,21578,21579,21580,21581,21582,21583,21584,21585,21586,21587,21588,21589);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21590,21591,21592,21593,21594,21595,21596,21597,21598,21599,21600,21601,21602,21603,21604,21605,21606,21607,21608,21609);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21610,21611,21612,21613,21614,21615,21616,21617,21618,21619,21620,21621,21622,21623,21624,21625,21626,21630,21631,21632);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21634,21640,21641,21645,21646,21647,21654,21657,21658,21659,21665,21666,21667,21668,21669,21670,21671,21672,21673,21674);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21675,21676,21677,21678,21679,21680,21681,21691,21692,21700,21712,21713,21714,21715,21716,21725,21729,21730,21737,21757);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21758,21759,21760,21764,21765,21768,21777,21781,21782,21785,21786,21789,21790,21791,21792,21793,21794,21799,21800,21801);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21807,21814,21819,21826,21838,21840,21841,21842,21843,21855,21856,21862,21892,21893,21894,21895,21896,21898,21899,21903);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21910,21914,21915,21916,21917,21918,21919,21921,21922,21924,21926,21929,21930,21933,21934,21939,21940,21943,21946,21947);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(21952,21957,21959,21962,21972,21973,21987,21988,21989,21990,21991,21999,22001,22002,22003,22004,22005,22014,22021,22023);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22024,22025,22026,22039,22041,22048,22049,22050,22051,22057,22058,22063,22068,22070,22080,22088,22096,22109,22110,22111);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22113,22116,22117,22118,22126,22129,22131,22133,22136,22139,22142,22145,22162,22163,22164,22165,22166,22167,22168,22169);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22170,22171,22172,22173,22174,22176,22177,22185,22186,22188,22190,22192,22203,22205,22207,22228,22230,22231,22240,22246);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22260,22268,22276,22279,22280,22281,22284,22288,22290,22296,22300,22316,22317,22320,22322,22340,22345,22346,22348,22349);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22350,22351,22353,22356,22358,22365,22367,22368,22370,22371,22377,22383,22389,22395,22399,22400,22401,22402,22403,22409);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22417,22418,22420,22422,22427,22428,22429,22434,22435,22436,22444,22447,22451,22457,22465,22467,22470,22471,22472,22475);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22484,22495,22497,22498,22502,22503,22504,22505,22508,22515,22517,22519,22520,22521,22523,22524,22525,22526,22527,22528);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22529,22530,22531,22532,22533,22534,22535,22536,22537,22538,22539,22540,22541,22542,22543,22544,22545,22546,22547,22548);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22549,22550,22551,22552,22553,22554,22555,22556,22557,22558,22559,22560,22561,22562,22563,22564,22565,22566,22567,22568);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22569,22570,22571,22572,22573,22574,22575,22576,22577,22578,22579,22580,22581,22582,22583,22584,22585,22586,22587,22588);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22589,22590,22591,22592,22593,22594,22595,22596,22597,22598,22599,22600,22601,22602,22603,22604,22605,22606,22607,22608);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22609,22610,22611,22612,22613,22614,22615,22616,22617,22618,22619,22620,22621,22622,22623,22624,22625,22626,22627,22628);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22629,22630,22631,22632,22633,22634,22635,22636,22637,22638,22639,22640,22641,22642,22643,22644,22645,22646,22647,22648);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22649,22650,22651,22652,22653,22654,22655,22656,22657,22658,22659,22660,22661,22662,22663,22664,22665,22666,22667,22668);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22669,22670,22671,22672,22673,22674,22675,22676,22677,22678,22679,22680,22681,22682,22683,22684,22685,22686,22687,22688);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22689,22690,22691,22692,22693,22694,22695,22696,22697,22698,22699,22700,22701,22702,22703,22704,22705,22706,22707,22708);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22709,22710,22711,22712,22713,22714,22715,22716,22717,22718,22719,22720,22721,22722,22723,22724,22725,22726,22727,22728);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22729,22730,22731,22732,22733,22734,22735,22736,22737,22738,22739,22740,22741,22742,22743,22744,22745,22746,22747,22748);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22749,22750,22751,22752,22753,22754,22755,22756,22757,22758,22759,22760,22761,22762,22763,22764,22765,22766,22767,22768);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22769,22770,22771,22772,22773,22774,22775,22776,22777,22778,22779,22780,22781,22782,22783,22784,22785,22786,22787,22788);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22789,22790,22791,22792,22793,22794,22795,22796,22797,22798,22799,22800,22801,22823,22829,22831,22833,22836,22838,22839);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22842,22851,22866,22867,22872,22888,22898,22903,22905,22913,22914,22918,22925,22926,22938,22940,22943,22944,22951,22961);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(22984,22985,22990,22991,22995,23003,23014,23021,23027,23035,23037,23040,23041,23046,23056,23057,23058,23059,23070,23071);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23072,23073,23074,23075,23077,23081,23084,23089,23093,23095,23101,23102,23104,23105,23106,23107,23108,23118,23119,23122);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23125,23126,23137,23138,23152,23156,23160,23164,23165,23181,23182,23183,23184,23185,23186,23191,23209,23214,23230,23231);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23233,23238,23240,23253,23255,23258,23260,23262,23276,23279,23281,23282,23283,23284,23292,23293,23294,23295,23296,23297);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23298,23299,23300,23301,23304,23306,23307,23312,23313,23314,23315,23316,23317,23322,23327,23328,23329,23347,23351,23353);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23355,23356,23357,23358,23359,23360,23361,23362,23365,23366,23378,23379,23380,23382,23387,23391,23395,23409,23412,23417);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23424,23425,23433,23438,23443,23444,23445,23448,23451,23454,23461,23462,23463,23464,23465,23466,23470,23472,23477,23478);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23479,23480,23485,23491,23496,23499,23500,23502,23505,23508,23512,23513,23514,23515,23516,23517,23518,23526,23532,23540);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23544,23547,23553,23567,23599,23607,23608,23609,23610,23611,23613,23614,23615,23629,23630,23631,23632,23633,23634,23679);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23686,23695,23703,23717,23718,23724,23727,23730,23745,23746,23758,23759,23761,23762,23764,23766,23768,23769,23790,23803);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23807,23810,23813,23814,23815,23819,23820,23821,23824,23825,23830,23837,23838,23845,23850,23852,23853,23854,23855,23858);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23864,23867,23868,23869,23884,23885,23893,23894,23897,23898,23899,23901,23912,23913,23914,23915,23916,23917,23921,23922);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(23923,23924,23925,23936,23938,23947,23957,23968,23972,23974,23996,23997,23999,24001,24012,24019,24020,24021,24022,24024);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24025,24034,24040,24056,24087,24092,24093,24094,24095,24098,24100,24101,24102,24110,24117,24121,24139,24153,24158,24162);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24165,24166,24167,24170,24171,24182,24183,24184,24185,24192,24193,24194,24202,24203,24204,24205,24220,24221,24223,24230);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24231,24235,24237,24240,24241,24243,24244,24247,24260,24263,24264,24265,24269,24274,24277,24281,24288,24289,24291,24292);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24293,24294,24295,24296,24297,24298,24299,24300,24301,24302,24303,24304,24305,24306,24307,24308,24309,24310,24311,24319);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24324,24325,24326,24328,24336,24337,24351,24352,24353,24354,24355,24358,24360,24361,24375,24382,24383,24384,24386,24397);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24403,24404,24405,24407,24412,24417,24438,24445,24448,24449,24450,24453,24455,24458,24465,24466,24470,24471,24472,24480);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24481,24482,24498,24499,24505,24506,24507,24508,24509,24512,24513,24516,24517,24521,24525,24541,24547,24550,24551,24553);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24555,24556,24561,24629,24630,24641,24655,24658,24665,24666,24682,24692,24693,24694,24695,24699,24700,24704,24705,24707);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24712,24724,24727,24729,24734,24735,24736,24737,24738,24739,24741,24744,24748,24749,24758,24763,24764,24766,24776,24778);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24788,24795,24798,24799,24800,24801,24802,24803,24809,24810,24822,24826,24827,24828,24829,24831,24832,24844,24845,24847);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24848,24850,24857,24860,24862,24866,24881,24882,24887,24888,24889,24890,24891,24893,24895,24903,24904,24907,24908,24912);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24914,24925,24928,24936,24937,24939,24940,24941,24942,24943,24944,24945,24946,24947,24948,24949,24950,24951,24952,24953);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(24959,24963,24973,24991,25006,25029,25042,25044,25064,25065,25066,25067,25069,25086,25090,25091,25092,25114,25116,25117);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25118,25119,25120,25121,25122,25123,25124,25125,25126,25127,25128,25129,25130,25131,25139,25140,25154,25156,25157,25158);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25160,25165,25167,25168,25172,25173,25174,25189,25191,25192,25199,25200,25203,25205,25207,25208,25209,25212,25213,25218);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25219,25221,25229,25230,25231,25232,25238,25239,25240,25241,25247,25250,25251,25252,25254,25255,25264,25267,25269,25292);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25303,25308,25309,25310,25319,25357,25358,25365,25366,25374,25376,25385,25388,25389,25402,25403,25404,25405,25410,25412);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25413,25430,25435,25450,25459,25465,25466,25471,25472,25473,25491,25505,25525,25526,25527,25528,25529,25530,25531,25532);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25533,25535,25536,25538,25539,25540,25541,25542,25543,25544,25545,25546,25547,25548,25549,25550,25551,25552,25553,25554);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25555,25556,25557,25558,25559,25560,25561,25562,25563,25564,25565,25566,25567,25568,25569,25570,25571,25572,25573,25574);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25575,25576,25577,25578,25579,25581,25586,25587,25594,25606,25608,25629,25640,25654,25669,25670,25671,25672,25683,25688);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25689,25690,25691,25692,25693,25694,25695,25698,25704,25716,25723,25738,25741,25742,25745,25746,25763,25768,25771,25787);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25811,25813,25815,25827,25830,25831,25832,25840,25842,25848,25852,25853,25854,25856,25857,25858,25859,25868,25869,25870);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(25871,25872,25873,25874,25875,25876,25877,25878,25952,25953,25964,25965,25966,25971,25972,25973,25985,26046,26056,26071);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26080,26082,26084,26085,26098,26099,26102,26105,26117,26120,26121,26128,26129,26130,26155,26161,26169,26170,26173,26176);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26188,26190,26193,26206,26213,26219,26227,26232,26237,26241,26245,26248,26249,26251,26256,26258,26260,26265,26274,26275);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26278,26285,26288,26292,26294,26296,26298,26310,26311,26312,26313,26317,26318,26320,26337,26338,26339,26340,26341,26342);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26346,26349,26355,26364,26368,26370,26372,26376,26391,26400,26412,26420,26422,26423,26424,26427,26429,26444,26450,26451);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26452,26454,26462,26464,26465,26466,26489,26490,26491,26495,26498,26519,26533,26535,26559,26576,26588,26591,26593,26604);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26612,26633,26647,26651,26659,26660,26661,26664,26665,26671,26675,26688,26700,26723,26724,26732,26738,26739,26740,26741);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26742,26743,26744,26745,26747,26748,26749,26750,26751,26752,26753,26754,26755,26756,26757,26758,26759,26763,26765,26773);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26774,26775,26778,26781,26784,26789,26791,26804,26814,26828,26831,26834,26835,26837,26840,26858,26859,26862,26863,26865);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26867,26882,26884,26886,26887,26889,26893,26894,26895,26897,26898,26901,26919,26924,26927,26932,26935,26937,26971,26978);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(26979,26983,27028,27036,27079,27101,27102,27111,27112,27121,27124,27127,27128,27135,27154,27168,27179,27200,27201,27205);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27208,27218,27239,27253,27263,27264,27265,27280,27296,27304,27306,27310,27311,27312,27321,27322,27326,27327,27331,27338);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27341,27348,27353,27366,27368,27369,27371,27372,27375,27380,27384,27387,27394,27396,27397,27402,27403,27404,27413,27414);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27418,27419,27420,27422,27423,27425,27426,27427,27428,27429,27440,27441,27442,27443,27444,27445,27449,27450,27453,27454);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27458,27461,27464,27466,27469,27471,27472,27473,27474,27480,27484,27486,27490,27491,27506,27507,27512,27514,27515,27522);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27527,27529,27532,27545,27561,27565,27569,27572,27580,27583,27586,27589,27590,27591,27592,27595,27596,27599,27601,27609);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27622,27625,27628,27634,27646,27657,27658,27659,27660,27663,27669,27674,27698,27708,27710,27723,27726,27740,27741,27757);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27763,27764,27786,27792,27793,27794,27795,27796,27802,27825,27827,27832,27837,27841,27851,27853,27854,27873,27875,27879);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27884,27885,27889,27890,27891,27903,27907,27910,27911,27921,27929,27931,27942,27944,27952,27954,27955,27956,27967,27968);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(27976,27977,27986,27988,27989,27991,27994,27995,27997,27999,28008,28013,28015,28016,28019,28032,28089,28100,28119,28120);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28121,28122,28125,28126,28128,28130,28132,28137,28163,28168,28171,28173,28180,28181,28184,28190,28206,28207,28211,28224);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28240,28244,28248,28250,28251,28252,28253,28254,28259,28262,28263,28271,28273,28280,28282,28288,28289,28292,28293,28294);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28295,28296,28297,28299,28300,28301,28307,28310,28311,28316,28328,28330,28332,28333,28348,28351,28352,28353,28354,28355);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28357,28360,28361,28364,28365,28375,28382,28395,28401,28409,28416,28420,28421,28422,28423,28424,28425,28426,28427,28428);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28429,28430,28431,28432,28433,28434,28435,28436,28437,28438,28439,28441,28449,28451,28453,28454,28455,28456,28457,28458);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28459,28460,28461,28462,28463,28469,28471,28472,28473,28474,28482,28485,28492,28494,28495,28497,28501,28507,28509,28514);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28515,28516,28517,28518,28520,28521,28523,28533,28546,28586,28587,28591,28595,28617,28620,28622,28625,28626,28627,28628);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28629,28631,28632,28633,28636,28640,28643,28644,28645,28648,28655,28663,28664,28667,28672,28713,28719,28724,28738,28739);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28740,28741,28744,28749,28751,28753,28755,28757,28758,28761,28762,28763,28764,28767,28770,28771,28773,28775,28777,28778);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28780,28783,28786,28793,28813,28815,28816,28820,28839,28842,28857,28859,28874,28876,28880,28904,28913,28921,28923,28928);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(28929,28930,28932,28948,28949,28950,28952,28953,28954,28955,28957,28960,28984,29020,29021,29022,29023,29024,29025,29038);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29043,29048,29050,29054,29055,29056,29057,29058,29059,29060,29069,29071,29074,29075,29081,29089,29094,29099,29105,29120);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29131,29132,29138,29140,29146,29155,29158,29159,29160,29161,29162,29163,29169,29170,29171,29181,29184,29192,29194,29195);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29196,29200,29215,29228,29229,29241,29242,29243,29245,29247,29248,29249,29256,29257,29258,29266,29267,29268,29273,29274);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29276,29278,29279,29281,29286,29292,29293,29294,29295,29303,29312,29315,29316,29320,29322,29324,29326,29352,29353,29354);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29355,29356,29357,29359,29360,29361,29362,29363,29371,29373,29379,29388,29391,29397,29398,29406,29417,29418,29419,29420);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29421,29428,29429,29432,29445,29446,29447,29448,29454,29455,29457,29503,29521,29524,29526,29550,29558,29574,29575,29576);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29577,29580,29581,29588,29589,29592,29595,29597,29599,29601,29603,29607,29608,29609,29610,29612,29613,29615,29627,29632);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29633,29634,29635,29643,29644,29655,29682,29685,29701,29711,29718,29756,29758,29759,29760,29761,29763,29764,29765,29766);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29772,29773,29776,29777,29780,29781,29782,29783,29784,29785,29789,29790,29799,29800,29802,29803,29805,29807,29812,29815);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29816,29827,29839,29845,29846,29847,29853,29855,29870,29871,29876,29877,29878,29879,29883,29886,29901,29902,29913,29915);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(29921,29928,29943,29977,29985,29986,29987,29988,29989,29990,29991,29999,30000,30014,30015,30016,30018,30021,30038,30041);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30047,30048,30049,30052,30057,30059,30068,30072,30073,30075,30076,30077,30078,30079,30080,30082,30087,30091,30097,30099);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30101,30103,30118,30119,30122,30123,30124,30125,30126,30127,30130,30131,30132,30133,30138,30139,30147,30153,30154,30156);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30167,30169,30180,30183,30187,30201,30210,30214,30215,30217,30220,30221,30227,30246,30258,30264,30295,30297,30298,30302);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30303,30315,30316,30317,30318,30327,30328,30339,30361,30366,30378,30384,30389,30390,30393,30396,30397,30398,30399,30403);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30404,30406,30412,30413,30415,30420,30421,30424,30426,30427,30428,30442,30449,30451,30452,30456,30457,30459,30460,30461);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30462,30465,30467,30472,30473,30476,30478,30483,30484,30485,30491,30493,30495,30496,30497,30498,30508,30509,30510,30511);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30512,30513,30514,30515,30516,30517,30518,30519,30520,30521,30522,30524,30525,30526,30527,30528,30529,30530,30532,30539);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30540,30545,30546,30559,30572,30573,30574,30576,30577,30588,30589,30594,30598,30599,30600,30601,30602,30603,30614,30615);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30618,30640,30644,30646,30649,30650,30651,30655,30656,30669,30671,30684,30690,30691,30692,30693,30698,30699,30700,30707);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30747,30748,30749,30750,30756,30757,30758,30759,30760,30761,30762,30763,30764,30765,30766,30767,30768,30769,30770,30771);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30772,30773,30774,30775,30776,30777,30778,30779,30780,30781,30782,30783,30784,30785,30786,30787,30788,30789,30790,30791);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30792,30793,30794,30795,30796,30797,30798,30799,30800,30801,30802,30803,30804,30805,30806,30807,30808,30809,30810,30811);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30812,30813,30814,30815,30816,30817,30818,30819,30820,30821,30822,30823,30827,30832,30839,30851,30857,30880,30883,30889);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30897,30898,30899,30901,30902,30903,30904,30905,30906,30907,30908,30909,30910,30911,30912,30913,30914,30915,30916,30917);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30925,30926,30927,30928,30929,30930,30931,30932,30933,30934,30935,30936,30937,30938,30939,30940,30941,30942,30943,30945);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30948,30959,30964,30965,30966,30967,30968,30969,30970,30971,30972,30973,30974,30975,30976,30977,30978,30979,30980,30981);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(30982,30983,30990,30991,30992,30995,30996,30998,30999,31000,31001,31004,31005,31006,31011,31014,31023,31025,31045,31047);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31049,31050,31055,31064,31065,31066,31068,31071,31072,31073,31074,31077,31086,31089,31092,31093,31100,31105,31117,31128);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31135,31143,31156,31178,31179,31180,31183,31184,31187,31188,31192,31195,31196,31199,31200,31201,31202,31203,31206,31207);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31208,31209,31210,31211,31212,31215,31217,31227,31237,31244,31246,31249,31252,31256,31272,31284,31285,31286,31287,31288);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31289,31291,31292,31293,31294,31295,31296,31297,31298,31299,31308,31309,31311,31315,31317,31329,31335,31336,31337,31338);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31339,31340,31341,31342,31343,31344,31345,31346,31347,31348,31349,31350,31351,31352,31353,31354,31355,31356,31357,31358);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31359,31360,31361,31362,31363,31364,31365,31367,31368,31369,31370,31371,31372,31373,31374,31375,31376,31377,31378,31379);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31380,31381,31382,31383,31384,31385,31386,31387,31388,31389,31390,31391,31392,31394,31405,31415,31424,31441,31442,31443);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31445,31446,31447,31448,31449,31450,31451,31452,31453,31454,31455,31456,31457,31458,31459,31460,31461,31462,31463,31464);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31465,31466,31468,31469,31470,31471,31472,31473,31474,31475,31476,31477,31478,31479,31480,31481,31483,31484,31485,31486);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31487,31488,31489,31490,31491,31492,31493,31494,31495,31496,31497,31498,31499,31500,31501,31502,31503,31504,31505,31506);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31507,31508,31509,31510,31511,31512,31513,31514,31515,31518,31519,31520,31521,31533,31534,31535,31536,31537,31538,31539);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31540,31541,31542,31543,31544,31546,31547,31548,31550,31558,31559,31560,31561,31565,31566,31567,31568,31569,31570,31571);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31573,31574,31576,31577,31585,31588,31593,31597,31598,31600,31603,31628,31630,31633,31635,31641,31642,31643,31644,31645);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31646,31647,31649,31655,31656,31657,31658,31659,31660,31661,31662,31663,31664,31665,31666,31667,31668,31669,31670,31671);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31672,31673,31674,31675,31676,31677,31678,31679,31680,31681,31682,31684,31696,31709,31710,31711,31712,31713,31714,31719);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31722,31728,31729,31730,31732,31733,31734,31735,31740,31741,31742,31743,31745,31748,31749,31750,31751,31752,31766,31767);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31773,31777,31794,31795,31796,31798,31799,31800,31801,31803,31816,31817,31818,31819,31820,31821,31822,31823,31824,31825);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31826,31828,31829,31835,31845,31848,31866,31867,31871,31873,31874,31875,31876,31877,31878,31879,31880,31885,31886,31888);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31898,31899,31903,31904,31905,31906,31907,31908,31909,31915,31917,31918,31919,31920,31921,31922,31923,31924,31925,31926);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31927,31928,31929,31930,31931,31932,31933,31934,31935,31936,31937,31938,31939,31940,31941,31942,31943,31944,31945,31946);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31947,31948,31949,31950,31951,31952,31953,31954,31955,31956,31957,31958,31959,31960,31961,31962,31963,31964,31965,31966);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31967,31968,31969,31970,31971,31972,31973,31974,31975,31976,31977,31978,31979,31980,31981,31982,31983,31984,31985,31986);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(31987,31988,31989,31990,31991,31992,31993,31994,31995,31996,31997,31998,31999,32000,32001,32002,32003,32004,32005,32006);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32007,32008,32009,32010,32011,32012,32013,32014,32015,32016,32017,32018,32019,32020,32021,32022,32023,32024,32025,32026);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32027,32028,32029,32030,32031,32032,32033,32034,32035,32036,32037,32038,32039,32040,32041,32042,32043,32044,32045,32046);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32047,32048,32049,32050,32051,32052,32053,32054,32055,32056,32057,32058,32059,32060,32061,32062,32063,32064,32065,32066);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32067,32068,32069,32070,32071,32072,32073,32074,32075,32076,32077,32078,32079,32080,32081,32082,32083,32084,32085,32086);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32087,32088,32089,32090,32091,32092,32093,32094,32095,32096,32097,32098,32099,32100,32101,32102,32103,32104,32105,32106);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32107,32108,32109,32110,32111,32112,32113,32114,32115,32116,32117,32118,32119,32120,32121,32122,32123,32124,32125,32126);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32127,32128,32129,32130,32131,32132,32133,32134,32135,32136,32137,32138,32139,32140,32141,32142,32143,32144,32145,32146);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32147,32148,32165,32166,32167,32168,32171,32174,32187,32192,32193,32195,32196,32197,32199,32202,32209,32214,32215,32217);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32218,32221,32224,32229,32242,32244,32245,32251,32252,32256,32264,32265,32266,32298,32304,32310,32313,32314,32318,32319);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32328,32338,32339,32347,32368,32378,32400,32404,32408,32422,32423,32427,32431,32432,32433,32434,32435,32436,32437,32439);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32440,32442,32445,32465,32471,32481,32497,32500,32508,32520,32521,32527,32530,32531,32532,32536,32548,32549,32550,32551);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32552,32553,32554,32555,32556,32557,32558,32559,32560,32561,32574,32583,32595,32604,32606,32607,32608,32630,32647,32648);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32654,32655,32656,32661,32663,32668,32669,32689,32694,32708,32713,32720,32727,32729,32752,32764,32765,32766,32768,32778);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32782,32785,32787,32794,32795,32796,32797,32819,32821,32824,32825,32827,32829,32831,32843,32845,32846,32847,32853,32854);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(32865,32887,32892,32898,32906,32930,32931,32942,32984,33005,33006,33014,33025,33026,33031,33045,33049,33054,33064,33068);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33070,33104,33105,33108,33116,33123,33130,33134,33135,33140,33141,33146,33147,33148,33149,33150,33151,33152,33153,33154);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33155,33156,33157,33158,33159,33160,33161,33162,33163,33164,33174,33184,33190,33191,33192,33196,33213,33234,33240,33241);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33242,33244,33246,33252,33271,33288,33305,33339,33340,33341,33350,33351,33352,33353,33360,33364,33366,33369,33376,33377);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33380,33385,33391,33392,33393,33395,33396,33397,33398,33399,33400,33401,33402,33406,33410,33411,33412,33413,33415,33425);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33426,33436,33449,33450,33489,33490,33491,33492,33493,33500,33501,33503,33515,33520,33521,33552,33570,33571,33576,33663);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33664,33667,33668,33689,33690,33691,33692,33693,33694,33700,33723,33724,33725,33729,33730,33731,33732,33733,33734,33735);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33737,33741,33742,33756,33757,33758,33764,33773,33776,33779,33784,33789,33805,33815,33827,33828,33829,33830,33831,33832);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33835,33839,33850,33851,33852,33856,33883,33885,33886,33887,33888,33906,33907,33908,33909,33910,33911,33942,33954,33955);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(33956,33959,33967,33968,33984,33986,33989,33994,33995,33999,34002,34003,34005,34016,34050,34054,34100,34104,34106,34107);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(34108,34109,34110,34111,34112,34114,34115,34121,34131,34139,34140,34141,34142,34148,34152,34153,34157,34159,34162,34166);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(34169,34170,34171,34174,34175,34186,34189,34200,34201,34214,34215,34216,34217,34218,34219,34220,34221,34222,34226,34227);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(34228,34229,34236,34237,34245,34246,34247,34268,34270,34272,34274,34276,34277,34281,34291,34296,34297,34298,34310,34313);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(34319,34327,34330,34332,34336,34338,34361,34363,34381,34383,34434,34436,34442,34443,34532,34533,34548,34562,34564,34566);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(34588,34589,34644,34648,34649,34650,34660,34675,34676,34677,34679,34694,34704,34720,34731,34732,34737,34738,34739,34740);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(34741,34743,34744,34768,34780,34794,34806,34810,34847,34875,34883,34887,34889,34891,34893,34899,34900,34901,34902,34903);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(34904,34905,34906,34908,34909,34910,34984,35009,35016,35055,35066,35074,35084,35088,35089,35104,35105,35113,35145,35189);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35216,35226,35227,35262,35263,35264,35265,35266,35267,35268,35269,35270,35271,35272,35278,35279,35280,35306,35308,35310);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35347,35348,35349,35350,35351,35352,35353,35354,35355,35356,35357,35358,35359,35360,35379,35380,35401,35403,35405,35407);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35410,35413,35415,35417,35419,35421,35423,35425,35427,35429,35431,35433,35436,35438,35439,35440,35441,35442,35443,35447);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35448,35449,35465,35467,35490,35511,35512,35513,35514,35515,35516,35517,35518,35519,35520,35521,35522,35523,35524,35525);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35527,35528,35529,35530,35531,35532,35533,35534,35535,35536,35537,35538,35539,35540,35541,35542,35543,35544,35546,35559);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35560,35568,35586,35608,35615,35616,35642,35652,35653,35654,35655,35656,35658,35659,35662,35663,35664,35665,35666,35667);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35668,35669,35670,35671,35672,35673,35674,35675,35676,35680,35681,35682,35683,35684,35685,35686,35687,35688,35689,35690);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35691,35692,35693,35694,35695,35696,35697,35699,35700,35701,35702,35703,35704,35705,35706,35707,35708,35709,35710,35711);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35712,35713,35714,35715,35716,35717,35718,35719,35720,35721,35722,35723,35724,35725,35726,35728,35729,35730,35731,35732);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35733,35734,35735,35736,35737,35738,35739,35740,35741,35742,35743,35744,35745,35746,35747,35748,35749,35774,35775,35776);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(35983,36067,36071,36072,36074,36075,36076,36082,36083,36084,36085,36086,36087,36088,36089,36090,36091,36118,36121,36124);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(36135,36148,36154,36155,36167,36168,36169,36171,36209,36212,36301,36302,36303,36349,36350,36357,36358,36473,36474,36475);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(36495,36498,36508,36530,36537,36538,36543,36547,36549,36566,36571,36572,36573,36574,36617,36643,36659,36710,36715,36726);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(36736,36792,36804,36823,36851,36875,36904,36923,36938,36966,37000,37014,37037,37039,37071,37074,37100,37101,37128,37131);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37158,37168,37191,37192,37193,37194,37201,37202,37222,37231,37233,37234,37235,37236,37237,37238,37239,37240,37241,37242);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37243,37244,37245,37246,37247,37248,37249,37250,37251,37252,37253,37254,37255,37256,37257,37258,37259,37260,37261,37262);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37263,37264,37265,37266,37267,37268,37269,37270,37271,37272,37273,37274,37275,37276,37277,37278,37279,37280,37281,37282);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37283,37284,37285,37286,37287,37288,37289,37290,37291,37292,37293,37295,37296,37297,37298,37299,37300,37301,37302,37303);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37304,37305,37306,37307,37308,37309,37310,37311,37312,37313,37314,37315,37316,37317,37318,37319,37320,37321,37322,37323);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37324,37325,37326,37327,37328,37329,37330,37331,37332,37333,37334,37335,37336,37337,37338,37339,37340,37341,37342,37343);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37344,37345,37346,37347,37348,37349,37350,37351,37352,37353,37354,37355,37356,37357,37358,37359,37360,37361,37362,37363);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37364,37365,37366,37367,37368,37369,37370,37371,37372,37373,37374,37375,37376,37377,37378,37379,37380,37381,37382,37383);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37384,37385,37386,37387,37388,37389,37390,37391,37392,37393,37394,37395,37396,37397,37398,37399,37400,37401,37402,37403);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37404,37405,37406,37407,37408,37409,37410,37411,37412,37413,37414,37415,37416,37417,37418,37419,37420,37421,37422,37423);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37424,37425,37426,37427,37428,37429,37430,37431,37432,37433,37434,37435,37436,37437,37438,37439,37440,37441,37442,37443);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37444,37445,37446,37447,37448,37449,37450,37451,37452,37453,37454,37455,37456,37457,37458,37459,37460,37461,37462,37463);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37464,37465,37466,37467,37468,37469,37470,37471,37472,37473,37474,37475,37476,37477,37478,37479,37480,37481,37482,37483);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37484,37485,37486,37504,37505,37506,37519,37525,37526,37543,37549,37550,37551,37558,37563,37564,37565,37566,37567,37568);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37569,37574,37580,37589,37591,37593,37603,37604,37605,37606,37607,37608,37609,37610,37611,37612,37613,37614,37615,37616);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37617,37618,37619,37620,37621,37622,37623,37624,37625,37626,37627,37628,37629,37630,37631,37632,37633,37634,37635,37636);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37637,37638,37639,37640,37641,37642,37643,37644,37645,37646,37647,37648,37649,37650,37651,37652,37653,37654,37655,37656);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37657,37658,37677,37678,37699,37700,37702,37704,37720,37721,37722,37730,37731,37745,37746,37788,37797,37801,37809,37814);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(37820,37824,37827,37831,37832,37852,37871,37878,37883,37894,37952,37957,37958,37959,37964,37981,37990,38000,38001,38020);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38025,38026,38031,38053,38057,38058,38059,38061,38062,38063,38064,38072,38073,38074,38075,38076,38077,38078,38079,38080);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38081,38082,38083,38084,38085,38086,38087,38088,38089,38090,38091,38092,38093,38094,38095,38096,38097,38098,38099,38100);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38101,38102,38103,38105,38106,38108,38110,38112,38113,38121,38123,38126,38128,38129,38130,38131,38132,38133,38134,38137);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38138,38139,38151,38156,38157,38164,38166,38167,38168,38169,38170,38171,38174,38185,38193,38197,38198,38211,38219,38220);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38226,38230,38233,38234,38236,38249,38256,38257,38258,38261,38262,38265,38266,38267,38288,38289,38296,38297,38298,38299);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38303,38304,38312,38317,38320,38321,38322,38325,38328,38340,38341,38342,38349,38350,38351,38352,38362,38388,38390,38393);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38394,38395,38396,38397,38398,38399,38400,38401,38402,38403,38404,38405,38406,38407,38408,38418,38419,38431,38434,38435);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38436,38444,38445,38446,38453,38458,38459,38460,38462,38463,38472,38479,38480,38481,38483,38485,38486,38495,38496,38503);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38524,38525,38527,38528,38544,38546,38547,38549,38550,38552,38557,38563,38564,38568,38572,38579,38580,38581,38582,38583);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38584,38585,38586,38587,38588,38590,38596,38597,38598,38599,38600,38601,38602,38603,38604,38605,38625,38626,38628,38629);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38630,38631,38632,38633,38634,38635,38637,38638,38639,38640,38641,38667,38675,38676,38677,38678,38679,38680,38681,38682);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38683,38684,38685,38686,38687,38688,38689,38690,38691,38692,38693,38694,38698,38699,38700,38701,38702,38710,38716,38717);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38721,38722,38723,38724,38725,38726,38727,38733,38734,38735,38736,38737,38751,38752,38758,38759,38760,38761,38769,38770);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38771,38772,38773,38774,38775,38776,38777,38784,38785,38786,38787,38788,38789,38790,38825,38830,38843,38846,38860,38863);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(38870,38882,38903,38905,38970,38971,38972,38973,38974,38975,39000,39001,39011,39012,39013,39019,39023,39057,39058,39091);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(39092,39120,39121,39122,39123,39125,39135,39166,39167,39168,39217,39229,39232,39233,39234,39284,39285,39286,39287,39288);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(39289,39296,39299,39300,39301,39302,39303,39304,39305,39306,39307,39309,39310,39311,39355,39356,39361,39362,39420,39454);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(39462,39647,39654,39683,39691,39692,39695,39703,39707,39743,39744,39746,39798,39799,39805,39815,39817,39821,39823,39841);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(39864,39872,39920,39922,39944,39945,39975,39976,39977,40101,40102,40103,40143,40144,40145,40182,40184,40192,40196,40218);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(40265,40279,40301,40329,40354,40387,40391,40418,40420,40422,40424,40428,40470,40471,40472,40502,40506,40617,40670,40671);
+DELETE FROM `creature_template_locale` WHERE `locale` = 'esMX' AND `entry` IN(40672,40673,40674,40675,40682,40684,40724,41839,43280,43281,43282,182757,182762,182767,3460602,3460603);
+
+-- Update existing entries, from WOTLK
+UPDATE `creature_template_locale` SET `Name` = 'Matón Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38;
+UPDATE `creature_template_locale` SET `Name` = 'Ratero Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 94;
+UPDATE `creature_template_locale` SET `Name` = 'Bandido Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 116;
+UPDATE `creature_template_locale` SET `Name` = 'Horror esquelético', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 202;
+UPDATE `creature_template_locale` SET `Name` = 'Gryan Mantorrecio', `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 234;
+UPDATE `creature_template_locale` SET `Name` = 'Lobo joven malsano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 299;
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Camarera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 379;
+UPDATE `creature_template_locale` SET `Name` = 'Guardia Parker', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 464;
+UPDATE `creature_template_locale` SET `Name` = 'Zahorí bribón de Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 474;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 487;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 488;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 489;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 490;
+UPDATE `creature_template_locale` SET `Name` = 'Emboscador Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 583;
+UPDATE `creature_template_locale` SET `Name` = 'Teniente Fangore', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 703;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 820;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 821;
+UPDATE `creature_template_locale` SET `Name` = 'Ayudante de alguacil Willem', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 823;
+UPDATE `creature_template_locale` SET `Name` = 'Diablo de polvo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 832;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 869;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 870;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 874;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 876;
+UPDATE `creature_template_locale` SET `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 878;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 946;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1073;
+UPDATE `creature_template_locale` SET `Name` = 'Oso negro mayor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1186;
+UPDATE `creature_template_locale` SET `Title` = 'Mercader de arcos y flechas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1298;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinero superior', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1382;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1430;
+UPDATE `creature_template_locale` SET `Name` = 'Gorila Lomoplata iracundo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1511;
+UPDATE `creature_template_locale` SET `Name` = 'Patriarca Lomoplata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1558;
+UPDATE `creature_template_locale` SET `Name` = 'Prisionero Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1706;
+UPDATE `creature_template_locale` SET `Name` = 'Presidiario Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1711;
+UPDATE `creature_template_locale` SET `Name` = 'Insurgente Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1715;
+UPDATE `creature_template_locale` SET `Name` = 'Gran Almirante Jes-Tereth', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1750;
+UPDATE `creature_template_locale` SET `Name` = 'Huargo jaspeado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1766;
+UPDATE `creature_template_locale` SET `Name` = 'Vigía de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1888;
+UPDATE `creature_template_locale` SET `Name` = 'Zahorí de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1889;
+UPDATE `creature_template_locale` SET `Title` = 'Médico', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2326;
+UPDATE `creature_template_locale` SET `Title` = 'Médica', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2329;
+UPDATE `creature_template_locale` SET `Name` = 'Trepamusgo gigante', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2349;
+UPDATE `creature_template_locale` SET `Name` = 'Trepamusgo del bosque', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2350;
+UPDATE `creature_template_locale` SET `Name` = 'Oso gris', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2351;
+UPDATE `creature_template_locale` SET `Name` = 'León de montaña feral', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2385;
+UPDATE `creature_template_locale` SET `Name` = 'Guardia de Costasur', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2386;
+UPDATE `creature_template_locale` SET `Name` = 'Guardia de la Muerte del Molino Tarren', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2405;
+UPDATE `creature_template_locale` SET `Title` = 'Rehén Lanza Negra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2530;
+UPDATE `creature_template_locale` SET `Name` = 'Vindicador de Stromgarde', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2585;
+UPDATE `creature_template_locale` SET `Name` = 'Crocolisco marino mayor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2635;
+UPDATE `creature_template_locale` SET `Title` = 'Pertrechos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2808;
+UPDATE `creature_template_locale` SET `Title` = 'Suministros de sastrería y peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3005;
+UPDATE `creature_template_locale` SET `Title` = 'Oficial peletero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3008;
+UPDATE `creature_template_locale` SET `Name` = 'Reptador de espuma pigmeo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3106;
+UPDATE `creature_template_locale` SET `Name` = 'Reptador de espuma', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3107;
+UPDATE `creature_template_locale` SET `Name` = 'Fizzle Tormenta Oscura', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3203;
+UPDATE `creature_template_locale` SET `Name` = 'Buscaqua Crines de Acero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3267;
+UPDATE `creature_template_locale` SET `Name` = 'Bestia de lodo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3295;
+UPDATE `creature_template_locale` SET `Title` = 'Mercader de armaduras ligeras', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3317;
+UPDATE `creature_template_locale` SET `Title` = 'Mercader de armas de fuego y municiones', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3322;
+UPDATE `creature_template_locale` SET `Title` = 'Suministros de herboristería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3405;
+UPDATE `creature_template_locale` SET `Title` = 'Gremio de manitas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3442;
+UPDATE `creature_template_locale` SET `Name` = 'Robovigilante Mark I', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3538;
+UPDATE `creature_template_locale` SET `Name` = 'Discípulo de Naralex', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3678;
+UPDATE `creature_template_locale` SET `Name` = 'Caylais Plumalunar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3841;
+UPDATE `creature_template_locale` SET `Name` = 'Merodeador Galak', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4099;
+UPDATE `creature_template_locale` SET `Name` = 'Tortuga brillavalva', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4142;
+UPDATE `creature_template_locale` SET `Name` = 'Mordedor brillavalva', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4143;
+UPDATE `creature_template_locale` SET `Name` = 'Cazapozos brillavalva', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4144;
+UPDATE `creature_template_locale` SET `Name` = 'Basilisco Piedra de sal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4147;
+UPDATE `creature_template_locale` SET `Name` = 'Observador Piedra de sal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4150;
+UPDATE `creature_template_locale` SET `Name` = 'Vitropiel Piedra de sal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4151;
+UPDATE `creature_template_locale` SET `Name` = 'Adivinador Escarlata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4291;
+UPDATE `creature_template_locale` SET `Name` = 'Lodobestia Parramustia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4387;
+UPDATE `creature_template_locale` SET `Name` = 'Maestro del circuito Kronkpiloto', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4419;
+UPDATE `creature_template_locale` SET `Name` = 'Visión encantada', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4472;
+UPDATE `creature_template_locale` SET `Title` = 'Sastre de tejido de sombra maestra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4578;
+UPDATE `creature_template_locale` SET `Title` = 'Forjadora de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4888;
+UPDATE `creature_template_locale` SET `Title` = 'Fabricante de arcos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4892;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4894;
+UPDATE `creature_template_locale` SET `Title` = 'Pertrechos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4896;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4941;
+UPDATE `creature_template_locale` SET `Name` = 'Mocasín', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4953;
+UPDATE `creature_template_locale` SET `Name` = 'Alborotador Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5043;
+UPDATE `creature_template_locale` SET `Name` = 'Secretario Lendry', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5083;
+UPDATE `creature_template_locale` SET `Name` = 'Dolkin Yelmorisco', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5125;
+UPDATE `creature_template_locale` SET `Name` = 'Olthran Yelmorisco', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5126;
+UPDATE `creature_template_locale` SET `Title` = 'Forjador de armaduras', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5164;
+UPDATE `creature_template_locale` SET `Name` = 'Depositario arbóreo Jademir', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5319;
+UPDATE `creature_template_locale` SET `Title` = 'Liga de Expedicionarios', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5388;
+UPDATE `creature_template_locale` SET `Name` = 'Corma Villardo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5683;
+UPDATE `creature_template_locale` SET `Name` = 'Sumo Hechicero Andromath', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5694;
+UPDATE `creature_template_locale` SET `Title` = 'Experimento de Gerard', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5697;
+UPDATE `creature_template_locale` SET `Name` = 'Escarbador', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5983;
+UPDATE `creature_template_locale` SET `Name` = 'Cultor Sombra Jurada', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6004;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6328;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6374;
+UPDATE `creature_template_locale` SET `Name` = 'Fantasma encantado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6427;
+UPDATE `creature_template_locale` SET `Name` = 'Brienna Brillaestrella', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6576;
+UPDATE `creature_template_locale` SET `Name` = 'Johnson el "Desplumado"', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6626;
+UPDATE `creature_template_locale` SET `Name` = 'Cangrejo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6827;
+UPDATE `creature_template_locale` SET `Name` = 'Maestro de embarcadero Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6846;
+UPDATE `creature_template_locale` SET `Name` = 'Trabajador de embarcadero Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6927;
+UPDATE `creature_template_locale` SET `Name` = 'Lechuza Cortezaférrea', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7097;
+UPDATE `creature_template_locale` SET `Title` = 'Forjadora de armaduras', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7230;
+UPDATE `creature_template_locale` SET `Title` = 'Artesano de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7231;
+UPDATE `creature_template_locale` SET `Title` = 'Artesano de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7232;
+UPDATE `creature_template_locale` SET `Name` = 'Cucaracha', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7395;
+UPDATE `creature_template_locale` SET `Name` = 'Guardia Flama Galak', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7404;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia a la Escarcha II', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7412;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Lengua de fuego III', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7423;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia al Fuego II', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7424;
+UPDATE `creature_template_locale` SET `Name` = 'Tabernero Byula', `Title` = 'Tabernero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7714;
+UPDATE `creature_template_locale` SET `Title` = 'Peletera elemental maestra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7868;
+UPDATE `creature_template_locale` SET `Title` = 'Peletero elemental maestro', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7869;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de peletería tribal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7870;
+UPDATE `creature_template_locale` SET `Title` = 'Peletero tribal maestro', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7871;
+UPDATE `creature_template_locale` SET `Title` = 'Piloto de mecazancudo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7954;
+UPDATE `creature_template_locale` SET `Name` = 'Guarda de Los Baldíos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8016;
+UPDATE `creature_template_locale` SET `Name` = 'Protector del pueblo', `Title` = 'La Milicia Popular', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8096;
+UPDATE `creature_template_locale` SET `Name` = 'Velarok Espada del Viento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8479;
+UPDATE `creature_template_locale` SET `Name` = 'Saern Correorgullo', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8664;
+UPDATE `creature_template_locale` SET `Name` = 'Ensamblaje Belisario', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8905;
+UPDATE `creature_template_locale` SET `Name` = 'Duente flamante', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9777;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro de establos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9983;
+UPDATE `creature_template_locale` SET `Name` = 'Infiltrado del Escudo del Estigma', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10299;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Lengua de fuego IV', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10557;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10839;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10840;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10857;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11034;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11036;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11039;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11063;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11102;
+UPDATE `creature_template_locale` SET `Title` = 'Artesano de armas especiales', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11146;
+UPDATE `creature_template_locale` SET `Title` = 'Forjador de armaduras', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11177;
+UPDATE `creature_template_locale` SET `Title` = 'Forjador de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11178;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11194;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11536;
+UPDATE `creature_template_locale` SET `Name` = 'Can del Núcleo anciano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11673;
+UPDATE `creature_template_locale` SET `Name` = 'Raptor de montar esmeralda', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12346;
+UPDATE `creature_template_locale` SET `Name` = 'Raptor turquesa de montar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12349;
+UPDATE `creature_template_locale` SET `Title` = 'Cirujano del dispensario', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12939;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13084;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13219;
+UPDATE `creature_template_locale` SET `Name` = 'Rana', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13321;
+UPDATE `creature_template_locale` SET `Name` = 'Mariscal de campo Petraponte', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14721;
+UPDATE `creature_template_locale` SET `Title` = 'Canje de vales de la Feria de la Luna Negra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14828;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedora de bebidas de la Feria de la Luna Negra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14844;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de alimentos de la Feria de la Luna Negra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14845;
+UPDATE `creature_template_locale` SET `Title` = 'Objetos exóticos de la Feria de la Luna Negra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14846;
+UPDATE `creature_template_locale` SET `Title` = 'Cartas de la Feria de la Luna Negra y objetos exóticos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14847;
+UPDATE `creature_template_locale` SET `Name` = 'Feriante de la Feria de la Luna Negra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14849;
+UPDATE `creature_template_locale` SET `Name` = 'Emisario Grito de Guerra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15105;
+UPDATE `creature_template_locale` SET `Name` = 'Emisaria Lobo Gélido', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15106;
+UPDATE `creature_template_locale` SET `Name` = 'Acechacaminos Avokor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15285;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem piel de piedra VII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15470;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem piel de piedra VIII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15474;
+UPDATE `creature_template_locale` SET `Name` = 'Escorpión', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15476;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Nova de Fuego VII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15483;
+UPDATE `creature_template_locale` SET `Name` = 'Encargado Wyllithen', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15969;
+UPDATE `creature_template_locale` SET `Name` = 'Korfax, Campeón de la Luz', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16112;
+UPDATE `creature_template_locale` SET `Name` = 'Comandante Eligor Albar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16115;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de pícaros', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16279;
+UPDATE `creature_template_locale` SET `Title` = 'El Alba Argenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16378;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16583;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16621;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16676;
+UPDATE `creature_template_locale` SET `Name` = 'Espíritu del Verano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16701;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16719;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16823;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17634;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de minería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18747;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de herboristería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18748;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra sastre', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18749;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18751;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18752;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de encantamientos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18753;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18754;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de desuello', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18755;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18771;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de sastrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18772;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de encantamientos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18773;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18774;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18775;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de herboristería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18776;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de desuello', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18777;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de minería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18779;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de alquimia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18802;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de pesca', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18911;
+UPDATE `creature_template_locale` SET `Name` = 'Guardia de Cólera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18975;
+UPDATE `creature_template_locale` SET `Name` = 'Duente dardo vil', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18978;
+UPDATE `creature_template_locale` SET `Title` = 'Médico militar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18990;
+UPDATE `creature_template_locale` SET `Title` = 'Médico militar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18991;
+UPDATE `creature_template_locale` SET `Title` = 'Suministros de cocina', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18993;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de alquimia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19052;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19063;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de desuello', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19180;
+UPDATE `creature_template_locale` SET `Name` = 'Cachorro de uñagrieta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19183;
+UPDATE `creature_template_locale` SET `Title` = 'Médico', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19184;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19185;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19187;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de encantamientos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19252;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19341;
+UPDATE `creature_template_locale` SET `Title` = 'Armas de fuego y munición', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19351;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19369;
+UPDATE `creature_template_locale` SET `Title` = 'Armas arrojadizas y munición', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19473;
+UPDATE `creature_template_locale` SET `Title` = 'Pariente de Ravandwyr', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19482;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19539;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de encantamientos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19540;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19576;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor forjador de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20124;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora forjadora de armaduras', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20125;
+UPDATE `creature_template_locale` SET `Name` = 'Kaliri de doma', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20127;
+UPDATE `creature_template_locale` SET `Name` = 'Hermana lobo Maka', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20276;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de arena brutal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20278;
+UPDATE `creature_template_locale` SET `Name` = 'Hidra sedienta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20324;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor de equitación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20500;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de equitación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20511;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21087;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro herrero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21209;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21426;
+UPDATE `creature_template_locale` SET `Title` = 'Munición', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21488;
+UPDATE `creature_template_locale` SET `Name` = 'Cría negra del barón Sablecrín', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22130;
+UPDATE `creature_template_locale` SET `Name` = 'Uñagrieta de doma', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22135;
+UPDATE `creature_template_locale` SET `Title` = 'Especialista en tela lunar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22208;
+UPDATE `creature_template_locale` SET `Title` = 'Especialista en tejido de sombra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22212;
+UPDATE `creature_template_locale` SET `Title` = 'Especialista en fuego de hechizo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22213;
+UPDATE `creature_template_locale` SET `Name` = 'Wodin el sirviente trol', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22893;
+UPDATE `creature_template_locale` SET `Name` = 'Gentío de la Fiesta de la cerveza', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23488;
+UPDATE `creature_template_locale` SET `Name` = 'Equipo de montaje de la Fiesta de la cerveza', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23504;
+UPDATE `creature_template_locale` SET `Name` = 'Budd Magallenas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23559;
+UPDATE `creature_template_locale` SET `Title` = 'IV:7', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23566;
+UPDATE `creature_template_locale` SET `Name` = 'Charlatán de cerveza Gordok', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23685;
+UPDATE `creature_template_locale` SET `Name` = 'Juerguista de la Fiesta de la cerveza borracho', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23698;
+UPDATE `creature_template_locale` SET `Title` = 'Mercader de pescado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23896;
+UPDATE `creature_template_locale` SET `Title` = 'G.U.A.O', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24108;
+UPDATE `creature_template_locale` SET `Name` = 'Necrófago del Ejército de muertos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24207;
+UPDATE `creature_template_locale` SET `Name` = 'Barril festivo de destilería de Drohn', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24372;
+UPDATE `creature_template_locale` SET `Name` = 'Juerguista de la Fiesta de la cerveza', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24484;
+UPDATE `creature_template_locale` SET `Name` = 'Charlatán de destilería de Drohn', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24492;
+UPDATE `creature_template_locale` SET `Name` = 'Charlatán de cervecería vudú de T''chali', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24493;
+UPDATE `creature_template_locale` SET `Name` = 'Aprendiz de destilería de Drohn', `Title` = 'Vendedor de cerveza de la destilería de Drohn', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24501;
+UPDATE `creature_template_locale` SET `Title` = 'Organizador de la Fiesta de la cerveza', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24710;
+UPDATE `creature_template_locale` SET `Title` = 'Organizador de la Fiesta de la cerveza', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24711;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora maestra de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24868;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25099;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de munición especial', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25195;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de munición especial', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25196;
+UPDATE `creature_template_locale` SET `Name` = 'Draco rojo guardián', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25364;
+UPDATE `creature_template_locale` SET `Name` = 'Espíritu de clarividente Caminante Siniestro', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25425;
+UPDATE `creature_template_locale` SET `Name` = 'Agostizo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25706;
+UPDATE `creature_template_locale` SET `Name` = 'Cucaracha', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26525;
+UPDATE `creature_template_locale` SET `Name` = 'Espía de la Fiesta de la cerveza', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26719;
+UPDATE `creature_template_locale` SET `Name` = 'Lord Devrestrasz', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27575;
+UPDATE `creature_template_locale` SET `Name` = 'Gran kodo de la Fiesta de la cerveza', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27707;
+UPDATE `creature_template_locale` SET `Name` = 'Torturador Alphonse', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28554;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de encantamiento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28693;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de herrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28694;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de desuello', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28696;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28697;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de minería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28698;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de sastrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28699;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28700;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28701;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de inscripción', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28702;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de alquimia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28703;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de herboristería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28704;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de cocina', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28705;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de primeros auxilios', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28706;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de pesca y suministros', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28742;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor de vuelo en clima frío', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28746;
+UPDATE `creature_template_locale` SET `Name` = 'Señor Escarlata Borugh', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28964;
+UPDATE `creature_template_locale` SET `Title` = 'Flechero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29014;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de polvo de cadáver', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29203;
+UPDATE `creature_template_locale` SET `Name` = 'Guerrero de los Páramos Congelados', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29206;
+UPDATE `creature_template_locale` SET `Name` = 'Devoto Veloneve', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29407;
+UPDATE `creature_template_locale` SET `Title` = 'Munición especial', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29493;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de forja de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29505;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor de forja de armaduras', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29506;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor de peletería elemental', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29507;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor de peletería de escamas de dragón', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29508;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de peletería tribal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29509;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de cocina', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29631;
+UPDATE `creature_template_locale` SET `Name` = 'Alto arcanista Sabor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29657;
+UPDATE `creature_template_locale` SET `Name` = 'Espíritu de Rhino', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29791;
+UPDATE `creature_template_locale` SET `Name` = 'Tiemblatérrea Drakkari', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29829;
+UPDATE `creature_template_locale` SET `Name` = 'Jorcuttar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30340;
+UPDATE `creature_template_locale` SET `Title` = 'Munición', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30437;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de inscripción', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30721;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de inscripción', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30722;
+UPDATE `creature_template_locale` SET `Name` = 'Tripulación del Martillo de Orgrim', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30754;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de agua', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30885;
+UPDATE `creature_template_locale` SET `Name` = 'Iniciado caballero de la Muerte', `Title` = 'Anfitrión de sufrimiento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30958;
+UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento de maestro mayor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31144;
+UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento heroico', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31146;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de vuelo en clima frío', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31247;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de valor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31579;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de heroísmo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31580;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de valor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31581;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de heroísmo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31582;
+UPDATE `creature_template_locale` SET `Name` = 'Imagen del profeta Tharon''ja', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31621;
+UPDATE `creature_template_locale` SET `Name` = 'Aceite resbaladizo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31786;
+UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento para expertos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32666;
+UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento de maestro', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32667;
+UPDATE `creature_template_locale` SET `Name` = 'Tomas Riogain', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32686;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de sastrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33580;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33581;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de encantamiento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33583;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33586;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de cocina', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33587;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de alquimia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33588;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de primeros auxilios', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33589;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33590;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestra instructora de herrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33591;
+UPDATE `creature_template_locale` SET `Title` = 'Gran maestro instructor de inscripción', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33603;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de alquimia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33630;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de herrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33631;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de encantamiento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33633;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33634;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33635;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de sastrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33636;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33637;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de inscripción', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33638;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de herboristería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33639;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de minería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33640;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de desuello', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33641;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de alquimia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33674;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de herrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33675;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de encantamiento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33676;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33677;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de herboristería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33678;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de inscripción', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33679;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de joyería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33680;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de peletería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33681;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de minería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33682;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro instructor de desuello', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33683;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra instructora de sastrería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33684;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de conquista', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33964;
+UPDATE `creature_template_locale` SET `Name` = 'Bomba de relojería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 34307;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor de equitación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35093;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor de equitación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35100;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de equitación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35133;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de equitación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35135;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de triunfo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35494;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de triunfo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35573;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de triunfo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35574;
+UPDATE `creature_template_locale` SET `Name` = 'Púa osaria', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36619;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de Escarcha', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37941;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de Escarcha', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37942;
+UPDATE `creature_template_locale` SET `Name` = 'Púa osaria', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38711;
+UPDATE `creature_template_locale` SET `Name` = 'Púa osaria', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38712;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de emblema de Escarcha', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38858;
+UPDATE `creature_template_locale` SET `Name` = 'Robot cohete de cuerda', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40295;
+
+-- Update existing entries, from TBC
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de mascotas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 543;
+UPDATE `creature_template_locale` SET `Name` = 'Capo el Miserable', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 601;
+UPDATE `creature_template_locale` SET `Name` = 'Formarrasca Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1732;
+UPDATE `creature_template_locale` SET `Name` = 'Escribachizo de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1920;
+UPDATE `creature_template_locale` SET `Name` = 'Ancestro protector', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2041;
+UPDATE `creature_template_locale` SET `Name` = 'Conservador Ilthalaine', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2079;
+UPDATE `creature_template_locale` SET `Name` = 'Furia pétrea', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2258;
+UPDATE `creature_template_locale` SET `Name` = 'Crocolisco del lago grande', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2476;
+UPDATE `creature_template_locale` SET `Title` = 'Bruja del Consejo de las Sombras', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2598;
+UPDATE `creature_template_locale` SET `Name` = 'Gólem de asedio', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2749;
+UPDATE `creature_template_locale` SET `Name` = 'Águila ratonera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2830;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3067;
+UPDATE `creature_template_locale` SET `Name` = 'Feegly el Exiliado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3421;
+UPDATE `creature_template_locale` SET `Name` = 'Comemusgo Sombramatorral', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3780;
+UPDATE `creature_template_locale` SET `Title` = 'Herramientas y suministros', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3969;
+UPDATE `creature_template_locale` SET `Name` = 'Bestia de savia corrosiva', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4021;
+UPDATE `creature_template_locale` SET `Name` = 'Devastador silítido', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4132;
+UPDATE `creature_template_locale` SET `Name` = 'Señor Ancaniebla', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4460;
+UPDATE `creature_template_locale` SET `Name` = 'Ulthaan Ferrocorno', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4772;
+UPDATE `creature_template_locale` SET `Name` = 'Carnero de montar (marrón)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4779;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5348;
+UPDATE `creature_template_locale` SET `Name` = 'Cosechaenjambres', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5409;
+UPDATE `creature_template_locale` SET `Name` = 'Aliado Antárbol', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5806;
+UPDATE `creature_template_locale` SET `Name` = 'Comandante de vigilancia Zalafil', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5809;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Lengua de fuego II', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6012;
+UPDATE `creature_template_locale` SET `Name` = 'Guardián de agua', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6047;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6286;
+UPDATE `creature_template_locale` SET `Name` = 'Estridador Cortezaférrea', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7098;
+UPDATE `creature_template_locale` SET `Name` = 'Cazador Cortezaférrea', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7099;
+UPDATE `creature_template_locale` SET `Name` = 'Cachorro sable de hielo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7430;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Viento Furioso II', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7483;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Viento Furioso III', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7484;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Gracia del aire', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7486;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Gracia del aire II', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7487;
+UPDATE `creature_template_locale` SET `Name` = 'Pájaro de fuego superior', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8207;
+UPDATE `creature_template_locale` SET `Title` = 'Cocinero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8306;
+UPDATE `creature_template_locale` SET `Name` = 'Velarok el Falsario', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8480;
+UPDATE `creature_template_locale` SET `Name` = 'Vórtice ráfaga', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8667;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9272;
+UPDATE `creature_template_locale` SET `Title` = 'Sastre de tejido de sombra maestra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9584;
+UPDATE `creature_template_locale` SET `Name` = 'Espíritu Antárbol', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9601;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 9618;
+UPDATE `creature_template_locale` SET `Name` = 'Cucaracha corrupta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10017;
+UPDATE `creature_template_locale` SET `Title` = 'UNUSED', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10237;
+UPDATE `creature_template_locale` SET `Title` = 'Liga de Expedicionarios', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10301;
+UPDATE `creature_template_locale` SET `Name` = 'El Imperdonable', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10516;
+UPDATE `creature_template_locale` SET `Name` = 'Señor forestal Lanzalcón', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10824;
+UPDATE `creature_template_locale` SET `Name` = 'Alta general Abbendis', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10828;
+UPDATE `creature_template_locale` SET `Name` = 'Skarr el Inquebrantable', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11498;
+UPDATE `creature_template_locale` SET `Name` = 'Machacador Grito de Guerra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11684;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra de armas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11866;
+UPDATE `creature_template_locale` SET `Title` = 'El segundo kahn', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12239;
+UPDATE `creature_template_locale` SET `Title` = 'El primer kahn', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12240;
+UPDATE `creature_template_locale` SET `Title` = 'El tercer kahn', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12241;
+UPDATE `creature_template_locale` SET `Name` = 'Carnero de montar blanco', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12374;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra de demonios', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12807;
+UPDATE `creature_template_locale` SET `Name` = 'Ushalac el Morador de la Oscuridad', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14016;
+UPDATE `creature_template_locale` SET `Name` = 'Lord capitán Wyrmak', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14445;
+UPDATE `creature_template_locale` SET `Name` = 'Emisaria de los Rapiñadores', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14990;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem Gracia del aire III', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15463;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia a la naturaleza IV', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15490;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de alquimia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16588;
+UPDATE `creature_template_locale` SET `Name` = 'Fogata del solsticio de verano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16592;
+UPDATE `creature_template_locale` SET `Name` = 'Celebrador del solsticio de verano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16781;
+UPDATE `creature_template_locale` SET `Name` = 'Muñeco de entrenamiento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17578;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de munición', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17598;
+UPDATE `creature_template_locale` SET `Title` = 'Instructor maestro de ingeniería', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17637;
+UPDATE `creature_template_locale` SET `Name` = 'Maatparm', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17663;
+UPDATE `creature_template_locale` SET `Name` = 'Embajador Semprepino Olorg', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18803;
+UPDATE `creature_template_locale` SET `Name` = 'Netherstorm Trigger', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19656;
+UPDATE `creature_template_locale` SET `Name` = 'Consola de control Coruu', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20417;
+UPDATE `creature_template_locale` SET `Name` = 'Invisible Stalker Coilfang Doors', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20926;
+UPDATE `creature_template_locale` SET `Title` = 'Munición', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21483;
+UPDATE `creature_template_locale` SET `Name` = 'Vagoneta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23289;
+UPDATE `creature_template_locale` SET `Title` = 'Vendedor de arena', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23396;
+UPDATE `creature_template_locale` SET `Name` = 'Generic Cosmetic Trigger - LAB', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24921;
+UPDATE `creature_template_locale` SET `Name` = 'Proveedor del solsticio de verano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26123;
+UPDATE `creature_template_locale` SET `Name` = 'Mercader del solsticio de verano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26124;
+UPDATE `creature_template_locale` SET `Title` = 'Anillo de la Tierra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26221;
+
+-- Update existing entries, from CLASSIC
+UPDATE `creature_template_locale` SET `Name` = 'Hemet Nesingwary', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 715;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 836;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 837;
+UPDATE `creature_template_locale` SET `Name` = 'Necrófago', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 846;
+UPDATE `creature_template_locale` SET `Name` = 'Rybrad Riberahiel', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 945;
+UPDATE `creature_template_locale` SET `Name` = 'Vigía Blomberg', `Title` = 'La Guardia Nocturna', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1000;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1203;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1204;
+UPDATE `creature_template_locale` SET `Name` = 'Ancestro gemebundo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1534;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1685;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1686;
+UPDATE `creature_template_locale` SET `Name` = 'Acechamusgo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1780;
+UPDATE `creature_template_locale` SET `Name` = 'Trepador de la niebla', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1781;
+UPDATE `creature_template_locale` SET `Name` = 'Protector de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1912;
+UPDATE `creature_template_locale` SET `Name` = 'Depositario de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1913;
+UPDATE `creature_template_locale` SET `Name` = 'Mago de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1914;
+UPDATE `creature_template_locale` SET `Name` = 'Conjuradora de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 1915;
+UPDATE `creature_template_locale` SET `Name` = 'Lodobestia Brezomadera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2029;
+UPDATE `creature_template_locale` SET `Name` = 'Esbirro de Morganth', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2531;
+UPDATE `creature_template_locale` SET `Name` = 'Serpiente de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2540;
+UPDATE `creature_template_locale` SET `Name` = 'Jabaespín Erizapúas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2952;
+UPDATE `creature_template_locale` SET `Name` = 'Jabaguerrero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2966;
+UPDATE `creature_template_locale` SET `Title` = 'Oficial sastre', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3523;
+UPDATE `creature_template_locale` SET `Title` = 'Minero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3555;
+UPDATE `creature_template_locale` SET `Title` = 'Oficial herrero', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3557;
+UPDATE `creature_template_locale` SET `Name` = 'Maestro cervecero de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3577;
+UPDATE `creature_template_locale` SET `Name` = 'Minero de Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3578;
+UPDATE `creature_template_locale` SET `Title` = 'Oficial peletera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3605;
+UPDATE `creature_template_locale` SET `Title` = 'Oficial encantadora', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3606;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3684;
+UPDATE `creature_template_locale` SET `Title` = 'Experta alquimista', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3964;
+UPDATE `creature_template_locale` SET `Title` = 'Herborista', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3965;
+UPDATE `creature_template_locale` SET `Name` = 'Ingeniero de Ventura y Cía.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 3992;
+UPDATE `creature_template_locale` SET `Name` = 'Cortapiedras Cortaviento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4002;
+UPDATE `creature_template_locale` SET `Title` = 'Experto encantador', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4213;
+UPDATE `creature_template_locale` SET `Name` = 'Lobo de montar (gris oscuro)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4271;
+UPDATE `creature_template_locale` SET `Name` = 'Espíritu encantado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4958;
+UPDATE `creature_template_locale` SET `Title` = 'Diseñadora de tabardos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5047;
+UPDATE `creature_template_locale` SET `Title` = 'Pescador', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5690;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia al fuego', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5927;
+UPDATE `creature_template_locale` SET `Title` = 'Pescador', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5938;
+UPDATE `creature_template_locale` SET `Title` = 'Desollador', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6287;
+UPDATE `creature_template_locale` SET `Title` = 'Desolladora', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6288;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6376;
+UPDATE `creature_template_locale` SET `Name` = 'Guardaespaldas Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6866;
+UPDATE `creature_template_locale` SET `Name` = 'Eric "El Veloz"', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6907;
+UPDATE `creature_template_locale` SET `Name` = 'Maligno de las tumbas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7349;
+UPDATE `creature_template_locale` SET `Name` = 'Atracador de las tumbas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7351;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia a la Escarcha III', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7413;
+UPDATE `creature_template_locale` SET `Name` = 'Tótem de resistencia al Fuego III', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7425;
+UPDATE `creature_template_locale` SET `Title` = 'Peletero dragontino maestro', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7866;
+UPDATE `creature_template_locale` SET `Title` = 'Peletero dragontino maestro', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7867;
+UPDATE `creature_template_locale` SET `Name` = 'Protector de Mulgore', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7975;
+UPDATE `creature_template_locale` SET `Name` = 'Abominación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8545;
+UPDATE `creature_template_locale` SET `Name` = 'Maligno de cripta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8555;
+UPDATE `creature_template_locale` SET `Name` = 'Trabajador forestal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8563;
+UPDATE `creature_template_locale` SET `Name` = 'Forestal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8564;
+UPDATE `creature_template_locale` SET `Name` = 'Zancamino', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8565;
+UPDATE `creature_template_locale` SET `Name` = 'Mecazancudo de montar (verde fluorescente)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10178;
+UPDATE `creature_template_locale` SET `Name` = 'Custodio carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10418;
+UPDATE `creature_template_locale` SET `Name` = 'Conjurador carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10419;
+UPDATE `creature_template_locale` SET `Name` = 'Iniciado carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10420;
+UPDATE `creature_template_locale` SET `Name` = 'Defensor carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10421;
+UPDATE `creature_template_locale` SET `Name` = 'Hechicero carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10422;
+UPDATE `creature_template_locale` SET `Name` = 'Sacerdote carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10423;
+UPDATE `creature_template_locale` SET `Name` = 'Gallardo carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10424;
+UPDATE `creature_template_locale` SET `Name` = 'Mago de batalla carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10425;
+UPDATE `creature_template_locale` SET `Name` = 'Inquisidor carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10426;
+UPDATE `creature_template_locale` SET `Title` = 'Instructores de sableinvernales', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10618;
+UPDATE `creature_template_locale` SET `Name` = 'Pip Perspicaz', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10776;
+UPDATE `creature_template_locale` SET `Name` = 'Archivista Galford', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10811;
+UPDATE `creature_template_locale` SET `Name` = 'Gran Cruzado Dathrohan', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10812;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10930;
+UPDATE `creature_template_locale` SET `Name` = 'Maestro cañonero Willey', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 10997;
+UPDATE `creature_template_locale` SET `Name` = 'Tigre de montar (Cuna del Invierno)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11021;
+UPDATE `creature_template_locale` SET `Name` = 'Malor el Fanático', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11032;
+UPDATE `creature_template_locale` SET `Name` = 'Monje carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11043;
+UPDATE `creature_template_locale` SET `Name` = 'Fusilero carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11054;
+UPDATE `creature_template_locale` SET `Title` = 'Oficial encantadora', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11070;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra encantadora', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11073;
+UPDATE `creature_template_locale` SET `Title` = 'Artesano encantador', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11074;
+UPDATE `creature_template_locale` SET `Name` = 'Forjador de martillos carmesí', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11120;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11466;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11486;
+UPDATE `creature_template_locale` SET `Name` = 'Chamán de la Horda', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11683;
+UPDATE `creature_template_locale` SET `Name` = 'Kodo de montar (marrón)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11689;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11858;
+UPDATE `creature_template_locale` SET `Name` = 'Vigilapiedras Gogger', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11915;
+UPDATE `creature_template_locale` SET `Name` = 'Geomántico Gogger', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11917;
+UPDATE `creature_template_locale` SET `Name` = 'Machacapiedras Gogger', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11918;
+UPDATE `creature_template_locale` SET `Name` = 'Presagista de Sulfuron', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12098;
+UPDATE `creature_template_locale` SET `Name` = 'Draka', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12121;
+UPDATE `creature_template_locale` SET `Name` = 'Kodo de montar (gris)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12149;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12918;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12958;
+UPDATE `creature_template_locale` SET `Name` = 'Activador de Alanegra', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12999;
+UPDATE `creature_template_locale` SET `Name` = 'Mastín Gordok', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13036;
+UPDATE `creature_template_locale` SET `Name` = 'Comandante Dardosh', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13140;
+UPDATE `creature_template_locale` SET `Name` = 'Teniente Murp', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13146;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13420;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13431;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13432;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14358;
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14361;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14364;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14368;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14369;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14371;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14381;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14382;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14383;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14481;
+UPDATE `creature_template_locale` SET `Name` = 'Lobo de montar Lobo Gélido', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14744;
+UPDATE `creature_template_locale` SET `Name` = 'Al''tabim el que todo lo ve', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14903;
+UPDATE `creature_template_locale` SET `Title` = 'Suministros y reparaciones de Zandalar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14921;
+UPDATE `creature_template_locale` SET `Name` = 'Activador del cañón de la feria', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15218;
+UPDATE `creature_template_locale` SET `Name` = 'Tonque de vapor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15328;
+UPDATE `creature_template_locale` SET `Name` = 'Activador de mundo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15384;
+UPDATE `creature_template_locale` SET `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16032;
+UPDATE `creature_template_locale` SET `Name` = 'Capitán caballero de la muerte', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16145;
+
+-- Update existing entries, from CATA
+UPDATE `creature_template_locale` SET `Name` = 'Raptor esmeralda', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6075;
+UPDATE `creature_template_locale` SET `Name` = 'Raptor turquesa', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7707;
+UPDATE `creature_template_locale` SET `Name` = 'Criadora de la Sala del Ídolo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 8611;
+UPDATE `creature_template_locale` SET `Name` = 'Ezra Grimm', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11058;
+UPDATE `creature_template_locale` SET `Name` = 'Amante ferviente', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16461;
+UPDATE `creature_template_locale` SET `Name` = 'Fogata del solsticio de verano Desaparición', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16606;
+UPDATE `creature_template_locale` SET `Name` = 'Robovigilante Mark 0', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20420;
+UPDATE `creature_template_locale` SET `Name` = 'Sulfuron Lanzamagma', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 20909;
+UPDATE `creature_template_locale` SET `Name` = 'Retador Faucedradco', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21717;
+UPDATE `creature_template_locale` SET `Name` = 'Vakkiz la Furia del Viento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23162;
+UPDATE `creature_template_locale` SET `Name` = 'Draco Ala Abisal veridiano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23457;
+UPDATE `creature_template_locale` SET `Name` = 'Daakara', `Title` = 'El Invencible', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23863;
+UPDATE `creature_template_locale` SET `Name` = 'Carnero de la Fiesta de la cerveza presto', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24368;
+UPDATE `creature_template_locale` SET `Name` = 'Doris Chiltonius', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24520;
+UPDATE `creature_template_locale` SET `Name` = 'Aniquilador Grek''lor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25329;
+UPDATE `creature_template_locale` SET `Name` = 'Guardián serpiente', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26806;
+UPDATE `creature_template_locale` SET `Name` = 'Túnel de Mina de Hibergarde superior', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27436;
+UPDATE `creature_template_locale` SET `Name` = 'Túnel de Mina de Hibergarde inferior', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27437;
+UPDATE `creature_template_locale` SET `Name` = 'Mentor del linaje Hath''ar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28412;
+UPDATE `creature_template_locale` SET `Name` = 'Gran Almirante Viento Oeste', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29621;
+UPDATE `creature_template_locale` SET `Name` = 'Almiar seco', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30096;
+UPDATE `creature_template_locale` SET `Name` = 'Vrykul agotado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30146;
+UPDATE `creature_template_locale` SET `Title` = 'Ingeniería de demoliciones', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30499;
+UPDATE `creature_template_locale` SET `Name` = 'Ezra Grimm', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30552;
+UPDATE `creature_template_locale` SET `Name` = 'Hechicera azur', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30667;
+UPDATE `creature_template_locale` SET `Name` = 'Iniciado caballero de la Muerte', `Title` = 'Anfitrión de sufrimiento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31327;
+UPDATE `creature_template_locale` SET `Name` = 'Ardilla de Colinas Pardas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31889;
+UPDATE `creature_template_locale` SET `Name` = 'Bomba de relojería que hace tic tac', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32246;
+UPDATE `creature_template_locale` SET `Name` = 'Doris Chiltonius', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32385;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de justicia de legado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33963;
+UPDATE `creature_template_locale` SET `Title` = 'Intendente de justicia de legado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35495;
+UPDATE `creature_template_locale` SET `Name` = 'Tripulación del Martillo de Orgrim', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36971;
+
+-- Update existing entries, from MOP
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15801;
+UPDATE `creature_template_locale` SET `Name` = 'Acólito del templo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22939;
+UPDATE `creature_template_locale` SET `Name` = 'Parroquiano encantador', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22955;
+UPDATE `creature_template_locale` SET `Name` = 'Sacerdotisa del Tormento', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22956;
+UPDATE `creature_template_locale` SET `Name` = 'Señora de la demencia', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22957;
+UPDATE `creature_template_locale` SET `Name` = 'Anfitrión ardiente', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22959;
+UPDATE `creature_template_locale` SET `Name` = 'Señora del infortunio', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22962;
+UPDATE `creature_template_locale` SET `Name` = 'Sacerdotisa de los placeres', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22964;
+UPDATE `creature_template_locale` SET `Name` = 'Administrador devoto', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 22965;
+UPDATE `creature_template_locale` SET `Name` = 'PattyMack - The Dummy', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25499;
+UPDATE `creature_template_locale` SET `Name` = 'Torturador Alphonse', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27209;
+UPDATE `creature_template_locale` SET `Name` = 'Escribana jefe Kinnedius', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27378;
+UPDATE `creature_template_locale` SET `Name` = 'Rompecorazones X-45', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38207;
+
+-- Update existing entries, from RETAIL
+UPDATE `creature_template_locale` SET `Name` = 'Vacaciones - Halloween - Fortaleza - Elemental espectral', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 81;
+UPDATE `creature_template_locale` SET `Name` = 'Tipo de la patrulla', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 399;
+UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 400;
+UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 401;
+UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 402;
+UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 403;
+UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 631;
+UPDATE `creature_template_locale` SET `Name` = 'Trogg grutacanto', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 2889;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4115;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDKitari Buscalongo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4157;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4318;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4445;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4446;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4449;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4450;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDAlexander Lister', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 4579;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDWorld Cartography Trainer', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5035;
+UPDATE `creature_template_locale` SET `Name` = 'Agente Gordunni', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 5231;
+UPDATE `creature_template_locale` SET `Title` = 'Héroe de Orgrimmar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6466;
+UPDATE `creature_template_locale` SET `Title` = '"Conservador" de reliquias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6566;
+UPDATE `creature_template_locale` SET `Name` = 'Forma felina', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6571;
+UPDATE `creature_template_locale` SET `Name` = 'Forma felina', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6572;
+UPDATE `creature_template_locale` SET `Name` = 'Campesino (madera)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6578;
+UPDATE `creature_template_locale` SET `Name` = 'Gorgrond Smokebelcher Depot NPC Invisible Stalker "Our Gun''s Bigger" Quest Target ELM', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 6783;
+UPDATE `creature_template_locale` SET `Name` = 'Comandante Marzuk Machacaenanos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7014;
+UPDATE `creature_template_locale` SET `Name` = 'Agente Vientomuerto', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 7373;
+UPDATE `creature_template_locale` SET `Name` = 'Alma sin descanso', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 11122;
+UPDATE `creature_template_locale` SET `Name` = 'Alquimista de Claro de la Luna', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12020;
+UPDATE `creature_template_locale` SET `Name` = 'Espíritu redentor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 12904;
+UPDATE `creature_template_locale` SET `Name` = 'Lobo gélido de establo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 13618;
+UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14735;
+UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy Warrior', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 14830;
+UPDATE `creature_template_locale` SET `Name` = 'Acechador zulian', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15067;
+UPDATE `creature_template_locale` SET `Name` = 'Guardián zulian', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15068;
+UPDATE `creature_template_locale` SET `Name` = 'Merodeador zulian', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15101;
+UPDATE `creature_template_locale` SET `Name` = 'Wayneth Antonius', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15166;
+UPDATE `creature_template_locale` SET `Name` = 'Alto mariscal Whirlaxis', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15204;
+UPDATE `creature_template_locale` SET `Name` = 'Pirata de Halloween', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15375;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia al fuego IV', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15487;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLD Tótem Muro de viento IV', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15492;
+UPDATE `creature_template_locale` SET `Name` = 'Agente Arcano', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15640;
+UPDATE `creature_template_locale` SET `Name` = 'Alta comandante Lynore Ventostryke', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15866;
+UPDATE `creature_template_locale` SET `Name` = 'Zumbador Colmen''Zara', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 15934;
+UPDATE `creature_template_locale` SET `Name` = 'Alajet', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16872;
+UPDATE `creature_template_locale` SET `Name` = 'Velonieve', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16874;
+UPDATE `creature_template_locale` SET `Name` = 'Picoabisal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16875;
+UPDATE `creature_template_locale` SET `Name` = 'Consola numérica', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16882;
+UPDATE `creature_template_locale` SET `Name` = 'Montura de Silas', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16883;
+UPDATE `creature_template_locale` SET `Name` = 'Target Dummy Right', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16898;
+UPDATE `creature_template_locale` SET `Name` = 'Target Dummy Left', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16899;
+UPDATE `creature_template_locale` SET `Name` = 'Arielle Azoterraudo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16908;
+UPDATE `creature_template_locale` SET `Name` = 'Niko', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16909;
+UPDATE `creature_template_locale` SET `Name` = 'Vívica Salvaestelar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16926;
+UPDATE `creature_template_locale` SET `Name` = 'Rata gigante', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 16930;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Marea de maná IV', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17061;
+UPDATE `creature_template_locale` SET `Name` = 'Zealous Paramour Transform Visual', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17065;
+UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17910;
+UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17911;
+UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17912;
+UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17913;
+UPDATE `creature_template_locale` SET `Title` = 'Orden de la Mano de plata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 17914;
+UPDATE `creature_template_locale` SET `Name` = 'Grommash Grito Infernal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18076;
+UPDATE `creature_template_locale` SET `Name` = 'Sigilo de prueba', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18366;
+UPDATE `creature_template_locale` SET `Name` = 'Summoned Satchel Charge A', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 18674;
+UPDATE `creature_template_locale` SET `Name` = 'Vigía diligente', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19160;
+UPDATE `creature_template_locale` SET `Name` = 'Insectógrafo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 19269;
+UPDATE `creature_template_locale` SET `Name` = 'Guía de visión', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21320;
+UPDATE `creature_template_locale` SET `Name` = 'Rey del Nexo Salhadaar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 21425;
+UPDATE `creature_template_locale` SET `Name` = 'Sacerdote de la Garra Ishaal', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23066;
+UPDATE `creature_template_locale` SET `Title` = 'SPAWNING IS INCOMPLETE HERE, BROTHER!', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23151;
+UPDATE `creature_template_locale` SET `Name` = 'Brewfest Keg Move to Target', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 23808;
+UPDATE `creature_template_locale` SET `Name` = 'Brewfest Target Dummy Move To Target', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24109;
+UPDATE `creature_template_locale` SET `Name` = 'Summoned Satchel Charge B', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24181;
+UPDATE `creature_template_locale` SET `Name` = 'Summoned Satchel Charge C', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24377;
+UPDATE `creature_template_locale` SET `Name` = '"Back To Bladespire Fortress" Flight Kill Credit', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24378;
+UPDATE `creature_template_locale` SET `Name` = 'Perito mareaférrea', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24581;
+UPDATE `creature_template_locale` SET `Name` = 'Maquinista mareaférrea', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24582;
+UPDATE `creature_template_locale` SET `Name` = 'Ingeniero mareaférrea', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24583;
+UPDATE `creature_template_locale` SET `Name` = 'Gelidar Invisman', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 24771;
+UPDATE `creature_template_locale` SET `Title` = 'Matriarca de los Caballeros de sangre', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25246;
+UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - Flying Dummy', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25500;
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 25734;
+UPDATE `creature_template_locale` SET `Name` = 'Gelidar - Drake Hunt Invisman', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26175;
+UPDATE `creature_template_locale` SET `Title` = 'Matriarca de los Caballeros de sangre', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26247;
+UPDATE `creature_template_locale` SET `Name` = 'Instructor de brujos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26331;
+UPDATE `creature_template_locale` SET `Name` = 'Gelidar Spell FX InvisMan', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26373;
+UPDATE `creature_template_locale` SET `Name` = 'Visión espiritual', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26594;
+UPDATE `creature_template_locale` SET `Title` = 'Instructora de vendajes', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 26956;
+UPDATE `creature_template_locale` SET `Name` = 'Clayton Dubin Test J', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27231;
+UPDATE `creature_template_locale` SET `Name` = 'Piloto de autito chocón', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27697;
+UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - vehicle', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 27862;
+UPDATE `creature_template_locale` SET `Name` = 'Comerciante misterioso', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 28652;
+UPDATE `creature_template_locale` SET `Name` = 'REUTILIZAR', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29039;
+UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - The Duece', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29083;
+UPDATE `creature_template_locale` SET `Name` = 'Universal Bunny - DNT', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29100;
+UPDATE `creature_template_locale` SET `Name` = 'Doncella de batalla Val''kyr', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29111;
+UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - Hovering Dummy', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29263;
+UPDATE `creature_template_locale` SET `Title` = 'Maestra de vuelo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 29749;
+UPDATE `creature_template_locale` SET `Name` = 'Andrew Test Dummy 80 Hostile Low Damage', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 30888;
+UPDATE `creature_template_locale` SET `Name` = 'Ali Garchanter [TEST]', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31060;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Garra de piedra VIII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31120;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Lengua de Fuego VI', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31132;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Lengua de Fuego VII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31158;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem abrasador VIII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31162;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem abrasador IX', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31164;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de magma VI', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31166;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDV', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31168;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia al fuego V', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31169;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia al fuego VI', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31170;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la escarcha V', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31171;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem de resistencia a la Naturaleza V', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31173;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Piel de piedra IX', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31175;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Corriente de sanación VIII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31182;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Fuente de maná VI', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31186;
+UPDATE `creature_template_locale` SET `Name` = 'Refugiada Renegada', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31467;
+UPDATE `creature_template_locale` SET `Title` = 'Bombardera', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 31839;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego IX', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32775;
+UPDATE `creature_template_locale` SET `Name` = 'zzOLDTótem Nova de Fuego VIII', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 32776;
+UPDATE `creature_template_locale` SET `Name` = 'Leviatán Mk II', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33432;
+UPDATE `creature_template_locale` SET `Name` = 'Ánimus de saronita', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33524;
+UPDATE `creature_template_locale` SET `Name` = 'Acechadora de canales Freya', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 33575;
+UPDATE `creature_template_locale` SET `Name` = 'Leviatán Mk II', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 34071;
+UPDATE `creature_template_locale` SET `Name` = 'Rememoración de Thunderaan', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 35032;
+UPDATE `creature_template_locale` SET `Name` = 'Cuerpo mutilado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36217;
+UPDATE `creature_template_locale` SET `Name` = 'Elemental de fuego inestable [mini]', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 36553;
+UPDATE `creature_template_locale` SET `Title` = 'Caballero de la Mano de plata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37225;
+UPDATE `creature_template_locale` SET `Title` = 'General forestal de Lunargenta', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37527;
+UPDATE `creature_template_locale` SET `Name` = 'Pacificador del Exodar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 37798;
+UPDATE `creature_template_locale` SET `Title` = 'Matriarca de los Caballeros de sangre', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38052;
+UPDATE `creature_template_locale` SET `Name` = 'Rompecorazones X-45', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38204;
+UPDATE `creature_template_locale` SET `Title` = 'Caballero de la Mano de plata', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38608;
+UPDATE `creature_template_locale` SET `Name` = 'PattyMack - Test - LK', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38857;
+UPDATE `creature_template_locale` SET `Name` = 'Parado antes de ascender', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 38883;
+UPDATE `creature_template_locale` SET `Name` = 'Marcador de cartel: Orgrimmar', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 39581;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro de calabozos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40435;
+UPDATE `creature_template_locale` SET `Title` = 'Maestro de calabozos', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40438;
+UPDATE `creature_template_locale` SET `Title` = 'Tamborilero bélico de Vol''jin', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `entry` = 40492;
+
+-- Insert new entries, from WOTLK
+DELETE FROM `creature_template_locale` WHERE `entry` IN(7558,7559,39010) AND `locale` = 'esMX';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(7558,'esMX','Conejo cola de algodón',NULL,0),
+(7559,'esMX','Conejo moteado',NULL,0),
+(39010,'esMX','Acechador mártir',NULL,0);
+
+-- Insert new entries, from CATA
+DELETE FROM `creature_template_locale` WHERE `entry` IN(25323,25406,25411,36795) AND `locale` = 'esMX';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(25323,'esMX','Craig Aceral','Ingeniero de software extremo',0),
+(25406,'esMX','Craig Aceral2','Ingeniero de software',0),
+(25411,'esMX','Craig Aceral3','Ingeniero de software',0),
+(36795,'esMX','Ruckus',NULL,0);
+
+-- Insert new entries, from RETAIL
+DELETE FROM `creature_template_locale` WHERE `entry` IN(25537,29347,29823,29824,29825,29828,29831,29833,29835,29837,29842,29852,29898,29899,29900,29940,29941,29955,30061,31366) AND `locale` = 'esMX';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(25537,'esMX','Craig''s Test Human',NULL,0),
+(29347,'esMX','Patchwork Golem',NULL,0),
+(29823,'esMX','Death Knight',NULL,0),
+(29824,'esMX','Death Knight Captain',NULL,0),
+(29825,'esMX','Shade of Naxxramas',NULL,0),
+(29828,'esMX','Necro Knight',NULL,0),
+(29831,'esMX','Risen Squire',NULL,0),
+(29833,'esMX','Dark Touched Warrior',NULL,0),
+(29835,'esMX','Bony Construct',NULL,0),
+(29837,'esMX','Skeletal Smith',NULL,0),
+(29842,'esMX','Death Knight Cavalier',NULL,0),
+(29852,'esMX','Deathcharger Steed',NULL,0),
+(29898,'esMX','Unholy Axe',NULL,0),
+(29899,'esMX','Unholy Staff',NULL,0),
+(29900,'esMX','Unholy Swords',NULL,0),
+(29940,'esMX','Instructor Razuvious',NULL,0),
+(29941,'esMX','Death Knight Understudy',NULL,0),
+(29955,'esMX','Gothik the Harvester',NULL,0),
+(30061,'esMX','Kel''Thuzad',NULL,0),
+(31366,'esMX','Brann Bronzebeard',NULL,0);
+
+DELETE FROM `creature_template_locale` WHERE `entry` IN(31586,31587,31589,31590,31591,31592,31594,31595,31596,31599,31601,31602,31604,31605,31606,31607,31608,31609,31610,31611) AND `locale` = 'esMX';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(31586,'esMX','Anub''ar Assassin',NULL,0),
+(31587,'esMX','Anub''ar Brood Keeper',NULL,0),
+(31589,'esMX','Anub''ar Champion',NULL,0),
+(31590,'esMX','Anub''ar Champion',NULL,0),
+(31591,'esMX','Anub''ar Champion',NULL,0),
+(31592,'esMX','Anub''ar Crusher',NULL,0),
+(31594,'esMX','Anub''ar Crypt Fiend',NULL,0),
+(31595,'esMX','Anub''ar Crypt Fiend',NULL,0),
+(31596,'esMX','Anub''ar Crypt Fiend',NULL,0),
+(31599,'esMX','Anub''ar Guardian',NULL,0),
+(31601,'esMX','Anub''ar Necromancer',NULL,0),
+(31602,'esMX','Anub''ar Necromancer',NULL,0),
+(31604,'esMX','Anub''ar Prime Guard',NULL,0),
+(31605,'esMX','Anub''ar Shadowcaster',NULL,0),
+(31606,'esMX','Anub''ar Skirmisher',NULL,0),
+(31607,'esMX','Anub''ar Venomancer',NULL,0),
+(31608,'esMX','Anub''ar Warrior',NULL,0),
+(31609,'esMX','Anub''ar Webspinner',NULL,0),
+(31610,'esMX','Anub''arak',NULL,0),
+(31611,'esMX','Hadronox',NULL,0);
+
+DELETE FROM `creature_template_locale` WHERE `entry` IN(31612,31613,31614,31615,31616,31617,34045,34105,34113,34165,34185,34235,34254,34255,34256,34257,37294,38440,70100,179820) AND `locale` = 'esMX';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(31612,'esMX','Krik''thir the Gatewatcher',NULL,0),
+(31613,'esMX','Skittering Infector',NULL,0),
+(31614,'esMX','Skittering Swarmer',NULL,0),
+(31615,'esMX','Watcher Gashra',NULL,0),
+(31616,'esMX','Watcher Narjil',NULL,0),
+(31617,'esMX','Watcher Silthik',NULL,0),
+(34045,'esMX','Salvaged Chopper',NULL,0),
+(34105,'esMX','Ulduar Colossus',NULL,0),
+(34113,'esMX','Steelforged Defender',NULL,0),
+(34165,'esMX','Mechagnome Battletank',NULL,0),
+(34185,'esMX','Molten Colossus',NULL,0),
+(34235,'esMX','Runeforged Sentry',NULL,0),
+(34254,'esMX','Expedition Commander',NULL,0),
+(34255,'esMX','Expedition Defender',NULL,0),
+(34256,'esMX','Expedition Engineer',NULL,0),
+(34257,'esMX','Expedition Trapper',NULL,0),
+(37294,'esMX','Frostwolf',NULL,0),
+(38440,'esMX','Tortunga',NULL,0),
+(70100,'esMX','Wrathion',NULL,0),
+(179820,'esMX','Acechador de condenación',NULL,0);
+
+DELETE FROM `creature_template_locale` WHERE `entry` IN(182753,182754,182755,182756,182758,182759,182760,182761,182763,182764,182765,182766,182768,182769,182770,182771,182772) AND `locale` = 'esMX';
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(182753,'esMX','Faerie Dragon',NULL,0),
+(182754,'esMX','Baby Faerie Dragon',NULL,0),
+(182755,'esMX','Ohn''ir Initiate',NULL,0),
+(182756,'esMX','Marmoset',NULL,0),
+(182758,'esMX','Vipérida roja',NULL,0),
+(182759,'esMX','Vipérida roja',NULL,0),
+(182760,'esMX','Vipérida rey',NULL,0),
+(182761,'esMX','Vipérida rey',NULL,0),
+(182763,'esMX','Kill Credit',NULL,0),
+(182764,'esMX','Alto señor Darion Mograine','Jinete de la Espada de Ébano',0),
+(182765,'esMX','Kleia',NULL,0),
+(182766,'esMX','Pelagos',NULL,0),
+(182768,'esMX','Vipérida verde',NULL,0),
+(182769,'esMX','Vipérida verde',NULL,0),
+(182770,'esMX','Ohn''ir Mystic',NULL,0),
+(182771,'esMX','Ohn''ir Windspeaker',NULL,0),
+(182772,'esMX','Lasher',NULL,0);
+
+-- List of entries using TBC datas :
+-- 543,601,1732,1920,2041,2079,2258,2476,2598,2749,2830,3067,3421,3780,3969,4021,4132,4460,4772,4779,5348,5409,5806,5809,6012,6047,6286,7098,7099,7430,7483,7484,7486,7487,8207,8306,8480,8667,9272,9584,9601,9618,10017,10237,10301,10516,10824,10828,11498,11684,11866,12239,12240,12241,12374,12807,14016,14445,14990,15463,15490,16588,16592,16781,17578,17598,17637,17663,18803,19656,20417,20926,21483,23289,23396,24921,26123,26124,26221
+-- List of entries using CLASSIC datas :
+-- 715,836,837,846,945,1000,1203,1204,1534,1685,1686,1780,1781,1912,1913,1914,1915,2029,2531,2540,2952,2966,3523,3555,3557,3577,3578,3605,3606,3684,3964,3965,3992,4002,4213,4271,4958,5047,5690,5927,5938,6287,6288,6376,6866,6907,7349,7351,7413,7425,7866,7867,7975,8545,8555,8563,8564,8565,10178,10418,10419,10420,10421,10422,10423,10424,10425,10426,10618,10776,10811,10812,10930,10997,11021,11032,11043,11054,11070,11073,11074,11120,11466,11486,11683,11689,11858,11915,11917,11918,12098,12121,12149,12918,12958,12999,13036,13140,13146,13420,13431,13432,14358,14361,14364,14368,14369,14371,14381,14382,14383,14481,14744,14903,14921,15218,15328,15384,16032,16145
+-- List of entries using CATA datas :
+-- 6075,7707,8611,11058,16461,16606,20420,20909,21717,23162,23457,23863,24368,24520,25329,26806,27436,27437,28412,29621,30096,30146,30499,30552,30667,31327,31889,32246,32385,33963,35495,36971,25323,25406,25411,36795
+-- List of entries using MOP datas :
+-- 15801,22939,22955,22956,22957,22959,22962,22964,22965,25499,27209,27378,38207
+-- List of entries using RETAIL datas :
+-- 81,399,400,401,402,403,631,2889,4115,4157,4318,4445,4446,4449,4450,4579,5035,5231,6466,6566,6571,6572,6578,6783,7014,7373,11122,12020,12904,13618,14735,14830,15067,15068,15101,15166,15204,15375,15487,15492,15640,15866,15934,16872,16874,16875,16882,16883,16898,16899,16908,16909,16926,16930,17061,17065,17910,17911,17912,17913,17914,18076,18366,18674,19160,19269,21320,21425,23066,23151,23808,24109,24181,24377,24378,24581,24582,24583,24771,25246,25500,25734,26175,26247,26331,26373,26594,26956,27231,27697,27862,28652,29039,29083,29100,29111,29263,29749,30888,31060,31120,31132,31158,31162,31164,31166,31168,31169,31170,31171,31173,31175,31182,31186,31467,31839,32775,32776,33432,33524,33575,34071,35032,36217,36553,37225,37527,37798,38052,38204,38608,38857,38883,39581,40435,40438,40492,25537,29347,29823,29824,29825,29828,29831,29833,29835,29837,29842,29852,29898,29899,29900,29940,29941,29955,30061,31366,31586,31587,31589,31590,31591,31592,31594,31595,31596,31599,31601,31602,31604,31605,31606,31607,31608,31609,31610,31611,31612,31613,31614,31615,31616,31617,34045,34105,34113,34165,34185,34235,34254,34255,34256,34257,37294,38440,70100,179820,182753,182754,182755,182756,182758,182759,182760,182761,182763,182764,182765,182766,182768,182769,182770,182771,182772
