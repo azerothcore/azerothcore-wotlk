@@ -942,7 +942,6 @@ void SmartAI::InitializeAI()
 {
     GetScript()->OnInitialize(me);
 
-    // Scan for SMARTCAST_MAIN_SPELL first (explicit)
     for (SmartScriptHolder const& event : GetScript()->GetEvents())
     {
         if (event.GetActionType() != SMART_ACTION_CAST)
