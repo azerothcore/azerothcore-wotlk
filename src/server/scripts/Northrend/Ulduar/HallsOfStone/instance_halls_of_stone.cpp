@@ -20,6 +20,18 @@
 #include "ScriptedCreature.h"
 #include "halls_of_stone.h"
 
+ObjectData const summonData[] =
+{
+    { NPC_IRON_SLUDGE, BOSS_SJONNIR },
+    { 0,               0            }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_SJONNIR,     BOSS_SJONNIR },
+    { 0,               0            }
+};
+
 class instance_halls_of_stone : public InstanceMapScript
 {
 public:
@@ -57,6 +69,9 @@ public:
         void Initialize() override
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
+            LoadSummonData(summonData);
             memset(&Encounter, 0, sizeof(Encounter));
 
             brannAchievement = false;
@@ -121,13 +136,12 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_SJONNIR:
-                    SjonnirGUID = creature->GetGUID();
-                    break;
                 case NPC_BRANN:
                     BrannGUID = creature->GetGUID();
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         ObjectGuid GetGuidData(uint32 id) const override

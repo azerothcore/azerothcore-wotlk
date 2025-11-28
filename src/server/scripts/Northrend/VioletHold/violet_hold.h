@@ -47,7 +47,8 @@ enum Creatures
     NPC_CYANIGOSA                   = 31134,
 
     NPC_PORTAL_GUARDIAN             = 30660,
-    NPC_PORTAL_KEEPER               = 30695,
+    NPC_PORTAL_KEEPER_1             = 30695,
+    NPC_PORTAL_KEEPER_2             = 30893,
     NPC_AZURE_INVADER_1             = 30661,
     NPC_AZURE_INVADER_2             = 30961,
     NPC_AZURE_SPELLBREAKER_1        = 30662,
