@@ -858,7 +858,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
+    if (who && me->Attack(who, me->IsWithinMeleeRange(who) || _currentRangeMode))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
@@ -870,7 +870,7 @@ void SmartAI::AttackStart(Unit* who)
                 me->GetMotionMaster()->Clear(false);
             }
 
-            me->GetMotionMaster()->MoveChase(who);
+            me->GetMotionMaster()->MoveChase(who, _attackDistance);
         }
     }
 }
@@ -941,6 +941,35 @@ void SmartAI::PassengerBoarded(Unit* who, int8 seatId, bool apply)
 void SmartAI::InitializeAI()
 {
     GetScript()->OnInitialize(me);
+
+    for (SmartScriptHolder const& event : GetScript()->GetEvents())
+    {
+        if (event.GetActionType() != SMART_ACTION_CAST)
+            continue;
+
+        if (!(event.action.cast.castFlags & SMARTCAST_MAIN_SPELL))
+            continue;
+
+        SetMainSpell(event.action.cast.spell);
+        break;
+    }
+
+    // Fallback: use first SMARTCAST_COMBAT_MOVE if no MAIN_SPELL found
+    if (!_currentRangeMode)
+    {
+        for (SmartScriptHolder const& event : GetScript()->GetEvents())
+        {
+            if (event.GetActionType() != SMART_ACTION_CAST)
+                continue;
+
+            if (!(event.action.cast.castFlags & SMARTCAST_COMBAT_MOVE))
+                continue;
+
+            SetMainSpell(event.action.cast.spell);
+            break;
+        }
+    }
+
     if (!me->isDead())
     {
         mJustReset = true;
@@ -1081,6 +1110,20 @@ void SmartAI::SetCurrentRangeMode(bool on, float range)
 
     if (Unit* victim = me->GetVictim())
         me->GetMotionMaster()->MoveChase(victim, _attackDistance);
+}
+
+void SmartAI::SetMainSpell(uint32 spellId)
+{
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    if (!spellInfo)
+        return;
+
+    float maxRange = spellInfo->GetMaxRange(false);
+    if (maxRange <= NOMINAL_MELEE_RANGE)
+        return;
+
+    _attackDistance = std::max(maxRange - NOMINAL_MELEE_RANGE, 0.0f);
+    _currentRangeMode = true;
 }
 
 void SmartAI::DistanceYourself(float range)
