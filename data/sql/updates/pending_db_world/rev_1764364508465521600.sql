@@ -12,6 +12,6 @@ DELETE FROM `creature_loot_template` WHERE `item` = @ITEM;
 -- Adds reference loot for "Corrupted Kor Gem" for each creature below
 DELETE FROM `creature_loot_template` WHERE `Reference` = @ENTRY AND `Entry` IN (4802, 4803, 4805);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(4802, @ITEM, @ENTRY, 80, 1, 1, 0, 1, 1, 'Blackfathom Tide Priestess - Corrupted Kor Gem'),
-(4803, @ITEM, @ENTRY, 80, 1, 1, 0, 1, 1, 'Blackfathom Oracle - Corrupted Kor Gem'),
-(4805, @ITEM, @ENTRY, 80, 1, 1, 0, 1, 1, 'Blackfathom Sea Witch - Corrupted Kor Gem');
+(4802, @ITEM, @ENTRY, 80, 0, 1, 0, 1, 1, 'Blackfathom Tide Priestess - Corrupted Kor Gem'),
+(4803, @ITEM, @ENTRY, 80, 0, 1, 0, 1, 1, 'Blackfathom Oracle - Corrupted Kor Gem'),
+(4805, @ITEM, @ENTRY, 80, 0, 1, 0, 1, 1, 'Blackfathom Sea Witch - Corrupted Kor Gem');
