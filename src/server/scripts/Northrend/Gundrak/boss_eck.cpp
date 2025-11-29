@@ -36,7 +36,8 @@ enum Misc
     EVENT_ECK_BITE                      = 2,
     EVENT_ECK_SPIT                      = 3,
     EVENT_ECK_SPRING                    = 4,
-    EVENT_ECK_HEALTH                    = 5
+    EVENT_ECK_CRAZED_EMOTE              = 5,
+    EMOTE_CRAZED                        = 1
 };
 
 class boss_eck : public CreatureScript
@@ -89,7 +90,8 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_ECK_BERSERK, 60s, 90s);
+            events.ScheduleEvent(EVENT_ECK_CRAZED_EMOTE, 76s, 78s);
+            events.ScheduleEvent(EVENT_ECK_BERSERK, 90s);
             events.ScheduleEvent(EVENT_ECK_BITE, 5s);
             events.ScheduleEvent(EVENT_ECK_SPIT, 10s, 37s);
             events.ScheduleEvent(EVENT_ECK_SPRING, 10s, 24s);
@@ -111,18 +113,11 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case EVENT_ECK_HEALTH:
-                    if (me->HealthBelowPct(21))
-                    {
-                        events.CancelEvent(EVENT_ECK_BERSERK);
-                        me->CastSpell(me, SPELL_ECK_BERSERK, false);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_ECK_HEALTH, 1s);
+                case EVENT_ECK_CRAZED_EMOTE:
+                    Talk(EMOTE_CRAZED);
                     break;
                 case EVENT_ECK_BERSERK:
                     me->CastSpell(me, SPELL_ECK_BERSERK, false);
-                    events.CancelEvent(EVENT_ECK_HEALTH);
                     break;
                 case EVENT_ECK_BITE:
                     me->CastSpell(me->GetVictim(), SPELL_ECK_BITE, false);
