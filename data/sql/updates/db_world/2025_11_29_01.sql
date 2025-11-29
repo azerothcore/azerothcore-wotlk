@@ -1,3 +1,4 @@
+-- DB update 2025_11_29_00 -> 2025_11_29_01
 --
 SET @REPTRASH := 1;
 SET @REPREGULAR := 18;
