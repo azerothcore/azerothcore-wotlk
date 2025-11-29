@@ -14085,7 +14085,22 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
 
     if (repThisToTarget > REP_NEUTRAL
             || (repTargetToThis = target->GetReactionTo(this)) > REP_NEUTRAL)
-        return false;
+    {
+        // contested guards can attack contested PvP players even though players may be friendly
+        if (!target->IsControlledByPlayer())
+            return false;
+
+        bool isContestedGuard = false;
+        if (FactionTemplateEntry const* entry = GetFactionTemplateEntry())
+            isContestedGuard = entry->factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS;
+
+        bool isContestedPvp = false;
+        if (Player const* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
+            isContestedPvp = player->HasPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
+
+        if (!isContestedGuard && !isContestedPvp)
+            return false;
+    }
 
     // Not all neutral creatures can be attacked (even some unfriendly faction does not react aggresive to you, like Sporaggar)
     if (repThisToTarget == REP_NEUTRAL &&
