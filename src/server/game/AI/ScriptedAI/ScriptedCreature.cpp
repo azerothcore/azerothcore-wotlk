@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Containers.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "TemporarySummon.h"
 
@@ -139,6 +140,23 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
     }
 
     return nullptr;
+}
+
+Creature* SummonList::GetRandomCreatureWithEntry(uint32 entry) const
+{
+    std::vector<ObjectGuid> candidates;
+    candidates.reserve(storage_.size());
+
+    for (auto const guid : storage_)
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+            if (summon->GetEntry() == entry)
+                candidates.push_back(guid);
+
+    if (candidates.empty())
+        return nullptr;
+
+    ObjectGuid randomGuid = Acore::Containers::SelectRandomContainerElement(candidates);
+    return ObjectAccessor::GetCreature(*me, randomGuid);
 }
 
 bool SummonList::IsAnyCreatureAlive() const
