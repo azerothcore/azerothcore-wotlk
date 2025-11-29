@@ -46,6 +46,7 @@
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
+#include "Transport.h"
 #include "WeatherMgr.h"
 #include "WorldSessionMgr.h"
 
@@ -870,20 +871,41 @@ public:
 
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink);
 
-            // stop flight if need
             if (_player->IsInFlight())
             {
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
             }
-            else // save only in non-flight case
+            else
             {
                 _player->SaveRecallPosition();
             }
 
-            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            if (Transport* transport = targetPlayer->GetTransport())
             {
-                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+                if (Transport* oldTransport = _player->GetTransport())
+                    oldTransport->RemovePassenger(_player, true);
+
+                float x, y, z, o;
+                targetPlayer->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+
+                _player->SetTransport(transport);
+                _player->m_movementInfo.transport.guid = transport->GetGUID();
+                _player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+                _player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
+                float wx = x, wy = y, wz = z, wo = o;
+                transport->CalculatePassengerPosition(wx, wy, wz, &wo);
+
+                transport->AddPassenger(_player, false);
+
+                if (_player->TeleportTo(transport->GetMapId(), wx, wy, wz + 0.25f, _player->GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+            }
+            else
+            {
+                if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
             }
         }
         else
