@@ -2550,7 +2550,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
 
         ItemAddedQuestCheck(item, count);
 
-        if (refund)
+        if (!refund)
         { // Don't update counter criteria for refunded items (primarily currencies)
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
