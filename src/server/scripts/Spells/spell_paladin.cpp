@@ -970,7 +970,7 @@ class spell_pal_lay_on_hands : public SpellScript
         Unit* caster = GetCaster();
         Unit* target = GetExplTargetUnit();
 
-        if (target == nullptr || caster == nullptr)
+        if (!target || !caster)
             return;
 
         uint32 baseHeal = caster->GetMaxHealth();
