@@ -31,13 +31,6 @@ enum Spells
     SPELL_FRENZY                        = 28747
 };
 
-enum Npcs
-{
-    NPC_WARRIOR                         = 28732,
-    NPC_SKIRMISHER                      = 28734,
-    NPC_SHADOWCASTER                    = 28733
-};
-
 enum Yells
 {
     SAY_AGGRO                           = 0,
@@ -150,7 +143,6 @@ public:
                     !me->FindNearestCreature(NPC_WATCHER_GASHRA, 100.0f))
                     return;
 
-                Talk(SAY_SEND_GROUP, 5s);
                 me->m_Events.AddEventAtOffset([this] {
                     SummonWatcher();
                 }, 5s, GROUP_WATCHERS);
