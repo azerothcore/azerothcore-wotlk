@@ -2492,6 +2492,29 @@ class spell_q9847_a_spirit_ally : public SpellScript
     }
 };
 
+enum WyrmrestSkytalon
+{
+    NPC_WYRMREST_SKYTALON = 32535
+};
+
+class spell_q13413_wyrmrest_skytalon_ride_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* target = GetTarget())
+            if (Creature* skytalon = target->FindNearestCreature(NPC_WYRMREST_SKYTALON, 20.0f))
+                target->CastSpell(skytalon, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13413_wyrmrest_skytalon_ride_periodic::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_q11065_wrangle_some_aether_rays, spell_q11065_wrangle_some_aether_rays_aura);
@@ -2564,4 +2587,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q4735_collect_rookery_egg);
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
+    RegisterSpellScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
 }
