@@ -41,36 +41,77 @@ UPDATE `creature_template` SET `flags_extra`= `flags_extra` | 128 WHERE `entry` 
 
 DELETE FROM `creature_addon` WHERE `guid` IN (122568, 122569, 122758, 122777, 124002, 124113);
 
+-- Match existing (A) entry, 'To Icecrown - Airship (H) - Aura - Approach'
+UPDATE `creature_template_addon` SET `auras` = '57424' WHERE (`entry` = 30588);
+
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` IN (30476, 30588));
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(30476, 0, 0, 1, 0, 0, 0, 0),
+(30588, 0, 0, 1, 0, 0, 0, 0);
+
 UPDATE `creature_template_addon` SET `auras` = '' WHERE (`entry` IN (30470, 30585));
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` IN (30470, 30585));
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (30470, 0, 0, 1, 0, 0, 0, 0),
 (30585, 0, 0, 1, 0, 0, 0, 0);
 
--- ================================================================================
-
--- dismount trigger condition
 -- teleport target condition
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` IN (56905, 56917, 56921, 57420, 57417)) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (30476, 30559, 30470, 30588, 30589)) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` IN (56905, 56917, 57420, 57417)) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (30476, 30559, 30588, 30588)) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 56905, 0, 0, 31, 0, 3, 30476, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (A)'),
 (13, 1, 56917, 0, 0, 31, 0, 3, 30559, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (A) Teleport Target'),
-(13, 1, 56921, 0, 0, 31, 0, 3, 30470, 0, 0, 0, 0, '', 'target must be Skybreaker Cloudbuster'),
-(13, 1, 56921, 0, 1, 31, 0, 3, 30585 0, 0, 0, 0, '', 'target must be Hammerhead'),
 (13, 1, 57420, 0, 0, 31, 0, 3, 30588, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (H)'),
-(13, 1, 57417 0, 0, 31, 0, 3, 30589, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (H) Teleport Target');
+(13, 1, 57417, 0, 0, 31, 0, 3, 30589, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (H) Teleport Target');
+
+-- dismount trigger condition
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 1) AND (`SourceEntry` = 56921) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (30470, 30585)) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(17, 1, 56921, 0, 0, 31, 1, 3, 30470, 0, 0, 0, 0, '', 'target must be Skybreaker Cloudbuster'),
+(17, 1, 56921, 0, 1, 31, 1, 3, 30585, 0, 0, 0, 0, '', 'target must be Hammerhead');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (30476, 30588);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (30476, 30588));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(30476, 0, 0, 1, 8, 0, 100, 0, 56905, 0, 0, 0, 0, 0, 11, 57554, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (A) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown Airship - Teleport to Airship (A) Force Player to Cast\''),
-(30476, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 56921, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (A) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown - Aura - Dismount Response\''),
-(30588, 0, 0, 1, 8, 0, 100, 0, 57420, 0, 0, 0, 0, 0, 11, 57556 , 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (H) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown Airship - Teleport to Airship (H) Force Player to Cast\''),
-(30588, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 56921, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (H) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown - Aura - Dismount Response\'');
+(30476, 0, 0, 1, 8, 0, 100, 0, 56905, 0, 0, 0, 0, 0, 11, 57554, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (A) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown Airship - Teleport to Airship (A) Force Player to Cast\''),
+(30476, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 56921, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (A) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown - Aura - Dismount Response\''),
+(30588, 0, 0, 1, 8, 0, 100, 0, 57420, 0, 0, 0, 0, 0, 11, 57556, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (H) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown Airship - Teleport to Airship (H) Force Player to Cast\''),
+(30588, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 56921, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DND] Icecrown Flight To Airship Bunny (H) - On Spellhit \'To Icecrown - Player - Aura (A) - Dismount Trigger\' - Cast \'To Icecrown - Aura - Dismount Response\'');
 
-DELETE FROM `spell_script_names` WHERE (`spell_id` IN (57554, 57556) AND `ScriptName` = 'spell_to_icecrown_airship_teleport_to_airship');
-DELETE FROM `spell_script_names` WHERE (`spell_id` = 56921 AND `ScriptName` = 'spell_to_icecrown_player_dismount_trigger_dismount_response');
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(57554, 'spell_to_icecrown_airship_teleport_to_airship'),
-(57556, 'spell_to_icecrown_airship_teleport_to_airship'),
-(56921, 'spell_to_icecrown_player_dismount_trigger_dismount_response');
+DELETE FROM `waypoints` WHERE `entry` IN (30470, 30585) AND `pointid` BETWEEN 1 AND 18;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
+(30470, 1, 5818.54, 483.97, 660.0, 'Skybreaker Cloudbuster'),
+(30470, 2, 5810.04, 486.907, 660.167, 'Skybreaker Cloudbuster'),
+(30470, 3, 5827.64, 482.851, 669.25, 'Skybreaker Cloudbuster'),
+(30470, 4, 5845.60, 505.766, 677.9, 'Skybreaker Cloudbuster'),
+(30470, 5, 5865.83, 544.756, 689.667, 'Skybreaker Cloudbuster'),
+(30470, 6, 5897.43, 586.118, 689.667, 'Skybreaker Cloudbuster'),
+(30470, 7, 5936.38, 642.625, 682.418, 'Skybreaker Cloudbuster'),
+(30470, 8, 5954.68, 688.565, 678.141, 'Skybreaker Cloudbuster'),
+(30470, 9, 5987.02, 725.128, 673.53, 'Skybreaker Cloudbuster'),
+(30470, 10, 6055.09, 766.575, 663.057, 'Skybreaker Cloudbuster'),
+(30470, 11, 6077.21, 796.139, 663.057, 'Skybreaker Cloudbuster'),
+(30470, 12, 6089.87, 824.184, 658.753, 'Skybreaker Cloudbuster'),
+(30470, 13, 6119.88, 881.953, 657.474, 'Skybreaker Cloudbuster'),
+(30470, 14, 6187.39, 959.597, 663.057, 'Skybreaker Cloudbuster'),
+(30470, 15, 6346.12, 1060.05, 654.669, 'Skybreaker Cloudbuster'),
+(30470, 16, 6466.61, 1107.18, 653.78, 'Skybreaker Cloudbuster'),
+(30470, 17, 6626.67, 1136.81, 647.084, 'Skybreaker Cloudbuster'),
+(30470, 18, 6733.84, 1153.34, 663.057, 'Skybreaker Cloudbuster'),
+(30585, 1, 5836.95, 475.408, 660.167, 'Hammerhead'),
+(30585, 2, 5835.36, 490.093, 669.25, 'Hammerhead'),
+(30585, 3, 5845.6,  505.766, 677.9, 'Hammerhead'),
+(30585, 4, 5865.83, 544.756, 689.667, 'Hammerhead'),
+(30585, 5, 5897.43, 586.118, 689.667, 'Hammerhead'),
+(30585, 6, 5936.38, 642.625, 682.418, 'Hammerhead'),
+(30585, 7, 5954.68, 688.565, 678.141, 'Hammerhead'),
+(30585, 8, 5987.02, 725.128, 673.53, 'Hammerhead'),
+(30585, 9, 6055.09, 766.575, 663.057, 'Hammerhead'),
+(30585, 10, 6077.21, 796.139, 663.057, 'Hammerhead'),
+(30585, 11, 6089.87, 824.184, 663.057, 'Hammerhead'),
+(30585, 12, 6133.36, 911.233, 642.309, 'Hammerhead'),
+(30585, 13, 6187.39, 959.597, 625.03, 'Hammerhead'),
+(30585, 14, 6346.12, 1060.05, 631.336, 'Hammerhead'),
+(30585, 15, 6466.61, 1107.18, 640.891, 'Hammerhead'),
+(30585, 16, 6626.67, 1136.81, 639.669, 'Hammerhead'),
+(30585, 17, 6733.84, 1153.34, 637.03, 'Hammerhead'),
+(30585, 18, 6835.57, 1203.64, 642.974, 'Hammerhead');
