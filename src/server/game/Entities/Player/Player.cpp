@@ -3338,7 +3338,7 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
 
 uint8 Player::GetLearnSpellSpecMask(uint32 const spellId) const
 {
-    uint32 const firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId); 
+    uint32 const firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
 
     bool const isTalentBasedSpell = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
     if (!isTalentBasedSpell)
@@ -3364,14 +3364,14 @@ uint8 Player::GetLearnSpellSpecMask(uint32 const spellId) const
         {
             uint32 const requiredSpellId = itr->second;
             bool const requiredSpellExistsAsPlayerSpell = (m_spells.find(requiredSpellId) != m_spells.end());
-            
+
             // The required spell should usually exist at least in the current spec, but maybe we are learning a spell via GM command
             requiredSpellsSpecMask &= requiredSpellExistsAsPlayerSpell ? m_spells.at(requiredSpellId)->specMask : 0;
-            
+
         }
         specMask |= requiredSpellsSpecMask;
     }
-    
+
     return specMask;
 }
 
