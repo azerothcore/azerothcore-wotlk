@@ -115,3 +115,8 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (30585, 16, 6626.67, 1136.81, 639.669, 'Hammerhead'),
 (30585, 17, 6733.84, 1153.34, 637.03, 'Hammerhead'),
 (30585, 18, 6835.57, 1203.64, 642.974, 'Hammerhead');
+
+-- TP To Dalaran after 5 minutes
+-- Location copied from 30719 'Teleport to Dalaran'
+DELETE FROM `spell_target_position` WHERE `ID` = 57461 AND `EffectIndex` = 0;
+INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES(57461, 0, 571, 5807.75, 588.347, 661.505, 1.663, 0);
