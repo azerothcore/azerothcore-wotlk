@@ -1,6 +1,5 @@
 SET @GUID = 2337;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @GUID+0 AND @GUID+27;
 DELETE FROM `gameobject` WHERE `id` = 186949;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (@GUID+0,  186949, 571, 0, 0, 1, 1, -80.7552108764648437, -3249,              -0.14548799395561218, 2.687806606292724609, 0, 0, 0.974370002746582031, 0.224951311945915222, 300, 100, 1, "", 45942, NULL),
