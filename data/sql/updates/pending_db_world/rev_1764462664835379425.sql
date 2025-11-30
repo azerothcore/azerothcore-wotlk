@@ -56,7 +56,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 (30585, 0, 0, 1, 0, 0, 0, 0);
 
 -- teleport target condition
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` IN (56905, 56917, 57420, 57417)) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (30476, 30559, 30588, 30588)) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` IN (56905, 56917, 57420, 57417)) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (30476, 30559, 30588, 30589)) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 56905, 0, 0, 31, 0, 3, 30476, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (A)'),
 (13, 1, 56917, 0, 0, 31, 0, 3, 30559, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (A) Teleport Target'),
