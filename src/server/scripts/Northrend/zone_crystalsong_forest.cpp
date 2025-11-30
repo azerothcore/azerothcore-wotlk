@@ -52,7 +52,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
     void MovementInform(uint32 type, uint32  /*id*/) override
     {
         if (type == ESCORT_MOTION_TYPE)
-            if (++pointId == 17) // path size
+            if (++pointId == 15) // path size
                 searchForShipTimer = 3000;
     }
 
