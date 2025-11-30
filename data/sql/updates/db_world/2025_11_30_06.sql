@@ -1,3 +1,4 @@
+-- DB update 2025_11_30_05 -> 2025_11_30_06
 --
 -- Judgment Day Comes! should not be available if Honor Above All Else is taken/complete/rewarded
 -- Uses CONDITION_QUESTSTATE (47) with state_mask 74 (2+8+64 = Completed+InProgress+Rewarded)
