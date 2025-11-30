@@ -7647,7 +7647,7 @@ void Player::_ApplyAllItemMods()
             if (!proto)
                 continue;
 
-            ApplyItemDependentAuras(m_items[i], false);
+            ApplyItemDependentAuras(m_items[i], true);
             _ApplyItemBonuses(proto, i, true);
 
             WeaponAttackType const attackType = Player::GetAttackBySlot(i);
