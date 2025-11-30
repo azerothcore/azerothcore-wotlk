@@ -37,7 +37,7 @@ enum ePreparationsForWar
     SPELL_TO_ICECROWN_AIRSHIP_PLAYER_AURA_TELEPORT_TO_DALARAN = 57460,
     SPELL_TO_ICECROWN_AIRSHIP_FROST_WYRM_WAITING_TO_SUMMON_AURA = 57498,
     POINT_END = 16,
-    SPELL_TO_ICECROWN_AIRSHIP_AURA_DISMOUNT_RESPONSE = 56921,
+    SPELL_TO_ICECROWN_AIRSHIP_AURA_DISMOUNT_RESPONSE = 56921, // unhandled - vehicle casts 50630 on self
     SPELL_EJECT_ALL_PASSENGERS  = 50630,
     SPELL_TO_ICECROWN_AIRSHIP_TELEPORT_TO_AIRSHIP_A_FORCE_PLAYER_TO_CAST = 57554,
     SPELL_TO_ICECROWN_AIRSHIP_TELEPORT_TO_AIRSHIP_H_FORCE_PLAYER_TO_CAST = 57556,
@@ -90,7 +90,6 @@ struct npc_preparations_for_war_vehicle : public VehicleAI
         switch (spell->Id)
         {
             case SPELL_TO_ICECROWN_AIRSHIP_AURA_DISMOUNT_RESPONSE:
-                DoCastSelf(SPELL_EJECT_ALL_PASSENGERS, true);
                 break;
             case SPELL_TO_ICECROWN_AIRSHIP_TELEPORT_TO_AIRSHIP_A_FORCE_PLAYER_TO_CAST:
             case SPELL_TO_ICECROWN_AIRSHIP_TELEPORT_TO_AIRSHIP_H_FORCE_PLAYER_TO_CAST:
@@ -98,8 +97,9 @@ struct npc_preparations_for_war_vehicle : public VehicleAI
                 uint32 teleportSpell = (spell->Id == SPELL_TO_ICECROWN_AIRSHIP_TELEPORT_TO_AIRSHIP_A_FORCE_PLAYER_TO_CAST)
                     ? SPELL_TO_ICECROWN_AIRSHIP_TELEPORT_TO_AIRSHIP_A
                     : SPELL_TO_ICECROWN_AIRSHIP_TELEPORT_TO_AIRSHIP_H;
-                if (Unit* unit = me->GetVehicleKit()->GetPassenger(SEAT_PLAYER))
-                    unit->CastSpell(unit, teleportSpell, true);
+                DoCastSelf(teleportSpell, true); // hack: cast on self to avoid visual glitch on player when ejecting and teleporting on transport
+                DoCastSelf(SPELL_EJECT_ALL_PASSENGERS, true);
+                me->DespawnOrUnsummon(0s);
                 break;
             }
             default:
