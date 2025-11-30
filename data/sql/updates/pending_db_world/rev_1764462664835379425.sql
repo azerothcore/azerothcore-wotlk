@@ -64,10 +64,10 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 1, 57417, 0, 0, 31, 0, 3, 30589, 0, 0, 0, 0, '', 'target must be [DND] Icecrown Flight To Airship Bunny (H) Teleport Target');
 
 -- dismount trigger condition
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 1) AND (`SourceEntry` = 56921) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (30470, 30585)) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 56921) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (30470, 30585)) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(17, 1, 56921, 0, 0, 31, 1, 3, 30470, 0, 0, 0, 0, '', 'target must be Skybreaker Cloudbuster'),
-(17, 1, 56921, 0, 1, 31, 1, 3, 30585, 0, 0, 0, 0, '', 'target must be Hammerhead');
+(17, 0, 56921, 0, 0, 31, 1, 3, 30470, 0, 0, 0, 0, '', 'target must be Skybreaker Cloudbuster'),
+(17, 0, 56921, 0, 1, 31, 1, 3, 30585, 0, 0, 0, 0, '', 'target must be Hammerhead');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (30476, 30588);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (30476, 30588));
