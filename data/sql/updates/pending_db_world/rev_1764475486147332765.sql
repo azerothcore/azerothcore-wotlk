@@ -4,7 +4,6 @@
 UPDATE `creature_loot_template` SET `Chance` = 0.04 WHERE `Entry` = 30387 AND `Item` = 45912;
 
 DELETE FROM `creature_loot_template` WHERE `Entry` = 30387 AND `Item` IN (39512, 42780, 37702, 39513, 43624, 42173, 42175, 26001, 26002, 26013, 26014, 26015, 26027, 26028, 35074);
-
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (30387, 39512, 0, 56, 0, 1, 0, 1, 1, 'Seething Revenant - Hoary Crystals'),
 (30387, 42780, 0, 26, 0, 1, 0, 1, 1, 'Seething Revenant - Relic of Ulduar'),
