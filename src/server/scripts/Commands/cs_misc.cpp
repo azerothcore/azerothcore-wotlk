@@ -896,15 +896,15 @@ public:
                 _player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
                 _player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
 
-                float wx = x;
-                float wy = y;
-                float wz = z;
-                float wo = o;
-                transport->CalculatePassengerPosition(wx, wy, wz, &wo);
+                float worldX = x;
+                float worldY = y;
+                float worldZ = z;
+                float worldO = o;
+                transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
 
                 transport->AddPassenger(_player, false);
 
-                if (_player->TeleportTo(transport->GetMapId(), wx, wy, wz + 0.25f, _player->GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_GM_MODE, targetPlayer))
+                if (_player->TeleportTo(transport->GetMapId(), worldX, worldY, worldZ + 0.25f, worldO, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_GM_MODE, targetPlayer))
                     _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
             }
             else
