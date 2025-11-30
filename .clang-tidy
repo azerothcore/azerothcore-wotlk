@@ -1,0 +1,442 @@
+---
+# Clang-Tidy configuration for AzerothCore
+# Modern C++ best practices and code quality checks
+
+Checks: >
+  -*,
+  bugprone-*,
+  cert-*,
+  cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-implicit-widening-of-multiplication-result,
+  -bugprone-narrowing-conversions,
+  -cert-err33-c,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-const-cast,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-type-vararg,
+  -modernize-avoid-c-arrays,
+  -modernize-deprecated-headers,
+  -modernize-use-trailing-return-type,
+  -readability-avoid-const-params-in-decls,
+  -readability-magic-numbers,
+  -readability-named-parameter
+
+WarningsAsErrors: ''
+
+HeaderFilterRegex: '.*'
+
+AnalyzeTemporaryDtors: false
+
+FormatStyle: 'file'
+
+CheckOptions:
+  - key: readability-identifier-naming.NamespaceCase
+    value: CamelCase
+  - key: readability-identifier-naming.ClassCase
+    value: CamelCase
+  - key: readability-identifier-naming.StructCase
+    value: CamelCase
+  - key: readability-identifier-naming.FunctionCase
+    value: camelBack
+  - key: readability-identifier-naming.VariableCase
+    value: camelBack
+  - key: readability-identifier-naming.ParameterCase
+    value: camelBack
+  - key: readability-identifier-naming.MemberCase
+    value: camelBack
+  - key: readability-identifier-naming.MemberPrefix
+    value: m_
+  - key: readability-identifier-naming.PrivateMemberPrefix
+    value: m_
+  - key: readability-identifier-naming.ProtectedMemberPrefix
+    value: m_
+  - key: readability-identifier-naming.EnumCase
+    value: CamelCase
+  - key: readability-identifier-naming.EnumConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstexprVariableCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstexprFunctionCase
+    value: camelBack
+  - key: readability-identifier-naming.GlobalConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.GlobalConstantPrefix
+    value: ''
+  - key: readability-identifier-naming.StaticConstantCase
+    value: CamelCase
+  - key: readability-identifier-naming.StaticConstantPrefix
+    value: ''
+  - key: readability-identifier-naming.StaticVariableCase
+    value: camelBack
+  - key: readability-identifier-naming.StaticVariablePrefix
+    value: s_
+  - key: readability-identifier-naming.MacroDefinitionCase
+    value: UPPER_CASE
+  - key: readability-identifier-naming.MacroDefinitionIgnoredRegexp
+    value: '^[A-Z][A-Z_]*$'
+  - key: readability-identifier-naming.ConstantMemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.ConstantMemberPrefix
+    value: ''
+  - key: readability-identifier-naming.PrivateConstantMemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.PrivateConstantMemberPrefix
+    value: ''
+  - key: readability-identifier-naming.ProtectedConstantMemberCase
+    value: CamelCase
+  - key: readability-identifier-naming.ProtectedConstantMemberPrefix
+    value: ''
+  - key: readability-identifier-naming.GlobalVariableCase
+    value: camelBack
+  - key: readability-identifier-naming.GlobalVariablePrefix
+    value: g_
+  - key: readability-identifier-naming.NamespaceIgnoredRegexp
+    value: '^(std|boost|AC|acore)$'
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value: true
+  - key: modernize-use-trailing-return-type.IgnoreMacros
+    value: true
+  - key: modernize-loop-convert.MaxCopySize
+    value: 16
+  - key: modernize-loop-convert.MinConfidence
+    value: reasonable
+  - key: modernize-use-auto.MinTypeNameLength
+    value: 5
+  - key: modernize-use-auto.RemoveStars
+    value: false
+  - key: performance-for-range-copy.WarnOnAllAutoCopies
+    value: true
+  - key: performance-unnecessary-copy-initialization.AllowedTypes
+    value: 'std::string;std::vector;std::array'
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 50
+  - key: readability-function-size.LineThreshold
+    value: 800
+  - key: readability-function-size.ParameterThreshold
+    value: 8
+  - key: readability-function-size.NestingThreshold
+    value: 4
+  - key: readability-function-size.VariableThreshold
+    value: 20
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: '^[ijkmn]$'
+  - key: readability-identifier-length.IgnoredParameterNames
+    value: '^[ijkmn]$'
+  - key: readability-identifier-length.IgnoredTemplateParameterNames
+    value: '^[TUV]$'
+  - key: readability-identifier-length.IgnoredMemberNames
+    value: '^[ijkmn]$'
+  - key: readability-identifier-length.Minimum
+    value: 2
+  - key: readability-magic-numbers.IgnoredValues
+    value: '^0(x|X)[0-9a-fA-F]+$'
+  - key: readability-magic-numbers.IgnoredIntegerValues
+    value: '^0$;^1$;^2$;^3$;^4$;^8$;^16$;^32$;^64$;^128$;^256$;^512$;^1024$;^2048$;^4096$;^8192$;^16384$;^32768$;^65536$'
+  - key: readability-magic-numbers.IgnoredFloatingPointValues
+    value: '^0(\.[0]+)?$;^1(\.[0]+)?$;^2(\.[0]+)?$;^0\.5$;^3\.14159.*$'
+  - key: readability-named-parameter.IgnoreSingleElement
+    value: true
+  - key: readability-named-parameter.IgnoreTemplateTypes
+    value: true
+  - key: readability-named-parameter.IgnoreMacros
+    value: true
+  - key: readability-redundant-member-init.IgnoreBaseInCopyConstructorAndMoveConstructor
+    value: true
+  - key: readability-simplify-boolean-expr.ChainedConditionalReturn
+    value: true
+  - key: readability-simplify-boolean-expr.ChainedConditionalAssignment
+    value: true
+  - key: readability-uppercase-literal-suffix.IgnoreMacros
+    value: true
+  - key: readability-uppercase-literal-suffix.IgnoreUserDefinedLiterals
+    value: true
+  - key: bugprone-easily-swappable-parameters.MinimumLength
+    value: 3
+  - key: bugprone-implicit-widening-of-multiplication-result.MaxWidth
+    value: 32
+  - key: bugprone-narrowing-conversions.IgnoreConversionFromTypes
+    value: 'unsigned char;signed char;unsigned short;signed short'
+  - key: bugprone-narrowing-conversions.IgnoreIntegerToFloatingPoint
+    value: false
+  - key: bugprone-narrowing-conversions.IgnoreVoidToPointer
+    value: true
+  - key: bugprone-narrowing-conversions.IgnoreSuspicious
+    value: false
+  - key: bugprone-suspicious-include.IgnoreHeaders
+    value: ''
+  - key: bugprone-suspicious-missing-comma.MaxAdjacentStatements
+    value: 5
+  - key: bugprone-suspicious-missing-comma.IgnoreMacros
+    value: true
+  - key: bugprone-suspicious-string-compare.IgnoreCase
+    value: false
+  - key: bugprone-too-small-loop-variable.IgnoreLargeLoops
+    value: true
+  - key: bugprone-undefined-memory-manipulation.CheckSafeFunctions
+    value: true
+  - key: cert-dcl16-c.NewSuffixes
+    value: 'L;LL;LU;LLU'
+  - key: cert-dcl21-cpp.CheckFn
+    value: true
+  - key: cert-dcl21-cpp.CheckDtor
+    value: true
+  - key: cert-dcl50-cpp.IgnoreMacros
+    value: true
+  - key: cert-dcl58-cpp.IgnoreMacros
+    value: true
+  - key: cert-err33-c.AllowExceptions
+    value: true
+  - key: cert-err33-c.AllowLongjmp
+    value: false
+  - key: cert-err33-c.AllowXorUsedAsPow
+    value: false
+  - key: cert-oop11-cpp.IgnoreMacros
+    value: true
+  - key: cppcoreguidelines-avoid-non-const-global-variables.IgnoreClasses
+    value: ''
+  - key: cppcoreguidelines-avoid-non-const-global-variables.IgnoreNamespaces
+    value: ''
+  - key: cppcoreguidelines-avoid-non-const-global-variables.IgnoreTypes
+    value: ''
+  - key: cppcoreguidelines-avoid-non-const-global-variables.IgnorePragma
+    value: false
+  - key: cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors
+    value: true
+  - key: cppcoreguidelines-explicit-virtual-functions.IgnoreOverridingFunctions
+    value: true
+  - key: cppcoreguidelines-macro-usage.IgnoreCommandLineMacros
+    value: true
+  - key: cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClasses
+    value: ''
+  - key: cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: false
+  - key: cppcoreguidelines-owning-memory.IgnoreMacros
+    value: true
+  - key: cppcoreguidelines-pro-bounds-array-to-pointer-decay.AllowArrayTypes
+    value: ''
+  - key: cppcoreguidelines-pro-bounds-array-to-pointer-decay.WarnOnlyForArrayToPointerDecay
+    value: false
+  - key: cppcoreguidelines-pro-bounds-constant-array-index.AllowPastEnd
+    value: false
+  - key: cppcoreguidelines-pro-bounds-pointer-arithmetic.AllowVoidPointer
+    value: false
+  - key: cppcoreguidelines-pro-type-const-cast.IgnoreMacros
+    value: true
+  - key: cppcoreguidelines-pro-type-reinterpret-cast.IgnoreMacros
+    value: true
+  - key: cppcoreguidelines-pro-type-union-access.IgnoreMacros
+    value: true
+  - key: cppcoreguidelines-pro-type-vararg.IgnoreVoidFunction
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value: true
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtorWithOneArg
+    value: false
+  - key: modernize-avoid-bind.IgnoreDelimiters
+    value: ''
+  - key: modernize-avoid-c-arrays.IgnoreMacros
+    value: true
+  - key: modernize-avoid-c-arrays.DisallowSizeType
+    value: false
+  - key: modernize-concat-nested-namespaces.IgnoreMacros
+    value: true
+  - key: modernize-deprecated-headers.IgnoreMacros
+    value: true
+  - key: modernize-loop-convert.MaxCopySize
+    value: 16
+  - key: modernize-loop-convert.MinConfidence
+    value: reasonable
+  - key: modernize-make-shared.IgnoreMacros
+    value: true
+  - key: modernize-make-unique.IgnoreMacros
+    value: true
+  - key: modernize-pass-by-value.IncludeStyle
+    value: llvm
+  - key: modernize-pass-by-value.PassByValueTypes
+    value: 'std::string;std::string_view'
+  - key: modernize-raw-string-literal.IgnoreMacros
+    value: true
+  - key: modernize-redundant-void-arg.IgnoreMacros
+    value: true
+  - key: modernize-replace-auto-ptr.IgnoreMacros
+    value: true
+  - key: modernize-replace-disallow-copy-and-assign-macro.IgnoreMacros
+    value: true
+  - key: modernize-replace-random-shuffle.IgnoreMacros
+    value: true
+  - key: modernize-return-braced-init-list.IgnoreMacros
+    value: true
+  - key: modernize-use-auto.MinTypeNameLength
+    value: 5
+  - key: modernize-use-auto.RemoveStars
+    value: false
+  - key: modernize-use-bool-literals.IgnoreMacros
+    value: true
+  - key: modernize-use-default-member-init.IgnoreMacros
+    value: true
+  - key: modernize-use-emplace.IgnoreMacros
+    value: true
+  - key: modernize-use-emplace.IgnoreImplicitConstructors
+    value: true
+  - key: modernize-use-equals-default.IgnoreMacros
+    value: true
+  - key: modernize-use-equals-delete.IgnoreMacros
+    value: true
+  - key: modernize-use-nodiscard.IgnoreMacros
+    value: true
+  - key: modernize-use-nullptr.IgnoreMacros
+    value: true
+  - key: modernize-use-override.IgnoreDestructors
+    value: false
+  - key: modernize-use-override.IgnoreMacros
+    value: true
+  - key: modernize-use-trailing-return-type.IgnoreMacros
+    value: true
+  - key: modernize-use-transparent-functors.IgnoreMacros
+    value: true
+  - key: modernize-use-uncaught-exceptions.IgnoreMacros
+    value: true
+  - key: performance-for-range-copy.WarnOnAllAutoCopies
+    value: true
+  - key: performance-for-range-copy.AllowedTypes
+    value: ''
+  - key: performance-implicit-conversion-in-loop.AllowedTypes
+    value: ''
+  - key: performance-inefficient-algorithm.IgnoreMacros
+    value: true
+  - key: performance-inefficient-string-concatenation.IgnoreMacros
+    value: true
+  - key: performance-inefficient-vector-operation.IgnoreMacros
+    value: true
+  - key: performance-move-const-arg.IgnoreMacros
+    value: true
+  - key: performance-no-automatic-move.IgnoreMacros
+    value: true
+  - key: performance-noexcept-move-constructor.IgnoreMacros
+    value: true
+  - key: performance-trivially-destructible.IgnoreMacros
+    value: true
+  - key: performance-type-promotion-in-math-fn.IgnoreMacros
+    value: true
+  - key: performance-unnecessary-copy-initialization.AllowedTypes
+    value: 'std::string;std::vector;std::array'
+  - key: performance-unnecessary-copy-initialization.AllowedVariableNames
+    value: ''
+  - key: performance-unnecessary-value-param.AllowedTypes
+    value: 'std::string;std::string_view'
+  - key: performance-unnecessary-value-param.AllowedVariableNames
+    value: ''
+  - key: readability-avoid-const-params-in-decls.IgnoreMacros
+    value: true
+  - key: readability-avoid-unconditional-preprocessor-if.IgnoreMacros
+    value: true
+  - key: readability-braces-around-statements.ShortStatementLines
+    value: 0
+  - key: readability-const-return-type.IgnoreMacros
+    value: true
+  - key: readability-container-size-empty.IgnoreMacros
+    value: true
+  - key: readability-convert-member-functions-to-static.IgnoreMacros
+    value: true
+  - key: readability-delete-null-pointer.IgnoreMacros
+    value: true
+  - key: readability-else-after-return.IgnoreMacros
+    value: true
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 50
+  - key: readability-function-size.LineThreshold
+    value: 800
+  - key: readability-function-size.ParameterThreshold
+    value: 8
+  - key: readability-function-size.NestingThreshold
+    value: 4
+  - key: readability-function-size.VariableThreshold
+    value: 20
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: '^[ijkmn]$'
+  - key: readability-identifier-length.IgnoredParameterNames
+    value: '^[ijkmn]$'
+  - key: readability-identifier-length.IgnoredTemplateParameterNames
+    value: '^[TUV]$'
+  - key: readability-identifier-length.IgnoredMemberNames
+    value: '^[ijkmn]$'
+  - key: readability-identifier-length.Minimum
+    value: 2
+  - key: readability-implicit-bool-conversion.AllowIntegerConditions
+    value: true
+  - key: readability-implicit-bool-conversion.AllowPointerConditions
+    value: true
+  - key: readability-inconsistent-declaration-parameter-name.IgnoreMacros
+    value: true
+  - key: readability-isolate-declaration.IgnoreMacros
+    value: true
+  - key: readability-magic-numbers.IgnoredValues
+    value: '^0(x|X)[0-9a-fA-F]+$'
+  - key: readability-magic-numbers.IgnoredIntegerValues
+    value: '^0$;^1$;^2$;^3$;^4$;^8$;^16$;^32$;^64$;^128$;^256$;^512$;^1024$;^2048$;^4096$;^8192$;^16384$;^32768$;^65536$'
+  - key: readability-magic-numbers.IgnoredFloatingPointValues
+    value: '^0(\.[0]+)?$;^1(\.[0]+)?$;^2(\.[0]+)?$;^0\.5$;^3\.14159.*$'
+  - key: readability-magic-numbers.IgnoreBitwiseExpressions
+    value: false
+  - key: readability-magic-numbers.IgnorePowersOfTwoInteger
+    value: false
+  - key: readability-magic-numbers.IgnorePowersOfTwoFloatingPoint
+    value: false
+  - key: readability-make-member-function-const.IgnoreMacros
+    value: true
+  - key: readability-named-parameter.IgnoreSingleElement
+    value: true
+  - key: readability-named-parameter.IgnoreTemplateTypes
+    value: true
+  - key: readability-named-parameter.IgnoreMacros
+    value: true
+  - key: readability-non-const-parameter.IgnoreMacros
+    value: true
+  - key: readability-qualified-auto.IgnoreMacros
+    value: true
+  - key: readability-redundant-access-specifiers.IgnoreMacros
+    value: true
+  - key: readability-redundant-control-flow.IgnoreMacros
+    value: true
+  - clang-analyzer-optin.performance.Padding: true
+  - clang-analyzer-optin.cplusplus.UninitializedObject: true
+  - clang-analyzer-optin.mpi.MPI-Checker: false
+  - clang-analyzer-optin.osx.OSObjectCStyleCast: true
+  - clang-analyzer-optin.osx.cocoa.localizability.PluralMisuseChecker: true
+  - clang-analyzer-optin.portability.UnixAPI: true
+  - clang-analyzer-security.FloatLoopCounter: true
+  - clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling: true
+  - clang-analyzer-security.insecureAPI.UncheckedReturn: true
+  - clang-analyzer-security.insecureAPI.bcmp: true
+  - clang-analyzer-security.insecureAPI.bcopy: true
+  - clang-analyzer-security.insecureAPI.bzero: true
+  - clang-analyzer-security.insecureAPI.rand: true
+  - clang-analyzer-security.insecureAPI.strcpy: true
+  - clang-analyzer-security.insecureAPI.vfork: true
+  - clang-analyzer-unix.API: true
+  - clang-analyzer-unix.DynamicMemoryModeling: true
+  - clang-analyzer-unix.Malloc: true
+  - clang-analyzer-unix.MallocSizeof: true
+  - clang-analyzer-unix.MismatchedDeallocator: true
+  - clang-analyzer-unix.Vfork: true
+  - clang-analyzer-unix.cstring.BadSizeArg: true
+  - clang-analyzer-unix.cstring.NullArg: true
+  - clang-analyzer-valist.Uninitialized: true
+  - clang-analyzer-valist.Unterminated: true
+
+...
+

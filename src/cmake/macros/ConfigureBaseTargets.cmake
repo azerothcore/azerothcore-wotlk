@@ -13,12 +13,14 @@
 # An interface library to make the target com available to other targets
 add_library(acore-compile-option-interface INTERFACE)
 
-# Use -std=c++11 instead of -std=gnu++11
+# Use -std=c++20 instead of -std=gnu++20
 set(CXX_EXTENSIONS OFF)
 
-# Enable C++20 support
+# Enable C++20 support with required standard
 set(CMAKE_CXX_STANDARD 20)
-message(STATUS "Enabled С++20 standard")
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+message(STATUS "Enabled C++20 standard (required)")
 
 # An interface library to make the warnings level available to other targets
 # This interface taget is set-up through the platform specific script

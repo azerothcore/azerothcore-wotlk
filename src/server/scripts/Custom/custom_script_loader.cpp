@@ -15,12 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// This is where scripts' loading functions should be declared:
-// void MyExampleScript()
+// Progressive Systems Custom Scripts
+void AddSC_progressive_npcs();
+void AddSC_progressive_bosses();
+void AddSC_progressive_items();
+void AddSC_progressive_spells();
+void AddSC_progressive_dungeons();
+void AddSC_progressive_commands();
+void AddSC_custom_stats_system();
+void AddSC_paragon_system();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
 void AddCustomScripts()
 {
-    // MyExampleScript()
+    // Progressive Systems Scripts
+    AddSC_progressive_npcs();
+    AddSC_progressive_bosses();
+    AddSC_progressive_items();
+    AddSC_progressive_spells();
+    AddSC_progressive_dungeons();
+    AddSC_progressive_commands();
+    AddSC_custom_stats_system();
+    AddSC_paragon_system();
 }

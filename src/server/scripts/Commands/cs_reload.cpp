@@ -110,6 +110,7 @@ public:
             { "item_enchantment_template",     HandleReloadItemEnchantementsCommand,          SEC_ADMINISTRATOR, Console::Yes },
             { "item_loot_template",            HandleReloadLootTemplatesItemCommand,          SEC_ADMINISTRATOR, Console::Yes },
             { "item_set_names",                HandleReloadItemSetNamesCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "item_template",                 HandleReloadItemTemplateCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "lfg_dungeon_rewards",           HandleReloadLfgRewardsCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "achievement_reward_locale",     HandleReloadLocalesAchievementRewardCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "creature_template_locale",      HandleReloadLocalesCreatureCommand,            SEC_ADMINISTRATOR, Console::Yes },
@@ -321,6 +322,9 @@ public:
     {
         HandleReloadPageTextsCommand(handler);
         HandleReloadItemEnchantementsCommand(handler);
+        HandleReloadItemTemplateCommand(handler);
+        HandleReloadItemSetNamesCommand(handler);
+        HandleReloadLocalesItemCommand(handler);
         return true;
     }
 
@@ -971,6 +975,24 @@ public:
         LOG_INFO("server.loading", "Reloading Item set names...");
         sObjectMgr->LoadItemSetNames();
         handler->SendGlobalGMSysMessage("DB table `item_set_names` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadItemTemplateCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading Item Templates...");
+        
+        // Clear existing item templates to remove deleted items
+        sObjectMgr->ClearItemTemplates();
+        
+        // Reload all item templates from database
+        sObjectMgr->LoadItemTemplates();
+        
+        // Reload item locales
+        sObjectMgr->LoadItemLocales();
+        
+        handler->SendGlobalGMSysMessage("DB table `item_template` reloaded. New items are now available in-game!");
+        handler->SendGlobalGMSysMessage("Note: Players may need to relog or clear cache to see item icons.");
         return true;
     }
 

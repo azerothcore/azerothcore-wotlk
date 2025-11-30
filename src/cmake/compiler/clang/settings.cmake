@@ -55,8 +55,19 @@ if(WITH_WARNINGS)
       -Winit-self
       -Wfatal-errors
       -Wno-mismatched-tags
-      -Woverloaded-virtual)
-  message(STATUS "Clang: All warnings enabled")
+      -Woverloaded-virtual
+      -Wpedantic
+      -Wconversion
+      -Wsign-conversion
+      -Wnull-dereference
+      -Wduplicated-cond
+      -Wduplicated-branches
+      -Wlogical-op
+      -Wrestrict
+      -Wformat=2
+      -Wformat-nonliteral
+      -Wformat-security)
+  message(STATUS "Clang: All warnings enabled (including modern C++ checks)")
 endif()
 
 if(WITH_COREDEBUG)

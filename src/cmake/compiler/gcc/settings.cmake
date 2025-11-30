@@ -46,8 +46,17 @@ if( WITH_WARNINGS )
     -Winit-self
     -Winvalid-pch
     -Wfatal-errors
-    -Woverloaded-virtual)
-  message(STATUS "GCC: All warnings enabled")
+    -Woverloaded-virtual
+    -Wpedantic
+    -Wconversion
+    -Wsign-conversion
+    -Wnull-dereference
+    -Wduplicated-cond
+    -Wduplicated-branches
+    -Wlogical-op
+    -Wrestrict
+    -Wuseless-cast)
+  message(STATUS "GCC: All warnings enabled (including modern C++ checks)")
 endif()
 
 if( WITH_COREDEBUG )

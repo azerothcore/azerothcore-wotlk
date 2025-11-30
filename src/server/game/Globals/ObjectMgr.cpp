@@ -2870,6 +2870,12 @@ ServerConfigs const qualityToSellValueConfig[MAX_ITEM_QUALITY] =
     RATE_SELLVALUE_ITEM_HEIRLOOM,                               // ITEM_QUALITY_HEIRLOOM
 };
 
+void ObjectMgr::ClearItemTemplates()
+{
+    _itemTemplateStore.clear();
+    _itemTemplateStoreFast.clear();
+}
+
 void ObjectMgr::LoadItemTemplates()
 {
     uint32 oldMSTime = getMSTime();

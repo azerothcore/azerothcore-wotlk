@@ -1051,6 +1051,7 @@ public:
     void LoadGameObjectLocales();
     void LoadGameobjects();
     void LoadItemTemplates();
+    void ClearItemTemplates(); // Clear item templates for reload
     void LoadItemLocales();
     void LoadItemSetNames();
     void LoadItemSetNameLocales();

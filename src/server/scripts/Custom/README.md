@@ -1,32 +1,72 @@
-# Custom folder
+# 🚀 Progressive Server Enhancements
 
-Here you can create a CMakeLists.txt file where to add your custom scripts.
-They will be git-ignored.
+## Overview
 
-Remember to use cmake macros inside your CMakeLists.txt to correctly add your scripts to the project solution.
+This directory contains comprehensive enhancements for your progressive server, including NPCs, bosses, items, spells, dungeons, and commands.
 
-**/!\ BTW, we strongly suggest you to use our module system to create your custom powerful module instead of simple scripts.**
+## 📁 Files
 
----------------------------
+- **`progressive_npcs.cpp`** - 5 enhanced NPCs with dynamic behaviors
+- **`progressive_bosses.cpp`** - Progressive boss AI base class + example
+- **`progressive_items.cpp`** - Items that scale with progression
+- **`progressive_spells.cpp`** - Spells that scale with tier
+- **`progressive_dungeons.cpp`** - Dungeon instance scripts
+- **`progressive_commands.cpp`** - GM/Player commands
+- **`custom_script_loader.cpp`** - Script loader (updated)
 
-## How to add your custom script:
+## 🎯 Features
 
-**1 - Create a CMakeLists.txt in this directory**
+### NPCs
+- Dynamic dialogue based on progression
+- Tier-based functionality
+- Real-time leaderboards
+- World announcements
+- Quick teleportation
 
-Example (everything below is needed, just replace with your scripts' names):
+### Bosses
+- Automatic difficulty scaling
+- Tier-based abilities
+- Progressive rewards
+- Dynamic dialogue
 
-```
-set(scripts_STAT_SRCS
-  ${scripts_STAT_SRCS}
-  ${AC_SCRIPTS_DIR}/Custom/your_script.cpp
-  ${AC_SCRIPTS_DIR}/Custom/your_script.h
-)
+### Items
+- Tier-based stat scaling
+- Progressive consumables
+- Enhancement system
 
-AC_ADD_SCRIPT_LOADER("Custom" "ScriptLoader.h")
+### Spells
+- Automatic damage/healing scaling
+- Tier-based effectiveness
+- Seamless integration
 
-message("  -> Prepared: My custom scripts")
-```
+### Dungeons
+- Automatic creature scaling
+- Difficulty-based rewards
+- Welcome messages
 
-**2 - Add the script to ../ScriptLoader.cpp**
+### Commands
+- Admin commands for management
+- Player commands for information
+- Easy progression manipulation
 
-Open the file `ScriptLoader.cpp` and go at the end to know what to edit.
+## 🔧 Setup
+
+1. **Compile** - All scripts are ready to compile
+2. **Spawn NPCs** - Use `.npc add [entry]` commands
+3. **Test** - Try all features
+4. **Customize** - Adjust values as needed
+
+## 📝 Documentation
+
+- `COMPLETE_ENHANCEMENTS.md` - Full documentation
+- `ENHANCEMENTS_SUMMARY.md` - Quick summary
+
+## ✅ Status
+
+All scripts are:
+- ✅ Compilation-ready
+- ✅ Database-integrated
+- ✅ Fully functional
+- ✅ Extensible
+
+**Ready to enhance your progressive server!** 🎮
