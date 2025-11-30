@@ -147,17 +147,20 @@ public:
         if (Transport* oldTransport = player->GetTransport())
             oldTransport->RemovePassenger(player, true);
 
-        float localX = pos.GetPositionX();
-        float localY = pos.GetPositionY();
-        float localZ = pos.GetPositionZ();
-        float localO = pos.GetOrientation();
+        float const localX = pos.GetPositionX();
+        float const localY = pos.GetPositionY();
+        float const localZ = pos.GetPositionZ();
+        float const localO = pos.GetOrientation();
 
         player->SetTransport(transport);
         player->m_movementInfo.transport.guid = transport->GetGUID();
         player->m_movementInfo.transport.pos.Relocate(localX, localY, localZ, localO);
         player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
 
-        float worldX = localX, worldY = localY, worldZ = localZ, worldO = localO;
+        float worldX = localX;
+        float worldY = localY;
+        float worldZ = localZ;
+        float worldO = localO;
         transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
 
         transport->AddPassenger(player, false);

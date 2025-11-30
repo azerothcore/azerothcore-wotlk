@@ -871,22 +871,24 @@ public:
 
             handler->PSendSysMessage(LANG_APPEARING_AT, nameLink);
 
+            // stop flight if need
             if (_player->IsInFlight())
             {
                 _player->GetMotionMaster()->MovementExpired();
                 _player->CleanupAfterTaxiFlight();
             }
-            else
-            {
+            else // save only in non-flight case
                 _player->SaveRecallPosition();
-            }
 
             if (Transport* transport = targetPlayer->GetTransport())
             {
                 if (Transport* oldTransport = _player->GetTransport())
                     oldTransport->RemovePassenger(_player, true);
 
-                float x, y, z, o;
+                float x;
+                float y;
+                float z;
+                float o;
                 targetPlayer->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
 
                 _player->SetTransport(transport);
@@ -894,7 +896,10 @@ public:
                 _player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
                 _player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
 
-                float wx = x, wy = y, wz = z, wo = o;
+                float wx = x;
+                float wy = y;
+                float wz = z;
+                float wo = o;
                 transport->CalculatePassengerPosition(wx, wy, wz, &wo);
 
                 transport->AddPassenger(_player, false);
