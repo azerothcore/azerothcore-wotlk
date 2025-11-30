@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -104,7 +104,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         victim = nullptr;
         Acore::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
         Acore::UnitLastSearcher<Acore::NearestAttackableUnitInObjectRangeCheck> checker(me, victim, u_check);
-        Cell::VisitAllObjects(me, checker, max_range);
+        Cell::VisitObjects(me, checker, max_range);
     }
 
     if (!victim && me->GetCharmerOrOwnerOrSelf()->IsInCombat())
@@ -135,6 +135,6 @@ void TotemAI::AttackStart(Unit* /*victim*/)
         data << me->GetGUID();
         data << me->GetPositionX();
         data << me->GetPositionY();
-        me->GetOwner()->ToPlayer()->GetSession()->SendPacket(&data);
+        me->GetOwner()->ToPlayer()->SendDirectMessage(&data);
     }
 }

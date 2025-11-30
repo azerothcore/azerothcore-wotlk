@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,7 +23,7 @@
 class instance_dire_maul : public InstanceMapScript
 {
 public:
-    instance_dire_maul() : InstanceMapScript(DMScriptName, 429) { }
+    instance_dire_maul() : InstanceMapScript(DMScriptName, MAP_DIRE_MAUL) { }
 
     struct instance_dire_maul_InstanceMapScript : public InstanceScript
     {
@@ -58,7 +58,7 @@ public:
                 case NPC_HIGHBORNE_SUMMONER:
                     if (_pylonsState == ALL_PYLONS_OFF)
                     {
-                        creature->DespawnOrUnsummon(5000);
+                        creature->DespawnOrUnsummon(5s);
                     }
                     else
                     {
@@ -95,11 +95,9 @@ public:
             {
                 case TYPE_EAST_WING_PROGRESS:
                     _eastWingProgress = data;
-                    instance->LoadGrid(-56.59f, -269.12f);
                     break;
                 case TYPE_WEST_WING_PROGRESS:
                     _westWingProgress = data;
-                    instance->LoadGrid(132.626f, 625.913f);
                     break;
                 case TYPE_NORTH_WING_PROGRESS:
                     _northWingProgress = data;
@@ -113,7 +111,6 @@ public:
                     _pylonsState |= data;
                     if (_pylonsState == ALL_PYLONS_OFF) // all five active, 31
                     {
-                        instance->LoadGrid(-38.08f, 812.44f);
                         if (Creature* immol = instance->GetCreature(_immoltharGUID))
                         {
                             immol->setActive(true);

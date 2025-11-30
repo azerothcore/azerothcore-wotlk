@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -33,12 +33,8 @@ enum bloodFurnace
     DATA_KELIDAN                = 2,
     MAX_ENCOUNTER               = 3,
 
-    DATA_DOOR1                  = 10,
-    DATA_DOOR2                  = 11,
-    DATA_DOOR3                  = 12,
     DATA_BROGGOK_REAR_DOOR      = 13,
     DATA_BROGGOK_LEVER          = 14,
-    DATA_DOOR6                  = 15,
 
     DATA_PRISON_CELL1           = 20,
     DATA_PRISON_CELL2           = 21,
@@ -62,7 +58,11 @@ enum BloodFurnaceGO
 {
     GO_BROGGOK_DOOR_FRONT      = 181822,
     GO_BROGGOK_DOOR_REAR       = 181819,
-    GO_BROGGOK_LEVER           = 181982
+    GO_BROGGOK_LEVER           = 181982,
+    GO_KELIDAN_DOOR_EXIT1      = 181823,
+    GO_KELIDAN_DOOR_EXIT2      = 181766,
+    GO_MAKER_DOOR_FRONT        = 181811,
+    GO_MAKER_DOOR_REAR         = 181812
 };
 
 template <class AI, class T>

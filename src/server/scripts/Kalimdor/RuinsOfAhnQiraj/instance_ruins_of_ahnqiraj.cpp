@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -67,7 +67,7 @@ std::array<uint32, 8> RajaxxWavesData[] =
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
 public:
-    instance_ruins_of_ahnqiraj() : InstanceMapScript("instance_ruins_of_ahnqiraj", 509) { }
+    instance_ruins_of_ahnqiraj() : InstanceMapScript("instance_ruins_of_ahnqiraj", MAP_RUINS_OF_AHN_QIRAJ) { }
 
     struct instance_ruins_of_ahnqiraj_InstanceMapScript : public InstanceScript
     {
@@ -87,7 +87,6 @@ public:
                 _rajaxWaveCounter == 0 &&                       // if non-zero, encounter is in progress
                 !_andorovGUID)                                  // cleared if he is dead
             {
-                instance->LoadGrid(-8538.17f, 1486.09f); // Andorov run path grid
                 if (Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 0))
                 {
                     creature->setActive(true);

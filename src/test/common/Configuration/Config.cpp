@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,6 +24,13 @@
 #include <fstream>
 #include <string>
 
+#if WIN32
+    void inline setenv(const char* name, const char* value, int overwrite)
+    {
+    _putenv_s(name, value);
+    }
+#endif
+
 std::string CreateConfigWithMap(std::map<std::string, std::string> const& map)
 {
     auto mTempFileRel = boost::filesystem::unique_path("deleteme.ini");
@@ -36,8 +43,12 @@ std::string CreateConfigWithMap(std::map<std::string, std::string> const& map)
         iniStream << itr.first << " = " << itr.second << "\n";
 
     iniStream.close();
-
+#if WIN32
+    auto tmp = mTempFileAbs.native();
+    return std::string(tmp.begin(), tmp.end());
+#else
     return mTempFileAbs.native();
+#endif
 }
 
 class ConfigEnvTest : public testing::Test {

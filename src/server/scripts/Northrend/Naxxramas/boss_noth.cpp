@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -34,10 +34,8 @@ enum Says
 
 enum Spells
 {
-    SPELL_CURSE_OF_THE_PLAGUEBRINGER_10     = 29213,
-    SPELL_CURSE_OF_THE_PLAGUEBRINGER_25     = 54835,
-    SPELL_CRIPPLE_10                        = 29212,
-    SPELL_CRIPPLE_25                        = 54814,
+    SPELL_CURSE_OF_THE_PLAGUEBRINGER        = 29213,
+    SPELL_CRIPPLE                           = 29212,
     SPELL_SUMMON_PLAGUED_WARRIORS           = 29237,
     SPELL_TELEPORT                          = 29216,
     SPELL_TELEPORT_BACK                     = 29231,
@@ -89,11 +87,8 @@ public:
     struct boss_nothAI : public BossAI
     {
         explicit boss_nothAI(Creature* c) : BossAI(c, BOSS_NOTH), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-        }
+        {}
 
-        InstanceScript* pInstance;
         uint8 timesInBalcony;
         EventMap events;
         SummonList summons;
@@ -151,13 +146,6 @@ public:
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->SetReactState(REACT_AGGRESSIVE);
             timesInBalcony = 0;
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -171,13 +159,6 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
             StartGroundPhase();
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
-                {
-                    go->SetGoState(GO_STATE_READY);
-                }
-            }
         }
 
         void JustSummoned(Creature* summon) override
@@ -195,13 +176,6 @@ public:
             }
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
         }
 
         void KilledUnit(Unit* who) override
@@ -210,10 +184,7 @@ public:
                 return;
 
             Talk(SAY_SLAY);
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void UpdateAI(uint32 diff) override
@@ -234,7 +205,7 @@ public:
                 case EVENT_CURSE:
                     if (events.GetPhaseMask() == 0)
                     {
-                        me->CastCustomSpell(RAID_MODE(SPELL_CURSE_OF_THE_PLAGUEBRINGER_10, SPELL_CURSE_OF_THE_PLAGUEBRINGER_25), SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 10), me, false);
+                        me->CastCustomSpell(SPELL_CURSE_OF_THE_PLAGUEBRINGER, SPELLVALUE_MAX_TARGETS, RAID_MODE(3, 10), me, false);
                     }
                     events.Repeat(25s);
                     break;
@@ -255,7 +226,7 @@ public:
                     break;
                 case EVENT_BLINK:
                     DoResetThreatList();
-                    me->CastSpell(me, RAID_MODE(SPELL_CRIPPLE_10, SPELL_CRIPPLE_25), false);
+                    me->CastSpell(me, SPELL_CRIPPLE, false);
                     me->CastSpell(me, SPELL_BLINK, true);
                     Talk(EMOTE_BLINK);
                     events.Repeat(30s);

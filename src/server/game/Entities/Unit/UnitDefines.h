@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -161,7 +161,7 @@ enum UnitTypeMask
     UNIT_MASK_VEHICLE                   = 0x00000020,
     UNIT_MASK_PUPPET                    = 0x00000040,
     UNIT_MASK_HUNTER_PET                = 0x00000080,
-    UNIT_MASK_CONTROLABLE_GUARDIAN      = 0x00000100,
+    UNIT_MASK_CONTROLLABLE_GUARDIAN     = 0x00000100,
     UNIT_MASK_ACCESSORY                 = 0x00000200
 };
 
@@ -196,6 +196,10 @@ enum UnitState
     UNIT_STATE_FOLLOW_MOVE              = 0x08000000,
     UNIT_STATE_IGNORE_PATHFINDING       = 0x10000000,       // do not use pathfinding in any MovementGenerator
     UNIT_STATE_NO_ENVIRONMENT_UPD       = 0x20000000,
+
+    // serverside region
+    UNIT_STATE_NO_COMBAT_MOVEMENT       = 0x40000000,       // should not be changed outside the core and should be placed at the end
+    UNIT_STATE_LOGOUT_TIMER             = 0x80000000,       // Unit is logging out
 
     UNIT_STATE_ALL_STATE_SUPPORTED = UNIT_STATE_DIED | UNIT_STATE_MELEE_ATTACKING | UNIT_STATE_STUNNED | UNIT_STATE_ROAMING | UNIT_STATE_CHASE
     | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT | UNIT_STATE_FOLLOW | UNIT_STATE_ROOT | UNIT_STATE_CONFUSED
@@ -409,6 +413,8 @@ enum MovementFlags
     /// @todo if needed: add more flags to this masks that are exclusive to players
     MOVEMENTFLAG_MASK_PLAYER_ONLY =
     MOVEMENTFLAG_FLYING,
+
+    MOVEMENTFLAG_MASK_MOVING_OR_TURN = MOVEMENTFLAG_MASK_MOVING | MOVEMENTFLAG_MASK_TURNING,
 
     /// Movement flags that have change status opcodes associated for players
     MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE = MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_ROOT |

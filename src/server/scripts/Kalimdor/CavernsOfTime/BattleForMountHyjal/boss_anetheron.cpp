@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -67,7 +67,7 @@ public:
         }).Schedule(25s, 32s, [this](TaskContext context)
         {
             Talk(SAY_SLEEP);
-            DoCastRandomTarget(SPELL_SLEEP, 1, 0.0f, true, false, false);
+            DoCastRandomTarget(SPELL_SLEEP, 0, 0.0f, true, false, false);
             context.Repeat(35s, 48s);
         }).Schedule(30s, 48s, [this](TaskContext context)
         {
@@ -97,7 +97,7 @@ public:
         Talk(SAY_ONSPAWN, 1200ms);
 
         if (action == DATA_ANETHERON)
-            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
+            me->GetMotionMaster()->MoveWaypoint(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
     }
 
     void PathEndReached(uint32 pathId) override
@@ -109,7 +109,7 @@ public:
         case ALLIANCE_BASE_CHARGE_3:
             me->m_Events.AddEventAtOffset([this]()
                 {
-                    me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+                    me->GetMotionMaster()->MoveWaypoint(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
                 }, 1s);
             break;
         }

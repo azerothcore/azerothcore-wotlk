@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -520,39 +520,39 @@ bool AuthSession::HandleLogonProof()
         stmt->SetData(2, GetLocaleByName(_localizationName));
         stmt->SetData(3, _os);
         stmt->SetData(4, _accountInfo.Login);
-        LoginDatabase.DirectExecute(stmt);
-
-        // Finish SRP6 and send the final result to the client
-        Acore::Crypto::SHA1::Digest M2 = Acore::Crypto::SRP6::GetSessionVerifier(logonProof->A, logonProof->clientM, _sessionKey);
-
-        ByteBuffer packet;
-        if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
+        _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt)
+            .WithPreparedCallback([this, M2 = Acore::Crypto::SRP6::GetSessionVerifier(logonProof->A, logonProof->clientM, _sessionKey)](PreparedQueryResult const&)
         {
-            sAuthLogonProof_S proof;
-            proof.M2 = M2;
-            proof.cmd = AUTH_LOGON_PROOF;
-            proof.error = 0;
-            proof.AccountFlags = 0x00800000;    // 0x01 = GM, 0x08 = Trial, 0x00800000 = Pro pass (arena tournament)
-            proof.SurveyId = 0;
-            proof.LoginFlags = 0;               // 0x1 = has account message
+            // Finish SRP6 and send the final result to the client
+            ByteBuffer packet;
+            if (_expversion & POST_BC_EXP_FLAG)                 // 2.x and 3.x clients
+            {
+                sAuthLogonProof_S proof;
+                proof.M2 = M2;
+                proof.cmd = AUTH_LOGON_PROOF;
+                proof.error = 0;
+                proof.AccountFlags = ACCOUNT_FLAG_PROPASS_LOCK;    // enum AccountFlag
+                proof.SurveyId = 0;
+                proof.LoginFlags = 0;               // 0x1 = has account message
 
-            packet.resize(sizeof(proof));
-            std::memcpy(packet.contents(), &proof, sizeof(proof));
-        }
-        else
-        {
-            sAuthLogonProof_S_Old proof;
-            proof.M2 = M2;
-            proof.cmd = AUTH_LOGON_PROOF;
-            proof.error = 0;
-            proof.unk2 = 0x00;
+                packet.resize(sizeof(proof));
+                std::memcpy(packet.contents(), &proof, sizeof(proof));
+            }
+            else
+            {
+                sAuthLogonProof_S_Old proof;
+                proof.M2 = M2;
+                proof.cmd = AUTH_LOGON_PROOF;
+                proof.error = 0;
+                proof.unk2 = 0x00;
 
-            packet.resize(sizeof(proof));
-            std::memcpy(packet.contents(), &proof, sizeof(proof));
-        }
+                packet.resize(sizeof(proof));
+                std::memcpy(packet.contents(), &proof, sizeof(proof));
+            }
 
-        SendPacket(packet);
-        _status = STATUS_AUTHED;
+            SendPacket(packet);
+            _status = STATUS_AUTHED;
+        }));
     }
     else
     {

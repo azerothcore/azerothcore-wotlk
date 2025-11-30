@@ -1,20 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
@@ -23,7 +24,6 @@
 #include "TaskScheduler.h"
 #include "World.h"
 
-// Ours
 class npc_steam_powered_auctioneer : public CreatureScript
 {
 public:
@@ -398,7 +398,6 @@ public:
     };
 };
 
-// Theirs
 /*******************************************************
  * npc_mageguard_dalaran
  *******************************************************/
@@ -429,7 +428,7 @@ public:
 
     struct npc_mageguard_dalaranAI : public ScriptedAI
     {
-        npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
+        explicit npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
         {
             creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
@@ -444,10 +443,13 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
+            if (!who || !who->IsInWorld()|| who->GetZoneId() != AREA_DALARAN || who->GetAreaId() == AREA_SEWER_EXIT_PIPE)
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))
+                return;
+
+            if (who->IsCreature() && who->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
                 return;
 
             Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -485,7 +487,6 @@ public:
                     break;
             }
             me->SetOrientation(me->GetHomePosition().GetOrientation());
-            return;
         }
 
         void UpdateAI(uint32 /*diff*/) override {}
@@ -499,8 +500,6 @@ public:
 
 enum MinigobData
 {
-    ZONE_DALARAN            = 4395,
-
     SPELL_MANABONKED        = 61834,
     SPELL_TELEPORT_VISUAL   = 51347,
     SPELL_IMPROVED_BLINK    = 61995,
@@ -537,7 +536,7 @@ struct npc_minigob_manabonk : public ScriptedAI
 
         me->GetMap()->DoForAllPlayers([&](Player* player)
             {
-                if (player->GetZoneId() == ZONE_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
+                if (player->GetZoneId() == AREA_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
                     playerInDalaranList.push_back(player);
             });
 
@@ -595,7 +594,7 @@ struct npc_minigob_manabonk : public ScriptedAI
                 case EVENT_MOVE:
                     {
                         Position pos = me->GetRandomNearPosition((urand(15, 40)));
-                        me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true);
+                        me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
                     }
                     events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 3s);
                     events.ScheduleEvent(EVENT_DESPAWN, 4s);

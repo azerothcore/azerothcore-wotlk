@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -34,8 +34,7 @@ enum Says
 enum Spells
 {
     SPELL_UNBALANCING_STRIKE        = 26613,
-    SPELL_DISRUPTING_SHOUT_10       = 55543,
-    SPELL_DISRUPTING_SHOUT_25       = 29107,
+    SPELL_DISRUPTING_SHOUT          = 55543,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
     SPELL_TAUNT                     = 29060
@@ -82,13 +81,10 @@ public:
     struct boss_razuviousAI : public BossAI
     {
         explicit boss_razuviousAI(Creature* c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-        }
+        {}
 
         EventMap events;
         SummonList summons;
-        InstanceScript* pInstance;
 
         void SpawnHelpers()
         {
@@ -210,13 +206,10 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (roll_chance_i(30))
-            {
                 Talk(SAY_SLAY);
-            }
-            if (who->IsPlayer() && pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+
+            if (who->IsPlayer())
+                instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -273,7 +266,7 @@ public:
                     events.Repeat(20s);
                     break;
                 case EVENT_DISRUPTING_SHOUT:
-                    me->CastSpell(me, RAID_MODE(SPELL_DISRUPTING_SHOUT_10, SPELL_DISRUPTING_SHOUT_25), false);
+                    me->CastSpell(me, SPELL_DISRUPTING_SHOUT, false);
                     events.Repeat(15s);
                     break;
                 case EVENT_JAGGED_KNIFE:
@@ -331,17 +324,16 @@ public:
             switch (action)
             {
                 case ACTION_FACE_ME:
+                {
                     scheduler.CancelGroup(GROUP_OOC_RP);
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                    if (InstanceScript* instance = me->GetInstanceScript())
-                    {
-                        if (Creature* creature = instance->GetCreature(DATA_RAZUVIOUS))
-                        {
-                            me->SetFacingToObject(creature);
-                        }
-                    }
+
+                    if (Creature* creature = me->GetInstanceScript()->GetCreature(DATA_RAZUVIOUS_BOSS))
+                        me->SetFacingToObject(creature);
+
                     break;
+                }
                 case ACTION_TALK:
                     Talk(SAY_DEATH_KNIGHT_UNDERSTUDY);
                     break;
@@ -360,22 +352,18 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() && me->GetInstanceScript())
-            {
-                me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            if (who->IsPlayer())
+                me->GetInstanceScript()->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void JustEngagedWith(Unit* who) override
         {
             scheduler.CancelGroup(GROUP_OOC_RP);
-            if (InstanceScript* instance = me->GetInstanceScript())
+
+            if (Creature* creature = me->GetInstanceScript()->GetCreature(DATA_RAZUVIOUS_BOSS))
             {
-                if (Creature* creature = instance->GetCreature(DATA_RAZUVIOUS))
-                {
-                    creature->SetInCombatWithZone();
-                    creature->AI()->AttackStart(who);
-                }
+                creature->SetInCombatWithZone();
+                creature->AI()->AttackStart(who);
             }
         }
 

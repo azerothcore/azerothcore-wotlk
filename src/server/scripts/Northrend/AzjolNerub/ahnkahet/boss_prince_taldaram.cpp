@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ahnkahet.h"
@@ -38,10 +39,9 @@ enum Spells
     SPELL_BEAM_VISUAL                       = 60342,
     SPELL_VANISH                            = 55964,
     SPELL_SHADOWSTEP                        = 55966,
-    SPELL_HOVER_FALL                        = 60425
+    SPELL_HOVER_FALL                        = 60425,
+    SPELL_EMBRACE_OF_THE_VAMPYR             = 55959,
 };
-
-#define SPELL_EMBRACE_OF_THE_VAMPYR         DUNGEON_MODE(55959, 59513)
 
 enum Spheres
 {
@@ -56,21 +56,14 @@ enum Misc
     MAX_EMBRACE_DMG_H                       = 40000,
 
     SUMMON_GROUP_TRIGGERS                   = 0,
+
+    GROUP_COMBAT_ABILITIES                  = 1,
 };
 
 enum Actions
 {
     ACTION_REMOVE_PRISON_AT_RESET           = 1,
     ACTION_SPHERE,
-};
-
-enum Event
-{
-    EVENT_PRINCE_FLAME_SPHERES              = 1,
-    EVENT_PRINCE_VANISH,
-    EVENT_PRINCE_BLOODTHIRST,
-    EVENT_PRINCE_VANISH_RUN,
-    EVENT_PRINCE_RESCHEDULE,
 };
 
 enum Yells
@@ -90,7 +83,6 @@ enum Points
     POINT_ORB,
 };
 
-constexpr float DATA_GROUND_POSITION_Z     = 11.308135f;
 constexpr float DATA_SPHERE_DISTANCE       = 25.0f;
 #define DATA_SPHERE_ANGLE_OFFSET            float(M_PI) / 2.0f
 
@@ -98,7 +90,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 {
     npc_taldaram_flamesphere(Creature *pCreature) : NullCreatureAI(pCreature),
         instance(pCreature->GetInstanceScript()),
-        uiDespawnTimer(13000),
         moveTimer(0)
     {
         pCreature->SetReactState(REACT_PASSIVE);
@@ -109,14 +100,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         if (action == ACTION_SPHERE)
         {
             moveTimer = 3000;
-        }
-    }
-
-    void MovementInform(uint32 type, uint32 id) override
-    {
-        if (type == POINT_MOTION_TYPE && id == POINT_ORB)
-        {
-            me->DisappearAndDie();
         }
     }
 
@@ -131,9 +114,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 
         DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT);
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
-
-        /// @todo: replace with DespawnOrUnsummon
-        uiDespawnTimer = 13000;
     }
 
     void JustDied(Unit* /*who*/) override
@@ -176,17 +156,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
                 moveTimer -= diff;
             }
         }
-
-        if (uiDespawnTimer)
-        {
-            if (uiDespawnTimer <= diff)
-            {
-                me->DisappearAndDie();
-                uiDespawnTimer = 0;
-            }
-            else
-                uiDespawnTimer -= diff;
-        }
     }
 
     void SetVictimPos(Position const& pos)
@@ -197,15 +166,17 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 private:
     Position victimPos;
     InstanceScript* instance;
-    uint32 uiDespawnTimer;
     uint32 moveTimer;
 };
 
 struct boss_taldaram : public BossAI
 {
-    boss_taldaram(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM),
-        vanishDamage(0)
+    boss_taldaram(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM), vanishDamage(0)
     {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void InitializeAI() override
@@ -218,19 +189,16 @@ struct boss_taldaram : public BossAI
             me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
             me->SetHover(true);
+
             if (!me->HasAura(SPELL_BEAM_VISUAL))
-            {
                 DoCastSelf(SPELL_BEAM_VISUAL, true);
-            }
 
             me->SummonCreatureGroup(SUMMON_GROUP_TRIGGERS);
             return;
         }
 
         if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE)
-        {
             DoAction(ACTION_REMOVE_PRISON_AT_RESET);
-        }
     }
 
     void Reset() override
@@ -238,14 +206,52 @@ struct boss_taldaram : public BossAI
         _Reset();
 
         vanishDamage = 0;
-        vanishTarget_GUID.Clear();
+
+        me->SetReactState(REACT_AGGRESSIVE);
+
+        ScheduleHealthCheckEvent({ 75, 50, 25 }, [&] {
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                Talk(SAY_VANISH);
+                DoCastSelf(SPELL_VANISH);
+                me->SetReactState(REACT_PASSIVE);
+                me->GetMotionMaster()->Clear();
+                DoStopAttack();
+                scheduler.CancelGroup(GROUP_COMBAT_ABILITIES);
+            });
+        });
+    }
+
+    void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode mode) override
+    {
+        if (auraApp->GetBase()->GetId() == SPELL_VANISH && mode == AURA_REMOVE_BY_EXPIRE)
+        {
+            scheduler.Schedule(2500ms, [this](TaskContext)
+            {
+                if (Unit* vanishTarget = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                {
+                    vanishDamage = 0;
+                    DoCast(vanishTarget, SPELL_SHADOWSTEP);
+                    DoCast(vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR);
+                }
+
+                me->m_Events.AddEventAtOffset([&] {
+                    if (!scheduler.IsGroupScheduled(GROUP_COMBAT_ABILITIES))
+                    {
+                        ScheduleCombatEvents();
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->ResumeChasingVictim();
+                    }
+                }, 20s);
+            });
+        }
     }
 
     void DoAction(int32 action) override
     {
         if (action == ACTION_REMOVE_PRISON || action == ACTION_REMOVE_PRISON_AT_RESET)
         {
-            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
+            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetMapWaterOrGroundLevel(me->GetPosition()), me->GetOrientation());
             instance->HandleGameObject(instance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM), true);
 
             if (action == ACTION_REMOVE_PRISON)
@@ -281,20 +287,20 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*school*/) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask school) override
     {
-        if (vanishTarget_GUID)
+        BossAI::DamageTaken(attacker, damage, damageType, school);
+
+        if (me->FindCurrentSpellBySpellId(sSpellMgr->GetSpellIdForDifficulty(SPELL_EMBRACE_OF_THE_VAMPYR, me)))
         {
-            if (me->FindCurrentSpellBySpellId(SPELL_EMBRACE_OF_THE_VAMPYR))
+            vanishDamage += damage;
+            if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
             {
-                vanishDamage += damage;
-                if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
-                {
-                    ScheduleCombatEvents();
-                    me->CastStop();
-                    vanishTarget_GUID.Clear();
-                    vanishDamage = 0;
-                }
+                ScheduleCombatEvents();
+                me->CastStop();
+                me->ResumeChasingVictim();
+                me->SetReactState(REACT_AGGRESSIVE);
+                vanishDamage = 0;
             }
         }
     }
@@ -308,17 +314,9 @@ struct boss_taldaram : public BossAI
     void KilledUnit(Unit* victim) override
     {
         if (!victim->IsPlayer())
-        {
             return;
-        }
 
         Talk(SAY_SLAY);
-
-        if (vanishTarget_GUID && victim->GetGUID() == vanishTarget_GUID)
-        {
-            vanishTarget_GUID.Clear();
-            vanishDamage = 0;
-        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -334,9 +332,7 @@ struct boss_taldaram : public BossAI
     void SpellHitTarget(Unit* /*target*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
-        {
             summons.DoAction(ACTION_SPHERE);
-        }
     }
 
     void JustSummoned(Creature* summon) override
@@ -349,9 +345,7 @@ struct boss_taldaram : public BossAI
             case NPC_FLAME_SPHERE_3:
             {
                 if (npc_taldaram_flamesphere* summonAI = dynamic_cast<npc_taldaram_flamesphere*>(summon->AI()))
-                {
                     summonAI->SetVictimPos(victimSperePos);
-                }
 
                 break;
             }
@@ -363,130 +357,27 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-        {
-            return;
-        }
-
-        events.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
-            return;
-        }
-
-        while (uint32 const eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_PRINCE_BLOODTHIRST:
-                {
-                    DoCastSelf(SPELL_BLOODTHIRST);
-                    events.Repeat(10s);
-                    break;
-                }
-                case EVENT_PRINCE_FLAME_SPHERES:
-                {
-                    if (Unit* victim = me->GetVictim())
-                    {
-                        DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
-                        victimSperePos = *victim;
-                    }
-
-                    if (!events.GetNextEventTime(EVENT_PRINCE_VANISH))
-                    {
-                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14s);
-                    }
-                    else
-                    {
-                        // Make sure that Vanish won't get triggered at same time as sphere summon
-                        events.DelayEvents(4s);
-                    }
-
-                    events.Repeat(15s);
-                    break;
-                }
-                case EVENT_PRINCE_VANISH:
-                {
-                    //Count alive players
-                    uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->GetThreatMgr().GetThreatList();
-                    if (!t_list.empty())
-                    {
-                        for (HostileReference const* reference : t_list)
-                        {
-                            if (reference)
-                            {
-                                Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                                if (pTarget && pTarget->IsPlayer() && pTarget->IsAlive())
-                                {
-                                    ++count;
-                                }
-                            }
-                        }
-                    }
-
-                    // He only vanishes if there are 3 or more alive players
-                    if (count > 2)
-                    {
-                        Talk(SAY_VANISH);
-                        DoCastSelf(SPELL_VANISH, false);
-                        if (Unit* pEmbraceTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                        {
-                            vanishTarget_GUID = pEmbraceTarget->GetGUID();
-                        }
-
-                        events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
-                        events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
-                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499ms);
-                    }
-                    break;
-                }
-                case EVENT_PRINCE_VANISH_RUN:
-                {
-                    if (Unit* _vanishTarget = ObjectAccessor::GetUnit(*me, vanishTarget_GUID))
-                    {
-                        vanishDamage = 0;
-                        DoCast(_vanishTarget, SPELL_SHADOWSTEP);
-                        me->CastSpell(_vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR, false);
-                        me->RemoveAura(SPELL_VANISH);
-                    }
-
-                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20s);
-                    break;
-                }
-                case EVENT_PRINCE_RESCHEDULE:
-                {
-                    ScheduleCombatEvents();
-                    break;
-                }
-            }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-        }
-
-        if (me->IsVisible())
-        {
-            DoMeleeAttackIfReady();
-        }
-    }
-
 private:
     Position victimSperePos;
-    ObjectGuid vanishTarget_GUID;
     uint32 vanishDamage;
 
     void ScheduleCombatEvents()
     {
-        events.Reset();
-        events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10s);
-        events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10s);
-        vanishTarget_GUID.Clear();
+        scheduler.Schedule(10s, GROUP_COMBAT_ABILITIES, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_BLOODTHIRST);
+            context.Repeat(15s);
+        }).Schedule(10s, GROUP_COMBAT_ABILITIES, [this](TaskContext context)
+        {
+            if (Unit* victim = me->GetVictim())
+            {
+                DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
+                victimSperePos = victim->GetPosition();
+            }
+
+            context.Repeat(15s);
+        });
+
         vanishDamage = 0;
     }
 };
@@ -531,7 +422,7 @@ class spell_prince_taldaram_flame_sphere_summon : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        dest._position.m_positionZ = DATA_GROUND_POSITION_Z + 5.5f;
+        dest._position.m_positionZ = GetCaster()->GetPositionZ() + 5.5f;
     }
 
     void Register() override

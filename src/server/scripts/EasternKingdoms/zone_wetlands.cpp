@@ -1,31 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Wetlands
-SD%Complete: 80
-SDComment: Quest support: 1249
-SDCategory: Wetlands
-EndScriptData */
-
-/* ContentData
-npc_mikhail
-npc_tapoke_slim_jahn
-EndContentData */
 
 #include "CreatureScript.h"
 #include "Player.h"
@@ -74,7 +62,7 @@ public:
                 case 2:
                     if (me->HasStealthAura())
                         me->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
-                    SetRun();
+                    me->SetWalk(false);
                     me->SetFaction(FACTION_ENEMY);
                     break;
             }
@@ -121,7 +109,7 @@ public:
                     me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
 
-                    SetRun(false);
+                    me->SetWalk(true);
                 }
             }
         }
@@ -150,7 +138,10 @@ public:
                 pSlim->CastSpell(pSlim, SPELL_STEALTH, true);
 
             if (npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI* pEscortAI = CAST_AI(npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI, pSlim->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
+            {
+                pSlim->SetWalk(true);
+                pEscortAI->Start(false, player->GetGUID(), quest);
+            }
         }
         return false;
     }

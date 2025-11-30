@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -57,23 +57,7 @@ void InstanceScript::SaveToDB()
 
 void InstanceScript::OnPlayerEnter(Player* player)
 {
-    if (!IsTwoFactionInstance())
-        return;
-
-    if (GetTeamIdInInstance() == TEAM_NEUTRAL)
-    {
-        if (Group* group = player->GetGroup())
-        {
-            if (Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID()))
-                _teamIdInInstance = leader->GetTeamId();
-            else
-                _teamIdInInstance = player->GetTeamId();
-        }
-        else
-            _teamIdInInstance = player->GetTeamId();
-    }
-
-    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsTwoFactionInstance())
         player->SetFaction((_teamIdInInstance == TEAM_HORDE) ? 1610 /*FACTION_HORDE*/ : 1 /*FACTION_ALLIANCE*/);
 }
 
@@ -610,6 +594,12 @@ void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespa
     }
     else
         LOG_DEBUG("scripts", "InstanceScript: DoRespawnGameObject failed");
+}
+
+void InstanceScript::DoRespawnGameObject(uint32 type)
+{
+    if (GameObject* go = instance->GetGameObject(GetObjectGuid(type)))
+        go->Respawn();
 }
 
 void InstanceScript::DoRespawnCreature(ObjectGuid guid, bool force)

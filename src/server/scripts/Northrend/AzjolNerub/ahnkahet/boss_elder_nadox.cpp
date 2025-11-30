@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -101,9 +101,7 @@ struct boss_elder_nadox : public BossAI
         events.ScheduleEvent(EVENT_PLAGUE, 5s, 8s);
 
         if (IsHeroic())
-        {
             events.ScheduleEvent(EVENT_BROOD_RAGE, 5s);
-        }
 
         // Cache eggs
         std::list<Creature*> eggs;
@@ -122,7 +120,7 @@ struct boss_elder_nadox : public BossAI
 
         eggs.clear();
 
-            // Guardian eggs
+        // Guardian eggs
         me->GetCreatureListWithEntryInGrid(eggs, NPC_AHNKAHAR_GUARDIAN_EGG, 250.0f);
         if (!eggs.empty())
         {
@@ -139,17 +137,13 @@ struct boss_elder_nadox : public BossAI
     void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
         if (summon->GetEntry() == NPC_AHNKAHAR_GUARDIAN)
-        {
             respectYourElders = false;
-        }
     }
 
     void KilledUnit(Unit* victim) override
     {
         if (victim->IsPlayer())
-        {
             Talk(SAY_SLAY);
-        }
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -160,7 +154,7 @@ struct boss_elder_nadox : public BossAI
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*school*/) override
     {
-        if (!guardianSummoned && me->HealthBelowPctDamaged(55, damage))
+        if (!guardianSummoned && me->HealthBelowPctDamaged(50, damage))
         {
             SummonHelpers(false);
             guardianSummoned = true;
@@ -170,9 +164,7 @@ struct boss_elder_nadox : public BossAI
     uint32 GetData(uint32 type) const override
     {
         if (type == DATA_RESPECT_YOUR_ELDERS)
-        {
             return respectYourElders ? 1 : 0;
-        }
 
         return 0;
     }
@@ -180,16 +172,12 @@ struct boss_elder_nadox : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
 
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
             return;
-        }
 
         while (uint32 const eventId = events.ExecuteEvent())
         {
@@ -218,9 +206,8 @@ struct boss_elder_nadox : public BossAI
                 case EVENT_CHECK_HOME:
                 {
                     if (!me->HasAura(SPELL_ENRAGE) && (me->GetPositionZ() < 24.0f || !me->GetHomePosition().IsInDist(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 110.0f)))
-                    {
                         DoCastSelf(SPELL_ENRAGE, true);
-                    }
+                    events.Repeat(1s);
                     break;
                 }
             }
@@ -241,9 +228,7 @@ private:
         if (swarm)
         {
             if (swarmEggs.empty())
-            {
                 return;
-            }
 
             // Make a copy of guid list
             GuidList swarmEggs2 = swarmEggs;
@@ -259,41 +244,29 @@ private:
             }
 
             if (swarmEggs2.empty())
-            {
                 return;
-            }
 
             previousSwarmEgg_GUID = Acore::Containers::SelectRandomContainerElement(swarmEggs2);
 
             if (Creature* egg = ObjectAccessor::GetCreature(*me, previousSwarmEgg_GUID))
-            {
                 egg->CastSpell(egg, SPELL_SUMMON_SWARMERS, true, nullptr, nullptr, me->GetGUID());
-            }
 
             if (roll_chance_f(33))
-            {
                 Talk(SAY_EGG_SAC);
-            }
         }
         else
         {
             if (guardianEggs.empty())
-            {
                 return;
-            }
 
             ObjectGuid const& guardianEggGUID = Acore::Containers::SelectRandomContainerElement(guardianEggs);
             if (Creature* egg = ObjectAccessor::GetCreature(*me, guardianEggGUID))
-            {
                 egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, true, nullptr, nullptr, me->GetGUID());
-            }
 
             Talk(EMOTE_HATCHES, me);
 
             if (roll_chance_f(33))
-            {
                 Talk(SAY_EGG_SAC);
-            }
         }
     }
 };

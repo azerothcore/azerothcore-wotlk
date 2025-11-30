@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,6 +21,7 @@
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 #include "EventMap.h"
+#include "WorldStateDefines.h"
 
 enum BG_EY_Events
 {
@@ -30,40 +31,10 @@ enum BG_EY_Events
     BG_EY_EVENT_CHECK_CPOINTS       = 4
 };
 
-enum BG_EY_Timers
-{
-    BG_EY_FLAG_RESPAWN_TIME         = 10 * IN_MILLISECONDS,
-    BG_EY_FLAG_ON_GROUND_TIME       = 10 * IN_MILLISECONDS,
-    BG_EY_FPOINTS_CHECK_TIME        = 2 * IN_MILLISECONDS,
-    BG_EY_FPOINTS_TICK_TIME         = 2 * IN_MILLISECONDS
-};
-
-enum BG_EY_WorldStates
-{
-    EY_ALLIANCE_RESOURCES           = 2749,
-    EY_HORDE_RESOURCES              = 2750,
-    EY_ALLIANCE_BASE                = 2752,
-    EY_HORDE_BASE                   = 2753,
-    DRAENEI_RUINS_HORDE_CONTROL     = 2733,
-    DRAENEI_RUINS_ALLIANCE_CONTROL  = 2732,
-    DRAENEI_RUINS_UNCONTROL         = 2731,
-    MAGE_TOWER_ALLIANCE_CONTROL     = 2730,
-    MAGE_TOWER_HORDE_CONTROL        = 2729,
-    MAGE_TOWER_UNCONTROL            = 2728,
-    FEL_REAVER_HORDE_CONTROL        = 2727,
-    FEL_REAVER_ALLIANCE_CONTROL     = 2726,
-    FEL_REAVER_UNCONTROL            = 2725,
-    BLOOD_ELF_HORDE_CONTROL         = 2724,
-    BLOOD_ELF_ALLIANCE_CONTROL      = 2723,
-    BLOOD_ELF_UNCONTROL             = 2722,
-    PROGRESS_BAR_PERCENT_GREY       = 2720,                 //100 = empty (only grey), 0 = blue|red (no grey)
-    PROGRESS_BAR_STATUS             = 2719,                 //50 init!, 48 ... hordak bere .. 33 .. 0 = full 100% hordacky, 100 = full alliance
-    PROGRESS_BAR_SHOW               = 2718,                 //1 init, 0 druhy send - bez messagu, 1 = controlled aliance
-    NETHERSTORM_FLAG                = 2757,
-    //set to 2 when flag is picked up, and to 1 if it is dropped
-    NETHERSTORM_FLAG_STATE_ALLIANCE = 2769,
-    NETHERSTORM_FLAG_STATE_HORDE    = 2770
-};
+constexpr Milliseconds BG_EY_FLAG_RESPAWN_TIME         = 10s;
+constexpr Milliseconds BG_EY_FLAG_ON_GROUND_TIME       = 10s;
+constexpr Milliseconds BG_EY_FPOINTS_CHECK_TIME        = 2s;
+constexpr Milliseconds BG_EY_FPOINTS_TICK_TIME         = 2s;
 
 enum BG_EY_ProgressBarConsts
 {
@@ -305,11 +276,11 @@ struct BattlegroundEYLosingPointStruct
 
 struct BattlegroundEYCapturingPointStruct
 {
-    BattlegroundEYCapturingPointStruct(uint32 _DespawnNeutralObjectType, uint32 _SpawnObjectTypeAlliance, uint32 _MessageIdAlliance, uint32 _SpawnObjectTypeHorde, uint32 _MessageIdHorde, uint32 _GraveYardId)
+    BattlegroundEYCapturingPointStruct(uint32 _DespawnNeutralObjectType, uint32 _SpawnObjectTypeAlliance, uint32 _MessageIdAlliance, uint32 _SpawnObjectTypeHorde, uint32 _MessageIdHorde, uint32 _GraveyardId)
         : DespawnNeutralObjectType(_DespawnNeutralObjectType),
           SpawnObjectTypeAlliance(_SpawnObjectTypeAlliance), MessageIdAlliance(_MessageIdAlliance),
           SpawnObjectTypeHorde(_SpawnObjectTypeHorde), MessageIdHorde(_MessageIdHorde),
-          GraveYardId(_GraveYardId)
+          GraveyardId(_GraveyardId)
     {}
 
     uint32 DespawnNeutralObjectType;
@@ -317,7 +288,7 @@ struct BattlegroundEYCapturingPointStruct
     uint32 MessageIdAlliance;
     uint32 SpawnObjectTypeHorde;
     uint32 MessageIdHorde;
-    uint32 GraveYardId;
+    uint32 GraveyardId;
 };
 
 const uint32 BG_EY_TickPoints[EY_POINTS_MAX] = {1, 2, 5, 10};
@@ -326,10 +297,10 @@ const uint32 BG_EY_FlagPoints[EY_POINTS_MAX] = {75, 85, 100, 500};
 //constant arrays:
 const BattlegroundEYPointIconsStruct m_PointsIconStruct[EY_POINTS_MAX] =
 {
-    BattlegroundEYPointIconsStruct(FEL_REAVER_UNCONTROL, FEL_REAVER_ALLIANCE_CONTROL, FEL_REAVER_HORDE_CONTROL),
-    BattlegroundEYPointIconsStruct(BLOOD_ELF_UNCONTROL, BLOOD_ELF_ALLIANCE_CONTROL, BLOOD_ELF_HORDE_CONTROL),
-    BattlegroundEYPointIconsStruct(DRAENEI_RUINS_UNCONTROL, DRAENEI_RUINS_ALLIANCE_CONTROL, DRAENEI_RUINS_HORDE_CONTROL),
-    BattlegroundEYPointIconsStruct(MAGE_TOWER_UNCONTROL, MAGE_TOWER_ALLIANCE_CONTROL, MAGE_TOWER_HORDE_CONTROL)
+    BattlegroundEYPointIconsStruct(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_UNCONTROL, WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_ALLIANCE_CONTROL, WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_HORDE_CONTROL),
+    BattlegroundEYPointIconsStruct(WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_UNCONTROL, WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_ALLIANCE_CONTROL, WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_HORDE_CONTROL),
+    BattlegroundEYPointIconsStruct(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_UNCONTROL, WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_ALLIANCE_CONTROL, WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_HORDE_CONTROL),
+    BattlegroundEYPointIconsStruct(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_UNCONTROL, WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_ALLIANCE_CONTROL, WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_HORDE_CONTROL)
 };
 
 const BattlegroundEYLosingPointStruct m_LosingPointTypes[EY_POINTS_MAX] =
@@ -402,7 +373,7 @@ public:
     void Init() override;
     void EndBattleground(TeamId winnerTeamId) override;
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
     void SetDroppedFlagGUID(ObjectGuid guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
     ObjectGuid GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 
@@ -456,5 +427,6 @@ private:
     ObjectGuid _droppedFlagGUID;
     uint8 _flagState;
     uint32 _flagCapturedObject;
+    uint32 _configurableMaxTeamScore;
 };
 #endif

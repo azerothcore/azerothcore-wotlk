@@ -1,37 +1,27 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Orgrimmar
-SD%Complete: 100
-SDComment: Quest support: 2460, 6566
-SDCategory: Orgrimmar
-EndScriptData */
-
-/* ContentData
-npc_shenthul
-npc_thrall_warchief
-EndContentData */
-
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "TaskScheduler.h"
+#include "LFGMgr.h"
 
 /*######
 ## npc_shenthul
@@ -148,17 +138,15 @@ enum ThrallWarchief : uint32
     SAY_THRALL_ON_QUEST_REWARD_0   = 0,
     SAY_THRALL_ON_QUEST_REWARD_1   = 1,
 
-    AREA_ORGRIMMAR                 = 1637,
-    AREA_RAZOR_HILL                = 362,
-    AREA_CAMP_TAURAJO              = 378,
-    AREA_CROSSROADS                = 380,
-
     GO_UNADORNED_SPIKE             = 175787,
 
     // What the Wind Carries (ID: 6566)
-    QUEST_WHAT_THE_WIND_CARRIES     = 6566,
-    GOSSIP_MENU_THRALL              = 3664,
-    GOSSIP_RESPONSE_THRALL_FIRST    = 5733,
+    QUEST_WHAT_THE_WIND_CARRIES    = 6566,
+    GOSSIP_MENU_THRALL             = 3664,
+    GOSSIP_RESPONSE_THRALL_FIRST   = 5733,
+
+    // Deathknight Starting Zone End
+    QUEST_WARCHIEFS_BLESSING       = 13189,
 };
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
@@ -208,14 +196,19 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/) override
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*item*/) override
     {
-        if (quest->GetQuestId() == QUEST_FOR_THE_HORDE)
+        switch (quest->GetQuestId())
         {
-            if (creature && creature->AI())
-            {
-                creature->AI()->DoAction(ACTION_START_TALKING);
-            }
+            case (QUEST_FOR_THE_HORDE):
+                if (creature && creature->AI())
+                    creature->AI()->DoAction(ACTION_START_TALKING);
+                break;
+            case (QUEST_WARCHIEFS_BLESSING):
+                sLFGMgr->InitializeLockedDungeons(player);
+                break;
+            default:
+                break;
         }
 
         return true;
@@ -279,7 +272,7 @@ public:
                     {
                         if (player->IsAlive() && !player->IsGameMaster())
                         {
-                            if (player->GetAreaId() == AREA_CROSSROADS)
+                            if (player->GetAreaId() == AREA_THE_CROSSROADS)
                             {
                                 player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
                             }

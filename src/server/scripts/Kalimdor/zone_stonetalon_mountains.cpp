@@ -1,31 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Stonetalon_Mountains
-SD%Complete: 95
-SDComment: Quest support: 6627, 6523
-SDCategory: Stonetalon Mountains
-EndScriptData */
-
-/* ContentData
-npc_braug_dimspirit
-npc_kaya_flathoof
-EndContentData */
 
 #include "CreatureScript.h"
 #include "Player.h"
@@ -149,7 +137,10 @@ public:
         if (quest->GetQuestId() == QUEST_PROTECT_KAYA)
         {
             if (npc_escortAI* pEscortAI = CAST_AI(npc_kaya_flathoof::npc_kaya_flathoofAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(true, player->GetGUID());
+            }
 
             creature->AI()->Talk(SAY_START);
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -293,7 +293,7 @@ public:
 
     void LoadFromDB();
 
-    CalendarEvent* GetEvent(uint64 eventId);
+    CalendarEvent* GetEvent(uint64 eventId, CalendarEventStore::iterator* it = nullptr);
     CalendarEventStore const& GetEvents() const { return _events; }
     CalendarEventStore GetEventsCreatedBy(ObjectGuid guid, bool includeGuildEvents = false);
     CalendarEventStore GetPlayerEvents(ObjectGuid guid);
@@ -314,8 +314,8 @@ public:
     uint32 GetPlayerNumPending(ObjectGuid guid);
 
     void AddEvent(CalendarEvent* calendarEvent, CalendarSendEventType sendType);
-    void RemoveEvent(uint64 eventId, ObjectGuid remover);
-    void RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover);
+    CalendarEventStore::iterator RemoveEvent(uint64 eventId, ObjectGuid remover);
+    CalendarEventStore::iterator RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover, CalendarEventStore::const_iterator* currIt = nullptr);
     void UpdateEvent(CalendarEvent* calendarEvent);
 
     void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, CharacterDatabaseTransaction trans = nullptr);

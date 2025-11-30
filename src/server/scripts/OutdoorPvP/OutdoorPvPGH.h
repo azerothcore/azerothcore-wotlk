@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,10 +26,6 @@ enum OutdoorPvPGHenum
     GH_HORDE_DEFENSE_EVENT              = 66,
 
     GH_ZONE                             = 394,
-
-    GH_UI_SLIDER_DISPLAY                = 3466,
-    GH_UI_SLIDER_POS                    = 3467,
-    GH_UI_SLIDER_N                      = 3468,
 };
 
 class Unit;
@@ -52,7 +48,7 @@ public:
     void ChangeState() override;
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     bool HandlePlayerEnter(Player* player) override;
     void HandlePlayerLeave(Player* player) override;

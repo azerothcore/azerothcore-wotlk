@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,6 +63,81 @@ bool ChaseMovementGenerator<T>::PositionOkay(T* owner, Unit* target, Optional<fl
 }
 
 template<class T>
+void ChaseMovementGenerator<T>::SetOffsetAndAngle(std::optional<ChaseRange> dist, std::optional<ChaseAngle> angle)
+{
+    _range = dist;
+    _angle = angle;
+    _lastTargetPosition.reset();
+}
+
+template<class T>
+void ChaseMovementGenerator<T>::SetNewTarget(Unit* target)
+{
+    i_target.link(target, this);
+    _lastTargetPosition.reset();
+}
+
+template<class T>
+void ChaseMovementGenerator<T>::DistanceYourself(T* owner, float distance)
+{
+    // make a new path if we have to...
+    if (!i_path)
+        i_path = std::make_unique<PathGenerator>(owner);
+
+    float x, y, z;
+    i_target->GetNearPoint(owner, x, y, z, owner->GetBoundaryRadius(), distance, i_target->GetAngle(owner));
+    if (DispatchSplineToPosition(owner, x, y, z, false, false, 0.f, false, false))
+    {
+        m_currentMode = CHASE_MODE_DISTANCING;
+        if constexpr (!std::is_same_v<T, Player>)
+        {
+            owner->AI()->DistancingStarted();
+        }
+    }
+}
+
+template<class T>
+bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, float y, float z, bool walk, bool cutPath, float maxTarget, bool forceDest, bool target)
+{
+    Creature* cOwner = owner->ToCreature();
+
+    if (owner->IsHovering())
+        owner->UpdateAllowedPositionZ(x, y, z);
+
+    bool success = i_path->CalculatePath(x, y, z, forceDest);
+    if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
+    {
+        if (cOwner)
+        {
+            cOwner->SetCannotReachTarget(i_target.getTarget()->GetGUID());
+        }
+
+        owner->StopMoving();
+        return false;
+    }
+
+    if (cutPath)
+        i_path->ShortenPathUntilDist(G3D::Vector3(x, y, z), maxTarget);
+
+    if (cOwner)
+    {
+        cOwner->SetCannotReachTarget();
+    }
+
+    owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
+    i_recalculateTravel = true;
+
+    Movement::MoveSplineInit init(owner);
+    init.MovebyPath(i_path->GetPath());
+    if (target)
+        init.SetFacing(i_target.getTarget());
+    init.SetWalk(walk);
+    init.Launch();
+
+    return true;
+}
+
+template<class T>
 bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld() || !owner->IsInMap(i_target.getTarget()))
@@ -71,16 +146,35 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (!owner || !owner->IsAlive())
         return false;
 
+    if (owner->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT)) // script paused combat movement
+    {
+        owner->StopMoving();
+        _lastTargetPosition.reset();
+        return true;
+    }
+
     Creature* cOwner = owner->ToCreature();
+    bool isStoppedBecauseOfCasting = cOwner && cOwner->IsMovementPreventedByCasting();
 
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || isStoppedBecauseOfCasting)
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (cOwner)
         {
-            cOwner->UpdateLeashExtensionTime();
+            if (isStoppedBecauseOfCasting)
+            {
+                // Don't reset leash timer if it's a spell like Shoot with a short cast time.
+                /// @todo: Research how it should actually work.
+                Spell *spell = cOwner->GetFirstCurrentCastingSpell();
+                bool spellHasLongCast = spell && spell->GetCastTime() > 1 * SECOND * IN_MILLISECONDS;
+                if (spellHasLongCast)
+                    cOwner->UpdateLeashExtensionTime();
+            }
+            else
+                cOwner->UpdateLeashExtensionTime();
+
             cOwner->SetCannotReachTarget();
         }
         return true;
@@ -125,18 +219,21 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_recheckDistance.Reset(400); // Sniffed value
 
-        if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
+        if (m_currentMode != CHASE_MODE_DISTANCING)
         {
-            if ((owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase) || _range)
+            if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
             {
-                i_recalculateTravel = false;
-                i_path = nullptr;
-                if (cOwner)
-                    cOwner->SetCannotReachTarget();
-                owner->StopMoving();
-                owner->SetInFront(target);
-                MovementInform(owner);
-                return true;
+                if ((owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase) || _range)
+                {
+                    i_recalculateTravel = false;
+                    i_path = nullptr;
+                    if (cOwner)
+                        cOwner->SetCannotReachTarget();
+                    owner->StopMoving();
+                    owner->SetInFront(target);
+                    MovementInform(owner);
+                    return true;
+                }
             }
         }
     }
@@ -153,18 +250,23 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         MovementInform(owner);
     }
 
-    if (owner->movespline->Finalized())
-    { // Mobs should chase you infinitely if you stop and wait every few seconds.
-        i_leashExtensionTimer.Update(time_diff);
-        if (i_leashExtensionTimer.Passed())
-        {
-            i_leashExtensionTimer.Reset(5000);
-            if (cOwner)
+    if (cOwner)
+    {
+        if (owner->movespline->Finalized() && cOwner->IsWithinMeleeRange(target))
+        { // Mobs should chase you infinitely if you stop and wait every few seconds.
+            i_leashExtensionTimer.Update(time_diff);
+            if (i_leashExtensionTimer.Passed())
+            {
+                i_leashExtensionTimer.Reset(cOwner->GetAttackTime(BASE_ATTACK));
                 cOwner->UpdateLeashExtensionTime();
+            }
         }
+        else if (i_recalculateTravel)
+            i_leashExtensionTimer.Reset(cOwner->GetAttackTime(BASE_ATTACK));
     }
-    else if (i_recalculateTravel)
-        i_leashExtensionTimer.Reset(5000);
+
+    if (m_currentMode == CHASE_MODE_DISTANCING)
+        return true;
 
     // if the target moved, we have to consider whether to adjust
     if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase || !owner->IsWithinLOSInMap(target))
@@ -229,53 +331,23 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
                 shortenPath = false;
             }
 
-            if (owner->IsHovering())
-                owner->UpdateAllowedPositionZ(x, y, z);
-
-            bool success = i_path->CalculatePath(x, y, z, forceDest);
-            if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
-            {
-                if (cOwner)
-                {
-                    cOwner->SetCannotReachTarget(target->GetGUID());
-                }
-
-                owner->StopMoving();
-                return true;
-            }
-
-            if (shortenPath)
-                i_path->ShortenPathUntilDist(G3D::Vector3(x, y, z), maxTarget);
-
-            if (cOwner)
-            {
-                cOwner->SetCannotReachTarget();
-            }
-
             bool walk = false;
             if (cOwner && !cOwner->IsPet())
             {
                 switch (cOwner->GetMovementTemplate().GetChase())
                 {
-                case CreatureChaseMovementType::CanWalk:
-                    walk = owner->IsWalking();
-                    break;
-                case CreatureChaseMovementType::AlwaysWalk:
-                    walk = true;
-                    break;
-                default:
-                    break;
+                    case CreatureChaseMovementType::CanWalk:
+                        walk = owner->IsWalking();
+                        break;
+                    case CreatureChaseMovementType::AlwaysWalk:
+                        walk = true;
+                        break;
+                    default:
+                        break;
                 }
             }
 
-            owner->AddUnitState(UNIT_STATE_CHASE_MOVE);
-            i_recalculateTravel = true;
-
-            Movement::MoveSplineInit init(owner);
-            init.MovebyPath(i_path->GetPath());
-            init.SetFacing(target);
-            init.SetWalk(walk);
-            init.Launch();
+            DispatchSplineToPosition(owner, x, y, z, walk, shortenPath, maxTarget, forceDest, true);
         }
     }
 
@@ -298,7 +370,7 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     i_recheckDistance.Reset(0);
-    owner->SetWalk(false);
+    i_leashExtensionTimer.Reset(owner->GetAttackTime(BASE_ATTACK));
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
@@ -324,9 +396,24 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
     if (!owner->IsCreature())
         return;
 
-    // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
-    if (CreatureAI* AI = owner->ToCreature()->AI())
-        AI->MovementInform(CHASE_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
+    switch (m_currentMode)
+    {
+        default:
+        {
+            // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
+            if (CreatureAI* AI = owner->ToCreature()->AI())
+                AI->MovementInform(CHASE_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
+            break;
+        }
+        case CHASE_MODE_DISTANCING:
+        {
+            if (CreatureAI* AI = owner->ToCreature()->AI())
+                AI->DistancingEnded();
+            break;
+        }
+    }
+
+    m_currentMode = CHASE_MODE_NORMAL;
 }
 
 //-----------------------------------------------//
@@ -539,8 +626,9 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         if (_inheritWalkState)
             init.SetWalk(target->IsWalking() || target->movespline->isWalking());
 
-        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
-            init.SetVelocity(*velocity);
+        if (_inheritSpeed)
+            if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
+                init.SetVelocity(*velocity);
         init.Launch();
     }
 
@@ -587,6 +675,13 @@ template void ChaseMovementGenerator<Creature>::DoReset(Creature*);
 template bool ChaseMovementGenerator<Player>::DoUpdate(Player*, uint32);
 template bool ChaseMovementGenerator<Creature>::DoUpdate(Creature*, uint32);
 template void ChaseMovementGenerator<Unit>::MovementInform(Unit*);
+
+template void ChaseMovementGenerator<Creature>::SetOffsetAndAngle(std::optional<ChaseRange>, std::optional<ChaseAngle>);
+template void ChaseMovementGenerator<Creature>::SetNewTarget(Unit*);
+template void ChaseMovementGenerator<Creature>::DistanceYourself(Creature*, float);
+template void ChaseMovementGenerator<Player>::SetOffsetAndAngle(std::optional<ChaseRange>, std::optional<ChaseAngle>);
+template void ChaseMovementGenerator<Player>::SetNewTarget(Unit*);
+template void ChaseMovementGenerator<Player>::DistanceYourself(Player*, float);
 
 template void FollowMovementGenerator<Player>::DoInitialize(Player*);
 template void FollowMovementGenerator<Creature>::DoInitialize(Creature*);

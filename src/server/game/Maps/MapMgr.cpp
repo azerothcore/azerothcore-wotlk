@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,7 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
+#include "GridTerrainLoader.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "LFGMgr.h"
@@ -83,13 +84,17 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             if (entry->Instanceable())
                 map = new MapInstanced(id);
             else
-            {
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
+
+            i_maps[id] = map;
+
+            if (!entry->Instanceable())
+            {
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
 
-            i_maps[id] = map;
+            map->OnCreateMap();
         }
     }
 
@@ -156,7 +161,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
 
     char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
-    if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+    if (!sScriptMgr->OnPlayerCanEnterMap(player, entry, instance, mapDiff, loginCheck))
         return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 
     Group* group = player->GetGroup();
@@ -167,7 +172,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
         {
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
             /// @todo: this is not a good place to send the message
-            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
+            player->GetSession()->SendAreaTriggerMessage(LANG_INSTANCE_RAID_GROUP_ONLY, mapName);
             LOG_DEBUG("maps", "MAP: Player '{}' must be in a raid group to enter instance '{}'", player->GetName(), mapName);
             return Map::CANNOT_ENTER_NOT_IN_RAID;
         }
@@ -200,7 +205,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
             if (!corpseMap)
             {
                 WorldPacket data(SMSG_CORPSE_NOT_IN_INSTANCE, 0);
-                player->GetSession()->SendPacket(&data);
+                player->SendDirectMessage(&data);
                 LOG_DEBUG("maps", "MAP: Player '{}' does not have a corpse in instance '{}' and cannot enter.", player->GetName(), mapName);
                 return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;
             }
@@ -209,6 +214,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
         else
         {
             LOG_DEBUG("maps", "Map::PlayerCannotEnter - player '{}' is dead but does not have a corpse!", player->GetName());
+            return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;
         }
     }
 
@@ -217,7 +223,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
     {
         uint32 destInstId = sInstanceSaveMgr->PlayerGetDestinationInstanceId(player, mapid, targetDifficulty);
         if (destInstId)
-            if (Map* boundMap = sMapMgr->FindMap(mapid, destInstId))
+            if (Map* boundMap = FindMap(mapid, destInstId))
                 if (Map::EnterState denyReason = boundMap->CannotEnter(player, loginCheck))
                     return denyReason;
     }
@@ -299,11 +305,7 @@ void MapMgr::DoDelayedMovesAndRemoves()
 bool MapMgr::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
     GridCoord p = Acore::ComputeGridCoord(x, y);
-
-    int gx = 63 - p.x_coord;
-    int gy = 63 - p.y_coord;
-
-    return Map::ExistMap(mapid, gx, gy) && Map::ExistVMap(mapid, gx, gy);
+    return GridTerrainLoader::ExistMap(mapid, p.x_coord, p.y_coord) && GridTerrainLoader::ExistVMap(mapid, p.x_coord, p.y_coord);
 }
 
 bool MapMgr::IsValidMAP(uint32 mapid, bool startUp)

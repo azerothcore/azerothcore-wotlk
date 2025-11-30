@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -285,7 +286,7 @@ void TicketMgr::ResetTickets()
         {
             uint32 ticketId = itr->second->GetId();
             ++itr;
-            sTicketMgr->RemoveTicket(ticketId);
+            RemoveTicket(ticketId);
         }
         else
             ++itr;
@@ -364,6 +365,8 @@ void TicketMgr::AddTicket(GmTicket* ticket)
         ++_openTicketCount;
     CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
     ticket->SaveToDB(trans);
+
+    sScriptMgr->OnTicketCreate(ticket);
 }
 
 void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
@@ -375,6 +378,8 @@ void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
         if (source)
             --_openTicketCount;
         ticket->SaveToDB(trans);
+
+        sScriptMgr->OnTicketClose(ticket);
     }
 }
 
@@ -398,6 +403,8 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source)
         if (source)
             --_openTicketCount;
         ticket->SaveToDB(trans);
+
+        sScriptMgr->OnTicketResolve(ticket);
     }
 }
 
@@ -438,7 +445,9 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
     session->SendPacket(&data);
 }
 
-void TicketMgr::UpdateLastChange()
+void TicketMgr::UpdateLastChange(GmTicket* ticket)
 {
     _lastChange = GameTime::GetGameTime().count();
+
+    sScriptMgr->OnTicketUpdateLastChange(ticket);
 }

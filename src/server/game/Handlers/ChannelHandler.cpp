@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -47,15 +47,11 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         return;
 
     if (channelName.size() >= 100 || !DisallowHyperlinksAndMaybeKick(channelName))
-    {
         return;
-    }
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-    {
         if (Channel* channel = cMgr->GetJoinChannel(channelName, channelId))
             channel->JoinChannel(GetPlayer(), password);
-    }
 }
 
 void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
@@ -70,10 +66,8 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-    {
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
             channel->LeaveChannel(GetPlayer(), true);
-    }
 }
 
 void WorldSession::HandleChannelList(WorldPacket& recvPacket)

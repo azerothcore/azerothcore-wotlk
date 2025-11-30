@@ -1,20 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
@@ -29,7 +30,6 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
-// Ours
 enum eBKG
 {
     QUEST_BLACK_KNIGHT_CURSE            = 14016,
@@ -501,7 +501,7 @@ public:
                         events.RescheduleEvent(EVENT_SOUL_COAX, 5s);
                     }
                     else
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(1ms);
                     break;
                 case EVENT_SOUL_COAX:
                     Talk(SAY_ARETE_1);
@@ -523,11 +523,8 @@ public:
                     {
                         soul->SetCanFly(true);
                         soul->SetVisible(true);
-                        Movement::MoveSplineInit init(soul);
-                        init.MoveTo(soul->GetPositionX(), soul->GetPositionY(), soul->GetPositionZ() + 5.0f);
-                        init.SetVelocity(1.0f);
-                        init.Launch();
                         soul->CastSpell(soul, 64462, true); // Drown
+                        soul->GetMotionMaster()->MovePoint(0, soul->GetPositionX(), soul->GetPositionY(), soul->GetPositionZ() + 5.0f, FORCED_MOVEMENT_NONE, 1.f);
                     }
                     events.ScheduleEvent(EVENT_SCENE_1, 6s);
                     break;
@@ -580,14 +577,14 @@ public:
                     if (Creature* soul = ObjectAccessor::GetCreature(*me, _landgrenSoulGUID))
                     {
                         soul->AI()->Talk(SAY_SOUL_4);
-                        soul->DespawnOrUnsummon(2000);
+                        soul->DespawnOrUnsummon(2s);
                     }
                     events.ScheduleEvent(EVENT_SCENE_10, 3s);
                     break;
                 case EVENT_SCENE_10:
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_QUESTGIVER);
                     Talk(SAY_ARETE_6);
-                    me->DespawnOrUnsummon(60000);
+                    me->DespawnOrUnsummon(60s);
                     break;
             }
         }
@@ -718,7 +715,8 @@ public:
                 Talk(0);
                 events.Reset();
                 summons.DespawnAll();
-                Start(false, false);
+                me->SetWalk(true);
+                Start(false);
 
                 int8 i = -1;
                 std::list<Creature*> cList;
@@ -796,7 +794,7 @@ public:
                                 summon->SetUInt32Value(UNIT_NPC_EMOTESTATE, param);
                                 break;
                             case ACTION_SUMMON_DESPAWN:
-                                summon->DespawnOrUnsummon(param);
+                                summon->DespawnOrUnsummon(Milliseconds(param));
                                 break;
                             case ACTION_SUMMON_ORIENTATION:
                                 summon->SetFacingTo(param / 100.0f);
@@ -1022,9 +1020,9 @@ public:
                         {
                             if (summon->GetEntry() == NPC_TIRION_LICH_KING)
                                 summon->CastSpell(summon, SPELL_LICH_KINGS_FURY, false);
-                            summon->DespawnOrUnsummon(summon->GetEntry() == NPC_TIRION_LICH_KING ? 10000 : 4000);
+                            summon->DespawnOrUnsummon(summon->GetEntry() == NPC_TIRION_LICH_KING ? 10s : 4s);
                         }
-                    me->DespawnOrUnsummon(10000);
+                    me->DespawnOrUnsummon(10s);
                     break;
             }
         }
@@ -1257,8 +1255,8 @@ public:
 
             player->CastSpell(player, SPELL_WAITING_FOR_A_BOMBER, true);
             player->CastSpell(player, SPELL_FLIGHT_ORDERS, true);
-            events.ScheduleEvent(EVENT_START_FLIGHT, 0);
-            events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3000);
+            events.ScheduleEvent(EVENT_START_FLIGHT, 0ms);
+            events.ScheduleEvent(EVENT_TAKE_PASSENGER, 3s);
             me->SetCanFly(true);
             me->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
             me->SetSpeed(MOVE_FLIGHT, 0.1f);
@@ -1310,29 +1308,11 @@ public:
                                 turret->HandleSpellClick(owner, 0);
                                 return;
                             }
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     break;
                 case EVENT_START_FLIGHT:
                     {
-                        WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-                        if (!path || path->empty())
-                        {
-                            me->DespawnOrUnsummon(1);
-                            return;
-                        }
-
-                        Movement::PointsArray pathPoints;
-                        pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                        uint32 wpCounter = 1;
-                        WPPath::const_iterator itr;
-                        while ((itr = path->find(wpCounter++)) != path->end())
-                        {
-                            WayPoint* wp = itr->second;
-                            pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
-                        }
-
-                        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                        me->GetMotionMaster()->MovePath(me->GetEntry(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
                         events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 1min);
                         events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 5s);
                         break;
@@ -1342,7 +1322,7 @@ public:
                         // Check if path is finished
                         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != ESCORT_MOTION_TYPE)
                         {
-                            me->DespawnOrUnsummon(1);
+                            me->DespawnOrUnsummon(1ms);
                             return;
                         }
 
@@ -1381,7 +1361,7 @@ public:
                                     station->RemoveAurasDueToSpell(SPELL_INFRA_GREEN_SHIELD);
                             }
                         if (!playerPresent)
-                            me->DespawnOrUnsummon(1);
+                            me->DespawnOrUnsummon(1ms);
                     }
                     events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 1s);
                     break;
@@ -1461,7 +1441,6 @@ class spell_deliver_gryphon : public SpellScript
     }
 };
 
-// Theirs
 /*######
 ## npc_guardian_pavilion
 ######*/
@@ -1469,9 +1448,6 @@ class spell_deliver_gryphon : public SpellScript
 enum GuardianPavilion
 {
     SPELL_TRESPASSER_H                            = 63987,
-    AREA_SUNREAVER_PAVILION                       = 4676,
-
-    AREA_SILVER_COVENANT_PAVILION                 = 4677,
     SPELL_TRESPASSER_A                            = 63986,
 };
 
@@ -2133,9 +2109,31 @@ public:
     }
 };
 
+enum WaterTerror
+{
+    SPELL_WATER_TERROR_FROST_NOVA = 57668
+};
+
+// 57652 - Crashing Wave
+class spell_crashing_wave : public SpellScript
+{
+    PrepareSpellScript(spell_crashing_wave);
+
+    void RecalculateDamage()
+    {
+        if (Unit* target = GetHitUnit())
+            if (target->HasAura(SPELL_WATER_TERROR_FROST_NOVA))
+                SetHitDamage(GetHitDamage() * 2);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_crashing_wave::RecalculateDamage);
+    }
+};
+
 void AddSC_icecrown()
 {
-    // Ours
     new npc_black_knight_graveyard();
     new npc_battle_at_valhalas();
     new npc_llod_generic();
@@ -2149,10 +2147,9 @@ void AddSC_icecrown()
     new npc_infra_green_bomber_generic();
     RegisterSpellScript(spell_onslaught_or_call_bone_gryphon);
     RegisterSpellScript(spell_deliver_gryphon);
-
-    // Theirs
     new npc_guardian_pavilion();
     new npc_tournament_training_dummy();
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
+    RegisterSpellScript(spell_crashing_wave);
 }

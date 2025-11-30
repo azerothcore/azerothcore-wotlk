@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -208,23 +208,6 @@ struct Mail
     [[nodiscard]] bool IsSentByGM() const { return stationery == MAIL_STATIONERY_GM; }
     [[nodiscard]] bool IsCODPayment() const { return checked & MAIL_CHECK_MASK_COD_PAYMENT; }
     [[nodiscard]] bool IsReturnedMail() const { return checked & MAIL_CHECK_MASK_RETURNED; }
-};
-
-struct ServerMail
-{
-    ServerMail() = default;
-    uint32 id{ 0 };
-    uint8 reqLevel{ 0 };
-    uint32 reqPlayTime{ 0 };
-    uint32 moneyA{ 0 };
-    uint32 moneyH{ 0 };
-    uint32 itemA{ 0 };
-    uint32 itemCountA{ 0 };
-    uint32 itemH{ 0 };
-    uint32 itemCountH{ 0 };
-    std::string subject;
-    std::string body;
-    uint8 active{ 0 };
 };
 
 #endif

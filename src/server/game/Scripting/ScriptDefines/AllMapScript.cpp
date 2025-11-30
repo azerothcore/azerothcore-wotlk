@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -134,10 +134,9 @@ void ScriptMgr::OnDestroyMap(Map* map)
     });
 }
 
-void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
+void ScriptMgr::OnLoadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy)
 {
     ASSERT(map);
-    ASSERT(gmap);
 
     ForeachMaps<WorldMapScript>(map,
     [&](WorldMapScript* script)
@@ -158,7 +157,7 @@ void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
     });
 }
 
-void ScriptMgr::OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
+void ScriptMgr::OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy)
 {
     ASSERT(map);
     ASSERT(gmap);
@@ -191,7 +190,7 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
 
     ExecuteScript<PlayerScript>([=](PlayerScript* script)
     {
-        script->OnMapChanged(player);
+        script->OnPlayerMapChanged(player);
     });
 
     ForeachMaps<WorldMapScript>(map,

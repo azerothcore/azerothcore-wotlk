@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -298,7 +298,7 @@ public:
             if (a == 1)
             {
                 me->setActive(true);
-                events.RescheduleEvent(20, 0);
+                events.RescheduleEvent(20, 0ms);
             }
         }
 
@@ -369,7 +369,7 @@ public:
                     if (pInstance)
                     {
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
-                            c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 10, false);
+                            c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 10, false);
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_2 : SAY_SYLVANAS_KRICK_2);
                     }
@@ -404,7 +404,7 @@ public:
                 case 8:
                     Talk(SAY_OUTRO_KRICK_4);
 
-                    events.RescheduleEvent(9, 1500);
+                    events.RescheduleEvent(9, 1500ms);
                     break;
                 case 9:
                     if (pInstance)
@@ -430,7 +430,7 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_TYRANNUS_EVENT_GUID)))
                             c->AI()->Talk(SAY_TYRANNUS_KRICK_2);
 
-                    events.RescheduleEvent(11, 9000);
+                    events.RescheduleEvent(11, 9s);
                     break;
                 case 11:
                     if (pInstance)
@@ -440,7 +440,7 @@ public:
                         if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_LEADER_FIRST_GUID)))
                         {
                             c->AI()->Talk(c->GetEntry() == NPC_JAINA_PART1 ? SAY_JAINA_KRICK_3 : SAY_SYLVANAS_KRICK_3);
-                            c->GetMotionMaster()->MovePath(PATH_BEGIN_VALUE + 11, false);
+                            c->GetMotionMaster()->MoveWaypoint(PATH_BEGIN_VALUE + 11, false);
                         }
                     }
                     me->setActive(false);
@@ -506,7 +506,7 @@ class spell_exploding_orb_auto_grow_aura : public AuraScript
                 target->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
                 target->RemoveAurasDueToSpell(SPELL_EXPLODING_ORB_VISUAL);
                 if (target->IsCreature())
-                    target->ToCreature()->DespawnOrUnsummon(2000);
+                    target->ToCreature()->DespawnOrUnsummon(2s);
             }
     }
 

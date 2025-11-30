@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -70,8 +70,6 @@ struct Cell
     [[nodiscard]] uint32 CellY() const { return data.Part.cell_y; }
     [[nodiscard]] uint32 GridX() const { return data.Part.grid_x; }
     [[nodiscard]] uint32 GridY() const { return data.Part.grid_y; }
-    [[nodiscard]] bool NoCreate() const { return data.Part.nocreate; }
-    void SetNoCreate() { data.Part.nocreate = 1; }
 
     [[nodiscard]] CellCoord GetCellCoord() const
     {
@@ -92,12 +90,10 @@ struct Cell
     {
         struct
         {
-            unsigned grid_x : 6;
-            unsigned grid_y : 6;
-            unsigned cell_x : 6;
-            unsigned cell_y : 6;
-            unsigned nocreate : 1;
-            unsigned reserved : 7;
+            unsigned grid_x : 8;
+            unsigned grid_y : 8;
+            unsigned cell_x : 8;
+            unsigned cell_y : 8;
         } Part;
         uint32 All;
     } data;
@@ -107,13 +103,10 @@ struct Cell
 
     static CellArea CalculateCellArea(float x, float y, float radius);
 
-    template<class T> static void VisitGridObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitWorldObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitAllObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitObjects(WorldObject const* obj, T& visitor, float radius);
+    template<class T> static void VisitObjects(float x, float y, Map* map, T& visitor, float radius);
 
-    template<class T> static void VisitGridObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitAllObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitFarVisibleObjects(WorldObject const* obj, T& visitor, float radius);
 
 private:
     template<class T, class CONTAINER> void VisitCircle(TypeContainerVisitor<T, CONTAINER>&, Map&, CellCoord const&, CellCoord const&) const;

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,6 +20,7 @@
 
 #include "SharedDefines.h"
 #include "ZoneScript.h"
+#include "WorldStatePackets.h"
 #include <array>
 
 class GameObject;
@@ -92,7 +93,7 @@ public:
     explicit OPvPCapturePoint(OutdoorPvP* pvp);
     virtual ~OPvPCapturePoint() = default;
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
 
     // send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);
@@ -199,7 +200,7 @@ public:
     typedef std::pair<ObjectGuid::LowType, GameObject*> GoScriptPair;
     typedef std::pair<ObjectGuid::LowType, Creature*> CreatureScriptPair;
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) {}
 
     // called when a player triggers an area trigger
     virtual bool HandleAreaTrigger(Player* player, uint32 trigger);

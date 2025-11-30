@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,25 +41,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
 
     void InitializeAI() override
     {
-        WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-        if (!path || path->empty())
-        {
-            me->DespawnOrUnsummon(1);
-            return;
-        }
-
-        Movement::PointsArray pathPoints;
-        pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-        uint32 wpCounter = 1;
-        WPPath::const_iterator itr;
-        while ((itr = path->find(wpCounter++)) != path->end())
-        {
-            WayPoint* wp = itr->second;
-            pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
-        }
-
-        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+        me->GetMotionMaster()->MovePath(me->GetEntry(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
 
         NullCreatureAI::InitializeAI();
         pointId = 0;
@@ -108,7 +90,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
 
                         if (me->GetDistance2d(x, y) < 10.0f)
                         {
-                            me->DespawnOrUnsummon(1000);
+                            me->DespawnOrUnsummon(1s);
                             if (Vehicle* vehicle = me->GetVehicleKit())
                                 if (Unit* passenger = vehicle->GetPassenger(0))
                                 {
@@ -117,7 +99,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
                                 }
                         }
                         else
-                            me->GetMotionMaster()->MovePoint(0, x, y, z, false, false);
+                            me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, false);
                         break;
                     }
                 }

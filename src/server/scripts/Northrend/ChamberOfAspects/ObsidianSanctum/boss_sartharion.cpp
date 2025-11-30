@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -130,9 +130,9 @@ enum Misc
     ACTION_DRAKE_DIED                           = 3,
 
     // Movement points
-    POINT_FINAL_TENEBRON                        = 8,
-    POINT_FINAL_SHADRON                         = 4,
-    POINT_FINAL_VESPERON                        = 4,
+    POINT_FINAL_TENEBRON                        = 9,
+    POINT_FINAL_SHADRON                         = 5,
+    POINT_FINAL_VESPERON                        = 5,
 
     // Lava directions. Its used to identify to which side lava was moving by last time
     LAVA_LEFT_SIDE                              = 0,
@@ -583,7 +583,7 @@ public:
                             }
                         }
 
-                        events.RepeatEvent((below11PctReached ? urand(1400, 2000) : urand(5000, 20000)));
+                        events.Repeat((below11PctReached ? randtime(1400ms, 2s) : randtime(5s, 20s)));
                         break;
                     }
                     case EVENT_SARTHARION_BERSERK:
@@ -852,7 +852,7 @@ struct boss_sartharion_dragonAI : public BossAI
 
         if (isCalledBySartharion)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 500, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 500, true, false))
             {
                 AttackStart(target);
             }
@@ -1071,7 +1071,7 @@ public:
                 Talk(SAY_TENEBRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1086,7 +1086,7 @@ public:
                         Talk(SAY_TENEBRON_BREATH);
                     }
                     DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
+                    events.Repeat(17500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
@@ -1095,7 +1095,7 @@ public:
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
-                    events.RepeatEvent(22500);
+                    events.Repeat(22500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_OPEN_PORTAL:
@@ -1254,7 +1254,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1270,7 +1270,7 @@ public:
                     }
 
                     DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
+                    events.Repeat(17500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
@@ -1279,7 +1279,7 @@ public:
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
-                    events.RepeatEvent(22500);
+                    events.Repeat(22500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_OPEN_PORTAL:
@@ -1370,7 +1370,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1480,7 +1480,7 @@ public:
         {
             if (param == ACTION_SWITCH_PHASE)
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 

@@ -94,11 +94,11 @@ function Joiner:add_repo() (
     basedir="${4:-""}"
 
     [[ -z $url ]] && hasReq=false || hasReq=true
-    Joiner:_help $hasReq "$1" "Syntax: joiner.sh add-repo [-d] [-e] url name branch [basedir]"
+    Joiner:_help "$hasReq" "$1" "Syntax: joiner.sh add-repo [-d] [-e] url name branch [basedir]"
 
     # retrieving info from url if not set
     if [[ -z $name ]]; then
-        basename=$(basename $url)
+        basename=$(basename "$url")
         name=${basename%%.*}
 
         if [[ -z "$basedir" ]]; then
@@ -115,10 +115,26 @@ function Joiner:add_repo() (
 
     if [ -e "$path/.git/" ]; then
         # if exists , update
-        git --git-dir="$path/.git/" rev-parse && git --git-dir="$path/.git/" pull origin $branch | grep 'Already up-to-date.' && changed="no" || true
+        echo "Updating $name on branch $branch..."
+        if ! git --git-dir="$path/.git/" --work-tree="$path" rev-parse >/dev/null 2>&1; then
+            echo "Unable to read repository at $path/.git/"
+            return $FALSE
+        fi
+
+        local pull_output
+        if ! pull_output=$(git --git-dir="$path/.git/" --work-tree="$path" pull origin "$branch" 2>&1); then
+            printf "%s\n" "$pull_output"
+            return $FALSE
+        fi
+
+        printf "%s\n" "$pull_output"
+        if echo "$pull_output" | grep -qE 'Already up[- ]to-date.'; then
+            changed="no"
+        fi
     else
         # otherwise clone
-        git clone $url -c advice.detachedHead=0 -b $branch "$path"
+        echo "Cloning $name on branch $branch..."
+        git clone "$url" -c advice.detachedHead=0 -b "$branch" "$path"
     fi
 
     if [ "$?" -ne "0" ]; then
@@ -140,16 +156,16 @@ function Joiner:add_git_submodule() (
     basedir=${4:-""}
 
     [[ -z $url ]] && hasReq=false || hasReq=true
-    Joiner:_help $hasReq "$1" "Syntax: joiner.sh add-git-submodule [-d] [-e] url name branch [basedir]"
+    Joiner:_help "$hasReq" "$1" "Syntax: joiner.sh add-git-submodule [-d] [-e] url name branch [basedir]"
 
     # retrieving info from url if not set
     if [[ -z $name ]]; then
-        basename=$(basename $url)
+        basename=$(basename "$url")
         name=${basename%%.*}
 
         if [[ -z $basedir ]]; then
-            dir=$(dirname $url)
-            basedir=$(basename $dir)
+            dir=$(dirname "$url")
+            basedir=$(basename "$dir")
         fi
 
         name="${name,,}" #to lowercase
@@ -158,17 +174,17 @@ function Joiner:add_git_submodule() (
 
     path="$J_PATH_MODULES/$basedir/$name"
     valid_path=`Joiner:_searchFirstValiPath "$path"`
-    rel_path=${path#$valid_path}
+    rel_path=${path#"$valid_path"}
     rel_path=${rel_path#/}
 
-    if [ -e $path/ ]; then
+    if [ -e "$path/" ]; then
         # if exists , update
-        (cd "$path" && git pull origin $branch)
-        (cd "$valid_path" && git submodule update -f --init $rel_path)
+        (cd "$path" && git pull origin "$branch")
+        (cd "$valid_path" && git submodule update -f --init "$rel_path")
     else
         # otherwise add
-        (cd "$valid_path" && git submodule add -f -b $branch $url $rel_path)
-        (cd "$valid_path" && git submodule update -f --init $rel_path)
+        (cd "$valid_path" && git submodule add -f -b "$branch" "$url" "$rel_path")
+        (cd "$valid_path" && git submodule update -f --init "$rel_path")
     fi
 
     if [ "$?" -ne "0" ]; then
@@ -324,7 +340,7 @@ function Joiner:self_update() {
         if [ ! -z "$J_VER_REQ" ]; then
             # if J_VER_REQ is defined then update only if tag is different
             _cur_branch=`git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" rev-parse --abbrev-ref HEAD`
-            _cur_ver=`git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" name-rev --tags --name-only $_cur_branch`
+            _cur_ver=`git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" name-rev --tags --name-only "$_cur_branch"`
             if [ "$_cur_ver" != "$J_VER_REQ" ]; then
                 git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" rev-parse && git --git-dir="$J_PATH/.git/" fetch --tags origin "$_cur_branch" --quiet
                 git --git-dir="$J_PATH/.git/" --work-tree="$J_PATH/" checkout "tags/$J_VER_REQ" -b "$_cur_branch"
@@ -416,8 +432,8 @@ function Joiner:menu() {
     while true
     do
         # run option directly if specified in argument
-        [ ! -z $1 ] && _switch $@
-        [ ! -z $1 ] && exit 0
+        [ ! -z "$1" ] && _switch $@
+        [ ! -z "$1" ] && exit 0
 
         echo ""
         echo "==== JOINER MENU ===="
@@ -438,4 +454,3 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 else
     Joiner:_checkOptions $@
 fi
-

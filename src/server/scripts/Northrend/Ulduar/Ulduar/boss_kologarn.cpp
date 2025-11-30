@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -45,55 +45,32 @@ enum KologarnSpells
     SPELL_KOLOGARN_REDUCE_PARRY         = 64651,
 
     // BASIC
-    SPELL_OVERHEAD_SMASH_10             = 63356,
-    SPELL_OVERHEAD_SMASH_25             = 64003,
-    SPELL_ONEARMED_OVERHEAD_SMASH_10    = 63573,
-    SPELL_ONEARMED_OVERHEAD_SMASH_25    = 64006,
-    SPELL_PETRIFYING_BREATH_10          = 62030,
-    SPELL_PETRIFYING_BREATH_25          = 63980,
-    SPELL_STONE_SHOUT_10                = 63716,
-    SPELL_STONE_SHOUT_25                = 64005,
+    SPELL_OVERHEAD_SMASH                = 63356,
+    SPELL_ONEARMED_OVERHEAD_SMASH       = 63573,
+    SPELL_PETRIFYING_BREATH             = 62030,
+    SPELL_STONE_SHOUT                   = 63716,
 
     // EYEBEAM
     SPELL_FOCUSED_EYEBEAM_SUMMON        = 63342,
-    SPELL_FOCUSED_EYEBEAM_10            = 63347,
-    SPELL_FOCUSED_EYEBEAM_25            = 63977,
+    SPELL_FOCUSED_EYEBEAM               = 63347,
     SPELL_FOCUSED_EYEBEAM_RIGHT         = 63702,
     SPELL_FOCUSED_EYEBEAM_LEFT          = 63676,
 
     // ARMS
-    SPELL_ARM_DEAD_10                   = 63629,
-    SPELL_ARM_DEAD_25                   = 63979,
-    SPELL_RUBBLE_FALL_10                = 63821,
-    SPELL_RUBBLE_FALL_25                = 64001,
+    SPELL_ARM_DEAD                      = 63629,
+    SPELL_RUBBLE_FALL                   = 63821,
     SPELL_ARM_RESPAWN_VISUAL            = 64753,
 
     // LEFT ARM
-    SPELL_ARM_SWEEP_10                  = 63766,
-    SPELL_ARM_SWEEP_25                  = 63983,
+    SPELL_ARM_SWEEP                     = 63766,
 
     // RIGHT ARM
-    SPELL_STONE_GRIP_10                 = 62166,
-    SPELL_STONE_GRIP_25                 = 63981,
-    SPELL_RIDE_RIGHT_ARM_10             = 62056,
-    SPELL_RIDE_RIGHT_ARM_25             = 63985,
+    SPELL_STONE_GRIP                    = 62166,
+    SPELL_RIDE_RIGHT_ARM                = 62056,
 
     // RUBBLE TRASH
-    SPELL_RUBBLE_ATTACK_10              = 63818,
-    SPELL_RUBBLE_ATTACK_25              = 63978,
+    SPELL_RUBBLE_ATTACK                 = 63818,
 };
-
-#define SPELL_PETRIFYING_BREATH         RAID_MODE(SPELL_PETRIFYING_BREATH_10, SPELL_PETRIFYING_BREATH_25)
-#define SPELL_OVERHEAD_SMASH            RAID_MODE(SPELL_OVERHEAD_SMASH_10, SPELL_OVERHEAD_SMASH_25)
-#define SPELL_ONEARMED_OVERHEAD_SMASH   RAID_MODE(SPELL_ONEARMED_OVERHEAD_SMASH_10, SPELL_ONEARMED_OVERHEAD_SMASH_25)
-#define SPELL_ARM_DEAD                  RAID_MODE(SPELL_ARM_DEAD_10, SPELL_ARM_DEAD_25)
-#define SPELL_ARM_SWEEP                 RAID_MODE(SPELL_ARM_SWEEP_10, SPELL_ARM_SWEEP_25)
-#define SPELL_STONE_GRIP                RAID_MODE(SPELL_STONE_GRIP_10, SPELL_STONE_GRIP_25)
-#define SPELL_FOCUSED_EYEBEAM           RAID_MODE(SPELL_FOCUSED_EYEBEAM_10, SPELL_FOCUSED_EYEBEAM_25)
-#define SPELL_RUBBLE_FALL               RAID_MODE(SPELL_RUBBLE_FALL_10, SPELL_RUBBLE_FALL_25)
-#define SPELL_RUBBLE_ATTACK             RAID_MODE(SPELL_RUBBLE_ATTACK_10, SPELL_RUBBLE_ATTACK_25)
-#define SPELL_RIDE_RIGHT_ARM            RAID_MODE(SPELL_RIDE_RIGHT_ARM_10, SPELL_RIDE_RIGHT_ARM_25)
-#define SPELL_STONE_SHOUT               RAID_MODE(SPELL_STONE_SHOUT_10, SPELL_STONE_SHOUT_25)
 
 enum KologarnEvents
 {
@@ -155,7 +132,6 @@ public:
         boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()), summons(me), breathReady(false)
         {
             m_pInstance = me->GetInstanceScript();
-            eyebeamTarget = nullptr;
             assert(vehicle);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
         }
@@ -166,8 +142,6 @@ public:
         ObjectGuid _left, _right;
         EventMap events;
         SummonList summons;
-
-        Unit* eyebeamTarget;
 
         bool _looksAchievement, breathReady;
         uint8 _rubbleAchievement;
@@ -236,6 +210,7 @@ public:
             _rubbleAchievement = 0;
             _looksAchievement = true;
 
+            me->GetMotionMaster()->MoveTargetedHome();
             me->SetDisableGravity(true);
             me->DisableRotate(true);
 
@@ -295,6 +270,24 @@ public:
                 summons.Summon(cr);
         }
 
+        void SummonedCreatureDespawn(Creature* cr) override
+        {
+            if (m_pInstance->GetData(TYPE_KOLOGARN) > NOT_STARTED)
+                return;
+
+            if (cr->GetEntry() == NPC_LEFT_ARM)
+            {
+                _left.Clear();
+                AttachLeftArm();
+            }
+
+            if (cr->GetEntry() == NPC_RIGHT_ARM)
+            {
+                _right.Clear();
+                AttachRightArm();
+            }
+        }
+
         void JustDied(Unit*) override
         {
             summons.DespawnAll();
@@ -323,9 +316,9 @@ public:
                 go->SetLootRecipient(me);
             }
             if (Creature* arm = ObjectAccessor::GetCreature(*me, _left))
-                arm->DespawnOrUnsummon(3000); // visual
+                arm->DespawnOrUnsummon(3s); // visual
             if (Creature* arm = ObjectAccessor::GetCreature(*me, _right))
-                arm->DespawnOrUnsummon(3000); // visual
+                arm->DespawnOrUnsummon(3s); // visual
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisableGravity(true);
         }
@@ -340,7 +333,7 @@ public:
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
-            if (!me->IsAlive())
+            if (!me->IsAlive() || m_pInstance->GetData(TYPE_KOLOGARN) != IN_PROGRESS)
                 return;
 
             if (!apply)
@@ -408,10 +401,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
-            {
-                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
-            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -465,12 +455,7 @@ public:
                 case EVENT_FOCUSED_EYEBEAM:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20s);
-
-                    if ((eyebeamTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true)))
-                    {
-                        me->CastSpell(eyebeamTarget, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
-                    }
-
+                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
                     Talk(EMOTE_EYES);
                     return;
                 }
@@ -621,16 +606,16 @@ public:
     }
     struct boss_kologarn_eyebeamAI : public ScriptedAI
     {
-        boss_kologarn_eyebeamAI(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false), justSpawned(true)
+        boss_kologarn_eyebeamAI(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false)
         {
             m_pInstance = (InstanceScript*)c->GetInstanceScript();
         }
 
         InstanceScript* m_pInstance;
         uint32 _timer;
-        bool _damaged, justSpawned;
+        bool _damaged;
 
-        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/) override
+        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (damage > 0 && !_damaged && me->GetInstanceScript())
             {
@@ -640,29 +625,85 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
-            if (justSpawned)
+            if (!summoner)
             {
-                me->DespawnOrUnsummon(10000);
+                return;
+            }
+
+            // Should only work on playable characters
+            if (Player* player = summoner->ToPlayer())
+            {
+                me->Attack(player, false);
+                me->GetMotionMaster()->MoveChase(player);
+
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_KOLOGARN)))
                 {
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
                 }
-                me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
-                justSpawned = false;
             }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
             if (_timer)
             {
                 _timer += diff;
                 if (_timer >= 2000)
                 {
-                    me->CastSpell(me, (me->GetMap()->Is25ManRaid() ? SPELL_FOCUSED_EYEBEAM_25 : SPELL_FOCUSED_EYEBEAM_10), true);
+                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
                     _timer = 0;
                 }
             }
         }
     };
+};
+
+class spell_kologarn_focused_eyebeam : public SpellScript
+{
+    PrepareSpellScript(spell_kologarn_focused_eyebeam);
+
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
+    void FilterTargetsInitial(std::list<WorldObject*>& targets)
+    {
+        std::list<Unit*> newTargets;
+        Creature* creature = GetCaster()->ToCreature();
+        // Select 3 most distant targets
+        GetCaster()->GetAI()->SelectTargetList(newTargets, 3, SelectTargetMethod::MaxDistance, 0, NonTankTargetSelector(creature, true));
+
+        // If no distant targets available, get 1 target from original list
+        if (newTargets.empty())
+        {
+            if (!targets.empty())
+            {
+                while (1 < targets.size())
+                {
+                    std::list<WorldObject*>::iterator itr = targets.begin();
+                    advance(itr, urand(0, targets.size() - 1));
+                    targets.erase(itr);
+                }
+            }
+            return;
+        }
+
+        // Clear original targets
+        targets.clear();
+
+        // Select a random target
+        std::list<Unit*>::iterator head = newTargets.begin();
+        advance(head, urand(0, newTargets.size() - 1));
+        targets.push_back(*head);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_focused_eyebeam::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
 };
 
 struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
@@ -724,19 +765,15 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     bool Load() override
     {
-        if (!GetCaster()->IsCreature())
-            return false;
-        return true;
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
         // Remove "main tank" and non-player targets
-        targets.remove_if (StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
+        targets.remove_if(StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
         // Maximum affected targets per difficulty mode
-        uint32 maxTargets = 1;
-        if (GetSpellInfo()->Id == 63981)
-            maxTargets = 3;
+        uint32 maxTargets = GetSpellInfo()->Id == SPELL_STONE_GRIP ? 1 : 3;
 
         // Return a random amount of targets based on maxTargets
         while (maxTargets < targets.size())
@@ -788,6 +825,7 @@ class spell_ulduar_squeezed_lifeless : public SpellScript
     }
 };
 
+// 63720, 64004
 class spell_kologarn_stone_shout : public SpellScript
 {
     PrepareSpellScript(spell_kologarn_stone_shout);
@@ -799,7 +837,6 @@ class spell_kologarn_stone_shout : public SpellScript
 
     void Register() override
     {
-        if (m_scriptSpellId != SPELL_STONE_SHOUT_10 && m_scriptSpellId != SPELL_STONE_SHOUT_25)
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_stone_shout::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
@@ -817,7 +854,6 @@ class spell_kologarn_stone_shout_aura : public AuraScript
 
     void Register() override
     {
-        if (m_scriptSpellId == SPELL_STONE_SHOUT_10 || m_scriptSpellId == SPELL_STONE_SHOUT_25)
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_kologarn_stone_shout_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
@@ -882,7 +918,9 @@ void AddSC_boss_kologarn()
     RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
     RegisterSpellScript(spell_ulduar_stone_grip_aura);
     RegisterSpellScript(spell_ulduar_squeezed_lifeless);
-    RegisterSpellAndAuraScriptPair(spell_kologarn_stone_shout, spell_kologarn_stone_shout_aura);
+    RegisterSpellScript(spell_kologarn_focused_eyebeam);
+    RegisterSpellScript(spell_kologarn_stone_shout);
+    RegisterSpellScript(spell_kologarn_stone_shout_aura);
 
     // Achievements
     new achievement_kologarn_looks_could_kill();

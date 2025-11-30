@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,7 +20,8 @@
 
 #include "Common.h"
 #include "MapDefines.h"
-#include "NGrid.h"
+#include "GridCell.h"
+#include "MapGrid.h"
 
 // Forward class definitions
 class Corpse;
@@ -30,8 +31,6 @@ class GameObject;
 class Pet;
 class Player;
 class ObjectGuid;
-
-#define MAX_NUMBER_OF_CELLS     8
 
 #define CENTER_GRID_ID          (MAX_NUMBER_OF_GRIDS/2)
 
@@ -52,10 +51,14 @@ class ObjectGuid;
 #define MAP_SIZE                (SIZE_OF_GRIDS*MAX_NUMBER_OF_GRIDS)
 #define MAP_HALFSIZE            (MAP_SIZE/2)
 
-// Creature used instead pet to simplify *::Visit templates (not required duplicate code for Creature->Pet case)
-typedef TYPELIST_5(GameObject, Player, Creature/*pets*/, Corpse/*resurrectable*/, DynamicObject/*farsight target*/) AllWorldObjectTypes;
-typedef TYPELIST_4(GameObject, Creature/*except pets*/, DynamicObject, Corpse/*Bones*/) AllGridObjectTypes;
-typedef TYPELIST_5(Creature, GameObject, DynamicObject, Pet, Corpse) AllMapStoredObjectTypes;
+// List of object types stored in a map grid
+typedef TYPELIST_5(GameObject, Player, Creature, Corpse, DynamicObject) AllMapGridStoredObjectTypes;
+
+// List of object types stored on map level
+typedef TYPELIST_4(Creature, GameObject, DynamicObject, Corpse) AllMapStoredObjectTypes;
+
+// List of object types that can have far visible range
+typedef TYPELIST_2(Creature, GameObject) AllFarVisibleObjectTypes;
 
 typedef GridRefMgr<Corpse>          CorpseMapType;
 typedef GridRefMgr<Creature>        CreatureMapType;
@@ -73,11 +76,11 @@ enum GridMapTypeMask
     GRID_MAP_TYPE_MASK_ALL              = 0x1F
 };
 
-typedef Grid<Player, AllWorldObjectTypes, AllGridObjectTypes> GridType;
-typedef NGrid<MAX_NUMBER_OF_CELLS, Player, AllWorldObjectTypes, AllGridObjectTypes> NGridType;
+typedef GridCell<AllMapGridStoredObjectTypes, AllFarVisibleObjectTypes> GridCellType;
+typedef MapGrid<AllMapGridStoredObjectTypes, AllFarVisibleObjectTypes> MapGridType;
 
-typedef TypeMapContainer<AllGridObjectTypes> GridTypeMapContainer;
-typedef TypeMapContainer<AllWorldObjectTypes> WorldTypeMapContainer;
+typedef TypeMapContainer<AllMapGridStoredObjectTypes> GridTypeMapContainer;
+typedef TypeVectorContainer<AllFarVisibleObjectTypes> FarVisibleGridContainer;
 typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStoredObjectTypesContainer;
 
 template<uint32 LIMIT>
@@ -171,37 +174,29 @@ typedef CoordPair<TOTAL_NUMBER_OF_CELLS_PER_MAP> CellCoord;
 namespace Acore
 {
     template<class RET_TYPE, int CENTER_VAL>
-    inline RET_TYPE Compute(float x, float y, float center_offset, float size)
+    inline RET_TYPE Compute(float x, float y, float size)
     {
-        // calculate and store temporary values in double format for having same result as same mySQL calculations
-        double x_offset = (double(x) - center_offset) / size;
-        double y_offset = (double(y) - center_offset) / size;
+        int gx = std::max<int>(0, (CENTER_VAL - x / size));
+        int gy = std::max<int>(0, (CENTER_VAL - y / size));
 
-        int x_val = int(x_offset + CENTER_VAL + 0.5f);
-        int y_val = int(y_offset + CENTER_VAL + 0.5f);
-        return RET_TYPE(x_val, y_val);
+        return RET_TYPE(gx, gy);
     }
 
     inline GridCoord ComputeGridCoord(float x, float y)
     {
-        return Compute<GridCoord, CENTER_GRID_ID>(x, y, CENTER_GRID_OFFSET, SIZE_OF_GRIDS);
+        return Compute<GridCoord, CENTER_GRID_ID>(x, y, SIZE_OF_GRIDS);
+    }
+
+    inline GridCoord ComputeGridCoordSimple(float x, float y)
+    {
+        int gx = (int)(CENTER_GRID_ID - x / SIZE_OF_GRIDS);
+        int gy = (int)(CENTER_GRID_ID - y / SIZE_OF_GRIDS);
+        return GridCoord((MAX_NUMBER_OF_GRIDS - 1) - gx, (MAX_NUMBER_OF_GRIDS - 1) - gy);
     }
 
     inline CellCoord ComputeCellCoord(float x, float y)
     {
-        return Compute<CellCoord, CENTER_GRID_CELL_ID>(x, y, CENTER_GRID_CELL_OFFSET, SIZE_OF_GRID_CELL);
-    }
-
-    inline CellCoord ComputeCellCoord(float x, float y, float& x_off, float& y_off)
-    {
-        double x_offset = (double(x) - CENTER_GRID_CELL_OFFSET) / SIZE_OF_GRID_CELL;
-        double y_offset = (double(y) - CENTER_GRID_CELL_OFFSET) / SIZE_OF_GRID_CELL;
-
-        int x_val = int(x_offset + CENTER_GRID_CELL_ID + 0.5f);
-        int y_val = int(y_offset + CENTER_GRID_CELL_ID + 0.5f);
-        x_off = (float(x_offset) - x_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
-        y_off = (float(y_offset) - y_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
-        return CellCoord(x_val, y_val);
+        return Compute<CellCoord, CENTER_GRID_CELL_ID>(x, y, SIZE_OF_GRID_CELL);
     }
 
     inline void NormalizeMapCoord(float& c)

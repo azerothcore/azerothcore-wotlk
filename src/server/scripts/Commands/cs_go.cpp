@@ -1,26 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-Name: go_commandscript
-%Complete: 100
-Comment: All go related commands
-Category: commandscripts
-EndScriptData */
 
 #include "Chat.h"
 #include "CommandScript.h"
@@ -93,15 +86,34 @@ public:
         return true;
     }
 
-    static bool HandleGoCreatureCIdCommand(ChatHandler* handler, Variant<Hyperlink<creature_entry>, uint32> cId)
+    static bool HandleGoCreatureCIdCommand(ChatHandler* handler, Variant<Hyperlink<creature_entry>, uint32> cId, Optional<uint32> _pos)
     {
-        CreatureData const* spawnpoint = GetCreatureData(handler, *cId);
+        uint32 pos = 1;
+        if (_pos)
+        {
+            pos = *_pos;
+            if (pos < 1)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
+                return false;
+            }
+        }
 
-        if (!spawnpoint)
+        std::vector<CreatureData const*> spawnpoints = GetCreatureDataList(*cId);
+
+        if (spawnpoints.empty())
         {
             handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
             return false;
         }
+
+        if (spawnpoints.size() < pos)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_GONOTENOUGHSPAWNS, pos, spawnpoints.size());
+            return false;
+        }
+
+        CreatureData const* spawnpoint = spawnpoints[--pos];
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
@@ -125,10 +137,7 @@ public:
 
         // Make sure we don't pass double quotes into the SQL query. Otherwise it causes a MySQL error
         std::string str = name.data(); // Making subtractions to the last character does not with in string_view
-        if (str.front() == '"')
-            str = str.substr(1);
-        if (str.back() == '"')
-            str = str.substr(0, str.size() - 1);
+        WorldDatabase.EscapeString(str);
 
         QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\" LIMIT 1", str);
         if (!result)
@@ -160,15 +169,34 @@ public:
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
 
-    static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId)
+    static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId, Optional<uint32> _pos)
     {
-        GameObjectData const* spawnpoint = GetGameObjectData(handler, goId);
+        uint32 pos = 1;
+        if (_pos)
+        {
+            pos = *_pos;
+            if (pos < 1)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
+                return false;
+            }
+        }
 
-        if (!spawnpoint)
+        std::vector<GameObjectData const*> spawnpoints = GetGameObjectDataList(goId);
+
+        if (spawnpoints.empty())
         {
             handler->SendErrorMessage(LANG_COMMAND_GOOBJNOTFOUND);
             return false;
         }
+
+        if (spawnpoints.size() < pos)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_GONOTENOUGHSPAWNS, pos, spawnpoints.size());
+            return false;
+        }
+
+        GameObjectData const* spawnpoint = spawnpoints[--pos];
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
@@ -516,6 +544,22 @@ public:
         return spawnpoint;
     }
 
+    static std::vector<CreatureData const*> GetCreatureDataList(uint32 entry)
+    {
+        std::vector<CreatureData const*> spawnpoints;
+        for (auto const& pair : sObjectMgr->GetAllCreatureData())
+        {
+            if (pair.second.id1 != entry)
+            {
+                continue;
+            }
+
+            spawnpoints.emplace_back(&pair.second);
+        }
+
+        return spawnpoints;
+    }
+
     static GameObjectData const* GetGameObjectData(ChatHandler* handler, uint32 entry)
     {
         GameObjectData const* spawnpoint = nullptr;
@@ -538,6 +582,22 @@ public:
         }
 
         return spawnpoint;
+    }
+
+    static std::vector<GameObjectData const*> GetGameObjectDataList(uint32 entry)
+    {
+        std::vector<GameObjectData const*> spawnpoints;
+        for (auto const& pair : sObjectMgr->GetAllGOData())
+        {
+            if (pair.second.id != entry)
+            {
+                continue;
+            }
+
+            spawnpoints.emplace_back(&pair.second);
+        }
+
+        return spawnpoints;
     }
 };
 

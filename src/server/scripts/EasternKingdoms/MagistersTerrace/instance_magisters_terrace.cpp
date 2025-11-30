@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -48,6 +48,7 @@ DoorData const doorData[] =
     { GO_SELIN_ENCOUNTER_DOOR, DATA_SELIN_FIREHEART, DOOR_TYPE_ROOM    },
     { GO_VEXALLUS_DOOR,        DATA_VEXALLUS,        DOOR_TYPE_PASSAGE },
     { GO_DELRISSA_DOOR,        DATA_DELRISSA,        DOOR_TYPE_PASSAGE },
+    { GO_KAEL_DOOR,            DATA_KAELTHAS,        DOOR_TYPE_ROOM    },
     { 0,                       0,                    DOOR_TYPE_ROOM    } // END
 };
 
@@ -56,7 +57,7 @@ Position const KalecgosSpawnPos = { 164.3747f, -397.1197f, 2.151798f, 1.66219f }
 class instance_magisters_terrace : public InstanceMapScript
 {
 public:
-    instance_magisters_terrace() : InstanceMapScript("instance_magisters_terrace", 585) { }
+    instance_magisters_terrace() : InstanceMapScript("instance_magisters_terrace", MAP_MAGISTERS_TERRACE) { }
 
     struct instance_magisters_terrace_InstanceMapScript : public InstanceScript
     {
@@ -64,6 +65,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, gameobjectData);
             LoadDoorData(doorData);
             LoadSummonData(summonerData);
@@ -77,7 +79,10 @@ public:
                     scheduler.Schedule(1min, 1min, DATA_KALECGOS,[this](TaskContext)
                     {
                         if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
-                            kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
+                        {
+                            kalecgos->GetMotionMaster()->MoveWaypoint(PATH_KALECGOS_FLIGHT, false);
+                            kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
+                        }
                     });
                 }
         }

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -53,8 +53,9 @@ ObjectData const creatureData[] =
 
 ObjectData const objectData[] =
 {
-    { GO_PORTCULLIS_CHROMAGGUS, DATA_GO_CHROMAGGUS_DOOR },
-    { GO_PORTCULLIS_CHROMAGGUS_EXIT, DATA_GO_CHROMAGGUS_DOOR_EXIT }
+    { GO_PORTCULLIS_CHROMAGGUS,      DATA_GO_CHROMAGGUS_DOOR      },
+    { GO_PORTCULLIS_CHROMAGGUS_EXIT, DATA_GO_CHROMAGGUS_DOOR_EXIT },
+    { 0,                             0                            }
 };
 
 Position const SummonPosition[8] =
@@ -74,7 +75,7 @@ uint32 const Entry[3] = { 12422, 12416, 12420 };
 class instance_blackwing_lair : public InstanceMapScript
 {
 public:
-    instance_blackwing_lair() : InstanceMapScript(BWLScriptName, 469) { }
+    instance_blackwing_lair() : InstanceMapScript(BWLScriptName, MAP_BLACKWING_LAIR) { }
 
     struct instance_blackwing_lair_InstanceMapScript : public InstanceScript
     {
@@ -344,7 +345,7 @@ public:
             {
                 case NPC_BLACKWING_DRAGON:
                     --addsCount[0];
-                    if (EggEvent != DONE && _events.GetTimeUntilEvent(EVENT_RAZOR_SPAWN) == Milliseconds::max())
+                    if (EggEvent != DONE && !_events.HasTimeUntilEvent(EVENT_RAZOR_SPAWN))
                     {
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 1s);
                     }
@@ -352,7 +353,7 @@ public:
                 case NPC_BLACKWING_LEGIONAIRE:
                 case NPC_BLACKWING_MAGE:
                     --addsCount[1];
-                    if (EggEvent != DONE && _events.GetTimeUntilEvent(EVENT_RAZOR_SPAWN) == Milliseconds::max())
+                    if (EggEvent != DONE && !_events.HasTimeUntilEvent(EVENT_RAZOR_SPAWN))
                     {
                         _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 1s);
                     }
@@ -412,7 +413,7 @@ public:
 
                             if (spawnMoreAdds)
                             {
-                                _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 15000);
+                                _events.ScheduleEvent(EVENT_RAZOR_SPAWN, 15s);
                             }
                         }
                         break;
@@ -503,8 +504,7 @@ class spell_bwl_shadowflame : public SpellScript
 
 enum orb_of_command_misc
 {
-    QUEST_BLACKHANDS_COMMAND = 7761,
-    MAP_BWL                  = 469
+    QUEST_BLACKHANDS_COMMAND = 7761
 };
 
 const Position orbOfCommandTP = { -7672.46f, -1107.19f, 396.65f, 0.59f };
@@ -518,7 +518,7 @@ public:
     {
         if (!player->IsAlive() && player->GetQuestRewardStatus(QUEST_BLACKHANDS_COMMAND))
         {
-            player->TeleportTo(MAP_BWL, orbOfCommandTP.m_positionX, orbOfCommandTP.m_positionY, orbOfCommandTP.m_positionZ, orbOfCommandTP.m_orientation);
+            player->TeleportTo(MAP_BLACKWING_LAIR, orbOfCommandTP.m_positionX, orbOfCommandTP.m_positionY, orbOfCommandTP.m_positionZ, orbOfCommandTP.m_orientation);
             return true;
         }
         return false;

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -443,7 +443,7 @@ public:
                     if (me->IsInCombat())
                         events.ScheduleEvent(EVENT_DESPAWN_ALGALON_4, 26s);
                     events.ScheduleEvent(EVENT_DESPAWN_ALGALON_5, 32s);
-                    me->DespawnOrUnsummon(39000);
+                    me->DespawnOrUnsummon(39s);
 
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
@@ -484,7 +484,7 @@ public:
                 return;
             }
 
-            uint32 introDelay = 0;
+            Milliseconds  introDelay = 0ms;
             me->setActive(true);
             me->SetInCombatWithZone();
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -495,27 +495,27 @@ public:
             if (!_firstPull)
             {
                 events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
-                introDelay = 8000;
+                introDelay = 8s;
             }
             else
             {
                 summons.DespawnEntry(NPC_AZEROTH);
                 _firstPull = false;
                 Talk(SAY_ALGALON_START_TIMER);
-                introDelay = 22000;
+                introDelay = 22s;
                 events.ScheduleEvent(EVENT_START_COMBAT, 14s);
                 m_pInstance->SetData(DATA_DESPAWN_ALGALON, 0);
             }
 
-            events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500);
+            events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
             events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
-            events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500 + introDelay);
-            events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500 + introDelay);
-            events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500 + introDelay);
-            events.ScheduleEvent(EVENT_COSMIC_SMASH, 25000 + introDelay);
-            events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500 + introDelay);
-            events.ScheduleEvent(EVENT_BIG_BANG, 90000 + introDelay);
-            events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360000 + introDelay);
+            events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
+            events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
+            events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
+            events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
+            events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
+            events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
+            events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
 
             events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
             DoCheckHeraldOfTheTitans();
@@ -574,7 +574,7 @@ public:
                         summon->SetHomePosition(x, y, z, o);
                         summon->UpdatePosition(x, y, z, o, true);
                         summon->StopMovingOnCurrentPos();
-                        summon->m_Events.AddEvent(new CosmicSmashDamageEvent(summon), summon->m_Events.CalculateTime(4000));
+                        summon->m_Events.AddEventAtOffset(new CosmicSmashDamageEvent(summon), 4s);
                         break;
                     }
                 case NPC_UNLEASHED_DARK_MATTER:
@@ -688,7 +688,7 @@ public:
                     break;
                 case EVENT_QUANTUM_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_QUANTUM_STRIKE, false);
-                    events.Repeat(3000ms, 4500ms);
+                    events.Repeat(3s, 4500ms);
                     break;
                 case EVENT_PHASE_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_PHASE_PUNCH, false);
@@ -795,7 +795,7 @@ public:
                 case EVENT_OUTRO_11:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->CastSpell(me, SPELL_TELEPORT, false);
-                    me->DespawnOrUnsummon(3000);
+                    me->DespawnOrUnsummon(3s);
                     break;
                 case EVENT_DESPAWN_ALGALON_1:
                     Talk(SAY_ALGALON_DESPAWN_1);
@@ -812,7 +812,7 @@ public:
                 case EVENT_DESPAWN_ALGALON_5:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->CastSpell(me, SPELL_TELEPORT, false);
-                    me->DespawnOrUnsummon(3000);
+                    me->DespawnOrUnsummon(3s);
                     break;
                 case EVENT_CHECK_HERALD_ITEMS:
                     if (!DoCheckHeraldOfTheTitans())
@@ -871,12 +871,12 @@ public:
             if (movementType != POINT_MOTION_TYPE)
                 return;
 
-            uint32 delay = 1;
+            Milliseconds delay = 1ms;
             _currentPoint = pointId + 1;
             switch (pointId)
             {
                 case 2:
-                    delay = 8000;
+                    delay = 8s;
                     me->SetWalk(true);
                     break;
                 case 6:
@@ -886,7 +886,7 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
                     return;
                 case 10:
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     return;
                 case POINT_BRANN_OUTRO:
                 case POINT_BRANN_OUTRO_END:
@@ -1010,7 +1010,7 @@ public:
                     break;
                 case ACTION_BIG_BANG:
                     events.SetPhase(PHASE_BIG_BANG);
-                    events.DelayEvents(9500);
+                    events.DelayEvents(9500ms);
                     events.ScheduleEvent(EVENT_RESUME_UPDATING, 9500ms);
                     break;
             }
@@ -1025,10 +1025,10 @@ public:
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, EVENT_ID_SUPERMASSIVE_START);
 
             caster->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_CREDIT, TRIGGERED_FULL_MASK);
-            caster->ToCreature()->DespawnOrUnsummon(1);
-            me->DespawnOrUnsummon(1);
+            caster->ToCreature()->DespawnOrUnsummon(1ms);
+            me->DespawnOrUnsummon(1ms);
             if (Creature* voidZone = caster->FindNearestCreature(NPC_ALGALON_VOID_ZONE_VISUAL_STALKER, 10.0f))
-                voidZone->DespawnOrUnsummon(1);
+                voidZone->DespawnOrUnsummon(1ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1146,7 +1146,7 @@ public:
             _locked = true;
             // Start Algalon event
             me->SetGameObjectFlag(GO_FLAG_IN_USE);
-            events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5000ms);
+            events.ScheduleEvent(EVENT_DESPAWN_CONSOLE, 5s);
             if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannIntroSpawnPos))
                 brann->AI()->DoAction(ACTION_START_INTRO);
 

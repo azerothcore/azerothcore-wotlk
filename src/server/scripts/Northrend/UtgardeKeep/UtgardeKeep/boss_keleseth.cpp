@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -45,11 +45,8 @@ enum eSpells
     SPELL_FROST_TOMB_SUMMON             = 42714,
     SPELL_FROST_TOMB_AURA               = 48400,
 
-    SPELL_SHADOWBOLT_N                  = 43667,
-    SPELL_SHADOWBOLT_H                  = 59389,
+    SPELL_SHADOWBOLT                    = 43667,
 };
-
-#define SPELL_SHADOWBOLT                DUNGEON_MODE(SPELL_SHADOWBOLT_N, SPELL_SHADOWBOLT_H)
 
 struct npc_frost_tomb : public NullCreatureAI
 {
@@ -80,7 +77,7 @@ struct npc_frost_tomb : public NullCreatureAI
         if (PrisonerGUID)
             if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 p->RemoveAurasDueToSpell(SPELL_FROST_TOMB_AURA);
-        me->DespawnOrUnsummon(5000);
+        me->DespawnOrUnsummon(5s);
     }
 
     void UpdateAI(uint32  /*diff*/) override

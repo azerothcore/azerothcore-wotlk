@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -143,7 +144,7 @@ bool Battlefield::Update(uint32 diff)
 {
     if (m_Timer <= diff)
     {
-        if (!IsEnabled() || (!IsWarTime() && sWorld->GetActiveSessionCount() > 3500)) // if WG is disabled or there is more than 3500 connections, switch automaticly
+        if (!IsEnabled() || (!IsWarTime() && sWorldSessionMgr->GetActiveSessionCount() > 3500)) // if WG is disabled or there is more than 3500 connections, switch automaticly
         {
             m_isActive = true;
             EndBattle(false);
@@ -167,6 +168,7 @@ bool Battlefield::Update(uint32 diff)
         m_StartGrouping = true;
         InvitePlayersInZoneToQueue();
         OnStartGrouping();
+        SendUpdateWorldStates();
     }
 
     bool objective_changed = false;
@@ -352,6 +354,8 @@ void Battlefield::StartBattle()
     DoPlaySoundToAll(BF_START);
 
     OnBattleStart();
+
+    SendUpdateWorldStates();
 }
 
 void Battlefield::EndBattle(bool endByTimer)
@@ -376,6 +380,7 @@ void Battlefield::EndBattle(bool endByTimer)
     // Reset battlefield timer
     m_Timer = m_NoWarBattleTime;
     SendInitWorldStatesToAll();
+    SendUpdateWorldStates();
 }
 
 void Battlefield::DoPlaySoundToAll(uint32 SoundID)
@@ -402,13 +407,15 @@ void Battlefield::AskToLeaveQueue(Player* player)
 {
     // Remove player from queue
     m_PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
+    // Send notification
+    player->GetSession()->SendBfLeaveMessage(m_BattleId, BF_LEAVE_REASON_CLOSE);
 }
 
 // Called in WorldSession::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
-    // Player leaving Wintergrasp, trigger Hearthstone spell.
-    player->CastSpell(player, 8690, true);
+    // Player leaving Wintergrasp, teleport to homebind possition.
+    player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
 }
 
 // Called in WorldSession::HandleBfEntryInviteResponse
@@ -451,7 +458,7 @@ void Battlefield::BroadcastPacketToZone(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(data);
+                player->SendDirectMessage(data);
 }
 
 void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
@@ -459,7 +466,7 @@ void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInQueue[team].begin(); itr != m_PlayersInQueue[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(data);
+                player->SendDirectMessage(data);
 }
 
 void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
@@ -467,7 +474,7 @@ void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(data);
+                player->SendDirectMessage(data);
 }
 
 void Battlefield::SendWarning(uint8 id, WorldObject const* target /*= nullptr*/)
@@ -656,7 +663,7 @@ void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const ObjectGu
 
     data << guid << time;
     ASSERT(player);
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 // ----------------------
@@ -798,7 +805,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         return nullptr;
     }
 
-    Creature* creature = new Creature(true);
+    Creature* creature = new Creature();
     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
     {
         LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
@@ -806,7 +813,10 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         return nullptr;
     }
 
-    creature->SetFaction(BattlefieldFactions[teamId]);
+    // no need to set faction for neutral team
+    if (teamId == TEAM_ALLIANCE || teamId == TEAM_HORDE)
+        creature->SetFaction(BattlefieldFactions[teamId]);
+
     creature->SetHomePosition(x, y, z, o);
 
     // force using DB speeds -- do we really need this?
@@ -845,7 +855,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
     return go;
 }
 
-Creature* Battlefield::GetCreature(ObjectGuid const guid)
+Creature* Battlefield::GetCreature(ObjectGuid const& guid)
 {
     if (!m_Map)
         return nullptr;
@@ -853,7 +863,7 @@ Creature* Battlefield::GetCreature(ObjectGuid const guid)
     return m_Map->GetCreature(guid);
 }
 
-GameObject* Battlefield::GetGameObject(ObjectGuid const guid)
+GameObject* Battlefield::GetGameObject(ObjectGuid const& guid)
 {
     if (!m_Map)
         return nullptr;
@@ -1009,7 +1019,7 @@ bool BfCapturePoint::Update(uint32 diff)
     std::list<Player*> players;
     Acore::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
-    Cell::VisitWorldObjects(capturePoint, searcher, radius);
+    Cell::VisitObjects(capturePoint, searcher, radius);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
         if ((*itr)->IsOutdoorPvPActive())

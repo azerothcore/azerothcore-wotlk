@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -31,12 +31,9 @@
 
 enum MageSpells
 {
-    // Ours
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
     SPELL_MAGE_COMBUSTION                        = 11129,
-
-    // Theirs
     SPELL_MAGE_COLD_SNAP                         = 11958,
     SPELL_MAGE_FOCUS_MAGIC_PROC                  = 54648,
     SPELL_MAGE_FROST_WARDING_R1                  = 11189,
@@ -979,35 +976,38 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
         {
             _chance = 100.f;
             _spell = eventInfo.GetProcSpell();
+            _procSpellDelayMoment = std::nullopt;
 
             if (!_spell || _spell->GetDelayMoment() <= 0)
-            {
                 PreventDefaultAction();
-            }
+
+            if (_spell)
+                _procSpellDelayMoment = _spell->GetDelayMoment();
         }
         else
         {
-            if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH || ((_spell && _spell->GetDelayMoment() > 0) || !eventInfo.GetDamageInfo()))
-            {
+            if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH || (_procSpellDelayMoment.value_or(0) > 0 || !eventInfo.GetDamageInfo()))
                 PreventDefaultAction();
-            }
 
-            _chance = 0.f;
-            _spell = nullptr;
+            ResetProcState();
         }
     }
 
     void HandleAfterEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
-        if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_HIT)
+        switch (eventInfo.GetSpellPhaseMask())
         {
-            _chance = 100.f;
+            case PROC_SPELL_PHASE_HIT:    _chance = 100.f; break;
+            case PROC_SPELL_PHASE_FINISH: ResetProcState(); break;
+            default: break;
         }
-        else if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH)
-        {
-            _chance = 0.f;
-            _spell = nullptr;
-        }
+    }
+
+    void ResetProcState()
+    {
+        _chance = 0.f;
+        _spell = nullptr;
+        _procSpellDelayMoment = std::nullopt;
     }
 
     void Register()
@@ -1019,10 +1019,15 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
     }
 
 public:
+    // May point to a deleted object.
+    // Dereferencing is unsafe unless validity is guaranteed by the caller.
     Spell const* GetProcSpell() const { return _spell; }
 
 private:
     float _chance = 0.f;
+    std::optional<uint64> _procSpellDelayMoment = std::nullopt;
+
+    // May be dangling; points to memory that might no longer be valid.
     Spell const* _spell = nullptr;
 };
 

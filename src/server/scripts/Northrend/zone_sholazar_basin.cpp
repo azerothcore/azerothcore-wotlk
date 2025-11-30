@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,7 +29,6 @@
 #include "Vehicle.h"
 #include "WaypointMgr.h"
 
-// Ours
 enum songOfWindandWater
 {
     NPC_SOWAW_WATER_ELEMENTAL           = 28999,
@@ -50,7 +49,6 @@ class spell_q12726_song_of_wind_and_water : public SpellScript
             cr->SetDisplayId(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? NPC_SOWAW_WIND_MODEL : NPC_SOWAW_WATER_MODEL);
             if (Player* player = cr->GetCharmerOrOwnerPlayerOrPlayerItself())
             {
-                player->KilledMonsterCredit(cr->GetDisplayId() == NPC_SOWAW_WATER_MODEL ? 29008 : 29009);
                 CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(cr->GetDisplayId() == NPC_SOWAW_WIND_MODEL ? NPC_SOWAW_WIND_ELEMENTAL : NPC_SOWAW_WATER_ELEMENTAL);
                 for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                     cr->m_spells[i] = ct->spells[i];
@@ -63,201 +61,6 @@ class spell_q12726_song_of_wind_and_water : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_q12726_song_of_wind_and_water::HandleHealPct, EFFECT_2, SPELL_EFFECT_HEAL_PCT);
-    }
-};
-
-enum AHerosBurden
-{
-    SPELL_TOMB_OF_THE_HEARTLESS = 52182,
-    SPELL_ARTRUIS_FROST_NOVA    = 11831,
-    SPELL_ARTRUIS_FROSTBOLT     = 15530,
-    SPELL_ARTRUIS_ICE_LANCE     = 54261,
-    SPELL_ARTRUIS_ICY_VEINS     = 54792,
-    SPELL_ARTRUIS_BINDING       = 52185,
-
-    NPC_JALOOT                  = 28667,
-    NPC_ZEPIK                   = 28668,
-    NPC_ARTRUIS                 = 28659,
-
-    EVENT_CAST_FROST_BOLT       = 1,
-    EVENT_CAST_FROST_NOVA       = 2,
-    EVENT_CAST_ICE_LANCE        = 3,
-    EVENT_CAST_ICY_VEINS        = 4,
-    EVENT_ARTRUIS_HP_CHECK      = 5,
-    EVENT_ARTRUIS_TALK1         = 6,
-    EVENT_ARTRUIS_TALK2         = 7,
-    EVENT_ARTRUIS_TALK3         = 8,
-
-    ACTION_BIND_MINIONS         = 1,
-    ACTION_MAKE_FRIENDLY        = 2,
-
-    GO_ARTRUIS_PHYLACTERY       = 190777,
-
-    // Texts
-    SAY_TURNED_FRIENDLY         = 0, // Zepik and Jaloot
-
-    SAY_ARTRUIS_AGGRO           = 0,
-    SAY_ARTRUIS_TALK_1          = 1,
-    SAY_ARTRUIS_TALK_2          = 2,
-    SAY_ARTRUIS_TALK_3          = 3,
-    SAY_ARTRUIS_SHIELD          = 4, // Boss emote
-    SAY_ARTRUIS_TALK_4          = 5,
-};
-
-class npc_artruis_the_hearthless : public CreatureScript
-{
-public:
-    npc_artruis_the_hearthless() : CreatureScript("npc_artruis_the_hearthless") { }
-
-    struct npc_artruis_the_hearthlessAI : public ScriptedAI
-    {
-        npc_artruis_the_hearthlessAI(Creature* creature) : ScriptedAI(creature), summons(me) { }
-
-        EventMap events;
-        SummonList summons;
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-            me->SetControlled(false, UNIT_STATE_STUNNED);
-
-            Creature* cr;
-            if ((cr = me->SummonCreature(NPC_JALOOT, 5616.91f, 3772.67f, -94.26f, 1.78f)))
-            {
-                summons.Summon(cr);
-                cr->CastSpell(cr, SPELL_TOMB_OF_THE_HEARTLESS, true);
-                cr->SetFaction(me->GetFaction());
-            }
-            if ((cr = me->SummonCreature(NPC_ZEPIK, 5631.63f, 3794.36f, -92.24f, 3.45f)))
-            {
-                summons.Summon(cr);
-                cr->CastSpell(cr, SPELL_TOMB_OF_THE_HEARTLESS, true);
-                cr->SetFaction(me->GetFaction());
-            }
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who->GetEntry() == NPC_JALOOT || who->GetEntry() == NPC_ZEPIK)
-                return;
-
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            Talk(SAY_ARTRUIS_AGGRO);
-            me->CastSpell(me, SPELL_ARTRUIS_ICY_VEINS, true);
-            events.RescheduleEvent(EVENT_CAST_FROST_BOLT, 4s);
-            events.RescheduleEvent(EVENT_CAST_FROST_NOVA, 15s);
-            events.RescheduleEvent(EVENT_CAST_ICE_LANCE, 8500ms);
-            events.RescheduleEvent(EVENT_CAST_ICY_VEINS, 30s);
-            events.RescheduleEvent(EVENT_ARTRUIS_HP_CHECK, 1s);
-            events.RescheduleEvent(EVENT_ARTRUIS_TALK1, 6s);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (GameObject* go = me->SummonGameObject(GO_ARTRUIS_PHYLACTERY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 600000))
-                me->RemoveGameObject(go, false);
-        }
-
-        void SummonedCreatureDies(Creature* summon, Unit*) override
-        {
-            SummonsAction(ACTION_MAKE_FRIENDLY);
-            me->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
-            summon->DespawnOrUnsummon(60000);
-            me->SetControlled(false, UNIT_STATE_STUNNED);
-        }
-
-        void SummonsAction(uint8 action)
-        {
-            if (!summons.empty())
-            {
-                if (action == ACTION_BIND_MINIONS)
-                    me->CastSpell(me, SPELL_ARTRUIS_BINDING, true);
-
-                for (ObjectGuid const& guid : summons)
-                {
-                    Creature* minion = ObjectAccessor::GetCreature(*me, guid);
-                    if (minion && minion->IsAlive())
-                    {
-                        if (action == ACTION_BIND_MINIONS)
-                        {
-                            minion->RemoveAurasDueToSpell(SPELL_TOMB_OF_THE_HEARTLESS);
-                            if (me->GetVictim())
-                                minion->AI()->AttackStart(me->GetVictim());
-                        }
-                        else if (action == ACTION_MAKE_FRIENDLY && me->GetVictim())
-                        {
-                            minion->AI()->Talk(SAY_TURNED_FRIENDLY);
-                            minion->RemoveAurasDueToSpell(SPELL_ARTRUIS_BINDING);
-                            minion->SetFaction(me->GetVictim()->GetFaction());
-                            minion->AddThreat(me, 100000.0f);
-                            minion->AI()->AttackStart(me);
-                            minion->DespawnOrUnsummon(900000);
-                            events.RescheduleEvent(EVENT_ARTRUIS_TALK3, 5s);
-                        }
-                    }
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ARTRUIS_HP_CHECK:
-                    if (me->GetHealthPct() <= 30)
-                    {
-                        me->SetControlled(true, UNIT_STATE_STUNNED);
-                        Talk(SAY_ARTRUIS_SHIELD);
-                        Talk(SAY_ARTRUIS_TALK_3);
-                        SummonsAction(ACTION_BIND_MINIONS);
-                        break;
-                    }
-                    events.Repeat(1s);
-                    break;
-                case EVENT_ARTRUIS_TALK1:
-                    Talk(SAY_ARTRUIS_TALK_1);
-                    events.RescheduleEvent(EVENT_ARTRUIS_TALK2, 10s);
-                    break;
-                case EVENT_ARTRUIS_TALK2:
-                    Talk(SAY_ARTRUIS_TALK_2);
-                    break;
-                case EVENT_ARTRUIS_TALK3:
-                    Talk(SAY_ARTRUIS_TALK_4);
-                    break;
-                case EVENT_CAST_FROST_BOLT:
-                    me->CastSpell(me->GetVictim(), SPELL_ARTRUIS_FROSTBOLT, false);
-                    events.Repeat(4s);
-                    break;
-                case EVENT_CAST_ICE_LANCE:
-                    me->CastSpell(me->GetVictim(), SPELL_ARTRUIS_ICE_LANCE, false);
-                    events.Repeat(8500ms);
-                    break;
-                case EVENT_CAST_FROST_NOVA:
-                    me->CastSpell(me, SPELL_ARTRUIS_FROST_NOVA, false);
-                    events.Repeat(15s);
-                    break;
-                case EVENT_CAST_ICY_VEINS:
-                    me->CastSpell(me, SPELL_ARTRUIS_ICY_VEINS, false);
-                    events.Repeat(30s);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_artruis_the_hearthlessAI(creature);
     }
 };
 
@@ -522,7 +325,6 @@ public:
     }
 };
 
-// Theirs
 /*######
 ## npc_vekjik
 ######*/
@@ -802,7 +604,8 @@ public:
                 creature->GetMotionMaster()->MoveJumpTo(0, 0.4f, 0.4f);
                 creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
 
-                pEscortAI->Start(false, false, player->GetGUID());
+                creature->SetWalk(true);
+                pEscortAI->Start(false, player->GetGUID());
                 creature->AI()->Talk(SAY_WP_1);
             }
         }
@@ -1304,118 +1107,6 @@ class spell_q12589_shoot_rjr : public SpellScript
 };
 
 /*######
-## Quest: Reconnaissance Flight (12671)
-######*/
-enum ReconnaissanceFlight
-{
-    NPC_PLANE       = 28710, // Vic's Flying Machine
-    NPC_PILOT       = 28646,
-
-    VIC_SAY_0       = 0,
-    VIC_SAY_1       = 1,
-    VIC_SAY_2       = 2,
-    VIC_SAY_3       = 3,
-    VIC_SAY_4       = 4,
-    VIC_SAY_5       = 5,
-    VIC_SAY_6       = 6,
-    PLANE_EMOTE     = 0,
-
-    AURA_ENGINE     = 52255, // Engine on Fire
-
-    SPELL_LAND      = 52226, // Land Flying Machine
-    SPELL_CREDIT    = 53328 // Land Flying Machine Credit
-};
-
-class npc_vics_flying_machine : public CreatureScript
-{
-public:
-    npc_vics_flying_machine() : CreatureScript("npc_vics_flying_machine") { }
-
-    struct npc_vics_flying_machineAI : public VehicleAI
-    {
-        npc_vics_flying_machineAI(Creature* creature) : VehicleAI(creature)
-        {
-            pointId = 0;
-        }
-
-        uint8 pointId;
-
-        void PassengerBoarded(Unit* passenger, int8 /*seatId*/, bool apply) override
-        {
-            if (apply && passenger->IsPlayer())
-            {
-                Movement::PointsArray pathPoints;
-                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                WaypointPath const* i_path = sWaypointMgr->GetPath(NPC_PLANE);
-                for (uint8 i = 0; i < i_path->size(); ++i)
-                {
-                    WaypointData const* node = i_path->at(i);
-                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                }
-
-                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-            }
-        }
-
-        void MovementInform(uint32 type, uint32  /*id*/) override
-        {
-            if (type != ESCORT_MOTION_TYPE)
-                return;
-
-            if (Vehicle* veh = me->GetVehicleKit())
-                if (Unit* pilot = veh->GetPassenger(0))
-                    switch (pointId)
-                    {
-                        case 5:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_0);
-                            break;
-                        case 11:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_1);
-                            break;
-                        case 12:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_2);
-                            break;
-                        case 14:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_3);
-                            break;
-                        case 15:
-                            pilot->ToCreature()->ToCreature()->AI()->Talk(VIC_SAY_4);
-                            break;
-                        case 17:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_5);
-                            break;
-                        case 21:
-                            pilot->ToCreature()->AI()->Talk(VIC_SAY_6);
-                            break;
-                        case 25:
-                            Talk(PLANE_EMOTE);
-                            DoCastSelf(AURA_ENGINE);
-                            break;
-                    }
-            pointId++;
-        }
-
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_LAND)
-            {
-                Unit* passenger = me->GetVehicleKit()->GetPassenger(1); // player should be on seat 1
-                if (passenger && passenger->IsPlayer())
-                    passenger->CastSpell(passenger, SPELL_CREDIT, true);
-
-                me->DespawnOrUnsummon();
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_vics_flying_machineAI(creature);
-    }
-};
-
-/*######
 ## Quest Dreadsaber Mastery: Stalking the Prey (12550)
 ######*/
 
@@ -1489,15 +1180,11 @@ class spell_q12611_deathbolt : public SpellScript
 
 void AddSC_sholazar_basin()
 {
-    // Ours
     RegisterSpellScript(spell_q12726_song_of_wind_and_water);
-    new npc_artruis_the_hearthless();
     new npc_still_at_it_trigger();
     new npc_mcmanus();
     new go_pressure_valve();
     new go_brazier();
-
-    // Theirs
     new npc_vekjik();
     new npc_avatar_of_freya();
     new npc_bushwhacker();
@@ -1506,7 +1193,6 @@ void AddSC_sholazar_basin()
     new npc_jungle_punch_target();
     RegisterSpellScript(spell_q12620_the_lifewarden_wrath);
     RegisterSpellScript(spell_q12589_shoot_rjr);
-    new npc_vics_flying_machine();
     RegisterSpellScript(spell_shango_tracks);
 
     RegisterSpellScript(spell_q12611_deathbolt);

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,7 +41,7 @@ namespace lfg
     {
     }
 
-    void LFGPlayerScript::OnLevelChanged(Player* player, uint8 /*oldLevel*/)
+    void LFGPlayerScript::OnPlayerLevelChanged(Player* player, uint8 /*oldLevel*/)
     {
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
@@ -49,7 +49,7 @@ namespace lfg
         sLFGMgr->InitializeLockedDungeons(player, player->GetGroup());
     }
 
-    void LFGPlayerScript::OnLogout(Player* player)
+    void LFGPlayerScript::OnPlayerLogout(Player* player)
     {
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
@@ -69,7 +69,7 @@ namespace lfg
         sLFGMgr->LfrSearchRemove(player);
     }
 
-    void LFGPlayerScript::OnLogin(Player* player)
+    void LFGPlayerScript::OnPlayerLogin(Player* player)
     {
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
@@ -93,14 +93,14 @@ namespace lfg
         /// @todo - Restore LfgPlayerData and send proper status to player if it was in a group
     }
 
-    void LFGPlayerScript::OnBindToInstance(Player* player, Difficulty difficulty, uint32 mapId, bool /*permanent*/)
+    void LFGPlayerScript::OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapId, bool /*permanent*/)
     {
         MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
         if (mapEntry->IsDungeon() && difficulty > DUNGEON_DIFFICULTY_NORMAL)
             sLFGMgr->InitializeLockedDungeons(player, player->GetGroup());
     }
 
-    void LFGPlayerScript::OnMapChanged(Player* player)
+    void LFGPlayerScript::OnPlayerMapChanged(Player* player)
     {
         Map const* map = player->GetMap();
 

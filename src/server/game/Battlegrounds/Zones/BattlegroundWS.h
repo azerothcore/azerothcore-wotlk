@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -39,12 +39,12 @@ enum BG_WS_TimerOrScore
     BG_WS_MAX_TEAM_SCORE            = 3,
 
     BG_WS_TOTAL_GAME_TIME           = 27 * MINUTE * IN_MILLISECONDS,
-    BG_WS_FLAG_RESPAWN_TIME         = 23 * IN_MILLISECONDS,
-    BG_WS_FLAG_DROP_TIME            = 10 * IN_MILLISECONDS,
-    BG_WS_SPELL_FORCE_TIME          = 10 * MINUTE * IN_MILLISECONDS,
-    BG_WS_SPELL_BRUTAL_TIME         = 15 * MINUTE * IN_MILLISECONDS,
-    BG_WS_DOOR_DESPAWN_TIME         = 5 * IN_MILLISECONDS
+    BG_WS_FLAG_RESPAWN_TIME         = 23 * IN_MILLISECONDS
 };
+constexpr Milliseconds BG_WS_FLAG_DROP_TIME = 10s;
+constexpr Milliseconds BG_WS_SPELL_FORCE_TIME = 600s;
+constexpr Milliseconds BG_WS_SPELL_BRUTAL_TIME = 900s;
+constexpr Milliseconds BG_WS_DOOR_DESPAWN_TIME = 5s;
 
 enum BG_WS_BroadcastTexts
 {
@@ -84,17 +84,6 @@ enum BG_WS_SpellId
     BG_WS_SPELL_SILVERWING_FLAG_PICKED  = 61265,    // fake spell, does not exist but used as timer start event
     BG_WS_SPELL_FOCUSED_ASSAULT         = 46392,
     BG_WS_SPELL_BRUTAL_ASSAULT          = 46393
-};
-
-enum BG_WS_WorldStates
-{
-    BG_WS_FLAG_CAPTURES_ALLIANCE  = 1581,
-    BG_WS_FLAG_CAPTURES_HORDE     = 1582,
-    BG_WS_FLAG_CAPTURES_MAX       = 1601,
-    BG_WS_FLAG_STATE_HORDE        = 2338,
-    BG_WS_FLAG_STATE_ALLIANCE     = 2339,
-    BG_WS_STATE_TIMER             = 4248,
-    BG_WS_STATE_TIMER_ACTIVE      = 4247
 };
 
 enum BG_WS_ObjectTypes
@@ -252,7 +241,7 @@ public:
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void SetDroppedFlagGUID(ObjectGuid guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
     ObjectGuid GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     /* Scorekeeping */
     void AddPoints(TeamId teamId, uint32 points) { m_TeamScores[teamId] += points; }
@@ -269,9 +258,11 @@ private:
     ObjectGuid _droppedFlagGUID[2];
     uint8  _flagState[2];
     TeamId _lastFlagCaptureTeam;
+    float _wsReputationRate;
     uint32 _reputationCapture;
     uint32 _honorWinKills;
     uint32 _honorEndKills;
+    uint32 _configurableMaxTeamScore;
 
     void PostUpdateImpl(uint32 diff) override;
 };

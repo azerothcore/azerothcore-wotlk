@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -137,12 +137,16 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     Powers const _power;
     float const _dist;
     bool const _playerOnly;
+    bool const _withTank;
 
-    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
+    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly, bool withTank = true) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly), _withTank(withTank) { }
 
     bool operator()(Unit const* target) const
     {
         if (!_me || !target)
+            return false;
+
+        if (!_withTank && target == _me->GetThreatMgr().GetCurrentVictim())
             return false;
 
         if (target->getPowerType() != _power)
@@ -161,9 +165,10 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     }
 };
 
-struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
+// Simple selector based on range and Los
+struct RangeSelector : public Acore::unary_function<Unit*, bool>
 {
-    FarthestTargetSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
+    RangeSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
 
     bool operator()(Unit const* target) const
     {
@@ -212,7 +217,7 @@ public:
     virtual void DoAction(int32 /*param*/) {}
     virtual uint32 GetData(uint32 /*id = 0*/) const { return 0; }
     virtual void SetData(uint32 /*id*/, uint32 /*value*/) {}
-    virtual void SetGUID(ObjectGuid /*guid*/, int32 /*id*/ = 0) {}
+    virtual void SetGUID(ObjectGuid const& /*guid*/, int32 /*id*/ = 0) {}
     virtual ObjectGuid GetGUID(int32 /*id*/ = 0) const { return ObjectGuid::Empty; }
 
     // Select the best target (in <targetType> order) from the threat list that fulfill the following:
@@ -294,18 +299,12 @@ public:
         }
         else
         {
-            Unit* currentVictim = mgr.GetCurrentVictim();
-            if (currentVictim)
-                targetList.push_back(currentVictim);
-
             for (ThreatReference const* ref : mgr.GetSortedThreatList())
             {
                 if (ref->IsOffline())
                     continue;
 
-                Unit* thisTarget = ref->GetVictim();
-                if (thisTarget != currentVictim)
-                    targetList.push_back(thisTarget);
+                targetList.push_back(ref->GetVictim());
             }
         }
 
@@ -359,7 +358,7 @@ public:
     virtual void JustExitedCombat() { }
 
     /// @brief Called at any Damage to any victim (before damage apply)
-    virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/) { }
+    virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) {}
 
     /** @brief Called at any Damage from any attacker (before damage apply)
      *

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -95,7 +95,7 @@ struct boss_selin_fireheart : public BossAI
         BossAI::JustEngagedWith(who);
         ScheduleTimedEvent(2500ms, [&]{
             DoCastRandomTarget(SPELL_DRAIN_LIFE);
-        }, 10000ms);
+        }, 10s);
         ScheduleTimedEvent(2s, [&]{
             me->RemoveAuraFromStack(SPELL_MANA_RAGE_TRIGGER);
             DoCastAOE(SPELL_FEL_EXPLOSION);
@@ -161,7 +161,7 @@ struct boss_selin_fireheart : public BossAI
             if (Creature* crystal = SelectNearestCrystal(false))
             {
                 Talk(EMOTE_CRYSTAL);
-                crystal->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+                crystal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 crystal->SetInCombatWithZone();
                 crystal->AI()->DoCast(me, SPELL_MANA_RAGE, true);
                 DoCast(crystal, SPELL_FEL_CRYSTAL_COSMETIC, true);

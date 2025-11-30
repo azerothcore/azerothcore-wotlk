@@ -1,36 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: The_Barrens
-SD%Complete: 90
-SDComment: Quest support: 863, 898, 1719, 2458, 4921, 6981,
-SDCategory: Barrens
-EndScriptData */
-
-/* ContentData
-npc_beaten_corpse
-npc_gilthares
-npc_sputtervalve
-npc_taskmaster_fizzule
-npc_twiggy_flathead
-npc_wizzlecrank_shredder
-EndContentData */
-
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -52,8 +37,7 @@ enum Gilthares
     SAY_GIL_SWEET               = 6,
     SAY_GIL_FREED               = 7,
 
-    QUEST_FREE_FROM_HOLD        = 898,
-    AREA_MERCHANT_COAST         = 391
+    QUEST_FREE_FROM_HOLD        = 898
 };
 
 class npc_gilthares : public CreatureScript
@@ -71,7 +55,10 @@ public:
             creature->AI()->Talk(SAY_GIL_START, player);
 
             if (npc_giltharesAI* pEscortAI = CAST_AI(npc_gilthares::npc_giltharesAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(false, player->GetGUID(), quest);
+            }
         }
         return true;
     }
@@ -124,7 +111,7 @@ public:
                 return;
 
             //only aggro text if not player and only in this area
-            if (!who->IsPlayer() && me->GetAreaId() == AREA_MERCHANT_COAST)
+            if (!who->IsPlayer() && me->GetAreaId() == AREA_THE_MERCHANT_COAST)
             {
                 //appears to be pretty much random (possible only if escorter not in combat with who yet?)
                 Talk(SAY_GIL_AGGRO, who);
@@ -316,11 +303,11 @@ public:
             for (uint8 i = 0; i < 6; ++i) // unsummon challengers
                 if (AffrayChallenger[i])
                     if (Creature* creature = ObjectAccessor::GetCreature((*me), AffrayChallenger[i]))
-                        creature->DespawnOrUnsummon(1);
+                        creature->DespawnOrUnsummon(1ms);
 
             if (BigWill) // unsummon bigWill
                 if (Creature* creature = ObjectAccessor::GetCreature((*me), BigWill))
-                    creature->DespawnOrUnsummon(1);
+                    creature->DespawnOrUnsummon(1ms);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -515,7 +502,7 @@ public:
                     Talk(SAY_STARTUP1);
                     break;
                 case 9:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 17:
                     if (Creature* temp = me->SummonCreature(NPC_MERCENARY, 1128.489f, -3037.611f, 92.701f, 1.472f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 120000))
@@ -544,7 +531,7 @@ public:
                     break;
                 case 18:
                     Talk(SAY_PROGRESS_1, player);
-                    SetRun();
+                    me->SetWalk(false);
                     break;
             }
         }
@@ -610,7 +597,10 @@ public:
             creature->SetFaction(FACTION_RATCHET);
             creature->AI()->Talk(SAY_START);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_wizzlecrank_shredder::npc_wizzlecrank_shredderAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(true, player->GetGUID());
+            }
         }
         return true;
     }

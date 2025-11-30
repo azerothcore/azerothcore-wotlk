@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -18,7 +18,9 @@
 #include "MapUpdater.h"
 #include "DatabaseEnv.h"
 #include "LFGMgr.h"
+#include "Log.h"
 #include "Map.h"
+#include "MapMgr.h"
 #include "Metric.h"
 
 class UpdateRequest
@@ -50,6 +52,27 @@ private:
     MapUpdater& m_updater;
     uint32 m_diff;
     uint32 s_diff;
+};
+
+class MapPreloadRequest : public UpdateRequest
+{
+public:
+    MapPreloadRequest(uint32 mapId, MapUpdater& updater)
+        : _mapId(mapId), _updater(updater)
+    {
+    }
+
+    void call() override
+    {
+        Map* map = sMapMgr->CreateBaseMap(_mapId);
+        LOG_INFO("server.loading", ">> Loading All Grids For Map {} ({})", map->GetId(), map->GetMapName());
+        map->LoadAllGrids();
+        _updater.update_finished();
+    }
+
+private:
+    uint32 _mapId;
+    MapUpdater& _updater;
 };
 
 class LFGUpdateRequest : public UpdateRequest
@@ -118,6 +141,11 @@ void MapUpdater::schedule_task(UpdateRequest* request)
 void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
     schedule_task(new MapUpdateRequest(map, *this, diff, s_diff));
+}
+
+void MapUpdater::schedule_map_preload(uint32 mapid)
+{
+    schedule_task(new MapPreloadRequest(mapid, *this));
 }
 
 void MapUpdater::schedule_lfg_update(uint32 diff)

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -43,7 +43,7 @@ DoorData const doorData[] =
 class instance_shattered_halls : public InstanceMapScript
 {
 public:
-    instance_shattered_halls() : InstanceMapScript("instance_shattered_halls", 540) { }
+    instance_shattered_halls() : InstanceMapScript("instance_shattered_halls", MAP_HELLFIRE_CITADEL_THE_SHATTERED_HALLS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
@@ -99,7 +99,6 @@ public:
             if (type == DATA_ENTERED_ROOM && data == DATA_ENTERED_ROOM && RescueTimer == 100 * MINUTE * IN_MILLISECONDS)
             {
                 DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_1);
-                instance->LoadGrid(230, -80);
 
                 if (Creature* kargath = GetCreature(DATA_KARGATH))
                     sCreatureTextMgr->SendChat(kargath, GetTeamIdInInstance() == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);

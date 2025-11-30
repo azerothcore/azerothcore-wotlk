@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -80,7 +80,7 @@ struct boss_doomwalker : public ScriptedAI
             context.Repeat(10s, 25s);
         }).Schedule(10s, 30s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_CHAIN_LIGHTNING, 1);
+            DoCastRandomTarget(SPELL_CHAIN_LIGHTNING, 0, 0.0f, true, false, false);
             context.Repeat(7s, 27s);
         }).Schedule(25s, 35s, [this](TaskContext context)
         {

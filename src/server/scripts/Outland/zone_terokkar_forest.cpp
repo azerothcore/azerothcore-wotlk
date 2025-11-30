@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,7 +26,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
-// Ours
 enum fumping
 {
     SPELL_SUMMON_SAND_GNOME1            = 39240,
@@ -221,7 +220,6 @@ class spell_q10898_skywing : public SpellScript
     }
 };
 
-// Theirs
 /*######
 ## npc_unkor_the_ruthless
 ######*/
@@ -435,9 +433,9 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_WRATH, 0);
-            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4000);
-            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10000);
+            events.ScheduleEvent(EVENT_SPELL_WRATH, 0ms);
+            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4s);
+            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10s);
         }
 
         void UpdateEscortAI(uint32 diff) override
@@ -453,15 +451,15 @@ public:
             {
                 case EVENT_SPELL_WRATH:
                     me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3s);
                     break;
                 case EVENT_SPELL_MOONFIRE:
                     me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
-                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12000);
+                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12s);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
                     me->CastSpell(me->GetVictim(), SPELL_ENTANGLING_ROOTS, false);
-                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20s);
                     break;
             }
 
@@ -475,7 +473,8 @@ public:
     {
         if (quest->GetQuestId() == QUEST_EFTW_H || quest->GetQuestId() == QUEST_EFTW_A)
         {
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(true);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
         }
         return true;
@@ -612,7 +611,6 @@ public:
 
 void AddSC_terokkar_forest()
 {
-    // Ours
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
     RegisterSpellAndAuraScriptPair(spell_q10929_fumping, spell_q10929_fumping_aura);
     RegisterSpellScript(spell_q10036_torgos);
@@ -620,8 +618,6 @@ void AddSC_terokkar_forest()
     RegisterSpellScript(spell_q10923_evil_draws_near_periodic_aura);
     RegisterSpellScript(spell_q10923_evil_draws_near_visual);
     RegisterSpellScript(spell_q10898_skywing);
-
-    // Theirs
     new npc_unkor_the_ruthless();
     new npc_isla_starmane();
     new go_skull_pile();

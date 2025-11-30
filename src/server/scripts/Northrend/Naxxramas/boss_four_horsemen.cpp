@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -33,23 +33,17 @@ enum Spells
     SPELL_MARK_OF_ZELIEK                = 28835,
     SPELL_MARK_DAMAGE                   = 28836,
     // Korth'azz
-    SPELL_KORTHAZZ_METEOR_10            = 28884,
-    SPELL_KORTHAZZ_METEOR_25            = 57467,
+    SPELL_KORTHAZZ_METEOR               = 28884,
     // Blaumeux
-    SPELL_BLAUMEUX_SHADOW_BOLT_10       = 57374,
-    SPELL_BLAUMEUX_SHADOW_BOLT_25       = 57464,
-    SPELL_BLAUMEUX_VOID_ZONE_10         = 28863,
-    SPELL_BLAUMEUX_VOID_ZONE_25         = 57463,
+    SPELL_BLAUMEUX_SHADOW_BOLT          = 57374,
+    SPELL_BLAUMEUX_VOID_ZONE            = 28863,
     SPELL_BLAUMEUX_UNYIELDING_PAIN      = 57381,
     // Zeliek
-    SPELL_ZELIEK_HOLY_WRATH_10          = 28883,
-    SPELL_ZELIEK_HOLY_WRATH_25          = 57466,
-    SPELL_ZELIEK_HOLY_BOLT_10           = 57376,
-    SPELL_ZELIEK_HOLY_BOLT_25           = 57465,
+    SPELL_ZELIEK_HOLY_WRATH             = 28883,
+    SPELL_ZELIEK_HOLY_BOLT              = 57376,
     SPELL_ZELIEK_CONDEMNATION           = 57377,
     // Rivendare
-    SPELL_RIVENDARE_UNHOLY_SHADOW_10    = 28882,
-    SPELL_RIVENDARE_UNHOLY_SHADOW_25    = 57369
+    SPELL_RIVENDARE_UNHOLY_SHADOW       = 28882,
 };
 
 enum Events
@@ -87,15 +81,13 @@ enum FourHorsemen
 const uint32 TABLE_SPELL_MARK[4] = {SPELL_MARK_OF_ZELIEK, SPELL_MARK_OF_BLAUMEUX, SPELL_MARK_OF_RIVENDARE, SPELL_MARK_OF_KORTHAZZ};
 
 // PRIMARY SPELL
-const uint32 TABLE_SPELL_PRIMARY_10[4] = {SPELL_ZELIEK_HOLY_BOLT_10, SPELL_BLAUMEUX_SHADOW_BOLT_10, SPELL_RIVENDARE_UNHOLY_SHADOW_10, SPELL_KORTHAZZ_METEOR_10};
-const uint32 TABLE_SPELL_PRIMARY_25[4] = {SPELL_ZELIEK_HOLY_BOLT_25, SPELL_BLAUMEUX_SHADOW_BOLT_25, SPELL_RIVENDARE_UNHOLY_SHADOW_25, SPELL_KORTHAZZ_METEOR_25};
+const uint32 TABLE_SPELL_PRIMARY[4] = {SPELL_ZELIEK_HOLY_BOLT, SPELL_BLAUMEUX_SHADOW_BOLT, SPELL_RIVENDARE_UNHOLY_SHADOW, SPELL_KORTHAZZ_METEOR};
 
 // PUNISH
 const uint32 TABLE_SPELL_PUNISH[4] = {SPELL_ZELIEK_CONDEMNATION, SPELL_BLAUMEUX_UNYIELDING_PAIN, 0, 0};
 
 // SECONDARY SPELL
-const uint32 TABLE_SPELL_SECONDARY_10[4] = {SPELL_ZELIEK_HOLY_WRATH_10, SPELL_BLAUMEUX_VOID_ZONE_10, 0, 0};
-const uint32 TABLE_SPELL_SECONDARY_25[4] = {SPELL_ZELIEK_HOLY_WRATH_25, SPELL_BLAUMEUX_VOID_ZONE_25, 0, 0};
+const uint32 TABLE_SPELL_SECONDARY[4] = {SPELL_ZELIEK_HOLY_WRATH, SPELL_BLAUMEUX_VOID_ZONE, 0, 0};
 
 const Position WaypointPositions[12] =
 {
@@ -131,7 +123,6 @@ public:
     {
         explicit boss_four_horsemenAI(Creature* c) : BossAI(c, BOSS_HORSEMAN)
         {
-            pInstance = me->GetInstanceScript();
             switch (me->GetEntry())
             {
                 case NPC_SIR_ZELIEK:
@@ -150,7 +141,6 @@ public:
         }
 
         EventMap events;
-        InstanceScript* pInstance;
         uint8 currentWaypoint{};
         uint8 movementPhase{};
         uint8 horsemanId;
@@ -203,16 +193,6 @@ public:
             {
                 events.RescheduleEvent(EVENT_SECONDARY_SPELL, 15s);
             }
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_HORSEMEN_GATE)))
-                {
-                    if (pInstance->GetBossState(BOSS_GOTHIK) == DONE)
-                    {
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                }
-            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -262,36 +242,19 @@ public:
                 return;
 
             Talk(SAY_SLAY);
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
-            if (pInstance)
-            {
-                if (pInstance->GetBossState(BOSS_HORSEMAN) == DONE)
-                {
-                    if (!me->GetMap()->GetPlayers().IsEmpty())
-                    {
-                        if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
-                        {
-                            if (GameObject* chest = player->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
-                            {
-                                chest->SetLootRecipient(me);
-                            }
-                        }
-                    }
-                    if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_HORSEMEN_GATE)))
-                    {
-                        go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                }
-            }
             Talk(SAY_DEATH);
+
+            if (instance->GetBossState(BOSS_HORSEMAN) == DONE)
+                if (!me->GetMap()->GetPlayers().IsEmpty())
+                    if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
+                        if (GameObject* chest = player->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
+                            chest->SetLootRecipient(me);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -304,13 +267,6 @@ public:
                 movementPhase = MOVE_PHASE_STARTED;
                 me->SetSpeed(MOVE_RUN, me->GetSpeedRate(MOVE_RUN), true);
                 MoveToCorner();
-            }
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_HORSEMEN_GATE)))
-                {
-                    go->SetGoState(GO_STATE_READY);
-                }
             }
         }
 
@@ -344,11 +300,11 @@ public:
                     return;
                 case EVENT_PRIMARY_SPELL:
                     Talk(SAY_TAUNT);
-                    me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
+                    me->CastSpell(me->GetVictim(), TABLE_SPELL_PRIMARY[horsemanId], false);
                     events.Repeat(15s);
                     return;
                 case EVENT_SECONDARY_SPELL:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_SECONDARY_10[horsemanId], TABLE_SPELL_SECONDARY_25[horsemanId]), false);
+                    me->CastSpell(me->GetVictim(), TABLE_SPELL_SECONDARY[horsemanId], false);
                     events.Repeat(15s);
                     return;
             }
@@ -364,7 +320,7 @@ public:
                 }
                 if (me->IsWithinDistInMap(me->GetVictim(), 45.0f) && me->IsValidAttackTarget(me->GetVictim()))
                 {
-                    DoCastVictim(RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]));
+                    DoCastVictim(TABLE_SPELL_PRIMARY[horsemanId]);
                 }
                 else if (!me->IsWithinDistInMap(me->GetVictim(), 45.0f) || !me->IsValidAttackTarget(me->GetVictim()))
                 {

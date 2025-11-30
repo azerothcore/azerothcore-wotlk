@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -417,7 +417,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     AuctionEntry* auction = auctionHouse->GetAuction(auctionId);
     Player* player = GetPlayer();
 
-    if (!sScriptMgr->CanPlaceAuctionBid(player, auction))
+    if (!sScriptMgr->OnPlayerCanPlaceAuctionBid(player, auction))
     {
         SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_RESTRICTED_ACCOUNT);
         return;
@@ -749,6 +749,9 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     if (usable)
     {
         AuctionHouseUsablePlayerInfo usablePlayerInfo;
+        usablePlayerInfo.classMask = GetPlayer()->getClassMask();
+        usablePlayerInfo.raceMask = GetPlayer()->getRaceMask();
+        usablePlayerInfo.level = GetPlayer()->GetLevel();
 
         SkillStatusMap const& skillMap = GetPlayer()->GetSkillStatusMap();
         for (auto const& pair : skillMap)

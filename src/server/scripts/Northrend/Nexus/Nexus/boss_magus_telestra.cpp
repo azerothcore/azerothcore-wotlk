@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -94,6 +94,8 @@ struct boss_magus_telestra : public BossAI
 
         if (IsHeroic() && sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL) && !me->HasAura(SPELL_WEAR_CHRISTMAS_HAT))
             me->AddAura(SPELL_WEAR_CHRISTMAS_HAT, me);
+
+        SetInvincibility(false);
     }
 
     uint32 GetData(uint32 data) const override
@@ -130,7 +132,7 @@ struct boss_magus_telestra : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_KILL);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -148,7 +150,7 @@ struct boss_magus_telestra : public BossAI
         if (spellInfo->Id >= SPELL_FIRE_MAGUS_DEATH && spellInfo->Id <= SPELL_ARCANE_MAGUS_DEATH && caster->ToCreature())
         {
             events.ScheduleEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT, 5s);
-            caster->ToCreature()->DespawnOrUnsummon(1000);
+            caster->ToCreature()->DespawnOrUnsummon(1s);
 
             if (++copiesDied >= 3)
             {
@@ -184,6 +186,7 @@ struct boss_magus_telestra : public BossAI
         case EVENT_MAGUS_HEALTH2:
             if (me->HealthBelowPct(11))
             {
+                SetInvincibility(true);
                 me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
                 events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);
                 Talk(SAY_SPLIT);
@@ -214,6 +217,7 @@ struct boss_magus_telestra : public BossAI
             me->CastSpell(me, SPELL_TELESTRA_BACK, true);
             me->RemoveAllAuras();
             Talk(SAY_MERGE);
+            SetInvincibility(false);
             break;
         }
 

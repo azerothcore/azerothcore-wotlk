@@ -1,0 +1,490 @@
+#!/usr/bin/env bash
+
+# AzerothCore Run Engine
+# Advanced script for running AzerothCore services with session management and restart capabilities
+#
+# This script can be sourced to provide functions or executed directly with parameters
+#
+# Configuration Priority Order (highest to lowest):
+#   1. conf.sh - User configuration file (highest priority)
+#   2. Command line arguments (--config, --server-config, etc.)
+#   3. Environment variables (RUN_ENGINE_*)
+#   4. conf.sh.dist - Default configuration (lowest priority)
+#
+# Environment Variables:
+#   RUN_ENGINE_CONFIG_FILE - Path to temporary configuration file (optional)
+#   RUN_ENGINE_SESSION_MANAGER - Session manager (none|auto|tmux|screen, default: auto)
+#   RUN_ENGINE_BINPATH - Binary directory path
+#   RUN_ENGINE_SERVERBIN - Server binary name (worldserver|authserver)
+#   RUN_ENGINE_CONFIG - Server configuration file path
+#   RUN_ENGINE_LOGS_PATH - Directory for log files
+#   RUN_ENGINE_CRASHES_PATH - Directory for crash dumps
+#   RUN_ENGINE_SESSION_NAME - Session name for tmux/screen
+
+export RUN_ENGINE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Configuration priority order:
+# 1. conf.sh (highest priority - user overrides)
+# 2. Environment variables (RUN_ENGINE_*)
+# 3. conf.sh.dist (lowest priority - defaults)
+
+# Load default configuration first (sets defaults from environment variables)
+if [ -e "$RUN_ENGINE_PATH/conf.sh.dist" ]; then
+    source "$RUN_ENGINE_PATH/conf.sh.dist"
+fi
+
+# Load user configuration if exists (this takes priority over everything)
+if [ -e "$RUN_ENGINE_PATH/conf.sh" ]; then
+    source "$RUN_ENGINE_PATH/conf.sh"
+fi
+
+# Load configuration
+function load_config() {
+    local config_file="$1"
+    
+    # If a specific config file is provided via command line, load it
+    # This allows temporary overrides for specific runs
+    if [ -n "$config_file" ] && [ -e "$config_file" ]; then
+        echo "Loading configuration from: $config_file"
+        source "$config_file"
+    elif [ -n "$RUN_ENGINE_CONFIG_FILE" ] && [ -e "$RUN_ENGINE_CONFIG_FILE" ]; then
+        echo "Loading configuration from environment: $RUN_ENGINE_CONFIG_FILE"
+        source "$RUN_ENGINE_CONFIG_FILE"
+    fi
+    
+    # Final override with any remaining environment variables
+    # This ensures that even after loading config files, environment variables take precedence
+    BINPATH="${RUN_ENGINE_BINPATH:-$BINPATH}"
+    SERVERBIN="${RUN_ENGINE_SERVERBIN:-$SERVERBIN}"
+    CONFIG="${RUN_ENGINE_CONFIG:-$CONFIG}"
+    SESSION_MANAGER="${RUN_ENGINE_SESSION_MANAGER:-$SESSION_MANAGER}"
+    LOGS_PATH="${RUN_ENGINE_LOGS_PATH:-$LOGS_PATH}"
+    CRASHES_PATH="${RUN_ENGINE_CRASHES_PATH:-$CRASHES_PATH}"
+}
+
+# Detect available session manager
+function detect_session_manager() {
+    if command -v tmux >/dev/null 2>&1; then
+        echo "tmux"
+    elif command -v screen >/dev/null 2>&1; then
+        echo "screen"
+    else
+        echo "none"
+    fi
+}
+
+# Determine which session manager to use
+function get_session_manager() {
+    local requested="$1"
+    
+    case "$requested" in
+        "none")
+            echo "none"
+            ;;
+        "auto")
+            detect_session_manager
+            ;;
+        "tmux")
+            if command -v tmux >/dev/null 2>&1; then
+                echo "tmux"
+            else
+                echo "error"
+            fi
+            ;;
+        "screen")
+            if command -v screen >/dev/null 2>&1; then
+                echo "screen"
+            else
+                echo "error"
+            fi
+            ;;
+        *)
+            echo "none"
+            ;;
+    esac
+}
+
+# Configure log files
+function configure_files() {
+    TRACE_BEGIN_STRING="SIGSEGV"
+    TRACE_FILE="$LOGS_PATH/${LOG_PREFIX_NAME}_trace.log"
+    ERR_FILE="$LOGS_PATH/${LOG_PREFIX_NAME}_error.log"
+    SYSLOG="$LOGS_PATH/${LOG_PREFIX_NAME}_system.log"
+    SYSERR="$LOGS_PATH/${LOG_PREFIX_NAME}_system.err"
+    LINKS_FILE="$LOGS_PATH/${LOG_PREFIX_NAME}_crash_links.link"
+}
+
+# Check if service is running
+function check_status() {
+    local session_name="$1"
+    local ret=1
+    
+    # Check for GDB process
+    local gdbres=$(pgrep -f "gdb.*--batch.*$SERVERBIN")
+    if [[ "$GDB_ENABLED" -eq 1 && -n "$gdbres" ]]; then
+        return 1
+    fi
+
+    # Check for binary process
+    local binres=$(pgrep -f "$SERVERBIN -c $CONFIG")
+    if [ -n "$binres" ]; then
+        return 1
+    fi
+
+    # Check session manager
+    if [ -n "$session_name" ]; then
+        case "$(get_session_manager "${SESSION_MANAGER:-auto}")" in
+            "tmux")
+                tmux has-session -t "$session_name" 2>/dev/null && return 1
+                ;;
+            "screen")
+                screen -ls "$session_name" 2>/dev/null | grep -q "$session_name" && return 1
+                ;;
+        esac
+    fi
+
+    return 0
+}
+
+# Run with session manager
+function run_with_session() {
+    local session_manager="$1"
+    local session_name="$2"
+    local wrapper="$3"
+    shift 3
+    local args=("$@")
+
+    if [ "$wrapper" = "simple-restarter" ]; then
+        script_path="$RUN_ENGINE_PATH/simple-restarter"
+    else
+        script_path="$RUN_ENGINE_PATH/starter"
+    fi
+
+    case "$session_manager" in
+        "tmux")
+            echo "> Starting with tmux session: $session_name - attach with 'tmux attach -t $session_name'"
+            tmux new-session -d -s "$session_name" -- "$script_path" "${args[@]}"
+            ;;
+        "screen")
+            local OPTIONS="-A -m -d -S"
+            if [ -n "$SCREEN_OPTIONS" ]; then
+                OPTIONS="$SCREEN_OPTIONS"
+            fi
+            echo "> Starting with screen session: $session_name (options: $OPTIONS) - attach with 'screen -r $session_name'"
+            echo "screen $OPTIONS \"$session_name\" -- \"$script_path\" ${args[*]}"
+            screen $OPTIONS "$session_name" -- "$script_path" "${args[@]}"
+            ;;
+        "none"|*)
+            echo "> Starting without session manager"
+            "$script_path" "${args[@]}"
+            ;;
+    esac
+}
+
+# Parse command line arguments
+function parse_arguments() {
+    local mode="$1"
+    local serverbin="$2"
+    shift 2
+    
+    local config_file=""
+    local serverconfig=""
+    local session_manager=""
+    
+    # Parse named arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --config)
+                config_file="$2"
+                shift 2
+                ;;
+            --server-config)
+                serverconfig="$2"
+                shift 2
+                ;;
+            --session-manager)
+                session_manager="$2"
+                shift 2
+                ;;
+            *)
+                echo "Unknown argument: $1"
+                return 1
+                ;;
+        esac
+    done
+    
+    # Export parsed values for use by start_service
+    export PARSED_MODE="$mode"
+    export PARSED_SERVERBIN="$serverbin"
+    export PARSED_CONFIG_FILE="$config_file"
+    export PARSED_SERVERCONFIG="$serverconfig"
+    export PARSED_SESSION_MANAGER="$session_manager"
+
+    echo "Parsed arguments:"
+    echo "  Mode: $PARSED_MODE"
+    echo "  Server Binary: $PARSED_SERVERBIN"
+    echo "  Config File: $PARSED_CONFIG_FILE"
+    echo "  Server Config: $PARSED_SERVERCONFIG"
+    echo "  Session Manager: $PARSED_SESSION_MANAGER"
+}
+
+# Start service (single run or with simple-restarter)
+function start_service() {
+    local config_file="$1"
+    local serverbin_path="$2"
+    local serverconfig="$3"
+    local use_restarter="${4:-false}"
+    local session_manager_choice="$5"
+    
+    # Load configuration first
+    load_config "$config_file"
+
+    # if no session manager is specified, get it from config
+    if [ -z "$session_manager_choice" ]; then
+        session_manager_choice="$SESSION_MANAGER"
+    fi
+
+    
+    # Parse serverbin_path to extract BINPATH and SERVERBIN
+    if [ -n "$serverbin_path" ]; then
+        # If it's a full path, extract directory and binary name
+        if [[ "$serverbin_path" == */* ]]; then
+            BINPATH="$(dirname "$serverbin_path")"
+            SERVERBIN="$(basename "$serverbin_path")"
+        else
+            # If it's just a binary name, use it as-is (system PATH)
+            SERVERBIN="$serverbin_path"
+            BINPATH="${BINPATH:-""}"  # Empty means use current directory or system PATH
+        fi
+    fi
+    
+    # Use environment/config values if not set from command line
+    BINPATH="${BINPATH:-$RUN_ENGINE_BINPATH}"
+    SERVERBIN="${SERVERBIN:-$RUN_ENGINE_SERVERBIN}"
+    CONFIG="${serverconfig:-$CONFIG}"
+
+    echo "SERVERBIN: $SERVERBIN"
+    
+    # Validate required parameters
+    if [ -z "$SERVERBIN" ]; then
+        echo "Error: SERVERBIN is required"
+        echo "Could not determine server binary from: $serverbin_path"
+        echo "Provide it as:"
+        echo "  - Full path: $0 <mode> /path/to/bin/worldserver"
+        echo "  - Binary name: $0 <mode> worldserver"
+        echo "  - Environment variables: RUN_ENGINE_SERVERBIN"
+        echo "  - Configuration file with SERVERBIN variable" 
+        return 1
+    fi
+    
+    # If BINPATH is set, validate binary exists and create log paths
+    if [ -n "$BINPATH" ]; then
+        if [ ! -d "$BINPATH" ]; then
+            echo "Error: BINPATH not found: $BINPATH"
+            return 1
+        fi
+        
+        # Set up directories and logging relative to BINPATH
+        LOGS_PATH="${LOGS_PATH:-"$BINPATH/logs"}"
+        CRASHES_PATH="${CRASHES_PATH:-"$BINPATH/crashes"}"
+        mkdir -p "$LOGS_PATH"
+        mkdir -p "$CRASHES_PATH"
+    else
+        # For system binaries, try to detect binary location and create logs accordingly
+        local detected_binpath=""
+        
+        # Try to find binary in system PATH
+        local binary_location=$(which "$SERVERBIN" 2>/dev/null)
+        if [ -n "$binary_location" ]; then
+            detected_binpath="$(dirname "$binary_location")"
+            echo "Binary found in system PATH: $binary_location"
+            # Set BINPATH to the detected location so starter script can find the binary
+            BINPATH="$detected_binpath"
+        fi
+        
+        # Set up log paths based on detected or fallback location
+        if [ -n "$detected_binpath" ]; then
+            LOGS_PATH="${LOGS_PATH:-"$detected_binpath/logs"}"
+            CRASHES_PATH="${CRASHES_PATH:-"$detected_binpath/crashes"}"
+        else
+            # Fallback to current directory for logs
+            LOGS_PATH="${LOGS_PATH:-./logs}"
+            CRASHES_PATH="${CRASHES_PATH:-"$./crashes"}"
+        fi
+            
+        
+        mkdir -p "$LOGS_PATH"
+        mkdir -p "$CRASHES_PATH"
+    fi
+
+    # Set up logging names
+    LOG_PREFIX_NAME="${LOG_PREFIX_NAME:-${SERVERBIN%server}}"
+    
+    # Set up session name (with backward compatibility for SCREEN_NAME)
+    SESSION_NAME="${SESSION_NAME:-$SCREEN_NAME}"
+    SESSION_NAME="${SESSION_NAME:-AC-${SERVERBIN%server}}"
+
+    configure_files
+    
+    local session_manager=$(get_session_manager "$session_manager_choice")
+
+    if [ "$session_manager" = "error" ]; then
+        echo "Error: Invalid session manager specified: $session_manager_choice, is it installed?"
+        exit 1
+    fi
+    
+    echo "Using session manager: $session_manager"
+    echo "Starting server: $SERVERBIN"
+
+    if [ -n "$CONFIG" ]; then
+        echo "Server config: $CONFIG"
+    else
+        echo "Server config: default (not specified)"
+    fi
+    
+    # Set AC_DISABLE_INTERACTIVE when running as a service without interactive session manager
+    # This prevents AzerothCore from showing interactive prompts when running under systemd/pm2
+    if [[ "${SERVICE_MODE:-false}" == "true" && "$session_manager" == "none" ]]; then
+        export AC_DISABLE_INTERACTIVE=1
+        echo "Service mode: Non-interactive mode enabled (AC_DISABLE_INTERACTIVE=1)"
+    else
+        export AC_DISABLE_INTERACTIVE=0
+        if [[ "${SERVICE_MODE:-false}" == "true" ]]; then
+            echo "Service mode: Interactive mode enabled (session manager: $session_manager)"
+        else
+            echo "Direct execution: Interactive mode enabled"
+        fi
+    fi
+    
+    if [ "$use_restarter" = "true" ]; then
+        # Use simple-restarter for restart functionality
+        local gdb_enabled="${GDB_ENABLED:-0}"
+        run_with_session "$session_manager" "$SESSION_NAME" "simple-restarter" "$BINPATH" "$SERVERBIN" "$GDB" "$CONFIG" "$SYSLOG" "$SYSERR" "$gdb_enabled" "$CRASHES_PATH"
+    else
+        # Single run using starter
+        local gdb_enabled="${GDB_ENABLED:-0}"
+        run_with_session "$session_manager" "$SESSION_NAME" "starter" "$BINPATH" "$SERVERBIN" "$GDB" "$CONFIG" "$SYSLOG" "$SYSERR" "$gdb_enabled" "$CRASHES_PATH"
+    fi
+}
+
+# Cleanup function
+function finish() {
+    local session_manager=$(get_session_manager "${SESSION_MANAGER:-auto}")
+    if [ -n "$SESSION_NAME" ]; then
+        case "$session_manager" in
+            "tmux")
+                tmux kill-session -t "$SESSION_NAME" 2>/dev/null || true
+                ;;
+            "screen")
+                screen -X -S "$SESSION_NAME" quit 2>/dev/null || true
+                ;;
+        esac
+    fi
+}
+
+# Legacy compatibility functions for old examples
+function restarter() {
+    echo "Legacy function 'restarter' called - redirecting to new API"
+    start_service "" "" "" "true" "${SESSION_MANAGER:-auto}"
+}
+
+function starter() {
+    echo "Legacy function 'starter' called - redirecting to new API"
+    start_service "" "" "" "false" "${SESSION_MANAGER:-auto}"
+}
+
+# Set trap for cleanup (currently disabled to avoid interfering with systemd)
+# trap finish EXIT
+
+# Main execution when script is run directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    case "${1:-help}" in
+        "start"|"restart")
+            if [ $# -lt 2 ]; then
+                echo "Error: Missing required arguments"
+                echo "Usage: $0 <mode> <serverbin> [options]"
+                echo "Example: $0 start worldserver --config ./conf-world.sh --server-config worldserver.conf"
+                exit 1
+            fi
+            
+            # Parse arguments
+            if ! parse_arguments "$@"; then
+                exit 1
+            fi
+            
+            # Determine restart mode
+            use_restarter="false"
+            if [ "$PARSED_MODE" = "restart" ]; then
+                use_restarter="true"
+            fi
+            
+            # Start service with parsed arguments
+            start_service "$PARSED_CONFIG_FILE" "$PARSED_SERVERBIN" "$PARSED_SERVERCONFIG" "$use_restarter" "$PARSED_SESSION_MANAGER"
+            ;;
+        "help"|*)
+            echo "AzerothCore Run Engine"
+            echo ""
+            echo "Usage: $0 <mode> <serverbin> [options]"
+            echo ""
+            echo "Modes:"
+            echo "  start     - Start service once (no restart on crash)"
+            echo "  restart   - Start service with restart on crash (uses simple-restarter)"
+            echo ""
+            echo "Required Parameters:"
+            echo "  serverbin          - Server binary (full path or binary name)"
+            echo "                       Full path: /path/to/bin/worldserver"
+            echo "                       Binary name: worldserver (uses system PATH)"
+            echo ""
+            echo "Options:"
+            echo "  --config <file>           - Path to configuration file"
+            echo "  --server-config <file>    - Server configuration file (sets -c parameter)"
+            echo "  --session-manager <type>  - Session manager: none|auto|tmux|screen (default: auto)"
+            echo ""
+            echo "Configuration Priority (highest to lowest):"
+            echo "  1. conf.sh - User configuration file"
+            echo "  2. Command line arguments (--config, --server-config, etc.)"
+            echo "  3. Environment variables (RUN_ENGINE_*)"
+            echo "  4. conf.sh.dist - Default configuration"
+            echo ""
+            echo "Environment Variables:"
+            echo "  RUN_ENGINE_CONFIG_FILE     - Config file path"
+            echo "  RUN_ENGINE_SESSION_MANAGER - Session manager (default: auto)"
+            echo "  RUN_ENGINE_BINPATH         - Binary directory path"
+            echo "  RUN_ENGINE_SERVERBIN       - Server binary name"
+            echo "  RUN_ENGINE_CONFIG          - Server configuration file"
+            echo "  RUN_ENGINE_LOGS_PATH       - Directory for log files"
+            echo "  RUN_ENGINE_CRASHES_PATH    - Directory for crash dumps"
+            echo "  RUN_ENGINE_SESSION_NAME    - Session name for tmux/screen"
+            echo ""
+            echo "Examples:"
+            echo ""
+            echo "  # Using full path to binary"
+            echo "  $0 start /home/user/ac/bin/worldserver"
+            echo ""
+            echo "  # Using binary name (system PATH)"
+            echo "  $0 start worldserver"
+            echo ""
+            echo "  # With configuration file"
+            echo "  $0 start worldserver --config ./conf-world.sh"
+            echo ""
+            echo "  # With server configuration (sets -c parameter)"
+            echo "  $0 start /path/to/bin/worldserver --server-config /etc/worldserver.conf"
+            echo ""
+            echo "  # With session manager"
+            echo "  $0 restart worldserver --session-manager tmux"
+            echo ""
+            echo "  # Complete example"
+            echo "  $0 restart /home/user/ac/bin/worldserver --config ./conf-world.sh --server-config worldserver.conf --session-manager screen"
+            echo ""
+            echo "Binary Resolution:"
+            echo "  - Full path (contains /): Extracts directory and binary name"
+            echo "  - Binary name only: Uses system PATH to find executable"
+            echo "    Auto-detection will check current directory first, then system PATH"
+            echo ""
+            echo "Server Config:"
+            echo "  If --server-config is specified, it's passed as -c parameter to the server."
+            echo "  If not specified, the server will use its default configuration."
+            ;;
+    esac
+fi
+

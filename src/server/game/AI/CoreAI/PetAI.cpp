@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -31,7 +31,7 @@
 
 int32 PetAI::Permissible(Creature const* creature)
 {
-    if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+    if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
     {
         if (reinterpret_cast<Guardian const*>(creature)->GetOwner()->IsPlayer())
             return PERMIT_BASE_PROACTIVE;
@@ -282,6 +282,14 @@ void PetAI::UpdateAI(uint32 diff)
                     }
                 }
 
+                if (spellInfo->HasEffect(SPELL_EFFECT_JUMP_DEST))
+                {
+                    if (!spellUsed)
+                        delete spell;
+
+                    continue; // Pets must only jump to target
+                }
+
                 // No enemy, check friendly
                 if (!spellUsed)
                 {
@@ -514,9 +522,22 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     // To prevent aggressive pets from chain selecting targets and running off, we
     // only select a random target if certain conditions are met.
     if (allowAutoSelect)
+    {
         if (!me->GetCharmInfo()->IsReturning() || me->GetCharmInfo()->IsFollowing() || me->GetCharmInfo()->IsAtStay())
+        {
             if (Unit* nearTarget = me->ToCreature()->SelectNearestTargetInAttackDistance(MAX_AGGRO_RADIUS))
-                return nearTarget;
+            {
+                if (nearTarget->IsPlayer() && nearTarget->ToPlayer()->IsPvP() && !owner->IsPvP()) // If owner is not PvP flagged and target is PvP flagged, do not attack
+                {
+                    return nullptr; /// @todo: try for another target
+                }
+                else
+                {
+                    return nearTarget;
+                }
+            }
+        }
+    }
 
     // Default - no valid targets
     return nullptr;

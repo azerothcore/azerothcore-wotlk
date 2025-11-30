@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -205,7 +205,7 @@ struct boss_zuljin : public BossAI
                 if (me->HasAura(SPELL_LYNX_RUSH_HASTE))
                     return;
 
-                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE, 1);
+                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE, 0, 0.0f, true, false, true);
             }, 15s, 20s);
 
             ScheduleTimedEvent(14s, [&] {
@@ -285,10 +285,7 @@ struct boss_zuljin : public BossAI
         instance->SetBossState(DATA_ZULJIN, DONE);
         Talk(SAY_DEATH);
         summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
-
-        me->m_Events.AddEventAtOffset( [this] {
-            summons.DespawnAll();
-        }, 3s);
+        summons.DespawnAll(3s);
     }
 
     void SpawnAdds()
