@@ -1,3 +1,4 @@
+-- DB update 2025_12_01_03 -> 2025_12_01_04
 -- Update gameobject 'Kaskala Supplies' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (188164)) AND (`guid` IN (21196, 21198, 21199, 21200, 21201, 55049, 55050, 55053, 55054, 55055, 55056, 55062, 55063, 55064, 55065, 55066, 55067, 55068, 55069, 55070, 55071, 55072, 55073, 55074, 55075, 55076));
