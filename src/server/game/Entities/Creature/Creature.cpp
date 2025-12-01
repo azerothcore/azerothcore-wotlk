@@ -1780,6 +1780,10 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
             if (curhealth < 1)
                 curhealth = 1;
         }
+
+        if (!curhealth || curhealth == 1)
+            curhealth = GetMaxHealth();
+
         SetPower(POWER_MANA, data->curmana);
     }
     else
