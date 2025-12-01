@@ -1,3 +1,4 @@
+-- DB update 2025_12_01_04 -> 2025_12_01_05
 --
 -- Wolfsbane Root (189313) - Despawn on use via SmartAI
 -- Closes https://github.com/azerothcore/azerothcore-wotlk/issues/23904
