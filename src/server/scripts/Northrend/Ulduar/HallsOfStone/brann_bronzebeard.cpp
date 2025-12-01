@@ -24,15 +24,6 @@
 #include "SpellScriptLoader.h"
 #include "halls_of_stone.h"
 
-#define GOSSIP_ITEM_1       "Brann, it would be our honor!"
-#define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
-#define GOSSIP_ITEM_3       "There will be plenty of time for this later Brann, we need to get moving!"
-#define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
-#define TEXT_ID_START           13100
-#define TEXT_ID_TRIBUNAL_START  13101
-#define TEXT_ID_TRIBUNAL_END    14176
-#define TEXT_ID_SJONNIR_DOOR    13883
-#define TEXT_ID_SJONNIR_END     13308
 
 enum NPCs
 {
@@ -110,54 +101,52 @@ enum events
     EVENT_SJONNIR_END_BRANN_LAST_YELL = 27,
 };
 
-struct Yells
+struct ConversationData
 {
-    uint32 sound;
-    const char* text;
-    uint32 creature, timer;
+    uint32 creature;
+    uint8 textGroup;
+    uint32 timer;
 };
 
-static Yells Conversation[] =
+static ConversationData Conversation[] =
 {
-    {14248, "Now keep an eye out! I'll have this licked in two shakes of a--", NPC_BRANN, 8000},
-    {13765, "Warning: life form pattern not recognized. Archival processing terminated. Continued interference will result in targeted response.", NPC_ABEDNEUM, 13000},
-    {14249, "Oh, that doesn't sound good. We might have a complication or two...", NPC_BRANN, 24000},
-    {13756, "Security breach in progress. Analysis of historical archives transferred to lower-priority queue. Countermeasures engaged.", NPC_KADDRAK, 30500},
-    {14250, "Ah, you want to play hardball, eh? That's just my game!", NPC_BRANN, 42000},
-    {14251, "Couple more minutes and I'll--", NPC_BRANN, 102000},
-    {13761, "Threat index threshold exceeded. Celestial archive aborted. Security level heightened.", NPC_MARNAK, 105000},
-    {14252, "Heightened? What's the good news?", NPC_BRANN, 113000},
-    {14253, "So that was the problem? Now I'm makin' progress...", NPC_BRANN, 201000},
-    {13767, "Critical threat index. Void analysis diverted. Initiating sanitization protocol.", NPC_ABEDNEUM, 207500 },
-    {14254, "Hang on! Nobody's gonna' be sanitized as long as I have a say in it!", NPC_BRANN, 214000},
-    {14255, "Ha! The old magic fingers finally won through! Now let's get down to--", NPC_BRANN, 305000},
-    {13768, "Alert: security fail-safes deactivated. Beginning memory purge and... ", NPC_ABEDNEUM, 310000},
-    //The fight is completed at this point.d
-    {14256, "Purge? No no no no no.. where did I-- Aha, this should do the trick...", NPC_BRANN, 316000},
-    {13769, "System online. Life form pattern recognized. Welcome, Branbronzan. Query?", NPC_ABEDNEUM, 322000},
-    {14263, "Query? What do you think I'm here for, tea and biscuits? Spill the beans already!", NPC_BRANN, 330000},
-    {14264, "Tell me how the dwarves came to be, and start at the beginning!", NPC_BRANN, 336000},
-    {13770, "Accessing prehistoric data... retrieved. In the beginning the earthen were created to--", NPC_ABEDNEUM, 341000},
-    {14265, "Right, right... I know the earthen were made from stone to shape the deep regions o' the world. But what about the anomalies? Matrix non-stabilizin' and what-not?", NPC_BRANN, 348000},
-    {13771, "Accessing... In the early stages of it's development cycle, Azeroth suffered infection by parasitic necrophotic symbiotes.", NPC_ABEDNEUM, 360000},
-    {14266, "Necrowhatinthe-- Speak bloody Common, will ye?", NPC_BRANN, 372000},
-    {13772, "Designation: Old Gods. Old Gods rendered all systems, including earthen, defenseless in order to facilitate assimilation. This matrix destabilization has been termed the Curse of Flesh. Effects of destabilization increased over time.", NPC_ABEDNEUM, 377000},
-    {14267, "Old Gods, huh? So they zapped the earthen with this Curse of Flesh... and then what?", NPC_BRANN, 400000},
-    {13757, "Accessing... Creators arrived to extirpate symbiotic infection. Assessment revealed that Old God infestation had grown malignant. Excising parasites would result in loss of host--", NPC_KADDRAK, 407500},
-    {14268, "If they killed the Old Gods, Azeroth would've been destroyed...", NPC_BRANN, 424000},
-    {13758, "Correct. Creators neutralized parasitic threat and contained it within the host. Forge of Wills and other systems were instituted to create new earthen. Safeguards were implemented, and protectors were appointed.", NPC_KADDRAK, 431000},
-    {14269, "What protectors?", NPC_BRANN, 450000},
-    {13759, "Designations: Aesir and Vanir. Or in the common nomenclature, storm and earth giants. Sentinel Loken designated supreme. Dragon Aspects appointed to monitor evolution on Azeroth.", NPC_KADDRAK, 453000},
-    {14270, "Aesir and Vanir... Okay, so the Forge o' Wills started makin' new earthen... but what happened to the old ones?", NPC_BRANN, 472000},
-    {13762, "Additional background is relevant to your query: following global combat between Aesir and Vanir--", NPC_MARNAK, 483000},
-    {14271, "Hold everything! The Aesir and Vanir went to war? Why?", NPC_BRANN, 489000},
-    {13763, "Unknown. Data suggests that impetus for global combat originated with prime designate Loken, who neutralized all remaining Aesir and Vanir, affecting termination of conflict. Prime designate Loken then initiated stasis of several seed races, including earthen, giants and vrykul, at designated holding facilities.", NPC_MARNAK, 495000},
-    {14272, "This Loken sounds like a nasty character. Glad we don't have to worry about the likes o' him anymore. So... if I'm understandin' ye right, the original earthen eventually woke up from this stasis, and by that time the destabili-whatever had turned 'em into proper dwarves. Or at least... dwarf ancestors.", NPC_BRANN, 519000},
-    {13764, "Essentially that is correct.", NPC_MARNAK, 543000},
-    {14273, "Well, now... that's a lot to digest. I'm gonna need some time to take all this in. Thank ye.", NPC_BRANN, 546000},
-    {13773, "Acknowledged, Branbronzan. Session terminated.", NPC_ABEDNEUM, 554000},
-    //Go to Sjonnir's door
-    {0, "I think it's time to see what's behind the door near the entrance. I'm going to sneak over there, nice and quiet. Meet me at the door and I'll get us in.", NPC_BRANN, 561000},
+    {NPC_BRANN, 10, 8000},
+    {NPC_ABEDNEUM, 0, 13000},
+    {NPC_BRANN, 11, 24000},
+    {NPC_KADDRAK, 0, 30500},
+    {NPC_BRANN, 12, 42000},
+    {NPC_BRANN, 13, 102000},
+    {NPC_MARNAK, 0, 105000},
+    {NPC_BRANN, 14, 113000},
+    {NPC_BRANN, 15, 201000},
+    {NPC_ABEDNEUM, 1, 207500},
+    {NPC_BRANN, 16, 214000},
+    {NPC_BRANN, 17, 305000},
+    {NPC_ABEDNEUM, 2, 310000},
+    {NPC_BRANN, 18, 316000},
+    {NPC_ABEDNEUM, 3, 322000},
+    {NPC_BRANN, 19, 330000},
+    {NPC_BRANN, 20, 336000},
+    {NPC_ABEDNEUM, 4, 341000},
+    {NPC_BRANN, 21, 348000},
+    {NPC_ABEDNEUM, 5, 360000},
+    {NPC_BRANN, 22, 372000},
+    {NPC_ABEDNEUM, 6, 377000},
+    {NPC_BRANN, 23, 407500},
+    {NPC_KADDRAK, 1, 424000},
+    {NPC_BRANN, 24, 431000},
+    {NPC_KADDRAK, 2, 450000},
+    {NPC_BRANN, 25, 453000},
+    {NPC_KADDRAK, 3, 472000},
+    {NPC_BRANN, 26, 483000},
+    {NPC_MARNAK, 1, 489000},
+    {NPC_BRANN, 27, 495000},
+    {NPC_MARNAK, 2, 519000},
+    {NPC_BRANN, 28, 543000},
+    {NPC_MARNAK, 3, 546000},
+    {NPC_BRANN, 29, 554000},
+    {NPC_ABEDNEUM, 7, 561000},
+    {NPC_BRANN, 32, 561000},
 };
 
 class brann_bronzebeard : public CreatureScript
@@ -170,30 +159,30 @@ public:
         InstanceScript* pInstance = (creature->GetInstanceScript());
 
         player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        player->PrepareGossipMenu(creature, 0, true);
         if (pInstance)
         {
             uint32 brann = pInstance->GetData(BRANN_BRONZEBEARD);
             switch (brann)
             {
                 case 1:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    SendGossipMenuFor(player, TEXT_ID_START, creature->GetGUID());
+                    player->PrepareGossipMenu(creature, 9669, true);
+                    player->SendPreparedGossip(creature);
                     break;
                 case 2:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    SendGossipMenuFor(player, TEXT_ID_TRIBUNAL_START, creature->GetGUID());
+                    player->PrepareGossipMenu(creature, 9670, true);
+                    player->SendPreparedGossip(creature);
                     break;
                 case 3:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, TEXT_ID_TRIBUNAL_END, creature->GetGUID());
+                    player->PrepareGossipMenu(creature, 10206, true);
+                    player->SendPreparedGossip(creature);
                     break;
                 case 4:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                    SendGossipMenuFor(player, TEXT_ID_SJONNIR_DOOR, creature->GetGUID());
+                    player->PrepareGossipMenu(creature, 10012, true);
+                    player->SendPreparedGossip(creature);
                     break;
                 case 5:
-                    SendGossipMenuFor(player, TEXT_ID_SJONNIR_END, creature->GetGUID());
+                    player->PrepareGossipMenu(creature, 9725, true);
+                    player->SendPreparedGossip(creature);
                     break;
                 default:
                     break;
@@ -748,12 +737,9 @@ public:
                     }
 
                     if (cs)
-                    {
-                        cs->Yell(Conversation[SpeechCount].text, LANG_UNIVERSAL);
-                        cs->PlayDirectSound(Conversation[SpeechCount].sound);
-                    }
+                        cs->AI()->Talk(Conversation[SpeechCount].textGroup);
 
-                    if (SpeechCount < 38)
+                    if (SpeechCount < 36)
                         SpeechPause = Conversation[SpeechCount++].timer;
                     else
                         TalkEvent = false;
