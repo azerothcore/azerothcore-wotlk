@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1932,16 +1932,17 @@ enum SmartEventFlags
 
 enum SmartCastFlags
 {
-    SMARTCAST_INTERRUPT_PREVIOUS     = 0x001,                     // Interrupt any spell casting
-    SMARTCAST_TRIGGERED              = 0x002,                     // Triggered (this makes spell cost zero mana and have no cast time)
-    //CAST_FORCE_CAST                  = 0x004,                     // Forces cast even if creature is out of mana or out of range
-    //CAST_NO_MELEE_IF_OOM             = 0x008,                     // Prevents creature from entering melee if out of mana or out of range
-    //CAST_FORCE_TARGET_SELF           = 0x010,                     // Forces the target to cast this spell on itself
-    SMARTCAST_AURA_NOT_PRESENT       = 0x020,                     // Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x040,                     // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
-    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
-    SMARTCAST_TARGET_POWER_MANA      = 0x100,                     // Only cast if the target has power type mana (e.g. Mana Drain)
-    SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS = 0x200,
+    SMARTCAST_INTERRUPT_PREVIOUS        = 0x001,                  // Interrupt any spell casting
+    SMARTCAST_TRIGGERED                 = 0x002,                  // Triggered (this makes spell cost zero mana and have no cast time)
+    //CAST_FORCE_CAST                   = 0x004,                  // Forces cast even if creature is out of mana or out of range
+    //CAST_NO_MELEE_IF_OOM              = 0x008,                  // Prevents creature from entering melee if out of mana or out of range
+    //CAST_FORCE_TARGET_SELF            = 0x010,                  // Forces the target to cast this spell on itself
+    SMARTCAST_AURA_NOT_PRESENT          = 0x020,                  // Only casts the spell if the target does not have an aura from the spell
+    SMARTCAST_COMBAT_MOVE               = 0x040,                  // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE     = 0x080,                  // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+    SMARTCAST_TARGET_POWER_MANA         = 0x100,                  // Only cast if the target has power type mana (e.g. Mana Drain)
+    SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS = 0x200,                  // Allows combat movement when not in line of sight
+    SMARTCAST_MAIN_SPELL                = 0x400,                  // Sets this spell's max range as the creature's chase distance on spawn
 };
 
 enum SmartFollowType

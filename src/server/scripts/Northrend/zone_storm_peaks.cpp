@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1166,6 +1166,43 @@ class spell_feed_stormcrest_eagle : public SpellScript
     }
 };
 
+enum MammothExplosion
+{
+    SPELL_MAMMOTH_EXPL_1    = 54627,
+    SPELL_MAMMOTH_EXPL_2    = 54628,
+    SPELL_MAMMOTH_EXPL_3    = 54623,
+    SPELL_MAIN_MAMMOTH_MEAT = 57444
+};
+
+// 54581 - Mammoth Explosion Spell Spawner
+class spell_mammoth_explosion : public SpellScript
+{
+    PrepareSpellScript(spell_mammoth_explosion);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAMMOTH_EXPL_1, SPELL_MAMMOTH_EXPL_2,  SPELL_MAMMOTH_EXPL_3, SPELL_MAIN_MAMMOTH_MEAT });
+    }
+
+    void HandleOnEffectHit(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            for (uint32 spellId : { SPELL_MAMMOTH_EXPL_1, SPELL_MAMMOTH_EXPL_2, SPELL_MAMMOTH_EXPL_3 })
+                target->CastSpell(GetHitUnit(), spellId, true);
+
+            target->CastSpell(GetHitUnit(), SPELL_MAIN_MAMMOTH_MEAT, true);
+
+            target->SetVisible(false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_mammoth_explosion::HandleOnEffectHit, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
@@ -1183,4 +1220,5 @@ void AddSC_storm_peaks()
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
     RegisterSpellScript(spell_feed_stormcrest_eagle);
+    RegisterSpellScript(spell_mammoth_explosion);
 }
