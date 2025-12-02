@@ -664,7 +664,6 @@ public:
                             me->CastSpell(me, 59046, true); // credit
                         }
 
-                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
                         me->SendMovementFlagUpdate();
 
@@ -871,6 +870,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         //Tribunal end, stand in the middle of the sky room
         case 17:
             SetEscortPaused(true);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetOrientation(3.91672f);
             me->SendMovementFlagUpdate();
             break;
