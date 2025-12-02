@@ -1,8 +1,8 @@
 -- Makes all Everfrost Chips spawns 45 minutes (before 30 and 1 hour).
-UPDATE `gameobject` SET `spawntimesecs` = 2700 WHERE `id` = 193997; 
+UPDATE `gameobject` SET `spawntimesecs` = 2700 WHERE `id` = 193997;
 
 DELETE FROM `pool_template` WHERE `entry` IN (150, 151, 152);
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (150, 8, "Everfrost Chip - Valley of Ancient Winters"), -- Total 30 / 4 = 7.5 rounded to 8
 (151, 4, "Everfrost Chip - Frostfield Lake"), -- Total 16 / 4 = 4
 (152, 2, "Everfrost Chip - Dun Niffelem"); -- Total 08 / 4 = 2
