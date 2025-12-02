@@ -31,7 +31,7 @@ body:
       description: |
         Do you have any logs or screenshots that can be useful?
         Crash logs in text are preffered over screenshots.
-        If you have logs in text form please upload them to [Gist](https://gist.github.com/) or PasteBin and upload the link.
+        DO NOT POST THE FULL CRASH LOG IN THE ISSUE BODY. DO NOT UPLOAD TEXT FILES. USE [GITHUB GIST](https://gist.github.com/), PASTEBIN, OR ANY SIMILAR SERVICE INSTEAD.
     validations:
       required: false
   - type: input
