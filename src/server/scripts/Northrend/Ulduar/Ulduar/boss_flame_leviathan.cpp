@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1089,6 +1089,7 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
+            me->SetWalk(true);
             Start(false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
@@ -1415,7 +1416,7 @@ public:
                 _startTimer -= diff;
                 if (_startTimer <= 0)
                 {
-                    me->GetMotionMaster()->MovePath(3000000 + urand(0, 11), true);
+                    me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
                     _startTimer = 0;
                 }
             }

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -715,6 +715,7 @@ public:
                 Talk(0);
                 events.Reset();
                 summons.DespawnAll();
+                me->SetWalk(true);
                 Start(false);
 
                 int8 i = -1;
@@ -1311,25 +1312,7 @@ public:
                     break;
                 case EVENT_START_FLIGHT:
                     {
-                        WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
-                        if (!path || path->empty())
-                        {
-                            me->DespawnOrUnsummon(1ms);
-                            return;
-                        }
-
-                        Movement::PointsArray pathPoints;
-                        pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-
-                        uint32 wpCounter = 1;
-                        WPPath::const_iterator itr;
-                        while ((itr = path->find(wpCounter++)) != path->end())
-                        {
-                            WayPoint* wp = itr->second;
-                            pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
-                        }
-
-                        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                        me->GetMotionMaster()->MovePath(me->GetEntry(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
                         events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 1min);
                         events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 5s);
                         break;
