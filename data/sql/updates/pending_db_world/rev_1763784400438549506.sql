@@ -1,7 +1,8 @@
 -- Winterskorn Vrykul Dismembering Bunny should only be giblet
-DELETE FROM `creature_template_model` WHERE (`CreatureID` = 24095) AND (`Idx` IN (0));
+DELETE FROM `creature_template_model` WHERE `CreatureID` = 24095;
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
-(24095, 0, 25628, 1, 1, 0);
+(24095, 0, 1126, 1, 0, 51831),
+(24095, 1, 25628, 1, 1, 51831);
 
 -- Conditions
 DELETE FROM `conditions` WHERE `SourceEntry` = 43036 AND `SourceTypeOrReferenceId` IN (13, 17);
