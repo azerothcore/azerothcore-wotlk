@@ -166,7 +166,7 @@ public:
             me->m_Events.AddEventAtOffset([this] {
                 me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
                 _firstCall = false;
-            }, 5s);
+            }, 5s, GROUP_WATCHERS);
         }
 
         uint32 GetData(uint32 data) const override
