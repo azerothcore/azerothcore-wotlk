@@ -99,7 +99,7 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
 
             uint32 health = uint32(107 * (me->GetLevel() - 40) * 0.025f);
             me->SetCreateHealth(health);
-            me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
+            me->SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
             me->SetMaxHealth(health);
 
             //Add delta to make them not all hit the same time
