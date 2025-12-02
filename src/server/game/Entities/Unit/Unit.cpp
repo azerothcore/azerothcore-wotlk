@@ -2226,15 +2226,18 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         {
             if (attacker)
             {
-                AuraEffectList const& ResIgnoreAurasAb = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
-                for (AuraEffectList::const_iterator j = ResIgnoreAurasAb.begin(); j != ResIgnoreAurasAb.end(); ++j)
-                    if (((*j)->GetMiscValue() & schoolMask) && (*j)->IsAffectedOnSpell(spellInfo))
-                        AddPct(damageResisted, -(*j)->GetAmount());
+                float mult = attacker->GetTotalAuraMultiplier(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST, [schoolMask, spellInfo](AuraEffect const* aurEff)
+                {
+                    if (!(aurEff->GetMiscValue() & schoolMask))
+                        return false;
+                    if (!aurEff->IsAffectedOnSpell(spellInfo))
+                        return false;
 
-                AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-                for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-                    if ((*j)->GetMiscValue() & schoolMask)
-                        AddPct(damageResisted, -(*j)->GetAmount());
+                    return true;
+                });
+                damageResisted -= damageResisted * (mult - 1.0f);
+                mult = attacker->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_IGNORE_TARGET_RESIST, schoolMask);
+                damageResisted -= damageResisted * (mult - 1.0f);
             }
 
             // pussywizard:
