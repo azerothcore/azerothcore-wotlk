@@ -1,3 +1,4 @@
+-- DB update 2025_12_02_03 -> 2025_12_02_04
 -- Seething Revenant (30387) - Add missing loot
 -- Closes https://github.com/azerothcore/azerothcore-wotlk/issues/23807
 
