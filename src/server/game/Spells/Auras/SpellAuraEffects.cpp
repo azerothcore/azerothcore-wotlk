@@ -726,9 +726,12 @@ void AuraEffect::ChangeAmount(int32 newAmount, bool mark, bool onStackOrReapply)
     std::list<AuraApplication*> effectApplications;
     GetApplicationList(effectApplications);
 
-    for (std::list<AuraApplication*>::const_iterator apptItr = effectApplications.begin(); apptItr != effectApplications.end(); ++apptItr)
-        if ((*apptItr)->HasEffect(GetEffIndex()))
-            HandleEffect(*apptItr, handleMask, false);
+    for (AuraApplication* aurApp : effectApplications)
+        if (aurApp->HasEffect(GetEffIndex()))
+        {
+            aurApp->GetTarget()->_RegisterAuraEffect(this, false);
+            HandleEffect(aurApp, handleMask, false);
+        }
 
     if (handleMask & AURA_EFFECT_HANDLE_CHANGE_AMOUNT)
     {
@@ -739,9 +742,15 @@ void AuraEffect::ChangeAmount(int32 newAmount, bool mark, bool onStackOrReapply)
         CalculateSpellMod();
     }
 
-    for (std::list<AuraApplication*>::const_iterator apptItr = effectApplications.begin(); apptItr != effectApplications.end(); ++apptItr)
-        if ((*apptItr)->HasEffect(GetEffIndex()))
-            HandleEffect(*apptItr, handleMask, true);
+    for (AuraApplication* aurApp : effectApplications)
+        if (aurApp->HasEffect(GetEffIndex()))
+        {
+            if (aurApp->GetRemoveMode() != AURA_REMOVE_NONE)
+                continue;
+
+            aurApp->GetTarget()->_RegisterAuraEffect(this, true);
+            HandleEffect(aurApp, handleMask, true);
+        }
 }
 
 void AuraEffect::HandleEffect(AuraApplication* aurApp, uint8 mode, bool apply)
@@ -5105,7 +5114,7 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
     if (!target->IsPlayer())
         return;
 
-    for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
+    for (uint8 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
         if (GetMiscValue() & (1 << rating))
             target->ToPlayer()->ApplyRatingMod(CombatRating(rating), GetAmount(), apply);
 }
@@ -5121,7 +5130,7 @@ void AuraEffect::HandleModRatingFromStat(AuraApplication const* aurApp, uint8 mo
         return;
 
     // Just recalculate ratings
-    for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
+    for (uint8 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
         if (GetMiscValue() & (1 << rating))
             target->ToPlayer()->ApplyRatingMod(CombatRating(rating), 0, apply);
 }
