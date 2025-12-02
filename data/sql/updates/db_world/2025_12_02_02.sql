@@ -1,3 +1,4 @@
+-- DB update 2025_12_02_01 -> 2025_12_02_02
 -- Makes all Everfrost Chips spawns 45 minutes (before 30 and 1 hour).
 UPDATE `gameobject` SET `spawntimesecs` = 2700 WHERE `id` = 193997;
 
