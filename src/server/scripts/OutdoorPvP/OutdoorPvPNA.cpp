@@ -673,11 +673,11 @@ bool OPvPCapturePointNA::Update(uint32 diff)
             m_RespawnTimer -= diff;
 
         // get the difference of numbers
-        float factDiff = ((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
+        float factDiff = (((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * diff / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL) * sWorld->getFloatConfig(CONFIG_OUTDOOR_PVP_CAPTURE_RATE);
         if (!factDiff)
             return false;
 
-        float maxDiff = _maxSpeed * diff;
+        float maxDiff = _maxSpeed * diff * sWorld->getFloatConfig(CONFIG_OUTDOOR_PVP_CAPTURE_RATE);
 
         if (factDiff < 0)
         {
