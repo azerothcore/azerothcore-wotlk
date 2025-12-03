@@ -1,5 +1,13 @@
 /*
- * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information.
+ *
+ * Portions of this file are derived from systemd, licensed under:
+ * - GPL-2.0-or-later (if the original systemd file was GPL-2.0+)
+ *   OR
+ * - LGPL-2.1-or-later, relicensed under GPL-2.0-or-later as permitted by LGPL-2.1+
+ *
+ * Original systemd copyright:
+ *   Copyright (c) the systemd contributors.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +23,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _VMAPDEFINITIONS_H
-#define _VMAPDEFINITIONS_H
+#ifndef _SYSTEMD_H_
+#define _SYSTEMD_H_
 
-#define LIQUID_TILE_SIZE (533.333f / 128.f)
+int get_listen_fd();
 
-namespace VMAP
-{
-    const char VMAP_MAGIC[] = "VMAP_4.8";
-    const char RAW_VMAP_MAGIC[] = "VMAP048";                // used in extracted vmap files with raw data
-    const char GAMEOBJECT_MODELS[] = "GameObjectModels.dtree";
-
-    // defined in TileAssembler.cpp currently...
-    bool readChunk(FILE* rf, char* dest, const char* compare, uint32 len);
-}
 #endif
