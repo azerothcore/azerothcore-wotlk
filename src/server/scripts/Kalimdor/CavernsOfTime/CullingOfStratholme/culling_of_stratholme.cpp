@@ -25,6 +25,25 @@
 #include "SpellInfo.h"
 #include "WorldStateDefines.h"
 
+enum EntranceNPCs
+{
+    NPC_HEARTHSINGER_FORRESTEN              = 30551,
+    NPC_FRAS_SIABI                          = 30552,
+    NPC_FOOTMAN_JAMES                       = 30553,
+    NPC_GRYAN_STOUTMANTLE                   = 30561,
+};
+
+enum EntranceEvents
+{
+    EVENT_HEARTHSINGER_OPENING              = 1,
+    EVENT_FOOTMAN_RESPONSE,
+    EVENT_FOOTMAN_CLOSING,
+    EVENT_HEARTHSINGER_RESPONSE,
+    EVENT_FRAS_OPENING,
+    EVENT_GRYAN_RESPONSE,
+    EVENT_FRAS_NOD,
+};
+
 enum Says
 {
     //Arthas
@@ -1623,6 +1642,75 @@ public:
     }
 };
 
+class npc_cos_entrance_gossip : public CreatureScript
+{
+public:
+    npc_cos_entrance_gossip() : CreatureScript("npc_cos_entrance_gossip") { }
+
+    struct npc_cos_entrance_gossipAI : public ScriptedAI
+    {
+        npc_cos_entrance_gossipAI(Creature* creature) : ScriptedAI(creature)
+        {
+            _events.Reset();
+            if (me->GetEntry() == NPC_HEARTHSINGER_FORRESTEN)
+                _events.ScheduleEvent(EVENT_HEARTHSINGER_OPENING, 10s, 15s);
+            else if (me->GetEntry() == NPC_FRAS_SIABI)
+                _events.ScheduleEvent(EVENT_FRAS_OPENING, 35s, 40s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_HEARTHSINGER_OPENING:
+                        Talk(0);
+                        _events.ScheduleEvent(EVENT_FOOTMAN_RESPONSE, 6s);
+                        break;
+                    case EVENT_FOOTMAN_RESPONSE:
+                        if (Creature* footman = me->FindNearestCreature(NPC_FOOTMAN_JAMES, 30.0f))
+                            footman->AI()->Talk(0);
+                        _events.ScheduleEvent(EVENT_FOOTMAN_CLOSING, 6s);
+                        break;
+                    case EVENT_FOOTMAN_CLOSING:
+                        if (Creature* footman = me->FindNearestCreature(NPC_FOOTMAN_JAMES, 30.0f))
+                            footman->AI()->Talk(1);
+                        _events.ScheduleEvent(EVENT_HEARTHSINGER_RESPONSE, 6s);
+                        break;
+                    case EVENT_HEARTHSINGER_RESPONSE:
+                        Talk(1);
+                        _events.ScheduleEvent(EVENT_HEARTHSINGER_OPENING, 60s, 90s);
+                        break;
+                    case EVENT_FRAS_OPENING:
+                        Talk(0);
+                        _events.ScheduleEvent(EVENT_GRYAN_RESPONSE, 6s);
+                        break;
+                    case EVENT_GRYAN_RESPONSE:
+                        if (Creature* gryan = me->FindNearestCreature(NPC_GRYAN_STOUTMANTLE, 30.0f))
+                            gryan->AI()->Talk(0);
+                        _events.ScheduleEvent(EVENT_FRAS_NOD, 6s);
+                        break;
+                    case EVENT_FRAS_NOD:
+                        Talk(1);
+                        _events.ScheduleEvent(EVENT_FRAS_OPENING, 60s, 90s);
+                        break;
+                }
+            }
+        }
+
+    private:
+        EventMap _events;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetCullingOfStratholmeAI<npc_cos_entrance_gossipAI>(creature);
+    }
+};
+
 void AddSC_culling_of_stratholme()
 {
     new npc_arthas();
@@ -1630,4 +1718,5 @@ void AddSC_culling_of_stratholme()
     new npc_cos_chromie_start();
     new npc_cos_chromie_middle();
     new npc_cos_stratholme_citizien();
+    new npc_cos_entrance_gossip();
 }
