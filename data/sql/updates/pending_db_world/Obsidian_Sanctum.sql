@@ -131,20 +131,14 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (126400, 12640000, 0, 0, 1, 0, 0, NULL),
 (126397, 12639700, 0, 0, 1, 0, 0, NULL);
 
--- Update SmartAI comments (Onyx Sanctum Guardian)
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30453;
+-- Update SmartAI (Onyx Sanctum Guardian & Onyx Brood General)
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (30453, 30680));
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 30453);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (30453, 30680));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (30453, 0, 0, 0, 0, 0, 100, 0, 7000, 9000, 17000, 18000, 0, 0, 11, 57728, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Sanctum Guardian - In Combat - Cast \'Shockwave\''),
 (30453, 0, 1, 0, 0, 0, 100, 0, 13000, 13000, 30000, 30000, 0, 0, 11, 39647, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Sanctum Guardian - In Combat - Cast \'Curse of Mending\''),
-(30453, 0, 2, 0, 12, 0, 100, 0, 25, 30, 5000, 5000, 0, 0, 11, 53801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Sanctum Guardian - Target Between 25-30% Health - Cast \'Frenzy\'');
-
--- Update SmartAI (Onyx Brood General)
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30680;
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 30680);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(30453, 0, 2, 0, 12, 0, 100, 0, 25, 30, 5000, 5000, 0, 0, 11, 53801, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Sanctum Guardian - Target Between 25-30% Health - Cast \'Frenzy\''),
 (30680, 0, 0, 0, 60, 0, 100, 0, 0, 0, 600000, 600000, 0, 0, 11, 57740, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - On Update - Cast \'Devotion Aura\''),
 (30680, 0, 1, 0, 0, 0, 100, 0, 5000, 6000, 7000, 8000, 0, 0, 11, 13737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - In Combat - Cast \'Mortal Strike\''),
 (30680, 0, 2, 0, 0, 0, 100, 0, 15000, 15000, 40000, 40000, 0, 0, 11, 57733, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - In Combat - Cast \'Draconic Rage\''),
