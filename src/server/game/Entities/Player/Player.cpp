@@ -7171,6 +7171,26 @@ void Player::ApplyItemDependentAuras(Item* item, bool apply)
             if (!HasAura(itr->first) && HasItemFitToSpellRequirements(spellInfo))
                 AddAura(itr->first, this);  // no SMSG_SPELL_GO in sniff found
         }
+
+        // Check talents (they are stored separately from regular spells)
+        // This fixes talents Lioke Poleaxe Specialization not being reapplied after weapon swap
+        PlayerTalentMap const& talents = GetTalentMap();
+        for (auto itr = talents.begin(); itr != talents.end(); ++itr)
+        {
+            if (itr->second->State == PLAYERSPELL_REMOVED)
+                continue;
+
+            // Only process talents for current spec
+            if (!(itr->second->specMask & GetActiveSpecMask()))
+                continue;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
+                continue;
+
+            if (!HasAura(itr->first) && HasItemFitToSpellRequirements(spellInfo))
+                AddAura(itr->first, this);
+        }
     }
     else
         RemoveItemDependentAurasAndCasts(item);
