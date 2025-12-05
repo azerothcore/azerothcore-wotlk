@@ -29,15 +29,15 @@ enum class HolidayCalculationType
     EASTER_OFFSET      // Days relative to Easter Sunday
 };
 
-enum Weekday
+enum class Weekday
 {
-    WEEKDAY_SUNDAY = 0,
-    WEEKDAY_MONDAY,
-    WEEKDAY_TUESDAY,
-    WEEKDAY_WEDNESDAY,
-    WEEKDAY_THURSDAY,
-    WEEKDAY_FRIDAY,
-    WEEKDAY_SATURDAY
+    SUNDAY = 0,
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY
 };
 
 struct HolidayRule

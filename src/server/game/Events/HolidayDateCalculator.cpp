@@ -36,7 +36,7 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 9, 28, 0, 0 },
 
     // Pilgrim's Bounty: 4th Thursday of November (Thanksgiving)
-    { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, WEEKDAY_THURSDAY, 0 }
+    { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), 0 }
 };
 
 const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
@@ -47,7 +47,7 @@ const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
 std::tm HolidayDateCalculator::CalculateEasterSunday(int year)
 {
     // Anonymous Gregorian algorithm (Computus)
-    // This algorithm calculates the date of Easter Sunday for any year
+    // Reference: https://en.wikipedia.org/wiki/Date_of_Easter#Anonymous_Gregorian_algorithm
     int a = year % 19;
     int b = year / 100;
     int c = year % 100;
@@ -82,7 +82,7 @@ std::tm HolidayDateCalculator::CalculateNthWeekday(int year, int month, Weekday 
     mktime(&date);
 
     // Find first occurrence of the target weekday
-    int daysUntilWeekday = (weekday - date.tm_wday + 7) % 7;
+    int const daysUntilWeekday = (static_cast<int>(weekday) - date.tm_wday + 7) % 7;
     date.tm_mday = 1 + daysUntilWeekday;
 
     // Move to nth occurrence

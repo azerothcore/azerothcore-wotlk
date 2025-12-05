@@ -35,7 +35,7 @@
 #include "WorldSessionMgr.h"
 #include "WorldState.h"
 #include "WorldStatePackets.h"
-#include <time.h>
+#include <chrono>
 
 GameEventMgr* GameEventMgr::instance()
 {
@@ -1076,9 +1076,15 @@ void GameEventMgr::LoadHolidayDates()
     uint32 dbCount = 0;
 
     // Step 1: Generate dynamic holiday dates based on current year
-    time_t now = time(nullptr);
-    struct tm* timeinfo = localtime(&now);
-    int currentYear = timeinfo->tm_year + 1900;
+    auto const now = std::chrono::system_clock::now();
+    std::time_t const nowTime = std::chrono::system_clock::to_time_t(now);
+    std::tm localTime = {};
+#ifdef _WIN32
+    localtime_s(&localTime, &nowTime);
+#else
+    localtime_r(&nowTime, &localTime);
+#endif
+    int const currentYear = localTime.tm_year + 1900;
 
     for (auto const& rule : HolidayDateCalculator::GetHolidayRules())
     {
@@ -1089,8 +1095,8 @@ void GameEventMgr::LoadHolidayDates()
         // Generate dates for current year and next 10 years
         for (int yearOffset = 0; yearOffset <= 10; ++yearOffset)
         {
-            int year = currentYear + yearOffset;
-            uint8 dateId = static_cast<uint8>(yearOffset);
+            int const year = currentYear + yearOffset;
+            uint8 const dateId = static_cast<uint8>(yearOffset);
 
             if (dateId >= MAX_HOLIDAY_DATES)
                 break;
@@ -1116,7 +1122,7 @@ void GameEventMgr::LoadHolidayDates()
         {
             Field* fields = result->Fetch();
 
-            uint32 holidayId = fields[0].Get<uint32>();
+            uint32 const holidayId = fields[0].Get<uint32>();
             HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(holidayId));
             if (!entry)
             {
@@ -1124,7 +1130,7 @@ void GameEventMgr::LoadHolidayDates()
                 continue;
             }
 
-            uint8 dateId = fields[1].Get<uint8>();
+            uint8 const dateId = fields[1].Get<uint8>();
             if (dateId >= MAX_HOLIDAY_DATES)
             {
                 LOG_ERROR("sql.sql", "holiday_dates entry has out of range date_id {}.", dateId);
@@ -1132,7 +1138,7 @@ void GameEventMgr::LoadHolidayDates()
             }
             entry->Date[dateId] = fields[2].Get<uint32>();
 
-            if (uint32 duration = fields[3].Get<uint32>())
+            if (uint32 const duration = fields[3].Get<uint32>())
                 entry->Duration[0] = duration;
 
             auto itr = std::lower_bound(ModifiedHolidays.begin(), ModifiedHolidays.end(), entry->Id);

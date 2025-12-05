@@ -150,7 +150,7 @@ TEST_F(HolidayDateCalculatorTest, NthWeekday_Thanksgiving_1900_2200)
     // Verify 4th Thursday of November for all years
     for (int year = 1900; year <= 2200; ++year)
     {
-        std::tm date = HolidayDateCalculator::CalculateNthWeekday(year, 11, WEEKDAY_THURSDAY, 4);
+        std::tm date = HolidayDateCalculator::CalculateNthWeekday(year, 11, Weekday::THURSDAY, 4);
 
         SCOPED_TRACE("Year: " + std::to_string(year));
 
@@ -158,7 +158,7 @@ TEST_F(HolidayDateCalculatorTest, NthWeekday_Thanksgiving_1900_2200)
         EXPECT_EQ(date.tm_mon + 1, 11);
 
         // Must be a Thursday
-        EXPECT_EQ(date.tm_wday, WEEKDAY_THURSDAY);
+        EXPECT_EQ(date.tm_wday, static_cast<int>(Weekday::THURSDAY));
 
         // 4th Thursday must be between 22nd and 28th
         EXPECT_GE(date.tm_mday, 22);
@@ -203,10 +203,10 @@ TEST_F(HolidayDateCalculatorTest, NthWeekday_SecondThirdFourth_Validation)
     {
         for (int month = 1; month <= 12; ++month)
         {
-            std::tm first = HolidayDateCalculator::CalculateNthWeekday(year, month, WEEKDAY_MONDAY, 1);
-            std::tm second = HolidayDateCalculator::CalculateNthWeekday(year, month, WEEKDAY_MONDAY, 2);
-            std::tm third = HolidayDateCalculator::CalculateNthWeekday(year, month, WEEKDAY_MONDAY, 3);
-            std::tm fourth = HolidayDateCalculator::CalculateNthWeekday(year, month, WEEKDAY_MONDAY, 4);
+            std::tm first = HolidayDateCalculator::CalculateNthWeekday(year, month, Weekday::MONDAY, 1);
+            std::tm second = HolidayDateCalculator::CalculateNthWeekday(year, month, Weekday::MONDAY, 2);
+            std::tm third = HolidayDateCalculator::CalculateNthWeekday(year, month, Weekday::MONDAY, 3);
+            std::tm fourth = HolidayDateCalculator::CalculateNthWeekday(year, month, Weekday::MONDAY, 4);
 
             SCOPED_TRACE("Year: " + std::to_string(year) + " Month: " + std::to_string(month));
 
@@ -337,14 +337,14 @@ TEST_F(HolidayDateCalculatorTest, PilgrimsBounty_FourthThursdayNovember_1900_220
     // Pilgrim's Bounty = Thanksgiving = 4th Thursday of November
     for (int year = 1900; year <= 2200; ++year)
     {
-        HolidayRule pilgrimsBounty = { 404, HolidayCalculationType::NTH_WEEKDAY, 11, 4, WEEKDAY_THURSDAY, 0 };
+        HolidayRule pilgrimsBounty = { 404, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), 0 };
         std::tm date = HolidayDateCalculator::CalculateHolidayDate(pilgrimsBounty, year);
 
         SCOPED_TRACE("Year: " + std::to_string(year));
 
         EXPECT_EQ(date.tm_year + 1900, year);
         EXPECT_EQ(date.tm_mon + 1, 11);            // November
-        EXPECT_EQ(date.tm_wday, WEEKDAY_THURSDAY); // Thursday
+        EXPECT_EQ(date.tm_wday, static_cast<int>(Weekday::THURSDAY)); // Thursday
         EXPECT_GE(date.tm_mday, 22);               // 4th week starts at earliest on 22nd
         EXPECT_LE(date.tm_mday, 28);               // 4th week ends at latest on 28th
     }
@@ -406,7 +406,7 @@ TEST_F(HolidayDateCalculatorTest, StressTest_AllCalculations_1900_2200)
         {
             for (int n = 1; n <= 4; ++n)
             {
-                std::tm date = HolidayDateCalculator::CalculateNthWeekday(year, month, WEEKDAY_THURSDAY, n);
+                std::tm date = HolidayDateCalculator::CalculateNthWeekday(year, month, Weekday::THURSDAY, n);
                 EXPECT_TRUE(IsValidDate(year, date.tm_mon + 1, date.tm_mday))
                     << "Invalid NthWeekday date for year " << year << " month " << month << " n=" << n;
                 totalCalculations++;
@@ -463,6 +463,66 @@ TEST_F(HolidayDateCalculatorTest, GetPackedHolidayDate_UnknownHoliday)
     EXPECT_EQ(result, 0u);
 }
 
+TEST_F(HolidayDateCalculatorTest, PackDate_YearBeyond2031)
+{
+    // WoW's packed date format uses 5 bits for year offset from 2000
+    // - Offsets 0-30 represent specific years 2000-2030
+    // - Offset 31 is a special marker meaning "repeats every year" (used for fixed-date holidays)
+    // This is a Blizzard client limitation, not an emulator design choice
+    //
+    // Years beyond 2031 will overflow when unpacked due to the 5-bit mask
+
+    // Test year 2032 (offset 32) - demonstrates the overflow behavior
+    {
+        std::tm date = {};
+        date.tm_year = 2032 - 1900;
+        date.tm_mon = 5;  // June
+        date.tm_mday = 15;
+        mktime(&date);
+
+        uint32_t packed = HolidayDateCalculator::PackDate(date);
+        std::tm unpacked = HolidayDateCalculator::UnpackDate(packed);
+
+        // Year offset 32 masked with 0x1F (5 bits) = 0, so unpacked year = 2000
+        // This documents the WoW client's inherent year 2031 limitation
+        EXPECT_EQ(unpacked.tm_year + 1900, 2000) << "Year 2032 wraps to 2000 due to 5-bit WoW client format";
+        EXPECT_EQ(unpacked.tm_mon + 1, 6);
+        EXPECT_EQ(unpacked.tm_mday, 15);
+    }
+
+    // Test year 2035 (offset 35)
+    {
+        std::tm date = {};
+        date.tm_year = 2035 - 1900;
+        date.tm_mon = 0;  // January
+        date.tm_mday = 1;
+        mktime(&date);
+
+        uint32_t packed = HolidayDateCalculator::PackDate(date);
+        std::tm unpacked = HolidayDateCalculator::UnpackDate(packed);
+
+        // Year offset 35 masked with 0x1F = 3, so unpacked year = 2003
+        EXPECT_EQ(unpacked.tm_year + 1900, 2003) << "Year 2035 wraps to 2003 due to 5-bit WoW client format";
+    }
+
+    // Test boundary: year 2030 is the last fully usable year (offset 30)
+    // (offset 31 is reserved for "repeating yearly" holidays)
+    {
+        std::tm date = {};
+        date.tm_year = 2030 - 1900;
+        date.tm_mon = 11;  // December
+        date.tm_mday = 31;
+        mktime(&date);
+
+        uint32_t packed = HolidayDateCalculator::PackDate(date);
+        std::tm unpacked = HolidayDateCalculator::UnpackDate(packed);
+
+        EXPECT_EQ(unpacked.tm_year + 1900, 2030) << "Year 2030 should pack/unpack correctly";
+        EXPECT_EQ(unpacked.tm_mon + 1, 12);
+        EXPECT_EQ(unpacked.tm_mday, 31);
+    }
+}
+
 TEST_F(HolidayDateCalculatorTest, CenturyBoundaries)
 {
     // Test calculations around century boundaries (which affect leap year rules)
@@ -478,8 +538,8 @@ TEST_F(HolidayDateCalculatorTest, CenturyBoundaries)
         EXPECT_TRUE(easter.tm_mon == 2 || easter.tm_mon == 3) << "Easter should be in March or April";
 
         // Thanksgiving
-        std::tm thanksgiving = HolidayDateCalculator::CalculateNthWeekday(year, 11, WEEKDAY_THURSDAY, 4);
-        EXPECT_EQ(thanksgiving.tm_wday, WEEKDAY_THURSDAY);
+        std::tm thanksgiving = HolidayDateCalculator::CalculateNthWeekday(year, 11, Weekday::THURSDAY, 4);
+        EXPECT_EQ(thanksgiving.tm_wday, static_cast<int>(Weekday::THURSDAY));
         EXPECT_EQ(thanksgiving.tm_mon + 1, 11);
     }
 }
