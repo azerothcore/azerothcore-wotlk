@@ -1075,7 +1075,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
     }
 
-    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
+    SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
     uint32 attackTime = BASE_ATTACK_TIME;
     if (!owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET) && cinfo->BaseAttackTime >= 1000)
@@ -1094,7 +1094,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     // xinef: hunter pets should not inherit template resistances
     if (!IsHunterPet())
         for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
-            SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, float(cinfo->resistance[i]));
+            SetStatFlatModifier(UnitMods(UNIT_MOD_RESISTANCE_START + i), BASE_VALUE, float(cinfo->resistance[i]));
 
     //health, mana, armor and resistance
     PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(creature_ID, petlevel);
@@ -1111,15 +1111,15 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         }
 
         SetCreateHealth(pInfo->health*factorHealth);
-        SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)pInfo->health);
+        SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)pInfo->health);
         if (petType != HUNTER_PET) //hunter pet use focus
         {
             SetCreateMana(pInfo->mana);
-            SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)pInfo->mana);
+            SetStatFlatModifier(UNIT_MOD_MANA, BASE_VALUE, (float)pInfo->mana);
         }
 
         if (pInfo->armor > 0)
-            SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
+            SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
 
         for (uint8 stat = 0; stat < MAX_STATS; ++stat)
             SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
@@ -1138,9 +1138,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         }
 
         SetCreateHealth(std::max<uint32>(1, stats->BaseHealth[cinfo->expansion]*factorHealth));
-        SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
+        SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
         SetCreateMana(stats->BaseMana * factorMana);
-        SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
+        SetStatFlatModifier(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
 
         // xinef: added some multipliers so debuffs can affect pets in any way...
         SetCreateStat(STAT_STRENGTH, 22);
@@ -1174,24 +1174,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
                 switch (GetEntry())
                 {
-                    case NPC_FELGUARD:
-                        {
-                            // xinef: Glyph of Felguard, so ugly im crying... no appropriate spell
-                            if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_FELGUARD))
-                            {
-                                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
-                            }
-
-                            break;
-                        }
-                    case NPC_VOIDWALKER:
-                        {
-                            if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_VOIDWALKER))
-                            {
-                                HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), true);
-                            }
-                            break;
-                        }
                     case NPC_WATER_ELEMENTAL_PERM:
                         {
                             AddAura(SPELL_PET_AVOIDANCE, this);

@@ -589,7 +589,7 @@ namespace lfg
         void DecreaseKicksLeft(ObjectGuid guid);
         void SetState(ObjectGuid guid, LfgState state);
         void SetCanOverrideRBState(ObjectGuid guid, bool val);
-        void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap);
+        void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, bool isRDF = false);
         void _SaveToDB(ObjectGuid guid);
         LFGDungeonData const* GetLFGDungeon(uint32 id);
 
