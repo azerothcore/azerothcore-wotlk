@@ -7880,6 +7880,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         {
             if (go)
                 go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
+
             SendLootRelease(guid);
             return;
         }
