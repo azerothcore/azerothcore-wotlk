@@ -1,0 +1,315 @@
+[worldserver]
+#
+###################################################################################################
+
+###################################################################################################
+#   ANTICHEAT MODULE
+#
+#     Anticheat.Enable
+#       Description: Enables or disables the Anticheat System functionality
+#       Default:     1 - (Enabled)
+#                    0 - (Disabled)
+
+Anticheat.Enabled = 1
+
+#     Anticheat.EnabledOnGmAccounts
+#       Description: Enables detection for GM accounts
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.EnabledOnGmAccounts = 0
+
+#     Anticheat.MaxReportsForDailyReport
+#       Description: How many reports must the player have to make a report that it is in DB for a day (not only during the player's session).
+#       Default:     70
+
+Anticheat.MaxReportsForDailyReport = 70
+
+#     Anticheat.ReportInChatThreshold.Min.[Report type]
+#     Anticheat.ReportInChatThreshold.Max.[Report type]
+#       Description: Mininum and maximum thresholds of reports needed to send an alert into the chatboxes of the currently online game masters.
+#                    With a minimum of 50 and a maximum of 60, the game master will receive into their chatbox a maximum of 10 alerts for a given cheat.
+#                    The maximum should not be lower than a minimum value or it would never show the report into the game master's chatbox.
+
+Anticheat.ReportInChatThreshold.Min.Speed = 50
+Anticheat.ReportInChatThreshold.Max.Speed = 60
+Anticheat.ReportInChatThreshold.Min.Fly = 50
+Anticheat.ReportInChatThreshold.Max.Fly = 60
+Anticheat.ReportInChatThreshold.Min.WaterWalk = 50
+Anticheat.ReportInChatThreshold.Max.WaterWalk = 60
+Anticheat.ReportInChatThreshold.Min.Jump = 50
+Anticheat.ReportInChatThreshold.Max.Jump = 60
+Anticheat.ReportInChatThreshold.Min.TeleportToPlane = 50
+Anticheat.ReportInChatThreshold.Max.TeleportToPlane = 60
+Anticheat.ReportInChatThreshold.Min.Climb = 50
+Anticheat.ReportInChatThreshold.Max.Climb = 60
+Anticheat.ReportInChatThreshold.Min.Teleport = 1
+Anticheat.ReportInChatThreshold.Max.Teleport = 60
+Anticheat.ReportInChatThreshold.Min.IgnoreControl = 50
+Anticheat.ReportInChatThreshold.Max.IgnoreControl = 60
+Anticheat.ReportInChatThreshold.Min.ZAxis = 50
+Anticheat.ReportInChatThreshold.Max.ZAxis = 60
+Anticheat.ReportInChatThreshold.Min.AntiSwim = 50
+Anticheat.ReportInChatThreshold.Max.AntiSwim = 60
+Anticheat.ReportInChatThreshold.Min.Gravity = 50
+Anticheat.ReportInChatThreshold.Max.Gravity = 60
+Anticheat.ReportInChatThreshold.Min.Antiknockback = 50
+Anticheat.ReportInChatThreshold.Max.Antiknockback = 60
+Anticheat.ReportInChatThreshold.Min.NoFallDamage = 1
+Anticheat.ReportInChatThreshold.Max.NoFallDamage = 60
+Anticheat.ReportInChatThreshold.Min.OpAck = 1
+Anticheat.ReportInChatThreshold.Max.OpAck = 60
+Anticheat.ReportInChatThreshold.Min.CounterMeasure = 50
+Anticheat.ReportInChatThreshold.Max.CounterMeasure = 60
+
+#     Anticheat.AlertFrequency.[Report type]
+#       Description: When a player triggers an alert, its report type count will increase.
+#                    When that count increases, the game masters will receive an alert of the respective report type into their chatbox if that count is a multiple of the following config.
+#                    If you have an AlertFrequency of 3 and wish to display a specific alert a maximum of 5 times, the ReportInChatThreshold.Max needs to be 15 units higher than its Min counterpart.
+
+Anticheat.AlertFrequency.Speed = 5
+Anticheat.AlertFrequency.Fly = 5
+Anticheat.AlertFrequency.WaterWalk = 5
+Anticheat.AlertFrequency.Jump = 5
+Anticheat.AlertFrequency.TeleportToPlane = 1
+Anticheat.AlertFrequency.Climb = 5
+Anticheat.AlertFrequency.Teleport = 1
+Anticheat.AlertFrequency.IgnoreControl = 5
+Anticheat.AlertFrequency.ZAxis = 5
+Anticheat.AlertFrequency.AntiSwim = 5
+Anticheat.AlertFrequency.Gravity = 5
+Anticheat.AlertFrequency.Antiknockback = 1
+Anticheat.AlertFrequency.NoFallDamage = 1
+Anticheat.AlertFrequency.OpAck = 1
+Anticheat.AlertFrequency.CounterMeasure = 5
+
+#     Anticheat.LoginMessage
+#       Description: Enable login message "This server is running an Anticheat module."
+#       Default: 1 
+
+Anticheat.LoginMessage = 0
+
+#     Anticheat.WriteLog
+#       Description: Enable writing to log when a player is detected using hacks
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.WriteLog = 0
+
+#     Anticheat.SaveReportsTime
+#       Description: Set the time between each report save in seconds
+#       Default:    60 - (seconds)
+
+Anticheat.SaveReportsTime = 60
+
+#     Anticheat.Detect
+#       Description: It represents which detections are enabled (ClimbHack disabled by default).
+#       Default:    1 - (Enabled)
+#                   0 - (Disabled)
+
+Anticheat.DetectFlyHack = 1
+Anticheat.DetectWaterWalkHack = 1
+Anticheat.DetectJumpHack = 1
+Anticheat.DetectTelePlaneHack = 1
+Anticheat.DetectSpeedHack = 1
+Anticheat.DetectClimbHack = 1
+Anticheat.DetectTelePortHack = 1
+Anticheat.IgnoreControlHack = 1
+Anticheat.DetectZaxisHack =1
+Anticheat.AntiSwimHack = 1
+Anticheat.DetectGravityHack = 1
+Anticheat.AntiKnockBack = 1
+Anticheat.NoFallDamage = 1
+Anticheat.DetectBGStartHack = 1
+Anticheat.OpAckOrderHack = 1
+
+#     Anticheat.StricterFlyHackCheck
+#       Description: Checks moveflag ascending (may give false positives)
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.StricterFlyHackCheck = 0
+
+#     Anticheat.StricterDetectJumpHack
+#       Description: Checks Stricter moveflag jumping (may give false positives)
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.StricterDetectJumpHack = 0
+
+#     Anticheat.SpeedLimitTolerance
+#       Description: Speed Limit Tolerance allows a certain whole percentage of tolerance to speed 
+#       hack logging and detection.
+#
+#       Example: AnticheatMgr:: Speed-Hack (Speed Movement at 12% above allowed Server Set rate 8%.)
+#       will be detected since if it is set to 4 (suggested) and higher, but anything 3 and lower will not be flagged.
+#       Default:    0 - (Default)
+#
+
+Anticheat.SpeedLimitTolerance = 0
+
+#     Automatic Moderation Features
+#
+#     Anticheat.KickPlayer
+#     Anticheat.ReportsForKick
+#
+#       Description: Enables and Auto kick when reports reach threshhold
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#       Default:    70 - (Kick at 70 auto reports)
+#
+
+Anticheat.KickPlayer = 0
+Anticheat.ReportsForKick = 70
+
+#     Anticheat.BanPlayer
+#     Anticheat.ReportsForBan
+#
+#       Description: Enables and Auto ban when reports reach threshhold
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#       Default:    70 - (Kick at 70 auto reports)
+#
+
+Anticheat.BanPlayer = 0
+Anticheat.ReportsForBan = 70
+
+#     Anticheat.JailPlayer
+#     Anticheat.ReportsForJail
+#
+#       Description: Enables and Auto Jail when reports reach threshhold
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#       Default:    70 - (Kick at 70 auto reports)
+#
+
+Anticheat.JailPlayer = 0
+Anticheat.ReportsForJail = 70
+
+#     Anticheat.AnnounceKick
+#     Anticheat.AnnounceBan
+#     Anticheat.AnnounceJail
+#       Description: Send a message to all players when a user kicked, banned, jailed.
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+
+Anticheat.AnnounceKick = 0
+Anticheat.AnnounceBan = 0
+Anticheat.AnnounceJail = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+#   ANTICHEAT COUNTER MEASURE
+#
+#     Anticheat Counter Measures
+#
+#     Anticheat.CM.TIMEMANIPULATION
+#
+#       Description: Counters Time Manipulation hacks. These hacks can cause server to crash.
+#
+#       Default:    1 - (Enabled)
+#                   0 - (Disabled)
+#
+
+Anticheat.CM.TIMEMANIPULATION = 1
+
+#
+#     Anticheat.CM.Teleport
+#
+#       Description: Sends player back to last gps position if player cheats and teleports.
+#
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.Teleport = 0
+
+#
+#     Anticheat.CM.FLYHACK
+#
+#       Description: Sets player back to the ground if fly hack is detected
+#
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.FLYHACK = 0
+
+#
+#     Anticheat.CM.JUMPHACK
+#     Anticheat.CM.ADVJUMPHACK
+#       Description: Sets player back to the ground if jump hack is detected
+#
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.JUMPHACK = 0
+Anticheat.CM.ADVJUMPHACK = 0
+
+#
+#     Anticheat.CM.IGNOREZ
+#
+#       Description: Sets player back to the ground if ignore-z hack is detected
+#
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.IGNOREZ = 0
+
+#
+#     Anticheat.CM.SPEEDHACK
+#
+#       Description: Sets player back to allowed server rate speed when speed hack is detected
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.SPEEDHACK = 0
+
+#
+#     Anticheat.BG.StartAreaTeleport
+#
+#       Description: Sends player back to start position if player cheats and teleports out of start spot
+#                    before the BG begins.
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.BG.StartAreaTeleport = 0
+
+#
+#     Anticheat.CM.WriteLog
+#
+#       Description: Enables Logging
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.WriteLog = 0
+
+#
+#     Anticheat.CM.ALERTSCREEN
+#
+#       Description: Alerts online GMs of Counter Measure being deployed via screen alert
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.ALERTSCREEN = 0
+
+#
+#     Anticheat.CM.ALERTCHAT
+#
+#       Description: Alerts online GMs of Counter Measure being deployed via chat alert
+#       Default:    0 - (Disabled)
+#                   1 - (Enabled)
+#
+
+Anticheat.CM.ALERTCHAT= 0
+
+#
+###################################################################################################

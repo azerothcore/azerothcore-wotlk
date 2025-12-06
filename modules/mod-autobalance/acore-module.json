@@ -1,0 +1,9 @@
+{
+  "name": "mod-autobalance",
+  "version": "2.2.0",
+  "compatibility" : [
+      { "version": "1.0.0", "branch": "none" },
+      { "version": "^2.0.0", "branch": "2.0" },
+      { "version": "^3.0.0", "branch": "master" }
+  ]
+}

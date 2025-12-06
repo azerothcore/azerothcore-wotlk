@@ -1,0 +1,14 @@
+name: Build mod-eluna with LuaJIT 🌙
+
+on:
+  push:
+    branches:
+      - 'master'
+      - 'main'
+  pull_request:
+
+jobs:
+  build_luajit:
+    uses: ./.github/workflows/core-build-base.yml
+    with:
+      lua_version: 'luajit'

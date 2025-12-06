@@ -1,0 +1,193 @@
+#
+# This file is part of the WarheadCore Project. See AUTHORS file for Copyright information
+#
+# This file is free software; as a special exception the author gives
+# unlimited permission to copy and/or distribute it, with or without
+# modifications, as long as this notice is preserved.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#
+# User has manually chosen to ignore the git-tests, so throw them a warning.
+# This is done EACH compile so they can be alerted about the consequences.
+#
+
+########################################
+# BGReward module configuration
+########################################
+[worldserver]
+
+###################################################################################################
+# BATTLEGROUND REWARD CONFIG
+#
+#
+#    Battleground.Reward.Enable
+#       Description: Enable Battleground Reward.
+#
+#       Default: 0  - (Disable)
+#        	     1  - (Enable)
+#
+
+Battleground.Reward.Enable = 0
+
+#
+#    Battleground.Reward.WinnerTeam.Count
+#       Description: Reward count winner Battleground team.
+#
+#       Default: 2
+#
+
+Battleground.Reward.WinnerTeam.Count = 2
+
+#
+#    Battleground.Reward.LoserTeam.Count
+#        Description: Reward count loser Battleground team.
+#        	  Default: 1  - (Default)
+#
+
+Battleground.Reward.LoserTeam.Count = 1
+
+#
+#    Battleground.Reward.ItemID.WS
+#       Description: Reward item on Battleground Warsong Gulch.
+#
+#       Default: 20558
+#
+
+Battleground.Reward.ItemID.WS = 20558
+
+#
+#    Battleground.Reward.ItemID.AB
+#       Description: Reward item on Battleground Arathi Basin.
+#
+#       Default: 20559
+#
+
+Battleground.Reward.ItemID.AB = 20559
+
+#
+#    Battleground.Reward.ItemID.EY
+#       Description: Reward item on Battleground Eye of the Storm.
+#
+#       Default: 29024
+#
+
+Battleground.Reward.ItemID.EY = 29024
+
+#
+#    Battleground.Reward.ItemID.IC
+#       Description: Reward item on Battleground Isle of Conquest.
+#
+#       Default: 47395
+#
+
+Battleground.Reward.ItemID.IC = 47395
+
+#
+#    Battleground.Reward.ItemID.SA
+#       Description: Reward item on Battleground Strand of the Ancients.
+#
+#       Default: 42425
+#
+
+Battleground.Reward.ItemID.SA = 42425
+
+#
+#    Battleground.Reward.ItemID.AV
+#       Description: Reward item on Battleground Alterac Valley.
+#
+#       Default: 20560
+#
+
+Battleground.Reward.ItemID.AV = 20560
+
+#
+###################################################################################################
+
+###################################################################################################
+# ARENA REWARD CONFIG
+#
+#
+#    Arena.Reward.Enable
+#        Description: Enable Arena Reward.
+#
+#        Default: 0  - (Disable)
+#        	      1  - (Enable)
+#
+
+Arena.Reward.Enable = 0
+
+#
+#    Arena.Reward.WinnerTeam.Count
+#       Description: Reward count winner arena team.
+#
+#       Default: 2
+#
+
+Arena.Reward.WinnerTeam.Count = 2
+
+#
+#    Arena.Reward.LoserTeam.Count
+#        Description: Reward count loser arena team.
+#        	  Default: 1  - (Default)
+#
+
+Arena.Reward.LoserTeam.Count = 1
+
+#
+#    Arena.Reward.Winner.ItemID.2v2
+#       Description: Reward item on arena 2v2.
+#
+#       Default: 29434
+#
+
+Arena.Reward.Winner.ItemID.2v2 = 29434
+
+#
+#    Arena.Reward.Loser.ItemID.2v2
+#       Description: Reward item on arena 2v2.
+#
+#       Default: 29434
+#
+
+Arena.Reward.Loser.ItemID.2v2 = 29434
+
+#
+#    Arena.Reward.Winner.ItemID.3v3
+#       Description: Reward item on arena 3v3.
+#
+#       Default: 29434
+#
+
+Arena.Reward.Winner.ItemID.3v3 = 29434
+
+#
+#    Arena.Reward.Loser.ItemID.3v3
+#       Description: Reward item on arena 3v3.
+#
+#       Default: 29434
+#
+
+Arena.Reward.Loser.ItemID.3v3 = 29434
+
+#
+#    Arena.Reward.Winner.ItemID.5v5
+#       Description: Reward item on arena 5v5.
+#
+#       Default: 29434
+#
+
+Arena.Reward.Winner.ItemID.5v5 = 29434
+
+#
+#    Arena.Reward.Loser.ItemID.5v5
+#       Description: Reward item on arena 5v5.
+#
+#       Default: 29434
+#
+
+Arena.Reward.Loser.ItemID.5v5 = 29434
+
+#
+###################################################################################################

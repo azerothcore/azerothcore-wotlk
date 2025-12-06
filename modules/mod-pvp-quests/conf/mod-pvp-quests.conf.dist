@@ -1,0 +1,32 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+
+[worldserver]
+
+########################################
+# mod-pvp-quests configuration
+########################################
+#
+#    ModPvPQuests.Enable
+#        Description: Enable my module.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+ModPvPQuests.Enable = 1
+
+#
+#    ModPvPQuests.WinAP
+#        Description: Points awarded on first BG win.
+#        Default:     10
+#                     0 - Disabled
+
+ModPvPQuests.WinAP = 10
+
+#
+#    ModPvPQuests.LossAP
+#        Description: Points awarded on first BG win.
+#        Default:     0 - Disabled
+
+ModPvPQuests.LossAP = 0

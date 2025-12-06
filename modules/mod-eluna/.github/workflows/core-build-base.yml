@@ -1,0 +1,85 @@
+name: Build mod-eluna base 🛠️
+
+on:
+  workflow_call:
+    inputs:
+      lua_version:
+        required: true
+        type: string
+
+jobs:
+  install_and_build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out AzerothCore 🧑‍💻
+        uses: actions/checkout@v4
+        with:
+          repository: 'azerothcore/azerothcore-wotlk'
+          ref: 'master'
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: Check out module repository 📂
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+          path: 'modules/${{ github.event.repository.name }}'
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Cache compilation artifacts 💾
+        uses: actions/cache@v4
+        with:
+          path: var/ccache
+          key: ccache:${{ matrix.compiler.CC }}:${{ github.ref }}:${{ github.sha }}
+          restore-keys: |
+            ccache:clang-18:${{ github.ref }}
+            ccache:clang-18
+
+      - name: Install build dependencies 🧰
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt-get -y install ccache clang cmake curl google-perftools \
+            libmysqlclient-dev make unzip build-essential cmake-data \
+            libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev \
+            libreadline6-dev libssl-dev libtool openssl zlib1g-dev
+
+      - name: Build mod-eluna with ${{ inputs.lua_version }} 🏗️
+        run: |
+          rm -rf build
+          mkdir build && cd build
+          cmake .. \
+            -DCMAKE_C_COMPILER=clang-18 \
+            -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DSCRIPTS="static" \
+            -DMODULES="static" \
+            -DWITH_WARNINGS="ON" \
+            -DCMAKE_BUILD_TYPE="Release" \
+            -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
+            -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
+            -DCMAKE_C_FLAGS="-Werror" \
+            -DCMAKE_CXX_FLAGS="-Werror" \
+            -DLUA_VERSION=${{ inputs.lua_version }}
+          make -j$(nproc)
+          cd ..
+
+      - name: Run Cppcheck for static code analysis 🔍
+        run: |
+          sudo apt update -y
+          sudo apt install -y cppcheck
+          cd modules/${{ github.event.repository.name }}
+          cppcheck -j$(nproc) --force --inline-suppr \
+            -I src/LuaEngine/ \
+            -I src/ \
+            --suppress=*:src/lualib/* \
+            --suppress=*:src/LuaEngine/libs/* \
+            --output-file=report.txt \
+            .
+          if [ -s report.txt ]; then
+            echo "Cppcheck detected issues 🚨:"
+            cat report.txt
+            exit 1
+          else
+            echo "No issues detected by cppcheck ✅."
+          fi
