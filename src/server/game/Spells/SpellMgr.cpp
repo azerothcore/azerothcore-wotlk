@@ -193,7 +193,7 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
             {
                 // Storm, Earth and Fire - Earthgrab
                 if (spellproto->SpellFamilyFlags[2] & 0x4000)
-                    return DIMINISHING_NONE;
+                    return DIMINISHING_CONTROLLED_ROOT;
                 break;
             }
         case SPELLFAMILY_DEATHKNIGHT:
