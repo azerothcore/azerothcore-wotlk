@@ -4500,14 +4500,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (!IsInPhase(e.event.eventPhaseChange.phasemask))
                     return;
 
-                WorldObject* templastInvoker = GetLastInvoker();
-                if (!templastInvoker)
-                    return;
-
-                if (!IsUnit(templastInvoker))
-                    return;
-
-                ProcessAction(e, templastInvoker->ToUnit());
+                ProcessAction(e);
                 break;
             }
         case SMART_EVENT_GAME_EVENT_START:
