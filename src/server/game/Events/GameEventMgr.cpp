@@ -17,11 +17,11 @@
 
 #include "GameEventMgr.h"
 #include "BattlegroundMgr.h"
-#include "HolidayDateCalculator.h"
 #include "Chat.h"
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
+#include "HolidayDateCalculator.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
@@ -1076,7 +1076,7 @@ void GameEventMgr::LoadHolidayDates()
     uint32 dbCount = 0;
 
     // Step 1: Generate dynamic holiday dates based on current year
-    auto const now = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
     std::time_t const nowTime = std::chrono::system_clock::to_time_t(now);
     std::tm localTime = {};
 #ifdef _WIN32
