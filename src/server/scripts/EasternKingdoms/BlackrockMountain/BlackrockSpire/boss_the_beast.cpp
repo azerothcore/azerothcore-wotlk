@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -110,7 +110,7 @@ public:
 
             if (_beastReached)
             {
-                me->GetMotionMaster()->MovePath(BEAST_MOVEMENT_ID, true);
+                me->GetMotionMaster()->MoveWaypoint(BEAST_MOVEMENT_ID, true);
             }
         }
 
@@ -157,8 +157,8 @@ public:
                                     orc->AI()->Talk(SAY_BLACKHAND_DOOMED);
                                 }
 
-                                orc->m_Events.AddEvent(new OrcMoveEvent(orc), me->m_Events.CalculateTime(3 * IN_MILLISECONDS));
-                                orc->m_Events.AddEvent(new OrcDeathEvent(orc), me->m_Events.CalculateTime(9 * IN_MILLISECONDS));
+                                orc->m_Events.AddEventAtOffset(new OrcMoveEvent(orc), 3s);
+                                orc->m_Events.AddEventAtOffset(new OrcDeathEvent(orc), 9s);
                             }
                         }
                     }
@@ -169,7 +169,7 @@ public:
                     if (!_beastReached)
                     {
                         _beastReached = true;
-                        me->GetMotionMaster()->MovePath(BEAST_MOVEMENT_ID, true);
+                        me->GetMotionMaster()->MoveWaypoint(BEAST_MOVEMENT_ID, true);
 
                         // There is a chance player logged in between areatriggers (realm crash or restart)
                         // executing part of script which happens when player enters boss room
@@ -227,7 +227,7 @@ public:
                     case EVENT_FIREBALL:
                         DoCastVictim(SPELL_FIREBALL);
                         events.ScheduleEvent(EVENT_FIREBALL, 8s, 21s);
-                        if (events.GetNextEventTime(EVENT_FIREBLAST) < 3 * IN_MILLISECONDS)
+                        if (events.GetTimeUntilEvent(EVENT_FIREBLAST) < 3s)
                         {
                             events.RescheduleEvent(EVENT_FIREBLAST, 3s);
                         }
@@ -235,7 +235,7 @@ public:
                     case EVENT_FIREBLAST:
                         DoCastVictim(SPELL_FIREBLAST);
                         events.ScheduleEvent(EVENT_FIREBLAST, 5s, 8s);
-                        if (events.GetNextEventTime(EVENT_FIREBALL) < 3 * IN_MILLISECONDS)
+                        if (events.GetTimeUntilEvent(EVENT_FIREBALL) < 3s)
                         {
                             events.RescheduleEvent(EVENT_FIREBALL, 3s);
                         }

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,27 +19,6 @@
 #include "GameTime.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-
-class AreaTrigger_at_voltarus_middle : public AreaTriggerScript
-{
-public:
-    AreaTrigger_at_voltarus_middle()
-        : AreaTriggerScript("at_voltarus_middle")
-    {
-    }
-
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
-    {
-        if (player->IsAlive() && !player->IsInCombat())
-            if (player->HasItemCount(39319)) // Scepter of Domination
-            {
-                player->TeleportTo(MAP_NORTHREND, 6242.67f, -1972.10f, 484.783f, 0.6f);
-                return true;
-            }
-
-        return false;
-    }
-};
 
 /*######
 ## at_coilfang_waterfall
@@ -191,7 +170,7 @@ public:
     {
         QuestStatus QLR = player->GetQuestStatus(QUEST_LAST_RITES);
         QuestStatus QBT = player->GetQuestStatus(QUEST_BREAKING_THROUGH);
-        if (!(QLR == QUEST_STATUS_INCOMPLETE || QLR  == QUEST_STATUS_COMPLETE ||
+        if (!(QLR == QUEST_STATUS_INCOMPLETE || QLR  == QUEST_STATUS_COMPLETE || QLR == QUEST_STATUS_REWARDED ||
                 QBT == QUEST_STATUS_INCOMPLETE || QBT == QUEST_STATUS_COMPLETE))
             return false;
 
@@ -416,7 +395,6 @@ private:
 
 void AddSC_areatrigger_scripts()
 {
-    new AreaTrigger_at_voltarus_middle();
     new AreaTrigger_at_coilfang_waterfall();
     new AreaTrigger_at_legion_teleporter();
     new AreaTrigger_at_stormwright_shelf();

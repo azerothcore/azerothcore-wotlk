@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -397,7 +397,10 @@ public:
         if (quest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
         {
             if (npc_escortAI* pEscortAI = CAST_AI(npc_prospector_remtravel::npc_prospector_remtravelAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(false, player->GetGUID());
+            }
 
             creature->SetFaction(FACTION_ESCORTEE_A_NEUTRAL_PASSIVE);
         }
@@ -463,7 +466,7 @@ public:
                             _events.Reset();
                             _events.ScheduleEvent(EVENT_CHECK_FOLLOWING, 1s);
                             player->KilledMonsterCredit(NPC_CAPTURED_RABID_THISTLE_BEAR);
-                            me->DespawnOrUnsummon(240000);
+                            me->DespawnOrUnsummon(240s);
                         }
                     }
                 }
@@ -552,7 +555,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid /*guid*/, int32 type) override
+        void SetGUID(ObjectGuid const& /*guid*/, int32 type) override
         {
             if (type == GUID_SCRIPT_INVOKER && _scriptRunning == false)
             {

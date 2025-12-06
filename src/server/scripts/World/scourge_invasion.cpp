@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,14 +63,8 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
 
     void UpdateWeather(bool startEvent)
     {
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        Weather* weather = me->GetMap()->GetOrGenerateZoneDefaultWeather(me->GetZoneId());
+        if (weather)
         {
             if (startEvent)
                 weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
@@ -956,14 +950,8 @@ struct npc_pallid_horror : public ScriptedAI
 
     void UpdateWeather(bool startEvent)
     {
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        Weather* weather = me->GetMap()->GetOrGenerateZoneDefaultWeather(me->GetZoneId());
+        if (weather)
         {
             if (startEvent)
                 weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -547,12 +547,17 @@ public:
                     }
                     case DONE:
                     {
+                        if (!horsemanKilled) // if no horsemen are found, assume wing is cleared
+                        {
+                            ActivateWingPortal(DATA_HORSEMAN_PORTAL);
+                            break;
+                        }
+
                         _events.RescheduleEvent(EVENT_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER, 15s);
 
                         if (horsemanKilled != HorsemanCount)
                             return false;
 
-                        // all horsemans are killed
                         if (Creature* cr = GetCreature(DATA_BARON_RIVENDARE_BOSS))
                             cr->CastSpell(cr, SPELL_THE_FOUR_HORSEMAN_CREDIT, true);
 
@@ -745,7 +750,7 @@ public:
                     if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, entry.Start, TEMPSUMMON_TIMED_DESPAWN, entry.DespawnTime))
                     {
                         cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, entry.End, false);
+                        cr->GetMotionMaster()->MovePoint(0, entry.End, FORCED_MOVEMENT_NONE, 0.f, false);
                     }
 
                 _events.Repeat(5s);

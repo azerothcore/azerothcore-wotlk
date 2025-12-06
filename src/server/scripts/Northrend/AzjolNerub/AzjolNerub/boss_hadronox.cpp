@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -111,7 +111,7 @@ public:
         uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
-                return !me->isActiveObject() || events.GetNextEventTime(EVENT_HADRONOX_MOVE4) != 0;
+                return !me->isActiveObject() || events.HasTimeUntilEvent(EVENT_HADRONOX_MOVE4) ? 1 : 0;
             return 0;
         }
 
@@ -121,11 +121,11 @@ public:
 
             // Xinef: cannot use pathfinding...
             if (summon->GetDistance(477.0f, 618.0f, 771.0f) < 5.0f)
-                summon->GetMotionMaster()->MovePath(3000012, false);
+                summon->GetMotionMaster()->MoveWaypoint(3000012, false);
             else if (summon->GetDistance(583.0f, 617.0f, 771.0f) < 5.0f)
-                summon->GetMotionMaster()->MovePath(3000013, false);
+                summon->GetMotionMaster()->MoveWaypoint(3000013, false);
             else if (summon->GetDistance(581.0f, 608.5f, 739.0f) < 5.0f)
-                summon->GetMotionMaster()->MovePath(3000014, false);
+                summon->GetMotionMaster()->MoveWaypoint(3000014, false);
         }
 
         void KilledUnit(Unit* victim) override
@@ -258,7 +258,7 @@ public:
         {
             if (summon->GetEntry() != me->GetEntry())
             {
-                summon->GetMotionMaster()->MovePoint(0, *me, false);
+                summon->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false);
                 summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
             }
             summons.Summon(summon);

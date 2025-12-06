@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -81,8 +81,8 @@ enum Misc
 
 enum WaterElementalPathIds
 {
-    PATH_CENTER                     = 5,
-    PATH_END                        = 12
+    PATH_CENTER                     = 6,
+    PATH_END                        = 13
 };
 
 struct boss_hydross_the_unstable : public BossAI
@@ -273,7 +273,7 @@ struct boss_hydross_the_unstable : public BossAI
         else if (summon->GetEntry() == NPC_TAINTED_HYDROSS_ELEMENTAL)
         {
             summon->setActive(true);
-            summon->GetMotionMaster()->MovePath(summon->GetEntry() * 10, false);
+            summon->GetMotionMaster()->MoveWaypoint(summon->GetEntry() * 10, false);
         }
         else
         {

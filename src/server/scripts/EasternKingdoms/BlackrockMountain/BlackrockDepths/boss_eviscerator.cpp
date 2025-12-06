@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,12 +26,9 @@ enum Spells
     SPELL_SHIELD            = 7121
 };
 
-enum Timers
-{
-    TIMER_SHADOWBOLT_VOLLEY = 7000,
-    TIMER_REND              = 20000,
-    TIMER_SHIELD            = 12000
-};
+constexpr Milliseconds TIMER_SHADOWBOLT_VOLLEY = 7s;
+constexpr Milliseconds TIMER_REND = 20s;
+constexpr Milliseconds TIMER_SHIELD = 12s;
 
 class boss_eviscerator : public CreatureScript
 {
@@ -52,9 +49,9 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-            events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, 0.2 * (int)TIMER_SHADOWBOLT_VOLLEY);
-            events.ScheduleEvent(SPELL_REND, 0.2 * (int) TIMER_REND);
-            events.ScheduleEvent(SPELL_SHIELD, 0.2 * (int) TIMER_SHIELD);
+            events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY / 5);
+            events.ScheduleEvent(SPELL_REND, TIMER_REND / 5);
+            events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD / 5);
         }
 
         void DamageTaken(Unit* /* doneBy */, uint32& /* damage */, DamageEffectType /* damagetype */, SpellSchoolMask damageSchoolMask) override
@@ -86,11 +83,11 @@ public:
                 {
                 case SPELL_SHADOWBOLT_VOLLEY:
                     DoCastVictim(SPELL_SHADOWBOLT_VOLLEY);
-                    events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, urand(TIMER_SHADOWBOLT_VOLLEY - 2000, TIMER_SHADOWBOLT_VOLLEY + 2000));
+                    events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY - 2s, TIMER_SHADOWBOLT_VOLLEY + 2s);
                     break;
                 case SPELL_REND:
                     DoCastVictim(SPELL_REND);
-                    events.ScheduleEvent(SPELL_REND, urand(TIMER_REND - 2000, TIMER_REND + 2000));
+                    events.ScheduleEvent(SPELL_REND, TIMER_REND - 2s, TIMER_REND + 2s);
                     break;
                 case SPELL_SHIELD:
                     SpellShieldReady = true;

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -77,51 +77,52 @@ enum Misc
     DATA_SET_INSANITY_PHASE                 = 1,
 };
 
-enum Events
-{
-    EVENT_HERALD_MIND_FLAY                  = 1,
-    EVENT_HERALD_SHADOW,
-    EVENT_HERALD_SHIVER,
-};
-
 const std::array<uint32, MAX_INSANITY_TARGETS> InsanitySpells = { SPELL_INSANITY_PHASING_1, SPELL_INSANITY_PHASING_2, SPELL_INSANITY_PHASING_3, SPELL_INSANITY_PHASING_4, SPELL_INSANITY_PHASING_5 };
 
 struct boss_volazj : public BossAI
 {
     boss_volazj(Creature* pCreature) : BossAI(pCreature, DATA_HERALD_VOLAZJ),
-        insanityTimes(0),
         insanityPhase(false)
         { }
-
-    void InitializeAI() override
-    {
-        BossAI::InitializeAI();
-        // Visible for all players in insanity
-        me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
-    }
 
     void Reset() override
     {
         _Reset();
-        insanityTimes = 0;
         insanityPhase = false;
 
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetControlled(false, UNIT_STATE_STUNNED);
         ResetPlayersPhaseMask();
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
+        me->SetPhaseMask((1 | 16 | 32 | 64 | 128 | 256), true);
+
+        ScheduleHealthCheckEvent({ 66, 33 }, [&]{
+            scheduler.CancelAll();
+            DoCastSelf(SPELL_INSANITY);
+        }, false);
+    }
+
+    void ScheduleTasks() override
+    {
+        ScheduleTimedEvent(8s, [&] {
+            DoCastVictim(SPELL_MIND_FLAY);
+        }, 20s);
+
+        ScheduleTimedEvent(5s, [&] {
+            DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY);
+        }, 5s);
+
+        ScheduleTimedEvent(15s, [&] {
+            DoCastRandomTarget(SPELL_SHIVER);
+        }, 15s);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        events.ScheduleEvent(EVENT_HERALD_MIND_FLAY, 8s);
-        events.ScheduleEvent(EVENT_HERALD_SHADOW, 5s);
-        events.ScheduleEvent(EVENT_HERALD_SHIVER, 15s);
         Talk(SAY_AGGRO);
         DoCastSelf(SPELL_WHISPER_AGGRO);
         instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_QUICK_DEMISE_START_EVENT);
-        me->SetInCombatWithZone();
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -184,36 +185,13 @@ struct boss_volazj : public BossAI
         }
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        // Do not perform insanity recast if boss is casting Insanity already
-        if (me->FindCurrentSpellBySpellId(SPELL_INSANITY))
-        {
-            return;
-        }
-
-        // First insanity
-        if (insanityTimes == 0 && me->HealthBelowPctDamaged(66, damage))
-        {
-            DoCastSelf(SPELL_INSANITY, false);
-            ++insanityTimes;
-        }
-        // Second insanity
-        else if (insanityTimes == 1 && me->HealthBelowPctDamaged(33, damage))
-        {
-            me->InterruptNonMeleeSpells(false);
-            DoCastSelf(SPELL_INSANITY, false);
-            ++insanityTimes;
-        }
-    }
-
     void UpdateAI(uint32 diff) override
     {
         //Return since we have no target
         if (!UpdateVictim())
-        {
             return;
-        }
+
+        scheduler.Update(diff);
 
         if (insanityPhase)
         {
@@ -226,53 +204,13 @@ struct boss_volazj : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetControlled(false, UNIT_STATE_STUNNED);
             me->RemoveAurasDueToSpell(INSANITY_VISUAL);
-        }
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
-            return;
-        }
-
-        while (uint32 const eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_HERALD_MIND_FLAY:
-                {
-                    DoCastVictim(SPELL_MIND_FLAY, false);
-                    events.Repeat(20s);
-                    break;
-                }
-                case EVENT_HERALD_SHADOW:
-                {
-                    DoCastVictim(SPELL_SHADOW_BOLT_VOLLEY, false);
-                    events.Repeat(5s);
-                    break;
-                }
-                case EVENT_HERALD_SHIVER:
-                {
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                    {
-                        DoCast(pTarget, SPELL_SHIVER, false);
-                    }
-
-                    events.Repeat(15s);
-                    break;
-                }
-            }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
+            ScheduleTasks();
         }
 
         DoMeleeAttackIfReady();
     }
 
 private:
-    uint8 insanityTimes;
     bool insanityPhase;     // Indicates if boss enter to insanity phase
 
     uint32 GetPlrInsanityAuraId(uint32 phaseMask) const
@@ -312,6 +250,7 @@ private:
     bool CheckPhaseMinions()
     {
         summons.RemoveNotExisting();
+
         if (summons.empty())
         {
             ResetPlayersPhaseMask();
