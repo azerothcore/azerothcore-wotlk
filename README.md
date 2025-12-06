@@ -239,6 +239,62 @@ docker logs -f ac-worldserver
 - Rate limit no registro
   - O `register.php` tem limitador “5 req/min”. Aguarde um minuto ou limpe os arquivos temporários em `sys_get_temp_dir()/reg_rl`.
 
+### Troubleshooting da sessão (erros reais e correções)
+
+- Build falhou em `mod-autobalance` com `Creature::SetStatFlatModifier`
+  - Causa: API não existe no core atual.
+  - Correção: trocar chamadas por `Unit::SetModifierValue(...)` no `modules/mod-autobalance/src/ABAllCreatureScript.cpp` (ex.: para armadura, `UNIT_MOD_ARMOR` com `BASE_VALUE`). Rebuild.
+
+- Build falhou em `mod-eluna` com `Cell::VisitAllObjects`
+  - Causa: Core usa `Cell::VisitObjects`.
+  - Correção: substituir em `modules/mod-eluna/src/UnitMethods.h` e `WorldObjectMethods.h` todas as ocorrências de `VisitAllObjects` por `VisitObjects`. Rebuild.
+
+- Import do World DB falhou com `Unknown column 'StatsCount'` ao aplicar `modules/mod-system-vip/data/sql/db-world/base/item_creatures_template.sql`
+  - Causa: coluna `StatsCount` removida pelos updates do core.
+  - Correção rápida e segura:
+    - Remover `StatsCount` da lista de colunas e converter o primeiro `INSERT` de `item_template` para formato `INSERT ... SET` mínimo (sem `StatsCount`).
+    - Evitar blocos “exemplo” malformados no fim do arquivo.
+    - Rebuild do importador: `docker compose build --no-cache --progress=plain ac-db-import`
+    - Reexecutar import: `docker compose run --rm ac-db-import`
+
+- `docker compose up` em Apple Silicon mostra "no matching manifest" para algumas imagens
+  - Causa: imagens sem multi-arch; mensagens são informativas.
+  - Correção: prosseguir — `authserver`/`worldserver` funcionam.
+
+- Realm via ngrok: mundo conecta, mas login externo falha
+  - Causa: cliente 3.3.5 usa porta fixa `3724` para auth; ngrok Free randomiza portas.
+  - Alternativas:
+    - Tailscale (recomendado): usar IP `100.x.x.x` estável e atualizar `realmlist` com `port=8085`.
+    - Port-forward no roteador: abrir `TCP 3724` e `TCP 8085` e usar IP público.
+  - Comandos úteis de realm:
+    - `docker compose exec ac-database mysql -uroot -ppassword -e "UPDATE acore_auth.realmlist SET address='0.tcp.sa.ngrok.io', port=19539 WHERE id=1;"`
+    - `docker compose exec ac-database mysql -uroot -ppassword -e "SELECT id,name,address,localAddress,port FROM acore_auth.realmlist WHERE id=1;"`
+  - Importante: `realmlist.wtf` não aceita porta. Use apenas o host (`set realmlist 0.tcp.sa.ngrok.io`).
+
+- Site de registro: `SQLSTATE[HY000] [1045] Access denied for user 'webreg'@'172.20.0.3'`
+  - Causa: usuário/senha do MySQL não batiam com as variáveis do container `ac-site`.
+  - Diagnóstico:
+    - Ver env no site: `docker compose exec ac-site env` (verifique `DB_USER` e `DB_PASS`).
+    - Ver usuário no MySQL: `docker compose exec ac-database mysql -uroot -ppassword -e "SELECT user,host,plugin,account_locked FROM mysql.user WHERE user='webreg';"`
+    - Ver grants: `docker compose exec ac-database mysql -uroot -ppassword -e "SHOW GRANTS FOR 'webreg'@'%';"`
+  - Correção:
+    - Alinhar a senha do MySQL com `DB_PASS` do site:
+      - `docker compose exec ac-database mysql -uroot -ppassword -e "ALTER USER 'webreg'@'%' IDENTIFIED BY 'webreg_local_01!'; FLUSH PRIVILEGES;"`
+    - (Se necessário) criar/grantar:
+      - `docker compose exec ac-database mysql -uroot -ppassword -e "CREATE USER IF NOT EXISTS 'webreg'@'%' IDENTIFIED BY 'webreg_local_01!';"`
+      - `docker compose exec ac-database mysql -uroot -ppassword -e "GRANT SELECT, INSERT ON acore_auth.account TO 'webreg'@'%'; FLUSH PRIVILEGES;"`
+    - Testar:
+      - `docker compose exec ac-database mysql -uwebreg -pwebreg_local_01! -e "SELECT 1;" acore_auth`
+  - Observação: não é necessário reiniciar containers para a troca de senha; vale na hora.
+
+- `register.php` falha com "GMP extension not enabled"
+  - Causa: extensão GMP não habilitada no PHP do `ac-site`/ambiente local.
+  - Correção: habilitar `ext-gmp` na imagem do site ou na instalação local do PHP.
+
+- Rate limit do formulário de registro
+  - Causa: proteção simples de abuso (5 requisições por minuto por IP).
+  - Correção: aguarde 60s ou limpe `$(sys_get_temp_dir)/reg_rl`.
+
 ## Comandos úteis
 
 - Subir tudo:
