@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -79,7 +79,11 @@ enum UldSpells
     SPELL_SIMPLE_TELEPORT       = 12980,
     SPELL_KEEPER_TELEPORT       = 62940,
     SPELL_SNOW_MOUND_PARTICLES  = 64615,
-    SPELL_ENERGY_SAP_10         = 64740
+    SPELL_ENERGY_SAP_10         = 64740,
+
+    // Arachnopod Destroyer
+    SPELL_FLAME_SPRAY           = 64717,
+    SPELL_MACHINE_GUN           = 64776,
 };
 
 class npc_ulduar_keeper : public CreatureScript
@@ -473,11 +477,11 @@ public:
                     case 0:
                         break;
                     case 1:
-                        me->CastSpell(me->GetVictim(), RAID_MODE(64717, 65241), false);
+                        me->CastSpell(me->GetVictim(), SPELL_FLAME_SPRAY, false);
                         events.Repeat(15s, 25s);
                         break;
                     case 2:
-                        me->CastSpell(me->GetVictim(), RAID_MODE(64776, 65240), false);
+                        me->CastSpell(me->GetVictim(), SPELL_MACHINE_GUN, false);
                         events.Repeat(10s, 15s);
                         break;
                     case 3:

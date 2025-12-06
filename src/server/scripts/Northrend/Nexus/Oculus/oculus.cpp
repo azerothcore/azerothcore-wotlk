@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -38,7 +38,6 @@ enum Drakes
 
     // Centrifuge Constructs
     SPELL_EMPOWERING_BLOWS                  = 50044,
-    H_SPELL_EMPOWERING_BLOWS                = 59213,
 
     SPELL_AMBER_SHOCK_CHARGE                = 49836,
     SPELL_RUBY_EVASIVE_CHARGES              = 50241,
@@ -490,7 +489,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            DoCast(IsHeroic() ? H_SPELL_EMPOWERING_BLOWS : SPELL_EMPOWERING_BLOWS);
+            DoCast(SPELL_EMPOWERING_BLOWS);
         }
 
         void UpdateAI(uint32 /*diff*/) override

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -707,7 +707,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         continue;
                     }
 
-                    // Let us not try to cast spell if we know it is going to fail anyway. Stick to chasing and continue.
                     if (distanceToTarget > spellMaxRange && isWithinLOSInMap)
                     {
                         failedSpellCast = true;
@@ -745,12 +744,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
-                        // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
-                        if (result == SPELL_FAILED_OUT_OF_RANGE || result == SPELL_CAST_OK)
-                            // if we are just out of range, we only chase until we are back in spell range.
+                        if (result == SPELL_FAILED_OUT_OF_RANGE)
                             CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
-                        else // move into melee on any other fail
-                            // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
+                        else if (result != SPELL_CAST_OK)
                             CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
                     }
 
@@ -2696,6 +2692,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             if (me && me->FindMap())
                 me->FindMap()->LoadGrid(e.target.x, e.target.y);
+            else if (go && go->FindMap())
+                go->FindMap()->LoadGrid(e.target.x, e.target.y);
             break;
         }
         case SMART_ACTION_PLAYER_TALK:
