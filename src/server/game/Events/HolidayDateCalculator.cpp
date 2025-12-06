@@ -40,11 +40,32 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     // Children's Week: Fixed Apr 28
     { HOLIDAY_CHILDRENS_WEEK, HolidayCalculationType::FIXED_DATE, 4, 28, 0, 0 },
 
+    // Midsummer Fire Festival: Fixed Jun 21
+    { HOLIDAY_FIRE_FESTIVAL, HolidayCalculationType::FIXED_DATE, 6, 21, 0, 0 },
+
+    // Fireworks Spectacular: Fixed Jul 4
+    { HOLIDAY_FIREWORKS_SPECTACULAR, HolidayCalculationType::FIXED_DATE, 7, 4, 0, 0 },
+
+    // Pirates' Day: Fixed Sep 19
+    { HOLIDAY_PIRATES_DAY, HolidayCalculationType::FIXED_DATE, 9, 19, 0, 0 },
+
+    // Brewfest: Fixed Sep 20
+    { HOLIDAY_BREWFEST, HolidayCalculationType::FIXED_DATE, 9, 20, 0, 0 },
+
     // Harvest Festival: Fixed Sep 28
     { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 9, 28, 0, 0 },
 
+    // Hallow's End: Fixed Oct 18
+    { HOLIDAY_HALLOWS_END, HolidayCalculationType::FIXED_DATE, 10, 18, 0, 0 },
+
+    // Day of the Dead: Fixed Nov 1
+    { HOLIDAY_DAY_OF_DEAD, HolidayCalculationType::FIXED_DATE, 11, 1, 0, 0 },
+
     // Pilgrim's Bounty: 4th Thursday of November (Thanksgiving)
-    { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), 0 }
+    { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), 0 },
+
+    // Winter Veil: Fixed Dec 15
+    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::FIXED_DATE, 12, 15, 0, 0 }
 };
 
 const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
