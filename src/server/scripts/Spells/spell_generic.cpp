@@ -4422,7 +4422,9 @@ class spell_gen_eject_all_passengers : public SpellScript
     }
 };
 
-/* 62539 - Eject Passenger 2
+/* 49259 - Despawn Driver
+   49261 - Dismount Passenger
+   62539 - Eject Passenger 2
    64614 - Eject Passenger 4
    64629 - Eject Passenger 1
    64630 - Eject Passenger 2
@@ -5670,6 +5672,29 @@ class spell_gen_bm_on : public SpellScript
     }
 };
 
+class spell_gen_whisper_to_controller : public SpellScript
+{
+    PrepareSpellScript(spell_gen_whisper_to_controller);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return sObjectMgr->GetBroadcastText(uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()));
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (TempSummon* casterSummon = caster->ToTempSummon())
+                if (Player* target = casterSummon->GetSummonerUnit()->ToPlayer())
+                    casterSummon->Unit::Whisper(uint32(GetEffectValue()), target, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_gen_whisper_to_controller::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5843,4 +5868,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_invis_on);
     RegisterSpellScript(spell_gen_bm_on);
     RegisterSpellScript(spell_gen_bm_off);
+    RegisterSpellScript(spell_gen_whisper_to_controller);
 }

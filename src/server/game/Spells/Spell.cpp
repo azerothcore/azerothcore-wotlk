@@ -19,7 +19,6 @@
 #include "ArenaSpectator.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
-#include "BattlegroundIC.h"
 #include "CharmInfo.h"
 #include "CellImpl.h"
 #include "Common.h"
@@ -33,7 +32,6 @@
 #include "InstanceScript.h"
 #include "Log.h"
 #include "LootMgr.h"
-#include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -41,6 +39,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
+#include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -1240,11 +1239,7 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
             // Other special target selection goes here
             if (uint32 maxTargets = m_spellValue->MaxAffectedTargets)
             {
-                Unit::AuraEffectList const& Auras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS);
-                for (Unit::AuraEffectList::const_iterator j = Auras.begin(); j != Auras.end(); ++j)
-                    if ((*j)->IsAffectedOnSpell(m_spellInfo))
-                        maxTargets += (*j)->GetAmount();
-
+                maxTargets += m_caster->GetTotalAuraModifierByAffectMask(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS, m_spellInfo);
                 Acore::Containers::RandomResize(targets, maxTargets);
             }
 
@@ -1327,11 +1322,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
         // Other special target selection goes here
         if (uint32 maxTargets = m_spellValue->MaxAffectedTargets)
         {
-            Unit::AuraEffectList const& Auras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS);
-            for (Unit::AuraEffectList::const_iterator j = Auras.begin(); j != Auras.end(); ++j)
-                if ((*j)->IsAffectedOnSpell(m_spellInfo))
-                    maxTargets += (*j)->GetAmount();
-
+            maxTargets += m_caster->GetTotalAuraModifierByAffectMask(SPELL_AURA_MOD_MAX_AFFECTED_TARGETS, m_spellInfo);
             Acore::Containers::RandomResize(targets, maxTargets);
         }
 
@@ -6076,6 +6067,8 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
+    uint8 approximateAuraEffectMask = 0;
+    uint8 nonAuraEffectMask = 0;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         // for effects of spells that have only one target
@@ -6561,6 +6554,11 @@ SpellCastResult Spell::CheckCast(bool strict)
             default:
                 break;
         }
+
+        if (m_spellInfo->Effects[i].IsAura())
+            approximateAuraEffectMask |= 1 << i;
+        else if (m_spellInfo->Effects[i].IsEffect())
+            nonAuraEffectMask |= 1 << i;
     }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -6609,8 +6607,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (target->IsCreature() && target->ToCreature()->IsVehicle())
                             return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
+                        // Allow SPELL_AURA_MOD_POSSESS to work on mounted players,
+                        // but keep the old restriction for everything else.
                         if (target->IsMounted())
-                            return SPELL_FAILED_CANT_BE_CHARMED;
+                        {
+                            if (!(target->IsPlayer() && m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_POSSESS))
+                                return SPELL_FAILED_CANT_BE_CHARMED;
+                        }
 
                         if (target->GetCharmerGUID())
                             return SPELL_FAILED_CHARMED;
@@ -6718,6 +6721,13 @@ SpellCastResult Spell::CheckCast(bool strict)
             default:
                 break;
         }
+
+        // check if target already has the same type, but more powerful aura
+        if (!nonAuraEffectMask && (approximateAuraEffectMask & (1 << i)) && !m_spellInfo->IsTargetingArea())
+            if (Unit* target = m_targets.GetUnitTarget())
+                if (!target->IsHighestExclusiveAuraEffect(m_spellInfo, AuraType(m_spellInfo->Effects[i].ApplyAuraName),
+                    m_spellInfo->Effects[i].CalcValue(m_caster, &m_spellValue->EffectBasePoints[i]), approximateAuraEffectMask, false))
+                    return SPELL_FAILED_AURA_BOUNCED;
     }
 
     // check trade slot case (last, for allow catch any another cast problems)
@@ -6968,26 +6978,35 @@ bool Spell::CanAutoCast(Unit* target)
 {
     ObjectGuid targetguid = target->GetGUID();
 
-    for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
+    for (SpellEffectInfo const& spellEffectInfo : m_spellInfo->GetEffects())
     {
-        if (m_spellInfo->Effects[j].Effect == SPELL_EFFECT_APPLY_AURA)
+        if (!spellEffectInfo.IsAura())
+            continue;
+
+        AuraType const& auraType = spellEffectInfo.ApplyAuraName;
+        Unit::AuraEffectList const& auras = target->GetAuraEffectsByType(auraType);
+        for (Unit::AuraEffectList::const_iterator auraIt = auras.begin(); auraIt != auras.end(); ++auraIt)
         {
-            if (m_spellInfo->StackAmount <= 1)
-            {
-                if (target->HasAuraEffect(m_spellInfo->Id, j))
-                    return false;
-            }
-            else
-            {
-                if (AuraEffect* aureff = target->GetAuraEffect(m_spellInfo->Id, j))
-                    if (aureff->GetBase()->GetStackAmount() >= m_spellInfo->StackAmount)
-                        return false;
-            }
-        }
-        else if (m_spellInfo->Effects[j].IsAreaAuraEffect())
-        {
-            if (target->HasAuraEffect(m_spellInfo->Id, j))
+            if (GetSpellInfo()->Id == (*auraIt)->GetSpellInfo()->Id)
                 return false;
+
+            switch (sSpellMgr->CheckSpellGroupStackRules(GetSpellInfo(), (*auraIt)->GetSpellInfo()))
+            {
+                case SPELL_GROUP_STACK_RULE_EXCLUSIVE:
+                    return false;
+                case SPELL_GROUP_STACK_RULE_EXCLUSIVE_FROM_SAME_CASTER:
+                    if (GetCaster() == (*auraIt)->GetCaster())
+                        return false;
+                    break;
+                case SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT: // this one has further checks, but i don't think they're necessary for autocast logic
+                case SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST:
+                    if (abs(spellEffectInfo.BasePoints) <= abs((*auraIt)->GetAmount()))
+                        return false;
+                    break;
+                case SPELL_GROUP_STACK_RULE_DEFAULT:
+                default:
+                    break;
+            }
         }
     }
 
@@ -7905,7 +7924,7 @@ bool Spell::CheckEffectTarget(Unit const* target, uint32 eff) const
         case SPELL_AURA_AOE_CHARM:
             if (target->IsCreature() && target->IsVehicle())
                 return false;
-            if (target->IsMounted())
+            if (target->IsMounted() && m_spellInfo->Effects[eff].ApplyAuraName != SPELL_AURA_MOD_POSSESS)
                 return false;
             if (target->GetCharmerGUID())
                 return false;

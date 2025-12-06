@@ -125,7 +125,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     m_playerLogout(false),
     m_playerRecentlyLogout(false),
     m_playerSave(false),
-    m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
+    m_sessionDbcLocale(sWorld->GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(locale),
     m_latency(0),
     m_TutorialsChanged(false),
