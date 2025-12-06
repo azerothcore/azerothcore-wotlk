@@ -1485,7 +1485,7 @@ namespace lfg
        @param[in]     players Set of players to check their dungeon restrictions
        @param[out]    lockMap Map of players Lock status info of given dungeons (Empty if dungeons is not empty)
     */
-    void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, bool isRDF)
+    void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId)
     {
         lockMap.clear();
         for (LfgGuidSet::const_iterator it = players.begin(); it != players.end() && !dungeons.empty(); ++it)
@@ -1496,7 +1496,14 @@ namespace lfg
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
 
-                if (it2->second == LFG_LOCKSTATUS_RAID_LOCKED && isRDF && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
+                LFGDungeonData const* dungeon = GetLFGDungeon(dungeonId);
+
+                uint8 difficultyFlag = (randomDungeonId == RANDOM_DUNGEON_NORMAL) ? 0 : 1;
+
+                bool isDungeonDisabled = dungeon && (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, nullptr, difficultyFlag)
+                    || sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, nullptr, difficultyFlag));
+
+                if (!isDungeonDisabled && it2->second == LFG_LOCKSTATUS_RAID_LOCKED && randomDungeonId && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
                     continue;
 
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
