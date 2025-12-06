@@ -75,17 +75,15 @@ enum NaxxramasData
     DATA_DANCE_FAIL                 = 301,
     DATA_SPORE_KILLED               = 302,
     DATA_FRENZY_REMOVED             = 303,
-    DATA_THADDIUS_INTRO             = 304,
-    DATA_CHARGES_CROSSED            = 305,
-    DATA_HUNDRED_CLUB               = 306,
-    DATA_ABOMINATION_KILLED         = 307,
+    DATA_CHARGES_CROSSED            = 304,
+    DATA_HUNDRED_CLUB               = 305,
+    DATA_ABOMINATION_KILLED         = 306,
 };
 
 enum NaxxramasPersistentData
 {
-    PERSISTENT_DATA_THADDIUS_INTRO   = 0,
-    PERSISTENT_DATA_KELTHUZAD_DIALOG = 1,
-    PERSISTENT_DATA_IMMORTAL_FAIL    = 2,
+    PERSISTENT_DATA_KELTHUZAD_DIALOG = 0,
+    PERSISTENT_DATA_IMMORTAL_FAIL    = 1,
     PERSISTENT_DATA_COUNT
 };
 
