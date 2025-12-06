@@ -1,0 +1,28 @@
+name: Check Playerbot-Sync Status
+
+on:
+  schedule:
+    - cron: '0 8 * * *'   # tous les jours à 8h UTC
+  workflow_dispatch:       # permet de lancer manuellement
+
+jobs:
+  check-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout your fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream AzerothCore
+        run: |
+          git remote add upstream https://github.com/azerothcore/azerothcore-wotlk.git
+          git fetch upstream
+
+      - name: Compare commits
+        run: |
+          echo "Commits ahead (dans playerbot-sync non présents dans upstream/master):"
+          git log upstream/master..origin/playerbot-sync --oneline || true
+
+          echo "Commits behind (dans upstream/master non présents dans playerbot-sync):"
+          git log origin/playerbot-sync..upstream/master --oneline || true
