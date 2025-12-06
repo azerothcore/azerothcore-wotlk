@@ -1,0 +1,55 @@
+# Ignore build and compiled artifacts inside modules
+# Keep only source code (CMake scripts, headers, sources, configs, SQL, README, etc.)
+
+# Common build directories/files
+build/
+build*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# Object files and static libs
+*.o
+*.obj
+*.lo
+*.la
+*.a
+*.lib
+
+# Shared libraries and executables
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.pdb
+*.exp
+
+# Intermediate/assembly
+*.i
+*.s
+
+# Coverage
+*.gcno
+*.gcda
+*.gcov
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+.DS_Store
+
+# IDE/project metadata
+.vscode/
+.idea/
+nbproject/
+
+# Caches
+.cache/
+.ccache/
