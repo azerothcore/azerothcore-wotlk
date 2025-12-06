@@ -1496,7 +1496,7 @@ namespace lfg
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
 
-                if (it2->second == LFG_LOCKSTATUS_RAID_LOCKED && isRDF)
+                if (it2->second == LFG_LOCKSTATUS_RAID_LOCKED && isRDF && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
                     continue;
 
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
