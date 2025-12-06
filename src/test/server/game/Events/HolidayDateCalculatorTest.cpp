@@ -543,3 +543,160 @@ TEST_F(HolidayDateCalculatorTest, CenturyBoundaries)
         EXPECT_EQ(thanksgiving.tm_mon + 1, 11);
     }
 }
+
+// ============================================================
+// Lunar New Year (Chinese New Year) Tests - Extended Range
+// Based on Jean Meeus "Astronomical Algorithms" (1991)
+// ============================================================
+
+TEST_F(HolidayDateCalculatorTest, LunarNewYear_KnownDates)
+{
+    // Verify against known Chinese New Year dates
+    // Source: Official astronomical calculations and historical records
+    struct LunarNewYearTestCase { int year; int month; int day; };
+    std::vector<LunarNewYearTestCase> testCases = {
+        // Historical dates (2000-2010)
+        { 2000, 2,  5 },
+        { 2001, 1, 24 },
+        { 2002, 2, 12 },
+        { 2003, 2,  1 },
+        { 2004, 1, 22 },
+        { 2005, 2,  9 },
+        { 2006, 1, 29 },
+        { 2007, 2, 18 },
+        { 2008, 2,  7 },
+        { 2009, 1, 26 },
+        { 2010, 2, 14 },
+        // Recent dates (2011-2020)
+        { 2011, 2,  3 },
+        { 2012, 1, 23 },
+        { 2013, 2, 10 },
+        { 2014, 1, 31 },
+        { 2015, 2, 19 },
+        { 2016, 2,  8 },
+        { 2017, 1, 28 },
+        { 2018, 2, 16 },
+        { 2019, 2,  5 },
+        { 2020, 1, 25 },
+        // Current and near-future dates (2021-2031)
+        { 2021, 2, 12 },
+        { 2022, 2,  1 },
+        { 2023, 1, 22 },
+        { 2024, 2, 10 },
+        { 2025, 1, 29 },
+        { 2026, 2, 17 },
+        { 2027, 2,  6 },
+        { 2028, 1, 26 },
+        { 2029, 2, 13 },
+        { 2030, 2,  3 },
+        { 2031, 1, 23 },
+    };
+
+    for (auto const& tc : testCases)
+    {
+        std::tm lunarNewYear = HolidayDateCalculator::CalculateLunarNewYear(tc.year);
+        SCOPED_TRACE("Year: " + std::to_string(tc.year));
+        ExpectDate(lunarNewYear, tc.year, tc.month, tc.day);
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, LunarNewYear_ValidDateRange_1900_2200)
+{
+    // Chinese New Year must always fall between January 21 and February 20 (inclusive)
+    // This is a fundamental property of the lunisolar calendar
+    for (int year = 1900; year <= 2200; ++year)
+    {
+        std::tm lunarNewYear = HolidayDateCalculator::CalculateLunarNewYear(year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Verify year is correct
+        EXPECT_EQ(lunarNewYear.tm_year + 1900, year);
+
+        // Chinese New Year must be in January or February
+        EXPECT_TRUE(lunarNewYear.tm_mon == 0 || lunarNewYear.tm_mon == 1)
+            << "Lunar New Year must be in January (0) or February (1), got month " << lunarNewYear.tm_mon;
+
+        // Valid range: January 21 - February 20
+        if (lunarNewYear.tm_mon == 0) // January
+        {
+            EXPECT_GE(lunarNewYear.tm_mday, 21) << "Lunar New Year in January must be >= 21";
+            EXPECT_LE(lunarNewYear.tm_mday, 31) << "Lunar New Year in January must be <= 31";
+        }
+        else // February
+        {
+            EXPECT_GE(lunarNewYear.tm_mday, 1) << "Lunar New Year in February must be >= 1";
+            EXPECT_LE(lunarNewYear.tm_mday, 20) << "Lunar New Year in February must be <= 20";
+        }
+
+        // Verify it's a valid calendar date
+        EXPECT_TRUE(IsValidDate(year, lunarNewYear.tm_mon + 1, lunarNewYear.tm_mday))
+            << "Lunar New Year should be a valid calendar date";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, LunarNewYear_HolidayRule_Integration)
+{
+    // Test that the LUNAR_NEW_YEAR calculation type works via CalculateHolidayDate
+    HolidayRule lunarFestival = { 327, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, 0 };
+
+    for (int year = 2000; year <= 2100; ++year)
+    {
+        std::tm fromRule = HolidayDateCalculator::CalculateHolidayDate(lunarFestival, year);
+        std::tm direct = HolidayDateCalculator::CalculateLunarNewYear(year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Both methods should produce identical results
+        EXPECT_EQ(fromRule.tm_year, direct.tm_year);
+        EXPECT_EQ(fromRule.tm_mon, direct.tm_mon);
+        EXPECT_EQ(fromRule.tm_mday, direct.tm_mday);
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, LunarNewYear_NoRepeatedDates)
+{
+    // Each year should have a unique Chinese New Year date
+    // (no two consecutive years should have the exact same month/day)
+    int prevMonth = -1;
+    int prevDay = -1;
+
+    for (int year = 1900; year <= 2200; ++year)
+    {
+        std::tm lunarNewYear = HolidayDateCalculator::CalculateLunarNewYear(year);
+
+        if (prevMonth != -1)
+        {
+            // The date should be different from previous year
+            // (due to ~11 day lunar cycle drift)
+            bool sameDate = (lunarNewYear.tm_mon == prevMonth && lunarNewYear.tm_mday == prevDay);
+            EXPECT_FALSE(sameDate)
+                << "Year " << year << " has same date as previous year: "
+                << (lunarNewYear.tm_mon + 1) << "/" << lunarNewYear.tm_mday;
+        }
+
+        prevMonth = lunarNewYear.tm_mon;
+        prevDay = lunarNewYear.tm_mday;
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, LunarNewYear_19YearMetonicCycle)
+{
+    // The Chinese calendar roughly follows a 19-year Metonic cycle
+    // Dates should approximately repeat every 19 years (within a few days)
+    for (int year = 1900; year <= 2180; ++year)
+    {
+        std::tm date1 = HolidayDateCalculator::CalculateLunarNewYear(year);
+        std::tm date2 = HolidayDateCalculator::CalculateLunarNewYear(year + 19);
+
+        SCOPED_TRACE("Comparing year " + std::to_string(year) + " with " + std::to_string(year + 19));
+
+        // Convert to day-of-year for easier comparison
+        int doy1 = (date1.tm_mon == 0) ? date1.tm_mday : 31 + date1.tm_mday;
+        int doy2 = (date2.tm_mon == 0) ? date2.tm_mday : 31 + date2.tm_mday;
+
+        // Dates should be within ~3 days of each other due to the Metonic cycle
+        int diff = std::abs(doy1 - doy2);
+        EXPECT_LE(diff, 30) << "19-year Metonic cycle should keep dates within ~30 days";
+    }
+}

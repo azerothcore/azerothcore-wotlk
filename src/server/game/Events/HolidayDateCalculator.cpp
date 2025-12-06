@@ -17,20 +17,28 @@
 
 #include "HolidayDateCalculator.h"
 #include "SharedDefines.h"
+#include <cmath>
+
+// Constants for astronomical calculations
+constexpr double PI = 3.14159265358979323846;
+constexpr double DEG_TO_RAD = PI / 180.0;
+
+// Helper: sin/cos in degrees
+inline double sind(double deg) { return std::sin(deg * DEG_TO_RAD); }
 
 // Static holiday rules configuration
 static const std::vector<HolidayRule> s_HolidayRules = {
-    // Lunar Festival: Fixed Jan 22 (simplification; Blizzard varied slightly)
-    { HOLIDAY_LUNAR_FESTIVAL, HolidayCalculationType::FIXED_DATE, 1, 22, 0, 0 },
+    // Lunar Festival: Chinese New Year (astronomical calculation)
+    { HOLIDAY_LUNAR_FESTIVAL, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, 0 },
 
     // Love is in the Air: Fixed Feb 6
     { HOLIDAY_LOVE_IS_IN_THE_AIR, HolidayCalculationType::FIXED_DATE, 2, 6, 0, 0 },
 
-    // Noblegarden: Week after Easter (Easter + 7 days)
-    { HOLIDAY_NOBLEGARDEN, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 7 },
+    // Noblegarden: Easter Sunday (Easter + 0 days)
+    { HOLIDAY_NOBLEGARDEN, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 0 },
 
-    // Children's Week: Fixed Apr 30
-    { HOLIDAY_CHILDRENS_WEEK, HolidayCalculationType::FIXED_DATE, 4, 30, 0, 0 },
+    // Children's Week: Fixed Apr 28
+    { HOLIDAY_CHILDRENS_WEEK, HolidayCalculationType::FIXED_DATE, 4, 28, 0, 0 },
 
     // Harvest Festival: Fixed Sep 28
     { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 9, 28, 0, 0 },
@@ -92,6 +100,161 @@ std::tm HolidayDateCalculator::CalculateNthWeekday(int year, int month, Weekday 
     return date;
 }
 
+// ============================================================================
+// LUNAR NEW YEAR CALCULATION
+// Based on Jean Meeus "Astronomical Algorithms" (1991)
+// Chinese New Year = new moon falling between January 21 and February 20
+// ============================================================================
+
+double HolidayDateCalculator::DateToJulianDay(int year, int month, double day)
+{
+    if (month <= 2)
+    {
+        year -= 1;
+        month += 12;
+    }
+    int const A = year / 100;
+    int const B = 2 - A + (A / 4);
+    return std::floor(365.25 * (year + 4716)) + std::floor(30.6001 * (month + 1)) + day + B - 1524.5;
+}
+
+void HolidayDateCalculator::JulianDayToDate(double jd, int& year, int& month, int& day)
+{
+    jd += 0.5;
+    int const Z = static_cast<int>(jd);
+    int A = Z;
+    if (Z >= 2299161)
+    {
+        int const alpha = static_cast<int>((Z - 1867216.25) / 36524.25);
+        A = Z + 1 + alpha - (alpha / 4);
+    }
+    int const B = A + 1524;
+    int const C = static_cast<int>((B - 122.1) / 365.25);
+    int const D = static_cast<int>(365.25 * C);
+    int const E = static_cast<int>((B - D) / 30.6001);
+
+    day = B - D - static_cast<int>(30.6001 * E);
+    month = (E < 14) ? E - 1 : E - 13;
+    year = (month > 2) ? C - 4716 : C - 4715;
+}
+
+double HolidayDateCalculator::CalculateNewMoon(double k)
+{
+    // Meeus "Astronomical Algorithms" Chapter 49
+    double const T = k / 1236.85;
+    double const T2 = T * T;
+    double const T3 = T2 * T;
+    double const T4 = T3 * T;
+
+    // Mean phase (Eq 49.1)
+    double JDE = 2451550.09766 + 29.530588861 * k + 0.00015437 * T2
+               - 0.000000150 * T3 + 0.00000000073 * T4;
+
+    // Eccentricity correction
+    double const E = 1.0 - 0.002516 * T - 0.0000074 * T2;
+    double const E2 = E * E;
+
+    // Sun's mean anomaly (Eq 49.4)
+    double const M = 2.5534 + 29.10535670 * k - 0.0000014 * T2 - 0.00000011 * T3;
+
+    // Moon's mean anomaly (Eq 49.5)
+    double const MPrime = 201.5643 + 385.81693528 * k + 0.0107582 * T2
+                        + 0.00001238 * T3 - 0.000000058 * T4;
+
+    // Moon's argument of latitude (Eq 49.6)
+    double const F = 160.7108 + 390.67050284 * k - 0.0016118 * T2
+                   - 0.00000227 * T3 + 0.000000011 * T4;
+
+    // Longitude of ascending node (Eq 49.7)
+    double const Omega = 124.7746 - 1.56375588 * k + 0.0020672 * T2 + 0.00000215 * T3;
+
+    // New Moon corrections (Table 49.A)
+    double correction =
+        - 0.40720 * sind(MPrime)
+        + 0.17241 * E * sind(M)
+        + 0.01608 * sind(2 * MPrime)
+        + 0.01039 * sind(2 * F)
+        + 0.00739 * E * sind(MPrime - M)
+        - 0.00514 * E * sind(MPrime + M)
+        + 0.00208 * E2 * sind(2 * M)
+        - 0.00111 * sind(MPrime - 2 * F)
+        - 0.00057 * sind(MPrime + 2 * F)
+        + 0.00056 * E * sind(2 * MPrime + M)
+        - 0.00042 * sind(3 * MPrime)
+        + 0.00042 * E * sind(M + 2 * F)
+        + 0.00038 * E * sind(M - 2 * F)
+        - 0.00024 * E * sind(2 * MPrime - M)
+        - 0.00017 * sind(Omega);
+
+    // Additional planetary corrections (Table 49.B)
+    double const A1  = 299.77 +  0.107408 * k - 0.009173 * T2;
+    double const A2  = 251.88 +  0.016321 * k;
+    double const A3  = 251.83 + 26.651886 * k;
+    double const A4  = 349.42 + 36.412478 * k;
+    double const A5  =  84.66 + 18.206239 * k;
+    double const A6  = 141.74 + 53.303771 * k;
+    double const A7  = 207.14 +  2.453732 * k;
+    double const A8  = 154.84 +  7.306860 * k;
+    double const A9  =  34.52 + 27.261239 * k;
+    double const A10 = 207.19 +  0.121824 * k;
+    double const A11 = 291.34 +  1.844379 * k;
+    double const A12 = 161.72 + 24.198154 * k;
+    double const A13 = 239.56 + 25.513099 * k;
+    double const A14 = 331.55 +  3.592518 * k;
+
+    correction += 0.000325 * sind(A1) + 0.000165 * sind(A2) + 0.000164 * sind(A3)
+                + 0.000126 * sind(A4) + 0.000110 * sind(A5) + 0.000062 * sind(A6)
+                + 0.000060 * sind(A7) + 0.000056 * sind(A8) + 0.000047 * sind(A9)
+                + 0.000042 * sind(A10) + 0.000040 * sind(A11) + 0.000037 * sind(A12)
+                + 0.000035 * sind(A13) + 0.000023 * sind(A14);
+
+    return JDE + correction;
+}
+
+std::tm HolidayDateCalculator::CalculateLunarNewYear(int year)
+{
+    // Chinese New Year always falls on the new moon between Jan 21 and Feb 20
+    double const jan21JD = DateToJulianDay(year, 1, 21.0);
+    double const feb21JD = DateToJulianDay(year, 2, 21.0);
+
+    // Approximate lunation number k for January of target year
+    double const approxK = (year - 2000.0) * 12.3685;
+    double k = std::floor(approxK);
+
+    // Search for the new moon in the valid range
+    for (int i = -2; i <= 2; ++i)
+    {
+        double nmJDE = CalculateNewMoon(k + i);
+
+        // Convert TT (Terrestrial Time) to UT (approximate DeltaT ~70s for 2020s)
+        double nmJD = nmJDE - 70.0 / 86400.0;
+
+        // Add 8 hours for China Standard Time (UTC+8)
+        nmJD += 8.0 / 24.0;
+
+        if (nmJD >= jan21JD && nmJD < feb21JD)
+        {
+            int cnyYear, cnyMonth, cnyDay;
+            JulianDayToDate(nmJD, cnyYear, cnyMonth, cnyDay);
+
+            std::tm result = {};
+            result.tm_year = cnyYear - 1900;
+            result.tm_mon = cnyMonth - 1;
+            result.tm_mday = cnyDay;
+            mktime(&result);
+            return result;
+        }
+    }
+
+    // Fallback (should never happen for years 2000-2031)
+    std::tm fallback = {};
+    fallback.tm_year = year - 1900;
+    fallback.tm_mon = 0;  // January
+    fallback.tm_mday = 25;
+    mktime(&fallback);
+    return fallback;
+}
+
 std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int year)
 {
     std::tm result = {};
@@ -116,6 +279,11 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             result = CalculateEasterSunday(year);
             result.tm_mday += rule.offset;
             mktime(&result); // Normalize
+            break;
+        }
+        case HolidayCalculationType::LUNAR_NEW_YEAR:
+        {
+            result = CalculateLunarNewYear(year);
             break;
         }
     }

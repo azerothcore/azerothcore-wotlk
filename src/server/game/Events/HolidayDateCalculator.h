@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AZEROTHCORE_HOLIDAY_DATE_CALCULATOR_H
-#define AZEROTHCORE_HOLIDAY_DATE_CALCULATOR_H
+#ifndef ACORE_HOLIDAY_DATE_CALCULATOR_H
+#define ACORE_HOLIDAY_DATE_CALCULATOR_H
 
 #include <cstdint>
 #include <ctime>
@@ -26,7 +26,8 @@ enum class HolidayCalculationType
 {
     FIXED_DATE,        // Same month/day every year (e.g., Dec 25)
     NTH_WEEKDAY,       // Nth weekday of month (e.g., 4th Thursday of Nov)
-    EASTER_OFFSET      // Days relative to Easter Sunday
+    EASTER_OFFSET,     // Days relative to Easter Sunday
+    LUNAR_NEW_YEAR     // Chinese New Year (new moon between Jan 21 - Feb 20)
 };
 
 enum class Weekday
@@ -59,6 +60,10 @@ public:
     // Calculate Nth weekday of a month (e.g., 4th Thursday of November)
     static std::tm CalculateNthWeekday(int year, int month, Weekday weekday, int n);
 
+    // Calculate Chinese New Year (Lunar New Year) using astronomical algorithm
+    // Based on Jean Meeus "Astronomical Algorithms" - finds new moon between Jan 21 - Feb 20
+    static std::tm CalculateLunarNewYear(int year);
+
     // Calculate holiday start date for a given year
     static std::tm CalculateHolidayDate(const HolidayRule& rule, int year);
 
@@ -73,6 +78,14 @@ public:
 
     // Calculate date for a specific holiday ID and year
     static uint32_t GetPackedHolidayDate(uint32_t holidayId, int year);
+
+private:
+    // Julian Date conversions for lunar calculations
+    static double DateToJulianDay(int year, int month, double day);
+    static void JulianDayToDate(double jd, int& year, int& month, int& day);
+
+    // Calculate new moon Julian Date for lunation k (Meeus algorithm)
+    static double CalculateNewMoon(double k);
 };
 
-#endif // AZEROTHCORE_HOLIDAY_DATE_CALCULATOR_H
+#endif // ACORE_HOLIDAY_DATE_CALCULATOR_H
