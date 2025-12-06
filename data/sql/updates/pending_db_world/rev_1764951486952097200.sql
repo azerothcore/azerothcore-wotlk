@@ -11,7 +11,7 @@ UPDATE `quest_template_addon` SET `ExclusiveGroup` = 0 WHERE (`ID` = 12583);
 -- ExclusiveGroup -12583 to 0, linear chain, no need for a group
 UPDATE `quest_template_addon` SET `PrevQuestID` = 12598, `NextQuestID` = 0, `ExclusiveGroup` = 0 WHERE (`ID` = 12606);
 
--- PrevQuestID 0 to 12552, Pure Evil requires Death to the Necromagi 
+-- PrevQuestID 0 to 12552, Pure Evil requires Death to the Necromagi
 UPDATE `quest_template_addon` SET `PrevQuestID` = 12552 WHERE (`ID` = 12584);
 
 -- PrevQuestId 12596 to 12598, Death to the Necromagi requires Throwing Down, not Pa'Troll
