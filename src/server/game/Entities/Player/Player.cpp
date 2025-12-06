@@ -7894,7 +7894,9 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         // And permit out of range GO with no owner in case fishing hole
         if (!go || (loot_type != LOOT_FISHINGHOLE && ((loot_type != LOOT_FISHING && loot_type != LOOT_FISHING_JUNK) || go->GetOwnerGUID() != GetGUID()) && !go->IsWithinDistInMap(this)) || (loot_type == LOOT_CORPSE && go->GetRespawnTime() && go->isSpawnedByDefault()))
         {
-            go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
+            if (go)
+                go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
+
             SendLootRelease(guid);
             return;
         }
