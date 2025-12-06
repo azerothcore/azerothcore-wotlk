@@ -2,7 +2,7 @@ name: Check Playerbot-Sync Status
 
 on:
   schedule:
-    - cron: '0 8 * * *'   # tous les jours à 8h UTC
+    - cron: '*/30 * * * *' # toutes les 30 minutes
   workflow_dispatch:       # permet de lancer manuellement
 
 jobs:
