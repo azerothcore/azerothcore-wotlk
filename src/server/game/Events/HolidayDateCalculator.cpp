@@ -123,7 +123,8 @@ std::tm HolidayDateCalculator::CalculateNthWeekday(int year, int month, Weekday 
 
 // ============================================================================
 // LUNAR NEW YEAR CALCULATION
-// Based on Jean Meeus "Astronomical Algorithms" (1991)
+// Based on Jean Meeus "Astronomical Algorithms" (1991), Chapter 49
+// Reference: https://celestialprogramming.com/moonphases.html
 // Chinese New Year = new moon falling between January 21 and February 20
 // ============================================================================
 
