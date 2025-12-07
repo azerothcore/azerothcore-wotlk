@@ -234,6 +234,8 @@ public:
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
 
+            me->SetAnimTier(AnimTier::Fly);
+
             if (pInstance)
             {
                 pInstance->SetData(DATA_ENCOUNTER_STATUS, NOT_STARTED);
