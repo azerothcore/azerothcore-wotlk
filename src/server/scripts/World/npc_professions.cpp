@@ -27,20 +27,15 @@
 # to be removed from here (->ncp_text). This is data for database projects.
 ###*/
 
-
 /*###
 # generic defines
-###*/
-
-#define GOSSIP_SENDER_LEARN         50
+###*/#define GOSSIP_SENDER_LEARN         50
 #define GOSSIP_SENDER_UNLEARN       51
 #define GOSSIP_SENDER_CHECK         52
 
 /*###
 # gossip item and box texts
 ###*/
-
-
 
 /*###
 # spells defines
@@ -805,8 +800,6 @@ enum EngineeringTrinkets
     SPELL_TO_AREA52             = 36954,
     SPELL_TO_TOSHLEY            = 36955,
 };
-
-
 
 class npc_engineering_tele_trinket : public CreatureScript
 {

@@ -787,7 +787,6 @@ enum AcoreStrings
     LANG_NPCINFO_MAILBOX                = 841,
     LANG_NPCINFO_PLAYER_VEHICLE         = 842,
 
-
     // from issue #4143
     LANG_TALK_MUST_UNLEARN_WEAPON = 35048,
     LANG_TALK_HAMMER_LEARN = 35049,
