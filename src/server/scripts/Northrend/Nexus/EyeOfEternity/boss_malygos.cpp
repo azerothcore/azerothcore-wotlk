@@ -401,7 +401,7 @@ public:
                     }
                 case EVENT_INTRO_LAND:
                     {
-                        me->GetMotionMaster()->MoveLand(MI_POINT_INTRO_LAND, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 7.0f);
+                        me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_LAND, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Ground);
                         break;
                     }
                 case EVENT_START_FIGHT:
@@ -462,7 +462,7 @@ public:
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
                         me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
+                        me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Fly);
 
                         events.DelayEvents(25s, 1); // don't delay berserk (group 0)
                     }
@@ -539,7 +539,7 @@ public:
                         break;
                     }
                 case EVENT_VORTEX_LAND_0:
-                    me->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, CenterPos, 7.0f);
+                    me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_LAND, CenterPos, FORCED_MOVEMENT_RUN, 0.f, true, true, AnimTier::Ground);
 
                     break;
                 case EVENT_VORTEX_LAND_1:
@@ -573,7 +573,7 @@ public:
                         me->GetMotionMaster()->MoveIdle();
                         me->DisableSpline();
                         me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MoveTakeoff(MI_POINT_CENTER_AIR_PH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 32.0f, 7.0f);
+                        me->GetMotionMaster()->MovePoint(MI_POINT_CENTER_AIR_PH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 32.0f, FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Fly);
                         events.RescheduleEvent(EVENT_START_PHASE_2_MOVE_TO_SIDE, 22s + 500ms, 1);
                         break;
                     }
@@ -699,7 +699,7 @@ public:
                 case EVENT_MOVE_TO_PHASE_3_POSITION:
                     {
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->GetMotionMaster()->MoveTakeoff(MI_POINT_PH_3_FIGHT_POSITION, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() - 5.0f, me->GetSpeed(MOVE_RUN));
+                        me->GetMotionMaster()->MovePoint(MI_POINT_PH_3_FIGHT_POSITION, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() - 5.0f, FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Fly);
 
                         me->GetThreatMgr().ClearAllThreat(); // players on vehicle are unattackable -> leads to EnterEvadeMode() because target is not acceptable!
 
