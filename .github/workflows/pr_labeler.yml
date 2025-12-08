@@ -1,7 +1,7 @@
 name: PR Labeler
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review] # Run the Labeler on Opened, Synced, Re-opened or Ready for Review (from Draft to Live)
+    types: [opened, synchronize, reopened, ready_for_review] # Ready for Review = Draft to Live PR
 
 jobs:
   triage:
@@ -16,4 +16,4 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
-          sync-labels: false # True = Overite existing Labels | False = Add Labels
+          sync-labels: false # true = Removes ALL current labels before adding the labels | false = Only adds the Labels
