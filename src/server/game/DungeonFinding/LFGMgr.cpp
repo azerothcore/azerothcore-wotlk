@@ -1484,6 +1484,7 @@ namespace lfg
        @param[in, out] dungeons Dungeons to check restrictions
        @param[in]     players Set of players to check their dungeon restrictions
        @param[out]    lockMap Map of players Lock status info of given dungeons (Empty if dungeons is not empty)
+       @param[in]     randomDungeonId Random dungeon ID (0 for non-random selections), used to filter disabled maps
     */
     void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId)
     {
