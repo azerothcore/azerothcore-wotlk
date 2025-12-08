@@ -7158,18 +7158,34 @@ void Player::ApplyItemDependentAuras(Item* item, bool apply)
 {
     if (apply)
     {
-        PlayerSpellMap const& spells = GetSpellMap();
-        for (auto itr = spells.begin(); itr != spells.end(); ++itr)
+        for (auto [spellId, playerSpell]: GetSpellMap())
         {
-            if (itr->second->State == PLAYERSPELL_REMOVED)
+            if (playerSpell->State == PLAYERSPELL_REMOVED)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
                 continue;
 
-            if (!HasAura(itr->first) && HasItemFitToSpellRequirements(spellInfo))
-                AddAura(itr->first, this);  // no SMSG_SPELL_GO in sniff found
+            if (!HasAura(spellId) && HasItemFitToSpellRequirements(spellInfo))
+                AddAura(spellId, this);  // no SMSG_SPELL_GO in sniff found
+        }
+
+        // Check talents (they are stored separately from regular spells)
+        for (auto [spellId, playerTalent] : GetTalentMap())
+        {
+            if (playerTalent->State == PLAYERSPELL_REMOVED)
+                continue;
+
+            if (!(playerTalent->IsInSpec(GetActiveSpec())))
+                continue;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
+                continue;
+
+            if (!HasAura(spellId) && HasItemFitToSpellRequirements(spellInfo))
+                AddAura(spellId, this);
         }
     }
     else
@@ -7878,7 +7894,9 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         // And permit out of range GO with no owner in case fishing hole
         if (!go || (loot_type != LOOT_FISHINGHOLE && ((loot_type != LOOT_FISHING && loot_type != LOOT_FISHING_JUNK) || go->GetOwnerGUID() != GetGUID()) && !go->IsWithinDistInMap(this)) || (loot_type == LOOT_CORPSE && go->GetRespawnTime() && go->isSpawnedByDefault()))
         {
-            go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
+            if (go)
+                go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
+
             SendLootRelease(guid);
             return;
         }
