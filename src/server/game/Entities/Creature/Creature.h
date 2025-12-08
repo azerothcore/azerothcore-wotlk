@@ -69,6 +69,8 @@ public:
     [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     void Update(uint32 time) override;  // overwrited Unit::Update
+    void Heartbeat() override;
+
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
 
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
@@ -186,6 +188,8 @@ public:
     void UpdateMaxPower(Powers power) override;
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
+
+    bool IsAggroGracePeriodExpired() { return _aggroGracePeriodExpired; }
 
     void LoadSparringPct();
     [[nodiscard]] float GetSparringPct() const { return _sparringPct; }
@@ -515,6 +519,8 @@ private:
     // Formation variable
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
+
+    bool _aggroGracePeriodExpired;
 
     // Shared timer between mobs who assist another.
     // Damaging one extends leash range on all of them.
