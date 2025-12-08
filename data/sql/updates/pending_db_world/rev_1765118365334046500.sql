@@ -4,7 +4,7 @@ UPDATE `quest_template_addon` SET `PrevQuestID` = 11231 WHERE (`ID` = 11432);
 -- Add Mage-Lieutenant Malister's text
 DELETE FROM `creature_text` WHERE (`CreatureID` = 23888) AND (`GroupID` IN (0));
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(23888, 0, 0, '$N, I would have words with you.', 15, 0, 100, 0, 0, 0, 0, 0, 'Mage-Lieutenant Malister - Quest 11231');
+(23888, 0, 0, '$n, I would have words with you.', 15, 0, 100, 0, 0, 0, 23634, 0, 'Mage-Lieutenant Malister - Quest 11231');
 
 -- Father Levariol - Store player who completes Of Keys and Cages and send to Mage-Lieutenant Malister
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24038;
