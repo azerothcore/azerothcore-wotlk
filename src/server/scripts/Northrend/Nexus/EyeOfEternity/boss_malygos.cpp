@@ -279,12 +279,6 @@ public:
                     case MI_POINT_SURGE_OF_POWER_CENTER:
                         events.RescheduleEvent(EVENT_SURGE_OF_POWER_WARNING, 0ms, 1);
                         break;
-                }
-            }
-            else if (type == EFFECT_MOTION_TYPE)
-            {
-                switch (id)
-                {
                     case MI_POINT_INTRO_LAND:
                         me->SetDisableGravity(false);
                         events.RescheduleEvent(EVENT_START_FIGHT, 0ms, 1);
