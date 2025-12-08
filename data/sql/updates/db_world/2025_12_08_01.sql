@@ -1,3 +1,4 @@
+-- DB update 2025_12_08_00 -> 2025_12_08_01
 -- PrevQuestID 0 to 12598, Skimmer Spinnerets requires Throwing Down
 -- NextQuestID 12555 to 12583, Skimmer Spinnerets opens up Crashed Sprayer, not A Tangled Skein
 -- ExclusiveGroup -12583 to 0, linear chain, no need for a group
