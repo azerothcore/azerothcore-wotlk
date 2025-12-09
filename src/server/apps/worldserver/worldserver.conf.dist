@@ -3376,6 +3376,15 @@ DungeonAccessRequirements.LFGLevelDBCOverride = 0
 DungeonFinder.CastDeserter = 1
 
 #
+#    DungeonFinder.AllowCompleted
+#
+#        Description: Controls whether completed heroic dungeons are excluded from LFG queue.
+#                     0 - (Classic WLK mode: Dungeons completed by any group member today are excluded (daily lockout enforced))
+#        Default:     1 - (Blizzlike: All dungeons are available for queue, even if already completed)
+
+DungeonFinder.AllowCompleted = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
