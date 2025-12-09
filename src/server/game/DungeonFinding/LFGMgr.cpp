@@ -1499,7 +1499,7 @@ namespace lfg
 
                 LFGDungeonData const* dungeon = GetLFGDungeon(dungeonId);
 
-                uint8 difficultyFlag = (randomDungeonId == RANDOM_DUNGEON_NORMAL) ? 1 : 2;
+                uint8 difficultyFlag = (randomDungeonId == RANDOM_DUNGEON_NORMAL) ? 0 : 1;
 
                 bool isDungeonDisabled = dungeon && (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, nullptr, difficultyFlag)
                     || sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, nullptr, difficultyFlag));
