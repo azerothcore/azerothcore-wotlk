@@ -399,9 +399,9 @@ bool DisableMgr::IsDisabledFor(DisableType type, uint32 entry, Unit const* unit,
             uint8 disabledModes = itr->second.flags;
 
             Difficulty targetDifficulty;
-            if (Player const* player = unit->ToPlayer())
+            if (unit && unit->IsPlayer())
             {
-                targetDifficulty = player->GetDifficulty(mapEntry->IsRaid());
+                targetDifficulty = unit->ToPlayer()->GetDifficulty(mapEntry->IsRaid());
                 GetDownscaledMapDifficultyData(entry, targetDifficulty);
             }
             else
