@@ -488,6 +488,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_FFA_PVP_TIMER, "FFAPvPTimer", 30);
 
+    SetConfigValue<float>(CONFIG_OUTDOOR_PVP_CAPTURE_RATE, "OutdoorPvPCaptureRate", 1.0f);
+
     SetConfigValue<uint32>(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION, "LootNeedBeforeGreedILvlRestriction", 70);
 
     SetConfigValue<bool>(CONFIG_PLAYER_SETTINGS_ENABLED, "EnablePlayerSettings", 0);
