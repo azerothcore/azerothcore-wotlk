@@ -30,6 +30,9 @@ WaypointMgr::~WaypointMgr()
 {
     for (WaypointPathContainer::iterator itr = _waypointStore.begin(); itr != _waypointStore.end(); ++itr)
     {
+        for (WaypointPath::const_iterator it = itr->second.begin(); it != itr->second.end(); ++it)
+            delete *it;
+
         itr->second.clear();
     }
 
@@ -61,7 +64,7 @@ void WaypointMgr::Load()
     do
     {
         Field* fields = result->Fetch();
-        WaypointData data;
+        WaypointData* wp = new WaypointData();
 
         uint32 pathId = fields[0].Get<uint32>();
         WaypointPath& path = _waypointStore[pathId];
@@ -76,39 +79,27 @@ void WaypointMgr::Load()
         Acore::NormalizeMapCoord(x);
         Acore::NormalizeMapCoord(y);
 
-        data.id = fields[1].Get<uint32>();
-        data.x = x;
-        data.y = y;
-        data.z = z;
-        data.orientation = o;
-        data.move_type = fields[6].Get<uint32>();
+        wp->id = fields[1].Get<uint32>();
+        wp->x = x;
+        wp->y = y;
+        wp->z = z;
+        wp->orientation = o;
+        wp->move_type = fields[6].Get<uint32>();
 
-        if (data.move_type >= WAYPOINT_MOVE_TYPE_MAX)
+        if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
             //LOG_ERROR("sql.sql", "Waypoint {} in waypoint_data has invalid move_type, ignoring", wp->id);
+            delete wp;
             continue;
         }
 
-        data.delay = fields[7].Get<uint32>();
-        data.event_id = fields[8].Get<uint32>();
-        data.event_chance = fields[9].Get<int16>();
+        wp->delay = fields[7].Get<uint32>();
+        wp->event_id = fields[8].Get<uint32>();
+        wp->event_chance = fields[9].Get<int16>();
 
-        path.emplace(data.id, data);
+        path.push_back(wp);
         ++count;
     } while (result->NextRow());
-
-    for (auto itr = _waypointStore.begin(); itr != _waypointStore.end(); )
-    {
-        uint32 first = itr->second.begin()->first;
-        uint32 last = itr->second.rbegin()->first;
-        if (last - first + 1 != itr->second.size())
-        {
-            LOG_ERROR("sql.sql", "Waypoint {} in waypoint_data has non-contiguous pointids, skipping", itr->first);
-            itr = _waypointStore.erase(itr);
-        }
-        else
-            ++itr;
-    }
 
     LOG_INFO("server.loading", ">> Loaded {} waypoints in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
@@ -119,6 +110,9 @@ void WaypointMgr::ReloadPath(uint32 id)
     WaypointPathContainer::iterator itr = _waypointStore.find(id);
     if (itr != _waypointStore.end())
     {
+        for (WaypointPath::const_iterator it = itr->second.begin(); it != itr->second.end(); ++it)
+            delete *it;
+
         _waypointStore.erase(itr);
     }
 
@@ -136,7 +130,7 @@ void WaypointMgr::ReloadPath(uint32 id)
     do
     {
         Field* fields = result->Fetch();
-        WaypointData data;
+        WaypointData* wp = new WaypointData();
 
         float x = fields[1].Get<float>();
         float y = fields[2].Get<float>();
@@ -148,23 +142,24 @@ void WaypointMgr::ReloadPath(uint32 id)
         Acore::NormalizeMapCoord(x);
         Acore::NormalizeMapCoord(y);
 
-        data.id = fields[0].Get<uint32>();
-        data.x = x;
-        data.y = y;
-        data.z = z;
-        data.orientation = o;
-        data.move_type = fields[5].Get<uint32>();
+        wp->id = fields[0].Get<uint32>();
+        wp->x = x;
+        wp->y = y;
+        wp->z = z;
+        wp->orientation = o;
+        wp->move_type = fields[5].Get<uint32>();
 
-        if (data.move_type >= WAYPOINT_MOVE_TYPE_MAX)
+        if (wp->move_type >= WAYPOINT_MOVE_TYPE_MAX)
         {
             //LOG_ERROR("sql.sql", "Waypoint {} in waypoint_data has invalid move_type, ignoring", wp->id);
+            delete wp;
             continue;
         }
 
-        data.delay = fields[6].Get<uint32>();
-        data.event_id = fields[7].Get<uint32>();
-        data.event_chance = fields[8].Get<uint8>();
+        wp->delay = fields[6].Get<uint32>();
+        wp->event_id = fields[7].Get<uint32>();
+        wp->event_chance = fields[8].Get<uint8>();
 
-        path.emplace(data.id, data);
+        path.push_back(wp);
     } while (result->NextRow());
 }

@@ -373,7 +373,7 @@ struct violet_hold_trashAI : public npc_escortAI
                     break;
             }
             SetDespawnAtEnd(false);
-            Start(true);
+            Start(true, true);
         }
 
         npc_escortAI::UpdateAI(diff);
@@ -1094,7 +1094,7 @@ public:
                         break;
                 }
                 SetDespawnAtEnd(false);
-                Start(true);
+                Start(true, true);
             }
 
             if (bOpening)

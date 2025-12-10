@@ -86,13 +86,13 @@ struct boss_ghazan : public BossAI
         if (type == ACTION_MOVE_TO_PLATFORM && !_movedToPlatform)
         {
             _movedToPlatform = true;
-            me->GetMotionMaster()->MoveWaypoint((me->GetSpawnId() * 10) + 1, false);
+            me->GetMotionMaster()->MovePath((me->GetSpawnId() * 10) + 1, false);
         }
     }
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
-        if (!_movedToPlatform || type != WAYPOINT_MOTION_TYPE || pointId != 20)
+        if (!_movedToPlatform || type != WAYPOINT_MOTION_TYPE || pointId != 19)
         {
             return;
         }

@@ -523,8 +523,11 @@ public:
                     {
                         soul->SetCanFly(true);
                         soul->SetVisible(true);
+                        Movement::MoveSplineInit init(soul);
+                        init.MoveTo(soul->GetPositionX(), soul->GetPositionY(), soul->GetPositionZ() + 5.0f);
+                        init.SetVelocity(1.0f);
+                        init.Launch();
                         soul->CastSpell(soul, 64462, true); // Drown
-                        soul->GetMotionMaster()->MovePoint(0, soul->GetPositionX(), soul->GetPositionY(), soul->GetPositionZ() + 5.0f, FORCED_MOVEMENT_NONE, 1.f);
                     }
                     events.ScheduleEvent(EVENT_SCENE_1, 6s);
                     break;
@@ -715,8 +718,7 @@ public:
                 Talk(0);
                 events.Reset();
                 summons.DespawnAll();
-                me->SetWalk(true);
-                Start(false);
+                Start(false, false);
 
                 int8 i = -1;
                 std::list<Creature*> cList;
@@ -1312,7 +1314,25 @@ public:
                     break;
                 case EVENT_START_FLIGHT:
                     {
-                        me->GetMotionMaster()->MovePath(me->GetEntry(), FORCED_MOVEMENT_NONE, PathSource::SMART_WAYPOINT_MGR);
+                        WPPath* path = sSmartWaypointMgr->GetPath(me->GetEntry());
+                        if (!path || path->empty())
+                        {
+                            me->DespawnOrUnsummon(1ms);
+                            return;
+                        }
+
+                        Movement::PointsArray pathPoints;
+                        pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+
+                        uint32 wpCounter = 1;
+                        WPPath::const_iterator itr;
+                        while ((itr = path->find(wpCounter++)) != path->end())
+                        {
+                            WayPoint* wp = itr->second;
+                            pathPoints.push_back(G3D::Vector3(wp->x, wp->y, wp->z));
+                        }
+
+                        me->GetMotionMaster()->MoveSplinePath(&pathPoints);
                         events.ScheduleEvent(EVENT_CHECK_PATH_REGEN_HEALTH_BURN_DAMAGE, 1min);
                         events.ScheduleEvent(EVENT_SYNCHRONIZE_SHIELDS, 5s);
                         break;

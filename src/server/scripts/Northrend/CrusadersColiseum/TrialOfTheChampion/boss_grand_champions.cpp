@@ -532,7 +532,7 @@ public:
                     return;
             }
 
-            Start(false);
+            Start(false, true);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

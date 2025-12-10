@@ -344,7 +344,17 @@ public:
             {
                 me->StopMoving();
                 startPath = false;
-                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+                if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
+                {
+                    Movement::PointsArray pathPoints;
+                    pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                    for (uint8 i = 0; i < i_path->size(); ++i)
+                    {
+                        WaypointData const* node = i_path->at(i);
+                        pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                    }
+                    me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                }
             }
 
             if (!UpdateVictim())
@@ -663,7 +673,7 @@ public:
                 {
                     razorscale->AI()->AttackStart(player);
                     razorscale->GetMotionMaster()->MoveIdle();
-                    razorscale->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_INIT, 588.0f, -178.0f, 490.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, false);
+                    razorscale->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_INIT, 588.0f, -178.0f, 490.0f, false, false);
                 }
             }
         }

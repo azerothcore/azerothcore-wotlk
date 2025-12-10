@@ -198,70 +198,54 @@ void WorldSession::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;           // used only for proper packet read
-    MovementInfo movementInfo; // used only for proper packet read
-    uint32 movementCounter;    // spline counter
-
-    Unit* mover = _player->m_mover;
-
+    ObjectGuid guid; // used only for proper packet read
     recvData >> guid.ReadAsPacked();
+
+    MovementInfo movementInfo;                              // used only for proper packet read
+    movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
-    recvData >> movementCounter;
 
-    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_TAXI_FLIGHT)) // taxi spline case
+    recvData.read_skip<uint32>();                          // spline id
+
+    // in taxi flight packet received in 2 case:
+    // 1) end taxi path in far (multi-node) flight
+    // 2) switch from one map to other in case multim-map taxi path
+    // we need process only (1)
+
+    uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
+    if (curDest)
     {
-        // in taxi flight packet received in 2 case:
-        // 1) end taxi path in far (multi-node) flight
-        // 2) switch from one map to other in case multim-map taxi path
-        // we need process only (1)
+        TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);
 
-        uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
-        if (curDest)
+        // far teleport case
+        if (curDestNode && curDestNode->map_id != GetPlayer()->GetMapId() && GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
         {
-            TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);
-
-            // far teleport case
-            if (curDestNode && curDestNode->map_id != GetPlayer()->GetMapId() && GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
+            if (FlightPathMovementGenerator* flight = dynamic_cast<FlightPathMovementGenerator*>(GetPlayer()->GetMotionMaster()->top()))
             {
-                if (FlightPathMovementGenerator* flight = dynamic_cast<FlightPathMovementGenerator*>(GetPlayer()->GetMotionMaster()->top()))
-                {
-                    // short preparations to continue flight
-                    flight->SetCurrentNodeAfterTeleport();
-                    TaxiPathNodeEntry const* node = flight->GetPath()[flight->GetCurrentNode()];
-                    flight->SkipCurrentNode();
+                // short preparations to continue flight
+                flight->SetCurrentNodeAfterTeleport();
+                TaxiPathNodeEntry const* node = flight->GetPath()[flight->GetCurrentNode()];
+                flight->SkipCurrentNode();
 
-                    GetPlayer()->TeleportTo(curDestNode->map_id, node->x, node->y, node->z, GetPlayer()->GetOrientation(), TELE_TO_NOT_LEAVE_TAXI);
-                }
+                GetPlayer()->TeleportTo(curDestNode->map_id, node->x, node->y, node->z, GetPlayer()->GetOrientation(), TELE_TO_NOT_LEAVE_TAXI);
             }
-
-            return;
         }
 
-        // at this point only 1 node is expected (final destination)
-        if (GetPlayer()->m_taxi.GetPath().size() != 1)
-        {
-            return;
-        }
-
-        GetPlayer()->CleanupAfterTaxiFlight();
-        GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
-        if (GetPlayer()->pvpInfo.IsHostile)
-        {
-            GetPlayer()->CastSpell(GetPlayer(), 2479, true);
-        }
         return;
     }
 
-    if (mover->GetGUID() != guid)
+    // at this point only 1 node is expected (final destination)
+    if (GetPlayer()->m_taxi.GetPath().size() != 1)
+    {
         return;
+    }
 
-    if (!_player->IsExpectingChangeTransport() || !mover->movespline || mover->movespline->GetId() != movementCounter)
-        return;
-
-    _player->SetExpectingChangeTransport(false);
-    WorldPacket data(_player->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT) ? MSG_MOVE_ROOT : MSG_MOVE_UNROOT, recvData.size());
-    WriteMovementInfo(&data, &movementInfo);
-    mover->SendMessageToSet(&data, _player);
+    GetPlayer()->CleanupAfterTaxiFlight();
+    GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
+    if (GetPlayer()->pvpInfo.IsHostile)
+    {
+        GetPlayer()->CastSpell(GetPlayer(), 2479, true);
+    }
 }
 
 void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)

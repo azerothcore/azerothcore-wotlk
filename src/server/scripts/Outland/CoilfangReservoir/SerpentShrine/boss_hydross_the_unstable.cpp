@@ -81,8 +81,8 @@ enum Misc
 
 enum WaterElementalPathIds
 {
-    PATH_CENTER                     = 6,
-    PATH_END                        = 13
+    PATH_CENTER                     = 5,
+    PATH_END                        = 12
 };
 
 struct boss_hydross_the_unstable : public BossAI
@@ -273,7 +273,7 @@ struct boss_hydross_the_unstable : public BossAI
         else if (summon->GetEntry() == NPC_TAINTED_HYDROSS_ELEMENTAL)
         {
             summon->setActive(true);
-            summon->GetMotionMaster()->MoveWaypoint(summon->GetEntry() * 10, false);
+            summon->GetMotionMaster()->MovePath(summon->GetEntry() * 10, false);
         }
         else
         {

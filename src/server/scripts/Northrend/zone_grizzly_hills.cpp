@@ -207,7 +207,7 @@ public:
                 Mrfloppy->GetMotionMaster()->MoveFollow(creature, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_emily::npc_emilyAI, (creature->AI())))
-                pEscortAI->Start(true, player->GetGUID());
+                pEscortAI->Start(true, false, player->GetGUID());
         }
         return true;
     }
@@ -479,77 +479,77 @@ public:
             case EVENT_WOUNDED_MOVE:
                 if (me->GetPositionY() == -2835.11f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
                     me->DespawnOrUnsummon(20s);
                 }
                 if (me->GetPositionY() == -2981.89f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
                     me->DespawnOrUnsummon(18s);
                 }
                 if (me->GetPositionY() == -2934.44f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
                     me->DespawnOrUnsummon(9s);
                 }
                 if (me->GetPositionY() == -3020.99f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
                     me->DespawnOrUnsummon(22s);
                 }
                 if (me->GetPositionY() == -2964.73f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_2, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
                     me->DespawnOrUnsummon(15s);
                 }
                 if (me->GetPositionY() == -2940.50f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
                     me->DespawnOrUnsummon(20s);
                 }
                 if (me->GetPositionY() == -2847.93f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
                     me->DespawnOrUnsummon(30s);
                 }
                 if (me->GetPositionY() == -2835.31f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
                     me->DespawnOrUnsummon(27s);
                 }
                 if (me->GetPositionY() == -2822.20f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
                     me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -2846.31f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
                     me->DespawnOrUnsummon(21s);
                 }
                 if (me->GetPositionY() == -2897.23f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
                     me->DespawnOrUnsummon(15s);
                 }
                 if (me->GetPositionY() == -2886.01f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
                     me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -2906.89f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
                     me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -3048.94f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_2, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
                     me->DespawnOrUnsummon(30s);
                 }
                 if (me->GetPositionY() == -2961.08f)
                 {
-                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_2, false);
+                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
                     me->DespawnOrUnsummon(25s);
                 }
                 break;

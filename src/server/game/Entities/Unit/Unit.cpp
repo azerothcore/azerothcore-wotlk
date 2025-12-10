@@ -245,6 +245,8 @@ Unit::Unit() : WorldObject(),
 
     _dualWieldMode = DualWieldMode::AUTO;
 
+    m_rootTimes = 0;
+
     m_state = 0;
     m_deathState = DeathState::Alive;
 
@@ -596,7 +598,7 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
         DisableSpline();
 
         if (movespline->HasAnimation() && IsCreature() && IsAlive())
-            SetAnimTier(AnimTier(movespline->GetAnimationType()));
+            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, movespline->GetAnimationType());
     }
 
     // pussywizard: update always! not every 400ms, because movement generators need the actual position
@@ -4323,10 +4325,10 @@ void Unit::ProcessTerrainStatusUpdate()
 
     LiquidData const& liquidData = GetLiquidData();
 
-    // remove appropriate auras if we are swimming/not swimming respectively - exact mirror of client logic
-    if (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING && (liquidData.Level - GetPositionZ()) > GetCollisionHeight() * 0.75f) // Shallow water at ~75% of collision height)
+    // remove appropriate auras if we are swimming/not swimming respectively
+    if (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING)
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_ABOVEWATER);
-    else
+    else if (!isSwimming())
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     // liquid aura handling
@@ -11091,11 +11093,7 @@ void Unit::SetCharm(Unit* charm, bool apply)
             charm->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
         }
         else
-        {
             charm->m_ControlledByPlayer = false;
-            if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
-                charm->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
-        }
 
         // PvP, FFAPvP
         charm->SetByteValue(UNIT_FIELD_BYTES_2, 1, GetByteValue(UNIT_FIELD_BYTES_2, 1));
@@ -14603,55 +14601,114 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
     propagateSpeedChange();
 
-    SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
-
-    if (forced && IsClientControlled())
+    WorldPacket data;
+    if (!forced)
     {
-        Player* player = const_cast<Player*>(GetClientControlling());
-        uint32 const counter = player->GetSession()->GetOrderCounter();
+        switch (mtype)
+        {
+            case MOVE_WALK:
+                data.Initialize(MSG_MOVE_SET_WALK_SPEED, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_RUN:
+                data.Initialize(MSG_MOVE_SET_RUN_SPEED, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_RUN_BACK:
+                data.Initialize(MSG_MOVE_SET_RUN_BACK_SPEED, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_SWIM:
+                data.Initialize(MSG_MOVE_SET_SWIM_SPEED, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_SWIM_BACK:
+                data.Initialize(MSG_MOVE_SET_SWIM_BACK_SPEED, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_TURN_RATE:
+                data.Initialize(MSG_MOVE_SET_TURN_RATE, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_FLIGHT:
+                data.Initialize(MSG_MOVE_SET_FLIGHT_SPEED, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_FLIGHT_BACK:
+                data.Initialize(MSG_MOVE_SET_FLIGHT_BACK_SPEED, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            case MOVE_PITCH_RATE:
+                data.Initialize(MSG_MOVE_SET_PITCH_RATE, 8 + 4 + 2 + 4 + 4 + 4 + 4 + 4 + 4 + 4);
+                break;
+            default:
+                LOG_ERROR("entities.unit", "Unit::SetSpeed: Unsupported move type ({}), data not sent to client.", mtype);
+                return;
+        }
 
-        // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
-        // and do it only for real sent packets and use run for run/mounted as client expected
-        ++player->m_forced_speed_changes[mtype];
-
-        WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
         data << GetPackGUID();
-        data << counter;
-        if (mtype == MOVE_RUN)
-            data << uint8(0);                           // new 2.1.0
-
-        data << GetSpeed(mtype);
-        player->GetSession()->SendPacket(&data);
-        player->GetSession()->IncrementOrderCounter();
-    }
-    else if (forced)
-    {
-        WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::NPC)], 12);
-        data << GetPackGUID();
+        BuildMovementPacket(&data);
         data << float(GetSpeed(mtype));
         SendMessageToSet(&data, true);
     }
-
-    if (IsPlayer())
+    else
     {
-        // Xinef: update speed of pet also
-        if (!IsInCombat())
+        if (IsPlayer())
         {
-            Unit* pet = ToPlayer()->GetPet();
-            if (!pet)
-                pet = GetCharm();
+            // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
+            // and do it only for real sent packets and use run for run/mounted as client expected
+            ++ToPlayer()->m_forced_speed_changes[mtype];
 
-            // xinef: do not affect vehicles and possesed pets
-            if (pet && (pet->HasUnitFlag(UNIT_FLAG_POSSESSED) || pet->IsVehicle()))
-                pet = nullptr;
+            // Xinef: update speed of pet also
+            if (!IsInCombat())
+            {
+                Unit* pet = ToPlayer()->GetPet();
+                if (!pet)
+                    pet = GetCharm();
 
-            if (pet && pet->IsCreature() && !pet->IsInCombat() && pet->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                pet->UpdateSpeed(mtype, forced);
+                // xinef: do not affect vehicles and possesed pets
+                if (pet && (pet->HasUnitFlag(UNIT_FLAG_POSSESSED) || pet->IsVehicle()))
+                    pet = nullptr;
 
-            if (Unit* critter = ObjectAccessor::GetUnit(*this, GetCritterGUID()))
-                critter->UpdateSpeed(mtype, forced);
+                if (pet && pet->IsCreature() && !pet->IsInCombat() && pet->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+                    pet->UpdateSpeed(mtype, forced);
+                if (Unit* critter = ObjectAccessor::GetUnit(*this, GetCritterGUID()))
+                    critter->UpdateSpeed(mtype, forced);
+            }
+            ToPlayer()->SetCanTeleport(true);
         }
-        ToPlayer()->SetCanTeleport(true);
+
+        switch (mtype)
+        {
+            case MOVE_WALK:
+                data.Initialize(SMSG_FORCE_WALK_SPEED_CHANGE, 16);
+                break;
+            case MOVE_RUN:
+                data.Initialize(SMSG_FORCE_RUN_SPEED_CHANGE, 17);
+                break;
+            case MOVE_RUN_BACK:
+                data.Initialize(SMSG_FORCE_RUN_BACK_SPEED_CHANGE, 16);
+                break;
+            case MOVE_SWIM:
+                data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, 16);
+                break;
+            case MOVE_SWIM_BACK:
+                data.Initialize(SMSG_FORCE_SWIM_BACK_SPEED_CHANGE, 16);
+                break;
+            case MOVE_TURN_RATE:
+                data.Initialize(SMSG_FORCE_TURN_RATE_CHANGE, 16);
+                break;
+            case MOVE_FLIGHT:
+                data.Initialize(SMSG_FORCE_FLIGHT_SPEED_CHANGE, 16);
+                break;
+            case MOVE_FLIGHT_BACK:
+                data.Initialize(SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE, 16);
+                break;
+            case MOVE_PITCH_RATE:
+                data.Initialize(SMSG_FORCE_PITCH_RATE_CHANGE, 16);
+                break;
+            default:
+                LOG_ERROR("entities.unit", "Unit::SetSpeed: Unsupported move type ({}), data not sent to client.", mtype);
+                return;
+        }
+        data << GetPackGUID();
+        data << (uint32)0;                                  // moveEvent, NUM_PMOVE_EVTS = 0x39
+        if (mtype == MOVE_RUN)
+            data << uint8(0);                               // new 2.1.0
+        data << float(GetSpeed(mtype));
+        SendMessageToSet(&data, true);
     }
 }
 
@@ -15282,11 +15339,6 @@ float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spell
     }
 
     return spellInfo->GetMinRange(!IsHostileTo(target));
-}
-
-void Unit::SetAnimTier(AnimTier animTier)
-{
-    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, uint8(animTier));
 }
 
 uint32 Unit::GetCreatureType() const
@@ -16919,13 +16971,6 @@ void Unit::StopMovingOnCurrentPos()
 
 void Unit::SendMovementFlagUpdate(bool self /* = false */)
 {
-    if (IsRooted())
-    {
-        // each case where this occurs has to be examined and reported and dealt with.
-        LOG_ERROR("Unit", "Attempted sending heartbeat with root flag for guid {}", GetGUID().ToString());
-        return;
-    }
-
     WorldPacket data;
     BuildHeartBeatMsg(&data);
     SendMessageToSet(&data, self);
@@ -16944,15 +16989,6 @@ bool Unit::IsStandState() const
 {
     uint8 s = getStandState();
     return !IsSitState() && s != UNIT_STAND_STATE_SLEEP && s != UNIT_STAND_STATE_KNEEL;
-}
-
-bool Unit::IsStandUpOnMovementState() const
-{
-    uint8 s = getStandState();
-    return
-        s == UNIT_STAND_STATE_SIT_CHAIR || s == UNIT_STAND_STATE_SIT_LOW_CHAIR ||
-        s == UNIT_STAND_STATE_SIT_MEDIUM_CHAIR || s == UNIT_STAND_STATE_SIT_HIGH_CHAIR ||
-        s == UNIT_STAND_STATE_SIT || s == UNIT_STAND_STATE_SLEEP;
 }
 
 void Unit::SetStandState(uint8 state)
@@ -18457,65 +18493,74 @@ void Unit::SetStunned(bool apply)
     }
 }
 
-void Unit::SetRooted(bool apply, bool stun, bool logout)
+void Unit::SetRooted(bool apply, bool isStun)
 {
-    const uint32 state = (stun ? (logout ? UNIT_STATE_LOGOUT_TIMER : UNIT_STATE_STUNNED) : UNIT_STATE_ROOT);
-
     if (apply)
     {
-        AddUnitState(state);
+        if (m_rootTimes > 0) // blizzard internal check?
+            m_rootTimes++;
 
-        SendMoveRoot(true);
-    }
-    else
-    {
-        ClearUnitState(state);
+        // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
+        // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
+        // setting MOVEMENTFLAG_ROOT
+        RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
 
-        // Prevent giving ability to move if more immobilizers are active
-        if (!IsImmobilizedState())
-            SendMoveRoot(false);
-    }
-}
-
-void Unit::SendMoveRoot(bool apply)
-{
-    const Player* client = GetClientControlling();
-
-    // Apply flags in-place when unit currently is not controlled by a player
-    if (!client)
-    {
-        if (apply)
+        if (IsFalling())
         {
-            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_MASK_MOVING_FLY);
-            m_movementInfo.AddMovementFlag(MOVEMENTFLAG_ROOT);
-            if (!client)
-                StopMoving();
+            AddUnitMovementFlag(MOVEMENTFLAG_PENDING_ROOT);
         }
         else
-            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ROOT);
-    }
+        {
+            AddUnitMovementFlag(MOVEMENTFLAG_ROOT);
+        }
 
-    if (!IsInWorld())
-        return;
+         // Creature specific
+        if (!IsPlayer())
+        {
+            if (isStun && movespline->Finalized())
+            {
+                StopMovingOnCurrentPos();
+            }
+            else
+            {
+                StopMoving();
+            }
+        }
 
-    const PackedGuid& guid = GetPackGUID();
-    // Wrath+ spline root: when unit is currently not controlled by a player
-    if (!client)
-    {
-        WorldPacket data(apply ? SMSG_SPLINE_MOVE_ROOT : SMSG_SPLINE_MOVE_UNROOT, guid.size());
-        data << guid;
-        SendMessageToSet(&data, true);
+        if (m_movedByPlayer)
+        {
+            WorldPacket data(SMSG_FORCE_MOVE_ROOT, GetPackGUID().size() + 4);
+            data << GetPackGUID();
+            data << m_rootTimes;
+            m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        }
+        else
+        {
+            WorldPacket data(SMSG_SPLINE_MOVE_ROOT, GetPackGUID().size());
+            data << GetPackGUID();
+            SendMessageToSet(&data, true);
+        }
     }
-    // Wrath+ force root: when unit is controlled by a player
     else
     {
-        uint32 const counter = client->GetSession()->GetOrderCounter();
+        RemoveUnitMovementFlag(MOVEMENTFLAG_ROOT | MOVEMENTFLAG_PENDING_ROOT);
 
-        WorldPacket data(apply ? SMSG_FORCE_MOVE_ROOT : SMSG_FORCE_MOVE_UNROOT, guid.size() + 4);
-        data << guid;
-        data << counter;
-        client->GetSession()->SendPacket(&data);
-        client->GetSession()->IncrementOrderCounter();
+        if (!HasUnitState(UNIT_STATE_STUNNED))      // prevent moving if it also has stun effect
+        {
+            if (m_movedByPlayer)
+            {
+                WorldPacket data(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
+                data << GetPackGUID();
+                data << m_rootTimes;
+                m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+            }
+            else
+            {
+                WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, GetPackGUID().size());
+                data << GetPackGUID();
+                SendMessageToSet(&data, true);
+            }
+        }
     }
 }
 
@@ -19769,9 +19814,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!vehicleBase)
         return;
 
-    if (IsPlayer())
-        ToPlayer()->SetExpectingChangeTransport(true);
-
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
     Position pos;
@@ -19801,6 +19843,12 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         player->SetFallInformation(GameTime::GetGameTime().count(), GetPositionZ());
 
         sScriptMgr->AnticheatSetUnderACKmount(player);
+    }
+    else if (HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+    {
+        WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+        data << GetPackGUID();
+        SendMessageToSet(&data, false);
     }
 
     // xinef: hack for flameleviathan seat vehicle
@@ -20544,39 +20592,22 @@ bool Unit::SetWalk(bool enable)
     return true;
 }
 
-void Unit::SetDisableGravity(bool enable)
+bool Unit::SetDisableGravity(bool disable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
 {
-    bool isClientControlled = IsClientControlled();
+    if (disable == IsLevitating())
+        return false;
 
-    if (!isClientControlled)
+    if (disable)
     {
-        if (enable)
-            m_movementInfo.AddMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
-        else
-            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+        AddUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
+        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
+    }
+    else
+    {
+        RemoveUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY);
     }
 
-    if (!IsInWorld()) // is sent on add to map
-        return;
-
-    if (isClientControlled)
-    {
-        if (Player const* player = GetClientControlling())
-        {
-            uint32 const counter = player->GetSession()->GetOrderCounter();
-
-            WorldPacket data(enable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, GetPackGUID().size() + 4);
-            data << GetPackGUID();
-            data << counter;
-            player->GetSession()->SendPacket(&data);
-            player->GetSession()->IncrementOrderCounter();
-            return;
-        }
-    }
-
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
+    return true;
 }
 
 bool Unit::SetSwim(bool enable)
@@ -20623,8 +20654,7 @@ void Unit::SetCanFly(bool enable)
     {
         if (Player const* player = GetClientControlling())
         {
-            uint32 const counter = player->GetSession()->GetOrderCounter();
-            const_cast<Player*>(player)->SetPendingFlightChange(counter);
+            auto const counter = player->GetSession()->GetOrderCounter();
 
             WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, GetPackGUID().size() + 4);
             data << GetPackGUID();
@@ -20659,7 +20689,7 @@ void Unit::SetFeatherFall(bool enable)
     {
         if (Player const* player = GetClientControlling())
         {
-            uint32 const counter = player->GetSession()->GetOrderCounter();
+            auto const counter = player->GetSession()->GetOrderCounter();
 
             WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, GetPackGUID().size() + 4);
 
@@ -20719,7 +20749,7 @@ void Unit::SetHover(bool enable)
         {
             WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, GetPackGUID().size() + 4);
 
-            uint32 const counter = player->GetSession()->GetOrderCounter();
+            auto const counter = player->GetSession()->GetOrderCounter();
 
             data << GetPackGUID();
             data << counter;
@@ -20753,7 +20783,7 @@ void Unit::SetWaterWalking(bool enable)
     {
         if (Player const* player = GetClientControlling())
         {
-            uint32 const counter = player->GetSession()->GetOrderCounter();
+            auto const counter = player->GetSession()->GetOrderCounter();
 
             WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4);
             data << GetPackGUID();
@@ -21434,59 +21464,4 @@ std::string Unit::GetDebugInfo() const
         << " UnitMovementFlags: " << GetUnitMovementFlags() << " ExtraUnitMovementFlags: " << GetExtraUnitMovementFlags()
         << " Class: " << std::to_string(getClass());
     return sstr.str();
-}
-
-bool Unit::IsClientControlled(Player const* exactClient /*= nullptr*/) const
-{
-    // Severvide method to check if unit is client controlled (optionally check for specific client in control)
-
-    // Applies only to player controlled units
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
-        return false;
-
-    // These flags are meant to be used when server controls this unit, client control is taken away
-    if (HasFlag(UNIT_FIELD_FLAGS, (UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING)))
-        return false;
-
-    // If unit is possessed, it has lost original control...
-    if (ObjectGuid const& guid = GetCharmerGUID())
-    {
-        // ... but if it is a possessing charm, then we have to check if some other player controls it
-        if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED) && guid.IsPlayer())
-            return (exactClient ? (exactClient->GetGUID() == guid) : true);
-        return false;
-    }
-
-    // By default: players have client control over themselves
-    if (IsPlayer())
-        return (exactClient ? (exactClient == this) : true);
-    return false;
-}
-
-Player const* Unit::GetClientControlling() const
-{
-    // Serverside reverse "mover" deduction logic at controlled unit
-
-    // Applies only to player controlled units
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
-    {
-        // Charm always removes control from original client...
-        if (GetCharmerGUID())
-        {
-            // ... but if it is a possessing charm, some other client may have control
-            if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
-            {
-                Unit const* charmer = GetCharmer();
-                if (charmer && charmer->IsPlayer())
-                    return static_cast<Player const*>(charmer);
-            }
-        }
-        else if (IsPlayer())
-        {
-            // Check if anything prevents original client from controlling
-            if (IsClientControlled(static_cast<Player const*>(this)))
-                return static_cast<Player const*>(this);
-        }
-    }
-    return nullptr;
 }

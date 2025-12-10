@@ -209,7 +209,7 @@ struct npc_general_andorov : public npc_escortAI
         _initialAttackTimer = 5 * IN_MILLISECONDS;
         _paused = false;
 
-        Start(false);
+        Start(false, true);
 
         me->SetImmuneToNPC(true);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);

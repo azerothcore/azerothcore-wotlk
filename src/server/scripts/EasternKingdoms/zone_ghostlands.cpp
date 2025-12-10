@@ -113,8 +113,7 @@ struct npc_ranger_lilatha : public npc_escortAI
         if (quest->GetQuestId() == QUEST_ESCAPE_FROM_THE_CATACOMBS)
         {
             me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-            me->SetWalk(true);
-            Start(true, player->GetGUID());
+            npc_escortAI::Start(true, false, player->GetGUID());
         }
     }
 };
@@ -149,13 +148,13 @@ struct npc_sentinel_leader : public ScriptedAI
         {
             switch (id)
             {
-            case 2:
-            case 5:
+            case 1:
+            case 4:
+            case 7:
             case 8:
-            case 9:
+            case 13:
             case 14:
-            case 15:
-            case 18:
+            case 17:
                 Creature* SentinelSpy = me->FindNearestCreature(NPC_SENTINEL_SPY, 2.0f, true);
                 if (SentinelSpy)
                 {
@@ -282,10 +281,10 @@ struct npc_sentinel_infiltrator : public ScriptedAI
             case PATH_ONE:
                 switch (id)
                 {
-                    case 6:
-                    case 9:
-                    case 15:
-                    case 19:
+                    case 5:
+                    case 8:
+                    case 14:
+                    case 18:
                         Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
                         if (SentinelInfiltrator)
                         {
@@ -299,10 +298,10 @@ struct npc_sentinel_infiltrator : public ScriptedAI
             case PATH_TWO:
                 switch (id)
                 {
-                    case 6:
-                    case 8:
-                    case 15:
-                    case 18:
+                    case 5:
+                    case 7:
+                    case 14:
+                    case 17:
                         Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
                         if (SentinelInfiltrator)
                         {

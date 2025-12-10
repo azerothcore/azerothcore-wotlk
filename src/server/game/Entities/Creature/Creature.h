@@ -83,7 +83,7 @@ public:
     [[nodiscard]] bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
     [[nodiscard]] bool CanSwim() const override;
     [[nodiscard]] bool CanEnterWater() const override;
-    [[nodiscard]] bool CanFly() const override { return GetMovementTemplate().IsFlightAllowed() || IsFlying(); }
+    [[nodiscard]] bool CanFly()  const override { return GetMovementTemplate().IsFlightAllowed() || IsFlying(); }
     [[nodiscard]] bool CanHover() const { return GetMovementTemplate().Ground == CreatureGroundMovementType::Hover || IsHovering(); }
     [[nodiscard]] bool IsRooted() const { return GetMovementTemplate().IsRooted(); }
 
@@ -145,7 +145,12 @@ public:
     [[nodiscard]] CreatureAI* AI() const { return (CreatureAI*)i_AI; }
 
     bool SetWalk(bool enable) override;
+    bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetSwim(bool enable) override;
+    bool SetCanFly(bool enable, bool packetOnly = false) override;
+    bool SetWaterWalking(bool enable, bool packetOnly = false) override;
+    bool SetFeatherFall(bool enable, bool packetOnly = false) override;
+    bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool HasSpellFocus(Spell const* focusSpell = nullptr) const;
 
     struct

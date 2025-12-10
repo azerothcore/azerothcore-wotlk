@@ -61,8 +61,7 @@ public:
             if (quest->GetQuestId() == QUEST_MISSING_IN_ACTION)
             {
                 Talk(SAY_CORPORAL_1, player);
-                me->SetWalk(true);
-                Start(true, player->GetGUID(), quest);
+                npc_escortAI::Start(true, false, player->GetGUID(), quest);
                 me->SetImmuneToNPC(false);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
             }

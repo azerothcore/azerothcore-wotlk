@@ -533,7 +533,7 @@ public:
                     case EVENT_SAURFANG_RUN:
                         if (Creature* factionNPC = ObjectAccessor::GetCreature(*me, _factionNPC))
                         {
-                            factionNPC->GetMotionMaster()->MoveWaypoint(factionNPC->GetSpawnId() * 10, false);
+                            factionNPC->GetMotionMaster()->MovePath(factionNPC->GetSpawnId() * 10, false);
                             factionNPC->DespawnOrUnsummon(46500ms);
                             std::list<Creature*> followers;
                             factionNPC->GetCreaturesWithEntryInRange(followers, 30, _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_KOR_KRON_GENERAL : NPC_ALLIANCE_COMMANDER);
@@ -934,7 +934,7 @@ public:
                 case EVENT_START_PATHING:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToAll(false);
-                    Start(true);
+                    Start(true, true);
                     break;
                 case EVENT_SCOURGE_STRIKE:
                     DoCastVictim(SPELL_SCOURGE_STRIKE);
@@ -3347,7 +3347,7 @@ public:
             if (Creature* broodling = me->SummonCreature(NPC_NERUBAR_BROODLING, me->GetPositionX() + cos(o) * dist, me->GetPositionY() + std::sin(o) * dist, 250.0f, Position::NormalizeOrientation(o - M_PI)))
             {
                 broodling->CastSpell(broodling, SPELL_WEB_BEAM2, false);
-                broodling->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, broodling->GetPositionX(), broodling->GetPositionY(), 213.03f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
+                broodling->GetMotionMaster()->MovePoint(POINT_ENTER_COMBAT, broodling->GetPositionX(), broodling->GetPositionY(), 213.03f, false);
             }
         }
 

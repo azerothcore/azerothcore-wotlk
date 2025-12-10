@@ -121,11 +121,11 @@ public:
 
             // Xinef: cannot use pathfinding...
             if (summon->GetDistance(477.0f, 618.0f, 771.0f) < 5.0f)
-                summon->GetMotionMaster()->MoveWaypoint(3000012, false);
+                summon->GetMotionMaster()->MovePath(3000012, false);
             else if (summon->GetDistance(583.0f, 617.0f, 771.0f) < 5.0f)
-                summon->GetMotionMaster()->MoveWaypoint(3000013, false);
+                summon->GetMotionMaster()->MovePath(3000013, false);
             else if (summon->GetDistance(581.0f, 608.5f, 739.0f) < 5.0f)
-                summon->GetMotionMaster()->MoveWaypoint(3000014, false);
+                summon->GetMotionMaster()->MovePath(3000014, false);
         }
 
         void KilledUnit(Unit* victim) override
@@ -258,7 +258,7 @@ public:
         {
             if (summon->GetEntry() != me->GetEntry())
             {
-                summon->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false);
+                summon->GetMotionMaster()->MovePoint(0, *me, false);
                 summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
             }
             summons.Summon(summon);

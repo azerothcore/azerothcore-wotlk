@@ -140,7 +140,7 @@ struct boss_alar : public BossAI
                 _noQuillTimes = 0;
                 _platformRoll = RAND(0, 1);
                 _platform = _platformRoll ? 0 : 3;
-                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], FORCED_MOVEMENT_NONE, 0.f, false, true);
+                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
                 _platformMoveRepeatTimer = 16s;
             }
             else
@@ -150,7 +150,7 @@ struct boss_alar : public BossAI
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
                     SpawnPhoenixes(1, me);
                 }
-                me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], FORCED_MOVEMENT_NONE, 0.f, false, true);
+                me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
                 _platform = (_platform+1)%4;
                 _platformMoveRepeatTimer = 30s;
             }
@@ -258,7 +258,7 @@ struct boss_alar : public BossAI
         }, 30s);
         ScheduleTimedEvent(34s, [&]
         {
-            me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], FORCED_MOVEMENT_NONE, 0.f, false, true);
+            me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
         }, 57s);
 
@@ -355,7 +355,17 @@ struct boss_alar : public BossAI
     void ConstructWaypointsAndMove()
     {
         me->StopMoving();
-        me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
+        if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
+        {
+            Movement::PointsArray pathPoints;
+            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+            for (uint8 i = 0; i < i_path->size(); ++i)
+            {
+                WaypointData const* node = i_path->at(i);
+                pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+            }
+            me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+        }
     }
 
     void UpdateAI(uint32 diff) override

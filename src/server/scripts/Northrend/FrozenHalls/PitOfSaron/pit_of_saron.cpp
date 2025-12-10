@@ -551,7 +551,7 @@ public:
                         while (FBSData[i].entry)
                         {
                             if (Creature* c = me->SummonCreature(FBSData[i].entry, 688.69f + i * 1.8f, FBSSpawnPos.GetPositionY() + (float)irand(-2, 2), FBSSpawnPos.GetPositionZ(), 3 * M_PI / 2))
-                                c->GetMotionMaster()->MoveWaypoint(FBSData[i].pathId, false);
+                                c->GetMotionMaster()->MovePath(FBSData[i].pathId, false);
                             ++i;
                         }
                         events.RescheduleEvent(2, 3s);
@@ -674,14 +674,14 @@ public:
             switch (events.ExecuteEvent())
             {
                 case 1:
-                    me->GetMotionMaster()->MovePoint(2, PTSTyrannusWaitPos1, FORCED_MOVEMENT_NONE, 0.f, false);
+                    me->GetMotionMaster()->MovePoint(2, PTSTyrannusWaitPos1, false);
                     break;
                 case 2:
                     me->SetFacingTo(PTSTyrannusWaitPos1.GetOrientation());
                     me->setActive(false);
                     break;
                 case 3:
-                    me->GetMotionMaster()->MovePoint(3, PTSTyrannusWaitPos2, FORCED_MOVEMENT_NONE, 0.f, false);
+                    me->GetMotionMaster()->MovePoint(3, PTSTyrannusWaitPos2, false);
                     break;
                 case 4:
                     me->SetFacingTo(PTSTyrannusWaitPos2.GetOrientation());
@@ -690,7 +690,7 @@ public:
                     me->GetMotionMaster()->MoveTakeoff(10, me->GetPositionX() + 2.0f * cos(me->GetOrientation()), me->GetPositionY() + 2.0f * std::sin(me->GetOrientation()), me->GetPositionZ() + 30.0f, 7.0f);
                     break;
                 case 6:
-                    me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, FORCED_MOVEMENT_NONE, 0.f, false);
+                    me->GetMotionMaster()->MovePoint(4, PTSTyrannusWaitPos3, false);
                     break;
                 case 30:
                     {
@@ -1200,16 +1200,16 @@ public:
 
             switch (id)
             {
-                case 1:
+                case 0:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_2 : SAY_SYLVANAS_OUTRO_2);
                     break;
-                case 2:
+                case 1:
                     if (me->GetEntry() == NPC_JAINA_PART2)
                     {
                         Talk(SAY_JAINA_OUTRO_3);
                     }
                     break;
-                case 7:
+                case 6:
                     me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     if (GameObject* g = me->FindNearestGameObject(GO_HOR_PORTCULLIS, 50.0f))
                         g->SetGoState(GO_STATE_ACTIVE);
@@ -1284,7 +1284,7 @@ public:
                     events.RescheduleEvent(8, 2s);
                     break;
                 case 8:
-                    me->GetMotionMaster()->MoveWaypoint(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);
+                    me->GetMotionMaster()->MovePath(me->GetEntry() == NPC_JAINA_PART2 ? PATH_BEGIN_VALUE + 16 : PATH_BEGIN_VALUE + 17, false);
                     break;
                 case 10:
                     if (Creature* x = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
@@ -1355,7 +1355,7 @@ public:
             }
         }
         if (minDist < 200.0f * 200.0f)
-            _owner.GetMotionMaster()->MovePoint(0, slaveFreePos[pointId], FORCED_MOVEMENT_NONE, 0.f, true, false);
+            _owner.GetMotionMaster()->MovePoint(0, slaveFreePos[pointId], true, false);
         return true;
     }
 

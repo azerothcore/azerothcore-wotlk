@@ -614,7 +614,7 @@ public:
             uint32 path = me->GetEntry() * 10 + urand(0, 4);
             if (me->GetPositionY() > -1150.0f)
                 path += 5;
-            me->GetMotionMaster()->MoveWaypoint(path, false);
+            me->GetMotionMaster()->MovePath(path, false);
         }
 
         void MovementInform(uint32 type, uint32 point) override
@@ -622,7 +622,7 @@ public:
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
 
-            if (point == 9)
+            if (point == 8) // max-1
             {
                 Talk(0);
                 me->RemoveAllAuras();

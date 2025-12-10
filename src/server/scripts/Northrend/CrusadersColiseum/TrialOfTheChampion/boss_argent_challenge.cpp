@@ -587,8 +587,7 @@ public:
                     break;
             }
 
-            me->SetWalk(false);
-            Start(false);
+            Start(false, true);
             uiWaypoint = uiType;
         }
 

@@ -51,7 +51,7 @@ enum Belnistrasz
     EVENT_FROST_NOVA             = 6,
 
     PATH_ESCORT                  = 871710,
-    POINT_REACH_IDOL             = 18,
+    POINT_REACH_IDOL             = 17,
 
     QUEST_EXTINGUISHING_THE_IDOL = 3525,
 
@@ -126,7 +126,7 @@ public:
                 Talk(SAY_QUEST_ACCEPTED);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
-                me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
+                me->GetMotionMaster()->MovePath(PATH_ESCORT, false);
             }
         }
 
