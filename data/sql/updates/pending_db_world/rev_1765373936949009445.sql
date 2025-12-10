@@ -3,7 +3,7 @@
 --
 
 ALTER TABLE `quest_template_addon`
-ADD COLUMN `BreadcrumbForQuestId` mediumint unsigned NOT NULL DEFAULT '0' AFTER `SpecialFlags`;
+ADD COLUMN `BreadcrumbForQuestId` mediumint unsigned NOT NULL DEFAULT '0' AFTER `ExclusiveGroup`;
 
 -- Assisting Arch Druid Runetotem
 UPDATE `quest_template_addon` SET `NextQuestID` = 0, `ExclusiveGroup` = 0, `BreadcrumbForQuestId` = 3761 WHERE `ID` IN (936, 3762, 3784);
