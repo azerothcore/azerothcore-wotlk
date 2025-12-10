@@ -518,6 +518,8 @@ namespace lfg
         LfgUpdateData GetLfgStatus(ObjectGuid guid);
         /// Checks if Seasonal dungeon is active
         bool IsSeasonActive(uint32 dungeonId);
+        /// Checks if given dungeon is disabled
+        bool IsDungeonDisabled(uint32 mapId, Difficulty difficulty) const;
         /// Gets the random dungeon reward corresponding to given dungeon and player level
         LfgReward const* GetRandomDungeonReward(uint32 dungeon, uint8 level);
         /// Returns all random and seasonal dungeons for given level and expansion

@@ -411,9 +411,7 @@ namespace lfg
 
             if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
-            else if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, nullptr, dungeon->difficulty))
-                lockData = LFG_LOCKSTATUS_RAID_LOCKED;
-            else if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, nullptr, dungeon->difficulty))
+            else if (IsDungeonDisabled(dungeon->map, dungeon->difficulty))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
             else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, Difficulty(dungeon->difficulty)))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -1502,10 +1500,7 @@ namespace lfg
 
                 uint8 difficultyFlag = (randomDungeonId == RANDOM_DUNGEON_NORMAL_TBC || randomDungeonId == RANDOM_DUNGEON_NORMAL_WOTLK) ? 0 : 1;
 
-                bool isDungeonDisabled = dungeon && (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, nullptr, difficultyFlag)
-                    || sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, nullptr, difficultyFlag));
-
-                if (!isDungeonDisabled && it2->second == LFG_LOCKSTATUS_RAID_LOCKED && randomDungeonId && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
+                if (dungeon && !IsDungeonDisabled(dungeon->map, (Difficulty)difficultyFlag) && it2->second == LFG_LOCKSTATUS_RAID_LOCKED && randomDungeonId && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
                     continue;
 
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
@@ -2827,6 +2822,12 @@ namespace lfg
                 randomDungeons.insert(dungeon.Entry());
         }
         return randomDungeons;
+    }
+
+    bool LFGMgr::IsDungeonDisabled(uint32 mapId, Difficulty difficulty) const
+    {
+        return sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, mapId, nullptr, difficulty) ||
+            sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, mapId, nullptr);
     }
 
 } // namespace lfg
