@@ -38,6 +38,7 @@ CREATE TABLE `quest_template_addon` (
   `RequiredMaxRepValue` int NOT NULL DEFAULT '0',
   `ProvidedItemCount` tinyint unsigned NOT NULL DEFAULT '0',
   `SpecialFlags` int unsigned NOT NULL DEFAULT '0',
+  `BreadcrumbForQuestId` mediumint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
