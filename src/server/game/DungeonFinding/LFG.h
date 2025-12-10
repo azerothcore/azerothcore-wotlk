@@ -102,8 +102,10 @@ namespace lfg
 
     enum LfgRandomDungeonIds : uint32
     {
-        RANDOM_DUNGEON_NORMAL                        = 259,
-        RANDOM_DUNGEON_HEROIC                        = 260
+        RANDOM_DUNGEON_NORMAL_TBC                    = 259,
+        RANDOM_DUNGEON_HEROIC_TBC                    = 260,
+        RANDOM_DUNGEON_NORMAL_WOTLK                  = 261,
+        RANDOM_DUNGEON_HEROIC_WOTLK                  = 262
     };
 
     class Lfg5Guids;
