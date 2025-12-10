@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -182,7 +182,7 @@ public:
                 case EVENT_SUMMON_KEEPER_OR_GUARDIAN:
                     bKorG = true;
                     spawned = true;
-                    if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
+                    if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER_1, NPC_PORTAL_KEEPER_2), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
                         me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
                     events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20s);
                     break;
@@ -205,7 +205,7 @@ public:
                     break;
                 case EVENT_SUMMON_SABOTEOUR:
                     DoSummon(NPC_SABOTEOUR, me, 2.0f, 0, TEMPSUMMON_CORPSE_DESPAWN);
-                    me->DespawnOrUnsummon(3000);
+                    me->DespawnOrUnsummon(3s);
                     break;
             }
 
@@ -220,11 +220,12 @@ public:
                     if (pInstance)
                         for (SummonList::iterator itr = listOfMobs.begin(); itr != listOfMobs.end(); ++itr)
                             if (Creature* c = pInstance->instance->GetCreature(*itr))
-                                if (c->IsAlive() && (c->GetEntry() == NPC_PORTAL_GUARDIAN || c->GetEntry() == NPC_PORTAL_KEEPER))
+                                if (c->IsAlive() && c->EntryEquals(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER_1, NPC_PORTAL_KEEPER_2))
                                 {
                                     me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
                                     return;
                                 }
+
                     Unit::Kill(me, me, false);
                 }
             }
@@ -372,7 +373,7 @@ struct violet_hold_trashAI : public npc_escortAI
                     break;
             }
             SetDespawnAtEnd(false);
-            Start(true, true);
+            Start(true);
         }
 
         npc_escortAI::UpdateAI(diff);
@@ -422,73 +423,55 @@ struct violet_hold_trashAI : public npc_escortAI
 
 enum AzureInvaderSpells
 {
-    SPELL_CLEAVE = 15496,
-    SPELL_IMPALE_N = 58459,
-    SPELL_IMPALE_H = 59256,
+    SPELL_CLEAVE        = 15496,
+    SPELL_IMPALE        = 58459,
     SPELL_BRUTAL_STRIKE = 58460,
-    SPELL_SUNDER_ARMOR = 58461,
+    SPELL_SUNDER_ARMOR  = 58461,
 };
-#define SPELL_IMPALE                DUNGEON_MODE(SPELL_IMPALE_N, SPELL_IMPALE_H)
 
 enum AzureSpellbreakerSpells
 {
-    SPELL_ARCANE_BLAST_N = 58462,
-    SPELL_ARCANE_BLAST_H = 59257,
-    SPELL_SLOW = 25603,
+    SPELL_ARCANE_BLAST  = 58462,
+    SPELL_SLOW          = 25603,
     SPELL_CHAINS_OF_ICE = 58464,
-    SPELL_CONE_OF_COLD_N = 58463,
-    SPELL_CONE_OF_COLD_H = 59258
+    SPELL_CONE_OF_COLD  = 58463,
 };
-#define SPELL_ARCANE_BLAST          DUNGEON_MODE(SPELL_ARCANE_BLAST_N, SPELL_ARCANE_BLAST_H)
-#define SPELL_CONE_OF_COLD          DUNGEON_MODE(SPELL_CONE_OF_COLD_N, SPELL_CONE_OF_COLD_H)
 
 enum AzureBinderSpells
 {
-    SPELL_ARCANE_BARRAGE_N = 58456,
-    SPELL_ARCANE_BARRAGE_H = 59248,
-    SPELL_ARCANE_EXPLOSION_N = 58455,
-    SPELL_ARCANE_EXPLOSION_H = 59245,
-    SPELL_FROST_NOVA_N = 58458,
-    SPELL_FROST_NOVA_H = 59253,
-    SPELL_FROSTBOLT_N = 58457,
-    SPELL_FROSTBOLT_H = 59251,
+    SPELL_ARCANE_BARRAGE   = 58456,
+    SPELL_ARCANE_EXPLOSION = 58455,
+    SPELL_FROST_NOVA       = 58458,
+    SPELL_FROSTBOLT        = 58457,
 };
-#define SPELL_ARCANE_BARRAGE        DUNGEON_MODE(SPELL_ARCANE_BARRAGE_N, SPELL_ARCANE_BARRAGE_H)
-#define SPELL_ARCANE_EXPLOSION      DUNGEON_MODE(SPELL_ARCANE_EXPLOSION_N, SPELL_ARCANE_EXPLOSION_H)
-#define SPELL_FROST_NOVA            DUNGEON_MODE(SPELL_FROST_NOVA_N, SPELL_FROST_NOVA_H)
-#define SPELL_FROSTBOLT             DUNGEON_MODE(SPELL_FROSTBOLT_N, SPELL_FROSTBOLT_H)
 
 enum AzureMageSlayerSpells
 {
     SPELL_ARCANE_EMPOWERMENT = 58469,
-    SPELL_SPELL_LOCK = 30849
+    SPELL_SPELL_LOCK         = 30849
 };
 
 enum AzureCaptainSpells
 {
-    SPELL_MORTAL_STRIKE = 32736,
+    SPELL_MORTAL_STRIKE      = 32736,
     SPELL_WHIRLWIND_OF_STEEL = 41056
 };
 
 enum AzureSorcerorSpells
 {
-    SPELL_ARCANE_STREAM_N = 60181,
-    SPELL_ARCANE_STREAM_H = 60204,
-    SPELL_MANA_DETONATION_N = 60182,
-    SPELL_MANA_DETONATION_H = 60205
+    SPELL_ARCANE_STREAM   = 60181,
+    SPELL_MANA_DETONATION = 60182,
 };
-#define SPELL_ARCANE_STREAM         DUNGEON_MODE(SPELL_ARCANE_STREAM_N, SPELL_ARCANE_STREAM_H)
-#define SPELL_MANA_DETONATION       DUNGEON_MODE(SPELL_MANA_DETONATION_N, SPELL_MANA_DETONATION_H)
 
 enum AzureRaiderSpells
 {
-    SPELL_CONCUSSION_BLOW = 52719,
+    SPELL_CONCUSSION_BLOW  = 52719,
     SPELL_MAGIC_REFLECTION = 60158
 };
 
 enum AzureStalkerSpells
 {
-    SPELL_BACKSTAB = 58471,
+    SPELL_BACKSTAB       = 58471,
     SPELL_TACTICAL_BLINK = 58470
 };
 
@@ -1111,7 +1094,7 @@ public:
                         break;
                 }
                 SetDespawnAtEnd(false);
-                Start(true, true);
+                Start(true);
             }
 
             if (bOpening)
@@ -1136,7 +1119,7 @@ public:
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetDisplayId(11686);
                         me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-                        me->DespawnOrUnsummon(1000);
+                        me->DespawnOrUnsummon(1s);
                     }
                     ++count;
                 }
@@ -1198,11 +1181,11 @@ struct npc_violet_hold_defense_system : public ScriptedAI
         {
             case EVENT_ARCANE_LIGHTNING:
                 DoCastAOE(RAND(SPELL_ARCANE_LIGHTNING, SPELL_ARCANE_LIGHTNING_VISUAL));
-                events.RepeatEvent(2000);
+                events.Repeat(2s);
                 break;
             case EVENT_ARCANE_LIGHTNING_INSTAKILL:
                 DoCastAOE(SPELL_ARCANE_LIGHTNING_INSTAKILL);
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 break;
         }
     }

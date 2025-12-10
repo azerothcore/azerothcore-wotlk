@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,17 +25,21 @@
 
 DoorData const doorData[] =
 {
-    { GO_KRIKTHIR_DOORS,    DATA_KRIKTHIR,          DOOR_TYPE_PASSAGE },
-    { GO_ANUBARAK_DOORS1,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
-    { GO_ANUBARAK_DOORS2,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
-    { GO_ANUBARAK_DOORS3,   DATA_ANUBARAK_EVENT,    DOOR_TYPE_ROOM },
-    { 0,                    0,                      DOOR_TYPE_ROOM }
+    { GO_KRIKTHIR_DOORS,    DATA_KRIKTHIR,   DOOR_TYPE_PASSAGE },
+    { GO_ANUBARAK_DOORS1,   DATA_ANUBARAK,   DOOR_TYPE_ROOM },
+    { GO_ANUBARAK_DOORS2,   DATA_ANUBARAK,   DOOR_TYPE_ROOM },
+    { GO_ANUBARAK_DOORS3,   DATA_ANUBARAK,   DOOR_TYPE_ROOM },
+    { 0,                    0,               DOOR_TYPE_ROOM }
 };
 
 ObjectData const creatureData[] =
 {
     { NPC_KRIKTHIR_THE_GATEWATCHER, DATA_KRIKTHIR },
     { NPC_HADRONOX,                 DATA_HADRONOX },
+    { NPC_ANUBARAK,                 DATA_ANUBARAK },
+    { NPC_WATCHER_GASHRA,           DATA_GASHRA   },
+    { NPC_WATCHER_NARJIL,           DATA_NARJIL   },
+    { NPC_WATCHER_SILTHIK,          DATA_SILTHIK  },
     { 0,                            0             }
 };
 
@@ -53,7 +57,7 @@ BossBoundaryData const boundaries =
 {
     { DATA_KRIKTHIR, new RectangleBoundary(400.0f, 580.0f, 623.5f, 810.0f) },
     { DATA_HADRONOX, new ZRangeBoundary(666.0f, 776.0f) },
-    { DATA_ANUBARAK_EVENT, new CircleBoundary(Position(550.6178f, 253.5917f), 26.0f) }
+    { DATA_ANUBARAK, new CircleBoundary(Position(550.6178f, 253.5917f), 32.0f) }
 };
 
 class instance_azjol_nerub : public InstanceMapScript
@@ -126,9 +130,36 @@ class spell_azjol_nerub_web_wrap_aura : public AuraScript
     }
 };
 
+enum DrainPowerSpells
+{
+    SPELL_DRAIN_POWER_AURA = 54315
+};
+
+// 54314, 59354 - Drain Power
+class spell_azjol_drain_power : public SpellScript
+{
+    PrepareSpellScript(spell_azjol_drain_power);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRAIN_POWER_AURA });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_DRAIN_POWER_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_azjol_drain_power::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+    }
+};
+
 void AddSC_instance_azjol_nerub()
 {
     new instance_azjol_nerub();
     RegisterSpellScript(spell_azjol_nerub_fixate);
     RegisterSpellScript(spell_azjol_nerub_web_wrap_aura);
+    RegisterSpellScript(spell_azjol_drain_power);
 }

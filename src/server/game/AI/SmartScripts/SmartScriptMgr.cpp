@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -48,12 +48,9 @@ void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+    for (auto itr : waypoint_map)
     {
-        for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
-            delete pathItr->second;
-
-        delete itr->second;
+        delete itr.second;
     }
 
     waypoint_map.clear();
@@ -88,7 +85,7 @@ void SmartWaypointMgr::LoadFromDB()
 
         if (last_entry != entry)
         {
-            waypoint_map[entry] = new WPPath();
+            waypoint_map[entry] = new WaypointPath();
             last_id = 1;
             count++;
         }
@@ -97,7 +94,15 @@ void SmartWaypointMgr::LoadFromDB()
             LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry {}, unexpected point id {}, expected {}.", entry, id, last_id);
 
         last_id++;
-        (*waypoint_map[entry])[id] = new WayPoint(id, x, y, z, o, delay);
+        WaypointData data;
+        data.id = id;
+        data.x = x;
+        data.y = y;
+        data.z = z;
+        data.orientation = o;
+        data.delay = delay;
+        data.move_type = WAYPOINT_MOVE_TYPE_MAX;
+        (*waypoint_map[entry]).emplace(id, data);
 
         last_entry = entry;
         total++;
@@ -109,12 +114,9 @@ void SmartWaypointMgr::LoadFromDB()
 
 SmartWaypointMgr::~SmartWaypointMgr()
 {
-    for (std::unordered_map<uint32, WPPath*>::iterator itr = waypoint_map.begin(); itr != waypoint_map.end(); ++itr)
+    for (auto itr : waypoint_map)
     {
-        for (WPPath::iterator pathItr = itr->second->begin(); pathItr != itr->second->end(); ++pathItr)
-            delete pathItr->second;
-
-        delete itr->second;
+        delete itr.second;
     }
 }
 
@@ -555,6 +557,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_RANDOM_POINT:
         case SMART_TARGET_ROLE_SELECTION:
         case SMART_TARGET_LOOT_RECIPIENTS:
+        case SMART_TARGET_VEHICLE_PASSENGER:
         case SMART_EVENT_SUMMONED_UNIT_DIES:
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
         case SMART_TARGET_PLAYER_RANGE:
@@ -624,8 +627,8 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_CORPSE_REMOVED: return NO_PARAMS;
             case SMART_EVENT_AI_INIT: return NO_PARAMS;
             case SMART_EVENT_DATA_SET: return sizeof(SmartEvent::dataSet);
-            case SMART_EVENT_WAYPOINT_START: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_REACHED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_START: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_REACHED: return sizeof(SmartEvent::waypoint);
             case SMART_EVENT_TRANSPORT_ADDPLAYER: return NO_PARAMS;
             case SMART_EVENT_TRANSPORT_ADDCREATURE: return sizeof(SmartEvent::transportAddCreature);
             case SMART_EVENT_TRANSPORT_REMOVE_PLAYER: return NO_PARAMS;
@@ -640,10 +643,10 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_TEXT_OVER: return sizeof(SmartEvent::textOver);
             case SMART_EVENT_RECEIVE_HEAL: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_JUST_SUMMONED: return NO_PARAMS;
-            case SMART_EVENT_WAYPOINT_PAUSED: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_RESUMED: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_STOPPED: return sizeof(SmartEvent::waypoint);
-            case SMART_EVENT_WAYPOINT_ENDED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_PAUSED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_RESUMED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_STOPPED: return sizeof(SmartEvent::waypoint);
+            case SMART_EVENT_ESCORT_ENDED: return sizeof(SmartEvent::waypoint);
             case SMART_EVENT_TIMED_EVENT_TRIGGERED: return sizeof(SmartEvent::timedEvent);
             case SMART_EVENT_UPDATE: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_LINK: return NO_PARAMS;
@@ -676,8 +679,8 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_AREA_RANGE: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_SUMMONED_UNIT_EVADE: return sizeof(SmartEvent::summoned);
-            case SMART_EVENT_WAYPOINT_DATA_REACHED: return sizeof(SmartEvent::wpData);
-            case SMART_EVENT_WAYPOINT_DATA_ENDED: return sizeof(SmartEvent::wpData);
+            case SMART_EVENT_WAYPOINT_REACHED: return sizeof(SmartEvent::wpData);
+            case SMART_EVENT_WAYPOINT_ENDED: return sizeof(SmartEvent::wpData);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -764,9 +767,9 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SUMMON_GO: return sizeof(SmartAction::summonGO);
             case SMART_ACTION_KILL_UNIT: return NO_PARAMS;
             case SMART_ACTION_ACTIVATE_TAXI: return sizeof(SmartAction::taxi);
-            case SMART_ACTION_WP_START: return sizeof(SmartAction::wpStart);
-            case SMART_ACTION_WP_PAUSE: return sizeof(SmartAction::wpPause);
-            case SMART_ACTION_WP_STOP: return sizeof(SmartAction::wpStop);
+            case SMART_ACTION_ESCORT_START: return sizeof(SmartAction::wpStart);
+            case SMART_ACTION_ESCORT_PAUSE: return sizeof(SmartAction::wpPause);
+            case SMART_ACTION_ESCORT_STOP: return sizeof(SmartAction::wpStop);
             case SMART_ACTION_ADD_ITEM: return sizeof(SmartAction::item);
             case SMART_ACTION_REMOVE_ITEM: return sizeof(SmartAction::item);
             case SMART_ACTION_INSTALL_AI_TEMPLATE: return sizeof(SmartAction::installTtemplate);
@@ -776,7 +779,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_TELEPORT: return sizeof(SmartAction::teleport);
             case SMART_ACTION_SET_COUNTER: return sizeof(SmartAction::setCounter);
             case SMART_ACTION_STORE_TARGET_LIST: return sizeof(SmartAction::storeTargets);
-            case SMART_ACTION_WP_RESUME: return NO_PARAMS;
+            case SMART_ACTION_ESCORT_RESUME: return NO_PARAMS;
             case SMART_ACTION_SET_ORIENTATION: return sizeof(SmartAction::orientation);
             case SMART_ACTION_CREATE_TIMED_EVENT: return sizeof(SmartAction::timeEvent);
             case SMART_ACTION_PLAYMOVIE: return sizeof(SmartAction::movie);
@@ -855,7 +858,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_HOVER: return sizeof(SmartAction::setHover);
             case SMART_ACTION_SET_HEALTH_PCT: return sizeof(SmartAction::setHealthPct);
             // case SMART_ACTION_CREATE_CONVERSATION: return sizeof(SmartAction::raw);
-            case SMART_ACTION_MOVE_TO_POS_TARGET: return sizeof(SmartAction::moveToPos);
+            case SMART_ACTION_MOVE_TO_POS_TARGET: return sizeof(SmartAction::moveToPosTarget);
             case SMART_ACTION_EXIT_VEHICLE: return NO_PARAMS;
             case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS: return sizeof(SmartAction::movementFlag);
             case SMART_ACTION_SET_COMBAT_DISTANCE: return sizeof(SmartAction::combatDistance);
@@ -866,6 +869,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_ZONE_UNDER_ATTACK: return NO_PARAMS;
             case SMART_ACTION_LOAD_GRID: return NO_PARAMS;
             case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
+            case SMART_ACTION_DO_ACTION: return sizeof(SmartAction::doAction);
             case SMART_ACTION_SET_GUID: return sizeof(SmartAction::setGuid);
             case SMART_ACTION_SCRIPTED_SPAWN: return sizeof(SmartAction::scriptSpawn);
             case SMART_ACTION_SET_SCALE: return sizeof(SmartAction::setScale);
@@ -873,13 +877,14 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_PLAY_SPELL_VISUAL: return sizeof(SmartAction::spellVisual);
             case SMART_ACTION_FOLLOW_GROUP: return sizeof(SmartAction::followGroup);
             case SMART_ACTION_SET_ORIENTATION_TARGET: return sizeof(SmartAction::orientationTarget);
-            case SMART_ACTION_WAYPOINT_DATA_START: return sizeof(SmartAction::wpData);
+            case SMART_ACTION_WAYPOINT_START: return sizeof(SmartAction::wpData);
             case SMART_ACTION_WAYPOINT_DATA_RANDOM: return sizeof(SmartAction::wpDataRandom);
             case SMART_ACTION_MOVEMENT_STOP: return NO_PARAMS;
             case SMART_ACTION_MOVEMENT_PAUSE: return sizeof(SmartAction::move);
             case SMART_ACTION_MOVEMENT_RESUME: return sizeof(SmartAction::move);
             case SMART_ACTION_WORLD_SCRIPT: return sizeof(SmartAction::worldStateScript);
             case SMART_ACTION_DISABLE_REWARD: return sizeof(SmartAction::reward);
+            case SMART_ACTION_DISMOUNT: return NO_PARAMS;
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -944,6 +949,9 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_VEHICLE_PASSENGER: return sizeof(SmartTarget::vehicle);
             // case SMART_TARGET_CLOSEST_UNSPAWNED_GAMEOBJECT: return sizeof(SmartTarget::goClosest);
             case SMART_TARGET_PLAYER_WITH_AURA: return sizeof(SmartTarget::playerWithAura);
+            case SMART_TARGET_RANDOM_POINT: return sizeof(SmartTarget::randomPoint);
+            case SMART_TARGET_SUMMONED_CREATURES: return sizeof(SmartTarget::summonedCreatures);
+            case SMART_TARGET_INSTANCE_STORAGE: return sizeof(SmartTarget::instanceStorage);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target {} with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
@@ -1414,19 +1422,19 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_QUEST_REWARDED:
             case SMART_EVENT_QUEST_FAIL:
             case SMART_EVENT_JUST_SUMMONED:
-            case SMART_EVENT_WAYPOINT_START:
-            case SMART_EVENT_WAYPOINT_REACHED:
-            case SMART_EVENT_WAYPOINT_PAUSED:
-            case SMART_EVENT_WAYPOINT_RESUMED:
-            case SMART_EVENT_WAYPOINT_STOPPED:
-            case SMART_EVENT_WAYPOINT_ENDED:
+            case SMART_EVENT_ESCORT_START:
+            case SMART_EVENT_ESCORT_REACHED:
+            case SMART_EVENT_ESCORT_PAUSED:
+            case SMART_EVENT_ESCORT_RESUMED:
+            case SMART_EVENT_ESCORT_STOPPED:
+            case SMART_EVENT_ESCORT_ENDED:
             case SMART_EVENT_GOSSIP_SELECT:
             case SMART_EVENT_GOSSIP_HELLO:
             case SMART_EVENT_JUST_CREATED:
             case SMART_EVENT_FOLLOW_COMPLETED:
             case SMART_EVENT_ON_SPELLCLICK:
-            case SMART_EVENT_WAYPOINT_DATA_REACHED:
-            case SMART_EVENT_WAYPOINT_DATA_ENDED:
+            case SMART_EVENT_WAYPOINT_REACHED:
+            case SMART_EVENT_WAYPOINT_ENDED:
                 break;
             default:
                 LOG_ERROR("sql.sql", "SmartAIMgr: Not handled event_type({}), Entry {} SourceType {} Event {} Action {}, skipped.", e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1562,11 +1570,11 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                 return false;
             }
-            if (e.action.startClosestWaypoint.repeat > 1 || e.action.startClosestWaypoint.run > 1)
+            if (e.action.startClosestWaypoint.repeat > 1 || e.action.startClosestWaypoint.forcedMovement >= FORCED_MOVEMENT_MAX)
             {
-                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid run ({}) or repeat ({}) parameter, must be 0 or 1.",
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid forcedMovement ({}) or repeat ({}) parameter, must be 0 or 1.",
                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(),
-                    e.action.startClosestWaypoint.repeat, e.action.startClosestWaypoint.run);
+                    e.action.startClosestWaypoint.repeat, e.action.startClosestWaypoint.forcedMovement);
                 return false;
             }
             break;
@@ -1719,11 +1727,11 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 return false;
             }
             break;
-        case SMART_ACTION_WP_STOP:
+        case SMART_ACTION_ESCORT_STOP:
             if (e.action.wpStop.quest && !IsQuestValid(e, e.action.wpStop.quest))
                 return false;
             return IsSAIBoolValid(e, e.action.wpStop.fail);
-        case SMART_ACTION_WP_START:
+        case SMART_ACTION_ESCORT_START:
             {
                 if (!sSmartWaypointMgr->GetPath(e.action.wpStart.pathID))
                 {
@@ -1743,8 +1751,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 }
 
-                return IsSAIBoolValid(e, e.action.wpStart.run) &&
-                       IsSAIBoolValid(e, e.action.wpStart.repeat);
+                if (e.action.wpStart.forcedMovement >= FORCED_MOVEMENT_MAX)
+                {
+                    LOG_ERROR("sql.sql", "SmartAIMgr: Creature {} Event {} Action {} uses invalid forcedMovement {}, skipped.", e.entryOrGuid, e.event_id, e.GetActionType(), e.action.wpStart.forcedMovement);
+                    return false;
+                }
+
+                return IsSAIBoolValid(e, e.action.wpStart.repeat);
             }
         case SMART_ACTION_CREATE_TIMED_EVENT:
             {
@@ -1933,7 +1946,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_STORE_TARGET_LIST:
         case SMART_ACTION_COMBAT_STOP:
         case SMART_ACTION_DIE:
-        case SMART_ACTION_WP_RESUME:
+        case SMART_ACTION_ESCORT_RESUME:
         case SMART_ACTION_KILL_UNIT:
         case SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL:
         case SMART_ACTION_RESET_GOBJECT:
@@ -1943,7 +1956,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_SET_DATA:
         case SMART_ACTION_MOVE_FORWARD:
-        case SMART_ACTION_WP_PAUSE:
+        case SMART_ACTION_ESCORT_PAUSE:
         case SMART_ACTION_SET_FLY:
         case SMART_ACTION_FORCE_DESPAWN:
         case SMART_ACTION_SET_INGAME_PHASE_MASK:
@@ -2013,7 +2026,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_PLAY_SPELL_VISUAL:
         case SMART_ACTION_FOLLOW_GROUP:
         case SMART_ACTION_SET_ORIENTATION_TARGET:
-        case SMART_ACTION_WAYPOINT_DATA_START:
+        case SMART_ACTION_WAYPOINT_START:
         case SMART_ACTION_WAYPOINT_DATA_RANDOM:
         case SMART_ACTION_MOVEMENT_STOP:
         case SMART_ACTION_MOVEMENT_PAUSE:

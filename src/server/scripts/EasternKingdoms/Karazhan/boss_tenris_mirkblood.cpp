@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -123,6 +123,15 @@ struct boss_tenris_mirkblood : public BossAI
             return;
 
         DoCast(victim, SPELL_SUMMON_SANGUINE_SPIRIT_ON_KILL);
+
+        if (!_mirrorTarget)
+            return;
+
+        if (victim == _mirrorTarget)
+        {
+            me->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR0);
+            me->RemoveAurasDueToSpell(SPELL_BLOOD_MIRROR1);
+        }
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
@@ -281,8 +290,8 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+            if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                if (mirkblood->IsAlive() && !mirkblood->IsInCombat())
                     mirkblood->AI()->Talk(SAY_APPROACH, player);
 
         return false;
@@ -297,8 +306,8 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+            if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                if (mirkblood->IsAlive() && mirkblood->IsImmuneToPC())
                     mirkblood->SetImmuneToPC(false);
 
         return false;

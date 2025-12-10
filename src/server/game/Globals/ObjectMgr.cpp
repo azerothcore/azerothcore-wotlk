@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1122,8 +1122,22 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (!cInfo->Models.size())
         LOG_ERROR("sql.sql", "Creature (Entry: {}) does not have any existing display id in creature_template_model.", cInfo->Entry);
-    else if (std::accumulate(cInfo->Models.begin(), cInfo->Models.end(), 0.0f, [](float sum, CreatureModel const& model) { return sum + model.Probability; }) <= 0.0f)
-        LOG_ERROR("sql.sql", "Creature (Entry: {}) has zero total chance for all models in creature_template_model.", cInfo->Entry);
+    else
+    {
+        float const totalProbability = std::accumulate(cInfo->Models.begin(), cInfo->Models.end(), 0.0f, [](float sum, CreatureModel const& model) { return sum + model.Probability; });
+
+        if (totalProbability <= 0.0f)
+        { // There are many cases in official data of all models having a probability of 0. Believe to be treated equivalent to equal chance ONLY if all are zeroed
+            if (totalProbability == 0.0f)
+                LOG_DEBUG("sql.sql", "Creature (Entry: {}) has zero total chance for all models in creature_template_model. Setting all to 1.0.", cInfo->Entry);
+            else // Custom, likely bad data
+                LOG_ERROR("sql.sql", "Creature (Entry: {}) has less than zero total chance for all models in creature_template_model. Setting all to 1.0.", cInfo->Entry);
+
+            auto& models = const_cast<CreatureTemplate*>(cInfo)->Models;
+            for (auto& model : models)
+                model.Probability = 1.0f;
+        }
+    }
 
     if (!cInfo->unit_class || ((1 << (cInfo->unit_class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
     {
@@ -3442,9 +3456,6 @@ void ObjectMgr::LoadItemTemplates()
                 _itemTemplateStoreFast[itr->first] = &(itr->second);
         }
     }
-
-    for (ItemTemplateContainer::iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
-        itr->second.InitializeQueryData();
 
     // Check if item templates for DBC referenced character start outfit are present
     std::set<uint32> notFoundOutfit;

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -43,15 +43,20 @@
 #include "Vehicle.h"
 #include "VMapMgr2.h"
 #include "Weather.h"
+#include "WeatherMgr.h"
 
 #define MAP_INVALID_ZONE        0xFFFFFFFF
 
-ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
+ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), DefaultWeather(nullptr), WeatherId(WEATHER_STATE_FINE),
                                      WeatherGrade(0.0f), OverrideLightId(0), LightFadeInTime(0) { }
 
 Map::~Map()
 {
     // UnloadAll must be called before deleting the map
+
+    // Kill all scheduled events without executing them, since the map and its objects are being destroyed.
+    // This prevents events from running on invalid or deleted objects during map destruction.
+    Events.KillAllEvents(false);
 
     sScriptMgr->OnDestroyMap(this);
 
@@ -74,6 +79,7 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
 
+    _weatherUpdateTimer.SetInterval(1 * IN_MILLISECONDS);
     _corpseUpdateTimer.SetInterval(20 * MINUTE * IN_MILLISECONDS);
 }
 
@@ -268,7 +274,6 @@ bool Map::AddPlayerToMap(Player* player)
 
     SendInitTransports(player);
     SendInitSelf(player);
-    SendZoneDynamicInfo(player);
 
     player->UpdateObjectVisibility(false);
 
@@ -416,12 +421,12 @@ void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
     if (oldZone != MAP_INVALID_ZONE)
     {
         uint32& oldZoneCount = _zonePlayerCountMap[oldZone];
-        if (!oldZoneCount)
-            LOG_ERROR("maps", "A player left zone {} (went to {}) - but there were no players in the zone!", oldZone, newZone);
-        else
+        if (oldZoneCount)
             --oldZoneCount;
     }
-    ++_zonePlayerCountMap[newZone];
+
+    if (newZone != MAP_INVALID_ZONE)
+        ++_zonePlayerCountMap[newZone];
 }
 
 void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
@@ -446,7 +451,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         }
     }
 
-    _creatureRespawnScheduler.Update(t_diff);
+    Events.Update(t_diff);
 
     if (!t_diff)
     {
@@ -500,6 +505,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
     HandleDelayedVisibility();
 
+    UpdateWeather(t_diff);
     UpdateExpiredCorpses(t_diff);
 
     sScriptMgr->OnMapUpdate(this, t_diff);
@@ -694,8 +700,8 @@ struct ResetNotifier
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
-    // Before leaving map, update zone/area for stats
-    player->UpdateZone(MAP_INVALID_ZONE, 0);
+    UpdatePlayerZoneStats(player->GetZoneId(), MAP_INVALID_ZONE);
+
     player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     player->RemoveFromWorld();
@@ -723,8 +729,6 @@ void Map::RemoveFromMap(T* obj, bool remove)
     obj->RemoveFromWorld();
 
     obj->RemoveFromGrid();
-    if (obj->IsFarVisible())
-        RemoveWorldObjectFromFarVisibleMap(obj);
 
     obj->ResetMap();
 
@@ -1097,7 +1101,7 @@ float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, fl
     if (ground)
         *ground = ground_z;
 
-    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phasemask, x, y, ground_z, collisionHeight, MAP_ALL_LIQUIDS);
+    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phasemask, x, y, ground_z, collisionHeight, {});
     switch (liquidData.Status)
     {
         case LIQUID_MAP_ABOVE_WATER:
@@ -1198,27 +1202,18 @@ static inline bool IsInWMOInterior(uint32 mogpFlags)
 
 bool Map::GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
 {
-    float vmap_z = z;
-    float dynamic_z = z;
     float check_z = z;
     VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
-    uint32 vflags;
-    int32 vadtId;
-    int32 vrootId;
-    int32 vgroupId;
-    uint32 dflags;
-    int32 dadtId;
-    int32 drootId;
-    int32 dgroupId;
+    VMAP::AreaAndLiquidData vdata;
+    VMAP::AreaAndLiquidData ddata;
 
-    bool hasVmapAreaInfo = vmgr->GetAreaInfo(GetId(), x, y, vmap_z, vflags, vadtId, vrootId, vgroupId);
-    bool hasDynamicAreaInfo = _dynamicTree.GetAreaInfo(x, y, dynamic_z, phaseMask, dflags, dadtId, drootId, dgroupId);
-    auto useVmap = [&]() { check_z = vmap_z; flags = vflags; adtId = vadtId; rootId = vrootId; groupId = vgroupId; };
-    auto useDyn = [&]() { check_z = dynamic_z; flags = dflags; adtId = dadtId; rootId = drootId; groupId = dgroupId; };
-
+    bool hasVmapAreaInfo = vmgr->GetAreaAndLiquidData(GetId(), x, y, z, {}, vdata) && vdata.areaInfo.has_value();
+    bool hasDynamicAreaInfo = _dynamicTree.GetAreaAndLiquidData(x, y, z, phaseMask, {}, ddata) && ddata.areaInfo.has_value();
+    auto useVmap = [&] { check_z = vdata.floorZ; groupId = vdata.areaInfo->groupId; adtId = vdata.areaInfo->adtId; rootId = vdata.areaInfo->rootId; flags = vdata.areaInfo->mogpFlags; };
+    auto useDyn = [&] { check_z = ddata.floorZ; groupId = ddata.areaInfo->groupId; adtId = ddata.areaInfo->adtId; rootId = ddata.areaInfo->rootId; flags = ddata.areaInfo->mogpFlags; };
     if (hasVmapAreaInfo)
     {
-        if (hasDynamicAreaInfo && dynamic_z > vmap_z)
+        if (hasDynamicAreaInfo && ddata.floorZ > vdata.floorZ)
             useDyn();
         else
             useVmap();
@@ -1299,32 +1294,30 @@ void Map::GetZoneAndAreaId(uint32 phaseMask, uint32& zoneid, uint32& areaid, flo
             zoneid = area->zone;
 }
 
-LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType)
+LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType)
 {
    LiquidData liquidData;
+   liquidData.Status = LIQUID_MAP_NO_WATER;
 
     VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
-    float liquid_level = INVALID_HEIGHT;
-    float ground_level = INVALID_HEIGHT;
-    uint32 liquid_type = 0;
-    uint32 mogpFlags = 0;
+    VMAP::AreaAndLiquidData vmapData;
     bool useGridLiquid = true;
-    if (vmgr->GetLiquidLevel(GetId(), x, y, z, ReqLiquidType, liquid_level, ground_level, liquid_type, mogpFlags))
+    if (vmgr->GetAreaAndLiquidData(GetId(), x, y, z, ReqLiquidType, vmapData) && vmapData.liquidInfo)
     {
-        useGridLiquid = !IsInWMOInterior(mogpFlags);
-        LOG_DEBUG("maps", "GetLiquidStatus(): vmap liquid level: {} ground: {} type: {}", liquid_level, ground_level, liquid_type);
+        useGridLiquid = !vmapData.areaInfo || !IsInWMOInterior(vmapData.areaInfo->mogpFlags);
+        LOG_DEBUG("maps", "GetLiquidStatus(): vmap liquid level: {} ground: {} type: {}", vmapData.liquidInfo->level, vmapData.floorZ, vmapData.liquidInfo->type);
         // Check water level and ground level
-        if (liquid_level > ground_level && G3D::fuzzyGe(z, ground_level - GROUND_HEIGHT_TOLERANCE))
+        if (vmapData.liquidInfo->level > vmapData.floorZ && G3D::fuzzyGe(z, vmapData.floorZ - GROUND_HEIGHT_TOLERANCE))
         {
             // hardcoded in client like this
-            if (GetId() == MAP_OUTLAND && liquid_type == 2)
-                liquid_type = 15;
+            if (GetId() == MAP_OUTLAND && vmapData.liquidInfo->type == 2)
+                vmapData.liquidInfo->type = 15;
 
             uint32 liquidFlagType = 0;
-            if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_type))
+            if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(vmapData.liquidInfo->type))
                 liquidFlagType = liq->Type;
 
-            if (liquid_type && liquid_type < 21)
+            if (vmapData.liquidInfo->type && vmapData.liquidInfo->type < 21)
             {
                 if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(GetAreaId(phaseMask, x, y, z)))
                 {
@@ -1338,19 +1331,19 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
 
                     if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
                     {
-                        liquid_type = overrideLiquid;
+                        vmapData.liquidInfo->type = overrideLiquid;
                         liquidFlagType = liq->Type;
                     }
                 }
             }
 
-            liquidData.Level = liquid_level;
-            liquidData.DepthLevel = ground_level;
-            liquidData.Entry = liquid_type;
+            liquidData.Level = vmapData.liquidInfo->level;
+            liquidData.DepthLevel = vmapData.floorZ;
+            liquidData.Entry = vmapData.liquidInfo->type;
             liquidData.Flags = 1 << liquidFlagType;
         }
 
-        float delta = liquid_level - z;
+        float delta = vmapData.liquidInfo->level - z;
 
         // Get position delta
         if (delta > collisionHeight)
@@ -1369,7 +1362,7 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         {
             LiquidData const& map_data = gmap->GetLiquidData(x, y, z, collisionHeight, ReqLiquidType);
             // Not override LIQUID_MAP_ABOVE_WATER with LIQUID_MAP_NO_WATER:
-            if (map_data.Status != LIQUID_MAP_NO_WATER && (map_data.Level > ground_level))
+            if (map_data.Status != LIQUID_MAP_NO_WATER && (map_data.Level > vmapData.floorZ))
             {
                 // hardcoded in client like this
                 uint32 liquidEntry = map_data.Entry;
@@ -1385,7 +1378,7 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
    return liquidData;
 }
 
-void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType)
+void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, Optional<uint8> reqLiquidType)
 {
     GridTerrainData* gmap = GetGridTerrainData(x, y);
 
@@ -1600,7 +1593,7 @@ float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=tr
 
 bool Map::IsInWater(uint32 phaseMask, float x, float y, float pZ, float collisionHeight) const
 {
-    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phaseMask, x, y, pZ, collisionHeight, MAP_ALL_LIQUIDS);
+    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phaseMask, x, y, pZ, collisionHeight, {});
     return (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING) != 0;
 }
 
@@ -1691,7 +1684,7 @@ void Map::SendInitTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(packet);
-    player->GetSession()->SendPacket(&packet);
+    player->SendDirectMessage(&packet);
 }
 
 void Map::SendRemoveTransports(Player* player)
@@ -1710,7 +1703,7 @@ void Map::SendRemoveTransports(Player* player)
 
     WorldPacket packet;
     transData.BuildPacket(packet);
-    player->GetSession()->SendPacket(&packet);
+    player->SendDirectMessage(&packet);
 }
 
 void Map::SendObjectUpdates()
@@ -1730,7 +1723,7 @@ void Map::SendObjectUpdates()
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
         iter->second.BuildPacket(packet);
-        iter->first->GetSession()->SendPacket(&packet);
+        iter->first->SendDirectMessage(&packet);
         packet.clear();                                     // clean the string
     }
 }
@@ -1850,7 +1843,7 @@ uint32 Map::GetPlayersCountExceptGMs() const
 void Map::SendToPlayers(WorldPacket const* data) const
 {
     for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
-        itr->GetSource()->GetSession()->SendPacket(data);
+        itr->GetSource()->SendDirectMessage(data);
 }
 
 template bool Map::AddToMap(Corpse*, bool);
@@ -2055,7 +2048,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
             data << uint32(60000);
             data << uint32(instance_data ? instance_data->GetCompletedEncounterMask() : 0);
             data << uint8(0);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
             player->SetPendingBind(mapSave->GetInstanceId(), 60000);
         }
     }
@@ -2118,7 +2111,7 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
     if (instance_data)
         isOtherAI = true;
 
-    // if Eluna AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
+    // if ALE AI was fetched succesfully we should not call CreateInstanceData nor set the unused scriptID
     if (!isOtherAI)
     {
         InstanceTemplate const* mInstance = sObjectMgr->GetInstanceTemplate(GetId());
@@ -2132,7 +2125,7 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
     if (!instance_data)
         return;
 
-    // use mangos behavior if we are dealing with Eluna AI
+    // use mangos behavior if we are dealing with ALE AI
     // initialize should then be called only if load is false
     if (!isOtherAI || !load)
     {
@@ -2227,7 +2220,7 @@ void InstanceMap::PermBindAllPlayers()
         {
             WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
             sInstanceSaveMgr->PlayerBindToInstance(player->GetGUID(), save, true, player);
         }
 
@@ -2356,27 +2349,27 @@ void BattlegroundMap::RemoveAllPlayers()
                     player->TeleportTo(player->GetEntryPoint());
 }
 
-Corpse* Map::GetCorpse(ObjectGuid const guid)
+Corpse* Map::GetCorpse(ObjectGuid const& guid)
 {
     return _objectsStore.Find<Corpse>(guid);
 }
 
-Creature* Map::GetCreature(ObjectGuid const guid)
+Creature* Map::GetCreature(ObjectGuid const& guid)
 {
     return _objectsStore.Find<Creature>(guid);
 }
 
-GameObject* Map::GetGameObject(ObjectGuid const guid)
+GameObject* Map::GetGameObject(ObjectGuid const& guid)
 {
     return _objectsStore.Find<GameObject>(guid);
 }
 
-Pet* Map::GetPet(ObjectGuid const guid)
+Pet* Map::GetPet(ObjectGuid const& guid)
 {
     return dynamic_cast<Pet*>(_objectsStore.Find<Creature>(guid));
 }
 
-Transport* Map::GetTransport(ObjectGuid guid)
+Transport* Map::GetTransport(ObjectGuid const& guid)
 {
     if (guid.GetHigh() != HighGuid::Mo_Transport && guid.GetHigh() != HighGuid::Transport)
         return nullptr;
@@ -2385,7 +2378,7 @@ Transport* Map::GetTransport(ObjectGuid guid)
     return go ? go->ToTransport() : nullptr;
 }
 
-DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
+DynamicObject* Map::GetDynamicObject(ObjectGuid const& guid)
 {
     return _objectsStore.Find<DynamicObject>(guid);
 }
@@ -2677,7 +2670,7 @@ void Map::RemoveCorpse(Corpse* corpse)
         _corpseBones.erase(corpse);
 }
 
-Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= false*/)
+Corpse* Map::ConvertCorpseToBones(ObjectGuid const& ownerGuid, bool insignia /*= false*/)
 {
     Corpse* corpse = GetCorpseByPlayer(ownerGuid);
     if (!corpse)
@@ -2758,18 +2751,46 @@ void Map::RemoveOldCorpses()
 
 void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer, Position pos)
 {
-    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid, pos](TaskContext)
+    Events.AddEventAtOffset([this, creatureGuid, pos]()
     {
         if (Creature* creature = GetCreature(creatureGuid))
             creature->Respawn();
         else
             SummonCreature(creatureGuid.GetEntry(), pos);
-    });
+    }, respawnTimer);
 }
 
-void Map::SendZoneDynamicInfo(Player* player)
+/// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
+bool Map::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession const* self, TeamId teamId) const
 {
-    uint32 zoneId = player->GetZoneId();
+    bool foundPlayerToSend = false;
+
+    for (MapReference const& ref : GetPlayers())
+    {
+        Player* player = ref.GetSource();
+        if (player->IsInWorld() &&
+            player->GetZoneId() == zone &&
+            player->GetSession() != self &&
+            (teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId))
+        {
+            player->SendDirectMessage(packet);
+            foundPlayerToSend = true;
+        }
+    }
+
+    return foundPlayerToSend;
+}
+
+/// Send a System Message to all players in the zone (except self if mentioned)
+void Map::SendZoneText(uint32 zoneId, char const* text, WorldSession const* self, TeamId teamId) const
+{
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
+    SendZoneMessage(zoneId, &data, self, teamId);
+}
+
+void Map::SendZoneDynamicInfo(uint32 zoneId, Player* player) const
+{
     ZoneDynamicInfoMap::const_iterator itr = _zoneDynamicInfo.find(zoneId);
     if (itr == _zoneDynamicInfo.end())
         return;
@@ -2777,20 +2798,51 @@ void Map::SendZoneDynamicInfo(Player* player)
     if (uint32 music = itr->second.MusicId)
         player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music).Write());
 
-    if (WeatherState weatherId = itr->second.WeatherId)
-    {
-        WorldPackets::Misc::Weather weather(weatherId, itr->second.WeatherGrade);
-        player->SendDirectMessage(weather.Write());
-    }
+    SendZoneWeather(itr->second, player);
 
     if (uint32 overrideLight = itr->second.OverrideLightId)
     {
-        WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 1);
+        WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
         data << uint32(_defaultLight);
         data << uint32(overrideLight);
         data << uint32(itr->second.LightFadeInTime);
         player->SendDirectMessage(&data);
     }
+}
+
+void Map::SendZoneWeather(uint32 zoneId, Player* player) const
+{
+    ZoneDynamicInfoMap::const_iterator itr = _zoneDynamicInfo.find(zoneId);
+    if (itr == _zoneDynamicInfo.end())
+        return;
+
+    SendZoneWeather(itr->second, player);
+}
+
+void Map::SendZoneWeather(ZoneDynamicInfo const& zoneDynamicInfo, Player* player) const
+{
+    if (WeatherState weatherId = zoneDynamicInfo.WeatherId)
+    {
+        WorldPackets::Misc::Weather weather(weatherId, zoneDynamicInfo.WeatherGrade);
+        player->SendDirectMessage(weather.Write());
+    }
+    else if (zoneDynamicInfo.DefaultWeather)
+        zoneDynamicInfo.DefaultWeather->SendWeatherUpdateToPlayer(player);
+    else
+        Weather::SendFineWeatherUpdateToPlayer(player);
+}
+
+void Map::UpdateWeather(uint32 const diff)
+{
+    _weatherUpdateTimer.Update(diff);
+    if (!_weatherUpdateTimer.Passed())
+        return;
+
+    for (auto&& zoneInfo : _zoneDynamicInfo)
+        if (zoneInfo.second.DefaultWeather && !zoneInfo.second.DefaultWeather->Update(_weatherUpdateTimer.GetInterval()))
+            zoneInfo.second.DefaultWeather.reset();
+
+    _weatherUpdateTimer.Reset();
 }
 
 void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId)
@@ -2810,67 +2862,50 @@ void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId)
 
 void Map::SetZoneMusic(uint32 zoneId, uint32 musicId)
 {
-    if (_zoneDynamicInfo.find(zoneId) == _zoneDynamicInfo.end())
-        _zoneDynamicInfo.insert(ZoneDynamicInfoMap::value_type(zoneId, ZoneDynamicInfo()));
-
     _zoneDynamicInfo[zoneId].MusicId = musicId;
 
-    Map::PlayerList const& players = GetPlayers();
-    if (!players.IsEmpty())
-    {
-        WorldPackets::Misc::PlayMusic playMusic(musicId);
-        playMusic.Write();
+    WorldPackets::Misc::PlayMusic playMusic(musicId);
+    SendZoneMessage(zoneId, WorldPackets::Misc::PlayMusic(musicId).Write());
+}
 
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (Player* player = itr->GetSource())
-                if (player->GetZoneId() == zoneId)
-                    player->SendDirectMessage(playMusic.GetRawPacket());
+Weather* Map::GetOrGenerateZoneDefaultWeather(uint32 zoneId)
+{
+    WeatherData const* weatherData = WeatherMgr::GetWeatherData(zoneId);
+    if (!weatherData)
+        return nullptr;
+
+    ZoneDynamicInfo& info = _zoneDynamicInfo[zoneId];
+
+    if (!info.DefaultWeather)
+    {
+        info.DefaultWeather = std::make_unique<Weather>(this, zoneId, weatherData);
+        info.DefaultWeather->ReGenerate();
+        info.DefaultWeather->UpdateWeather();
     }
+
+    return info.DefaultWeather.get();
 }
 
 void Map::SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade)
 {
-    if (_zoneDynamicInfo.find(zoneId) == _zoneDynamicInfo.end())
-        _zoneDynamicInfo.insert(ZoneDynamicInfoMap::value_type(zoneId, ZoneDynamicInfo()));
-
     ZoneDynamicInfo& info = _zoneDynamicInfo[zoneId];
     info.WeatherId = weatherId;
     info.WeatherGrade = weatherGrade;
-    Map::PlayerList const& players = GetPlayers();
 
-    if (!players.IsEmpty())
-    {
-        WorldPackets::Misc::Weather weather(weatherId, weatherGrade);
-
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (Player* player = itr->GetSource())
-                if (player->GetZoneId() == zoneId)
-                    player->SendDirectMessage(weather.Write());
-    }
+    SendZoneMessage(zoneId, WorldPackets::Misc::Weather(weatherId, weatherGrade).Write());
 }
 
 void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime)
 {
-    if (_zoneDynamicInfo.find(zoneId) == _zoneDynamicInfo.end())
-        _zoneDynamicInfo.insert(ZoneDynamicInfoMap::value_type(zoneId, ZoneDynamicInfo()));
-
     ZoneDynamicInfo& info = _zoneDynamicInfo[zoneId];
     info.OverrideLightId = lightId;
     info.LightFadeInTime = static_cast<uint32>(fadeInTime.count());
-    Map::PlayerList const& players = GetPlayers();
 
-    if (!players.IsEmpty())
-    {
-        WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
-        data << uint32(_defaultLight);
-        data << uint32(lightId);
-        data << uint32(static_cast<uint32>(fadeInTime.count()));
-
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (Player* player = itr->GetSource())
-                if (player->GetZoneId() == zoneId)
-                    player->SendDirectMessage(&data);
-    }
+    WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
+    data << uint32(_defaultLight);
+    data << uint32(lightId);
+    data << uint32(static_cast<uint32>(fadeInTime.count()));
+    SendZoneMessage(zoneId, &data);
 }
 
 void Map::DoForAllPlayers(std::function<void(Player*)> exec)

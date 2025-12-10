@@ -344,6 +344,14 @@ Updates.AllowRehash = 1
 Updates.CleanDeadRefMaxCount = 3
 
 #
+#    Updates.ExceptionShutdownDelay
+#        Description: Time (in milliseconds) to wait before shutting down after a fatal exception (e.g. failed SQL update).
+#        Default:     10000 - 10 seconds
+#                     0     - Disabled (immediate shutdown)
+
+Updates.ExceptionShutdownDelay = 10000
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -388,6 +396,20 @@ Network.TcpNodelay = 1
 #        Default:     0 - (Disabled)
 
 Network.EnableProxyProtocol = 0
+
+#
+#    Network.UseSocketActivation
+#        Description: Enable systemd socket activation support for the worldserver.
+#                     When enabled and the process is started by systemd socket activation,
+#                     the server will use the socket passed by systemd instead of
+#                     creating and binding its own listening socket. Disabled by default.
+#
+#                     When enabled the realm is not automatically set as offline on shutdown.
+#
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.UseSocketActivation = 0
 
 #
 ###################################################################################################
@@ -2343,6 +2365,18 @@ Rate.Reputation.LowLevel.Quest = 1
 Rate.Reputation.RecruitAFriendBonus = 0.1
 
 #
+#    Rate.Reputation.Gain.WSG
+#    Rate.Reputation.Gain.AB
+#    Rate.Reputation.Gain.AV
+#        Description: Reputation bonus rate for WSG, AB and AV battlegrounds.
+#                     This is applied IN ADDITION to the global Rate.Reputation.Gain.
+#        Default:     1
+
+Rate.Reputation.Gain.WSG = 1
+Rate.Reputation.Gain.AB = 1
+Rate.Reputation.Gain.AV = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3001,6 +3035,15 @@ ListenRange.TextEmote = 40
 ListenRange.Yell = 300
 
 #
+#    Creature.RepositionAgainstNpcs
+#        Description: Enables circling and backwards repositioning during NPC versus NPC combat.
+#                     Set to 0 to keep the legacy optimization that disables these moves for NPCs.
+#        Default:     1 - (Enabled, uses more CPU, but looks better)
+#                     0 - (Disabled, uses less CPU)
+
+Creature.RepositionAgainstNpcs = 1
+
+#
 #    Creature.MovingStopTimeForPlayer
 #        Description: Time (in milliseconds) during which creature will not move after
 #                     interaction with player.
@@ -3331,6 +3374,15 @@ DungeonAccessRequirements.LFGLevelDBCOverride = 0
 #                     0 - (Disabled)
 
 DungeonFinder.CastDeserter = 1
+
+#
+#    DungeonFinder.AllowCompleted
+#
+#        Description: Controls whether completed heroic dungeons are excluded from LFG queue.
+#                     0 - (Classic WLK mode: Dungeons completed by any group member today are excluded (daily lockout enforced))
+#        Default:     1 - (Blizzlike: All dungeons are available for queue, even if already completed)
+
+DungeonFinder.AllowCompleted = 1
 
 #
 ###################################################################################################
@@ -4394,6 +4446,19 @@ Event.Announce = 0
 Sunsreach.CounterMax = 10000
 
 #
+#    ScourgeInvasion.CounterFirst
+#    ScourgeInvasion.CounterSecond
+#    ScourgeInvasion.CounterThird
+#        Description: Counter thresholds to be reached to transition phases
+#        Default:     50  - (ScourgeInvasion.CounterFirst)
+#                     100 - (ScourgeInvasion.CounterSecond)
+#                     150 - (ScourgeInvasion.CounterThird)
+
+ScourgeInvasion.CounterFirst  = 50
+ScourgeInvasion.CounterSecond = 100
+ScourgeInvasion.CounterThird  = 150
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4540,6 +4605,13 @@ MunchingBlizzlike.Enabled = 1
 #        Default: 1 - (Blizzlike)
 
 Daze.Enabled = 1
+
+#
+#    InfiniteAmmo.Enabled
+#        Description: Enable or disable ammo consumption for ranged attacks and thrown weapons.
+#        Default: 0 - (Blizzlike)
+
+InfiniteAmmo.Enabled = 0
 
 #
 ###################################################################################################

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -34,12 +34,20 @@ protected:
     FollowerReference i_target;
 };
 
+enum ChaseMovementMode
+{
+    CHASE_MODE_NORMAL,      // chasing target
+    CHASE_MODE_BACKPEDAL,   // collision movement
+    CHASE_MODE_DISTANCING,  // running away from melee
+    CHASE_MODE_FANNING,     // mob collision movement
+};
+
 template<class T>
 class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGenerator<T>>, public TargetedMovementGeneratorBase
 {
 public:
     ChaseMovementGenerator(Unit* target, Optional<ChaseRange> range = {}, Optional<ChaseAngle> angle = {})
-        : TargetedMovementGeneratorBase(target), i_leashExtensionTimer(5000), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
+        : TargetedMovementGeneratorBase(target), i_leashExtensionTimer(5000), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle), m_currentMode(CHASE_MODE_NORMAL) {}
     ~ChaseMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -58,6 +66,11 @@ public:
     bool EnableWalking() const { return false; }
     bool HasLostTarget(Unit* unit) const { return unit->GetVictim() != this->GetTarget(); }
 
+    void SetOffsetAndAngle(std::optional<ChaseRange> dist, std::optional<ChaseAngle> angle);
+    void SetNewTarget(Unit* target);
+
+    void DistanceYourself(T* owner, float distance);
+    bool DispatchSplineToPosition(T* owner, float x, float y, float z, bool walk, bool cutPath, float maxTarget, bool forceDest, bool target = false);
 private:
     TimeTrackerSmall i_leashExtensionTimer;
     std::unique_ptr<PathGenerator> i_path;
@@ -65,10 +78,12 @@ private:
     bool i_recalculateTravel;
 
     Optional<Position> _lastTargetPosition;
-    Optional<ChaseRange> const _range;
-    Optional<ChaseAngle> const _angle;
+    Optional<ChaseRange> _range;
+    Optional<ChaseAngle> _angle;
     bool _movingTowards = true;
     bool _mutualChase = true;
+
+    ChaseMovementMode m_currentMode;
 };
 
 template<class T>

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,6 +29,7 @@ class Unit;
 class Creature;
 class Player;
 class SpellInfo;
+enum SpellFinishReason : uint8;
 
 typedef std::vector<AreaBoundary const*> CreatureBoundary;
 
@@ -93,7 +94,7 @@ public:
         EVADE_REASON_OTHER
     };
 
-    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0s);
+    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0ms);
     void Talk(uint8 id, Milliseconds delay) { Talk(id, nullptr, delay); }
 
     WorldObject* GetSummoner() const;
@@ -145,6 +146,9 @@ public:
 
     // Called when spell hits a target
     virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
+
+    // Called when a spell either finishes, interrupts or cancels a spell cast
+    virtual void OnSpellCastFinished(SpellInfo const* /*spell*/, SpellFinishReason /*reason*/) {}
 
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}
@@ -226,6 +230,9 @@ public:
 
     // Called when an aura is removed or expires.
     virtual void OnAuraRemove(AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
+
+    virtual void DistancingStarted() {}
+    virtual void DistancingEnded() {}
 
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
