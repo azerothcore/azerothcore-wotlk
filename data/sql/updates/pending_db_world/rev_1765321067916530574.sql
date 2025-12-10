@@ -13,4 +13,4 @@
   (19, 0, 11287, 0, 0, 9, 0, 11286, 0, 0, 1, 0, 0, '', 'Find Sage Mistwalker - Not available if The Artifacts of Steel Gate is taken'),
   (19, 0, 11287, 0, 0, 8, 0, 11286, 0, 0, 1, 0, 0, '', 'Find Sage Mistwalker - Not available if The Artifacts of Steel Gate is rewarded'),
   (19, 0, 11286, 0, 0, 9, 0, 11287, 0, 0, 1, 0, 0, '', 'The Artifacts of Steel Gate - Not available if Find Sage Mistwalker is in progress'),
-  (19, 0, 11286, 0, 0, 28, 0, 11287, 0, 0, 1, 0, 0, '', 'The Artifacts of Steel Gate - Not available if Find Sage Mistwalker is complete but not turned in');\
+  (19, 0, 11286, 0, 0, 28, 0, 11287, 0, 0, 1, 0, 0, '', 'The Artifacts of Steel Gate - Not available if Find Sage Mistwalker is complete but not turned in');
