@@ -63,7 +63,7 @@ python config_merger.py [config_dir] [target] [options]
   - `modules-select` - Interactive module selection
 
 **Options:**
-- `-y, --yes`: Skip prompts and auto-add all new config options
+- `-y, --yes`: Skip prompts and auto-add all new config options (default: prompt for each option)
 - `--version`: Show version information
 
 **Examples:**
