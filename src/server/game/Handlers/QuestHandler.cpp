@@ -96,7 +96,6 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     // Stop the npc if moving
     if (uint32 pause = creature->GetMovementTemplate().GetInteractionPauseTimer())
         creature->PauseMovement(pause);
-    creature->SetHomePosition(creature->GetPosition());
 
     if (sScriptMgr->OnGossipHello(_player, creature))
         return;

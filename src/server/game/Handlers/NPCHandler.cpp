@@ -298,7 +298,6 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     // Stop the npc if moving
     if (uint32 pause = unit->GetMovementTemplate().GetInteractionPauseTimer())
         unit->PauseMovement(pause);
-    unit->SetHomePosition(unit->GetPosition());
 
     // If spiritguide, no need for gossip menu, just put player into resurrect queue
     if (unit->IsSpiritGuide())
