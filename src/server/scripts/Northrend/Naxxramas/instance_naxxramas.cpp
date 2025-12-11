@@ -547,12 +547,17 @@ public:
                     }
                     case DONE:
                     {
+                        if (!horsemanKilled) // if no horsemen are found, assume wing is cleared
+                        {
+                            ActivateWingPortal(DATA_HORSEMAN_PORTAL);
+                            break;
+                        }
+
                         _events.RescheduleEvent(EVENT_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER, 15s);
 
                         if (horsemanKilled != HorsemanCount)
                             return false;
 
-                        // all horsemans are killed
                         if (Creature* cr = GetCreature(DATA_BARON_RIVENDARE_BOSS))
                             cr->CastSpell(cr, SPELL_THE_FOUR_HORSEMAN_CREDIT, true);
 
