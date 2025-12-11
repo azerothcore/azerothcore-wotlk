@@ -388,7 +388,4 @@ if (MOD_ALE_FOUND)
   install(DIRECTORY "${MOD_ALE_PATH}/LuaEngine/extensions" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
 endif()
 
-# Copy the config merger tool if enabled
-CopyConfigMergerTool()
-
 message("")

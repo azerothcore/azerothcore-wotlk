@@ -177,6 +177,15 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
 
   # Install config
   CopyApplicationConfig(${APP_PROJECT_NAME} ${APPLICATION_NAME})
+  
+  # Copy config merger tool if enabled
+  if(TOOL_CONFIG_MERGER)
+    if(WIN32 AND "${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
+      add_custom_command(TARGET ${APP_PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/apps/config-merger/python" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
+    endif()
+  endif()
 
   if (UNIX)
     install(TARGETS ${APP_PROJECT_NAME} DESTINATION bin)

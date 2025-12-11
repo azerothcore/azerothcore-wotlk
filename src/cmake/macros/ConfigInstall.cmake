@@ -104,34 +104,3 @@ function(CopyModuleConfig configDir)
   endif()
   unset(postPath)
 endfunction()
-
-function(CopyConfigMergerTool)
-  if(TOOL_CONFIG_MERGER)
-    set(configMergerPath "${CMAKE_SOURCE_DIR}/apps/config-merger/python")
-
-    if(WIN32)
-      if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
-        add_custom_command(TARGET modules
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
-        add_custom_command(TARGET modules
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy_directory "${configMergerPath}" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
-      elseif(MINGW)
-        add_custom_command(TARGET modules
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/configs")
-        add_custom_command(TARGET modules
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy_directory "${configMergerPath}" "${CMAKE_BINARY_DIR}/bin/configs")
-      endif()
-    endif()
-
-    if(UNIX)
-      install(DIRECTORY "${configMergerPath}/" DESTINATION "${CONF_DIR}")
-    elseif(WIN32)
-      install(DIRECTORY "${configMergerPath}/" DESTINATION "${CMAKE_INSTALL_PREFIX}/configs")
-    endif()
-    unset(configMergerPath)
-  endif()
-endfunction()
