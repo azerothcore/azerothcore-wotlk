@@ -194,7 +194,7 @@ class spell_dk_raise_ally : public SpellScript
 
                 // DK Ghoul haste refresh
                 float val = (GetCaster()->m_modAttackSpeedPct[BASE_ATTACK] - 1.0f) * 100.0f;
-                val *= 2000.0f + 2000.0f * ((100.0f + val) / 100.0f);
+                val = 2000.0f * (100.0f + val) / 100.0f;
                 ghoul->m_modAttackSpeedPct[BASE_ATTACK] = GetCaster()->m_modAttackSpeedPct[BASE_ATTACK];
                 ghoul->SetFloatValue(UNIT_FIELD_BASEATTACKTIME, val);
 
