@@ -1,7 +1,6 @@
 # Version 1
 # Based and modified from: https://github.com/Brian-Aldridge/update_module_confs 
 
-
 VERSION = "1"
 
 import os
