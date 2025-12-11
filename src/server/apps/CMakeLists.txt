@@ -182,21 +182,17 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
   if(TOOL_CONFIG_MERGER)
     if(WIN32)
       if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
-        add_custom_command(TARGET ${APP_PROJECT_NAME}
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
-        add_custom_command(TARGET ${APP_PROJECT_NAME}
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/apps/config-merger/python" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs"
-          DEPENDS "${CMAKE_SOURCE_DIR}/apps/config-merger/python/config_merger.py")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Debug/configs")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Release/configs")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/RelWithDebInfo/configs")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/MinSizeRel/configs")
+        file(COPY "${CMAKE_SOURCE_DIR}/apps/config-merger/python/" DESTINATION "${CMAKE_BINARY_DIR}/bin/Debug/configs")
+        file(COPY "${CMAKE_SOURCE_DIR}/apps/config-merger/python/" DESTINATION "${CMAKE_BINARY_DIR}/bin/Release/configs")
+        file(COPY "${CMAKE_SOURCE_DIR}/apps/config-merger/python/" DESTINATION "${CMAKE_BINARY_DIR}/bin/RelWithDebInfo/configs")
+        file(COPY "${CMAKE_SOURCE_DIR}/apps/config-merger/python/" DESTINATION "${CMAKE_BINARY_DIR}/bin/MinSizeRel/configs")
       elseif(MINGW)
-        add_custom_command(TARGET ${APP_PROJECT_NAME}
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/configs")
-        add_custom_command(TARGET ${APP_PROJECT_NAME}
-          POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/apps/config-merger/python" "${CMAKE_BINARY_DIR}/bin/configs"
-          DEPENDS "${CMAKE_SOURCE_DIR}/apps/config-merger/python/config_merger.py")
+        file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin/configs")
+        file(COPY "${CMAKE_SOURCE_DIR}/apps/config-merger/python/" DESTINATION "${CMAKE_BINARY_DIR}/bin/configs")
       endif()
     endif()
   endif()
