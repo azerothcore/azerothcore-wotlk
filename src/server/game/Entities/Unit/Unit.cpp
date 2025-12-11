@@ -20953,7 +20953,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
             appendValue &= ~UNIT_NPC_FLAG_VENDOR_MASK;
         }
 
-        if (!creature->IsValidTrainerForPlayer(target, &appendValue))
+        if (!target->CanSeeTrainer(creature))
             appendValue &= ~UNIT_NPC_FLAG_TRAINER;
 
         valuesUpdateBuf.put(posPointers.UnitNPCFlagsPos, appendValue);
