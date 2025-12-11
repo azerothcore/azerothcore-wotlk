@@ -3,7 +3,7 @@
 A command-line tool to update your AzerothCore configuration files with new options from distribution files.
 
 > [!NOTE]  
-> Based on and modified from [@Brian-Aldridge](https://github.com/Brian-Aldridge)'s [update_module_confs](https://github.com/Brian-Aldridge/update_module_confs) project to meet AzerothCore's needs
+> Based on and modified from [@BoiseComputer](https://github.com/BoiseComputer) (Brian Aldridge)'s [update_module_confs](https://github.com/Brian-Aldridge/update_module_confs) project to meet AzerothCore's needs
 
 ## Overview
 
