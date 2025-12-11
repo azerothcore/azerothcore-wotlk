@@ -68,7 +68,7 @@ def update_conf(dist_path, conf_path):
     with open(conf_path, "a", encoding="utf-8") as f:
         for key, (line, comments) in missing.items():
             print("\n" + "".join(comments if comments else []) + line, end="")
-            add = input(f"  Add {key} to config? (Y/n): ").strip().lower()
+            add = input(f"  Add {key} to config? (y/n): ").strip().lower()
             if add in ("", "y", "yes"):
                 if comments:
                     f.writelines(comments)
@@ -161,4 +161,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
