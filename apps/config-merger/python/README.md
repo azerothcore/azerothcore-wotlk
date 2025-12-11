@@ -20,6 +20,8 @@ This tool compares your existing configuration files (`.conf`) with the latest d
 
 ## How to Use
 
+### Interactive Mode (Default)
+
 1. **Run the script** in your configs directory:
    ```bash
    python config_merger.py
@@ -42,6 +44,42 @@ This tool compares your existing configuration files (`.conf`) with the latest d
    5 - Update Modules (Selection) Configs
    0 - Quit
    ```
+
+### Command Line Interface (CLI)
+
+For automation and scripting, you can use CLI mode:
+
+```bash
+python config_merger.py [config_dir] [target] [options]
+```
+
+**Arguments:**
+- `config_dir` (optional): Path to configs directory (default: current directory)
+- `target` (optional): What to update:
+  - `auth` - Update authserver.conf only
+  - `world` - Update worldserver.conf only  
+  - `both` - Update both server configs
+  - `modules` - Update all module configs
+  - `modules-select` - Interactive module selection
+
+**Options:**
+- `-y, --yes`: Skip prompts and auto-add all new config options
+- `--version`: Show version information
+
+**Examples:**
+```bash
+# Interactive mode (default)
+python config_merger.py
+
+# Update auth config with prompts
+python config_merger.py . auth
+
+# Update both configs automatically (no prompts)
+python config_merger.py /path/to/configs both -y
+
+# Update all modules with confirmation
+python config_merger.py . modules
+```
 
 ## Menu Options Explained
 
