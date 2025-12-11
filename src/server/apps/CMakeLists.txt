@@ -187,14 +187,16 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
           COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
         add_custom_command(TARGET ${APP_PROJECT_NAME}
           POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/apps/config-merger/python" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs")
+          COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/apps/config-merger/python" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/configs"
+          DEPENDS "${CMAKE_SOURCE_DIR}/apps/config-merger/python/config_merger.py")
       elseif(MINGW)
         add_custom_command(TARGET ${APP_PROJECT_NAME}
           POST_BUILD
           COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/configs")
         add_custom_command(TARGET ${APP_PROJECT_NAME}
           POST_BUILD
-          COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/apps/config-merger/python" "${CMAKE_BINARY_DIR}/bin/configs")
+          COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/apps/config-merger/python" "${CMAKE_BINARY_DIR}/bin/configs"
+          DEPENDS "${CMAKE_SOURCE_DIR}/apps/config-merger/python/config_merger.py")
       endif()
     endif()
   endif()
