@@ -177,7 +177,7 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
 
   # Install config
   CopyApplicationConfig(${APP_PROJECT_NAME} ${APPLICATION_NAME})
-  
+
   # Copy config merger tool if enabled
   if(TOOL_CONFIG_MERGER)
     if(WIN32)
