@@ -23,6 +23,8 @@ VERSION = "1"
 
 import os
 import shutil
+import argparse
+import sys
 from datetime import datetime
 
 def find_modules(folder):
@@ -71,7 +73,7 @@ def find_missing_keys(dist_conf, user_conf):
             missing[key] = (line, comments)
     return missing
 
-def update_conf(dist_path, conf_path):
+def update_conf(dist_path, conf_path, skip_prompts=False):
     if not os.path.exists(conf_path):
         print(f"  User config {conf_path} does not exist, skipping.")
         return False
@@ -85,19 +87,26 @@ def update_conf(dist_path, conf_path):
     updated = False
     with open(conf_path, "a", encoding="utf-8") as f:
         for key, (line, comments) in missing.items():
-            print("\n" + "".join(comments if comments else []) + line, end="")
-            add = input(f"  Add {key} to config? (y/n): ").strip().lower()
-            if add in ("", "y", "yes"):
+            if skip_prompts:
                 if comments:
                     f.writelines(comments)
                 f.write(line)
                 print(f"    Added {key}.")
                 updated = True
             else:
-                print(f"    Skipped {key}.")
+                print("\n" + "".join(comments if comments else []) + line, end="")
+                add = input(f"  Add {key} to config? (y/n): ").strip().lower()
+                if add in ("", "y", "yes"):
+                    if comments:
+                        f.writelines(comments)
+                    f.write(line)
+                    print(f"    Added {key}.")
+                    updated = True
+                else:
+                    print(f"    Skipped {key}.")
     return updated
 
-def update_server_config(config_name, config_dir):
+def update_server_config(config_name, config_dir, skip_prompts=False):
     dist_path = os.path.join(config_dir, f"{config_name}.conf.dist")
     conf_path = os.path.join(config_dir, f"{config_name}.conf")
     
@@ -106,9 +115,9 @@ def update_server_config(config_name, config_dir):
         return False
     
     print(f"\nProcessing {config_name}.conf ...")
-    return update_conf(dist_path, conf_path)
+    return update_conf(dist_path, conf_path, skip_prompts)
 
-def update_modules(config_dir, selected_only=False):
+def update_modules(config_dir, selected_only=False, skip_prompts=False):
     modules_dir = os.path.join(config_dir, "modules")
     if not os.path.exists(modules_dir):
         print(f"  Modules directory {modules_dir} does not exist, skipping.")
@@ -133,7 +142,7 @@ def update_modules(config_dir, selected_only=False):
         dist_path = os.path.join(modules_dir, dist_fname)
         conf_path = os.path.join(modules_dir, conf_fname)
         print(f"\nProcessing {conf_fname} ...")
-        update_conf(dist_path, conf_path)
+        update_conf(dist_path, conf_path, skip_prompts)
 
 def show_main_menu():
     print(f"\nAzerothCore Config Updater/Merger (v. {VERSION})")
@@ -146,36 +155,79 @@ def show_main_menu():
     print("0 - Quit")
     return input("Select an option: ").strip()
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='AzerothCore Config Updater/Merger')
+    parser.add_argument('config_dir', nargs='?', default='.', 
+                      help='Path to configs directory (default: current directory)')
+    parser.add_argument('target', nargs='?',
+                      choices=['auth', 'world', 'both', 'modules', 'modules-select'],
+                      help='What to update: auth, world, both, modules, modules-select')
+    parser.add_argument('-y', '--yes', action='store_true',
+                      help='Automatically answer yes to all prompts')
+    parser.add_argument('--version', action='version', version=f'%(prog)s {VERSION}')
+    return parser.parse_args()
+
 def main():
-    print(f"AzerothCore Config Updater/Merger (v. {VERSION})")
-    print("==========================")
-    config_dir = input("Enter the path to your configs folder (default: .) which means current folder: ").strip()
-    if not config_dir:
-        config_dir = "."
+    args = parse_args()
     
-    if not os.path.isdir(config_dir):
-        print("Provided path is not a valid directory.")
-        return
-    
-    while True:
-        choice = show_main_menu()
+    # If no target specified, run interactive mode
+    if args.target is None:
+        print(f"AzerothCore Config Updater/Merger (v. {VERSION})")
+        print("==========================")
+        config_dir = input("Enter the path to your configs folder (default: .) which means current folder: ").strip()
+        if not config_dir:
+            config_dir = "."
         
-        if choice == "1":
-            update_server_config("authserver", config_dir)
-        elif choice == "2":
-            update_server_config("worldserver", config_dir)
-        elif choice == "3":
-            update_server_config("authserver", config_dir)
-            update_server_config("worldserver", config_dir)
-        elif choice == "4":
-            update_modules(config_dir, selected_only=False)
-        elif choice == "5":
-            update_modules(config_dir, selected_only=True)
-        elif choice == "0":
-            print("Goodbye!")
-            break
-        else:
-            print("Invalid selection. Please try again.")
+        if not os.path.isdir(config_dir):
+            print("Provided path is not a valid directory.")
+            return
+        
+        while True:
+            choice = show_main_menu()
+            
+            if choice == "1":
+                update_server_config("authserver", config_dir)
+            elif choice == "2":
+                update_server_config("worldserver", config_dir)
+            elif choice == "3":
+                update_server_config("authserver", config_dir)
+                update_server_config("worldserver", config_dir)
+            elif choice == "4":
+                update_modules(config_dir, selected_only=False)
+            elif choice == "5":
+                update_modules(config_dir, selected_only=True)
+            elif choice == "0":
+                print("Goodbye!")
+                break
+            else:
+                print("Invalid selection. Please try again.")
+    else:
+        # CLI mode
+        config_dir = args.config_dir
+        
+        if not os.path.isdir(config_dir):
+            print(f"Error: Directory '{config_dir}' does not exist.")
+            sys.exit(1)
+        
+        print(f"AzerothCore Config Updater/Merger (v. {VERSION}) - CLI Mode")
+        print(f"Config directory: {os.path.abspath(config_dir)}")
+        print(f"Target: {args.target}")
+        if args.yes:
+            print("Skip prompts: Yes")
+        
+        if args.target == 'auth':
+            update_server_config("authserver", config_dir, args.yes)
+        elif args.target == 'world':
+            update_server_config("worldserver", config_dir, args.yes)
+        elif args.target == 'both':
+            update_server_config("authserver", config_dir, args.yes)
+            update_server_config("worldserver", config_dir, args.yes)
+        elif args.target == 'modules':
+            update_modules(config_dir, selected_only=False, skip_prompts=args.yes)
+        elif args.target == 'modules-select':
+            if args.yes:
+                print("Warning: --yes flag ignored for modules-select (requires interactive selection)")
+            update_modules(config_dir, selected_only=True, skip_prompts=False)
 
 if __name__ == "__main__":
     main()
