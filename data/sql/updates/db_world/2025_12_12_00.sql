@@ -1,3 +1,4 @@
+-- DB update 2025_12_11_00 -> 2025_12_12_00
 -- Update npc (ruRU) ; from WowHead Wotlk > TBC > Classic > Cata > Mop > Retail
 -- Disclaimer : Datas of technical NPCs (Theoretically not visible to players) could be wrong, here we strictly align with WoWHead datas
 
