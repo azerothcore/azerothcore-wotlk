@@ -1950,14 +1950,14 @@ public:
             currentStopPoint = 0;
             events.Reset();
         }
-        void DoAction(int32 actionId) override
 
+        void DoAction(int32 actionId) override
         {
             switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0ms);
-                    events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s +500ms);
+                    events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s + 500ms);
                     events.ScheduleEvent(EVENT_LK_BATTLE_2, 3s);
                     events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
                     break;
@@ -1989,7 +1989,7 @@ public:
             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
             for (uint8 i = WP_STOP[currentStopPoint - 1] + (currentStopPoint == 1 ? 0 : 1); i <= WP_STOP[currentStopPoint]; ++i)
                 path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
-            me->GetMotionMaster()->MoveSplinePath(&path);
+            me->GetMotionMaster()->MoveSplinePath(&path, FORCED_MOVEMENT_RUN);
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override
