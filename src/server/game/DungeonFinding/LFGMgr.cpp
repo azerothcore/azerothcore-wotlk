@@ -408,11 +408,10 @@ namespace lfg
             DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty));
 
             uint32 lockData = 0;
+
             if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
-            else if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
-                lockData = LFG_LOCKSTATUS_RAID_LOCKED;
-            else if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, player))
+            else if (IsDungeonDisabled(dungeon->map, dungeon->difficulty))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
             else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, Difficulty(dungeon->difficulty)))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -1484,8 +1483,9 @@ namespace lfg
        @param[in, out] dungeons Dungeons to check restrictions
        @param[in]     players Set of players to check their dungeon restrictions
        @param[out]    lockMap Map of players Lock status info of given dungeons (Empty if dungeons is not empty)
+       @param[in]     randomDungeonId Random dungeon ID (0 for non-random selections), used to filter disabled maps
     */
-    void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, bool isRDF)
+    void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId)
     {
         lockMap.clear();
         for (LfgGuidSet::const_iterator it = players.begin(); it != players.end() && !dungeons.empty(); ++it)
@@ -1496,7 +1496,11 @@ namespace lfg
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
 
-                if (it2->second == LFG_LOCKSTATUS_RAID_LOCKED && isRDF && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
+                LFGDungeonData const* dungeon = GetLFGDungeon(dungeonId);
+
+                uint8 difficultyFlag = (randomDungeonId == RANDOM_DUNGEON_NORMAL_TBC || randomDungeonId == RANDOM_DUNGEON_NORMAL_WOTLK) ? 0 : 1;
+
+                if (dungeon && !IsDungeonDisabled(dungeon->map, (Difficulty)difficultyFlag) && it2->second == LFG_LOCKSTATUS_RAID_LOCKED && randomDungeonId && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
                     continue;
 
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
@@ -2818,6 +2822,12 @@ namespace lfg
                 randomDungeons.insert(dungeon.Entry());
         }
         return randomDungeons;
+    }
+
+    bool LFGMgr::IsDungeonDisabled(uint32 mapId, Difficulty difficulty) const
+    {
+        return sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, mapId, nullptr, difficulty) ||
+            sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, mapId, nullptr);
     }
 
 } // namespace lfg
