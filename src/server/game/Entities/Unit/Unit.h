@@ -774,6 +774,8 @@ public:
     inline bool IsCrowdControlled() const { return HasFlag(UNIT_FIELD_FLAGS, (UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_STUNNED)); }
     inline bool IsImmobilizedState() const { return HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED); }
 
+    void SetAnimTier(AnimTier animTier);
+
     /*********************************************************/
     /***           UNIT TYPES, CLASSES, RACES...           ***/
     /*********************************************************/
