@@ -399,7 +399,7 @@ Network.EnableProxyProtocol = 0
 
 #
 #    Network.UseSocketActivation
-#        Description: Enable systemd socket activation support for the worldserver.
+#        Description: [LINUX ONLY FEATURE] Enable systemd socket activation support for the worldserver.
 #                     When enabled and the process is started by systemd socket activation,
 #                     the server will use the socket passed by systemd instead of
 #                     creating and binding its own listening socket. Disabled by default.
