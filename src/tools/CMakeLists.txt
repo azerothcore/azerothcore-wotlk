@@ -184,7 +184,7 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
           COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE_TOOL_PATH}/mmaps-config.yaml" "${CMAKE_BINARY_DIR}/bin/mmaps-config.yaml")
       endif()
     endif()
-    
+  
     if (UNIX)
       install(FILES ${SOURCE_TOOL_PATH}/mmaps-config.yaml DESTINATION bin)
     elseif (WIN32)
