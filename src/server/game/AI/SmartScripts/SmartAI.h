@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -52,13 +52,13 @@ public:
     bool IsAIControlled() const;
 
     // Start moving to the desired MovePoint
-    void StartPath(ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
-    bool LoadPath(uint32 entry);
+    void StartPath(ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr, PathSource pathSource = PathSource::SMART_WAYPOINT_MGR);
+    bool LoadPath(uint32 entry, PathSource pathSource);
     void PausePath(uint32 delay, bool forced = false);
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
     void EndPath(bool fail = false);
     void ResumePath();
-    WayPoint* GetNextWayPoint();
+    WaypointData const* GetNextWayPoint();
     void GenerateWayPointArray(Movement::PointsArray* points);
     bool HasEscortState(uint32 uiEscortState) { return (mEscortState & uiEscortState); }
     void AddEscortState(uint32 uiEscortState) { mEscortState |= uiEscortState; }
@@ -67,6 +67,7 @@ public:
     void SetAutoAttack(bool on) { mCanAutoAttack = on; }
     void SetCombatMovement(bool on, bool stopOrStartMovement);
     void SetCurrentRangeMode(bool on, float range = 0.f);
+    void SetMainSpell(uint32 spellId);
     void DistanceYourself(float range);
     void SetFollow(Unit* target, float dist = 0.0f, float angle = 0.0f, uint32 credit = 0, uint32 end = 0, uint32 creditType = 0, bool aliveState = true);
     void StopFollow(bool complete);
@@ -227,13 +228,13 @@ private:
     void ReturnToLastOOCPos();
     void UpdatePath(const uint32 diff);
     SmartScript mScript;
-    WPPath* mWayPoints;
+    WaypointPath const* mWayPoints;
     uint32 mEscortState;
     uint32 mCurrentWPID;
     bool mWPReached;
     bool mOOCReached;
     uint32 mWPPauseTimer;
-    WayPoint* mLastWP;
+    WaypointData const* mLastWP;
     uint32 mEscortNPCFlags;
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
     bool mCanRepeatPath;

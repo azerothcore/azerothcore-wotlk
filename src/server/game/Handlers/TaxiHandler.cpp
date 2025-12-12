@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -198,54 +198,70 @@ void WorldSession::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid; // used only for proper packet read
+    ObjectGuid guid;           // used only for proper packet read
+    MovementInfo movementInfo; // used only for proper packet read
+    uint32 movementCounter;    // spline counter
+
+    Unit* mover = _player->m_mover;
+
     recvData >> guid.ReadAsPacked();
-
-    MovementInfo movementInfo;                              // used only for proper packet read
-    movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
+    recvData >> movementCounter;
 
-    recvData.read_skip<uint32>();                          // spline id
-
-    // in taxi flight packet received in 2 case:
-    // 1) end taxi path in far (multi-node) flight
-    // 2) switch from one map to other in case multim-map taxi path
-    // we need process only (1)
-
-    uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
-    if (curDest)
+    if (_player->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_TAXI_FLIGHT)) // taxi spline case
     {
-        TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);
+        // in taxi flight packet received in 2 case:
+        // 1) end taxi path in far (multi-node) flight
+        // 2) switch from one map to other in case multim-map taxi path
+        // we need process only (1)
 
-        // far teleport case
-        if (curDestNode && curDestNode->map_id != GetPlayer()->GetMapId() && GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
+        uint32 curDest = GetPlayer()->m_taxi.GetTaxiDestination();
+        if (curDest)
         {
-            if (FlightPathMovementGenerator* flight = dynamic_cast<FlightPathMovementGenerator*>(GetPlayer()->GetMotionMaster()->top()))
-            {
-                // short preparations to continue flight
-                flight->SetCurrentNodeAfterTeleport();
-                TaxiPathNodeEntry const* node = flight->GetPath()[flight->GetCurrentNode()];
-                flight->SkipCurrentNode();
+            TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);
 
-                GetPlayer()->TeleportTo(curDestNode->map_id, node->x, node->y, node->z, GetPlayer()->GetOrientation(), TELE_TO_NOT_LEAVE_TAXI);
+            // far teleport case
+            if (curDestNode && curDestNode->map_id != GetPlayer()->GetMapId() && GetPlayer()->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
+            {
+                if (FlightPathMovementGenerator* flight = dynamic_cast<FlightPathMovementGenerator*>(GetPlayer()->GetMotionMaster()->top()))
+                {
+                    // short preparations to continue flight
+                    flight->SetCurrentNodeAfterTeleport();
+                    TaxiPathNodeEntry const* node = flight->GetPath()[flight->GetCurrentNode()];
+                    flight->SkipCurrentNode();
+
+                    GetPlayer()->TeleportTo(curDestNode->map_id, node->x, node->y, node->z, GetPlayer()->GetOrientation(), TELE_TO_NOT_LEAVE_TAXI);
+                }
             }
+
+            return;
         }
 
+        // at this point only 1 node is expected (final destination)
+        if (GetPlayer()->m_taxi.GetPath().size() != 1)
+        {
+            return;
+        }
+
+        GetPlayer()->CleanupAfterTaxiFlight();
+        GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
+        if (GetPlayer()->pvpInfo.IsHostile)
+        {
+            GetPlayer()->CastSpell(GetPlayer(), 2479, true);
+        }
         return;
     }
 
-    // at this point only 1 node is expected (final destination)
-    if (GetPlayer()->m_taxi.GetPath().size() != 1)
-    {
+    if (mover->GetGUID() != guid)
         return;
-    }
 
-    GetPlayer()->CleanupAfterTaxiFlight();
-    GetPlayer()->SetFallInformation(GameTime::GetGameTime().count(), GetPlayer()->GetPositionZ());
-    if (GetPlayer()->pvpInfo.IsHostile)
-    {
-        GetPlayer()->CastSpell(GetPlayer(), 2479, true);
-    }
+    if (!_player->IsExpectingChangeTransport() || !mover->movespline || mover->movespline->GetId() != movementCounter)
+        return;
+
+    _player->SetExpectingChangeTransport(false);
+    WorldPacket data(_player->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_ROOT) ? MSG_MOVE_ROOT : MSG_MOVE_UNROOT, recvData.size());
+    WriteMovementInfo(&data, &movementInfo);
+    mover->SendMessageToSet(&data, _player);
 }
 
 void WorldSession::HandleActivateTaxiOpcode(WorldPacket& recvData)

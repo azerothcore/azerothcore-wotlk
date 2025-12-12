@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -102,6 +102,11 @@ bool WMORoot::open()
         {
             DoodadData.Spawns.resize(size / sizeof(WMO::MODD));
             f.read(DoodadData.Spawns.data(), size);
+        }
+        else if (!strcmp(fourcc, "MOGN"))
+        {
+            GroupNames.resize(size);
+            f.read(GroupNames.data(), size);
         }
         /*
         else if (!strcmp(fourcc,"MOTX"))
@@ -495,6 +500,22 @@ uint32 WMOGroup::GetLiquidTypeId(uint32 liquidTypeId)
         }
     }
     return liquidTypeId;
+}
+
+bool WMOGroup::ShouldSkip(WMORoot const* root) const
+{
+        // skip unreachable
+        if (mogpFlags & 0x80)
+                return true;
+
+        // skip antiportals
+        if (mogpFlags & 0x4000000)
+                return true;
+
+       if (groupName < int32(root->GroupNames.size()) && !strcmp(&root->GroupNames[groupName], "antiportal"))
+                return true;
+
+        return false;
 }
 
 WMOGroup::~WMOGroup()
