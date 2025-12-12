@@ -12,6 +12,7 @@
 #    CRYPTOGRAPHY
 #    UPDATE SETTINGS
 #    LOGGING SYSTEM SETTINGS
+#    NETWORK
 #
 ###################################################################################################
 
@@ -438,6 +439,11 @@ Appender.Auth=2,5,0,Auth.log,w
 
 Logger.root=4,Console Auth
 
+#
+###################################################################################################
+
+###################################################################################################
+# NETWORK
 #
 #    Network.UseSocketActivation
 #        Description: [LINUX ONLY FEATURE] [PLACEHOLDER] Enable systemd socket activation support for the authserver.
