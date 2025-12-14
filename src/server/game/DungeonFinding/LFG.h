@@ -100,6 +100,14 @@ namespace lfg
         LFG_ANSWER_AGREE                             = 1
     };
 
+    enum LfgRandomDungeonIds : uint32
+    {
+        RANDOM_DUNGEON_NORMAL_TBC                    = 259,
+        RANDOM_DUNGEON_HEROIC_TBC                    = 260,
+        RANDOM_DUNGEON_NORMAL_WOTLK                  = 261,
+        RANDOM_DUNGEON_HEROIC_WOTLK                  = 262
+    };
+
     class Lfg5Guids;
 
     typedef std::list<Lfg5Guids> Lfg5GuidsList;
