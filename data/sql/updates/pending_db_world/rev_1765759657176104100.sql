@@ -2,7 +2,7 @@
 UPDATE `gameobject` SET `rotation0`= 0,`rotation1`= 0,`rotation2`= 0,`rotation3`= 0, `spawntimesecs` = 900, `animprogress` = 255, `VerifiedBuild` = 64907 WHERE `id` = 106318 AND `guid` IN (85745, 85756, 85879, 26916);
 
 -- The below Rotation Values are Most probably related to one of the Rotation0 - 3
--- GameObject Rotation: X: 0 Y: 0 Z: 0.9996567 W: 0.026201647  
+-- GameObject Rotation: X: 0 Y: 0 Z: 0.9996567 W: 0.026201647
 UPDATE `gameobject` SET `position_x` = -9711.927, `position_y` = -943.4976, `position_z` = 38.416466, `orientation` = 3.0891833, `Comment` = "Brackwell Pumpkin Patch - Inside Barn" WHERE `id` = 106318 AND `guid` = 26916;
 -- GameObject Rotation: X: 0 Y: 0 Z: -0.19936752 W: 0.9799248
 UPDATE `gameobject` SET `position_x` = -9796.159, `position_y` = -929.679, `position_z` = 39.13272, `orientation` = 5.8817606, `Comment` = "Brackwell Pumpkin Patch - Outside Trio House" WHERE `id` = 106318 AND `guid` = 85756;
