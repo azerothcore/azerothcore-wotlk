@@ -926,20 +926,28 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 
             if (IsRandom())
             {
-                // Achievement 909 "Call to Arms!"
+                // Achievement 908 / 909 "Call to Arms!"
                 switch (GetBgTypeID(true))
                 {
                     case BATTLEGROUND_AB:
-                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11339); // Call to Arms: Arathi Basin
+                        // Call to Arms: Arathi Basin
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11335);
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11339);
                         break;
                     case BATTLEGROUND_AV:
-                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11340); // Call to Arms: Alterac Valley
+                        // Call to Arms: Alterac Valley
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11336);
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11340);
                         break;
                     case BATTLEGROUND_EY:
-                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11341); // Call to Arms: Eye of the Storm
+                        // Call to Arms: Eye of the Storm
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11337);
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11341);
                         break;
                     case BATTLEGROUND_WS:
-                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11342); // Call to Arms: Warsong Gulch
+                        // Call to Arms: Warsong Gulch
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11338);
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11342);
                         break;
                 }
             }
