@@ -923,6 +923,26 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             }
 
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, player->GetMapId());
+
+            if (IsRandom())
+            {
+                // Achievement 909 "Call to Arms!"
+                switch (GetBgTypeID(true))
+                {
+                    case BATTLEGROUND_AB:
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11339); // Call to Arms: Arathi Basin
+                        break;
+                    case BATTLEGROUND_AV:
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11340); // Call to Arms: Alterac Valley
+                        break;
+                    case BATTLEGROUND_EY:
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11341); // Call to Arms: Eye of the Storm
+                        break;
+                    case BATTLEGROUND_WS:
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11342); // Call to Arms: Warsong Gulch
+                        break;
+                }
+            }
         }
         else
         {
