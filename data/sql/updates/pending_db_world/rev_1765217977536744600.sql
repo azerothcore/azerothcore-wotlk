@@ -9,10 +9,7 @@ WHERE `Quest_start` = 12822
   AND `quest_start_status` = 74;
 
 -- Add phase shift in Garm and Garm's Rise after turning in Opening the Backdoor
-DELETE FROM `spell_area`
-WHERE `Quest_start` = 12821
-  AND `Spell` = 54635;
-
+DELETE FROM `spell_area` WHERE `Quest_start` = 12821 AND `Spell` = 54635;
 INSERT INTO `spell_area`
 (
   `Spell`,
