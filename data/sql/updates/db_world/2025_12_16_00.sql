@@ -1,3 +1,4 @@
+-- DB update 2025_12_15_00 -> 2025_12_16_00
 -- Sets the chests in "Brackwell Pumpkin Patch" to 15 mins (validated in Classic Era and TBC PTR).
 UPDATE `gameobject` SET `rotation0`= 0,`rotation1`= 0,`rotation2`= 0,`rotation3`= 0, `spawntimesecs` = 900, `animprogress` = 255, `VerifiedBuild` = 64907 WHERE `id` = 106318 AND `guid` IN (85745, 85756, 85879, 26916);
 
