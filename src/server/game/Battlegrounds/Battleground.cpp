@@ -920,12 +920,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 
                 if (!player->GetRandomWinner())
                     player->SetRandomWinner(true);
-            }
 
-            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, player->GetMapId());
-
-            if (IsRandom())
-            {
                 // Achievement 908 / 909 "Call to Arms!"
                 switch (GetBgTypeID(true))
                 {
@@ -951,6 +946,8 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
                         break;
                 }
             }
+
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, player->GetMapId());
         }
         else
         {
