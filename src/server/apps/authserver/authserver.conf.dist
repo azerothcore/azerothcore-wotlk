@@ -446,7 +446,7 @@ Logger.root=4,Console Auth
 # NETWORK
 #
 #    Network.UseSocketActivation
-#        Description: [LINUX ONLY FEATURE] [PLACEHOLDER] Enable systemd socket activation support for the authserver.
+#        Description: [LINUX ONLY FEATURE] Enable systemd socket activation support for the authserver.
 #
 #        Example:     1 - (Enabled)
 #        Default:     0 - (Disabled)
