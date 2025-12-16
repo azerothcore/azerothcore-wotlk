@@ -944,6 +944,8 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11338);
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_QUEST, 11342);
                         break;
+                    default:
+                        break;
                 }
             }
 
