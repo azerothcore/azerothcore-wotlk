@@ -1,2 +1,2 @@
 --
-DELETE FROM spelldifficulty_dbc WHERE ID = 69037;
+DELETE FROM `spelldifficulty_dbc` WHERE `ID` = 69037;
