@@ -1,7 +1,5 @@
 -- PrevQuestID from 12822 to 18221, A Flawless Plan requires Opening the Backdoor, not Know No Fear
-UPDATE `quest_template_addon`
-SET `PrevQuestID` = 12821
-WHERE `ID` = 12823;
+UPDATE `quest_template_addon` SET `PrevQuestID` = 12821 WHERE `ID` = 12823;
 
 -- Remove phase shifts in Garm and Garm's Rise for Know No Fear
 DELETE FROM `spell_area`
