@@ -2682,8 +2682,6 @@ struct npc_controller : public PossessedAI
 enum TravelerMammothVendor
 {
     SAY_DISMISS      = 0,
-
-    SPELL_MAMMOTH    = 61424,
 };
 
 struct npc_traveler_mammoth_vendor : public ScriptedAI
