@@ -24,7 +24,7 @@ INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`,
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 19632) AND (`source_type` = 0) AND (`id` IN (2));
 
 -- Behemothon, King of the Colossi
-DELETE FROM `creature_template_model` WHERE (`CreatureID` = 22054);
+DELETE FROM `creature_template_model` WHERE `CreatureID` = 22054;
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
 (22054, 0, 20261, 1, 0, 12340),
 (22054, 1, 20577, 1, 1, 12340);
