@@ -2028,7 +2028,8 @@ class spell_gen_animal_blood : public AuraScript
             return;
 
         if (Unit* owner = GetUnitOwner())
-            owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
+            if (owner->IsInWater())
+                owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
     }
 
     void Register() override
