@@ -1,3 +1,4 @@
+-- DB update 2025_12_17_02 -> 2025_12_17_03
 -- Lykul Wasp
 DELETE FROM `creature_template_model` WHERE (`CreatureID` = 17732);
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
