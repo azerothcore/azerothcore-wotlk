@@ -1,3 +1,4 @@
+-- DB update 2025_12_18_02 -> 2025_12_18_03
 --
 DELETE FROM `disenchant_loot_template` WHERE `Entry` IN (15, 16, 34, 35);
 INSERT INTO `disenchant_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
