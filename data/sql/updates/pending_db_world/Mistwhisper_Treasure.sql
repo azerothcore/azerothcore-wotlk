@@ -15,7 +15,7 @@ INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`,
 
 -- Set spellclick (Zeptek the Destroyer)
 DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 28399;
-INSERT INTO `npc_spellclick_spells` (npc_entry, spell_id, cast_flags, user_type) VALUES
+INSERT INTO `npc_spellclick_spells` (`npc_entr`y, `spell_id`, `cast_flags`, `user_type`) VALUES
 (28399, 46598, 1, 0);
 
 -- Update SAI (pearborn Encampment Bunny)
