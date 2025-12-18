@@ -1,3 +1,4 @@
+-- DB update 2025_12_17_03 -> 2025_12_18_00
 -- Rework WotLK Dungeon Trash Rares
 
 -- Cleanup loose items
