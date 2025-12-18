@@ -5801,6 +5801,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_default_count_pct_from_max_hp");
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_10pct_count_pct_from_max_hp", 10);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_50pct_count_pct_from_max_hp", 50);
+    RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_26pct_count_pct_from_max_hp", 26);
     RegisterSpellScript(spell_gen_despawn_self);
     RegisterSpellScript(spell_gen_bandage);
     RegisterSpellScript(spell_gen_paralytic_poison);
