@@ -65,8 +65,7 @@ public:
             {
                 creature->SetStandState(UNIT_STAND_STATE_STAND);
                 creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE);
-                creature->SetWalk(true);
-                EscortAI->Start(true, player->GetGUID(), quest);
+                EscortAI->Start(true, false, player->GetGUID(), quest);
                 creature->AI()->Talk(SAY_MAG_START);
 
                 creature->SummonCreature(NPC_MURK_RAIDER, m_afAmbushA[0] + 2.5f, m_afAmbushA[1] - 2.5f, m_afAmbushA[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
@@ -134,7 +133,7 @@ public:
                     if (Player* player = GetPlayerForEscort())
                         player->GroupEventHappens(QUEST_TOTEM_KARDASH_H, me);
 
-                    me->SetWalk(false);
+                    SetRun();
                     break;
             }
         }
@@ -307,8 +306,7 @@ public:
         void SetGUID(ObjectGuid const& guid, int32  /*questId*/) override
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetWalk(true);
-            Start(true, guid);
+            Start(true, false, guid);
             Talk(SAY_KUR_START);
 
             me->SummonCreature(NPC_KUR_MURK_RAIDER, kurenaiAmbushA[0] + 2.5f, kurenaiAmbushA[1] - 2.5f, kurenaiAmbushA[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
@@ -363,7 +361,7 @@ public:
                         if (Player* player = GetPlayerForEscort())
                             player->GroupEventHappens(QUEST_TOTEM_KARDASH_A, me);
 
-                        me->SetWalk(false);
+                        SetRun();
                         break;
                     }
             }

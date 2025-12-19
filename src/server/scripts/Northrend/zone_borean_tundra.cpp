@@ -464,10 +464,7 @@ public:
                 go->UseDoorOrButton();
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
-            {
-                creature->SetWalk(true);
-                pEscortAI->Start(true, player->GetGUID());
-            }
+                pEscortAI->Start(true, false, player->GetGUID());
 
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
@@ -731,8 +728,7 @@ public:
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
-            creature->SetWalk(true);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
         }
         return true;
     }
@@ -777,7 +773,7 @@ public:
                     Talk(SAY_5);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     player->GroupEventHappens(QUEST_ESCAPING_THE_MIST, me);
-                    me->SetWalk(false);
+                    SetRun(true);
                     break;
             }
         }
@@ -813,7 +809,7 @@ public:
         {
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, true, player->GetGUID());
         }
         return true;
     }
@@ -1466,7 +1462,7 @@ public:
 
         void MovementInform(uint32 type, uint32 param) override
         {
-            if (type == WAYPOINT_MOTION_TYPE && param == 3)
+            if (type == WAYPOINT_MOTION_TYPE && param == 2)
             {
                 me->SetWalk(false);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
@@ -1502,7 +1498,7 @@ public:
                         // Arthas load path
                         if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
                         {
-                            arthas->GetMotionMaster()->MoveWaypoint(PATH_ARTHAS, false);
+                            arthas->GetMotionMaster()->MovePath(PATH_ARTHAS, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_3, 1s);
                         break;
@@ -1510,7 +1506,7 @@ public:
                         // Talbot load path
                         if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                         {
-                            talbot->GetMotionMaster()->MoveWaypoint(PATH_TALBOT, false);
+                            talbot->GetMotionMaster()->MovePath(PATH_TALBOT, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_4, 20s);
                         break;
@@ -1544,7 +1540,7 @@ public:
                             arlos->SetWalk(true);
                             arlos->SetImmuneToAll(true);
                             arlos->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                            arlos->GetMotionMaster()->MoveWaypoint(PATH_ARLOS, false);
+                            arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
                         }
                         if (Creature* leryssa = me->SummonCreature(NPC_LERYSSA, 3751.0986f, 3614.9219f, 473.4048f, 4.5029f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
                         {
@@ -1552,7 +1548,7 @@ public:
                             leryssa->SetWalk(true);
                             leryssa->SetImmuneToAll(true);
                             leryssa->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                            leryssa->GetMotionMaster()->MoveWaypoint(PATH_LERYSSA, false);
+                            leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_7, 7s);
                         break;
@@ -1702,7 +1698,7 @@ public:
                         if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
                         {
                             leryssa->SetWalk(false);
-                            leryssa->GetMotionMaster()->MovePoint(0, 3726.751f, 3568.1633f, 477.44086f, FORCED_MOVEMENT_RUN);
+                            leryssa->MonsterMoveWithSpeed(3726.751f, 3568.1633f, 477.44086f, leryssa->GetSpeed(MOVE_RUN));
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_23, 2s);
                         break;
@@ -1807,7 +1803,7 @@ public:
                 _playerGUID = player->GetGUID();
                 CloseGossipMenuFor(player);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->GetMotionMaster()->MoveWaypoint(PATH_THASSARIAN, false);
+                me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
             }
         }
 
@@ -1838,7 +1834,7 @@ public:
 
         void MovementInform(uint32 type, uint32 param) override
         {
-            if (type == WAYPOINT_MOTION_TYPE && param == 3)
+            if (type == WAYPOINT_MOTION_TYPE && param == 2)
             {
                 if (me->IsSummon())
                 {

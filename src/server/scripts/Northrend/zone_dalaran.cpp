@@ -594,7 +594,7 @@ struct npc_minigob_manabonk : public ScriptedAI
                 case EVENT_MOVE:
                     {
                         Position pos = me->GetRandomNearPosition((urand(15, 40)));
-                        me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+                        me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true);
                     }
                     events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 3s);
                     events.ScheduleEvent(EVENT_DESPAWN, 4s);

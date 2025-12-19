@@ -130,9 +130,9 @@ enum Misc
     ACTION_DRAKE_DIED                           = 3,
 
     // Movement points
-    POINT_FINAL_TENEBRON                        = 9,
-    POINT_FINAL_SHADRON                         = 5,
-    POINT_FINAL_VESPERON                        = 5,
+    POINT_FINAL_TENEBRON                        = 8,
+    POINT_FINAL_SHADRON                         = 4,
+    POINT_FINAL_VESPERON                        = 4,
 
     // Lava directions. Its used to identify to which side lava was moving by last time
     LAVA_LEFT_SIDE                              = 0,
@@ -1071,7 +1071,7 @@ public:
                 Talk(SAY_TENEBRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             }
         }
 
@@ -1254,7 +1254,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             }
         }
 
@@ -1370,7 +1370,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
             }
         }
 

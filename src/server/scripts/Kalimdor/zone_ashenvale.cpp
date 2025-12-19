@@ -121,8 +121,7 @@ public:
             {
                 Talk(SAY_MUG_START1);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-                me->SetWalk(true);
-                Start(true, player->GetGUID());
+                npc_escortAI::Start(true, false, player->GetGUID());
             }
         }
 

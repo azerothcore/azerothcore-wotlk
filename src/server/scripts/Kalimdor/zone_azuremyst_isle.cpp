@@ -258,7 +258,7 @@ public:
                     case 28:
                         player->GroupEventHappens(QUEST_A_CRY_FOR_HELP, me);
                         _events.ScheduleEvent(EVENT_TALK_END, 2s);
-                        me->SetWalk(false);
+                        SetRun(true);
                         break;
                     case 29:
                         if (Creature* cowlen = me->FindNearestCreature(NPC_COWLEN, 50.0f, true))
@@ -289,8 +289,7 @@ public:
                     case EVENT_START_ESCORT:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
                         {
-                            me->SetWalk(true);
-                            Start(true, player->GetGUID());
+                            npc_escortAI::Start(true, false, player->GetGUID());
                         }
                         _events.ScheduleEvent(EVENT_STAND, 2s);
                         break;

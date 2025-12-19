@@ -24,7 +24,7 @@ template<class T>
 class EscortMovementGenerator : public MovementGeneratorMedium< T, EscortMovementGenerator<T> >
 {
 public:
-    EscortMovementGenerator(ForcedMovement forcedMovement, Movement::PointsArray* _path = nullptr) : i_recalculateSpeed(false), _forcedMovement(forcedMovement)
+    EscortMovementGenerator(Movement::PointsArray* _path = nullptr) : i_recalculateSpeed(false)
     {
         if (_path)
             m_precomputedPath = *_path;
@@ -46,7 +46,6 @@ private:
     Movement::PointsArray m_precomputedPath;
 
     uint32 _splineId;
-    ForcedMovement _forcedMovement;
 };
 
 #endif

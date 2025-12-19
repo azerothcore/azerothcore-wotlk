@@ -56,8 +56,9 @@ public:
         if (quest->GetQuestId() == QUEST_TOME_VALOR)
         {
             creature->AI()->Talk(SAY_DS_START);
+
             if (npc_escortAI* pEscortAI = CAST_AI(npc_daphne_stilwell::npc_daphne_stilwellAI, creature->AI()))
-                pEscortAI->Start(true, player->GetGUID());
+                pEscortAI->Start(true, true, player->GetGUID());
         }
 
         return true;
@@ -116,7 +117,7 @@ public:
                     me->SummonCreature(NPC_DEFIAS_RAIDER, -11438.14f, 1607.6f, 70.94f, 4.38f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
                     break;
                 case 10:
-                    me->SetWalk(true);
+                    SetRun(false);
                     break;
                 case 11:
                     Talk(SAY_DS_PROLOGUE);

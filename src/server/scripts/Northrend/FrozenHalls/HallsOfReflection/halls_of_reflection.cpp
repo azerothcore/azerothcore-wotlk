@@ -571,7 +571,7 @@ public:
                     pInstance->HandleGameObject(pInstance->GetGuidData(GO_ARTHAS_DOOR), true);
                     pLichKing->SetVisible(true);
 
-                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, FORCED_MOVEMENT_NONE, 0.f, false);
+                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveMidlelThronePos, false);
 
                 }
 
@@ -618,7 +618,7 @@ public:
                     if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
                     {
                         pLichKing->SetVisible(true);
-                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, FORCED_MOVEMENT_NONE, 0.f, false);
+                        pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveThronePos, false);
                     }
                 events.ScheduleEvent(EVENT_INTRO_LK_2_1, 1s);
                 break;
@@ -709,7 +709,7 @@ public:
             case EVENT_INTRO_LK_5_2:
                 if (Creature* pLichKing = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_LICH_KING_EVENT)))
                 {
-                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, FORCED_MOVEMENT_NONE, 0.f, false);
+                    pLichKing->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
                 }
                 break;
 
@@ -763,11 +763,11 @@ public:
                 {
                     Talk(SAY_SYLVANAS_INTRO_END);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                    me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, FORCED_MOVEMENT_NONE, 0.f, false);
+                    me->GetMotionMaster()->MovePoint(0, LichKingMoveAwayPos, false);
                 }
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, FORCED_MOVEMENT_NONE, 0.f, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk1, false);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_10, 1s + 500ms);
                 break;
@@ -775,7 +775,7 @@ public:
             case EVENT_INTRO_LK_10:
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, FORCED_MOVEMENT_NONE, 0.f, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk2, false);
 
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_11, 2s);
@@ -784,7 +784,7 @@ public:
             case EVENT_INTRO_LK_11:
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, FORCED_MOVEMENT_NONE, 0.f, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLk3, false);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_12, 5s + 500ms);
                 break;
@@ -796,7 +796,7 @@ public:
                 }
                 if (Creature* pLoralen = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_DARK_RANGER_LORALEN)))
                 {
-                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, FORCED_MOVEMENT_NONE, 0.f, false);
+                    pLoralen->GetMotionMaster()->MovePoint(0, LoralenFollowLkFinal, false);
                 }
                 events.ScheduleEvent(EVENT_INTRO_LK_13, 2s);
                     break;
@@ -1950,14 +1950,14 @@ public:
             currentStopPoint = 0;
             events.Reset();
         }
-
         void DoAction(int32 actionId) override
+
         {
             switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0ms);
-                    events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s + 500ms);
+                    events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s +500ms);
                     events.ScheduleEvent(EVENT_LK_BATTLE_2, 3s);
                     events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
                     break;
@@ -1989,7 +1989,7 @@ public:
             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
             for (uint8 i = WP_STOP[currentStopPoint - 1] + (currentStopPoint == 1 ? 0 : 1); i <= WP_STOP[currentStopPoint]; ++i)
                 path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
-            me->GetMotionMaster()->MoveSplinePath(&path, FORCED_MOVEMENT_RUN);
+            me->GetMotionMaster()->MoveSplinePath(&path);
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override

@@ -347,7 +347,7 @@ struct boss_kaelthas : public BossAI
         }
         else if (point == POINT_AIR)
         {
-            me->SetDisableGravity(true); // updating AnimationTier will break drowning animation later
+            me->SetDisableGravity(true, false, false); // updating AnimationTier will break drowning animation later
         }
         else if (point == POINT_START_LAST_PHASE)
         {
@@ -655,7 +655,7 @@ struct boss_kaelthas : public BossAI
                 me->AttackStop();
                 me->CastStop();
                 me->SetReactState(REACT_PASSIVE);
-                me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), FORCED_MOVEMENT_NONE, 0.f, true, true);
+                me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
             }
         });
         ScheduleTimedEvent(1s, [&]

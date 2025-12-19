@@ -400,7 +400,7 @@ struct npc_harrison_jones : public ScriptedAI
             Talk(SAY_HARRISON_0);
             scheduler.Schedule(2s, [this](TaskContext /*task*/)
             {
-                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_1, false);
+                me->GetMotionMaster()->MovePath(HARRISON_MOVE_1, false);
             });
         }
     }
@@ -448,7 +448,7 @@ struct npc_harrison_jones : public ScriptedAI
             // Players are Now Saved to instance at SPECIAL (Player should be notified?)
             scheduler.Schedule(500ms, [this](TaskContext /*task*/)
             {
-                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_2, false);
+                me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
             });
         }
     }
@@ -486,7 +486,7 @@ struct npc_harrison_jones : public ScriptedAI
     void MovementInform(uint32 type, uint32 id) override
     {
         // at gong
-        if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GONG)
+        if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GONG)
         {
             if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                 me->SetFacingToObject(gong);
@@ -503,13 +503,13 @@ struct npc_harrison_jones : public ScriptedAI
             });
         }
         // to the massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 1 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetEntry(NPC_HARRISON_JONES_1);
             Talk(SAY_HARRISON_2);
         }
         // at massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             Talk(SAY_HARRISON_3);
@@ -521,7 +521,7 @@ struct npc_harrison_jones : public ScriptedAI
             {
                 DoCastSelf(SPELL_STEALTH);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_3, false);
+                me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
             });
         }
     }
@@ -592,14 +592,14 @@ struct npc_amanishi_lookout : public NullCreatureAI
             Talk(SAY_INVADERS);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUnitFlag(UNIT_FLAG_RENAME);
-            me->GetMotionMaster()->MoveWaypoint(PATH_LOOKOUT, false);
+            me->GetMotionMaster()->MovePath(PATH_LOOKOUT, false);
         }
     }
 
     void MovementInform(uint32 type, uint32 id) override
     {
         // at boss
-        if (type == WAYPOINT_MOTION_TYPE && id == 9) // should despawn with waypoint script
+        if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
             me->DespawnOrUnsummon(0s, 0s);
     }
 private:

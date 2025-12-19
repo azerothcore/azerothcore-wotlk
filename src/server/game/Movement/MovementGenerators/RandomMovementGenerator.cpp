@@ -51,21 +51,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
         Movement::MoveSplineInit init(creature);
         init.MoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ());
-
-        bool walk = true;
-        switch (creature->GetMovementTemplate().GetRandom())
-        {
-            case CreatureRandomMovementType::CanRun:
-                walk = creature->IsWalking();
-                break;
-            case CreatureRandomMovementType::AlwaysRun:
-                walk = false;
-                break;
-            default:
-                break;
-        }
-
-        init.SetWalk(walk);
+        init.SetWalk(true);
         init.Launch();
         if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
             creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), 0);
@@ -284,6 +270,7 @@ template<>
 void RandomMovementGenerator<Creature>::DoFinalize(Creature* creature)
 {
     creature->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    creature->SetWalk(false);
 }
 
 template<>

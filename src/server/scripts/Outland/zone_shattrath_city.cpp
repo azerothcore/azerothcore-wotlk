@@ -246,10 +246,7 @@ public:
 
             Player* player = summoner->ToPlayer();
             if (player && player->GetQuestStatus(10211) == QUEST_STATUS_INCOMPLETE)
-            {
-                me->SetWalk(true);
-                Start(false, summoner->GetGUID());
-            }
+                Start(false, false, summoner->GetGUID());
         }
 
         void Reset() override { }

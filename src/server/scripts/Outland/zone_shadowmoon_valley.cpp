@@ -617,7 +617,7 @@ public:
                 {
                     case EVENT_WALK_TO_MUTTON:
                         me->SetWalk(true);
-                        me->GetMotionMaster()->MovePoint(1, x, y, z);
+                        me->GetMotionMaster()->MovePoint(1, x, y, z, true);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                         break;
@@ -1860,22 +1860,22 @@ struct dragonmaw_race_npc : public ScriptedAI
         switch (me->GetEntry())
         {
         case NPC_MUCKJAW:
-            me->GetMotionMaster()->MoveWaypoint(PATH_MUCKJAW, false);
+            me->GetMotionMaster()->MovePath(PATH_MUCKJAW, false);
             break;
         case NPC_TROPE:
-            me->GetMotionMaster()->MoveWaypoint(PATH_TROPE, false);
+            me->GetMotionMaster()->MovePath(PATH_TROPE, false);
             break;
         case NPC_CORLOK:
-            me->GetMotionMaster()->MoveWaypoint(PATH_CORLOK, false);
+            me->GetMotionMaster()->MovePath(PATH_CORLOK, false);
             break;
         case NPC_ICHMAN:
-            me->GetMotionMaster()->MoveWaypoint(PATH_ICHMAN, false);
+            me->GetMotionMaster()->MovePath(PATH_ICHMAN, false);
             break;
         case NPC_MULVERICK:
-            me->GetMotionMaster()->MoveWaypoint(PATH_MULVERICK, false);
+            me->GetMotionMaster()->MovePath(PATH_MULVERICK, false);
             break;
         case NPC_SKYSHATTER:
-            me->GetMotionMaster()->MoveWaypoint(PATH_SKYSHATTER, false);
+            me->GetMotionMaster()->MovePath(PATH_SKYSHATTER, false);
             break;
         default:
             break;

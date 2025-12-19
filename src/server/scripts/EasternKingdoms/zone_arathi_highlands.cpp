@@ -78,7 +78,7 @@ public:
                     break;
                 case 11:
                     Talk(SAY_PROGRESS_6, player);
-                    me->SetWalk(false);
+                    SetRun();
                     break;
                 case 19:
                     Talk(SAY_PROGRESS_7, player);
@@ -106,8 +106,7 @@ public:
             if (quest->GetQuestId() == QUEST_SUNKEN_TREASURE)
             {
                 Talk(SAY_PROGRESS_1, player);
-                me->SetWalk(true);
-                Start(false, player->GetGUID(), quest);
+                npc_escortAI::Start(false, false, player->GetGUID(), quest);
                 me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
             }
         }

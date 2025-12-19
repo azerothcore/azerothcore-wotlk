@@ -111,10 +111,7 @@ public:
             creature->AI()->Talk(SAY_QUESTACCEPT, player);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_deathstalker_erland::npc_deathstalker_erlandAI, creature->AI()))
-            {
-                creature->SetWalk(true);
-                pEscortAI->Start(true, player->GetGUID());
-            }
+                pEscortAI->Start(true, false, player->GetGUID());
         }
 
         return true;

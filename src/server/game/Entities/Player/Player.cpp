@@ -420,10 +420,6 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
     GetObjectVisibilityContainer().InitForPlayer();
 
     sScriptMgr->OnConstructPlayer(this);
-
-    _expectingChangeTransport = false;
-    _pendingFlightChangeCounter = 0;
-    _mapChangeOrderCounter = 0;
 }
 
 Player::~Player()
@@ -1536,6 +1532,17 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             CombatStop();
 
+            // remove arena spell coldowns/buffs now to also remove pet's cooldowns before it's temporarily unsummoned
+            if (mEntry->IsBattleArena() && (HasPendingSpectatorForBG(0) || !HasPendingSpectatorForBG(GetBattlegroundId())))
+            {
+                // KEEP THIS ORDER!
+                RemoveArenaAuras();
+                if (pet)
+                    pet->RemoveArenaAuras();
+
+                RemoveArenaSpellCooldowns(true);
+            }
+
             // remove pet on map change
             if (pet)
                 UnsummonPetTemporaryIfAny();
@@ -1552,8 +1559,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             //remove auras before removing from map...
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
 
-            SetMapChangeOrderCounter();
-
             if (!GetSession()->PlayerLogout())
             {
                 // send transfer packets
@@ -1568,6 +1573,17 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             // remove from old map now
             if (oldmap)
                 oldmap->RemovePlayerFromMap(this, false);
+
+            // xinef: do this before setting fall information!
+            if (IsMounted() && (!GetMap()->GetEntry()->IsDungeon() && !GetMap()->GetEntry()->IsBattlegroundOrArena()) && !m_transport)
+            {
+                AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_MOUNTED);
+                if (!auras.empty())
+                {
+                    SetMountBlockId((*auras.begin())->GetId());
+                    RemoveAurasByType(SPELL_AURA_MOUNTED);
+                }
+            }
 
             teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
             SetFallInformation(GameTime::GetGameTime().count(), z);
@@ -4404,6 +4420,34 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
     }
 }
 
+void Player::SetMovement(PlayerMovementType pType)
+{
+    WorldPacket data;
+    const PackedGuid& guid = GetPackGUID();
+    switch (pType)
+    {
+        case MOVE_ROOT:
+            data.Initialize(SMSG_FORCE_MOVE_ROOT, guid.size() + 4);
+            break;
+        case MOVE_UNROOT:
+            data.Initialize(SMSG_FORCE_MOVE_UNROOT, guid.size() + 4);
+            break;
+        case MOVE_WATER_WALK:
+            data.Initialize(SMSG_MOVE_WATER_WALK, guid.size() + 4);
+            break;
+        case MOVE_LAND_WALK:
+            data.Initialize(SMSG_MOVE_LAND_WALK, guid.size() + 4);
+            break;
+        default:
+            LOG_ERROR("entities.player", "Player::SetMovement: Unsupported move type ({}), data not sent to client.", pType);
+            return;
+    }
+    data << guid;
+    data << GetSession()->GetOrderCounter(); // movement counter
+    SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
+}
+
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4439,11 +4483,12 @@ void Player::BuildPlayerRepop()
     }
     GetMap()->AddToMap(corpse);
     SetHealth(1); // convert player body to ghost
+    SetMovement(MOVE_WATER_WALK);
     SetWaterWalking(true);
-
-    if (!IsImmobilizedState())
-        SendMoveRoot(false);
-
+    if (!GetSession()->isLogingOut())
+    {
+        SetMovement(MOVE_UNROOT);
+    }
     RemoveUnitFlag(UNIT_FLAG_SKINNABLE); // BG - remove insignia related
     int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
     if (corpseReclaimDelay >= 0)
@@ -4479,7 +4524,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
     setDeathState(DeathState::Alive);
-    SendMoveRoot(false);
+    SetMovement(MOVE_LAND_WALK);
+    SetMovement(MOVE_UNROOT);
     SetWaterWalking(false);
     m_deathTimer = 0;
 
@@ -4543,7 +4589,7 @@ void Player::KillPlayer()
     if (IsFlying() && !GetTransport())
         GetMotionMaster()->MoveFall();
 
-    SendMoveRoot(true);
+    SetMovement(MOVE_ROOT);
 
     StopMirrorTimers();                                     //disable timers(bars)
 
@@ -11702,56 +11748,16 @@ void Player::SendInitialPacketsAfterAddToMap()
     GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
 
-    WorldPacket setCompoundState(SMSG_MULTIPLE_MOVES, 100);
-    setCompoundState << uint32(0); // size placeholder
+    if (HasStunAura())
+        SetMovement(MOVE_ROOT);
 
     // manual send package (have code in HandleEffect(this, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT, true); that must not be re-applied.
-    if (IsImmobilizedState())
+    if (HasRootAura())
     {
-        uint32 const counter = GetSession()->GetOrderCounter();
-        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
-        setCompoundState << uint16(SMSG_FORCE_MOVE_ROOT);
-        setCompoundState << GetPackGUID();
-        setCompoundState << uint32(counter);
-        GetSession()->IncrementOrderCounter();
-    }
-
-    if (HasAuraType(SPELL_AURA_FEATHER_FALL))
-    {
-        uint32 const counter = GetSession()->GetOrderCounter();
-        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
-        setCompoundState << uint16(SMSG_MOVE_FEATHER_FALL);
-        setCompoundState << GetPackGUID();
-        setCompoundState << uint32(counter);
-        GetSession()->IncrementOrderCounter();
-    }
-
-    if (HasAuraType(SPELL_AURA_WATER_WALK) || HasAura(8326))
-    {
-        uint32 const counter = GetSession()->GetOrderCounter();
-        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
-        setCompoundState << uint16(SMSG_MOVE_WATER_WALK);
-        setCompoundState << GetPackGUID();
-        setCompoundState << uint32(counter);
-        GetSession()->IncrementOrderCounter();
-    }
-
-    if (HasAuraType(SPELL_AURA_HOVER))
-    {
-        uint32 const counter = GetSession()->GetOrderCounter();
-        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
-        setCompoundState << uint16(SMSG_MOVE_SET_HOVER);
-        setCompoundState << GetPackGUID();
-        setCompoundState << uint32(counter);
-        GetSession()->IncrementOrderCounter();
-    }
-
-    // TODO: Pending mount protocol
-
-    if (setCompoundState.size() > 4)
-    {
-        setCompoundState.put<uint32>(0, setCompoundState.size() - 4);
-        SendDirectMessage(&setCompoundState);
+        WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
+        data2 << GetPackGUID();
+        data2 << (uint32)2;
+        SendMessageToSet(&data2, true);
     }
 
     SendEnchantmentDurations();                             // must be after add to map
@@ -12132,6 +12138,18 @@ void Player::GetAurasForTarget(Unit* target, bool force /*= false*/)
 {
     if (!target || (!force && target->GetVisibleAuras()->empty()))    // speedup things
         return;
+
+    /*! Blizz sends certain movement packets sometimes even before CreateObject
+        These movement packets are usually found in SMSG_COMPRESSED_MOVES
+    */
+    if (target->HasFeatherFallAura())
+        target->SendMovementFeatherFall(this);
+
+    if (target->HasWaterWalkAura())
+        target->SendMovementWaterWalking(this);
+
+    if (target->HasHoverAura())
+        target->SendMovementHover(this);
 
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data<< target->GetPackGUID();
@@ -16024,6 +16042,108 @@ bool Player::IsInWhisperWhiteList(ObjectGuid guid)
     }
 
     return false;
+}
+
+bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
+{
+    if (!packetOnly && !Unit::SetDisableGravity(disable))
+        return false;
+
+    WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
+    return true;
+}
+
+bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
+{
+    sScriptMgr->AnticheatSetCanFlybyServer(this, apply);
+
+    if (!packetOnly && !Unit::SetCanFly(apply))
+        return false;
+
+    if (!apply)
+        SetFallInformation(GameTime::GetGameTime().count(), GetPositionZ());
+
+    WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
+    return true;
+}
+
+bool Player::SetHover(bool apply, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
+{
+    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
+    if (!packetOnly /* && !Unit::SetHover(apply)*/)
+    {
+        Unit::SetHover(apply);
+        // return false;
+    }
+
+    WorldPacket data(apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_HOVER, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
+    return true;
+}
+
+bool Player::SetWaterWalking(bool apply, bool packetOnly /*= false*/)
+{
+    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
+    if (!packetOnly /* && !Unit::SetWaterWalking(apply)*/)
+    {
+        Unit::SetWaterWalking(apply);
+        // return false;
+    }
+
+    WorldPacket data(apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_WATER_WALK, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
+    return true;
+}
+
+bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
+{
+    // Xinef: moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
+    if (!packetOnly/* && !Unit::SetFeatherFall(apply)*/)
+    {
+        Unit::SetFeatherFall(apply);
+        //return false;
+    }
+
+    WorldPacket data(apply ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
+    data << GetPackGUID();
+    data << uint32(0);          //! movement counter
+    SendDirectMessage(&data);
+
+    data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
+    data << GetPackGUID();
+    BuildMovementPacket(&data);
+    SendMessageToSet(&data, false);
+    return true;
 }
 
 Guild* Player::GetGuild() const

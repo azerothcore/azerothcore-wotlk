@@ -932,7 +932,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, ObjectGuid::Empty, nullptr, false, true);
+            Start(false, true, ObjectGuid::Empty, nullptr, false, true);
         }
 
         uint32 _checkTimer;
