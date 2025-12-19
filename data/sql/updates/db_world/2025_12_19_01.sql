@@ -1,3 +1,4 @@
+-- DB update 2025_12_19_00 -> 2025_12_19_01
 
 -- Remove ScriptName from Mistwhisper Treasure
 UPDATE `gameobject_template` SET `ScriptName` = '' WHERE (`entry` = 190578);
