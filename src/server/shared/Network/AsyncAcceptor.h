@@ -20,6 +20,7 @@
 
 #include "IpAddress.h"
 #include "Log.h"
+#include "Systemd.h"
 #include <atomic>
 #include <boost/asio/ip/tcp.hpp>
 #include <functional>
@@ -33,10 +34,20 @@ class AsyncAcceptor
 public:
     typedef void(*AcceptCallback)(tcp::socket&& newSocket, uint32 threadIndex);
 
-    AsyncAcceptor(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port) :
+    AsyncAcceptor(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, bool supportSocketActivation = false) :
         _acceptor(ioContext), _endpoint(Acore::Net::make_address(bindIp), port),
-        _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); })
+        _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); }),
+        _supportSocketActivation(supportSocketActivation)
     {
+        int const listen_fd = get_listen_fd();
+        if (_supportSocketActivation && listen_fd > 0)
+        {
+            LOG_DEBUG("network", "Using socket from systemd socket activation");
+            boost::system::error_code errorCode;
+            _acceptor.assign(boost::asio::ip::tcp::v4(), listen_fd, errorCode);
+            if (errorCode)
+                LOG_WARN("network", "Failed to assign socket {}", errorCode.message());
+        }
     }
 
     template<class T>
@@ -72,27 +83,31 @@ public:
     bool Bind()
     {
         boost::system::error_code errorCode;
-        _acceptor.open(_endpoint.protocol(), errorCode);
-        if (errorCode)
+        // with socket activation the acceptor is already open and bound
+        if (!_acceptor.is_open())
         {
-            LOG_INFO("network", "Failed to open acceptor {}", errorCode.message());
-            return false;
-        }
+            _acceptor.open(_endpoint.protocol(), errorCode);
+            if (errorCode)
+            {
+                LOG_INFO("network", "Failed to open acceptor {}", errorCode.message());
+                return false;
+            }
 
 #if AC_PLATFORM != AC_PLATFORM_WINDOWS
-        _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true), errorCode);
-        if (errorCode)
-        {
-            LOG_INFO("network", "Failed to set reuse_address option on acceptor {}", errorCode.message());
-            return false;
-        }
+            _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true), errorCode);
+            if (errorCode)
+            {
+                LOG_INFO("network", "Failed to set reuse_address option on acceptor {}", errorCode.message());
+                return false;
+            }
 #endif
 
-        _acceptor.bind(_endpoint, errorCode);
-        if (errorCode)
-        {
-            LOG_INFO("network", "Could not bind to {}:{} {}", _endpoint.address().to_string(), _endpoint.port(), errorCode.message());
-            return false;
+            _acceptor.bind(_endpoint, errorCode);
+            if (errorCode)
+            {
+                LOG_INFO("network", "Could not bind to {}:{} {}", _endpoint.address().to_string(), _endpoint.port(), errorCode.message());
+                return false;
+            }
         }
 
         _acceptor.listen(ACORE_MAX_LISTEN_CONNECTIONS, errorCode);
@@ -124,6 +139,7 @@ private:
     tcp::socket _socket;
     std::atomic<bool> _closed;
     std::function<std::pair<tcp::socket*, uint32>()> _socketFactory;
+    bool _supportSocketActivation;
 };
 
 template<class T>
