@@ -1,3 +1,4 @@
+-- DB update 2025_12_19_03 -> 2025_12_19_04
 --
 -- Bane SAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25655;
