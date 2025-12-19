@@ -61,7 +61,7 @@ UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1824 WHERE `ID` = 182
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 4505 WHERE `ID` = 6605;
 
 -- A Call to Arms: The Plaguelands! (horde)
-UPDATE `quest_template_addon` SET `ExclusiveGroup` = 0, `BreadcrumbForQuestId` = 5096 WHERE `ID` IN (5093, 5094, 5095, 10374);
+UPDATE `quest_template_addon` SET `NextQuestID` = 0, `ExclusiveGroup` = 0, `BreadcrumbForQuestId` = 5096 WHERE `ID` IN (5093, 5094, 5095, 10374);
 
 -- A Call to Arms: The Plaguelands! (alliance)
 UPDATE `quest_template_addon` SET `ExclusiveGroup` = 0, `BreadcrumbForQuestId` = 5092 WHERE `ID` IN (5066, 5090, 5091, 10373);
@@ -274,7 +274,7 @@ UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 2206 WHERE `ID` = 220
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 2242 WHERE `ID` = 2241;
 
 -- Find Sage Mistwalker (breadcrumb for The Artifacts of Steel Gate)
-UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 11286 WHERE `ID` = 11287;
+UPDATE `quest_template_addon` SET `ExclusiveGroup` = 0, `BreadcrumbForQuestId` = 11286 WHERE `ID` = 11287;
 
 -- Judgment Day Comes! (Alliance/Horde breadcrumbs for Honor Above All Else)
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 13036 WHERE `ID` IN (13226, 13227);
