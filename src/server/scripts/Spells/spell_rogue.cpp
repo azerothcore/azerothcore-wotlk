@@ -315,13 +315,21 @@ class spell_rog_killing_spree_aura : public AuraScript
                     continue;
                 }
 
-                GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_TELEPORT, true);
+                Player* player = GetTarget()->ToPlayer();
+                if (!player)
+                    return;
 
-                // xinef: ensure fast coordinates switch, dont wait for client to send opcode
-                WorldLocation const& dest = GetTarget()->ToPlayer()->GetTeleportDest();
-                GetTarget()->ToPlayer()->UpdatePosition(dest, true);
+                float dist = 3.0f;
+                float angle = target->GetOrientation() + float(M_PI);
 
-                GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_DONT_REPORT_CAST_ERROR));
+                float x = target->GetPositionX() + std::cos(angle) * dist;
+                float y = target->GetPositionY() + std::sin(angle) * dist;
+                float z = target->GetPositionZ();
+
+                player->UpdateAllowedPositionZ(x, y, z);
+                player->NearTeleportTo(x, y, z, target->GetOrientation());
+
+                player->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_DONT_REPORT_CAST_ERROR));
                 break;
             }
             else
