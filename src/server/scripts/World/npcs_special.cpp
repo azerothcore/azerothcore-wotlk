@@ -2699,7 +2699,7 @@ struct npc_traveler_mammoth_vendor : public ScriptedAI
         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
             me->SetFaction(FACTION_FRIENDLY);
 
-        scheduler.CancelAll();
+        me->m_Events.KillAllEvents(false);
     }
 
     void UpdateAI(uint32 /*diff*/) override
