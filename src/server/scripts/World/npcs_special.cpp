@@ -2696,7 +2696,7 @@ struct npc_traveler_mammoth_vendor : public ScriptedAI
         _hasEjected = false;
         _playerGuid.Clear();
 
-        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && !me->GetMap()->IsBattlegroundOrArena())
             me->SetFaction(FACTION_FRIENDLY);
 
         me->m_Events.KillAllEvents(false);
