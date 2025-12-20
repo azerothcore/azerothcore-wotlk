@@ -315,300 +315,6 @@ public:
     }
 };
 
-enum eWildWyrm
-{
-    SPELL_FIGHT_WYRM_BASE           = 56673,
-    SPELL_FIGHT_WYRM_NEXT           = 60863,
-    SPELL_SPEAR_OF_HODIR            = 56671,
-    SPELL_DODGE_CLAWS               = 56704,
-    SPELL_WYRM_GRIP                 = 56689,
-    SPELL_GRAB_ON                   = 60533,
-    SPELL_THRUST_SPEAR              = 56690,
-    SPELL_MIGHTY_SPEAR_THRUST       = 60586,
-    SPELL_FATAL_STRIKE              = 60587,
-    SPELL_PRY_JAWS_OPEN             = 56706,
-    SPELL_JAWS_OF_DEATH             = 56692,
-};
-
-class npc_wild_wyrm : public CreatureScript
-{
-public:
-    npc_wild_wyrm() : CreatureScript("npc_wild_wyrm") { }
-
-    struct npc_wild_wyrmAI : public ScriptedAI
-    {
-        npc_wild_wyrmAI(Creature* creature) : ScriptedAI(creature) {}
-
-        ObjectGuid playerGUID;
-        uint32 checkTimer;
-        uint32 announceAttackTimer;
-        uint32 attackTimer;
-        bool setCharm;
-        bool switching;
-        bool startPath;
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (switching || me->HasControlVehicleAura())
-                return;
-            ScriptedAI::EnterEvadeMode(why);
-        }
-
-        void Reset() override
-        {
-            me->SetRegeneratingHealth(true);
-            me->SetSpeed(MOVE_RUN, 1.14f, true); // ZOMG!
-            setCharm = false;
-            switching = false;
-            startPath = false;
-            checkTimer = 0;
-            playerGUID.Clear();
-            attackTimer = 0;
-            announceAttackTimer = 0;
-            me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-        }
-
-        void PassengerBoarded(Unit*, int8, bool apply) override
-        {
-            if (!apply && me->IsAlive() && me->HasAura(SPELL_WYRM_GRIP))
-                me->RemoveAurasDueToSpell(SPELL_WYRM_GRIP);
-        }
-
-        void MovementInform(uint32 type, uint32 pointId) override
-        {
-            if (type == POINT_MOTION_TYPE && pointId == 1 && !me->GetCharmerGUID())
-            {
-                if (Player* player = GetValidPlayer())
-                {
-                    checkTimer = 1;
-                    me->SetFullHealth();
-                    player->CastSpell(me, SPELL_FIGHT_WYRM_BASE, true);
-                    me->CastSpell(me, SPELL_WYRM_GRIP, true);
-                    me->SetRegeneratingHealth(false);
-                }
-            }
-            else if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
-                startPath = true;
-            else if (type == EFFECT_MOTION_TYPE && pointId == me->GetEntry())
-                me->KillSelf();
-        }
-
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (who != me)
-            {
-                damage = 0;
-                if (!GetValidPlayer())
-                    setCharm = true; // will enter evade on next update
-            }
-        }
-
-        void AttackStart(Unit*) override { }
-        void MoveInLineOfSight(Unit*  /*who*/) override { }
-
-        void OnCharmed(bool apply) override
-        {
-            if (apply)
-                setCharm = true;
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-        {
-            if (!playerGUID && spellInfo->Id == SPELL_SPEAR_OF_HODIR)
-            {
-                me->GetMotionMaster()->MovePoint(1, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ() + 12.0f);
-                playerGUID = caster->GetGUID();
-            }
-            else if (spellInfo->Id == SPELL_GRAB_ON)
-            {
-                if (Aura* aura = me->GetAura(SPELL_WYRM_GRIP))
-                    aura->ModStackAmount(10);
-            }
-            else if (spellInfo->Id == SPELL_THRUST_SPEAR)
-            {
-                if (Aura* aura = me->GetAura(SPELL_WYRM_GRIP))
-                    aura->ModStackAmount(-5);
-            }
-            else if (spellInfo->Id == SPELL_MIGHTY_SPEAR_THRUST)
-            {
-                if (Aura* aura = me->GetAura(SPELL_WYRM_GRIP))
-                    aura->ModStackAmount(-15);
-            }
-            else if (spellInfo->Id == SPELL_FATAL_STRIKE)
-            {
-                if (roll_chance_i(me->GetAuraCount(SPELL_PRY_JAWS_OPEN) * 10))
-                {
-                    if (Player* player = GetValidPlayer())
-                    {
-                        player->KilledMonsterCredit(30415);
-                        player->RemoveAurasDueToSpell(SPELL_JAWS_OF_DEATH);
-                    }
-                    me->SetStandState(UNIT_STAND_STATE_DEAD);
-                    me->GetMotionMaster()->MoveFall(me->GetEntry());
-                }
-                else
-                    Talk(2);
-            }
-        }
-
-        Player* GetValidPlayer()
-        {
-            Player* charmer = ObjectAccessor::GetPlayer(*me, playerGUID);
-            if (charmer && charmer->IsAlive() && me->GetDistance(charmer) < 20.0f)
-                return charmer;
-            return nullptr;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (startPath)
-            {
-                startPath = false;
-                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
-            }
-            if (setCharm)
-            {
-                setCharm = false;
-
-                if (Player* charmer = GetValidPlayer())
-                {
-                    me->SetFaction(FACTION_MONSTER_2);
-                    charmer->SetClientControl(me, 0, true);
-
-                    me->SetSpeed(MOVE_RUN, 2.0f, true);
-                    startPath = true;
-                }
-                else
-                {
-                    me->RemoveAllAuras();
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                }
-                return;
-            }
-
-            if (!checkTimer)
-                return;
-
-            if (checkTimer < 10000)
-            {
-                checkTimer += diff;
-                if (checkTimer >= 2000)
-                {
-                    checkTimer = 1;
-                    if (me->HealthBelowPct(25))
-                    {
-                        if (Player* player = GetValidPlayer())
-                        {
-                            Talk(3);
-                            switching = true;
-                            me->RemoveAllAuras();
-                            me->CastSpell(me, SPELL_JAWS_OF_DEATH, true);
-                            player->CastSpell(me, SPELL_FIGHT_WYRM_NEXT, true);
-                            checkTimer = 10000;
-                            return;
-                        }
-                        else
-                        {
-                            me->RemoveAllAuras();
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            return;
-                        }
-                    }
-                }
-            }
-            else if (checkTimer < 20000)
-            {
-                checkTimer += diff;
-                if (checkTimer >= 13000)
-                {
-                    switching = false;
-                    checkTimer = 20000;
-                }
-            }
-            else if (checkTimer < 30000)
-            {
-                checkTimer += diff;
-                if (checkTimer >= 22000)
-                {
-                    checkTimer = 20000;
-                    Player* player = GetValidPlayer();
-                    if (!player)
-                    {
-                        me->RemoveAllAuras();
-                        EnterEvadeMode(EVADE_REASON_OTHER);
-                    }
-                }
-                return;
-            }
-
-            announceAttackTimer += diff;
-            if (announceAttackTimer >= 7000)
-            {
-                announceAttackTimer = urand(0, 3000);
-                Talk(0);
-                attackTimer = 1;
-            }
-            if (attackTimer)
-            {
-                attackTimer += diff;
-                if (attackTimer > 2000)
-                {
-                    attackTimer = 0;
-                    Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-                    if (player && player->HasAura(SPELL_DODGE_CLAWS))
-                        Talk(1);
-                    else if (player)
-                        me->AttackerStateUpdate(player);
-                    else
-                    {
-                        me->RemoveAllAuras();
-                        EnterEvadeMode(EVADE_REASON_OTHER);
-                    }
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_wild_wyrmAI(creature);
-    }
-};
-
-class spell_q13003_thursting_hodirs_spear_aura : public AuraScript
-{
-    PrepareAuraScript(spell_q13003_thursting_hodirs_spear_aura);
-
-    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        ModStackAmount(60);
-    }
-
-    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Creature* creature = GetUnitOwner()->ToCreature())
-        {
-            if (!creature->IsInEvadeMode())
-            {
-                creature->RemoveAllAuras();
-                creature->AI()->EnterEvadeMode();
-            }
-        }
-    }
-
-    void HandlePeriodic(AuraEffect const* /* aurEff */)
-    {
-        ModStackAmount(-1);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_q13003_thursting_hodirs_spear_aura::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 enum q13007IronColossus
 {
     SPELL_JORMUNGAR_SUBMERGE        = 56504,
@@ -1171,13 +877,509 @@ class spell_mammoth_explosion : public SpellScript
     }
 };
 
+/*#####
+# Quest 13003 Thrusting Hodir's Spear
+#####*/
+
+enum WildWyrm
+{
+    // Phase 1
+    SPELL_PLAYER_MOUNT_WYRM             = 56672,
+    SPELL_FIGHT_WYRM                    = 56673,
+    SPELL_SPEAR_OF_HODIR                = 56671,
+    SPELL_GRIP                          = 56689,
+    SPELL_GRAB_ON                       = 60533,
+    SPELL_DODGE_CLAWS                   = 56704,
+    SPELL_THRUST_SPEAR                  = 56690,
+    SPELL_MIGHTY_SPEAR_THRUST           = 60586,
+    SPELL_CLAW_SWIPE_PERIODIC           = 60689,
+    SPELL_CLAW_SWIPE_DAMAGE             = 60776,
+    SPELL_FULL_HEAL_MANA                = 32432,
+    SPELL_LOW_HEALTH_TRIGGER            = 60596,
+
+    // Phase 2
+    SPELL_EJECT_PASSENGER_1             = 60603,
+    SPELL_PRY_JAWS_OPEN                 = 56706,
+    SPELL_FATAL_STRIKE                  = 60587,
+    SPELL_FATAL_STRIKE_DAMAGE           = 60881,
+    SPELL_JAWS_OF_DEATH_PERIODIC        = 56692,
+    SPELL_FLY_STATE_VISUAL              = 60865,
+
+    // Dead phase
+    SPELL_WYRM_KILL_CREDIT              = 56703,
+    SPELL_FALLING_DRAGON_FEIGN_DEATH    = 55795,
+    SPELL_EJECT_ALL_PASSENGERS          = 50630,
+
+    SAY_SWIPE                           = 0,
+    SAY_DODGED                          = 1,
+    SAY_PHASE_2                         = 2,
+    SAY_GRIP_WARN                       = 3,
+    SAY_STRIKE_MISS                     = 4,
+
+    ACTION_CLAW_SWIPE_WARN              = 1,
+    ACTION_CLAW_SWIPE_DODGE             = 2,
+    ACTION_GRIP_FAILING                 = 3,
+    ACTION_GRIP_LOST                    = 4,
+    ACTION_FATAL_STRIKE_MISS            = 5,
+
+    POINT_START_FIGHT                   = 1,
+    POINT_FALL                          = 2,
+
+    SEAT_INITIAL                        = 0,
+    SEAT_MOUTH                          = 1,
+
+    PHASE_INITIAL                       = 0,
+    PHASE_MOUTH                         = 1,
+    PHASE_DEAD                          = 2,
+    PHASE_MAX                           = 3
+};
+
+constexpr uint8 ControllableSpellsCount = 4;
+constexpr uint32 WyrmControlSpells[PHASE_MAX][ControllableSpellsCount] =
+{
+    { SPELL_GRAB_ON,       SPELL_DODGE_CLAWS, SPELL_THRUST_SPEAR, SPELL_MIGHTY_SPEAR_THRUST },
+    { SPELL_PRY_JAWS_OPEN, 0,                 SPELL_FATAL_STRIKE, 0                         },
+    { 0,                   0,                 0,                  0                         }
+};
+
+struct npc_wild_wyrm : public VehicleAI
+{
+    explicit npc_wild_wyrm(Creature* creature) : VehicleAI(creature) { }
+
+    void InitSpellsForPhase()
+    {
+        ASSERT(_phase < PHASE_MAX);
+        for (uint8 i = 0; i < ControllableSpellsCount; ++i)
+            me->m_spells[i] = WyrmControlSpells[_phase][i];
+    }
+
+    void Reset() override
+    {
+        _phase = PHASE_INITIAL;
+
+        _playerGuid.Clear();
+        scheduler.CancelAll();
+
+        InitSpellsForPhase();
+
+        me->SetImmuneToPC(false);
+    }
+
+    void DoAction(int32 action) override
+    {
+        Player* player = ObjectAccessor::GetPlayer(*me, _playerGuid);
+        if (!player)
+            return;
+
+        switch (action)
+        {
+            case ACTION_CLAW_SWIPE_WARN:
+                Talk(SAY_SWIPE, player);
+                break;
+            case ACTION_CLAW_SWIPE_DODGE:
+                Talk(SAY_DODGED, player);
+                break;
+            case ACTION_GRIP_FAILING:
+                Talk(SAY_GRIP_WARN, player);
+                break;
+            case ACTION_GRIP_LOST:
+                DoCastAOE(SPELL_EJECT_PASSENGER_1, true);
+                break;
+            case ACTION_FATAL_STRIKE_MISS:
+                Talk(SAY_STRIKE_MISS, player);
+                break;
+            default:
+                break;
+        }
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+    {
+        if (!_playerGuid.IsEmpty() || spellInfo->Id != SPELL_SPEAR_OF_HODIR)
+            return;
+
+        _playerGuid = caster->GetGUID();
+        DoCastAOE(SPELL_FULL_HEAL_MANA, true);
+        me->SetImmuneToPC(true);
+
+        me->GetMotionMaster()->MovePoint(POINT_START_FIGHT, *caster);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
+            return;
+
+        switch (id)
+        {
+            case POINT_START_FIGHT:
+            {
+                Player* player = ObjectAccessor::GetPlayer(*me, _playerGuid);
+                if (!player)
+                    return;
+
+                DoCast(player, SPELL_PLAYER_MOUNT_WYRM);
+                me->GetMotionMaster()->Clear();
+                break;
+            }
+            case POINT_FALL:
+                DoCastAOE(SPELL_EJECT_ALL_PASSENGERS);
+                me->KillSelf();
+                break;
+            default:
+                break;
+        }
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (damage >= me->GetHealth())
+        {
+            damage = me->GetHealth() - 1;
+
+            if (_phase == PHASE_DEAD)
+                return;
+
+            _phase = PHASE_DEAD;
+            scheduler.CancelAll().Async([this]
+            {
+                InitSpellsForPhase();
+
+                if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGuid))
+                    player->VehicleSpellInitialize();
+
+                DoCastAOE(SPELL_WYRM_KILL_CREDIT);
+                DoCastAOE(SPELL_FALLING_DRAGON_FEIGN_DEATH);
+
+                me->RemoveAurasDueToSpell(SPELL_JAWS_OF_DEATH_PERIODIC);
+                me->RemoveAurasDueToSpell(SPELL_PRY_JAWS_OPEN);
+
+                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+
+                me->GetMotionMaster()->MoveFall(POINT_FALL, true);
+            });
+        }
+    }
+
+    void PassengerBoarded(Unit* passenger, int8 seatId, bool apply) override
+    {
+        if (!apply)
+        {
+            // The player is automatically moved from SEAT_INITIAL to SEAT_MOUTH during phase transition.
+            // Only evade if player exits during the respective active phase.
+            bool initialPhaseExit = (seatId == SEAT_INITIAL && _phase == PHASE_INITIAL);
+            bool mouthPhaseExit = (seatId == SEAT_MOUTH && _phase == PHASE_MOUTH);
+            if (initialPhaseExit || mouthPhaseExit)
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+            return;
+        }
+
+        if (passenger->GetGUID() != _playerGuid)
+            return;
+
+        if (seatId == SEAT_INITIAL)
+        {
+            me->CastCustomSpell(SPELL_GRIP, SPELLVALUE_AURA_STACK, 50);
+            DoCastAOE(SPELL_CLAW_SWIPE_PERIODIC, true);
+
+            scheduler.Async([this]
+            {
+                me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
+            }).Schedule(500ms, [this](TaskContext context)
+            {
+                if (_phase == PHASE_MOUTH)
+                    return;
+
+                if (me->HealthBelowPct(25))
+                {
+                    _phase = PHASE_MOUTH;
+                    context.Async([this]
+                    {
+                        InitSpellsForPhase();
+                        DoCastAOE(SPELL_LOW_HEALTH_TRIGGER, true);
+                        me->RemoveAurasDueToSpell(SPELL_CLAW_SWIPE_PERIODIC);
+                        me->RemoveAurasDueToSpell(SPELL_GRIP);
+
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGuid))
+                            Talk(SAY_PHASE_2, player);
+
+                        DoCastAOE(SPELL_EJECT_PASSENGER_1, true);
+                        DoCastAOE(SPELL_JAWS_OF_DEATH_PERIODIC);
+                        DoCastAOE(SPELL_FLY_STATE_VISUAL);
+                    });
+                    return;
+                }
+
+                context.Repeat();
+            });
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!_playerGuid)
+        {
+            if (UpdateVictim())
+                DoMeleeAttackIfReady();
+            return;
+        }
+
+        scheduler.Update(diff);
+    }
+
+private:
+    uint8 _phase{PHASE_INITIAL};
+    ObjectGuid _playerGuid;
+};
+
+// 56689 - Grip
+class spell_grip : public AuraScript
+{
+    PrepareAuraScript(spell_grip);
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        ++_tickNumber;
+
+        // each 15 ticks stack reduction increases by 2 (increases by 1 at each 7th and 15th tick)
+        // except for the first 15 ticks that remove 1 stack each
+        uint32 const period = ((_tickNumber - 1) % 15) + 1;
+        uint32 const sequence = (_tickNumber - 1) / 15;
+
+        uint32 stacksToRemove;
+        if (sequence == 0)
+            stacksToRemove = 1;
+        else
+        {
+            stacksToRemove = sequence * 2;
+            if (period > 7)
+                ++stacksToRemove;
+        }
+
+        // while we could do ModStackAmount(-stacksToRemove), this is how it's done in sniffs :)
+        for (uint32 i = 0; i < stacksToRemove; ++i)
+            ModStackAmount(-1, AURA_REMOVE_BY_EXPIRE);
+
+        if (GetStackAmount() < 15 && !_warning)
+        {
+            _warning = true;
+            GetTarget()->GetAI()->DoAction(ACTION_GRIP_FAILING);
+        }
+        else if (GetStackAmount() > 30)
+            _warning = false;
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        GetTarget()->GetAI()->DoAction(ACTION_GRIP_LOST);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_grip::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+
+        AfterEffectRemove += AuraEffectRemoveFn(spell_grip::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+
+    // tick number in the AuraEffect gets reset each time we stack the aura, so keep track of it locally
+    uint32 _tickNumber = 0;
+
+    bool _warning = false;
+};
+
+// 60533 - Grab On
+class spell_grab_on : public SpellScript
+{
+    PrepareSpellScript(spell_grab_on);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* grip = GetCaster()->GetAura(SPELL_GRIP, GetCaster()->GetGUID()))
+            grip->ModStackAmount(GetEffectValue(), AURA_REMOVE_BY_DEFAULT, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_grab_on::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 56690 - Thrust Spear
+// 60586 - Mighty Spear Thrust
+class spell_loosen_grip : public SpellScript
+{
+    PrepareSpellScript(spell_loosen_grip);
+
+public:
+    explicit spell_loosen_grip(int8 stacksToLose) : SpellScript(), _stacksToLose(stacksToLose) { }
+private:
+    int32 _stacksToLose;
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* grip = GetCaster()->GetAura(SPELL_GRIP))
+            grip->ModStackAmount(-_stacksToLose, AURA_REMOVE_BY_EXPIRE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_loosen_grip::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 60596 - Low Health Trigger
+class spell_low_health_trigger : public SpellScript
+{
+    PrepareSpellScript(spell_low_health_trigger);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ static_cast<uint32>(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(static_cast<Unit*>(nullptr), GetEffectValue(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_low_health_trigger::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 60776 - Claw Swipe
+// 60864 - Jaws of Death
+class spell_jaws_of_death_claw_swipe_pct_damage : public SpellScript
+{
+    PrepareSpellScript(spell_jaws_of_death_claw_swipe_pct_damage);
+
+    void HandleDamage(SpellEffIndex /*effIndex*/)
+    {
+        SetEffectValue(static_cast<int32>(GetHitUnit()->CountPctFromMaxHealth(GetEffectValue())));
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_jaws_of_death_claw_swipe_pct_damage::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+// 56705 - Claw Swipe
+class spell_claw_swipe_check : public AuraScript
+{
+    PrepareAuraScript(spell_claw_swipe_check);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->GetAI()->DoAction(ACTION_CLAW_SWIPE_WARN);
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Vehicle* vehicle = GetTarget()->GetVehicleKit())
+        {
+            if (Unit* player = vehicle->GetPassenger(SEAT_INITIAL))
+            {
+                if (player->HasAura(SPELL_DODGE_CLAWS))
+                {
+                    GetTarget()->GetAI()->DoAction(ACTION_CLAW_SWIPE_DODGE);
+                    return;
+                }
+            }
+        }
+
+        GetTarget()->CastSpell(nullptr, aurEff->GetAmount());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_claw_swipe_check::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectApplyFn(spell_claw_swipe_check::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 60587 - Fatal Strike
+class spell_fatal_strike : public SpellScript
+{
+    PrepareSpellScript(spell_fatal_strike);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FATAL_STRIKE_DAMAGE });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        int32 chance = 0;
+        if (AuraEffect const* aurEff = GetCaster()->GetAuraEffect(SPELL_PRY_JAWS_OPEN, EFFECT_0))
+            chance = aurEff->GetAmount();
+
+        if (!roll_chance_i(chance))
+        {
+            GetCaster()->GetAI()->DoAction(ACTION_FATAL_STRIKE_MISS);
+            return;
+        }
+
+        GetCaster()->CastSpell(static_cast<Unit*>(nullptr), SPELL_FATAL_STRIKE_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_fatal_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 56672 - Player Mount Wyrm
+class spell_player_mount_wyrm : public AuraScript
+{
+    PrepareAuraScript(spell_player_mount_wyrm);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FIGHT_WYRM });
+    }
+
+    void HandleDummy(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->CastSpell(static_cast<Unit*>(nullptr), SPELL_FIGHT_WYRM, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectApplyFn(spell_player_mount_wyrm::HandleDummy, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 60603 - Eject Passenger 1
+class spell_eject_passenger_wild_wyrm : public SpellScript
+{
+    PrepareSpellScript(spell_eject_passenger_wild_wyrm);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FIGHT_WYRM });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_FIGHT_WYRM);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_eject_passenger_wild_wyrm::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
-    new npc_wild_wyrm();
-    RegisterSpellScript(spell_q13003_thursting_hodirs_spear_aura);
     RegisterSpellScript(spell_q13007_iron_colossus);
     new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
@@ -1189,4 +1391,15 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
     RegisterSpellScript(spell_feed_stormcrest_eagle);
     RegisterSpellScript(spell_mammoth_explosion);
+    RegisterCreatureAI(npc_wild_wyrm);
+    RegisterSpellScript(spell_grip);
+    RegisterSpellScript(spell_grab_on);
+    RegisterSpellScriptWithArgs(spell_loosen_grip, "spell_thrust_spear", 5);
+    RegisterSpellScriptWithArgs(spell_loosen_grip, "spell_mighty_spear_thrust", 15);
+    RegisterSpellScript(spell_low_health_trigger);
+    RegisterSpellScript(spell_jaws_of_death_claw_swipe_pct_damage);
+    RegisterSpellScript(spell_claw_swipe_check);
+    RegisterSpellScript(spell_fatal_strike);
+    RegisterSpellScript(spell_player_mount_wyrm);
+    RegisterSpellScript(spell_eject_passenger_wild_wyrm);
 }
