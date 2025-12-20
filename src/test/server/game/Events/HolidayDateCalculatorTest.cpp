@@ -301,20 +301,20 @@ TEST_F(HolidayDateCalculatorTest, UnpackDate_KnownValues)
 // Noblegarden (Easter-based) Tests - Extended Range
 // ============================================================
 
-TEST_F(HolidayDateCalculatorTest, Noblegarden_WeekAfterEaster_1900_2200)
+TEST_F(HolidayDateCalculatorTest, Noblegarden_DayAfterEaster_1900_2200)
 {
-    // Noblegarden should be Easter + 7 days for all years
+    // Noblegarden should be Easter + 1 day (Monday after Easter) for all years
     for (int year = 1900; year <= 2200; ++year)
     {
         std::tm easter = HolidayDateCalculator::CalculateEasterSunday(year);
 
-        // Calculate expected Noblegarden date (Easter + 7)
+        // Calculate expected Noblegarden date (Easter + 1)
         std::tm expectedNoblegarden = easter;
-        expectedNoblegarden.tm_mday += 7;
+        expectedNoblegarden.tm_mday += 1;
         mktime(&expectedNoblegarden); // Normalize (handles month rollover)
 
         // Get calculated Noblegarden from holiday rule
-        HolidayRule noblegarden = { 181, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 7 };
+        HolidayRule noblegarden = { 181, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 1 };
         std::tm calculated = HolidayDateCalculator::CalculateHolidayDate(noblegarden, year);
 
         SCOPED_TRACE("Year: " + std::to_string(year));
@@ -323,8 +323,8 @@ TEST_F(HolidayDateCalculatorTest, Noblegarden_WeekAfterEaster_1900_2200)
         EXPECT_EQ(calculated.tm_mon, expectedNoblegarden.tm_mon);
         EXPECT_EQ(calculated.tm_mday, expectedNoblegarden.tm_mday);
 
-        // Noblegarden should be a Sunday (7 days after Easter Sunday)
-        EXPECT_EQ(calculated.tm_wday, 0) << "Noblegarden should be Sunday";
+        // Noblegarden should be Monday (1 day after Easter Sunday)
+        EXPECT_EQ(calculated.tm_wday, 1) << "Noblegarden should be Monday";
     }
 }
 
@@ -332,21 +332,33 @@ TEST_F(HolidayDateCalculatorTest, Noblegarden_WeekAfterEaster_1900_2200)
 // Pilgrim's Bounty (Thanksgiving) Tests - Extended Range
 // ============================================================
 
-TEST_F(HolidayDateCalculatorTest, PilgrimsBounty_FourthThursdayNovember_1900_2200)
+TEST_F(HolidayDateCalculatorTest, PilgrimsBounty_SundayBeforeThanksgiving_1900_2200)
 {
-    // Pilgrim's Bounty = Thanksgiving = 4th Thursday of November
+    // Pilgrim's Bounty = Sunday before Thanksgiving (4th Thursday - 4 days)
     for (int year = 1900; year <= 2200; ++year)
     {
-        HolidayRule pilgrimsBounty = { 404, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), 0 };
+        // Calculate 4th Thursday of November
+        std::tm thanksgiving = HolidayDateCalculator::CalculateNthWeekday(year, 11, Weekday::THURSDAY, 4);
+
+        // Pilgrim's Bounty starts on Sunday before (4 days earlier)
+        std::tm expectedPilgrims = thanksgiving;
+        expectedPilgrims.tm_mday -= 4;
+        mktime(&expectedPilgrims);
+
+        // Get calculated date using rule with -4 offset
+        HolidayRule pilgrimsBounty = { 404, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), -4 };
         std::tm date = HolidayDateCalculator::CalculateHolidayDate(pilgrimsBounty, year);
 
         SCOPED_TRACE("Year: " + std::to_string(year));
 
         EXPECT_EQ(date.tm_year + 1900, year);
         EXPECT_EQ(date.tm_mon + 1, 11);            // November
-        EXPECT_EQ(date.tm_wday, static_cast<int>(Weekday::THURSDAY)); // Thursday
-        EXPECT_GE(date.tm_mday, 22);               // 4th week starts at earliest on 22nd
-        EXPECT_LE(date.tm_mday, 28);               // 4th week ends at latest on 28th
+        EXPECT_EQ(date.tm_wday, 0);                // Sunday
+        EXPECT_EQ(date.tm_mday, expectedPilgrims.tm_mday);
+
+        // Sunday before 4th Thursday should be between 18th and 24th
+        EXPECT_GE(date.tm_mday, 18);
+        EXPECT_LE(date.tm_mday, 24);
     }
 }
 
@@ -359,10 +371,16 @@ TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2
     // Fixed date holidays should have same month/day every year
     struct FixedHolidayTestCase { uint32_t holidayId; int month; int day; const char* name; };
     std::vector<FixedHolidayTestCase> testCases = {
-        { 327, 1, 22, "Lunar Festival" },
-        { 423, 2,  6, "Love is in the Air" },
-        { 201, 4, 30, "Children's Week" },
-        { 321, 9, 28, "Harvest Festival" },
+        { 423, 2,  3, "Love is in the Air" },
+        { 201, 4, 28, "Children's Week" },
+        { 341, 6, 21, "Midsummer Fire Festival" },
+        { 62,  7,  4, "Fireworks Spectacular" },
+        { 398, 9, 19, "Pirates' Day" },
+        { 372, 9, 20, "Brewfest" },
+        { 321, 10, 2, "Harvest Festival" },
+        { 324, 10, 25, "Hallow's End" },
+        { 409, 11,  1, "Day of the Dead" },
+        { 141, 12, 19, "Winter Veil" },
     };
 
     for (auto const& tc : testCases)
@@ -635,22 +653,50 @@ TEST_F(HolidayDateCalculatorTest, LunarNewYear_ValidDateRange_1900_2200)
     }
 }
 
-TEST_F(HolidayDateCalculatorTest, LunarNewYear_HolidayRule_Integration)
+TEST_F(HolidayDateCalculatorTest, LunarFestival_DayBeforeChineseNewYear)
 {
-    // Test that the LUNAR_NEW_YEAR calculation type works via CalculateHolidayDate
-    HolidayRule lunarFestival = { 327, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, 0 };
+    // Lunar Festival starts 1 day before Chinese New Year
+    // Test with -1 offset applied
+    HolidayRule lunarFestival = { 327, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, -1 };
 
     for (int year = 2000; year <= 2100; ++year)
     {
         std::tm fromRule = HolidayDateCalculator::CalculateHolidayDate(lunarFestival, year);
-        std::tm direct = HolidayDateCalculator::CalculateLunarNewYear(year);
+        std::tm cny = HolidayDateCalculator::CalculateLunarNewYear(year);
+
+        // Expected: CNY - 1 day
+        std::tm expected = cny;
+        expected.tm_mday -= 1;
+        mktime(&expected);
 
         SCOPED_TRACE("Year: " + std::to_string(year));
 
-        // Both methods should produce identical results
-        EXPECT_EQ(fromRule.tm_year, direct.tm_year);
-        EXPECT_EQ(fromRule.tm_mon, direct.tm_mon);
-        EXPECT_EQ(fromRule.tm_mday, direct.tm_mday);
+        // Lunar Festival should be 1 day before Chinese New Year
+        EXPECT_EQ(fromRule.tm_year, expected.tm_year);
+        EXPECT_EQ(fromRule.tm_mon, expected.tm_mon);
+        EXPECT_EQ(fromRule.tm_mday, expected.tm_mday);
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, LunarFestival_KnownDates)
+{
+    // Verify Lunar Festival (CNY - 1 day) against known official dates
+    // Source: WoW official event announcements
+    struct LunarFestivalTestCase { int year; int month; int day; };
+    std::vector<LunarFestivalTestCase> testCases = {
+        { 2024, 2,  9 },  // CNY Feb 10 - 1 = Feb 9
+        { 2025, 1, 28 },  // CNY Jan 29 - 1 = Jan 28 (confirmed official)
+        { 2026, 2, 16 },  // CNY Feb 17 - 1 = Feb 16
+        { 2027, 2,  5 },  // CNY Feb 6 - 1 = Feb 5
+    };
+
+    HolidayRule lunarFestival = { 327, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, -1 };
+
+    for (auto const& tc : testCases)
+    {
+        std::tm date = HolidayDateCalculator::CalculateHolidayDate(lunarFestival, tc.year);
+        SCOPED_TRACE("Year: " + std::to_string(tc.year));
+        ExpectDate(date, tc.year, tc.month, tc.day);
     }
 }
 

@@ -1114,9 +1114,9 @@ void GameEventMgr::LoadHolidayDates()
         }
     }
 
-    // Step 2: Load DB overrides (allows custom servers to override calculated dates)
-    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_HOLIDAY_DATES);
-    PreparedQueryResult result = WorldDatabase.Query(stmt);
+    // Step 2: Check game_event.start_time for overrides (allows custom servers to override calculated dates)
+    // Only use as override if start_time year >= current year (ignore old static dates)
+    QueryResult result = WorldDatabase.Query("SELECT holiday, start_time FROM game_event WHERE holiday != 0 AND start_time > '2000-12-31'");
 
     if (result)
     {
@@ -1127,33 +1127,27 @@ void GameEventMgr::LoadHolidayDates()
             uint32 const holidayId = fields[0].Get<uint32>();
             HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(holidayId));
             if (!entry)
-            {
-                LOG_ERROR("sql.sql", "holiday_dates entry has invalid holiday id {}.", holidayId);
                 continue;
-            }
 
-            uint8 const dateId = fields[1].Get<uint8>();
-            if (dateId >= MAX_HOLIDAY_DATES)
-            {
-                LOG_ERROR("sql.sql", "holiday_dates entry has out of range date_id {}.", dateId);
+            time_t const startTime = fields[1].Get<uint64>();
+            std::tm timeInfo = Acore::Time::TimeBreakdown(startTime);
+
+            int const year = timeInfo.tm_year + 1900;
+            // Only override if start_time is current year or later (ignore old static dates)
+            if (year < currentYear || year > 2030)
                 continue;
-            }
-            entry->Date[dateId] = fields[2].Get<uint32>();
 
-            if (uint32 const duration = fields[3].Get<uint32>())
-                entry->Duration[0] = duration;
-
-            auto itr = std::lower_bound(ModifiedHolidays.begin(), ModifiedHolidays.end(), entry->Id);
-            if (itr == ModifiedHolidays.end() || *itr != entry->Id)
-            {
-                ModifiedHolidays.insert(itr, entry->Id);
-            }
+            // Pack the date in WoW format and override Date[0]
+            uint32_t const yearOffset = static_cast<uint32_t>(year - 2000);
+            uint32_t const month = static_cast<uint32_t>(timeInfo.tm_mon);
+            uint32_t const day = static_cast<uint32_t>(timeInfo.tm_mday - 1);
+            entry->Date[0] = (yearOffset << 24) | (month << 20) | (day << 14);
 
             ++dbCount;
         } while (result->NextRow());
     }
 
-    LOG_INFO("server.loading", ">> Loaded {} Holiday Dates ({} dynamic, {} DB overrides) in {} ms",
+    LOG_INFO("server.loading", ">> Loaded {} Holiday Dates ({} dynamic, {} game_event overrides) in {} ms",
         dynamicCount + dbCount, dynamicCount, dbCount, GetMSTimeDiffToNow(oldMSTime));
 }
 
@@ -1966,7 +1960,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
         }
         else
         {
-            // date is due and not a singleDate event, try with next DBC date (modified by holiday_dates)
+            // date is due and not a singleDate event, try with next DBC date (dynamically calculated or overridden by game_event.start_time)
             // if none is found we don't modify start date and use the one in game_event
         }
     }

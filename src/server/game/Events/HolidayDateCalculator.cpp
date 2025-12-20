@@ -28,14 +28,14 @@ inline double sind(double deg) { return std::sin(deg * DEG_TO_RAD); }
 
 // Static holiday rules configuration
 static const std::vector<HolidayRule> s_HolidayRules = {
-    // Lunar Festival: Chinese New Year (astronomical calculation)
-    { HOLIDAY_LUNAR_FESTIVAL, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, 0 },
+    // Lunar Festival: Chinese New Year - 1 day (event starts day before CNY)
+    { HOLIDAY_LUNAR_FESTIVAL, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, -1 },
 
-    // Love is in the Air: Fixed Feb 6
-    { HOLIDAY_LOVE_IS_IN_THE_AIR, HolidayCalculationType::FIXED_DATE, 2, 6, 0, 0 },
+    // Love is in the Air: Fixed Feb 3
+    { HOLIDAY_LOVE_IS_IN_THE_AIR, HolidayCalculationType::FIXED_DATE, 2, 3, 0, 0 },
 
-    // Noblegarden: Easter Sunday (Easter + 0 days)
-    { HOLIDAY_NOBLEGARDEN, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 0 },
+    // Noblegarden: Day after Easter Sunday (Easter + 1 day)
+    { HOLIDAY_NOBLEGARDEN, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 1 },
 
     // Children's Week: Fixed Apr 28
     { HOLIDAY_CHILDRENS_WEEK, HolidayCalculationType::FIXED_DATE, 4, 28, 0, 0 },
@@ -52,20 +52,20 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     // Brewfest: Fixed Sep 20
     { HOLIDAY_BREWFEST, HolidayCalculationType::FIXED_DATE, 9, 20, 0, 0 },
 
-    // Harvest Festival: Fixed Sep 28
-    { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 9, 28, 0, 0 },
+    // Harvest Festival: Fixed Oct 2
+    { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 10, 2, 0, 0 },
 
-    // Hallow's End: Fixed Oct 18
-    { HOLIDAY_HALLOWS_END, HolidayCalculationType::FIXED_DATE, 10, 18, 0, 0 },
+    // Hallow's End: Fixed Oct 25
+    { HOLIDAY_HALLOWS_END, HolidayCalculationType::FIXED_DATE, 10, 25, 0, 0 },
 
     // Day of the Dead: Fixed Nov 1
     { HOLIDAY_DAY_OF_DEAD, HolidayCalculationType::FIXED_DATE, 11, 1, 0, 0 },
 
-    // Pilgrim's Bounty: 4th Thursday of November (Thanksgiving)
-    { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), 0 },
+    // Pilgrim's Bounty: Sunday before Thanksgiving (4th Thursday - 4 days)
+    { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), -4 },
 
-    // Winter Veil: Fixed Dec 15
-    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::FIXED_DATE, 12, 15, 0, 0 }
+    // Winter Veil: Fixed Dec 19
+    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::FIXED_DATE, 12, 19, 0, 0 }
 };
 
 const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
@@ -294,6 +294,11 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
         case HolidayCalculationType::NTH_WEEKDAY:
         {
             result = CalculateNthWeekday(year, rule.month, static_cast<Weekday>(rule.weekday), rule.day);
+            if (rule.offset != 0)
+            {
+                result.tm_mday += rule.offset;
+                mktime(&result); // Normalize
+            }
             break;
         }
         case HolidayCalculationType::EASTER_OFFSET:
@@ -306,6 +311,11 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
         case HolidayCalculationType::LUNAR_NEW_YEAR:
         {
             result = CalculateLunarNewYear(year);
+            if (rule.offset != 0)
+            {
+                result.tm_mday += rule.offset;
+                mktime(&result); // Normalize
+            }
             break;
         }
     }
