@@ -1116,7 +1116,7 @@ void GameEventMgr::LoadHolidayDates()
 
     // Step 2: Check game_event.start_time for overrides (allows custom servers to override calculated dates)
     // Only use as override if start_time year >= current year (ignore old static dates)
-    QueryResult result = WorldDatabase.Query("SELECT holiday, start_time FROM game_event WHERE holiday != 0 AND start_time > '2000-12-31'");
+    QueryResult result = WorldDatabase.Query("SELECT holiday, UNIX_TIMESTAMP(start_time) FROM game_event WHERE holiday != 0 AND start_time > '2000-12-31'");
 
     if (result)
     {
@@ -1129,7 +1129,13 @@ void GameEventMgr::LoadHolidayDates()
             if (!entry)
                 continue;
 
+            if (fields[1].IsNull())
+                continue;
+
             time_t const startTime = fields[1].Get<uint64>();
+            if (startTime == 0)
+                continue;
+
             std::tm timeInfo = Acore::Time::TimeBreakdown(startTime);
 
             int const year = timeInfo.tm_year + 1900;
