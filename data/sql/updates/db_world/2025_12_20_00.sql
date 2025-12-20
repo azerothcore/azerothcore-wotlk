@@ -1,3 +1,4 @@
+-- DB update 2025_12_19_04 -> 2025_12_20_00
 --
 -- Quest: Thrusting Hodir's Spear - 13003
 SET @ENTRY := 30275;
