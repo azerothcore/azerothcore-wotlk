@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -884,6 +884,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MOVEMENT_RESUME: return sizeof(SmartAction::move);
             case SMART_ACTION_WORLD_SCRIPT: return sizeof(SmartAction::worldStateScript);
             case SMART_ACTION_DISABLE_REWARD: return sizeof(SmartAction::reward);
+            case SMART_ACTION_SET_ANIM_TIER: return sizeof(SmartAction::animTier);
             case SMART_ACTION_DISMOUNT: return NO_PARAMS;
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
@@ -1897,6 +1898,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 }
                 break;
             }
+        case SMART_ACTION_SET_ANIM_TIER:
+            if (e.action.animTier.animTier >= uint32(AnimTier::Max))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses invalid animtier %u, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.animTier.animTier);
+                return false;
+            }
+            break;
         case SMART_ACTION_AUTO_ATTACK:
             return IsSAIBoolValid(e, e.action.autoAttack.attack);
         case SMART_ACTION_ALLOW_COMBAT_MOVEMENT:
