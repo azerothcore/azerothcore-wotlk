@@ -302,8 +302,8 @@ public:
 
         // SQL Variables and Header
         outfile << fmt::format("-- Pool Dump: {}\n", session.ZoneName);
-        outfile << "SET @mother_pool := 0;   -- EDIT ME: Mother Pool ID\n";
-        outfile << "SET @max_limit   := 0;   -- EDIT ME: Max Limit (0 = unlimited)\n\n";
+        outfile << "SET @mother_pool := 0;   -- EDIT ME\n";
+        outfile << "SET @max_limit   := 0;   -- EDIT ME\n\n";
 
         // DELETEs section
         if (!session.CapturedGroups.empty())
@@ -326,7 +326,7 @@ public:
         bool complexPool = (session.CurrentTemplate.size() > 1);
 
         if (complexPool)
-            outfile << "SET @pool_node := (SELECT MAX(entry) FROM pool_template);\n\n";
+            outfile << "SET @pool_node := 0;   -- EDIT ME\n\n";
 
         int groupCounter = 0;
 
@@ -402,7 +402,7 @@ public:
         }
 
         outfile.close();
-        handler->PSendSysMessage("Dumped {} groups to {}.sql", groupCounter, fileName);
+        handler->PSendSysMessage("Dumped {} groups to {}", groupCounter, fileName);
 
         // Cleanup
         sPoolSessions.erase(it);
