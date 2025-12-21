@@ -1,3 +1,4 @@
+-- DB update 2025_12_21_01 -> 2025_12_21_02
 UPDATE `creature` SET `phaseMask` = 511 WHERE `id1` IN (
 32357, -- Old Crystalbark
 32358, -- Fumblub Gearwind
