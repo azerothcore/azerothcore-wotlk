@@ -1241,12 +1241,8 @@ void SmartAI::OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reas
 {
     CreatureAI::OnSpellCastFinished(spell, reason);
     if (reason == SPELL_FINISHED_CANCELED && _mainSpellId == spell->Id)
-    {
         if (_currentRangeMode && IsMainSpellPrevented(spell))
-        {
             SetCurrentRangeMode(false);
-        }
-    }
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
