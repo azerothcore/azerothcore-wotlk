@@ -4501,10 +4501,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (@GUID+4436, 191133, 571, 4197, 4612, 1, 2147483647, 4342.11, 2426, 350.083, 0.506145, 0, 0, 0.25038, 0.968148, 300, 255, 1, '', 48632, NULL),
 (@GUID+4437, 189980, 571, 4197, 4612, 1, 2147483647, 4342.11, 2426, 350.083, 0.506145, 0, 0, 0.25038, 0.968148, 300, 255, 1, '', 48632, NULL);
 
--- .pooltools start 
--- .pooltools def 189978 75 189979 25
--- Borean Tundra
-
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+3420, @POOL_NODE+001, 75, 'GlimmerBay - Cobalt Deposit'),
 (@GUID+3421, @POOL_NODE+001, 25, 'GlimmerBay - Rich Cobalt Deposit'),
@@ -4967,9 +4963,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+108, 1, 'GammothInside - Node 3'),
 (@POOL_NODE+109, 1, 'GammothInside - Node 4');
 
--- .pooltools start 
--- .pooltools def 189978 60 189979 40
--- Dragonblight
 SET @POOL_MOTHER := @POOL_MOTHER+20;
 SET @POOL_NODE   := @POOL_NODE+110;
 
@@ -5377,9 +5370,6 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 (@POOL_NODE+98, @POOL_MOTHER+13, 0, 'BelowNaxx - Cobalt Deposit / Rich Cobalt Deposit'),
 (@POOL_NODE+99, @POOL_MOTHER+13, 0, 'BelowNaxx - Cobalt Deposit / Rich Cobalt Deposit');
 
--- .pooltools start 
--- .pooltools def 189978 70 189979 30
--- Grizzly Hills
 SET @POOL_MOTHER := @POOL_MOTHER+14;
 SET @POOL_NODE   := @POOL_NODE+100;
 
@@ -5702,9 +5692,6 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 (@POOL_NODE+74, @POOL_MOTHER+12, 0, 'Grizzlemaw - Cobalt Deposit / Rich Cobalt Deposit'),
 (@POOL_NODE+75, @POOL_MOTHER+12, 0, 'Grizzlemaw - Cobalt Deposit / Rich Cobalt Deposit');
 
--- .pooltools start 
--- .pooltools def 189978 75 189979 25
--- Howling Fjord
 SET @POOL_MOTHER := @POOL_MOTHER+13;
 SET @POOL_NODE   := @POOL_NODE+76;
 
@@ -6296,9 +6283,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+138, 1, 'GarvansReef - Node 3'),
 (@POOL_NODE+139, 1, 'GarvansReef - Node 4');
 
--- .pooltools start 
--- .pooltools def 189978 65 189979 25 189980 10
--- Zul'Drak
 SET @POOL_MOTHER := @POOL_MOTHER+24;
 SET @POOL_NODE   := @POOL_NODE+140;
 
@@ -7138,9 +7122,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+163, 1, 'ZulDrakTierFour - Node 16'),
 (@POOL_NODE+164, 1, 'ZulDrakTierFour - Node 17');
 
--- .pooltools start 
--- .pooltools def 189980 70 189981 20 191133 10
--- Sholazar Basin
 SET @POOL_MOTHER := @POOL_MOTHER+7;
 SET @POOL_NODE   := @POOL_NODE+165;
 
@@ -8235,9 +8216,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+215, 1, 'SholazarBasinSouthEast - Node 24'),
 (@POOL_NODE+216, 1, 'SholazarBasinSouthEast - Node 25');
 
--- .pooltools start 
--- .pooltools def 189980 60 189981 20 191133 20
--- Wintergrasp
 SET @POOL_MOTHER := @POOL_MOTHER+5;
 SET @POOL_NODE   := @POOL_NODE+217;
 
@@ -8639,9 +8617,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+77, 1, 'WintergraspSouth - Node 42'),
 (@POOL_NODE+78, 1, 'WintergraspSouth - Node 43');
 
--- .pooltools start 
--- .pooltools def 189980 75 189981 15 191133 10
--- Crystalsong
 SET @POOL_MOTHER := @POOL_MOTHER+2;
 SET @POOL_NODE   := @POOL_NODE+79;
 
@@ -8692,9 +8667,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+7, 1, 'CrystalsongForest - Node 7'),
 (@POOL_NODE+8, 1, 'CrystalsongForest - Node 8');
 
--- .pooltools start 
--- .pooltools def 189980 65 189981 15 191133 20
--- Storm Peaks
 SET @POOL_MOTHER := @POOL_MOTHER+1;
 SET @POOL_NODE   := @POOL_NODE+9;
 
@@ -9845,9 +9817,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+221, 1, 'TheHowlingHollow - Node 11'),
 (@POOL_NODE+222, 1, 'TheHowlingHollow - Node 12');
 
--- .pooltools start 
--- .pooltools def 189980 50 189981 30 191133 20
--- Icecrown
 SET @POOL_MOTHER := @POOL_MOTHER+16;
 SET @POOL_NODE   := @POOL_NODE+223;
 
@@ -12354,13 +12323,12 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (5713396, @POOL_NODE, 75, 'Coldarra - Cobalt Deposit');
 
 -- Pool Dump: StormPeaksMisc
-SET @POOL_MOTHER := @POOL_MOTHER + 1;   -- EDIT ME
-SET @MAX_LIMIT   := 2;   -- EDIT ME
+SET @POOL_MOTHER := @POOL_MOTHER + 1;
+SET @MAX_LIMIT   := 2;
 
--- Cleanup specific object links
 DELETE FROM `pool_template` WHERE `entry`=@POOL_MOTHER;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_MOTHER, @MAX_LIMIT, 'StormPeaksMisc - Mother Pool');
-SET @POOL_NODE := @POOL_NODE + 1;   -- EDIT ME
+SET @POOL_NODE := @POOL_NODE + 1;
 
 -- Group 1
 SET @POOL_NODE := @POOL_NODE + 1;
@@ -12417,13 +12385,13 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (5711085, @POOL_NODE, 15, 'StormPeaksMisc - Rich Saronite Deposit');
 
 -- Pool Dump: IcecrownMisc
-SET @POOL_MOTHER := @POOL_MOTHER + 1;   -- EDIT ME
-SET @MAX_LIMIT   := 2;   -- EDIT ME
+SET @POOL_MOTHER := @POOL_MOTHER + 1;
+SET @MAX_LIMIT   := 2;
 
 -- Cleanup specific object links
 DELETE FROM `pool_template` WHERE `entry`=@POOL_MOTHER;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_MOTHER, @MAX_LIMIT, 'IcecrownMisc - Mother Pool');
-SET @POOL_NODE := @POOL_NODE + 1;   -- EDIT ME
+SET @POOL_NODE := @POOL_NODE + 1;
 
 -- Group 1
 SET @POOL_NODE := @POOL_NODE + 1;
