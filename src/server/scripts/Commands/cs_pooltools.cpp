@@ -300,10 +300,14 @@ public:
             return safe;
             };
 
+        bool complexPool = (session.CurrentTemplate.size() > 1);
+
         // SQL Variables and Header
         outfile << fmt::format("-- Pool Dump: {}\n", session.ZoneName);
-        outfile << "SET @mother_pool := 0;   -- EDIT ME\n";
-        outfile << "SET @max_limit   := 0;   -- EDIT ME\n\n";
+        outfile << "SET @mother_pool := @mother_pool+1;   -- EDIT ME\n";
+        outfile << fmt::format("SET @max_limit   := {};   -- EDIT ME\n\n", (session.CapturedGroups.size() + 3) / 4);
+        if (complexPool)
+            outfile << "SET @pool_node := @pool_node+1;   -- EDIT ME\n\n";
 
         // DELETEs section
         if (!session.CapturedGroups.empty())
@@ -322,11 +326,6 @@ public:
 
         outfile << "DELETE FROM `pool_template` WHERE `entry`=@mother_pool;\n";
         outfile << fmt::format("INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@mother_pool, @max_limit, '{} - Mother Pool');\n", EscapeSQL(session.ZoneName));
-
-        bool complexPool = (session.CurrentTemplate.size() > 1);
-
-        if (complexPool)
-            outfile << "SET @pool_node := 0;   -- EDIT ME\n\n";
 
         int groupCounter = 0;
 
