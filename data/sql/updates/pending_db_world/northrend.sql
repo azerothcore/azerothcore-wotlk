@@ -12278,9 +12278,9 @@ SET @POOL_NODE   := @POOL_NODE+485;
 
 SET @POOL_NODE := @POOL_NODE + 1;
 SET @POOL_MOTHER := @POOL_MOTHER + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'HearthglenShore - Node 1');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER+01, 0, 'HearthglenShore - Cobalt Deposit / Rich Cobalt Deposit');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'HearthglenShore - Node 1');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER+01, 0, 'HearthglenShore - Cobalt Deposit / Rich Cobalt Deposit');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+123, @POOL_NODE, 40, 'HearthglenShore - Rich Cobalt Deposit'),
 (@GUID+122, @POOL_NODE, 60, 'HearthglenShore - Cobalt Deposit');
 
@@ -12299,26 +12299,26 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 (@ORIGINAL_POOL_NODE+171, @POOL_MOTHER+01, 0, 'HearthglenShore - Cobalt Deposit / Rich Cobalt Deposit');
 
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'ZulDrakTierOneNorth - Node 1');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @ORIGINAL_POOL_MOTHER+71, 0, 'ZulDrakTierOneNorth - Cobalt Deposit / Rich Cobalt Deposit / Saronite Deposit');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'ZulDrakTierOneNorth - Node 1');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @ORIGINAL_POOL_MOTHER+71, 0, 'ZulDrakTierOneNorth - Cobalt Deposit / Rich Cobalt Deposit / Saronite Deposit');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+709, @POOL_NODE, 10, 'ZulDrakTierOneNorth - Saronite Deposit'),
 (@GUID+708, @POOL_NODE, 25, 'ZulDrakTierOneNorth - Rich Cobalt Deposit'),
 (@GUID+707, @POOL_NODE, 65, 'ZulDrakTierOneNorth - Cobalt Deposit');
 
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'ZulDrakTierOneNorth - Node 2');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @ORIGINAL_POOL_MOTHER+71, 0, 'ZulDrakTierOneNorth - Cobalt Deposit / Rich Cobalt Deposit / Saronite Deposit');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'ZulDrakTierOneNorth - Node 2');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @ORIGINAL_POOL_MOTHER+71, 0, 'ZulDrakTierOneNorth - Cobalt Deposit / Rich Cobalt Deposit / Saronite Deposit');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (@GUID+712, @POOL_NODE, 10, 'ZulDrakTierOneNorth - Saronite Deposit'),
 (@GUID+711, @POOL_NODE, 25, 'ZulDrakTierOneNorth - Rich Cobalt Deposit'),
 (@GUID+710, @POOL_NODE, 65, 'ZulDrakTierOneNorth - Cobalt Deposit');
 
 -- Group 1
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'Coldarra - Node 1');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @ORIGINAL_POOL_MOTHER+1, 0, 'Coldarra - Cobalt Deposit / Rich Cobalt Deposit');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'Coldarra - Node 1');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @ORIGINAL_POOL_MOTHER+1, 0, 'Coldarra - Cobalt Deposit / Rich Cobalt Deposit');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5713397, @POOL_NODE, 25, 'Coldarra - Rich Cobalt Deposit'),
 (5713396, @POOL_NODE, 75, 'Coldarra - Cobalt Deposit');
 
@@ -12327,59 +12327,59 @@ SET @POOL_MOTHER := @POOL_MOTHER + 1;
 SET @MAX_LIMIT   := 2;
 
 DELETE FROM `pool_template` WHERE `entry`=@POOL_MOTHER;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_MOTHER, @MAX_LIMIT, 'StormPeaksMisc - Mother Pool');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_MOTHER, @MAX_LIMIT, 'StormPeaksMisc - Mother Pool');
 SET @POOL_NODE := @POOL_NODE + 1;
 
 -- Group 1
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'StormPeaksMisc - Node 1');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'StormPeaksMisc - Node 1');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5710718, @POOL_NODE, 20, 'StormPeaksMisc - Titanium Vein'),
 (5710717, @POOL_NODE, 15, 'StormPeaksMisc - Rich Saronite Deposit'),
 (5710716, @POOL_NODE, 65, 'StormPeaksMisc - Saronite Deposit');
 
 -- Group 2
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'StormPeaksMisc - Node 2');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'StormPeaksMisc - Node 2');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5710721, @POOL_NODE, 65, 'StormPeaksMisc - Saronite Deposit'),
 (5710720, @POOL_NODE, 20, 'StormPeaksMisc - Titanium Vein'),
 (5710719, @POOL_NODE, 15, 'StormPeaksMisc - Rich Saronite Deposit');
 
 -- Group 3
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'StormPeaksMisc - Node 3');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'StormPeaksMisc - Node 3');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5710727, @POOL_NODE, 65, 'StormPeaksMisc - Saronite Deposit'),
 (5710726, @POOL_NODE, 20, 'StormPeaksMisc - Titanium Vein'),
 (5710725, @POOL_NODE, 15, 'StormPeaksMisc - Rich Saronite Deposit');
 
 -- Group 4
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'StormPeaksMisc - Node 4');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'StormPeaksMisc - Node 4');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5710742, @POOL_NODE, 20, 'StormPeaksMisc - Titanium Vein'),
 (5710741, @POOL_NODE, 15, 'StormPeaksMisc - Rich Saronite Deposit'),
 (5710740, @POOL_NODE, 65, 'StormPeaksMisc - Saronite Deposit');
 
 -- Group 5
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'StormPeaksMisc - Node 5');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'StormPeaksMisc - Node 5');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5710802, @POOL_NODE, 65, 'StormPeaksMisc - Saronite Deposit'),
 (5710801, @POOL_NODE, 20, 'StormPeaksMisc - Titanium Vein'),
 (5710800, @POOL_NODE, 15, 'StormPeaksMisc - Rich Saronite Deposit');
 
 -- Group 6
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'StormPeaksMisc - Node 6');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'StormPeaksMisc - Node 6');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'StormPeaksMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711087, @POOL_NODE, 65, 'StormPeaksMisc - Saronite Deposit'),
 (5711086, @POOL_NODE, 20, 'StormPeaksMisc - Titanium Vein'),
 (5711085, @POOL_NODE, 15, 'StormPeaksMisc - Rich Saronite Deposit');
@@ -12390,77 +12390,77 @@ SET @MAX_LIMIT   := 2;
 
 -- Cleanup specific object links
 DELETE FROM `pool_template` WHERE `entry`=@POOL_MOTHER;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_MOTHER, @MAX_LIMIT, 'IcecrownMisc - Mother Pool');
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_MOTHER, @MAX_LIMIT, 'IcecrownMisc - Mother Pool');
 SET @POOL_NODE := @POOL_NODE + 1;
 
 -- Group 1
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 1');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 1');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711438, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein'),
 (5711437, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit'),
 (5711436, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit');
 
 -- Group 2
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 2');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 2');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711528, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein'),
 (5711527, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit'),
 (5711526, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit');
 
 -- Group 3
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 3');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 3');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711540, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein'),
 (5711539, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit'),
 (5711538, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit');
 
 -- Group 4
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 4');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 4');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711543, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit'),
 (5711542, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit'),
 (5711541, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein');
 
 -- Group 5
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 5');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 5');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711552, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein'),
 (5711551, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit'),
 (5711550, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit');
 
 -- Group 6
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 6');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 6');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711657, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit'),
 (5711656, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein'),
 (5711655, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit');
 
 -- Group 7
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 7');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 7');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711672, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein'),
 (5711671, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit'),
 (5711670, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit');
 
 -- Group 8
 SET @POOL_NODE := @POOL_NODE + 1;
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@POOL_NODE, 1, 'IcecrownMisc - Node 8');
-INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES(@POOL_NODE, 1, 'IcecrownMisc - Node 8');
+INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES(@POOL_NODE, @POOL_MOTHER, 0, 'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (5711681, @POOL_NODE, 50, 'IcecrownMisc - Saronite Deposit'),
 (5711680, @POOL_NODE, 20, 'IcecrownMisc - Titanium Vein'),
 (5711679, @POOL_NODE, 30, 'IcecrownMisc - Rich Saronite Deposit');
