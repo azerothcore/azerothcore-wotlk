@@ -304,10 +304,10 @@ public:
 
         // SQL Variables and Header
         outfile << fmt::format("-- Pool Dump: {}\n", session.ZoneName);
-        outfile << "SET @mother_pool := @mother_pool+1;   -- EDIT ME\n";
-        outfile << fmt::format("SET @max_limit   := {};   -- EDIT ME\n\n", (session.CapturedGroups.size() + 3) / 4);
+        outfile << "SET @mother_pool := @mother_pool+1;\n";
+        outfile << fmt::format("SET @max_limit   := {};\n\n", (session.CapturedGroups.size() + 3) / 4);
         if (complexPool)
-            outfile << "SET @pool_node := @pool_node+1;   -- EDIT ME\n\n";
+            outfile << "SET @pool_node := @pool_node+1;\n\n";
 
         // DELETEs section
         if (!session.CapturedGroups.empty())
@@ -375,7 +375,7 @@ public:
                     EscapeSQL(session.ZoneName), safeGroupDesc);
 
                 // Link Objects to Sub-Pool Node
-                outfile << "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES \n";
+                outfile << "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES\n";
 
                 std::vector<std::string> nodeInserts;
                 for (const auto& obj : group.FoundObjects)
