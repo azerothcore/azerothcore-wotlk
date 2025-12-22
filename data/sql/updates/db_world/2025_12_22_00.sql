@@ -1,3 +1,4 @@
+-- DB update 2025_12_21_03 -> 2025_12_22_00
 --
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_traveler_mammoth_vendor' WHERE (`entry` IN (32638, 32639, 32641, 32642));
 
