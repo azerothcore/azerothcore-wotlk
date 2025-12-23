@@ -1,6 +1,6 @@
 --
 DELETE FROM `command` WHERE `name` LIKE 'pooltools%';
-INSERT INTO `command` (`name`, `security`, `help`) VALUES 
+INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('pooltools', 3, 'Syntax: .pooltools [subcommand]\nTools for creating herb/mining pools from live spawns.'),
 ('pooltools start', 3, 'Syntax: .pooltools start [Description]\nStarts a new pooling session with the specified description.'),
 ('pooltools def', 3, 'Syntax: .pooltools def [EntryID] [Chance] [EntryID] [Chance]...\nDefines which IDs of detected groups along with their chances.'),
