@@ -1217,6 +1217,25 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
         mapid = unitTarget->GetMapId();
     float x, y, z, orientation;
     destTarget->GetPosition(x, y, z, orientation);
+
+    Unit* target = m_targets.GetUnitTarget();
+    Unit* caster = unitTarget;
+
+    bool isBackTeleportSpell = (m_spellInfo->Id == 57840 || m_spellInfo->Id == 36563 || m_spellInfo->Id == 38932);
+
+    if (isBackTeleportSpell && target && caster)
+    {
+        float dist = 3.0f;
+        float angle = target->GetOrientation() + float(M_PI);
+
+        x = target->GetPositionX() + std::cos(angle) * dist;
+        y = target->GetPositionY() + std::sin(angle) * dist;
+        z = target->GetPositionZ();
+
+        caster->UpdateAllowedPositionZ(x, y, z);
+        orientation = target->GetOrientation();
+    }
+
     if (!orientation && m_targets.GetUnitTarget())
         orientation = m_targets.GetUnitTarget()->GetOrientation();
     LOG_DEBUG("spells.aura", "Spell::EffectTeleportUnits - teleport unit to {} {} {} {} {}\n", mapid, x, y, z, orientation);
