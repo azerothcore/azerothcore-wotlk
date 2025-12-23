@@ -1217,7 +1217,6 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
         mapid = unitTarget->GetMapId();
     float x, y, z, orientation;
     destTarget->GetPosition(x, y, z, orientation);
-
     if (!orientation && m_targets.GetUnitTarget())
         orientation = m_targets.GetUnitTarget()->GetOrientation();
     LOG_DEBUG("spells.aura", "Spell::EffectTeleportUnits - teleport unit to {} {} {} {} {}\n", mapid, x, y, z, orientation);
