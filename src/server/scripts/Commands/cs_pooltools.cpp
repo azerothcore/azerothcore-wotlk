@@ -170,7 +170,7 @@ public:
                 continue;
 
             bool isTemplateMatch = false;
-            for (const auto& tpl : session.CurrentTemplate)
+            for (auto const& tpl : session.CurrentTemplate)
             {
                 if (go->GetEntry() == tpl.Entry)
                 {
@@ -183,9 +183,9 @@ public:
             uint32 spawnId = go->GetSpawnId();
 
             bool alreadyCaptured = false;
-            for (const auto& group : session.CapturedGroups)
+            for (auto const& group : session.CapturedGroups)
             {
-                for (const auto& obj : group.FoundObjects)
+                for (auto const& obj : group.FoundObjects)
                 {
                     if (obj.second == spawnId)
                     {
@@ -305,9 +305,9 @@ public:
         // SQL Variables and Header
         outfile << fmt::format("-- Pool Dump: {}\n", session.ZoneName);
         outfile << "SET @mother_pool := @mother_pool+1;\n";
-        outfile << fmt::format("SET @max_limit   := {};\n\n", (session.CapturedGroups.size() + 3) / 4);
         if (complexPool)
             outfile << "SET @pool_node := @pool_node+1;\n\n";
+        outfile << fmt::format("SET @max_limit   := {};\n\n", (session.CapturedGroups.size() + 3) / 4);
 
         // DELETEs section
         if (!session.CapturedGroups.empty())
@@ -316,8 +316,8 @@ public:
             outfile << "DELETE FROM `pool_gameobject` WHERE `guid` IN (";
 
             std::vector<std::string> guidList;
-            for (const auto& group : session.CapturedGroups)
-                for (const auto& obj : group.FoundObjects)
+            for (auto const& group : session.CapturedGroups)
+                for (auto const& obj : group.FoundObjects)
                     guidList.push_back(std::to_string(obj.second));
 
             outfile << fmt::format("{}", fmt::join(guidList, ", "));
@@ -332,13 +332,13 @@ public:
         // We can buffer the simple bulk inserts here
         std::vector<std::string> bulkInserts;
 
-        for (const auto& group : session.CapturedGroups)
+        for (auto const& group : session.CapturedGroups)
         {
             groupCounter++;
 
             // Generate Description
             std::set<std::string> uniqueNames;
-            for (const auto& obj : group.FoundObjects)
+            for (auto const& obj : group.FoundObjects)
             {
                 GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(obj.first);
                 uniqueNames.insert(goInfo ? goInfo->name : std::to_string(obj.first));
@@ -350,10 +350,10 @@ public:
             // Simple pooling
             if (!complexPool)
             {
-                for (const auto& obj : group.FoundObjects)
+                for (auto const& obj : group.FoundObjects)
                 {
                     float chance = 0.0f;
-                    for (const auto& tpl : session.CurrentTemplate)
+                    for (auto const& tpl : session.CurrentTemplate)
                         if (tpl.Entry == obj.first) chance = (float)tpl.Chance;
 
                     bulkInserts.push_back(fmt::format("({}, @mother_pool, {}, '{} - {}')",
@@ -378,13 +378,13 @@ public:
                 outfile << "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES\n";
 
                 std::vector<std::string> nodeInserts;
-                for (const auto& obj : group.FoundObjects)
+                for (auto const& obj : group.FoundObjects)
                 {
                     GameObjectTemplate const* goInfo = sObjectMgr->GetGameObjectTemplate(obj.first);
                     std::string objName = goInfo ? goInfo->name : "Unknown";
 
                     float chance = 0.0f;
-                    for (const auto& tpl : session.CurrentTemplate)
+                    for (auto const& tpl : session.CurrentTemplate)
                         if (tpl.Entry == obj.first) chance = (float)tpl.Chance;
 
                     nodeInserts.push_back(fmt::format("({}, @pool_node, {}, '{} - {}')",
