@@ -1699,14 +1699,7 @@ void Spell::SelectImplicitTargetDestTargets(SpellEffIndex effIndex, SpellImplici
             float angle = targetType.CalcDirectionAngle();
             float dist = m_spellInfo->Effects[effIndex].CalcRadius(nullptr);
             if (targetType.GetTarget() == TARGET_DEST_TARGET_RANDOM)
-            {
                 dist *= float(rand_norm());
-            }
-
-            if (targetType.GetTarget() == TARGET_DEST_TARGET_BACK)
-            {
-                dist += target->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS);
-            }
 
             Position pos = dest._position;
             target->MovePositionToFirstCollision(pos, dist, angle);
