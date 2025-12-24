@@ -5916,7 +5916,7 @@ class spell_gen_vampiric_might : public AuraScript
         return ValidateSpellInfo({ 70677 });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         Unit* caster = GetCaster();
@@ -5933,7 +5933,7 @@ class spell_gen_vampiric_might : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_gen_vampiric_might::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_gen_vampiric_might::HandleProc);
     }
 };
 
@@ -5947,7 +5947,7 @@ class spell_gen_mirrored_soul : public AuraScript
         return ValidateSpellInfo({ 69034 });
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
@@ -5965,7 +5965,7 @@ class spell_gen_mirrored_soul : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_gen_mirrored_soul::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_gen_mirrored_soul::HandleProc);
     }
 };
 
@@ -5979,21 +5979,21 @@ class spell_gen_black_bow_of_the_betrayer : public AuraScript
         return ValidateSpellInfo({ 29471, 27526 });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         Unit* target = GetTarget();
         Unit* victim = eventInfo.GetActionTarget();
 
         if (target->IsAlive())
-            target->CastSpell(target, 29471, true, nullptr, aurEff);
+            target->CastSpell(target, 29471, true);
         if (victim && victim->IsAlive())
-            target->CastSpell(victim, 27526, true, nullptr, aurEff);
+            target->CastSpell(victim, 27526, true);
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_gen_black_bow_of_the_betrayer::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_gen_black_bow_of_the_betrayer::HandleProc);
     }
 };
 

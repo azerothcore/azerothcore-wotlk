@@ -1107,19 +1107,25 @@ class spell_pri_body_and_soul : public AuraScript
         if (procSpell->Id != 552 || eventInfo.GetActionTarget() != GetTarget())
             return false;
 
-        return roll_chance_i(GetEffect(EFFECT_0)->GetAmount());
+        return true;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_PRIEST_BODY_AND_SOUL_SPEED, true, nullptr, aurEff);
+        AuraEffect const* aurEff = GetEffect(EFFECT_1);
+        if (!aurEff)
+            return;
+
+        // Roll chance from Effect 1 (50%/100% for ranks 1/2)
+        if (roll_chance_i(aurEff->GetAmount()))
+            GetTarget()->CastSpell(GetTarget(), SPELL_PRIEST_BODY_AND_SOUL_SPEED, true, nullptr, aurEff);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_pri_body_and_soul::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_pri_body_and_soul::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_pri_body_and_soul::HandleProc);
     }
 };
 

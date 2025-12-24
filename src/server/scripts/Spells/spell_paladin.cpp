@@ -1267,21 +1267,27 @@ class spell_pal_sheath_of_light : public AuraScript
         return ValidateSpellInfo({ SPELL_PALADIN_SHEATH_OF_LIGHT_HOT });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         HealInfo* healInfo = eventInfo.GetHealInfo();
-        if (!healInfo || !healInfo->GetHeal())
+        if (!healInfo || !healInfo->GetEffectiveHeal())
             return;
 
-        // 4 healing ticks
-        int32 bp = aurEff->GetAmount() * healInfo->GetHeal() / 400;
-        GetTarget()->CastCustomSpell(SPELL_PALADIN_SHEATH_OF_LIGHT_HOT, SPELLVALUE_BASE_POINT0, bp, GetTarget(), true, nullptr, aurEff);
+        AuraEffect const* aurEff = GetEffect(EFFECT_0);
+        if (!aurEff)
+            return;
+
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_SHEATH_OF_LIGHT_HOT);
+        int32 amount = CalculatePct(static_cast<int32>(healInfo->GetEffectiveHeal()), aurEff->GetAmount());
+        amount /= spellInfo->GetMaxTicks();
+
+        GetTarget()->CastCustomSpell(SPELL_PALADIN_SHEATH_OF_LIGHT_HOT, SPELLVALUE_BASE_POINT0, amount, GetTarget(), true, nullptr, aurEff);
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_pal_sheath_of_light::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_pal_sheath_of_light::HandleProc);
     }
 };
 

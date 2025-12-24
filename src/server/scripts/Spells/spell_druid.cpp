@@ -17,6 +17,7 @@
 
 #include "Containers.h"
 #include "CreatureScript.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -1394,7 +1395,7 @@ class spell_dru_leader_of_the_pack : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_dru_leader_of_the_pack::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_dru_leader_of_the_pack::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
@@ -1453,13 +1454,25 @@ class spell_dru_eclipse : public AuraScript
             return false;
 
         bool isWrathSpell = (spellInfo->SpellFamilyFlags[0] & 1);
+        bool isStarfireSpell = (spellInfo->SpellFamilyFlags[0] & 4);
+
+        // Must be Wrath or Starfire
+        if (!isWrathSpell && !isStarfireSpell)
+            return false;
+
+        // Check 30 second internal cooldown
+        uint32 now = GameTime::GetGameTimeMS().count();
+        if (isWrathSpell && _lunarProcCooldownEnd > now)
+            return false;
+        if (isStarfireSpell && _solarProcCooldownEnd > now)
+            return false;
+
+        // Don't proc if already have any eclipse aura
+        if (target->HasAura(SPELL_DRUID_ECLIPSE_LUNAR) || target->HasAura(SPELL_DRUID_ECLIPSE_SOLAR))
+            return false;
 
         // Check proc chance (60% for Wrath, 100% for Starfire)
         if (!roll_chance_f(GetSpellInfo()->ProcChance * (isWrathSpell ? 0.6f : 1.0f)))
-            return false;
-
-        // Don't proc if already have the opposite eclipse
-        if (target->HasAura(isWrathSpell ? SPELL_DRUID_ECLIPSE_SOLAR : SPELL_DRUID_ECLIPSE_LUNAR))
             return false;
 
         return true;
@@ -1471,6 +1484,14 @@ class spell_dru_eclipse : public AuraScript
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         bool isWrathSpell = (spellInfo->SpellFamilyFlags[0] & 1);
         uint32 triggeredSpell = isWrathSpell ? SPELL_DRUID_ECLIPSE_LUNAR : SPELL_DRUID_ECLIPSE_SOLAR;
+
+        // Set 30 second internal cooldown
+        uint32 now = GameTime::GetGameTimeMS().count();
+        if (isWrathSpell)
+            _lunarProcCooldownEnd = now + 30000; // 30 seconds
+        else
+            _solarProcCooldownEnd = now + 30000; // 30 seconds
+
         GetTarget()->CastSpell(GetTarget(), triggeredSpell, true, nullptr, aurEff);
     }
 
@@ -1479,6 +1500,10 @@ class spell_dru_eclipse : public AuraScript
         DoCheckProc += AuraCheckProcFn(spell_dru_eclipse::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_dru_eclipse::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
+
+private:
+    uint32 _lunarProcCooldownEnd = 0;
+    uint32 _solarProcCooldownEnd = 0;
 };
 
 // -48539 - Revitalize

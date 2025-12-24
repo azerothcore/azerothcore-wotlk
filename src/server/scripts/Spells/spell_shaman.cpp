@@ -1279,7 +1279,7 @@ class spell_sha_frozen_power : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_sha_frozen_power::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_sha_frozen_power::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_sha_frozen_power::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
@@ -1341,7 +1341,7 @@ class spell_sha_lightning_overload : public AuraScript
     }
 };
 
-// -51474 - Ancestral Awakening (talent proc handler)
+// -51556 - Ancestral Awakening (talent proc handler)
 class spell_sha_ancestral_awakening : public AuraScript
 {
     PrepareAuraScript(spell_sha_ancestral_awakening);

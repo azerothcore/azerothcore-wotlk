@@ -1183,18 +1183,18 @@ class spell_warr_item_t10_prot_4p_bonus : public AuraScript
         return ValidateSpellInfo({ SPELL_WARRIOR_T10_PROT_4P_ABSORB });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
 
         Unit* caster = GetTarget();
         int32 basepoints = CalculatePct(static_cast<int32>(caster->GetMaxHealth()), GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-        caster->CastCustomSpell(caster, SPELL_WARRIOR_T10_PROT_4P_ABSORB, &basepoints, nullptr, nullptr, true, nullptr, aurEff);
+        caster->CastCustomSpell(caster, SPELL_WARRIOR_T10_PROT_4P_ABSORB, &basepoints, nullptr, nullptr, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_warr_item_t10_prot_4p_bonus::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_warr_item_t10_prot_4p_bonus::HandleProc);
     }
 };
 

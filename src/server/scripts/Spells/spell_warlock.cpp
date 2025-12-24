@@ -1594,24 +1594,20 @@ class spell_warl_improved_drain_soul : public AuraScript
         return victim->GetAuraApplicationOfRankedSpell(SPELL_WARLOCK_DRAIN_SOUL_R1, caster->GetGUID()) != nullptr;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
         Unit* caster = eventInfo.GetActor();
-        // Improved Drain Soul
-        Aura const* impDrainSoul = caster->GetAuraOfRankedSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1, caster->GetGUID());
-        if (!impDrainSoul)
-            return;
-
-        int32 amount = CalculatePct(caster->GetMaxPower(POWER_MANA), impDrainSoul->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
-        caster->CastCustomSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC, SPELLVALUE_BASE_POINT0, amount, caster, true, nullptr, aurEff);
+        // Improved Drain Soul - use the current aura (this script is on the talent)
+        int32 amount = CalculatePct(caster->GetMaxPower(POWER_MANA), GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+        caster->CastCustomSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC, SPELLVALUE_BASE_POINT0, amount, caster, true);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_warl_improved_drain_soul::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_warl_improved_drain_soul::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnProc += AuraProcFn(spell_warl_improved_drain_soul::HandleProc);
     }
 };
 

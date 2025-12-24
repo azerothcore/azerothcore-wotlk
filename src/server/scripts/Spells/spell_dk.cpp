@@ -517,9 +517,13 @@ class spell_dk_wandering_plague_aura : public AuraScript
     }
 
     // xinef: prevent default proc with castItem passed, which applies 30 sec cooldown to procing of the aura
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+
+        AuraEffect const* aurEff = GetEffect(EFFECT_0);
+        if (!aurEff)
+            return;
 
         eventInfo.GetActor()->AddSpellCooldown(SPELL_DK_WANDERING_PLAGUE_TRIGGER, 0, 1000);
         eventInfo.GetActor()->CastCustomSpell(SPELL_DK_WANDERING_PLAGUE_TRIGGER, SPELLVALUE_BASE_POINT0, CalculatePct<int32, int32>(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()), eventInfo.GetActionTarget(), TRIGGERED_FULL_MASK);
@@ -528,7 +532,7 @@ class spell_dk_wandering_plague_aura : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_dk_wandering_plague_aura::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_dk_wandering_plague_aura::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_dk_wandering_plague_aura::HandleProc);
     }
 };
 

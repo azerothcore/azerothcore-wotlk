@@ -1463,7 +1463,7 @@ class spell_hun_rapid_recuperation : public AuraScript
         return (procSpell->SpellFamilyFlags[1] & 0x01000000) != 0;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         uint32 triggeredSpell = 0;
@@ -1478,13 +1478,13 @@ class spell_hun_rapid_recuperation : public AuraScript
             default:
                 return;
         }
-        GetTarget()->CastSpell(GetTarget(), triggeredSpell, true, nullptr, aurEff);
+        GetTarget()->CastSpell(GetTarget(), triggeredSpell, true);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_hun_rapid_recuperation::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_hun_rapid_recuperation::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_hun_rapid_recuperation::HandleProc);
     }
 };
 

@@ -830,7 +830,7 @@ class spell_rog_cut_to_the_chase : public AuraScript
 {
     PrepareAuraScript(spell_rog_cut_to_the_chase);
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         // Refresh Slice and Dice to 5 combo point max duration
@@ -842,7 +842,7 @@ class spell_rog_cut_to_the_chase : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_rog_cut_to_the_chase::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_rog_cut_to_the_chase::HandleProc);
     }
 };
 

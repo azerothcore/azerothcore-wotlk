@@ -311,7 +311,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (-49018, 'spell_dk_sudden_doom'),
 (-49182, 'spell_dk_blade_barrier'),
 (-49188, 'spell_dk_rime'),
-(-49217, 'spell_dk_wandering_plague'),
+(50526, 'spell_dk_wandering_plague'),  -- Damage spell, not talent aura
 (-51474, 'spell_sha_astral_shift_aura'),
 (-51459, 'spell_dk_necrosis'),
 (-51525, 'spell_sha_static_shock'),
@@ -1095,7 +1095,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_rog_glyph_of_backstab', 'spell_rog_master_of_subtlety', 'spell_rog_cut_to_the_chase', 'spell_rog_deadly_brew', 'spell_rog_quick_recovery');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (56800, 'spell_rog_glyph_of_backstab'),     -- Glyph of Backstab
-(-31223, 'spell_rog_master_of_subtlety'),   -- Master of Subtlety (all ranks)
+(-31221, 'spell_rog_master_of_subtlety'),   -- Master of Subtlety (all ranks, first rank)
 (-35541, 'spell_rog_cut_to_the_chase'),     -- Cut to the Chase (all ranks)
 (-51625, 'spell_rog_deadly_brew'),          -- Deadly Brew (all ranks)
 (-31244, 'spell_rog_quick_recovery');       -- Quick Recovery (all ranks)
@@ -1153,12 +1153,12 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 
 -- First delete any existing entries that might conflict
 DELETE FROM `spell_proc` WHERE `SpellId` IN (
-    -31641, -16689, -16086, 4524, 9452, 15257, 15331, 15332, 16372, 21747,
+    -31641, -16689, 4524, 9452, 15257, 15331, 15332, 16372, 21747,
     24256, 26016, 27539, 27997, 28460, 29307, 31221, 31222, 31223, 33511,
     33522, 35399, 37565, 38319, 40303, 42760, 43730, 43983, 44546, 44548,
     44549, 44835, 45278, 45396, 45398, 45444, 46102, 49027, 49542, 49543,
     50871, 52881, 54404, 55610, 55717, 56845, 57351, 58426, 59887, 59888,
-    59889, 59890, 59891, 60617, 62337, 62933, 64764, 64936, 66865, 66889,
+    59889, 59890, 59891, 60617, 62337, 64764, 64936, 66865, 66889,
     67530, 70871, 71567, 71604, 72256, 72673, 72674, 72675
 );
 
@@ -1170,8 +1170,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (-31641,  0, 0, 0x00000000, 0x00000000, 0x00000000,     680, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
 -- Shadow Weaving (Priest) - Cooldown=1000
 (-16689,  0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,  1000, 0),
--- Improved Mend Pet (Hunter) - procFlags=196608 (KILL|DONE_TRAP_ACTIVATION)
-(-16086,  0, 0, 0x00000000, 0x00000000, 0x00000000,  196608, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- -16086 removed - TC doesn't have this entry, let DBC defaults handle it
 -- Cure Ailments (Pet) - procFlags=1048576 (TAKEN_SPELL_MAGIC_DMG_CLASS)
 (4524,    0, 0, 0x00000000, 0x00000000, 0x00000000, 1048576, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
 -- Duelist's Riposte - ppmRate=3.0
@@ -1276,8 +1275,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (60617,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
 -- Petrified Bark (Normal) - procFlags=40
 (62337,   0, 0, 0x00000000, 0x00000000, 0x00000000,      40, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
--- Petrified Bark (Heroic) - procFlags=40
-(62933,   0, 0, 0x00000000, 0x00000000, 0x00000000,      40, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- 62933 removed - TC doesn't have this entry, let DBC defaults handle it
 -- Dying Curse - Cooldown=50000
 (64764,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 50000, 0),
 -- Glyph of Scourge Strike - procFlags=69632, customChance=100
@@ -1730,5 +1728,55 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 -- Fix duplicate entries (remove positive when negative already covers all ranks)
 DELETE FROM `spell_proc` WHERE `SpellId` IN (9452, 44546, 49027, 59887);
 
--- Fix entries with Charges too high
-UPDATE `spell_proc` SET `Charges`=0 WHERE `SpellId`=62933;
+-- Delete AC-specific entries that don't exist in TC's spell_proc (they cause warnings and aren't needed)
+DELETE FROM `spell_proc` WHERE `SpellId` IN (-16086, 62933);
+
+-- Delete AC-specific legacy entries that don't exist in TC's spell_proc
+-- These have invalid ProcFlags/SpellPhaseMask combinations and cause warnings
+DELETE FROM `spell_proc` WHERE `SpellId` IN (
+    16086,  -- Piercing Howl (rank handling)
+    15257, 15331, 15332,  -- Priest Shadow Weaving (handled by AuraScript)
+    21747,  -- Raptorslayer
+    24256,  -- Judgement of Crusader
+    27997,  -- Spell Vulnerability
+    28460,  -- Mojo Madness
+    31221, 31222, 31223,  -- Master of Subtlety
+    33511, 33522,  -- Concussion/Daze
+    37565,  -- Magma Shield
+    38319,  -- Mojo Madness
+    40303,  -- Thrash
+    42760,  -- Dark Transformation
+    43730,  -- Stormchops
+    43983,  -- Fiery Payback
+    44835,  -- Maim Interrupt
+    45278,  -- Chaos Bolt
+    45396, 45398,  -- Blackout
+    45444,  -- Totem of Ancestral Guidance
+    46102,  -- Living Flame
+    54404,  -- Demonic Immolation
+    55610,  -- Improved Icy Talons
+    55717,  -- Venom
+    56845,  -- Glyph of Seal of Command
+    58426,  -- Overkill
+    59888, 59889, 59890, 59891,  -- Borrowed Time ranks
+    64936,  -- Flame Leviathan Residue
+    70871   -- Essence of the Blood Queen
+);
+
+-- Fix additional duplicate entries
+DELETE FROM `spell_proc` WHERE `SpellId` IN (26016, 44548, 44549, 49542, 49543);
+
+-- Fix spell_script_names bindings for proc system
+-- Remove 44401 from spell_mage_gen_extra_effects (TC uses separate handler)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 44401 AND `ScriptName` = 'spell_mage_gen_extra_effects';
+
+-- Fix Savage Defense binding (script is for 62606 absorb buff, not 62600 passive)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 62600 AND `ScriptName` = 'spell_dru_savage_defense';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (62606, 'spell_dru_savage_defense');
+
+-- Fix Ancestral Awakening binding (was incorrectly bound to -51474 Astral Shift, should be -51556 Ancestral Awakening)
+DELETE FROM `spell_script_names` WHERE `spell_id` = -51474 AND `ScriptName` = 'spell_sha_ancestral_awakening';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-51556, 'spell_sha_ancestral_awakening');
+
+-- Remove obsolete reload spell_proc_event command (replaced by spell_proc)
+DELETE FROM `command` WHERE `name` = 'reload spell_proc_event';

@@ -133,7 +133,7 @@ class spell_mage_burning_determination : public AuraScript
         return true;
     }
 
-    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo&  /*eventInfo*/)
+    void HandleProc(ProcEventInfo&  /*eventInfo*/)
     {
         PreventDefaultAction();
         GetUnitOwner()->CastSpell(GetUnitOwner(), 54748, true);
@@ -142,7 +142,7 @@ class spell_mage_burning_determination : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_burning_determination::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_mage_burning_determination::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnProc += AuraProcFn(spell_mage_burning_determination::HandleProc);
     }
 };
 
@@ -1170,11 +1170,11 @@ class spell_mage_empowered_fire : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_empowered_fire::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_mage_empowered_fire::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_mage_empowered_fire::HandleProc, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER);
     }
 };
 
-// 48108 - Hot Streak, 44401 - Missile Barrage, 57761 - Fireball!
+// 48108 - Hot Streak, 57761 - Fireball!
 class spell_mage_gen_extra_effects : public AuraScript
 {
     PrepareAuraScript(spell_mage_gen_extra_effects);
@@ -1203,18 +1203,18 @@ class spell_mage_gen_extra_effects : public AuraScript
         return true;
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         Unit* caster = eventInfo.GetActor();
         // T10 2P bonus: apply pushing the limit on proc consumption
         if (caster->HasAura(SPELL_MAGE_T10_2P_BONUS))
-            caster->CastSpell(caster, SPELL_MAGE_T10_2P_BONUS_EFFECT, true, nullptr, aurEff);
+            caster->CastSpell(caster, SPELL_MAGE_T10_2P_BONUS_EFFECT, true);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_gen_extra_effects::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_mage_gen_extra_effects::HandleProc, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER);
+        OnProc += AuraProcFn(spell_mage_gen_extra_effects::HandleProc);
     }
 };
 
@@ -1383,7 +1383,7 @@ class spell_mage_imp_blizzard : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_mage_imp_blizzard::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_mage_imp_blizzard::HandleProc, EFFECT_0, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
     }
 };
 
@@ -1405,7 +1405,7 @@ class spell_mage_imp_mana_gems : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_mage_imp_mana_gems::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_mage_imp_mana_gems::HandleProc, EFFECT_1, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
     }
 };
 

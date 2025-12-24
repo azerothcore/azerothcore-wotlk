@@ -4934,6 +4934,12 @@ class spell_item_persistent_shield : public AuraScript
         Unit* caster = eventInfo.GetActor();
         Unit* target = eventInfo.GetActionTarget();
         int32 bp0 = CalculatePct(static_cast<int32>(eventInfo.GetHealInfo()->GetHeal()), 15);
+
+        // Scarab Brooch does not replace stronger shields
+        if (AuraEffect const* shield = target->GetAuraEffect(SPELL_PERSISTENT_SHIELD_TRIGGERED, EFFECT_0, caster->GetGUID()))
+            if (shield->GetAmount() > bp0)
+                return;
+
         caster->CastCustomSpell(SPELL_PERSISTENT_SHIELD_TRIGGERED, SPELLVALUE_BASE_POINT0, bp0, target, true, nullptr, aurEff);
     }
 
@@ -4982,7 +4988,7 @@ class spell_item_restless_strength : public AuraScript
         return ValidateSpellInfo({ SPELL_RESTLESS_STRENGTH });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         GetTarget()->RemoveAuraFromStack(SPELL_RESTLESS_STRENGTH);
@@ -4990,7 +4996,7 @@ class spell_item_restless_strength : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_restless_strength::HandleProc, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
+        OnProc += AuraProcFn(spell_item_restless_strength::HandleProc);
     }
 };
 
@@ -5004,7 +5010,7 @@ class spell_item_unstable_power : public AuraScript
         return ValidateSpellInfo({ SPELL_UNSTABLE_POWER_AURA });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         GetTarget()->RemoveAuraFromStack(SPELL_UNSTABLE_POWER_AURA);
@@ -5012,7 +5018,7 @@ class spell_item_unstable_power : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_unstable_power::HandleProc, EFFECT_0, SPELL_AURA_MOD_SPELL_CRIT_CHANCE);
+        OnProc += AuraProcFn(spell_item_unstable_power::HandleProc);
     }
 };
 
@@ -5046,15 +5052,15 @@ class spell_item_corpse_tongue_coin : public AuraScript
         return ValidateSpellInfo({ SPELL_CORPSE_TONGUE_COIN });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(nullptr, SPELL_CORPSE_TONGUE_COIN, true, nullptr, aurEff);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_CORPSE_TONGUE_COIN, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_corpse_tongue_coin::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_item_corpse_tongue_coin::HandleProc);
     }
 };
 
@@ -5068,15 +5074,15 @@ class spell_item_corpse_tongue_coin_heroic : public AuraScript
         return ValidateSpellInfo({ SPELL_CORPSE_TONGUE_COIN_HERO });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(nullptr, SPELL_CORPSE_TONGUE_COIN_HERO, true, nullptr, aurEff);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_CORPSE_TONGUE_COIN_HERO, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_corpse_tongue_coin_heroic::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_item_corpse_tongue_coin_heroic::HandleProc);
     }
 };
 
@@ -5108,15 +5114,15 @@ class spell_item_soul_harvesters_charm : public AuraScript
         return ValidateSpellInfo({ SPELL_SOUL_HARVESTERS_CHARM });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(nullptr, SPELL_SOUL_HARVESTERS_CHARM, true, nullptr, aurEff);
+        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_SOUL_HARVESTERS_CHARM, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_soul_harvesters_charm::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_item_soul_harvesters_charm::HandleProc);
     }
 };
 
@@ -5328,15 +5334,15 @@ class spell_item_petrified_twilight_scale : public AuraScript
         return ValidateSpellInfo({ SPELL_PETRIFIED_TWILIGHT_SCALE });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActionTarget()->CastSpell(nullptr, SPELL_PETRIFIED_TWILIGHT_SCALE, true, nullptr, aurEff);
+        eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_PETRIFIED_TWILIGHT_SCALE, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_petrified_twilight_scale::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_item_petrified_twilight_scale::HandleProc);
     }
 };
 
@@ -5350,15 +5356,15 @@ class spell_item_petrified_twilight_scale_heroic : public AuraScript
         return ValidateSpellInfo({ SPELL_PETRIFIED_TWILIGHT_SCALE_HC });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActionTarget()->CastSpell(nullptr, SPELL_PETRIFIED_TWILIGHT_SCALE_HC, true, nullptr, aurEff);
+        eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_PETRIFIED_TWILIGHT_SCALE_HC, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_petrified_twilight_scale_heroic::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnProc += AuraProcFn(spell_item_petrified_twilight_scale_heroic::HandleProc);
     }
 };
 
