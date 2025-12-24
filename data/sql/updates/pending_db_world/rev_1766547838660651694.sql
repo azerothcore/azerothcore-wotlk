@@ -1,6 +1,10 @@
 -- QAston Proc System - Base spell_proc entries
 -- Port from TrinityCore QAston proc system commits
 
+-- Add DisableEffectsMask column to spell_proc table
+ALTER TABLE `spell_proc`
+ADD COLUMN IF NOT EXISTS `DisableEffectsMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesMask`;
+
 -- Charge drop on spell cast
 DELETE FROM `spell_proc` WHERE `SpellId` IN (17941, 18820, 22008, 28200, 31834, 32216, 34477, 34936, 44401, 48108, 51124, 54741, 57761, 64823);
 INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES

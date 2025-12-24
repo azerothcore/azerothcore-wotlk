@@ -2705,20 +2705,21 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         uint32 addhealth = m_healing;
 
         if (crit)
-        {
-            procEx |= PROC_EX_CRITICAL_HIT;
             addhealth = Unit::SpellCriticalHealingBonus(caster, m_spellInfo, addhealth, nullptr);
-        }
-        else
-            procEx |= PROC_EX_NORMAL_HIT;
 
         HealInfo healInfo(caster, unitTarget, addhealth, m_spellInfo, m_spellInfo->GetSchoolMask());
+
+        // Set hitMask based on crit
+        if (crit)
+            healInfo.AddHitMask(PROC_HIT_CRITICAL);
+        else
+            healInfo.AddHitMask(PROC_HIT_NORMAL);
 
         // Xinef: override with forced crit, only visual result
         if (GetSpellValue()->ForcedCritResult)
         {
             crit = true;
-            procEx |= PROC_EX_CRITICAL_HIT;
+            healInfo.AddHitMask(PROC_HIT_CRITICAL);
         }
 
         int32 gain = caster->HealBySpell(healInfo, crit);
@@ -2729,14 +2730,17 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         unitTarget->getHostileRefMgr().threatAssist(caster, threat, m_spellInfo);
         m_healing = gain;
 
-        // Xinef: if heal acutally healed something, add no overheal flag
+        // Xinef: if heal actually healed something, add no overheal flag
         if (m_healing)
-            procEx |= PROC_EX_NO_OVERHEAL;
+            healInfo.AddHitMask(PROC_EX_NO_OVERHEAL);
 
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
-            Unit::ProcDamageAndSpell(caster, unitTarget, procAttacker, procVictim, procEx, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+        {
+            uint32 hitMask = m_procEx | healInfo.GetHitMask();
+            Unit::ProcDamageAndSpell(caster, unitTarget, procAttacker, procVictim, hitMask, addhealth, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
                 m_triggeredByAuraSpell.effectIndex, this, nullptr, &healInfo);
+        }
     }
     // Do damage and triggers
     else if (m_damage > 0)
@@ -2802,7 +2806,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (reflectedSpell)
             effectUnit->SendSpellNonMeleeReflectLog(&damageInfo, effectUnit);
 
-        procEx |= createProcExtendMask(&damageInfo, missInfo);
         procVictim |= PROC_FLAG_TAKEN_DAMAGE;
 
         caster->DealSpellDamage(&damageInfo, true, this);
@@ -2813,13 +2816,14 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
         {
-            DamageInfo dmgInfo(damageInfo, SPELL_DIRECT_DAMAGE);
-            Unit::ProcDamageAndSpell(caster, unitTarget, procAttacker, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+            DamageInfo dmgInfo(damageInfo, SPELL_DIRECT_DAMAGE, m_attackType, missInfo);
+            uint32 hitMask = m_procEx | dmgInfo.GetHitMask();
+            Unit::ProcDamageAndSpell(caster, unitTarget, procAttacker, procVictim, hitMask, damageInfo.damage, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
                 m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
 
             if (caster->IsPlayer() && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
                     m_spellInfo->HasAttribute(SPELL_ATTR4_SUPPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
-                caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim, procEx);
+                caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim, dmgInfo.GetHitMask());
         }
 
         m_damage = damageInfo.damage;
@@ -2829,19 +2833,19 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo, m_spellSchoolMask);
-        procEx |= createProcExtendMask(&damageInfo, missInfo);
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (canEffectTrigger)
         {
-            DamageInfo dmgInfo(damageInfo, NODAMAGE);
-            Unit::ProcDamageAndSpell(caster, unitTarget, procAttacker, procVictim, procEx, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+            DamageInfo dmgInfo(damageInfo, NODAMAGE, m_attackType, missInfo);
+            uint32 hitMask = m_procEx | dmgInfo.GetHitMask();
+            Unit::ProcDamageAndSpell(caster, unitTarget, procAttacker, procVictim, hitMask, 0, m_attackType, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
                 m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
 
             // Xinef: eg. rogue poisons can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
-            if ((procEx & PROC_EX_NORMAL_HIT || procEx & PROC_EX_CRITICAL_HIT) && caster->IsPlayer() && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
+            if ((dmgInfo.GetHitMask() & (PROC_HIT_NORMAL | PROC_HIT_CRITICAL)) && caster->IsPlayer() && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
                     m_spellInfo->HasAttribute(SPELL_ATTR4_SUPPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
-                caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim | PROC_FLAG_TAKEN_DAMAGE, procEx);
+                caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim | PROC_FLAG_TAKEN_DAMAGE, dmgInfo.GetHitMask());
         }
 
         // Failed Pickpocket, reveal rogue
@@ -3917,25 +3921,21 @@ void Spell::_cast(bool skipCheck)
             }
         }
 
-        uint32 procEx = PROC_EX_NORMAL_HIT;
+        uint32 hitMask = PROC_HIT_NORMAL;
 
         for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
         {
             if (ihit->missCondition != SPELL_MISS_NONE)
-            {
                 continue;
-            }
 
             if (!ihit->crit)
-            {
                 continue;
-            }
 
-            procEx |= PROC_EX_CRITICAL_HIT;
+            hitMask |= PROC_HIT_CRITICAL;
             break;
         }
 
-        Unit::ProcDamageAndSpell(m_originalCaster, m_originalCaster, procAttacker, PROC_FLAG_NONE, procEx, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+        Unit::ProcDamageAndSpell(m_originalCaster, m_originalCaster, procAttacker, PROC_FLAG_NONE, hitMask, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
             m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_CAST);
     }
 
@@ -4270,24 +4270,20 @@ void Spell::_handle_finish_phase()
             }
         }
 
-        uint32 procEx = PROC_EX_NORMAL_HIT;
+        uint32 hitMask = PROC_HIT_NORMAL;
         for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
         {
             if (ihit->missCondition != SPELL_MISS_NONE)
-            {
                 continue;
-            }
 
             if (!ihit->crit)
-            {
                 continue;
-            }
 
-            procEx |= PROC_EX_CRITICAL_HIT;
+            hitMask |= PROC_HIT_CRITICAL;
             break;
         }
 
-        Unit::ProcDamageAndSpell(m_originalCaster, m_originalCaster, procAttacker, PROC_FLAG_NONE, procEx, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+        Unit::ProcDamageAndSpell(m_originalCaster, m_originalCaster, procAttacker, PROC_FLAG_NONE, hitMask, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
             m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_FINISH);
     }
 }

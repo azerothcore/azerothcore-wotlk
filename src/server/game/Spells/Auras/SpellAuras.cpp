@@ -2112,22 +2112,22 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     return true;
 }
 
-bool Aura::IsProcOnCooldown() const
+bool Aura::IsProcOnCooldown(TimePoint now) const
 {
-    /*if (m_procCooldown)
-    {
-        if (m_procCooldown > GameTime::GetGameTime().count())
-            return true;
-    }*/
-    return false;
+    return m_procCooldown > now;
 }
 
-void Aura::AddProcCooldown(Milliseconds /*msec*/)
+void Aura::AddProcCooldown(TimePoint cooldownEnd)
 {
-    //m_procCooldown = std:chrono::steady_clock::now() + msec;
+    m_procCooldown = cooldownEnd;
 }
 
-void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+void Aura::ResetProcCooldown()
+{
+    m_procCooldown = std::chrono::steady_clock::now();
+}
+
+void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now)
 {
     bool prepare = CallScriptPrepareProcHandlers(aurApp, eventInfo);
     if (!prepare)
@@ -2145,10 +2145,10 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
     ASSERT(procEntry);
 
     // cooldowns should be added to the whole aura (see 51698 area aura)
-    AddProcCooldown(procEntry->Cooldown);
+    AddProcCooldown(now + procEntry->Cooldown);
 }
 
-uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo) const
+uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now) const
 {
     SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId());
     // only auras with spell proc entry can trigger proc
@@ -2160,7 +2160,7 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo)
         return 0;
 
     // check proc cooldown
-    if (IsProcOnCooldown())
+    if (IsProcOnCooldown(now))
         return 0;
 
     // do checks against db data
@@ -2186,7 +2186,7 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo)
         {
             if (procEffectMask & (1 << i))
             {
-                if (!aurEff->CheckEffectProc(aurApp, eventInfo))
+                if ((procEntry->DisableEffectsMask & (1u << i)) || !aurEff->CheckEffectProc(aurApp, eventInfo))
                     procEffectMask &= ~(1 << i);
             }
         }
@@ -2591,10 +2591,21 @@ bool Aura::CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventI
     return result;
 }
 
-bool Aura::CallScriptCheckEffectProcHandlers(AuraEffect const* /*aurEff*/, AuraApplication const* /*aurApp*/, ProcEventInfo& /*eventInfo*/) const
+bool Aura::CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo)
 {
-    // AC doesn't have CheckEffectProc hooks yet - just return true to allow all effects
-    return true;
+    bool result = true;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_CHECK_EFFECT_PROC, aurApp);
+        std::list<AuraScript::CheckEffectProcHandler>::iterator effEndItr = (*scritr)->DoCheckEffectProc.end(), effItr = (*scritr)->DoCheckEffectProc.begin();
+        for (; effItr != effEndItr; ++effItr)
+            if (effItr->IsEffectAffected(m_spellInfo, aurEff->GetEffIndex()))
+                result &= effItr->Call(*scritr, aurEff, eventInfo);
+
+        (*scritr)->_FinishScriptCall();
+    }
+
+    return result;
 }
 
 bool Aura::CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
