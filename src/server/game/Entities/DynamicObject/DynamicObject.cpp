@@ -122,6 +122,14 @@ bool DynamicObject::CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caste
     SetFloatValue(DYNAMICOBJECT_RADIUS, radius);
     SetUInt32Value(DYNAMICOBJECT_CASTTIME, GameTime::GetGameTimeMS().count());
 
+    // Area spell DynamicObjects (like Death and Decay) must always be active to ensure periodic ticks
+    // even when the caster is stationary. Without this, grid cell updates may not occur, causing
+    // the periodic aura to stop ticking until the caster moves.
+    if (type == DYNAMIC_OBJECT_AREA_SPELL)
+    {
+        setActive(true);
+    }
+
     if (!GetMap()->AddToMap(this, true))
     {
         // Returning false will cause the object to be deleted - remove from transport
