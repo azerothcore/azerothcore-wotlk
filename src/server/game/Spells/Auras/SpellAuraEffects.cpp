@@ -6351,7 +6351,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                         case 27808:
                             if (caster)
                             {
-                                caster->CastCustomSpell(29879, SPELLVALUE_BASE_POINT0, int32(target->CountPctFromMaxHealth(21)), target, true, nullptr, this);
+                                caster->CastSpell(target, 29879, true, nullptr, this);
                                 if (GetTickNumber() == 1)
                                     caster->CastSpell(target, 27808, true);
                             }
