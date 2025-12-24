@@ -158,6 +158,7 @@ public:
         _events.Reset();
         _currentWingTaunt = SAY_FIRST_WING_TAUNT;
         _horsemanLoaded = 0;
+        _thaddiusScreamsScheduled = false;
 
         // Achievements
         _abominationsKilled = 0;
@@ -233,7 +234,11 @@ public:
     {
         InstanceScript::OnPlayerEnter(player);
 
-        _events.ScheduleEvent(EVENT_THADDIUS_SCREAMS, 2min, 2min + 30s);
+        if (!_thaddiusScreamsScheduled)
+        {
+            _thaddiusScreamsScheduled = true;
+            _events.ScheduleEvent(EVENT_THADDIUS_SCREAMS, 2min, 2min + 30s);
+        }
     }
 
     void OnCreatureCreate(Creature* creature) override
@@ -619,7 +624,7 @@ public:
                     break;
 
                 instance->PlayDirectSoundToMap(SOUND_SCREAM + urand(0, 3));
-                return _events.ScheduleEvent(EVENT_THADDIUS_SCREAMS, 2min, 2min + 30s);
+                return _events.ScheduleEvent(EVENT_THADDIUS_SCREAMS, 5min, 10min);
             }
             case EVENT_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER:
                 _horsemanAchievement = false;
@@ -682,6 +687,7 @@ private:
     EventMap _events;
     uint8 _currentWingTaunt;
     uint8 _horsemanLoaded;
+    bool _thaddiusScreamsScheduled;
 
     // GameObjects
     std::set<GameObject*> _heiganEruption[HeiganEruptSectionCount];
