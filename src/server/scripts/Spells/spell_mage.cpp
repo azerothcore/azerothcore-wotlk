@@ -31,6 +31,7 @@
 
 enum MageSpells
 {
+    SPELL_MAGE_BLAZING_SPEED                     = 31643,
     SPELL_MAGE_MAGIC_ABSORPTION_MANA             = 29442,
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
@@ -1464,10 +1465,34 @@ class spell_mage_magic_absorption : public AuraScript
     }
 };
 
+// -31641 - Blazing Speed
+class spell_mage_blazing_speed : public AuraScript
+{
+    PrepareAuraScript(spell_mage_blazing_speed);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_BLAZING_SPEED });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (Unit* target = eventInfo.GetActionTarget())
+            target->CastSpell(target, SPELL_MAGE_BLAZING_SPEED, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mage_blazing_speed::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_arcane_blast);
     RegisterSpellScript(spell_mage_arcane_potency);
+    RegisterSpellScript(spell_mage_blazing_speed);
     RegisterSpellScript(spell_mage_burning_determination);
     RegisterSpellScript(spell_mage_molten_armor);
     RegisterSpellScript(spell_mage_mirror_image);

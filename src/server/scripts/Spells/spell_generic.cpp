@@ -5729,6 +5729,274 @@ class spell_gen_vampiric_touch : public AuraScript
     }
 };
 
+// 62337, 62933 - Petrified Bark (Freya)
+class spell_gen_petrified_bark : public AuraScript
+{
+    PrepareAuraScript(spell_gen_petrified_bark);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 62379 });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        Unit* victim = eventInfo.GetActor();
+        if (!victim)
+            return;
+
+        int32 damage = damageInfo->GetDamage();
+        victim->CastCustomSpell(GetTarget(), 62379, &damage, nullptr, nullptr, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_petrified_bark::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 67534 - Earth Shield (Trial of the Champion)
+class spell_gen_earth_shield_toc : public AuraScript
+{
+    PrepareAuraScript(spell_gen_earth_shield_toc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 67535 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 damage = damageInfo->GetDamage();
+        GetTarget()->CastCustomSpell(GetTarget(), 67535, &damage, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_earth_shield_toc::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 65932 - Retaliation (Faction Champions)
+class spell_gen_retaliation_toc : public AuraScript
+{
+    PrepareAuraScript(spell_gen_retaliation_toc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 65934 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* attacker = eventInfo.GetActor();
+        return attacker && GetTarget()->HasInArc(M_PI, attacker);
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* attacker = eventInfo.GetActor();
+        if (attacker)
+            GetTarget()->CastSpell(attacker, 65934, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_gen_retaliation_toc::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_gen_retaliation_toc::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 69172 - Overlord's Brand (damage/heal redirect - non-DoT)
+class spell_gen_overlords_brand : public AuraScript
+{
+    PrepareAuraScript(spell_gen_overlords_brand);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 69189, 69190 });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (eventInfo.GetTypeMask() & (PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS))
+        {
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (!healInfo || !healInfo->GetHeal())
+                return;
+            int32 heal = static_cast<int32>(healInfo->GetHeal() * 5.5f);
+            GetTarget()->CastCustomSpell(caster, 69190, &heal, nullptr, nullptr, true);
+        }
+        else
+        {
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetDamage())
+                return;
+            if (Unit* victim = caster->GetVictim())
+            {
+                int32 damage = damageInfo->GetDamage();
+                GetTarget()->CastCustomSpell(victim, 69189, &damage, nullptr, nullptr, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_overlords_brand::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 69173 - Overlord's Brand (damage/heal redirect - DoT only)
+class spell_gen_overlords_brand_dot : public AuraScript
+{
+    PrepareAuraScript(spell_gen_overlords_brand_dot);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 69189, 69190 });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT)
+        {
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (!healInfo || !healInfo->GetHeal())
+                return;
+            int32 heal = static_cast<int32>(healInfo->GetHeal() * 5.5f);
+            GetTarget()->CastCustomSpell(caster, 69190, &heal, nullptr, nullptr, true);
+        }
+        else
+        {
+            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+            if (!damageInfo || !damageInfo->GetDamage())
+                return;
+            if (Unit* victim = caster->GetVictim())
+            {
+                int32 damage = damageInfo->GetDamage();
+                GetTarget()->CastCustomSpell(victim, 69189, &damage, nullptr, nullptr, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_overlords_brand_dot::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 70674 - Vampiric Might (Lady Deathwhisper)
+class spell_gen_vampiric_might : public AuraScript
+{
+    PrepareAuraScript(spell_gen_vampiric_might);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 70677 });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 heal = damageInfo->GetDamage() * 3;
+        caster->CastCustomSpell(caster, 70677, &heal, nullptr, nullptr, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_vampiric_might::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 69023 - Mirrored Soul (Devourer of Souls)
+class spell_gen_mirrored_soul : public AuraScript
+{
+    PrepareAuraScript(spell_gen_mirrored_soul);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 69034 });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        int32 damage = static_cast<int32>(damageInfo->GetDamage() * 0.45f);
+        if (damage > 0)
+            GetTarget()->CastCustomSpell(caster, 69034, &damage, nullptr, nullptr, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_mirrored_soul::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 27522, 40336, 46939 - Black Bow of the Betrayer / Mana Drain Trigger
+class spell_gen_black_bow_of_the_betrayer : public AuraScript
+{
+    PrepareAuraScript(spell_gen_black_bow_of_the_betrayer);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 29471, 27526 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* target = GetTarget();
+        Unit* victim = eventInfo.GetActionTarget();
+
+        if (target->IsAlive())
+            target->CastSpell(target, 29471, true, nullptr, aurEff);
+        if (victim && victim->IsAlive())
+            target->CastSpell(victim, 27526, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_black_bow_of_the_betrayer::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5905,4 +6173,13 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_bm_off);
     RegisterSpellScript(spell_gen_whisper_to_controller);
     RegisterSpellScript(spell_gen_vampiric_touch);
+    // Boss and item proc scripts
+    RegisterSpellScript(spell_gen_petrified_bark);
+    RegisterSpellScript(spell_gen_earth_shield_toc);
+    RegisterSpellScript(spell_gen_retaliation_toc);
+    RegisterSpellScript(spell_gen_overlords_brand);
+    RegisterSpellScript(spell_gen_overlords_brand_dot);
+    RegisterSpellScript(spell_gen_vampiric_might);
+    RegisterSpellScript(spell_gen_mirrored_soul);
+    RegisterSpellScript(spell_gen_black_bow_of_the_betrayer);
 }

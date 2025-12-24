@@ -80,7 +80,8 @@ enum PriestProcSpells
     SPELL_PRIEST_BLESSED_HEALING                    = 70772,
     SPELL_PRIEST_SHADOW_WORD_DEATH_R1               = 32379,
     SPELL_PRIEST_MIND_BLAST_R1                      = 8092,
-    SPELL_PRIEST_MIND_FLAY_DAMAGE                   = 58381
+    SPELL_PRIEST_MIND_FLAY_DAMAGE                   = 58381,
+    SPELL_PRIEST_BLESSED_RECOVERY_R1                = 27813
 };
 
 enum Mics
@@ -1357,6 +1358,42 @@ class spell_pri_t10_heal_2p_bonus : public AuraScript
     }
 };
 
+// -27811 - Blessed Recovery
+class spell_pri_blessed_recovery : public AuraScript
+{
+    PrepareAuraScript(spell_pri_blessed_recovery);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PRIEST_BLESSED_RECOVERY_R1 });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        DamageInfo* dmgInfo = eventInfo.GetDamageInfo();
+        if (!dmgInfo || !dmgInfo->GetDamage())
+            return;
+
+        Unit* target = eventInfo.GetActionTarget();
+        uint32 triggerSpell = sSpellMgr->GetSpellWithRank(SPELL_PRIEST_BLESSED_RECOVERY_R1, aurEff->GetSpellInfo()->GetRank());
+        SpellInfo const* triggerInfo = sSpellMgr->AssertSpellInfo(triggerSpell);
+
+        int32 bp = CalculatePct(static_cast<int32>(dmgInfo->GetDamage()), aurEff->GetAmount());
+
+        ASSERT(triggerInfo->GetMaxTicks() > 0);
+        bp /= triggerInfo->GetMaxTicks();
+
+        target->CastCustomSpell(target, triggerSpell, &bp, nullptr, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pri_blessed_recovery::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
@@ -1388,6 +1425,7 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_improved_shadowform);
     // Proc system scripts
     RegisterSpellScript(spell_pri_aq_3p_bonus);
+    RegisterSpellScript(spell_pri_blessed_recovery);
     RegisterSpellScript(spell_pri_imp_shadowform);
     RegisterSpellScript(spell_pri_improved_spirit_tap);
     RegisterSpellScript(spell_pri_item_t6_trinket);

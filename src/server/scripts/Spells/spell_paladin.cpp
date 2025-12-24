@@ -110,6 +110,7 @@ enum PaladinSpellIcons
 // Proc system triggered spell IDs
 enum PaladinProcSpells
 {
+    SPELL_PALADIN_ILLUMINATION_ENERGIZE          = 20272,
     SPELL_PALADIN_JUDGEMENTS_OF_THE_WISE_MANA    = 31930,
     SPELL_PALADIN_REPLENISHMENT                  = 57669,
     SPELL_PALADIN_RIGHTEOUS_VENGEANCE_DOT        = 61840,
@@ -1973,6 +1974,50 @@ private:
     bool _isVengeance = true;
 };
 
+// -20234 - Illumination
+class spell_pal_illumination : public AuraScript
+{
+    PrepareAuraScript(spell_pal_illumination);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_PALADIN_HOLY_SHOCK_R1_HEALING,
+            SPELL_PALADIN_ILLUMINATION_ENERGIZE,
+            SPELL_PALADIN_HOLY_SHOCK_R1
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        // this script is valid only for the Holy Shock procs of illumination
+        if (eventInfo.GetHealInfo() && eventInfo.GetHealInfo()->GetSpellInfo())
+        {
+            SpellInfo const* originalSpell = nullptr;
+
+            // if proc comes from the Holy Shock heal, need to get mana cost of original spell - else it's the original heal itself
+            if (eventInfo.GetHealInfo()->GetSpellInfo()->SpellFamilyFlags[1] & 0x00010000)
+                originalSpell = sSpellMgr->GetSpellInfo(sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1, eventInfo.GetHealInfo()->GetSpellInfo()->GetRank()));
+            else
+                originalSpell = eventInfo.GetHealInfo()->GetSpellInfo();
+
+            if (originalSpell && aurEff->GetSpellInfo())
+            {
+                Unit* target = eventInfo.GetActor(); // Paladin is the target of the energize
+                int32 bp = CalculatePct(static_cast<int32>(originalSpell->CalcPowerCost(target, originalSpell->GetSchoolMask())), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+                target->CastCustomSpell(target, SPELL_PALADIN_ILLUMINATION_ENERGIZE, &bp, nullptr, nullptr, true, nullptr, aurEff);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pal_illumination::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_pal_seal_of_command, spell_pal_seal_of_command_aura);
@@ -2021,4 +2066,5 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_improved_lay_of_hands);
     RegisterSpellScript(spell_pal_judgements_of_the_just);
     RegisterSpellScript(spell_pal_sacred_shield_dummy);
+    RegisterSpellScript(spell_pal_illumination);
 }

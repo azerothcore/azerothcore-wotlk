@@ -50,7 +50,8 @@ enum RogueSpells
     SPELL_ROGUE_QUICK_RECOVERY_ENERGY           = 31663,
     SPELL_ROGUE_TURN_THE_TABLES_R1              = 52910,
     SPELL_ROGUE_TURN_THE_TABLES_R2              = 52914,
-    SPELL_ROGUE_TURN_THE_TABLES_R3              = 52915
+    SPELL_ROGUE_TURN_THE_TABLES_R3              = 52915,
+    SPELL_ROGUE_OVERKILL_TRIGGERED              = 58427
 };
 
 enum RogueSpellIcons
@@ -957,6 +958,28 @@ class spell_rog_turn_the_tables_proc : public AuraScript
     }
 };
 
+// 58426 - Overkill
+class spell_rog_overkill : public AuraScript
+{
+    PrepareAuraScript(spell_rog_overkill);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_OVERKILL_TRIGGERED });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_ROGUE_OVERKILL_TRIGGERED, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_overkill::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -984,4 +1007,5 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_setup);
     RegisterSpellScript(spell_rog_turn_the_tables);
     RegisterSpellScript(spell_rog_turn_the_tables_proc);
+    RegisterSpellScript(spell_rog_overkill);
 }

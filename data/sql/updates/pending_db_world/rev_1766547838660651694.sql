@@ -1,9 +1,18 @@
 -- QAston Proc System - Base spell_proc entries
 -- Port from TrinityCore QAston proc system commits
 
--- Add DisableEffectsMask column to spell_proc table
-ALTER TABLE `spell_proc`
-ADD COLUMN IF NOT EXISTS `DisableEffectsMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesMask`;
+-- Add DisableEffectsMask column to spell_proc table if it doesn't exist
+DROP PROCEDURE IF EXISTS add_disable_effects_mask;
+DELIMITER //
+CREATE PROCEDURE add_disable_effects_mask()
+BEGIN
+    IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'spell_proc' AND column_name = 'DisableEffectsMask') THEN
+        ALTER TABLE `spell_proc` ADD COLUMN `DisableEffectsMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesMask`;
+    END IF;
+END //
+DELIMITER ;
+CALL add_disable_effects_mask();
+DROP PROCEDURE IF EXISTS add_disable_effects_mask;
 
 -- Charge drop on spell cast
 DELETE FROM `spell_proc` WHERE `SpellId` IN (17941, 18820, 22008, 28200, 31834, 32216, 34477, 34936, 44401, 48108, 51124, 54741, 57761, 64823);
@@ -259,7 +268,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 
 -- Add spellscripts to spells previously on giant switches in Unit.cpp
 DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_rog_t10_2p_bonus';
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_sha_flametongue_weapon','spell_mage_imp_blizzard','spell_warr_deep_wounds_aura','spell_rog_setup','spell_pri_improved_spirit_tap','spell_sha_imp_water_shield','spell_warl_improved_drain_soul','spell_pal_improved_lay_of_hands','spell_pal_heart_of_the_crusader','spell_warl_seed_of_corruption_dummy','spell_mage_magic_absorption','spell_warr_extra_proc','spell_warr_second_wind','spell_warl_soul_leech','spell_sha_lightning_overload','spell_rog_quick_recovery','spell_mage_arcane_potency','spell_mage_empowered_fire','spell_pal_spiritual_attunement','spell_pal_divine_purpose','spell_pal_judgements_of_the_wise','spell_hun_thrill_of_the_hunt','spell_mage_missile_barrage','spell_mage_hot_streak','spell_warr_sword_and_board','spell_pri_imp_shadowform','spell_dk_butchery','spell_item_unstable_power','spell_item_restless_strength','spell_dru_leader_of_the_pack','spell_pri_aq_3p_bonus','spell_item_persistent_shield','spell_dru_revitalize','spell_dk_death_rune','spell_dk_scent_of_blood_trigger','spell_dk_vendetta','spell_dk_sudden_doom','spell_dk_blade_barrier','spell_dk_rime','spell_dk_wandering_plague','spell_sha_astral_shift_aura','spell_dk_necrosis','spell_sha_static_shock','spell_sha_maelstrom_weapon','spell_sha_ancestral_awakening','spell_rog_deadly_brew','spell_rog_turn_the_tables','spell_rog_cut_to_the_chase','spell_pet_guard_dog','spell_hun_rapid_recuperation_trigger','spell_hun_hunting_party','spell_pal_righteous_vengeance','spell_pal_sheath_of_light','spell_pal_infusion_of_light','spell_pal_judgements_of_the_just','spell_mage_burning_determination','spell_warr_improved_spell_reflection','spell_pet_culling_the_herd','spell_pet_silverback','spell_warl_decimation','spell_sha_frozen_power','spell_pri_body_and_soul','spell_dk_threat_of_thassarian','spell_warl_seduction','spell_mage_combustion','spell_pri_vampiric_embrace','spell_dru_omen_of_clarity','spell_item_alchemists_stone','spell_pal_judgement_of_light_heal','spell_pal_judgement_of_wisdom_mana','spell_twisted_reflection','spell_dru_t3_2p_bonus','spell_dru_t3_8p_bonus','spell_dru_t3_6p_bonus','spell_pal_t3_6p_bonus','spell_pri_t3_4p_bonus','spell_sha_t3_6p_bonus','spell_warr_t3_prot_8p_bonus','spell_item_healing_touch_refund','spell_item_totem_of_flowing_water','spell_item_pendant_of_the_violet_eye','spell_sha_shamanistic_rage','spell_pal_seal_of_vengeance','spell_warl_seed_of_corruption_generic','spell_mark_of_malice','spell_item_mark_of_conquest','spell_sha_windfury_weapon','spell_dru_t4_2p_bonus','spell_pri_t5_heal_2p_bonus','spell_anetheron_vampiric_aura','spell_item_frozen_shadoweave','spell_item_aura_of_madness','spell_pri_item_t6_trinket','spell_dru_item_t6_trinket','spell_sha_item_t6_trinket','spell_pal_item_t6_trinket','spell_item_crystal_spire_of_karabor','spell_item_dementia','spell_item_pet_healing','spell_warl_t4_2p_bonus_shadow','spell_warl_t4_2p_bonus_fire','spell_mage_gen_extra_effects','spell_uk_second_wind','spell_item_commendation_of_kaelthas','spell_item_sunwell_exalted_caster_neck','spell_item_sunwell_exalted_melee_neck','spell_item_sunwell_exalted_tank_neck','spell_item_sunwell_exalted_healer_neck','spell_warl_glyph_of_corruption_nightfall','spell_dk_mark_of_blood','spell_dk_dancing_rune_weapon','spell_dk_unholy_blight','spell_dk_hungering_cold','spell_item_soul_harvesters_charm','spell_rog_turn_the_tables_proc','spell_pal_sacred_shield_dummy','spell_warl_demonic_pact','spell_pal_seal_of_corruption','spell_dru_glyph_of_rejuvenation','spell_dru_glyph_of_shred','spell_dru_glyph_of_rake','spell_dru_glyph_of_innervate','spell_dru_glyph_of_starfire_dummy','spell_pal_glyph_of_holy_light_dummy','spell_pal_glyph_of_divinity','spell_sha_tidal_force_dummy','spell_sha_glyph_of_healing_wave','spell_pri_glyph_of_dispel_magic','spell_mage_glyph_of_ice_block','spell_mage_glyph_of_icy_veins','spell_mage_glyph_of_polymorph','spell_rog_glyph_of_backstab','spell_hun_glyph_of_mend_pet','spell_pri_shadowfiend_death','spell_warr_glyph_of_blocking','spell_dk_glyph_of_scourge_strike','spell_sha_spirit_hunt','spell_hun_kill_command_pet','spell_item_swift_hand_justice_dummy','spell_item_discerning_eye_beast_dummy','spell_mage_imp_mana_gems','spell_gen_vampiric_touch','spell_dk_pvp_4p_bonus','spell_dk_glyph_of_death_grip','spell_dru_savage_defense','spell_sha_glyph_of_earth_shield','spell_sha_glyph_of_totem_of_wrath','spell_warl_glyph_of_life_tap','spell_pal_t8_2p_bonus','spell_sha_t8_elemental_4p_bonus','spell_xt002_321_boombot_aura','spell_sha_t9_elemental_4p_bonus','spell_item_purified_shard_of_the_scale','spell_item_shiny_shard_of_the_scale','spell_dru_t10_balance_4p_bonus','spell_dru_t10_restoration_4p_bonus_dummy','spell_pri_t10_heal_2p_bonus','spell_sha_t10_restoration_4p_bonus','spell_sha_t10_elemental_4p_bonus','spell_warr_item_t10_prot_4p_bonus','spell_item_tiny_abomination_in_a_jar','spell_item_tiny_abomination_in_a_jar_hero','spell_item_deadly_precision_dummy','spell_item_deadly_precision','spell_item_heartpierce','spell_item_heartpierce_hero','spell_item_deathbringers_will_normal','spell_item_deathbringers_will_heroic','spell_item_corpse_tongue_coin','spell_item_corpse_tongue_coin_heroic','spell_putricide_ooze_tank_protection','spell_deathbringer_blood_beast_blood_link','spell_item_petrified_twilight_scale','spell_item_petrified_twilight_scale_heroic');
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_sha_flametongue_weapon','spell_mage_imp_blizzard','spell_warr_deep_wounds_aura','spell_rog_setup','spell_pri_improved_spirit_tap','spell_sha_imp_water_shield','spell_warl_improved_drain_soul','spell_pal_improved_lay_of_hands','spell_pal_heart_of_the_crusader','spell_warl_seed_of_corruption_dummy','spell_mage_magic_absorption','spell_warr_extra_proc','spell_warr_second_wind','spell_warl_soul_leech','spell_sha_lightning_overload','spell_rog_quick_recovery','spell_mage_arcane_potency','spell_mage_empowered_fire','spell_pal_spiritual_attunement','spell_pal_divine_purpose','spell_pal_judgements_of_the_wise','spell_hun_thrill_of_the_hunt','spell_mage_missile_barrage','spell_mage_hot_streak','spell_warr_sword_and_board','spell_pri_imp_shadowform','spell_dk_butchery','spell_item_unstable_power','spell_item_restless_strength','spell_dru_leader_of_the_pack','spell_pri_aq_3p_bonus','spell_item_persistent_shield','spell_dru_revitalize','spell_dk_death_rune','spell_dk_scent_of_blood_trigger','spell_dk_vendetta','spell_dk_sudden_doom','spell_dk_blade_barrier','spell_dk_rime','spell_dk_wandering_plague','spell_sha_astral_shift_aura','spell_dk_necrosis','spell_sha_static_shock','spell_sha_maelstrom_weapon','spell_sha_ancestral_awakening','spell_rog_deadly_brew','spell_rog_turn_the_tables','spell_rog_cut_to_the_chase','spell_pet_guard_dog','spell_hun_rapid_recuperation_trigger','spell_hun_hunting_party','spell_pal_righteous_vengeance','spell_pal_sheath_of_light','spell_pal_infusion_of_light','spell_pal_judgements_of_the_just','spell_mage_burning_determination','spell_warr_improved_spell_reflection','spell_pet_culling_the_herd','spell_pet_silverback','spell_warl_decimation','spell_sha_frozen_power','spell_pri_body_and_soul','spell_dk_threat_of_thassarian','spell_warl_seduction','spell_mage_combustion','spell_pri_vampiric_embrace','spell_dru_omen_of_clarity','spell_item_alchemists_stone','spell_pal_judgement_of_light_heal','spell_pal_judgement_of_wisdom_mana','spell_twisted_reflection','spell_dru_t3_2p_bonus','spell_dru_t3_8p_bonus','spell_dru_t3_6p_bonus','spell_pal_t3_6p_bonus','spell_pri_t3_4p_bonus','spell_sha_t3_6p_bonus','spell_warr_t3_prot_8p_bonus','spell_item_healing_touch_refund','spell_item_totem_of_flowing_water','spell_item_pendant_of_the_violet_eye','spell_sha_shamanistic_rage','spell_pal_seal_of_vengeance','spell_warl_seed_of_corruption_generic','spell_mark_of_malice','spell_item_mark_of_conquest','spell_sha_windfury_weapon','spell_dru_t4_2p_bonus','spell_pri_t5_heal_2p_bonus','spell_anetheron_vampiric_aura','spell_item_frozen_shadoweave','spell_item_aura_of_madness','spell_pri_item_t6_trinket','spell_dru_item_t6_trinket','spell_sha_item_t6_trinket','spell_pal_item_t6_trinket','spell_item_crystal_spire_of_karabor','spell_item_dementia','spell_item_pet_healing','spell_warl_t4_2p_bonus_shadow','spell_warl_t4_2p_bonus_fire','spell_mage_gen_extra_effects','spell_uk_second_wind','spell_item_commendation_of_kaelthas','spell_item_sunwell_exalted_caster_neck','spell_item_sunwell_exalted_melee_neck','spell_item_sunwell_exalted_tank_neck','spell_item_sunwell_exalted_healer_neck','spell_warl_glyph_of_corruption_nightfall','spell_dk_mark_of_blood','spell_dk_dancing_rune_weapon','spell_dk_unholy_blight','spell_dk_hungering_cold','spell_item_soul_harvesters_charm','spell_rog_turn_the_tables_proc','spell_pal_sacred_shield_dummy','spell_warl_demonic_pact','spell_pal_seal_of_corruption','spell_dru_glyph_of_rejuvenation','spell_dru_glyph_of_shred','spell_dru_glyph_of_rake','spell_dru_glyph_of_innervate','spell_dru_glyph_of_starfire_dummy','spell_pal_glyph_of_holy_light_dummy','spell_pal_glyph_of_divinity','spell_sha_tidal_force_dummy','spell_sha_glyph_of_healing_wave','spell_pri_glyph_of_dispel_magic','spell_mage_glyph_of_ice_block','spell_mage_glyph_of_icy_veins','spell_mage_glyph_of_polymorph','spell_rog_glyph_of_backstab','spell_hun_glyph_of_mend_pet','spell_pri_shadowfiend_death','spell_warr_glyph_of_blocking','spell_dk_glyph_of_scourge_strike','spell_sha_spirit_hunt','spell_hun_kill_command_pet','spell_item_swift_hand_justice_dummy','spell_item_discerning_eye_beast_dummy','spell_mage_imp_mana_gems','spell_gen_vampiric_touch','spell_dk_pvp_4p_bonus','spell_dk_glyph_of_death_grip','spell_dru_savage_defense','spell_sha_glyph_of_earth_shield','spell_sha_glyph_of_totem_of_wrath','spell_warl_glyph_of_life_tap','spell_pal_t8_2p_bonus','spell_sha_t8_elemental_4p_bonus','spell_xt002_321_boombot_aura','spell_sha_t9_elemental_4p_bonus','spell_item_purified_shard_of_the_scale','spell_item_shiny_shard_of_the_scale','spell_dru_t10_balance_4p_bonus','spell_dru_t10_restoration_4p_bonus_dummy','spell_pri_t10_heal_2p_bonus','spell_sha_t10_restoration_4p_bonus','spell_sha_t10_elemental_4p_bonus','spell_warr_item_t10_prot_4p_bonus','spell_item_tiny_abomination_in_a_jar','spell_item_tiny_abomination_in_a_jar_hero','spell_item_deadly_precision_dummy','spell_item_deadly_precision','spell_item_heartpierce','spell_item_heartpierce_hero','spell_item_deathbringers_will_normal','spell_item_deathbringers_will_heroic','spell_item_corpse_tongue_coin','spell_item_corpse_tongue_coin_heroic','spell_putricide_ooze_tank_protection','spell_deathbringer_blood_beast_blood_link','spell_item_petrified_twilight_scale','spell_item_petrified_twilight_scale_heroic','spell_pri_blessed_recovery','spell_mage_blazing_speed','spell_hun_piercing_shots','spell_pal_illumination','spell_rog_overkill','spell_dru_maim_interrupt','spell_gen_petrified_bark','spell_gen_earth_shield_toc','spell_gen_retaliation_toc','spell_gen_overlords_brand','spell_gen_overlords_brand_dot','spell_gen_vampiric_might','spell_gen_mirrored_soul','spell_gen_black_bow_of_the_betrayer','spell_dk_glyph_of_scourge_strike_script');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (-10400, 'spell_sha_flametongue_weapon'),
 (-11185, 'spell_mage_imp_blizzard'),
@@ -323,6 +332,23 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (-62764, 'spell_pet_silverback'),
 (-63156, 'spell_warl_decimation'),
 (-63373, 'spell_sha_frozen_power'),
+(-27811, 'spell_pri_blessed_recovery'),
+(-31641, 'spell_mage_blazing_speed'),
+(-53234, 'spell_hun_piercing_shots'),
+(-20234, 'spell_pal_illumination'),
+(58426,  'spell_rog_overkill'),
+(44835,  'spell_dru_maim_interrupt'),
+(62337,  'spell_gen_petrified_bark'),
+(62933,  'spell_gen_petrified_bark'),
+(67534,  'spell_gen_earth_shield_toc'),
+(65932,  'spell_gen_retaliation_toc'),
+(69172,  'spell_gen_overlords_brand'),
+(69173,  'spell_gen_overlords_brand_dot'),
+(70674,  'spell_gen_vampiric_might'),
+(69023,  'spell_gen_mirrored_soul'),
+(27522,  'spell_gen_black_bow_of_the_betrayer'),
+(40336,  'spell_gen_black_bow_of_the_betrayer'),
+(46939,  'spell_gen_black_bow_of_the_betrayer'),
 (-64127, 'spell_pri_body_and_soul'),
 (-65661, 'spell_dk_threat_of_thassarian'),
 (6358,   'spell_warl_seduction'),
@@ -378,12 +404,11 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 
 (37377,  'spell_warl_t4_2p_bonus_shadow'),
 (39437,  'spell_warl_t4_2p_bonus_fire'),
+(42770,  'spell_uk_second_wind'),
 
 (44401,  'spell_mage_gen_extra_effects'),
 (48108,  'spell_mage_gen_extra_effects'),
 (57761,  'spell_mage_gen_extra_effects'),
-
-(42770,  'spell_uk_second_wind'),
 (45057,  'spell_item_commendation_of_kaelthas'),
 (45481,  'spell_item_sunwell_exalted_caster_neck'),
 (45482,  'spell_item_sunwell_exalted_melee_neck'),
@@ -429,6 +454,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (57989,  'spell_pri_shadowfiend_death'),
 (58375,  'spell_warr_glyph_of_blocking'),
 (58642,  'spell_dk_glyph_of_scourge_strike'),
+(69961,  'spell_dk_glyph_of_scourge_strike_script'),
 (58877,  'spell_sha_spirit_hunt'),
 (58914,  'spell_hun_kill_command_pet'),
 (59906,  'spell_item_swift_hand_justice_dummy'),
@@ -1119,3 +1145,590 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (18094, 'spell_warl_nightfall'),               -- Nightfall Rank 1
 (18095, 'spell_warl_nightfall'),               -- Nightfall Rank 2
 (56218, 'spell_warl_nightfall');               -- Glyph of Corruption
+
+-- ============================================================================
+-- Phase 2: Migrate spell_proc_event entries with non-default values to spell_proc
+-- These 68 entries have procFlags, ppmRate, customChance, or Cooldown set
+-- ============================================================================
+
+-- First delete any existing entries that might conflict
+DELETE FROM `spell_proc` WHERE `SpellId` IN (
+    -31641, -16689, -16086, 4524, 9452, 15257, 15331, 15332, 16372, 21747,
+    24256, 26016, 27539, 27997, 28460, 29307, 31221, 31222, 31223, 33511,
+    33522, 35399, 37565, 38319, 40303, 42760, 43730, 43983, 44546, 44548,
+    44549, 44835, 45278, 45396, 45398, 45444, 46102, 49027, 49542, 49543,
+    50871, 52881, 54404, 55610, 55717, 56845, 57351, 58426, 59887, 59888,
+    59889, 59890, 59891, 60617, 62337, 62933, 64764, 64936, 66865, 66889,
+    67530, 70871, 71567, 71604, 72256, 72673, 72674, 72675
+);
+
+-- Insert migrated entries from spell_proc_event
+-- Schema: SpellId, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2,
+--         ProcFlags, SpellTypeMask, SpellPhaseMask, HitMask, AttributesMask, ProcsPerMinute, Chance, Cooldown, Charges
+INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
+-- Blazing Speed (Mage) - procFlags=680 (TAKEN_MELEE_AUTO_ATTACK|TAKEN_DAMAGE)
+(-31641,  0, 0, 0x00000000, 0x00000000, 0x00000000,     680, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Shadow Weaving (Priest) - Cooldown=1000
+(-16689,  0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,  1000, 0),
+-- Improved Mend Pet (Hunter) - procFlags=196608 (KILL|DONE_TRAP_ACTIVATION)
+(-16086,  0, 0, 0x00000000, 0x00000000, 0x00000000,  196608, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Cure Ailments (Pet) - procFlags=1048576 (TAKEN_SPELL_MAGIC_DMG_CLASS)
+(4524,    0, 0, 0x00000000, 0x00000000, 0x00000000, 1048576, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Duelist's Riposte - ppmRate=3.0
+(9452,    0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 3,   0,     0, 0),
+-- Shadow Weaving Rank 1 - procFlags=327680 (DONE_SPELL_MAGIC_DMG_CLASS), customChance=33
+(15257,   0, 0, 0x00000000, 0x00000000, 0x00000000,  327680, 0x0, 0x0, 0, 0x0, 0,  33,     0, 0),
+-- Shadow Weaving Rank 2 - procFlags=327680, customChance=66
+(15331,   0, 0, 0x00000000, 0x00000000, 0x00000000,  327680, 0x0, 0x0, 0, 0x0, 0,  66,     0, 0),
+-- Shadow Weaving Rank 3 - procFlags=327680, customChance=100
+(15332,   0, 0, 0x00000000, 0x00000000, 0x00000000,  327680, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Ancestral Fortitude (Shaman) - procFlags=131072, customChance=100
+(16372,   0, 0, 0x00000000, 0x00000000, 0x00000000,  131072, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Fiery Core - procFlags=20, ppmRate=20.0, Cooldown=50000
+(21747,   0, 0, 0x00000000, 0x00000000, 0x00000000,      20, 0x0, 0x0, 0, 0x0,20,   0, 50000, 0),
+-- Blessing of the Claw - Cooldown=240000 (4 min)
+(24256,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,240000, 0),
+-- Thorn Shield - ppmRate=2.0
+(26016,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 2,   0,     0, 0),
+-- Thick Chitin - Cooldown=10000
+(27539,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 10000, 0),
+-- Bloodgorged - Cooldown=50000
+(27997,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 50000, 0),
+-- Monstrous Vitality - Cooldown=5000
+(28460,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,  5000, 0),
+-- Arcane Power (Boss) - procFlags=4, customChance=100
+(29307,   0, 0, 0x00000000, 0x00000000, 0x00000000,       4, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Master of Subtlety Rank 1 - procFlags=1024
+(31221,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Master of Subtlety Rank 2 - procFlags=1024
+(31222,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Master of Subtlety Rank 3 - procFlags=1024
+(31223,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Zandalarian Hero Charm - Cooldown=17000
+(33511,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 17000, 0),
+-- Idol of the Raven Goddess - Cooldown=25000
+(33522,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 25000, 0),
+-- Inspiration (Priest) - procFlags=131072
+(35399,   0, 0, 0x00000000, 0x00000000, 0x00000000,  131072, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Blessing of the Onyx Serpent - procFlags=16384
+(37565,   0, 0, 0x00000000, 0x00000000, 0x00000000,   16384, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Thundering Rage - Cooldown=50000
+(38319,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 50000, 0),
+-- Ashtongue Talisman of Acumen - Cooldown=1000
+(40303,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,  1000, 0),
+-- Focused Assault - procFlags=245966, customChance=20
+(42760,   0, 0, 0x00000000, 0x00000000, 0x00000000,  245966, 0x0, 0x0, 0, 0x0, 0,  20,     0, 0),
+-- Spirit Wolf - Cooldown=8000
+(43730,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,  8000, 0),
+-- Enchant Cloak - Steelweave - procFlags=81920, customChance=100, Cooldown=600
+(43983,   0, 0, 0x00000000, 0x00000000, 0x00000000,   81920, 0x0, 0x0, 0, 0x0, 0, 100,   600, 0),
+-- Brain Freeze Rank 1 - procFlags=69632, customChance=5, Cooldown=3000
+(44546,   0, 0, 0x00000000, 0x00000000, 0x00000000,   69632, 0x0, 0x0, 0, 0x0, 0,   5,  3000, 0),
+-- Brain Freeze Rank 2 - procFlags=69632, customChance=10, Cooldown=3000
+(44548,   0, 0, 0x00000000, 0x00000000, 0x00000000,   69632, 0x0, 0x0, 0, 0x0, 0,  10,  3000, 0),
+-- Brain Freeze Rank 3 - procFlags=69632, customChance=15, Cooldown=3000
+(44549,   0, 0, 0x00000000, 0x00000000, 0x00000000,   69632, 0x0, 0x0, 0, 0x0, 0,  15,  3000, 0),
+-- Maim Interrupt - procFlags=16
+(44835,   0, 0, 0x00000000, 0x00000000, 0x00000000,      16, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Improved Water Shield - procFlags=82944
+(45278,   0, 0, 0x00000000, 0x00000000, 0x00000000,   82944, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Blessed Book of Nagrand - Cooldown=45000
+(45396,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 45000, 0),
+-- Memento of Tyrande - Cooldown=45000
+(45398,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 45000, 0),
+-- Tome of the Lightbringer - Cooldown=45000
+(45444,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 45000, 0),
+-- Forked Lightning - procFlags=81920
+(46102,   0, 0, 0x00000000, 0x00000000, 0x00000000,   81920, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Wandering Plague Rank 1 - customChance=3, Cooldown=20000
+(49027,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   3, 20000, 0),
+-- Wandering Plague Rank 2 - customChance=6, Cooldown=20000
+(49542,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   6, 20000, 0),
+-- Wandering Plague Rank 3 - customChance=9, Cooldown=20000
+(49543,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   9, 20000, 0),
+-- Divine Storm - customChance=100
+(50871,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Blade Warding - Cooldown=12000
+(52881,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 12000, 0),
+-- Rapid Killing - customChance=100
+(54404,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Imp Devotion - procFlags=4096
+(55610,   0, 0, 0x00000000, 0x00000000, 0x00000000,    4096, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Berserking - Cooldown=5000
+(55717,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,  5000, 0),
+-- Glyph of Scourge Strike - procFlags=2097152
+(56845,   0, 0, 0x00000000, 0x00000000, 0x00000000, 2097152, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Fel Vitality - procFlags=1782780
+(57351,   0, 0, 0x00000000, 0x00000000, 0x00000000, 1782780, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Overkill - procFlags=1024
+(58426,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Frostfire Orb Rank 1 - procFlags=87040
+(59887,   0, 0, 0x00000000, 0x00000000, 0x00000000,   87040, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Frostfire Orb Rank 2 - procFlags=87040
+(59888,   0, 0, 0x00000000, 0x00000000, 0x00000000,   87040, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Frostfire Orb Rank 3 - procFlags=87040
+(59889,   0, 0, 0x00000000, 0x00000000, 0x00000000,   87040, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Frostfire Orb Rank 4 - procFlags=87040
+(59890,   0, 0, 0x00000000, 0x00000000, 0x00000000,   87040, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Frostfire Orb Rank 5 - procFlags=87040
+(59891,   0, 0, 0x00000000, 0x00000000, 0x00000000,   87040, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Rage of Thassarian - customChance=100
+(60617,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Petrified Bark (Normal) - procFlags=40
+(62337,   0, 0, 0x00000000, 0x00000000, 0x00000000,      40, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Petrified Bark (Heroic) - procFlags=40
+(62933,   0, 0, 0x00000000, 0x00000000, 0x00000000,      40, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Dying Curse - Cooldown=50000
+(64764,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 50000, 0),
+-- Glyph of Scourge Strike - procFlags=69632, customChance=100
+(64936,   0, 0, 0x00000000, 0x00000000, 0x00000000,   69632, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Talisman of the Forsaken City - customChance=35, Cooldown=3000
+(66865,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,  35,  3000, 0),
+-- Mana Shield - procFlags=4, customChance=100
+(66889,   0, 0, 0x00000000, 0x00000000, 0x00000000,       4, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Thorns - procFlags=40, Cooldown=5000
+(67530,   0, 0, 0x00000000, 0x00000000, 0x00000000,      40, 0x0, 0x0, 0, 0x0, 0,   0,  5000, 0),
+-- Devious Minds - procFlags=69972, customChance=100
+(70871,   0, 0, 0x00000000, 0x00000000, 0x00000000,   69972, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
+-- Mutated Plague - Cooldown=250
+(71567,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,   250, 0),
+-- Deathbringer's Will Normal - customChance=100, Cooldown=10000
+(71604,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100, 10000, 0),
+-- Crimson Scourge - procFlags=4
+(72256,   0, 0, 0x00000000, 0x00000000, 0x00000000,       4, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- Deathbringer's Will Heroic 1 - customChance=100, Cooldown=10000
+(72673,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100, 10000, 0),
+-- Deathbringer's Will Heroic 2 - customChance=100, Cooldown=10000
+(72674,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100, 10000, 0),
+-- Deathbringer's Will Heroic 3 - customChance=100, Cooldown=10000
+(72675,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100, 10000, 0)
+;
+
+-- Additional spell_proc entries from TrinityCore (missing in AzerothCore)
+-- These entries provide refined proc configuration from TC's spell_proc table
+DELETE FROM `spell_proc` WHERE `SpellId` IN (-59887,-53583,-51682,-49200,-47230,-31226,-30482,-16689,-14143,-12317,-11103,-7302,-7001,-1120,-588,-168,4341,5118,12043,12328,13159,13234,16166,17116,17670,18708,20911,21084,23591,32065,35321,36659,37604,38363,39215,40816,41350,45092,48504,50871,50908,53257,53515,53651,53817,57529,57531,58501,60617,63057,63849,70656,70904,71567,71571,71573,71865,71868,71993,72059,75490,75495);
+INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `DisableEffectsMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
+-- Negative SpellId entries (applies to all spell ranks)
+(-59887,  0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x1,     0, 0x0, 0, 0,   0,     0, 0), -- Frostfire Orb (all ranks)
+(-53583,  0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x0, 0, 0,   0,     0, 0), -- Swift Retribution (all ranks)
+(-51682,  0,  8, 0x00000000, 0x00080000, 0x00000000,       0, 0x4, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Rogue Deadly Brew (all ranks)
+(-49200,126,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x2, 0, 0,   0,     0, 0), -- Dispersion (all ranks)
+(-47230,  0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Fel Synergy (all ranks)
+(-31226,  0,  8, 0x00000000, 0x00080000, 0x00000000,       0, 0x5, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Rogue Deadly Poison (all ranks)
+(-30482,  0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,  1027, 0x2, 0, 0,   0,     0, 0), -- Molten Shields (all ranks)
+(-16689,  0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x0, 0, 0,   0,  1000, 0), -- Nature's Grasp (all ranks)
+(-14143,  0,  8, 0x47046286, 0x00200000, 0x00000000,       0, 0x1, 0x2,     0, 0x8, 0, 0,   0,     0, 0), -- Rogue Relentless Strikes (all ranks)
+(-12317,  0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Enrage (all ranks)
+(-11103,  0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x0, 0, 0,   0,     0, 0), -- World in Flames (all ranks)
+(-7302,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,  1027, 0x2, 0, 0,   0,     0, 0), -- Frost Armor (all ranks)
+(-7001,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x2, 0, 0,   0,     0, 0), -- Lightwell Renew (all ranks)
+(-1120,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x1, 3, 0,   0,     0, 0), -- Drain Soul (all ranks)
+(-588,    0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Inner Fire (all ranks)
+(-168,    0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,  1027, 0x2, 0, 0,   0,     0, 0), -- Frost Armor (all ranks)
+-- Positive SpellId entries (specific spells)
+(4341,    0,  0, 0x00000000, 0x00000000, 0x00000000,    4096, 0x1, 0x1,     0, 0x0, 0, 0,   0,     0, 0), -- Flame Buffet
+(5118,    0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x2, 0, 0,   0,     0, 0), -- Aspect of the Cheetah
+(12043,   0,  3, 0x61400035, 0x00001000, 0x00000000,       0, 0x7, 0x1,     0, 0x8, 0, 0,   0,     0, 0), -- Presence of Mind
+(12328,   0,  4, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Sweeping Strikes
+(13159,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x2, 0, 0,   0,     0, 0), -- Aspect of the Pack
+(13234,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,  1027, 0x2, 0, 0,   0,     0, 0), -- Magic Resistance
+(16166,   0, 11, 0x00000003, 0x00001000, 0x00000000,       0, 0x7, 0x1,     0, 0x8, 0, 0,   0,     0, 0), -- Elemental Mastery
+(17116,   0,  7, 0x10000861, 0x02000020, 0x00008000,       0, 0x7, 0x1,     0, 0x8, 0, 0,   0,     0, 0), -- Nature's Swiftness
+(17670,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0, 1, 0,   0,     0, 0), -- Argent Dawn Commission
+(18708,   0,  5, 0x20000000, 0x00000000, 0x00000000,       0, 0x0, 0x1,     0, 0x8, 0, 0,   0,     0, 0), -- Fel Domination
+(20911,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,   112, 0x0, 0, 0,   0,     0, 0), -- Blessing of Sanctuary
+(21084,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Seal of Righteousness
+(23591,   0, 10, 0x00800000, 0x00000000, 0x00000000,      16, 0x0, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Reckoning
+(32065,   0,  0, 0x00000000, 0x00000000, 0x00000000,  524288, 0x1, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Fungal Decay
+(35321,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Gust of Wind
+(36659,   0,  0, 0x00000000, 0x00000000, 0x00000000,  524288, 0x1, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Tail Lash
+(37604,   0,  6, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0, 0, 0,   0,     0, 0), -- Primal Blessing
+(38363,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Gust of Wind
+(39215,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Gust of Wind
+(40816,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0, 0, 0,   0,  7000, 0), -- Saber Lash
+(41350,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Aura of Desire
+(45092,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0, 0, 0,   0,     0, 0), -- Faction, Spar Buddy
+(48504,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x2, 0, 0,   0,     0, 0), -- Living Seed
+(50871,   0,  9, 0x00000000, 0x40000000, 0x00000000,       0, 0x1, 0x2,     2, 0x0, 0, 0,   0,     0, 0), -- Brutal Gladiator's War Edge
+(50908,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0, 2, 0,   0,  4000, 0), -- Serpent-Coil Braid
+(53257,   0,  9, 0x00000000, 0x10000000, 0x00000000,      16, 0x1, 0x2,     2, 0x8, 0, 0,   0,     0, 0), -- Cobra Strikes
+(53515,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x3, 0x2,     0, 0x0, 0, 0,   0,     0, 0), -- Divine Aegis
+(53651,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x0,     0, 0x2, 0, 0,   0,     0, 0), -- Beacon of Light
+(53817,   0, 11, 0x000001C3, 0x00008000, 0x00000000,       0, 0x0, 0x1,     0, 0x8, 0, 0,   0,     0, 0), -- Maelstrom Weapon
+(57529,   0,  3, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x1,     0, 0x0, 0, 0,   0,     0, 0), -- Arcane Potency (Rank 1 trigger)
+(57531,   0,  3, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x1,     0, 0x0, 0, 0,   0,     0, 0), -- Arcane Potency (Rank 2 trigger)
+(58501,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0, 4, 0,   0, 30000, 0), -- Soul Fire (TC)
+(63057,   0,  7, 0x00000000, 0x00040000, 0x00000000,   16384, 0x0, 0x2,     0, 0x0, 0, 0,   0,     0, 0), -- Nourish
+(63849,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0, 2, 0,   0,     0, 0), -- Hand of Salvation
+(70656,   0, 15, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x1,     0, 0x0, 0, 0,   0,     0, 0), -- Blood Strike (trigger)
+(70904,   0,  6, 0x00000000, 0x00000000, 0x00000800,    2048, 0x4, 0x0,     0, 0x0, 0, 0,   0,  1000, 0), -- Shadow Word: Pain (trigger)
+(71571,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Gutripper (Normal)
+(71573,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Gutripper (Heroic)
+(71865,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Unbound Plague
+(71868,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Unbound Plague (Heroic)
+(71993,   0,  0, 0x00000000, 0x00000000, 0x00000000,       4, 0x0, 0x0, 12287, 0x0, 0, 0,   0,  3000, 0), -- Deathwhisper Necromancer
+(72059,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,  1027, 0x2, 0, 0,   0,     0, 0), -- Frost Damage Immunity
+(75490,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Frostfire Orb
+(75495,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x2,     0, 0x2, 0, 0,   0,     0, 0); -- Frostfire Orb
+
+
+-- Sync spell_proc values from TrinityCore
+-- SpellFamilyName, SpellFamilyMask, SchoolMask differences
+UPDATE `spell_proc` SET `SpellFamilyName`=3, `SpellFamilyMask0`=0, `SpellFamilyMask1`=34, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=-31571;
+UPDATE `spell_proc` SET `SpellFamilyName`=0, `SpellFamilyMask0`=0, `SpellFamilyMask1`=0, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=-29441;
+UPDATE `spell_proc` SET `SpellFamilyName`=8, `SpellFamilyMask0`=1107296782, `SpellFamilyMask1`=2, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=-14186;
+UPDATE `spell_proc` SET `SpellFamilyName`=8, `SpellFamilyMask0`=1191182854, `SpellFamilyMask1`=2097152, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=-14143;
+UPDATE `spell_proc` SET `SpellFamilyName`=6, `SpellFamilyMask0`=41984016, `SpellFamilyMask1`=9218, `SpellFamilyMask2`=8, `SchoolMask`=32 WHERE `SpellId`=15286;
+UPDATE `spell_proc` SET `SpellFamilyName`=7, `SpellFamilyMask0`=268436065, `SpellFamilyMask1`=33554464, `SpellFamilyMask2`=32768, `SchoolMask`=0 WHERE `SpellId`=17116;
+UPDATE `spell_proc` SET `SpellFamilyName`=0, `SpellFamilyMask0`=2416967683, `SpellFamilyMask1`=0, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=26119;
+UPDATE `spell_proc` SET `SpellFamilyName`=3, `SpellFamilyMask0`=0, `SpellFamilyMask1`=0, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=44401;
+UPDATE `spell_proc` SET `SpellFamilyName`=5, `SpellFamilyMask0`=357, `SpellFamilyMask1`=131264, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=54274;
+UPDATE `spell_proc` SET `SpellFamilyName`=5, `SpellFamilyMask0`=357, `SpellFamilyMask1`=131264, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=54276;
+UPDATE `spell_proc` SET `SpellFamilyName`=5, `SpellFamilyMask0`=357, `SpellFamilyMask1`=131264, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=54277;
+UPDATE `spell_proc` SET `SpellFamilyName`=3, `SpellFamilyMask0`=0, `SpellFamilyMask1`=16384, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=56374;
+UPDATE `spell_proc` SET `SpellFamilyName`=0, `SpellFamilyMask0`=0, `SpellFamilyMask1`=0, `SpellFamilyMask2`=0, `SchoolMask`=4 WHERE `SpellId`=71756;
+UPDATE `spell_proc` SET `SpellFamilyName`=3, `SpellFamilyMask0`=0, `SpellFamilyMask1`=1048576, `SpellFamilyMask2`=0, `SchoolMask`=0 WHERE `SpellId`=71761;
+UPDATE `spell_proc` SET `SpellFamilyName`=0, `SpellFamilyMask0`=0, `SpellFamilyMask1`=0, `SpellFamilyMask2`=0, `SchoolMask`=4 WHERE `SpellId`=72782;
+UPDATE `spell_proc` SET `SpellFamilyName`=0, `SpellFamilyMask0`=0, `SpellFamilyMask1`=0, `SpellFamilyMask2`=0, `SchoolMask`=4 WHERE `SpellId`=72783;
+UPDATE `spell_proc` SET `SpellFamilyName`=0, `SpellFamilyMask0`=0, `SpellFamilyMask1`=0, `SpellFamilyMask2`=0, `SchoolMask`=4 WHERE `SpellId`=72784;
+
+-- SpellTypeMask, SpellPhaseMask, AttributesMask, Cooldown, HitMask, ProcFlags, Chance sync from TrinityCore
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=100, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-63730;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=64, `Chance`=0 WHERE `SpellId`=-61846;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=8259, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-58872;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=16, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-57878;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=5800, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-56636;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=4, `AttributesMask`=2, `Cooldown`=22000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-56342;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=100, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-54639;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-53569;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-53486;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-53380;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-53290;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=2, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-52127;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-51940;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-51634;
+UPDATE `spell_proc` SET `SpellTypeMask`=5, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-51625;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-51521;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-50880;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-49217;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=100, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-49208;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-49182;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=20000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-49027;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-48988;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=-48539;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-47516;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-47509;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=-47245;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-47195;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-46867;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-46854;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-45234;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=6000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-44557;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=8, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-44449;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-41635;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-34950;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=8000, `HitMask`=1027, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-34935;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=1, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-34753;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-34500;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-33881;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=6000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-33150;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-33142;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-31656;
+UPDATE `spell_proc` SET `SpellTypeMask`=7, `SpellPhaseMask`=4, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=16384, `Chance`=0 WHERE `SpellId`=-31571;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=664232, `Chance`=100 WHERE `SpellId`=-30701;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=500, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-30160;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-29723;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=8, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-29074;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-20049;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=-19572;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=4, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-19184;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=6000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-18094;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-16958;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-16257;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-16256;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-14892;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=500, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-14186;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=64, `Chance`=0 WHERE `SpellId`=-13165;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-12319;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-11213;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=3, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-11180;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=8, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-10400;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=2, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-974;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=2, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=-324;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=8, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=1719;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=256, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=7383;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=6000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=7434;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=12, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=12536;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=20000, `HitMask`=16, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=13163;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=5000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=15088;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=15286;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=2000, `HitMask`=0, `ProcFlags`=0, `Chance`=2 WHERE `SpellId`=15600;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=500, `HitMask`=2, `ProcFlags`=65536, `Chance`=0 WHERE `SpellId`=16164;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=12, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=16246;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=16620;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=12, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=16870;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=17364;
+UPDATE `spell_proc` SET `SpellTypeMask`=7, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=34816, `Chance`=0 WHERE `SpellId`=17619;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=1, `AttributesMask`=8, `Cooldown`=0, `HitMask`=0, `ProcFlags`=65536, `Chance`=0 WHERE `SpellId`=17941;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=20164;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=20165;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=20166;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=20375;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=20784;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=1000, `HitMask`=64, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=22618;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=120000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=22648;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=23552;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=1000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=23572;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=23578;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=23581;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=23686;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=23689;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=24353;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=25669;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=16, `Chance`=0 WHERE `SpellId`=26135;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=26480;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=27656;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=27774;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=28716;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=28752;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=28845;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29150;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29501;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29624;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29625;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29626;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29632;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29633;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29634;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29635;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29636;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29637;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=30823;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32734;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=35000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32837;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32844;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=33297;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=340, `Chance`=0 WHERE `SpellId`=33510;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=33648;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=279552, `Chance`=0 WHERE `SpellId`=33953;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34074;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34320;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34355;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34584;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34586;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34598;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=20000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34774;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=4000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34827;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=35077;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=35080;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=35083;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=35086;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=35121;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=36111;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37170;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37173;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37213;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=40000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37247;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37381;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37600;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37603;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37655;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=2500, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=37657;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=256, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=38026;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=120000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=38164;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=38290;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=15000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=38299;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=38334;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=38350;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=38394;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=39027;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=1, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=39442;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=39443;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=40000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=39958;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=40438;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=40475;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=40478;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=40482;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=8000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=40899;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=15000, `HitMask`=32, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=41393;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=41434;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=41989;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=42083;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=90000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=42135;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=90000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=42136;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=10000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=43748;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=43750;
+UPDATE `spell_proc` SET `SpellTypeMask`=5, `SpellPhaseMask`=1, `AttributesMask`=8, `Cooldown`=0, `HitMask`=0, `ProcFlags`=69632, `Chance`=0 WHERE `SpellId`=44401;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=7 WHERE `SpellId`=44543;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=15 WHERE `SpellId`=44545;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=15000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=45054;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=45057;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=45354;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=45355;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=45481;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=45482;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=45483;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=16384, `Chance`=0 WHERE `SpellId`=45484;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=46569;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=25000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=46662;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=15000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=46832;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=4, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=46916;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=10000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=48833;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=10000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=48837;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=2000, `HitMask`=0, `ProcFlags`=139944, `Chance`=0 WHERE `SpellId`=49222;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=8528552, `Chance`=0 WHERE `SpellId`=49592;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=49622;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=4, `AttributesMask`=8, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=49796;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=4, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=50240;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=4, `AttributesMask`=8, `Cooldown`=0, `HitMask`=0, `ProcFlags`=65552, `Chance`=0 WHERE `SpellId`=51124;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=4, `AttributesMask`=0, `Cooldown`=1000, `HitMask`=2, `ProcFlags`=0, `Chance`=33 WHERE `SpellId`=51698;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=4, `AttributesMask`=0, `Cooldown`=1000, `HitMask`=2, `ProcFlags`=0, `Chance`=66 WHERE `SpellId`=51700;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=4, `AttributesMask`=0, `Cooldown`=1000, `HitMask`=2, `ProcFlags`=0, `Chance`=100 WHERE `SpellId`=51701;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=10000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=52020;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=52420;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=32, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=52423;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=4, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=16, `Chance`=0 WHERE `SpellId`=52437;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=6000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=52898;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=53397;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=5000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=53646;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54278;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54646;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54695;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54707;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54754;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54808;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=2500, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54841;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=54909;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=40000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=55380;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=55440;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=55640;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=55689;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=55747;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=55000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=55776;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=6000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=56218;
+UPDATE `spell_proc` SET `SpellTypeMask`=4, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2049, `ProcFlags`=65536, `Chance`=0 WHERE `SpellId`=56375;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=56451;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=500, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=56821;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=57345;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=57351;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=57870;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=57907;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=58442;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=5000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=58444;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=58901;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=6000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=59176;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=59345;
+UPDATE `spell_proc` SET `SpellTypeMask`=5, `SpellPhaseMask`=1, `AttributesMask`=2, `Cooldown`=35000, `HitMask`=0, `ProcFlags`=69648, `Chance`=0 WHERE `SpellId`=59630;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=294912, `Chance`=0 WHERE `SpellId`=60061;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60066;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60170;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=60176;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60221;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60301;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60306;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60317;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60436;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60442;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60473;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=15000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60487;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60519;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60529;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60770;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=60826;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=61188;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=61356;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=61618;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=62114;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=62115;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=63251;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=63280;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=279552, `Chance`=0 WHERE `SpellId`=64411;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=279552, `Chance`=0 WHERE `SpellId`=64415;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=32, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64440;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64738;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=15000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64752;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64786;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64792;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64824;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64860;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64867;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64890;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=64914;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=65002;
+UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=81920, `Chance`=0 WHERE `SpellId`=65007;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=65013;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=65020;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=65025;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67151;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=15000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67209;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=8000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67353;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=5000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67356;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=6000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67361;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=8000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67363;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=8000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67365;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=9000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67379;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=9000, `HitMask`=0, `ProcFlags`=16, `Chance`=0 WHERE `SpellId`=67392;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67653;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=8388948, `Chance`=0 WHERE `SpellId`=67672;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67702;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=2000, `HitMask`=2, `ProcFlags`=69632, `Chance`=0 WHERE `SpellId`=67712;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=2000, `HitMask`=2, `ProcFlags`=69632, `Chance`=0 WHERE `SpellId`=67758;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=67771;
+UPDATE `spell_proc` SET `SpellTypeMask`=7, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=69739;
+UPDATE `spell_proc` SET `SpellTypeMask`=7, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=69755;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=256, `Cooldown`=100, `HitMask`=0, `ProcFlags`=87040, `Chance`=0 WHERE `SpellId`=69762;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3000, `HitMask`=16, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70188;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70664;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=12287, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70672;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70727;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70730;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=4, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70803;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70811;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70841;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=70854;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71174;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71176;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71178;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71198;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71402;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71404;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=50 WHERE `SpellId`=71406;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71540;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=50 WHERE `SpellId`=71545;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71585;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=65536, `Chance`=0 WHERE `SpellId`=71602;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=100000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71606;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71634;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=100000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71637;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71640;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=65536, `Chance`=0 WHERE `SpellId`=71645;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71756;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71770;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=71903;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=0, `Chance`=10 WHERE `SpellId`=72413;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=327680, `Chance`=0 WHERE `SpellId`=72417;
+UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=60000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=72419;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=12287, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=72455;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=72782;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=72783;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=72784;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=12287, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=72832;
+UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=0, `HitMask`=12287, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=72833;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=75455;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=75457;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=75465;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=75474;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=75475;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=75481;
+
+-- Missing TC spell_proc entries
+DELETE FROM `spell_proc` WHERE `SpellId` IN (60617, 71567);
+INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `DisableEffectsMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
+(60617, 0, 0, 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0), -- Unknown (proc on absorb)
+(71567, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 250, 0); -- ICC buff (heal proc)
+
+-- Fix duplicate entries (remove positive when negative already covers all ranks)
+DELETE FROM `spell_proc` WHERE `SpellId` IN (9452, 44546, 49027, 59887);
+
+-- Fix entries with Charges too high
+UPDATE `spell_proc` SET `Charges`=0 WHERE `SpellId`=62933;

@@ -77,7 +77,8 @@ enum HunterSpells
     SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS        = 57894,
     SPELL_HUNTER_KILL_COMMAND_HUNTER                = 34026,
     SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1         = 56654,
-    SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2         = 58882
+    SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2         = 58882,
+    SPELL_HUNTER_PIERCING_SHOTS                     = 63468
 };
 
 enum HunterSpellIcons
@@ -1609,6 +1610,48 @@ class spell_hun_rapid_recuperation_trigger : public AuraScript
     }
 };
 
+// -53234 - Piercing Shots
+class spell_hun_piercing_shots : public AuraScript
+{
+    PrepareAuraScript(spell_hun_piercing_shots);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_PIERCING_SHOTS });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActionTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        DamageInfo* dmgInfo = eventInfo.GetDamageInfo();
+        if (!dmgInfo || !dmgInfo->GetDamage())
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetActionTarget();
+
+        SpellInfo const* piercingShots = sSpellMgr->AssertSpellInfo(SPELL_HUNTER_PIERCING_SHOTS);
+        int32 bp = CalculatePct(static_cast<int32>(dmgInfo->GetDamage()), aurEff->GetAmount());
+
+        ASSERT(piercingShots->GetMaxTicks() > 0);
+        bp /= piercingShots->GetMaxTicks();
+
+        caster->CastCustomSpell(target, SPELL_HUNTER_PIERCING_SHOTS, &bp, nullptr, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_piercing_shots::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hun_piercing_shots::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1647,5 +1690,6 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_glyph_of_mend_pet);
     // Proc system scripts
     RegisterSpellScript(spell_hun_kill_command_pet);
+    RegisterSpellScript(spell_hun_piercing_shots);
     RegisterSpellScript(spell_hun_rapid_recuperation_trigger);
 }

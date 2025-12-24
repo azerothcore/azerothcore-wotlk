@@ -60,6 +60,7 @@ enum DruidSpells
     SPELL_DRUID_ENRAGE                      = 5229,
     SPELL_DRUID_ENRAGED_DEFENSE             = 70725,
     SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS     = 70726,
+    SPELL_DRUID_MAIM_INTERRUPT              = 32747,
     SPELL_DRUID_MOONGLADE_2P_BONUS          = 37286,
     // Proc system spells
     SPELL_DRUID_GLYPH_OF_INNERVATE_MANA     = 54833,
@@ -1819,6 +1820,28 @@ class spell_dru_t10_restoration_4p_bonus_dummy : public AuraScript
     }
 };
 
+// 44835 - Maim Interrupt
+class spell_dru_maim_interrupt : public AuraScript
+{
+    PrepareAuraScript(spell_dru_maim_interrupt);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_MAIM_INTERRUPT });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_DRUID_MAIM_INTERRUPT, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_maim_interrupt::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_druid_spell_scripts()
 {
     RegisterSpellScript(spell_dru_bear_form_passive);
@@ -1870,4 +1893,5 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_glyph_of_shred);
     RegisterSpellScript(spell_dru_glyph_of_starfire_dummy);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus_dummy);
+    RegisterSpellScript(spell_dru_maim_interrupt);
 }
