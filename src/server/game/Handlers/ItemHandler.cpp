@@ -872,6 +872,11 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     if (uint32 pause = vendor->GetMovementTemplate().GetInteractionPauseTimer())
         vendor->PauseMovement(pause);
 
+    // Update home position for patrolling NPCs only (prevents drift for stationary NPCs)
+    if (vendor->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ||
+        vendor->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
+        vendor->SetHomePosition(vendor->GetPosition());
+
     SetCurrentVendor(vendorEntry);
 
     VendorItemData const* items = vendorEntry ? sObjectMgr->GetNpcVendorItemList(vendorEntry) : vendor->GetVendorItems();
