@@ -2148,47 +2148,55 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
     AddProcCooldown(procEntry->Cooldown);
 }
 
-bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo) const
+uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo) const
 {
     SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId());
     // only auras with spell proc entry can trigger proc
     if (!procEntry)
-        return false;
+        return 0;
 
     // check if we have charges to proc with
     if (IsUsingCharges() && !GetCharges())
-        return false;
+        return 0;
 
     // check proc cooldown
     if (IsProcOnCooldown())
-        return false;
-
-    /// @todo:
-    // something about triggered spells triggering, and add extra attack effect
+        return 0;
 
     // do checks against db data
     if (!sSpellMgr->CanSpellTriggerProcOnEvent(*procEntry, eventInfo))
-        return false;
+        return 0;
 
     // do checks using conditions table
     ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_SPELL_PROC, GetId());
     ConditionSourceInfo condInfo = ConditionSourceInfo(eventInfo.GetActor(), eventInfo.GetActionTarget());
     if (!sConditionMgr->IsObjectMeetToConditions(condInfo, conditions))
-        return false;
+        return 0;
 
     // AuraScript Hook
     bool check = const_cast<Aura*>(this)->CallScriptCheckProcHandlers(aurApp, eventInfo);
     if (!check)
-        return false;
+        return 0;
 
-    /// @todo:
-    // do allow additional requirements for procs
-    // this is needed because this is the last moment in which you can prevent aura charge drop on proc
-    // and possibly a way to prevent default checks (if there're going to be any)
+    // At least one effect has to pass checks to proc aura
+    uint8 procEffectMask = aurApp->GetEffectMask();
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (AuraEffect* aurEff = GetEffect(i))
+        {
+            if (procEffectMask & (1 << i))
+            {
+                if (!aurEff->CheckEffectProc(aurApp, eventInfo))
+                    procEffectMask &= ~(1 << i);
+            }
+        }
+    }
+
+    if (!procEffectMask)
+        return 0;
 
     // Check if current equipment meets aura requirements
     // do that only for passive spells
-    /// @todo: this needs to be unified for all kinds of auras
     Unit* target = aurApp->GetTarget();
     if (IsPassive() && target->IsPlayer() && GetSpellInfo()->EquippedItemClass != -1)
     {
@@ -2198,7 +2206,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             if (GetSpellInfo()->EquippedItemClass == ITEM_CLASS_WEAPON)
             {
                 if (target->ToPlayer()->IsInFeralForm())
-                    return false;
+                    return 0;
 
                 if (DamageInfo const* damageInfo = eventInfo.GetDamageInfo())
                 {
@@ -2223,13 +2231,14 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             }
 
             if (!item || item->IsBroken() || !item->IsFitToSpellRequirements(GetSpellInfo()))
-            {
                 return 0;
-            }
         }
     }
 
-    return roll_chance_f(CalcProcChance(*procEntry, eventInfo));
+    if (roll_chance_f(CalcProcChance(*procEntry, eventInfo)))
+        return procEffectMask;
+
+    return 0;
 }
 
 float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const
@@ -2252,17 +2261,29 @@ float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& event
     return chance;
 }
 
-void Aura::TriggerProcOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+void Aura::TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
-    CallScriptProcHandlers(aurApp, eventInfo);
+    bool prevented = CallScriptProcHandlers(aurApp, eventInfo);
+    if (!prevented)
+    {
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (!(procEffectMask & (1 << i)))
+                continue;
 
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        if (aurApp->HasEffect(i))
             // OnEffectProc / AfterEffectProc hooks handled in AuraEffect::HandleProc()
-            GetEffect(i)->HandleProc(aurApp, eventInfo);
+            if (aurApp->HasEffect(i))
+                GetEffect(i)->HandleProc(aurApp, eventInfo);
+        }
 
-    CallScriptAfterProcHandlers(aurApp, eventInfo);
+        CallScriptAfterProcHandlers(aurApp, eventInfo);
+    }
 
+    ConsumeProcCharges(sSpellMgr->GetSpellProcEntry(GetId()));
+}
+
+void Aura::ConsumeProcCharges(SpellProcEntry const* procEntry)
+{
     // Remove aura if we've used last charge to proc
     if (IsUsingCharges() && !GetCharges())
         Remove();
@@ -2568,6 +2589,12 @@ bool Aura::CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventI
     }
 
     return result;
+}
+
+bool Aura::CallScriptCheckEffectProcHandlers(AuraEffect const* /*aurEff*/, AuraApplication const* /*aurApp*/, ProcEventInfo& /*eventInfo*/) const
+{
+    // AC doesn't have CheckEffectProc hooks yet - just return true to allow all effects
+    return true;
 }
 
 bool Aura::CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)

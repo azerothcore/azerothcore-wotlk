@@ -36,6 +36,7 @@
 
 enum WarlockSpells
 {
+    SPELL_WARLOCK_SHADOW_TRANCE                     = 17941,
     SPELL_WARLOCK_DRAIN_SOUL_R1                     = 1120,
     SPELL_WARLOCK_CREATE_SOULSHARD                  = 43836,
     SPELL_WARLOCK_CURSE_OF_DOOM_EFFECT              = 18662,
@@ -77,6 +78,16 @@ enum WarlockSpells
     SPELL_WARLOCK_PET_VOID_STAR_TALISMAN            = 37386, // Void Star Talisman
     SPELL_WARLOCK_DEMONIC_PACT_PROC                 = 48090,
     SPELL_WARLOCK_GLYPH_OF_VOIDWALKER               = 56247,
+    SPELL_WARLOCK_GLYPH_OF_LIFE_TAP_TRIGGERED       = 63321,
+    SPELL_WARLOCK_SOUL_LEECH_HEAL                   = 30294,
+    SPELL_WARLOCK_IMP_SOUL_LEECH_R1                 = 54117,
+    SPELL_WARLOCK_SOUL_LEECH_PET_MANA_1             = 54607,
+    SPELL_WARLOCK_SOUL_LEECH_PET_MANA_2             = 59118,
+    SPELL_WARLOCK_SOUL_LEECH_CASTER_MANA_1          = 54300,
+    SPELL_WARLOCK_SOUL_LEECH_CASTER_MANA_2          = 59117,
+    SPELL_WARLOCK_SHADOWFLAME_PROC                  = 37378,
+    SPELL_WARLOCK_FLAMESHADOW_PROC                  = 37379,
+    SPELL_REPLENISHMENT                             = 57669,
 };
 
 enum WarlockSpellIcons
@@ -1458,6 +1469,341 @@ class spell_warl_demonic_pact_aura : public AuraScript
     }
 };
 
+// 18094, 18095 - Nightfall
+// 56218 - Glyph of Corruption
+class spell_warl_nightfall : public AuraScript
+{
+    PrepareAuraScript(spell_warl_nightfall);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_SHADOW_TRANCE });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SHADOW_TRANCE, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_nightfall::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -63156 - Decimation
+class spell_warl_decimation : public AuraScript
+{
+    PrepareAuraScript(spell_warl_decimation);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            if (eventInfo.GetActionTarget()->HasAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, spellInfo, eventInfo.GetActor()))
+                return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warl_decimation::CheckProc);
+    }
+};
+
+// 54909, 53646 - Demonic Pact
+class spell_warl_demonic_pact : public AuraScript
+{
+    PrepareAuraScript(spell_warl_demonic_pact);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_PACT_PROC });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (Unit* owner = eventInfo.GetActor()->GetOwner())
+        {
+            if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
+            {
+                int32 bp = static_cast<int32>((aurEff->GetAmount() * owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) + 100.0f) / 100.0f);
+                owner->CastCustomSpell(owner, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, nullptr, true, nullptr, aurEff);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warl_demonic_pact::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warl_demonic_pact::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 63320 - Glyph of Life Tap
+class spell_warl_glyph_of_life_tap : public AuraScript
+{
+    PrepareAuraScript(spell_warl_glyph_of_life_tap);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_GLYPH_OF_LIFE_TAP_TRIGGERED });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        Unit* caster = GetTarget();
+        caster->CastSpell(caster, SPELL_WARLOCK_GLYPH_OF_LIFE_TAP_TRIGGERED, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_glyph_of_life_tap::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 18213, 18372 - Improved Drain Soul (proc handler)
+class spell_warl_improved_drain_soul : public AuraScript
+{
+    PrepareAuraScript(spell_warl_improved_drain_soul);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_WARLOCK_DRAIN_SOUL_R1,
+            SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1,
+            SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // Make sure that dying unit is afflicted by the caster's Drain Soul debuff
+        Unit* caster = eventInfo.GetActor();
+        Unit* victim = eventInfo.GetActionTarget();
+        return victim->GetAuraApplicationOfRankedSpell(SPELL_WARLOCK_DRAIN_SOUL_R1, caster->GetGUID()) != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+        // Improved Drain Soul
+        Aura const* impDrainSoul = caster->GetAuraOfRankedSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1, caster->GetGUID());
+        if (!impDrainSoul)
+            return;
+
+        int32 amount = CalculatePct(caster->GetMaxPower(POWER_MANA), impDrainSoul->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+        caster->CastCustomSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC, SPELLVALUE_BASE_POINT0, amount, caster, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warl_improved_drain_soul::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warl_improved_drain_soul::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// -27243 - Seed of Corruption (proc handler)
+class spell_warl_seed_of_corruption_dummy : public AuraScript
+{
+    PrepareAuraScript(spell_warl_seed_of_corruption_dummy);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1 });
+    }
+
+    void CalculateBuffer(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        amount = caster->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE, aurEff->GetEffIndex());
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 amount = aurEff->GetAmount() - damageInfo->GetDamage();
+        if (amount > 0)
+        {
+            const_cast<AuraEffect*>(aurEff)->SetAmount(amount);
+            if (!GetTarget()->HealthBelowPctDamaged(1, damageInfo->GetDamage()))
+                return;
+        }
+
+        Remove();
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        uint32 spellId = sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank());
+        caster->CastSpell(eventInfo.GetActionTarget(), spellId, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_seed_of_corruption_dummy::CalculateBuffer, EFFECT_1, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_dummy::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// 32863, 36123, 38252, 39367, 44141, 70388 - Seed of Corruption (generic)
+class spell_warl_seed_of_corruption_generic : public AuraScript
+{
+    PrepareAuraScript(spell_warl_seed_of_corruption_generic);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 amount = aurEff->GetAmount() - damageInfo->GetDamage();
+        if (amount > 0)
+        {
+            const_cast<AuraEffect*>(aurEff)->SetAmount(amount);
+            return;
+        }
+
+        Remove();
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        caster->CastSpell(eventInfo.GetActionTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_generic::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// -30293 - Soul Leech
+class spell_warl_soul_leech : public AuraScript
+{
+    PrepareAuraScript(spell_warl_soul_leech);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_WARLOCK_SOUL_LEECH_HEAL,
+            SPELL_WARLOCK_IMP_SOUL_LEECH_R1,
+            SPELL_WARLOCK_SOUL_LEECH_PET_MANA_1,
+            SPELL_WARLOCK_SOUL_LEECH_PET_MANA_2,
+            SPELL_WARLOCK_SOUL_LEECH_CASTER_MANA_1,
+            SPELL_WARLOCK_SOUL_LEECH_CASTER_MANA_2,
+            SPELL_REPLENISHMENT
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        static uint32 const casterMana[2] = { SPELL_WARLOCK_SOUL_LEECH_CASTER_MANA_1, SPELL_WARLOCK_SOUL_LEECH_CASTER_MANA_2 };
+        static uint32 const petMana[2]    = { SPELL_WARLOCK_SOUL_LEECH_PET_MANA_1,    SPELL_WARLOCK_SOUL_LEECH_PET_MANA_2    };
+
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        int32 healAmount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
+        caster->CastCustomSpell(SPELL_WARLOCK_SOUL_LEECH_HEAL, SPELLVALUE_BASE_POINT0, healAmount, caster, true, nullptr, aurEff);
+
+        // Improved Soul Leech code below
+        AuraEffect const* impSoulLeech = GetTarget()->GetAuraEffectOfRankedSpell(SPELL_WARLOCK_IMP_SOUL_LEECH_R1, EFFECT_1, aurEff->GetCasterGUID());
+        if (!impSoulLeech)
+            return;
+
+        uint8 impSoulLeechRank = impSoulLeech->GetSpellInfo()->GetRank();
+        uint32 selfSpellId = casterMana[impSoulLeechRank - 1];
+        uint32 petSpellId = petMana[impSoulLeechRank - 1];
+
+        caster->CastSpell(nullptr, selfSpellId, true, nullptr, aurEff);
+        caster->CastSpell(nullptr, petSpellId, true, nullptr, aurEff);
+
+        if (roll_chance_i(impSoulLeech->GetAmount()))
+            caster->CastSpell(nullptr, SPELL_REPLENISHMENT, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_soul_leech::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 37377 - Shadowflame (T4 2P fire)
+class spell_warl_t4_2p_bonus_fire : public AuraScript
+{
+    PrepareAuraScript(spell_warl_t4_2p_bonus_fire);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_SHADOWFLAME_PROC });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SHADOWFLAME_PROC, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_t4_2p_bonus_fire::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 39437 - Shadowflame Hellfire and RoF (T4 2P shadow)
+class spell_warl_t4_2p_bonus_shadow : public AuraScript
+{
+    PrepareAuraScript(spell_warl_t4_2p_bonus_shadow);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_FLAMESHADOW_PROC });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_FLAMESHADOW_PROC, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_t4_2p_bonus_shadow::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
@@ -1493,4 +1839,15 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_voidwalker_pet_passive);
     RegisterSpellScript(spell_warl_demonic_pact_aura);
+    RegisterSpellScript(spell_warl_nightfall);
+    RegisterSpellScriptWithArgs(spell_warl_nightfall, "spell_warl_glyph_of_corruption_nightfall");
+    RegisterSpellScript(spell_warl_decimation);
+    RegisterSpellScript(spell_warl_demonic_pact);
+    RegisterSpellScript(spell_warl_glyph_of_life_tap);
+    RegisterSpellScript(spell_warl_improved_drain_soul);
+    RegisterSpellScript(spell_warl_seed_of_corruption_dummy);
+    RegisterSpellScript(spell_warl_seed_of_corruption_generic);
+    RegisterSpellScript(spell_warl_soul_leech);
+    RegisterSpellScript(spell_warl_t4_2p_bonus_fire);
+    RegisterSpellScript(spell_warl_t4_2p_bonus_shadow);
 }
