@@ -3977,6 +3977,10 @@ void Unit::_UpdateAutoRepeatSpell()
 
         // Reset attack
         resetAttackTimer(RANGED_ATTACK);
+
+        // Blizzlike: Reset melee swing timers when performing ranged attack
+        resetAttackTimer(BASE_ATTACK);
+        resetAttackTimer(OFF_ATTACK);
     }
 }
 
