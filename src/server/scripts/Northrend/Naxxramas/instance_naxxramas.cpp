@@ -651,7 +651,9 @@ public:
                 return CreatureTalk(DATA_BARON_RIVENDARE_BOSS, SAY_HORSEMEN_DIALOG2);
             case EVENT_FROSTWYRM_WATERFALL_DOOR:
                 SetGoState(DATA_SAPPHIRON_GATE, GO_STATE_ACTIVE);
-                return _events.ScheduleEvent(EVENT_KELTHUZAD_LICH_KING_TALK1, 5s);
+                if (GetBossState(BOSS_KELTHUZAD) != DONE)
+                    _events.ScheduleEvent(EVENT_KELTHUZAD_LICH_KING_TALK1, 5s);
+                break;
             case EVENT_KELTHUZAD_LICH_KING_TALK1:
                 CreatureTalk(DATA_KELTHUZAD_BOSS, SAY_SAPP_DIALOG1);
                 return _events.ScheduleEvent(EVENT_KELTHUZAD_LICH_KING_TALK2, 10s);
