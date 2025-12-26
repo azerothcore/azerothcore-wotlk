@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -30,7 +30,7 @@
 #include "Util.h"
 #include "World.h"
 
-static Rates const qualityToRate[MAX_ITEM_QUALITY] =
+ServerConfigs const qualityToRate[] =
 {
     RATE_DROP_ITEM_POOR,                                    // ITEM_QUALITY_POOR
     RATE_DROP_ITEM_NORMAL,                                  // ITEM_QUALITY_NORMAL
@@ -322,8 +322,9 @@ bool LootStoreItem::Roll(bool rate, Player const* player, Loot& loot, LootStore 
         return roll_chance_f(_chance * (rate ? sWorld->getRate(RATE_DROP_ITEM_REFERENCED) : 1.0f));
 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
-
-    float qualityModifier = pProto && rate ? sWorld->getRate(qualityToRate[pProto->Quality]) : 1.0f;
+    float qualityModifier = 1.0f;
+    if (pProto && pProto->Quality < ITEM_QUALITY_HEIRLOOM && rate)
+        qualityModifier = sWorld->getRate(qualityToRate[pProto->Quality]);
 
     return roll_chance_f(_chance * qualityModifier);
 }

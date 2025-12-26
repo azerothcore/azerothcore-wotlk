@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -51,7 +51,21 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
         Movement::MoveSplineInit init(creature);
         init.MoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ());
-        init.SetWalk(true);
+
+        bool walk = true;
+        switch (creature->GetMovementTemplate().GetRandom())
+        {
+            case CreatureRandomMovementType::CanRun:
+                walk = creature->IsWalking();
+                break;
+            case CreatureRandomMovementType::AlwaysRun:
+                walk = false;
+                break;
+            default:
+                break;
+        }
+
+        init.SetWalk(walk);
         init.Launch();
         if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
             creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), 0);
@@ -270,7 +284,6 @@ template<>
 void RandomMovementGenerator<Creature>::DoFinalize(Creature* creature)
 {
     creature->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
-    creature->SetWalk(false);
 }
 
 template<>

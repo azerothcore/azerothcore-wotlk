@@ -1,30 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Felwood
-SD%Complete: 95
-SDComment: Quest support: 4101, 4102
-SDCategory: Felwood
-EndScriptData */
-
-/* ContentData
-npcs_riverbreeze_and_silversky
-EndContentData */
 
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
@@ -36,17 +25,29 @@ EndContentData */
 ## npcs_riverbreeze_and_silversky
 ######*/
 
-#define GOSSIP_ITEM_BEACON  "Please make me a Cenarion Beacon"
-
 enum RiverbreezeAndSilversky
 {
     SPELL_CENARION_BEACON       = 15120,
+    ITEM_CENARION_BEACON        = 11511,
+    ACTION_CREATE_CENARION_BEACON = GOSSIP_ACTION_INFO_DEF + 1,
 
     NPC_ARATHANDRIS_SILVERSKY   = 9528,
     NPC_MAYBESS_RIVERBREEZE     = 9529,
 
     QUEST_CLEASING_FELWOOD_A    = 4101,
-    QUEST_CLEASING_FELWOOD_H    = 4102
+    QUEST_CLEASING_FELWOOD_H    = 4102,
+
+    // Texts
+    GOSSIP_MENU_SILVERSKY = 2208,
+    GOSSIP_MENU_RIVERBREEZE = 21400,
+    GOSSIP_OPTION_BEACON = 0,
+
+    TEXT_SILVERSKY_1 = 2848,
+    TEXT_SILVERSKY_2 = 2845,
+    TEXT_SILVERSKY_3 = 2844,
+    TEXT_RIVERBREEZE_1 = 2849,
+    TEXT_RIVERBREEZE_2 = 2843,
+    TEXT_RIVERBREEZE_3 = 2842,
 };
 
 class npcs_riverbreeze_and_silversky : public CreatureScript
@@ -70,32 +71,36 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        uint32 creatureId = creature->GetEntry();
+        uint32 const creatureId = creature->GetEntry();
 
         if (creatureId == NPC_ARATHANDRIS_SILVERSKY)
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_A))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 2848, creature->GetGUID());
+                if (!player->HasItemCount(ITEM_CENARION_BEACON, 1, true))
+                   AddGossipItemFor(player, GOSSIP_MENU_SILVERSKY, GOSSIP_OPTION_BEACON, GOSSIP_SENDER_MAIN, ACTION_CREATE_CENARION_BEACON);
+
+                SendGossipMenuFor(player, TEXT_SILVERSKY_1, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_HORDE)
-                SendGossipMenuFor(player, 2845, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_SILVERSKY_2, creature->GetGUID());
             else
-                SendGossipMenuFor(player, 2844, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_SILVERSKY_3, creature->GetGUID());
         }
 
         if (creatureId == NPC_MAYBESS_RIVERBREEZE)
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_H))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 2849, creature->GetGUID());
+                if (!player->HasItemCount(ITEM_CENARION_BEACON, 1, true))
+                    AddGossipItemFor(player, GOSSIP_MENU_RIVERBREEZE, GOSSIP_OPTION_BEACON, GOSSIP_SENDER_MAIN, ACTION_CREATE_CENARION_BEACON);
+
+                SendGossipMenuFor(player, TEXT_RIVERBREEZE_1, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_ALLIANCE)
-                SendGossipMenuFor(player, 2843, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_RIVERBREEZE_2, creature->GetGUID());
             else
-                SendGossipMenuFor(player, 2842, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_RIVERBREEZE_3, creature->GetGUID());
         }
 
         return true;

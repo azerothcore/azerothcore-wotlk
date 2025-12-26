@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -211,8 +211,8 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     {
         bool buildShortcut = false;
 
-        auto liquidDataStart = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
-        auto liquidDataEnd = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+        auto liquidDataStart = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), startPos.x, startPos.y, startPos.z, _source->GetCollisionHeight(), {});
+        auto liquidDataEnd = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), endPos.x, endPos.y, endPos.z, _source->GetCollisionHeight(), {});
 
         bool startUnderWaterEndInWater = liquidDataStart.Status == LIQUID_MAP_UNDER_WATER &&
                                          (liquidDataEnd.Status & MAP_LIQUID_STATUS_IN_CONTACT) != 0;
@@ -556,7 +556,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     }
 
     // Special case with start and end positions very close to each other
-    if (_polyLength == 1 && pointCount == 1)
+    if (_polyLength == 1 && pointCount == 1 && !(dtResult & DT_SLOPE_TOO_STEEP))
     {
         // First point is start position, append end position
         dtVcopy(&pathPoints[1 * VERTEX_SIZE], endPoint);
@@ -564,6 +564,22 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     }
     else if (pointCount < 2 || dtStatusFailed(dtResult))
     {
+        // If its too steep, just return incomplete path.
+        if (pointCount > 0 && dtResult & DT_SLOPE_TOO_STEEP)
+        {
+            _pathPoints.resize(pointCount);
+            for (uint32 i = 0; i < pointCount; ++i)
+                _pathPoints[i] = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
+
+            NormalizePath();
+
+            // first point is always our current location - we need the next one
+            SetActualEndPosition(_pathPoints[pointCount - 1]);
+
+            _type = PathType(_type | PATHFIND_INCOMPLETE);
+            return;
+        }
+
         // only happens if pass bad data to findStraightPath or navmesh is broken
         // single point paths can be generated here
         /// @todo check the exact cases
@@ -682,7 +698,7 @@ void PathGenerator::UpdateFilter()
 
 NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
 {
-    LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), MAP_ALL_LIQUIDS);
+    LiquidData const& liquidData = _source->GetMap()->GetLiquidData(_source->GetPhaseMask(), x, y, z, _source->GetCollisionHeight(), {});
     if (liquidData.Status == LIQUID_MAP_NO_WATER)
         return NAV_GROUND;
 
@@ -884,7 +900,9 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
 
         if (canCheckSlope && !IsSwimmableSegment(iterPos, steerPos) && !IsWalkableClimb(iterPos, steerPos))
         {
-            return DT_FAILURE;
+            nsmoothPath--;
+            *smoothPathSize = nsmoothPath;
+            return DT_FAILURE | DT_SLOPE_TOO_STEEP;
         }
 
         // Handle end of path and off-mesh links when close enough.

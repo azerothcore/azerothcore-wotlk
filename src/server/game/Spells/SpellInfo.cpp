@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -326,9 +326,9 @@ std::array<SpellImplicitTargetInfo::StaticData, TOTAL_SPELL_TARGETS> SpellImplic
 SpellEffectInfo::SpellEffectInfo(SpellEntry const* spellEntry, SpellInfo const* spellInfo, uint8 effIndex)
 {
     _spellInfo = spellInfo;
-    _effIndex = effIndex;
+    EffectIndex = effIndex;
     Effect = spellEntry->Effect[effIndex];
-    ApplyAuraName = spellEntry->EffectApplyAuraName[effIndex];
+    ApplyAuraName = AuraType(spellEntry->EffectApplyAuraName[effIndex]);
     Amplitude = spellEntry->EffectAmplitude[effIndex];
     DieSides = spellEntry->EffectDieSides[effIndex];
     RealPointsPerLevel = spellEntry->EffectRealPointsPerLevel[effIndex];
@@ -456,7 +456,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
             value += PointsPerComboPoint * comboPoints;
         }
 
-        value = caster->ApplyEffectModifiers(_spellInfo, _effIndex, value);
+        value = caster->ApplyEffectModifiers(_spellInfo, EffectIndex, value);
 
         // amount multiplication based on caster's level
         if (!caster->IsControlledByPlayer() &&
@@ -501,7 +501,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                     break;
             }
 
-            if ((sSpellMgr->GetSpellInfo(_spellInfo->Effects[_effIndex].TriggerSpell) && sSpellMgr->GetSpellInfo(_spellInfo->Effects[_effIndex].TriggerSpell)->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL)) && _spellInfo->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
+            if ((sSpellMgr->GetSpellInfo(_spellInfo->Effects[EffectIndex].TriggerSpell) && sSpellMgr->GetSpellInfo(_spellInfo->Effects[EffectIndex].TriggerSpell)->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL)) && _spellInfo->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
                 canEffectScale = false;
 
             if (canEffectScale)
@@ -1579,122 +1579,6 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
 
     return SPELL_CAST_OK;
 }
-
-bool SpellInfo::IsStrongerAuraActive(Unit const* caster, Unit const* target) const
-{
-    if (!target)
-        return false;
-
-    // xinef: check spell group
-    uint32 groupId = sSpellMgr->GetSpellGroup(Id);
-    if (!groupId)
-        return false;
-
-    SpellGroupSpecialFlags sFlag = sSpellMgr->GetSpellGroupSpecialFlags(Id);
-    if (sFlag & SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK)
-        return false;
-
-    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        // xinef: Skip Empty effects
-        if (!Effects[i].IsEffect())
-            continue;
-
-        // xinef: if non-aura effect is preset - return false
-        if (!Effects[i].IsAura())
-            return false;
-
-        // xinef: aura is periodic - return false
-        if (Effects[i].Amplitude)
-            return false;
-
-        // xinef: exclude dummy auras
-        if (Effects[i].ApplyAuraName == SPELL_AURA_DUMMY)
-            return false;
-    }
-
-    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        // xinef: skip non-aura efects
-        if (!Effects[i].IsAura())
-            return false;
-
-        Unit::AuraEffectList const& auraList = target->GetAuraEffectsByType((AuraType)Effects[i].ApplyAuraName);
-        for (Unit::AuraEffectList::const_iterator iter = auraList.begin(); iter != auraList.end(); ++iter)
-        {
-            // xinef: aura is not groupped or in different group
-            uint32 auraGroup = (*iter)->GetAuraGroup();
-            if (!auraGroup || auraGroup != groupId)
-                continue;
-
-            if (IsRankOf((*iter)->GetSpellInfo()) && (sFlag & SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_SAME_SPELL))
-            {
-                continue;
-            }
-
-            // xinef: check priority before effect mask
-            if (sFlag >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlag <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4)
-            {
-                SpellGroupSpecialFlags sFlagCurr = sSpellMgr->GetSpellGroupSpecialFlags((*iter)->GetId());
-                if (sFlagCurr >= SPELL_GROUP_SPECIAL_FLAG_PRIORITY1 && sFlagCurr <= SPELL_GROUP_SPECIAL_FLAG_PRIORITY4 && sFlagCurr < sFlag)
-                {
-                    return true;
-                }
-            }
-
-            // xinef: check aura effect equal auras only, some auras have different effects on different ranks - check rank also
-            if (!IsAuraEffectEqual((*iter)->GetSpellInfo()) && !IsRankOf((*iter)->GetSpellInfo()))
-                continue;
-
-            // xinef: misc value mismatches
-            // xinef: commented, checked above
-            //if (Effects[i].MiscValue != (*iter)->GetMiscValue())
-            //  continue;
-
-            // xinef: should not happen, or effect is not active - stronger one is present
-            AuraApplication* aurApp = (*iter)->GetBase()->GetApplicationOfTarget(target->GetGUID());
-            if (!aurApp || !aurApp->IsActive((*iter)->GetEffIndex()))
-                continue;
-
-            // xinef: assume that all spells are either positive or negative, otherwise they should not be in one group
-            // xinef: take custom values into account
-
-            int32 basePoints = Effects[i].BasePoints;
-            int32 duration = GetMaxDuration();
-
-            // xinef: should have the same id, can be different if spell is triggered
-            // xinef: have to fix spell mods for triggered spell, turn off current spellmodtakingspell for preparing and restore after
-            if (Player const* player = caster->GetSpellModOwner())
-                if (player->m_spellModTakingSpell && player->m_spellModTakingSpell->m_spellInfo->Id == Id)
-                    basePoints = player->m_spellModTakingSpell->GetSpellValue()->EffectBasePoints[i];
-
-            int32 curValue = std::abs(Effects[i].CalcValue(caster, &basePoints));
-            int32 auraValue = (sFlag & SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK) ?
-                              std::abs((*iter)->GetSpellInfo()->Effects[(*iter)->GetEffIndex()].CalcValue((*iter)->GetCaster())) :
-                              std::abs((*iter)->GetAmount());
-
-            // xinef: for same spells, divide amount by stack amount
-            if (Id == (*iter)->GetId())
-                auraValue /= (*iter)->GetBase()->GetStackAmount();
-
-            if (curValue < auraValue)
-                return true;
-
-            // xinef: little hack, if current spell is the same as aura spell, asume it is not stronger
-            // xinef: if values are the same, duration mods should be taken into account but they are almost always passive
-            if (curValue == auraValue)
-            {
-                if (Id == (*iter)->GetId())
-                    continue;
-                if (!(*iter)->GetBase()->IsPassive() && duration < (*iter)->GetBase()->GetDuration())
-                    return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 bool SpellInfo::IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const
 {
     uint8 matchCount = 0;
@@ -1824,7 +1708,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
                         {
                             if (Player const* player = unitTarget->ToPlayer())
                             {
-                                if (player->GetWeaponForAttack(WeaponAttackType(BASE_ATTACK + i), true))
+                                if (player->GetWeaponForAttack(WeaponAttackType(i), true))
                                 {
                                     valid = true;
                                     break;
@@ -1863,8 +1747,19 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     else return SPELL_CAST_OK;
 
     // corpseOwner and unit specific target checks
-    if (AttributesEx3 & SPELL_ATTR3_ONLY_ON_PLAYER && !unitTarget->ToPlayer())
-        return SPELL_FAILED_TARGET_NOT_PLAYER;
+    if (unitTarget->IsPlayer())
+    {
+        if (HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
+            return SPELL_FAILED_TARGET_IS_PLAYER;
+    }
+    else
+    {
+        if (HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
+            return SPELL_FAILED_TARGET_NOT_PLAYER;
+
+        if (HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && unitTarget->IsControlledByPlayer())
+            return SPELL_FAILED_TARGET_IS_PLAYER_CONTROLLED;
+    }
 
     if (!IsAllowingDeadTarget() && !unitTarget->IsAlive())
         return SPELL_FAILED_TARGETS_DEAD;
@@ -1926,10 +1821,6 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     if (unitTarget->HasPreventResurectionAura() && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
         if (HasEffect(SPELL_EFFECT_SELF_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT_NEW))
             return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
-
-    // xinef: check if stronger aura is active
-    if (IsStrongerAuraActive(caster, unitTarget))
-        return SPELL_FAILED_AURA_BOUNCED;
 
     return SPELL_CAST_OK;
 }
@@ -2126,6 +2017,7 @@ AuraStateType SpellInfo::LoadAuraState() const
         case 20656:
         case 25602:
         case 32129:
+        case 49163: // Perpetual Instability (Element 115)
             return AURA_STATE_FAERIE_FIRE;
         default:
             break;
@@ -2304,6 +2196,8 @@ SpellSpecificType SpellInfo::LoadSpellSpecific() const
                 case SPELL_AURA_TRACK_RESOURCES:
                 case SPELL_AURA_TRACK_STEALTHED:
                     return SPELL_SPECIFIC_TRACKER;
+                default:
+                    break;
             }
         }
     }
@@ -2386,6 +2280,8 @@ uint32 SpellInfo::GetMaxTicks() const
                 case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     if (Effects[x].Amplitude != 0)
                         return DotDuration / Effects[x].Amplitude;
+                    break;
+                default:
                     break;
             }
     }
@@ -2644,14 +2540,6 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
 
     switch (Effects[effIndex].Effect)
     {
-        case SPELL_EFFECT_DUMMY:
-            // some explicitly required dummy effect sets
-            switch (Id)
-            {
-                default:
-                    break;
-            }
-            break;
         // always positive effects (check before target checks that provided non-positive result in some case for positive effects)
         case SPELL_EFFECT_HEAL:
         case SPELL_EFFECT_LEARN_SPELL:
@@ -2661,10 +2549,8 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
             return true;
         case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
             return false;
-
         case SPELL_EFFECT_GAMEOBJECT_DAMAGE:
             return false;
-
         case SPELL_EFFECT_SCHOOL_DAMAGE:
             {
                 bool only = true;
@@ -2688,7 +2574,6 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                         return false;
                 break;
             }
-
         // non-positive aura use
         case SPELL_EFFECT_APPLY_AURA:
         case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
@@ -2887,51 +2772,4 @@ void SpellInfo::_UnloadImplicitTargetConditionLists()
         }
         delete cur;
     }
-}
-
-bool SpellInfo::CheckElixirStacking(Unit const* caster) const
-{
-    if (!caster)
-    {
-        return true;
-    }
-
-    // xinef: check spell group
-    uint32 groupId = sSpellMgr->GetSpellGroup(Id);
-    if (groupId != SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS)
-    {
-        return true;
-    }
-
-    SpellGroupSpecialFlags sFlag = sSpellMgr->GetSpellGroupSpecialFlags(Id);
-    for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!Effects[i].IsAura())
-        {
-            continue;
-        }
-
-        Unit::AuraApplicationMap const& Auras = caster->GetAppliedAuras();
-        for (Unit::AuraApplicationMap::const_iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
-        {
-            // xinef: aura is not groupped or in different group
-            uint32 auraGroup = sSpellMgr->GetSpellGroup(itr->first);
-            if (auraGroup != groupId)
-            {
-                continue;
-            }
-
-            // Cannot apply guardian/battle elixir if flask is present
-            if (sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE || sFlag == SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN)
-            {
-                SpellGroupSpecialFlags sAuraFlag = sSpellMgr->GetSpellGroupSpecialFlags(itr->first);
-                if ((sAuraFlag & SPELL_GROUP_SPECIAL_FLAG_FLASK) == SPELL_GROUP_SPECIAL_FLAG_FLASK)
-                {
-                    return false;
-                }
-            }
-        }
-    }
-
-    return true;
 }

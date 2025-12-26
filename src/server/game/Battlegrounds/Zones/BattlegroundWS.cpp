@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,7 +63,7 @@ void BattlegroundWS::PostUpdateImpl(uint32 diff)
         {
             case BG_WS_EVENT_UPDATE_GAME_TIME:
                 UpdateWorldState(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER, GetMatchTime());
-                _bgEvents.ScheduleEvent(BG_WS_EVENT_UPDATE_GAME_TIME, ((BG_WS_TOTAL_GAME_TIME - GetStartTime()) % (MINUTE * IN_MILLISECONDS)) + 1);
+                _bgEvents.ScheduleEvent(BG_WS_EVENT_UPDATE_GAME_TIME, Milliseconds(((BG_WS_TOTAL_GAME_TIME - GetStartTime()) % (MINUTE * IN_MILLISECONDS)) + 1));
                 break;
             case BG_WS_EVENT_NO_TIME_LEFT:
                 if (GetTeamScore(TEAM_ALLIANCE) == GetTeamScore(TEAM_HORDE))
@@ -137,8 +137,8 @@ void BattlegroundWS::StartingEventOpenDoors()
 
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, WS_EVENT_START_BATTLE);
     UpdateWorldState(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER_ACTIVE, 1);
-    _bgEvents.ScheduleEvent(BG_WS_EVENT_UPDATE_GAME_TIME, 0);
-    _bgEvents.ScheduleEvent(BG_WS_EVENT_NO_TIME_LEFT, BG_WS_TOTAL_GAME_TIME - 2 * MINUTE * IN_MILLISECONDS); // 27 - 2 = 25 minutes
+    _bgEvents.ScheduleEvent(BG_WS_EVENT_UPDATE_GAME_TIME, 0ms);
+    _bgEvents.ScheduleEvent(BG_WS_EVENT_NO_TIME_LEFT, Milliseconds(BG_WS_TOTAL_GAME_TIME - 2 * MINUTE * IN_MILLISECONDS)); // 27 - 2 = 25 minutes
     _bgEvents.ScheduleEvent(BG_WS_EVENT_DESPAWN_DOORS, BG_WS_DOOR_DESPAWN_TIME);
 }
 
@@ -229,7 +229,7 @@ void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
         EndBattleground(GetTeamScore(TEAM_HORDE) == _configurableMaxTeamScore ? TEAM_HORDE : TEAM_ALLIANCE);
     }
     else
-        _bgEvents.ScheduleEvent(BG_WS_EVENT_RESPAWN_BOTH_FLAGS, BG_WS_FLAG_RESPAWN_TIME);
+        _bgEvents.ScheduleEvent(BG_WS_EVENT_RESPAWN_BOTH_FLAGS, Milliseconds(BG_WS_FLAG_RESPAWN_TIME));
 
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
@@ -426,6 +426,21 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
 
 bool BattlegroundWS::SetupBattleground()
 {
+    _wsReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_WSG);
+
+    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
+    {
+        _reputationCapture = uint32(45 * _wsReputationRate);
+        _honorWinKills = 3;
+        _honorEndKills = 4;
+    }
+    else
+    {
+        _reputationCapture = uint32(35 * _wsReputationRate);
+        _honorWinKills = 1;
+        _honorEndKills = 2;
+    }
+
     // flags
     AddObject(BG_WS_OBJECT_A_FLAG, BG_OBJECT_A_FLAG_WS_ENTRY, 1540.423f, 1481.325f, 351.8284f, 3.089233f, 0, 0, 0.9996573f, 0.02617699f, RESPAWN_IMMEDIATELY);
     AddObject(BG_WS_OBJECT_H_FLAG, BG_OBJECT_H_FLAG_WS_ENTRY, 916.0226f, 1434.405f, 345.413f, 0.01745329f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY);
@@ -485,19 +500,6 @@ void BattlegroundWS::Init()
     _flagState[TEAM_ALLIANCE]       = BG_WS_FLAG_STATE_ON_BASE;
     _flagState[TEAM_HORDE]          = BG_WS_FLAG_STATE_ON_BASE;
     _lastFlagCaptureTeam            = TEAM_NEUTRAL;
-
-    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
-    {
-        _reputationCapture = 45;
-        _honorWinKills = 3;
-        _honorEndKills = 4;
-    }
-    else
-    {
-        _reputationCapture = 35;
-        _honorWinKills = 1;
-        _honorEndKills = 2;
-    }
 
     uint32 bgWarsongFlagsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_FLAGS);
     _configurableMaxTeamScore = bgWarsongFlagsConfig > 0
@@ -578,10 +580,10 @@ uint32 BattlegroundWS::GetAssaultSpellId() const
 {
     if ((!GetFlagPickerGUID(TEAM_ALLIANCE) && GetFlagState(TEAM_ALLIANCE) != BG_WS_FLAG_STATE_ON_GROUND) ||
             (!GetFlagPickerGUID(TEAM_HORDE) && GetFlagState(TEAM_HORDE) != BG_WS_FLAG_STATE_ON_GROUND) ||
-            _bgEvents.GetNextEventTime(BG_WS_EVENT_BOTH_FLAGS_KEPT10) > 0)
+            _bgEvents.HasTimeUntilEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10))
         return 0;
 
-    return _bgEvents.GetNextEventTime(BG_WS_EVENT_BOTH_FLAGS_KEPT15) > 0 ? BG_WS_SPELL_FOCUSED_ASSAULT : BG_WS_SPELL_BRUTAL_ASSAULT;
+    return _bgEvents.HasTimeUntilEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15) ? BG_WS_SPELL_FOCUSED_ASSAULT : BG_WS_SPELL_BRUTAL_ASSAULT;
 }
 
 void BattlegroundWS::RemoveAssaultAuras()

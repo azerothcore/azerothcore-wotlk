@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -258,7 +258,7 @@ public:
                     case 28:
                         player->GroupEventHappens(QUEST_A_CRY_FOR_HELP, me);
                         _events.ScheduleEvent(EVENT_TALK_END, 2s);
-                        SetRun(true);
+                        me->SetWalk(false);
                         break;
                     case 29:
                         if (Creature* cowlen = me->FindNearestCreature(NPC_COWLEN, 50.0f, true))
@@ -289,7 +289,8 @@ public:
                     case EVENT_START_ESCORT:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
                         {
-                            npc_escortAI::Start(true, false, player->GetGUID());
+                            me->SetWalk(true);
+                            Start(true, player->GetGUID());
                         }
                         _events.ScheduleEvent(EVENT_STAND, 2s);
                         break;

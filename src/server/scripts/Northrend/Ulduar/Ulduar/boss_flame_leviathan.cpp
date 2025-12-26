@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -381,8 +381,7 @@ public:
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     TurnGates(true, false);
-                    me->MonsterMoveWithSpeed(homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), 100.0f);
-                    me->UpdatePosition(homePos);
+                    me->GetMotionMaster()->MovePoint(0, homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
                     _speakTimer = 60000;
                 }
                 else if (_speakTimer > 63500)
@@ -748,7 +747,7 @@ public:
                     _despawnTimer = 0;
                     if (Vehicle* veh = me->GetVehicle())
                         if (veh->GetPassenger(0) == me || veh->GetPassenger(1) == me)
-                            me->DespawnOrUnsummon(1);
+                            me->DespawnOrUnsummon(1ms);
                 }
             }
 
@@ -1090,7 +1089,8 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
-            Start(false, false, ObjectGuid::Empty, nullptr, false, true);
+            me->SetWalk(true);
+            Start(false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
                 aur->SetMaxDuration(-1);
@@ -1157,7 +1157,7 @@ public:
 
                     _beamTimer = 0;
                     _removeTimer = 1;
-                    me->DespawnOrUnsummon(5 * IN_MILLISECONDS);
+                    me->DespawnOrUnsummon(5s);
                 }
             }
             if (_removeTimer)
@@ -1364,7 +1364,7 @@ public:
                     liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);
                 }
 
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 
@@ -1416,7 +1416,7 @@ public:
                 _startTimer -= diff;
                 if (_startTimer <= 0)
                 {
-                    me->GetMotionMaster()->MovePath(3000000 + urand(0, 11), true);
+                    me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
                     _startTimer = 0;
                 }
             }
@@ -1665,7 +1665,7 @@ class spell_vehicle_throw_passenger : public SpellScript
                 std::list<WorldObject*> targetList;
                 Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
                 Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
+                Cell::VisitObjects(GetCaster(), searcher, 99.0f);
                 float minDist = 99 * 99;
                 Unit* target = nullptr;
                 for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
@@ -1750,7 +1750,7 @@ class spell_vehicle_grab_pyrite : public SpellScript
                     target->CastSpell(seat, GetEffectValue());
 
                     if (target->IsCreature())
-                        target->ToCreature()->DespawnOrUnsummon(1300);
+                        target->ToCreature()->DespawnOrUnsummon(1300ms);
                 }
             }
     }

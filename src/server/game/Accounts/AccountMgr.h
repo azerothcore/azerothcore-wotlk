@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,7 @@
 #define _ACCMGR_H
 
 #include "Define.h"
+#include "Common.h"
 #include <string>
 
 enum AccountOpResult
@@ -38,7 +39,7 @@ enum AccountOpResult
 
 namespace AccountMgr
 {
-    AccountOpResult CreateAccount(std::string username, std::string password);
+    AccountOpResult CreateAccount(std::string username, std::string password, std::string email = "");
     AccountOpResult DeleteAccount(uint32 accountId);
     AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword);
     AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
@@ -52,6 +53,7 @@ namespace AccountMgr
     uint32 GetCharactersCount(uint32 accountId);
 
     bool IsPlayerAccount(uint32 gmlevel);
+    bool IsGMAccount(uint32 gmlevel);
     bool IsAdminAccount(uint32 gmlevel);
     bool IsConsoleAccount(uint32 gmlevel);
 };

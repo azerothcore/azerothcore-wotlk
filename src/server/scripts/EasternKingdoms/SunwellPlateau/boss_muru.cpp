@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -209,52 +209,11 @@ struct npc_dark_fiend : public ScriptedAI
 
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
+
             Unit* target = nullptr;
             if (InstanceScript* instance = me->GetInstanceScript())
-            {
                 if (Creature* muru = instance->GetCreature(DATA_MURU))
-                {
-                    if (muru->IsAlive() && !muru->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-                    {
-                        std::list<HostileReference*> const& threatList = muru->GetThreatMgr().GetThreatList();
-                        std::vector<Unit*> validTargets;
-
-                        for (HostileReference* ref : threatList)
-                        {
-                            if (Unit* unit = ObjectAccessor::GetUnit(*muru, ref->getUnitGuid()))
-                            {
-                                if (unit->IsPlayer() && unit->IsAlive() && unit->IsWithinDist(me, 50.0f))
-                                    validTargets.push_back(unit);
-                            }
-                        }
-
-                        if (!validTargets.empty())
-                            target = validTargets[urand(0, validTargets.size() - 1)];
-                    }
-                    else
-                    {
-                        if (Creature* entropius = me->FindNearestCreature(NPC_ENTROPIUS, 100.0f))
-                        {
-                            std::list<HostileReference*> const& threatList = entropius->GetThreatMgr().GetThreatList();
-                            std::vector<Unit*> validTargets;
-
-                            for (HostileReference* ref : threatList)
-                            {
-                                if (Unit* unit = ObjectAccessor::GetUnit(*entropius, ref->getUnitGuid()))
-                                {
-                                    if (unit->IsPlayer() && unit->IsAlive() && unit->IsWithinDist(me, 50.0f))
-                                    {
-                                        validTargets.push_back(unit);
-                                    }
-                                }
-                            }
-
-                            if (!validTargets.empty())
-                                target = validTargets[urand(0, validTargets.size() - 1)];
-                        }
-                    }
-                }
-            }
+                    target = muru->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, RangeSelector(me, 50.0f, true, true));
 
             if (target)
             {
@@ -315,7 +274,7 @@ struct npc_singularity : public NullCreatureAI
 
     void Reset() override
     {
-        me->DespawnOrUnsummon(18000);
+        me->DespawnOrUnsummon(18s);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);

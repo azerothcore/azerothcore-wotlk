@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -406,7 +406,8 @@ public:
                             {
                                 if (Player* player = GetPlayerForEscort())
                                 {
-                                    CAST_AI(npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI, pLescovar->AI())->Start(false, false, player->GetGUID());
+                                    pLescovar->SetWalk(true);
+                                    CAST_AI(npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI, pLescovar->AI())->Start(false, player->GetGUID());
                                     CAST_AI(npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI, pLescovar->AI())->SetMaxPlayerDistance(200.0f);
                                 }
                             }
@@ -448,7 +449,8 @@ public:
         {
             if (Creature* pSpybot = creature->FindNearestCreature(NPC_TYRION_SPYBOT, 5.0f, true))
             {
-                CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->Start(false, false, player->GetGUID());
+                pSpybot->SetWalk(true);
+                CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->Start(false, player->GetGUID());
                 CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->SetMaxPlayerDistance(200.0f);
             }
             return true;
@@ -457,6 +459,11 @@ public:
     }
 };
 
+enum KingVarianWrynn : uint32
+{
+    // Deathknight Starting Zone End
+    QUEST_WHERE_KINGS_WALK       = 13188,
+};
 // 29611 - King Varian Wryn
 /// @todo add abilities/timers
 struct npc_king_varian_wrynn : public ScriptedAI
@@ -475,6 +482,15 @@ struct npc_king_varian_wrynn : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/) override
+    {
+
+        if (quest->GetQuestId() == QUEST_WHERE_KINGS_WALK)
+            sLFGMgr->InitializeLockedDungeons(player);
+
+        return true;
+    }
 };
 
 void AddSC_stormwind_city()
@@ -484,4 +500,5 @@ void AddSC_stormwind_city()
     new npc_lord_gregor_lescovar();
     new npc_marzon_silent_blade();
     RegisterCreatureAI(npc_king_varian_wrynn);
+
 }

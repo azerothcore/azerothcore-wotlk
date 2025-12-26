@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,6 +23,7 @@
 #include "DataMap.h"
 #include "Define.h"
 #include "DynamicTree.h"
+#include "EventProcessor.h"
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
@@ -33,7 +34,7 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
-#include "TaskScheduler.h"
+#include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
 #include <list>
@@ -46,6 +47,7 @@ class InstanceScript;
 class Group;
 class InstanceSave;
 class Object;
+class Weather;
 class WorldObject;
 class TempSummon;
 class Player;
@@ -61,6 +63,7 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 class PathGenerator;
+class WorldSession;
 
 enum WeatherState : uint32;
 
@@ -85,6 +88,7 @@ struct ScriptAction
 
 #define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
+#define UPDATABLE_OBJECT_LIST_RECHECK_TIMER 30 * IN_MILLISECONDS // Time to recheck update object list
 
 struct PositionFullTerrainStatus
 {
@@ -130,6 +134,7 @@ struct ZoneDynamicInfo
     ZoneDynamicInfo();
 
     uint32 MusicId;
+    std::unique_ptr<Weather> DefaultWeather;
     WeatherState WeatherId;
     float WeatherGrade;
     uint32 OverrideLightId;
@@ -144,7 +149,9 @@ struct ZoneDynamicInfo
 
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
-typedef std::set<MotionTransport*> TransportsContainer;
+typedef std::unordered_set<Transport*> TransportsContainer;
+typedef std::unordered_set<WorldObject*> ZoneWideVisibleWorldObjectsSet;
+typedef std::unordered_map<uint32 /*ZoneId*/, ZoneWideVisibleWorldObjectsSet> ZoneWideVisibleWorldObjectsMap;
 
 enum EncounterCreditType : uint8
 {
@@ -165,7 +172,7 @@ public:
     // currently unused for normal maps
     bool CanUnload(uint32 diff)
     {
-        if (!m_unloadTimer)
+        if (!m_unloadTimer || Events.HasEvents())
             return false;
 
         if (m_unloadTimer <= diff)
@@ -181,14 +188,7 @@ public:
     template<class T> bool AddToMap(T*, bool checkTransport = false);
     template<class T> void RemoveFromMap(T*, bool);
 
-    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                            TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
-    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                                  TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void MarkNearbyCellsOf(WorldObject* obj);
 
     virtual void Update(const uint32, const uint32, bool thread = true);
 
@@ -243,8 +243,8 @@ public:
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType = MAP_ALL_LIQUIDS);
-    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType);
+    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, Optional<uint8> reqLiquidType = {});
+    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType);
 
     [[nodiscard]] bool GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
     [[nodiscard]] uint32 GetAreaId(uint32 phaseMask, float x, float y, float z) const;
@@ -311,21 +311,14 @@ public:
     }
 
     void AddObjectToRemoveList(WorldObject* obj);
-    void AddObjectToSwitchList(WorldObject* obj, bool on);
     virtual void DelayedUpdate(const uint32 diff);
 
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
-    void resetMarkedCellsLarge() { marked_cells_large.reset(); }
-    bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
-    void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
-
-    void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
-    void RemoveWorldObject(WorldObject* obj) { i_worldObjects.erase(obj); }
 
     void SendToPlayers(WorldPacket const* data) const;
 
@@ -336,15 +329,6 @@ public:
     void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
     void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
 
-    // must called with AddToWorld
-    template<class T>
-    void AddToActive(T* obj);
-
-    // must called with RemoveFromWorld
-    template<class T>
-    void RemoveFromActive(T* obj);
-
-    template<class T> void SwitchGridContainers(T* obj, bool on);
     CreatureGroupHolderType CreatureGroupHolder;
 
     void UpdateIteratorBack(Player* player);
@@ -354,12 +338,12 @@ public:
     GameObject* SummonGameObject(uint32 entry, Position const& pos, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 100, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
-    Corpse* GetCorpse(ObjectGuid const guid);
-    Creature* GetCreature(ObjectGuid const guid);
-    GameObject* GetGameObject(ObjectGuid const guid);
-    Transport* GetTransport(ObjectGuid const guid);
-    DynamicObject* GetDynamicObject(ObjectGuid const guid);
-    Pet* GetPet(ObjectGuid const guid);
+    Corpse* GetCorpse(ObjectGuid const& guid);
+    Creature* GetCreature(ObjectGuid const& guid);
+    GameObject* GetGameObject(ObjectGuid const& guid);
+    Transport* GetTransport(ObjectGuid const& guid);
+    DynamicObject* GetDynamicObject(ObjectGuid const& guid);
+    Pet* GetPet(ObjectGuid const& guid);
 
     MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
 
@@ -369,10 +353,10 @@ public:
     typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
     GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameobjectBySpawnIdStore; }
 
-    [[nodiscard]] std::unordered_set<Corpse*> const* GetCorpsesInCell(uint32 cellId) const
+    [[nodiscard]] std::unordered_set<Corpse*> const* GetCorpsesInGrid(uint32 gridId) const
     {
-        auto itr = _corpsesByCell.find(cellId);
-        if (itr != _corpsesByCell.end())
+        auto itr = _corpsesByGrid.find(gridId);
+        if (itr != _corpsesByGrid.end())
             return &itr->second;
 
         return nullptr;
@@ -446,7 +430,7 @@ public:
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
     [[nodiscard]] uint32 ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const;
 
-    TaskScheduler _creatureRespawnScheduler;
+    EventProcessor Events;
 
     void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/, Position pos = Position());
 
@@ -454,18 +438,27 @@ public:
     void DeleteCorpseData();
     void AddCorpse(Corpse* corpse);
     void RemoveCorpse(Corpse* corpse);
-    Corpse* ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia = false);
+    Corpse* ConvertCorpseToBones(ObjectGuid const& ownerGuid, bool insignia = false);
     void RemoveOldCorpses();
 
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
 
+    bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession const* self = nullptr, TeamId teamId = TEAM_NEUTRAL) const;
+    void SendZoneText(uint32 zoneId, char const* text, WorldSession const* self = nullptr, TeamId teamId = TEAM_NEUTRAL) const;
+
     void SendInitTransports(Player* player);
     void SendRemoveTransports(Player* player);
-    void SendZoneDynamicInfo(Player* player);
+    void SendZoneDynamicInfo(uint32 zoneId, Player* player) const;
+    void SendZoneWeather(uint32 zoneId, Player* player) const;
+    void SendZoneWeather(ZoneDynamicInfo const& zoneDynamicInfo, Player* player) const;
     void SendInitSelf(Player* player);
+
+    void UpdateWeather(uint32 const diff);
+    void UpdateExpiredCorpses(uint32 const diff);
 
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
+    Weather* GetOrGenerateZoneDefaultWeather(uint32 zoneId);
     void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
     void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
 
@@ -500,10 +493,7 @@ public:
         _updateObjects.erase(obj);
     }
 
-    std::size_t GetActiveNonPlayersCount() const
-    {
-        return m_activeNonPlayers.size();
-    }
+    size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
 
     virtual std::string GetDebugInfo() const;
 
@@ -511,6 +501,26 @@ public:
     uint32 GetLoadedGridsCount();
     uint32 GetCreatedCellsInGridCount(uint16 const x, uint16 const y);
     uint32 GetCreatedCellsInMapCount();
+
+    void AddObjectToPendingUpdateList(WorldObject* obj);
+    void RemoveObjectFromMapUpdateList(WorldObject* obj);
+
+    typedef std::vector<WorldObject*> UpdatableObjectList;
+    typedef std::unordered_set<WorldObject*> PendingAddUpdatableObjectList;
+
+    void AddWorldObjectToFarVisibleMap(WorldObject* obj);
+    void RemoveWorldObjectFromFarVisibleMap(WorldObject* obj);
+    void AddWorldObjectToZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    void RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    ZoneWideVisibleWorldObjectsSet const* GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const;
+
+    [[nodiscard]] uint32 GetPlayerCountInZone(uint32 zoneId) const
+    {
+        if (auto const& it = _zonePlayerCountMap.find(zoneId); it != _zonePlayerCountMap.end())
+            return it->second;
+
+        return 0;
+    };
 
 private:
 
@@ -553,11 +563,6 @@ protected:
     MapRefMgr m_mapRefMgr;
     MapRefMgr::iterator m_mapRefIter;
 
-    typedef std::set<WorldObject*> ActiveNonPlayers;
-    ActiveNonPlayers m_activeNonPlayers;
-    ActiveNonPlayers::iterator m_activeNonPlayersIter;
-
-    // Objects that must update even in inactive grids without activating them
     TransportsContainer _transports;
     TransportsContainer::iterator _transportsUpdateIter;
 
@@ -576,12 +581,9 @@ private:
     Map* m_parentMap;
 
     std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
-    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
-    std::map<WorldObject*, bool> i_objectsToSwitch;
-    std::unordered_set<WorldObject*> i_worldObjects;
 
     typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
     ScriptScheduleMap m_scriptSchedule;
@@ -589,26 +591,10 @@ private:
     template<class T>
     void DeleteFromWorld(T*);
 
-    void AddToActiveHelper(WorldObject* obj)
-    {
-        m_activeNonPlayers.insert(obj);
-    }
+    void UpdateNonPlayerObjects(uint32 const diff);
 
-    void RemoveFromActiveHelper(WorldObject* obj)
-    {
-        // Map::Update for active object in proccess
-        if (m_activeNonPlayersIter != m_activeNonPlayers.end())
-        {
-            ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
-            if (itr == m_activeNonPlayers.end())
-                return;
-            if (itr == m_activeNonPlayersIter)
-                ++m_activeNonPlayersIter;
-            m_activeNonPlayers.erase(itr);
-        }
-        else
-            m_activeNonPlayers.erase(obj);
-    }
+    void _AddObjectToUpdateList(WorldObject* obj);
+    void _RemoveObjectFromUpdateList(WorldObject* obj);
 
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
@@ -616,7 +602,10 @@ private:
     std::unordered_map<uint32, uint32> _zonePlayerCountMap;
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
+    IntervalTimer _weatherUpdateTimer;
     uint32 _defaultLight;
+
+    IntervalTimer _corpseUpdateTimer;
 
     template<HighGuid high>
     inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
@@ -632,11 +621,16 @@ private:
     MapStoredObjectTypesContainer _objectsStore;
     CreatureBySpawnIdContainer _creatureBySpawnIdStore;
     GameObjectBySpawnIdContainer _gameobjectBySpawnIdStore;
-    std::unordered_map<uint32/*cellId*/, std::unordered_set<Corpse*>> _corpsesByCell;
+    std::unordered_map<uint32/*gridId*/, std::unordered_set<Corpse*>> _corpsesByGrid;
     std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
     std::unordered_set<Corpse*> _corpseBones;
 
     std::unordered_set<Object*> _updateObjects;
+
+    UpdatableObjectList _updatableObjectList;
+    PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
+    IntervalTimer _updatableObjectListRecheckTimer;
+    ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
 };
 
 enum InstanceResetMethod

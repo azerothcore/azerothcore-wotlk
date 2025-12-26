@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -27,14 +27,10 @@ enum Archavon
     SPELL_ROCK_SHARDS                   = 58678,
     SPELL_ROCK_SHARDS_LEFT_HAND_VISUAL  = 58689,
     SPELL_ROCK_SHARDS_RIGHT_HAND_VISUAL = 58692,
-    SPELL_ROCK_SHARDS_DAMAGE_10         = 58695,
-    SPELL_ROCK_SHARDS_DAMAGE_25         = 60883,
-    SPELL_CRUSHING_LEAP_10              = 58960,
-    SPELL_CRUSHING_LEAP_25              = 60894, // Instant (10-80yr range) -- Leaps at an enemy, inflicting 8000 Physical damage, knocking all nearby enemies away, and creating a cloud of choking debris.
-    SPELL_STOMP_10                      = 58663,
-    SPELL_STOMP_25                      = 60880,
-    SPELL_IMPALE_10                     = 58666,
-    SPELL_IMPALE_25                     = 60882, // Lifts an enemy off the ground with a spiked fist, inflicting 47125 to 52875 Physical damage and 9425 to 10575 additional damage each second for 8 sec.
+    SPELL_ROCK_SHARDS_DAMAGE            = 58695,
+    SPELL_CRUSHING_LEAP                 = 58960,
+    SPELL_STOMP                         = 58663,
+    SPELL_IMPALE                        = 58666,
     SPELL_BERSERK                       = 47008
 };
 
@@ -145,7 +141,7 @@ class boss_archavon : public CreatureScript
                     case EVENT_CHOKING_CLOUD:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                         {
-                            DoCast(target, RAID_MODE(SPELL_CRUSHING_LEAP_10, SPELL_CRUSHING_LEAP_25), true); //10y ~ 80y, ignore range
+                            DoCast(target, SPELL_CRUSHING_LEAP, true); //10y ~ 80y, ignore range
                         }
 
                         events.Repeat(30s);
@@ -156,14 +152,14 @@ class boss_archavon : public CreatureScript
                         snprintf(buffer, sizeof(buffer), "Archavon the Stone Watcher lunges for %s!", me->GetVictim()->GetName().c_str());
                         me->TextEmote(buffer);
 
-                        DoCastVictim(RAID_MODE(SPELL_STOMP_10, SPELL_STOMP_25));
+                        DoCastVictim(SPELL_STOMP);
 
                         events.Repeat(45s);
                         events.ScheduleEvent(EVENT_IMPALE, 3s);
                         break;
                     }
                     case EVENT_IMPALE:
-                        DoCastVictim(RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25));
+                        DoCastVictim(SPELL_IMPALE);
                         break;
                     case EVENT_BERSERK:
                         DoCast(me, SPELL_BERSERK, true);
@@ -205,17 +201,10 @@ class spell_archavon_rock_shards : public SpellScript
                 return;
             }
 
-            Map* map = caster->GetMap();
-            if (!map)
-            {
-                return;
-            }
-
             caster->CastSpell(target, SPELL_ROCK_SHARDS_LEFT_HAND_VISUAL, true);
             caster->CastSpell(target, SPELL_ROCK_SHARDS_RIGHT_HAND_VISUAL, true);
 
-            uint32 spellId = map->Is25ManRaid() ? SPELL_ROCK_SHARDS_DAMAGE_25 : SPELL_ROCK_SHARDS_DAMAGE_10;
-            caster->CastSpell(target, spellId, true);
+            caster->CastSpell(target, SPELL_ROCK_SHARDS_DAMAGE, true);
         }
 
     void Register() override

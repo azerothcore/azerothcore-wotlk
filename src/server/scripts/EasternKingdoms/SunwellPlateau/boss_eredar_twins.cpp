@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -17,6 +17,8 @@
 
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
@@ -488,6 +490,22 @@ public:
     }
 };
 
+struct go_eredar_twins_blaze : GameObjectAI
+{
+    explicit go_eredar_twins_blaze(GameObject *object) : GameObjectAI(object) { };
+
+    void InitializeAI() override
+    {
+        // required for the trap to apply its startDelay
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (ObjectGuid creatureGUID = instance->GetGuidData(DATA_ALYTHESS))
+            {
+                me->SetOwnerGUID(creatureGUID);
+                me->SetLootState(GO_NOT_READY);
+            }
+     }
+};
+
 void AddSC_boss_eredar_twins()
 {
     RegisterSunwellPlateauCreatureAI(boss_sacrolash);
@@ -501,4 +519,5 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_periodic", SPELL_FLAME_TOUCHED, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_flame_sear", SPELL_FLAME_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     new at_sunwell_eredar_twins();
+    RegisterGameObjectAI(go_eredar_twins_blaze);
 }

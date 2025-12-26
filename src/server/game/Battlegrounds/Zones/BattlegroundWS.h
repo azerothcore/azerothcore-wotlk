@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -39,12 +39,12 @@ enum BG_WS_TimerOrScore
     BG_WS_MAX_TEAM_SCORE            = 3,
 
     BG_WS_TOTAL_GAME_TIME           = 27 * MINUTE * IN_MILLISECONDS,
-    BG_WS_FLAG_RESPAWN_TIME         = 23 * IN_MILLISECONDS,
-    BG_WS_FLAG_DROP_TIME            = 10 * IN_MILLISECONDS,
-    BG_WS_SPELL_FORCE_TIME          = 10 * MINUTE * IN_MILLISECONDS,
-    BG_WS_SPELL_BRUTAL_TIME         = 15 * MINUTE * IN_MILLISECONDS,
-    BG_WS_DOOR_DESPAWN_TIME         = 5 * IN_MILLISECONDS
+    BG_WS_FLAG_RESPAWN_TIME         = 23 * IN_MILLISECONDS
 };
+constexpr Milliseconds BG_WS_FLAG_DROP_TIME = 10s;
+constexpr Milliseconds BG_WS_SPELL_FORCE_TIME = 600s;
+constexpr Milliseconds BG_WS_SPELL_BRUTAL_TIME = 900s;
+constexpr Milliseconds BG_WS_DOOR_DESPAWN_TIME = 5s;
 
 enum BG_WS_BroadcastTexts
 {
@@ -258,6 +258,7 @@ private:
     ObjectGuid _droppedFlagGUID[2];
     uint8  _flagState[2];
     TeamId _lastFlagCaptureTeam;
+    float _wsReputationRate;
     uint32 _reputationCapture;
     uint32 _honorWinKills;
     uint32 _honorEndKills;

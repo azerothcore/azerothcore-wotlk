@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,44 +63,6 @@ namespace VMAP
         return hit;
     }
 
-    void ModelInstance::intersectPoint(const G3D::Vector3& p, AreaInfo& info) const
-    {
-        if (!iModel)
-        {
-#ifdef VMAP_DEBUG
-            std::cout << "<object not loaded>\n";
-#endif
-            return;
-        }
-
-        // M2 files don't contain area info, only WMO files
-        if (flags & MOD_M2)
-        {
-            return;
-        }
-        if (!iBound.contains(p))
-        {
-            return;
-        }
-        // child bounds are defined in object space:
-        Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
-        Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
-        float zDist;
-        if (iModel->IntersectPoint(pModel, zDirModel, zDist, info))
-        {
-            Vector3 modelGround = pModel + zDist * zDirModel;
-            // Transform back to world space. Note that:
-            // Mat * vec == vec * Mat.transpose()
-            // and for rotation matrices: Mat.inverse() == Mat.transpose()
-            float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
-            if (info.ground_Z < world_Z)
-            {
-                info.ground_Z = world_Z;
-                info.adtId = adtId;
-            }
-        }
-    }
-
     bool ModelInstance::GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const
     {
         if (!iModel)
@@ -124,7 +86,9 @@ namespace VMAP
         Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
         Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
         float zDist;
-        if (iModel->GetLocationInfo(pModel, zDirModel, zDist, info))
+
+        GroupLocationInfo groupInfo;
+        if (iModel->GetLocationInfo(pModel, zDirModel, zDist, groupInfo))
         {
             Vector3 modelGround = pModel + zDist * zDirModel;
             // Transform back to world space. Note that:
@@ -133,6 +97,8 @@ namespace VMAP
             float world_Z = ((modelGround * iInvRot) * iScale + iPos).z;
             if (info.ground_Z < world_Z) // hm...could it be handled automatically with zDist at intersection?
             {
+                info.rootId = groupInfo.rootId;
+                info.hitModel = groupInfo.hitModel;
                 info.ground_Z = world_Z;
                 info.hitInstance = this;
                 return true;

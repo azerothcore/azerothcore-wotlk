@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -86,13 +86,13 @@ struct boss_ghazan : public BossAI
         if (type == ACTION_MOVE_TO_PLATFORM && !_movedToPlatform)
         {
             _movedToPlatform = true;
-            me->GetMotionMaster()->MovePath((me->GetSpawnId() * 10) + 1, false);
+            me->GetMotionMaster()->MoveWaypoint((me->GetSpawnId() * 10) + 1, false);
         }
     }
 
     void MovementInform(uint32 type, uint32 pointId) override
     {
-        if (!_movedToPlatform || type != WAYPOINT_MOTION_TYPE || pointId != 19)
+        if (!_movedToPlatform || type != WAYPOINT_MOTION_TYPE || pointId != 20)
         {
             return;
         }

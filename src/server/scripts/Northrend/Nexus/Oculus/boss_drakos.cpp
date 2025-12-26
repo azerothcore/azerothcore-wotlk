@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,8 +22,7 @@
 enum Spells
 {
     SPELL_MAGIC_PULL                    = 51336,
-    SPELL_THUNDERING_STOMP_N            = 50774,
-    SPELL_THUNDERING_STOMP_H            = 59370,
+    SPELL_THUNDERING_STOMP              = 50774,
 
     SPELL_UNSTABLE_SPHERE_PASSIVE       = 50756,
     SPELL_UNSTABLE_SPHERE_PULSE         = 50757,
@@ -43,8 +42,6 @@ enum Events
     EVENT_SUMMON                        = 3,
     EVENT_SUMMON_x4                     = 4,
 };
-
-#define SPELL_THUNDERING_STOMP          DUNGEON_MODE(SPELL_THUNDERING_STOMP_N, SPELL_THUNDERING_STOMP_H)
 
 enum Yells
 {

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -101,7 +101,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         uint8 controlledPoints = _controlledPoints[teamId];
                         if (controlledPoints == 0)
                         {
-                            _bgEvents.ScheduleEvent(eventId, 3000);
+                            _bgEvents.ScheduleEvent(eventId, 3s);
                             break;
                         }
 
@@ -115,7 +115,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
-                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
+                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, uint32(10 * _abReputationRate), teamId);
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
                             if (teamId == TEAM_ALLIANCE)
@@ -170,8 +170,8 @@ void BattlegroundAB::StartingEventOpenDoors()
     DoorOpen(BG_AB_OBJECT_GATE_A);
     DoorOpen(BG_AB_OBJECT_GATE_H);
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, BG_AB_EVENT_START_BATTLE);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3000);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3000);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3s);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3s);
 }
 
 void BattlegroundAB::AddPlayer(Player* player)
@@ -419,6 +419,10 @@ TeamId BattlegroundAB::GetPrematureWinner()
 
 bool BattlegroundAB::SetupBattleground()
 {
+    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
+    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
+    _abReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_AB);
+
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
     {
         AddObject(BG_AB_OBJECT_BANNER_NEUTRAL + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_NODE_BANNER_0 + i, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
@@ -467,9 +471,6 @@ void BattlegroundAB::Init()
     Battleground::Init();
 
     _bgEvents.Reset();
-
-    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
-    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
 
     _capturePointInfo[BG_AB_NODE_STABLES]._iconNone = WORLD_STATE_BATTLEGROUND_AB_STABLE_ICON;
     _capturePointInfo[BG_AB_NODE_FARM]._iconNone = WORLD_STATE_BATTLEGROUND_AB_FARM_ICON;

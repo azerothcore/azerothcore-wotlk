@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,7 +23,6 @@
 #include "trial_of_the_champion.h"
 
 const Position SpawnPosition = {746.67f, 684.08f, 412.5f, 4.65f};
-#define CLEANUP_CHECK_INTERVAL  5000
 
 /**
  *  @todo: Missing dialog/RP (already populated in DB) && spawns (can use ToC25 locations?) for:
@@ -88,7 +87,7 @@ public:
             VehicleList.clear();
             CLEANED = false;
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
             Counter = 0;
             temp1 = 0;
             temp2 = 0;
@@ -268,7 +267,7 @@ public:
             if (DoNeedCleanup(player))
                 InstanceCleanup();
 
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
@@ -443,7 +442,7 @@ public:
             Counter = 0;
             SaveToDB();
             events.Reset();
-            events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+            events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
 
             CLEANED = true;
         }
@@ -785,7 +784,7 @@ public:
                         {
                             InstanceCleanup();
                         }
-                        events.RepeatEvent(CLEANUP_CHECK_INTERVAL);
+                        events.Repeat(5s);
                     }
                     break;
                 case EVENT_SUMMON_GRAND_CHAMPION_1:
@@ -812,7 +811,7 @@ public:
                         while( number == temp1 || number == temp2 );
                         DoSummonGrandChampion(number, 2);
                         HandleGameObject(GO_MainGateGUID, true);
-                        events.ScheduleEvent(EVENT_CLOSE_GATE, 6000);
+                        events.ScheduleEvent(EVENT_CLOSE_GATE, 6s);
                     }
                     break;
                 case EVENT_CLOSE_GATE:
@@ -1129,7 +1128,7 @@ public:
                         if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
                         {
                             boss->GetMotionMaster()->MovePoint(0, SpawnPosition);
-                            boss->DespawnOrUnsummon(3000);
+                            boss->DespawnOrUnsummon(3s);
                         }
                     }
                     break;

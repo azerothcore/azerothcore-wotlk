@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1444,7 +1444,7 @@ void Guild::HandleInviteMember(WorldSession* session, std::string const& name)
     if (pInvitee->GetSocial()->HasIgnore(player->GetGUID()))
         return;
 
-    uint32 memberLimit = sConfigMgr->GetOption<uint32>("Guild.MemberLimit", 0);
+    uint32 memberLimit = sWorld->getIntConfig(CONFIG_GUILD_MEMBER_LIMIT);
     if (memberLimit > 0 && player->GetGuild()->GetMemberCount() >= memberLimit)
     {
         ChatHandler(player->GetSession()).PSendSysMessage("Your guild has reached the maximum amount of members ({}). You cannot send another invite until the guild member count is lower.", memberLimit);
@@ -2123,7 +2123,7 @@ void Guild::BroadcastToGuild(WorldSession* session, bool officerOnly, std::strin
         for (auto const& [guid, member] : m_members)
             if (Player* player = member.FindPlayer())
                 if (_HasRankRight(player, officerOnly ? GR_RIGHT_OFFCHATLISTEN : GR_RIGHT_GCHATLISTEN) && !player->GetSocial()->HasIgnore(session->GetPlayer()->GetGUID()))
-                    player->GetSession()->SendPacket(&data);
+                    player->SendDirectMessage(&data);
     }
 }
 
@@ -2132,14 +2132,14 @@ void Guild::BroadcastPacketToRank(WorldPacket const* packet, uint8 rankId) const
     for (auto const& [guid, member] : m_members)
         if (member.IsRank(rankId))
             if (Player* player = member.FindPlayer())
-                player->GetSession()->SendPacket(packet);
+                player->SendDirectMessage(packet);
 }
 
 void Guild::BroadcastPacket(WorldPacket const* packet) const
 {
     for (auto const& [guid, member] : m_members)
         if (Player* player = member.FindPlayer())
-            player->GetSession()->SendPacket(packet);
+            player->SendDirectMessage(packet);
 }
 
 void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank)

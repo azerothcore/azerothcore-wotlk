@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -98,31 +98,31 @@ public:
             {
                 case EVENT_SNAP_KICK:
                     DoCastVictim(SPELL_SNAPKICK);
-                    events.RepeatEvent(6 * IN_MILLISECONDS);
+                    events.Repeat(6s);
                     break;
                 case EVENT_CLEAVE:
                     DoCastVictim(SPELL_CLEAVE);
-                    events.RepeatEvent(12 * IN_MILLISECONDS);
+                    events.Repeat(12s);
                     break;
                 case EVENT_UPPERCUT:
                     DoCastVictim(SPELL_UPPERCUT);
-                    events.RepeatEvent(14 * IN_MILLISECONDS);
+                    events.Repeat(14s);
                     break;
                 case EVENT_MORTAL_STRIKE:
                     DoCastVictim(SPELL_MORTALSTRIKE);
-                    events.RepeatEvent(10 * IN_MILLISECONDS);
+                    events.Repeat(10s);
                     break;
                 case EVENT_PUMMEL:
                     DoCastVictim(SPELL_PUMMEL);
-                    events.RepeatEvent(16 * IN_MILLISECONDS);
+                    events.Repeat(16s);
                     break;
                 case EVENT_THROW_AXE:
                     DoCastRandomTarget(SPELL_THROWAXE);
-                    events.RepeatEvent(8 * IN_MILLISECONDS);
+                    events.Repeat(8s);
                     break;
                 case EVENT_THRASH:
                     DoCastSelf(SPELL_THRASH);
-                    events.RepeatEvent(10 * IN_MILLISECONDS);
+                    events.Repeat(10s);
                     break;
             }
         }

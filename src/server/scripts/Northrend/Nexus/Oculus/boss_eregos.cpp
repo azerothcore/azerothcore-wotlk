@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,10 +22,8 @@
 
 enum Spells
 {
-    SPELL_ARCANE_BARRAGE_N                      = 50804,
-    SPELL_ARCANE_BARRAGE_H                      = 59381,
-    SPELL_ARCANE_VOLLEY_N                       = 51153,
-    SPELL_ARCANE_VOLLEY_H                       = 59382,
+    SPELL_ARCANE_BARRAGE                        = 50804,
+    SPELL_ARCANE_VOLLEY                         = 51153,
     SPELL_ENRAGED_ASSAULT                       = 51170,
     SPELL_PLANAR_ANOMALIES                      = 57959,
     SPELL_PLANAR_SHIFT                          = 51162,
@@ -37,9 +35,6 @@ enum Spells
 
     SPELL_DRAKE_STOP_TIME                       = 49838,
 };
-
-#define SPELL_ARCANE_BARRAGE                    DUNGEON_MODE(SPELL_ARCANE_BARRAGE_N, SPELL_ARCANE_BARRAGE_H)
-#define SPELL_ARCANE_VOLLEY                     DUNGEON_MODE(SPELL_ARCANE_VOLLEY_N, SPELL_ARCANE_VOLLEY_H)
 
 enum VarosNPCs
 {
@@ -208,7 +203,7 @@ public:
                     break;
                 case EVENT_SUMMON_WHELPS:
                     for( uint8 i = 0; i < 5; ++i )
-                        events.ScheduleEvent(EVENT_SUMMON_SINGLE_WHELP, urand(0, 8000));
+                        events.ScheduleEvent(EVENT_SUMMON_SINGLE_WHELP, 0ms, 8s);
                     events.Repeat(40s);
                     break;
                 case EVENT_SUMMON_SINGLE_WHELP:

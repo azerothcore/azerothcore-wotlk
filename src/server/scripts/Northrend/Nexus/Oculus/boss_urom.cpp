@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,14 +29,9 @@ enum Spells
     SPELL_TELEPORT                              = 51112,
 
     SPELL_FROSTBOMB                             = 51103,
-    SPELL_TIME_BOMB_N                           = 51121,
-    SPELL_TIME_BOMB_H                           = 59376,
-    SPELL_EMPOWERED_ARCANE_EXPLOSION_N          = 51110,
-    SPELL_EMPOWERED_ARCANE_EXPLOSION_H          = 59377,
+    SPELL_TIME_BOMB                             = 51121,
+    SPELL_EMPOWERED_ARCANE_EXPLOSION            = 51110,
 };
-
-#define SPELL_EMPOWERED_ARCANE_EXPLOSION        DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H)
-//#define SPELL_TIME_BOMB                         DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H)
 
 enum UromNPCs
 {
@@ -252,7 +247,7 @@ public:
                             me->SummonCreature(summons[0][i], cords[0][0] + ((i % 2) ? 4.0f : -4.0f), cords[0][1] + (i < 2 ? 4.0f : -4.0f), cords[0][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
-                        me->DestroyForNearbyPlayers();
+                        me->DestroyForVisiblePlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
                         releaseLockTimer = 1;
@@ -264,7 +259,7 @@ public:
                             me->SummonCreature(summons[1][i], cords[1][0] + ((i % 2) ? 4.0f : -4.0f), cords[1][1] + (i < 2 ? 4.0f : -4.0f), cords[1][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
-                        me->DestroyForNearbyPlayers();
+                        me->DestroyForVisiblePlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
                         releaseLockTimer = 1;
@@ -276,7 +271,7 @@ public:
                             me->SummonCreature(summons[2][i], cords[2][0] + ((i % 2) ? 4.0f : -4.0f), cords[2][1] + (i < 2 ? 4.0f : -4.0f), cords[2][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
                         uint8 phase = GetPhaseByCurrentPosition();
                         me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
-                        me->DestroyForNearbyPlayers();
+                        me->DestroyForVisiblePlayers();
                         LeaveCombat();
                         me->CastSpell(me, SPELL_EVOCATION, true);
                         releaseLockTimer = 1;
@@ -298,9 +293,9 @@ public:
 
                     //At this point we are still in casting state so we need to clear it for DoCastAOE not to fail
                     me->ClearUnitState(UNIT_STATE_CASTING);
-                    DoCastAOE(DUNGEON_MODE(SPELL_EMPOWERED_ARCANE_EXPLOSION_N, SPELL_EMPOWERED_ARCANE_EXPLOSION_H));
+                    DoCastAOE(SPELL_EMPOWERED_ARCANE_EXPLOSION);
                     me->AddUnitState(UNIT_STATE_CASTING);
-                    events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9000, 7000));
+                    events.RescheduleEvent(EVENT_TELE_BACK, DUNGEON_MODE(9s, 7s));
                 default:
                     break;
             }
@@ -347,7 +342,7 @@ public:
                     break;
                 case EVENT_TIME_BOMB:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                        DoCast(target, DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H));
+                        DoCast(target, SPELL_TIME_BOMB);
                     events.Repeat(20s, 25s);
                     break;
                 case EVENT_TELEPORT_TO_CENTER:

@@ -3,11 +3,21 @@ import os
 import sys
 import re
 import glob
+import subprocess
+
+base_dir = os.getcwd()
 
 # Get the pending directory of the project
-base_dir = os.getcwd()
 pattern = os.path.join(base_dir, 'data/sql/updates/pending_db_*')
 src_directory = glob.glob(pattern)
+
+# Get files from base dir
+base_pattern = os.path.join(base_dir, 'data/sql/base/db_*')
+base_directory = glob.glob(base_pattern)
+
+# Get files from archive dir
+archive_pattern = os.path.join(base_dir, 'data/sql/archive/db_*')
+archive_directory = glob.glob(archive_pattern)
 
 # Global variables
 error_handler = False
@@ -17,7 +27,9 @@ results = {
     "SQL codestyle check": "Passed",
     "INSERT & DELETE safety usage check": "Passed",
     "Missing semicolon check": "Passed",
-    "Backtick check": "Passed"
+    "Backtick check": "Passed",
+    "Directory check": "Passed",
+    "Table engine check": "Passed"
 }
 
 # Collect all files in all directories
@@ -30,6 +42,24 @@ def collect_files_from_directories(directories: list) -> list:
                     all_files.append(os.path.join(root, file))
     return all_files
 
+# Used to find changed or added files compared to master.
+def get_changed_files() -> list:
+    subprocess.run(["git", "fetch", "origin", "master"], check=True)
+    result = subprocess.run(
+        ["git", "diff", "--name-status", "origin/master"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    changed_files = []
+    for line in result.stdout.strip().splitlines():
+        if not line:
+            continue
+        status, path = line.split(maxsplit=1)
+        if status in ("A", "M"):
+            changed_files.append(path)
+    return changed_files
+
 # Main function to parse all the files of the project
 def parsing_file(files: list) -> None:
     print("Starting AzerothCore SQL Codestyle check...")
@@ -38,19 +68,33 @@ def parsing_file(files: list) -> None:
     print("https://www.azerothcore.org/wiki/sql-standards")
     print(" ")
 
-    # Iterate over all files
+    # Iterate over all files in data/sql/updates/pending_db_*
     for file_path in files:
-        try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                multiple_blank_lines_check(file, file_path)
-                trailing_whitespace_check(file, file_path)
-                sql_check(file, file_path)
-                insert_delete_safety_check(file, file_path)
-                semicolon_check(file, file_path)
-                backtick_check(file, file_path)
-        except UnicodeDecodeError:
-            print(f"\n❌ Could not decode file {file_path}")
-            sys.exit(1)
+        if "base" not in file_path and "archive" not in file_path:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    multiple_blank_lines_check(file, file_path)
+                    trailing_whitespace_check(file, file_path)
+                    sql_check(file, file_path)
+                    insert_delete_safety_check(file, file_path)
+                    semicolon_check(file, file_path)
+                    backtick_check(file, file_path)
+                    non_innodb_engine_check(file, file_path)
+            except UnicodeDecodeError:
+                print(f"\n❌ Could not decode file {file_path}")
+                sys.exit(1)
+
+    # Make sure we only check changed or added files when we work with base/archive paths
+    changed_files = get_changed_files()
+    # Iterate over all file paths
+    for file_path in changed_files:
+        if "base" in file_path or "archive" in file_path:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    directory_check(f, file_path)
+            except UnicodeDecodeError:
+                print(f"\n❌ Could not decode file {file_path}")
+                sys.exit(1)
 
     # Output the results
     print("\n ")
@@ -171,11 +215,6 @@ def semicolon_check(file: io, file_path: str) -> None:
 
     file.seek(0)  # Reset file pointer to the start
     check_failed = False
-
-    sql_statement_regex = re.compile(r'^\s*(SELECT|INSERT|UPDATE|DELETE|REPLACE|SET)\b', re.IGNORECASE)
-    block_comment_start = re.compile(r'/\*')
-    block_comment_end = re.compile(r'\*/')
-    inline_comment = re.compile(r'--.*')
 
     query_open = False
     in_block_comment = False
@@ -323,8 +362,50 @@ def backtick_check(file: io, file_path: str) -> None:
         error_handler = True
         results["Backtick check"] = "Failed"
 
+def directory_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+
+    # Normalize path and split into parts
+    normalized_path = os.path.normpath(file_path)  # handles / and \
+    path_parts = normalized_path.split(os.sep)
+
+    # Fail if '/base/' is part of the path
+    if "base" in path_parts:
+        print(f"❗ {file_path} is changed/added in the base directory.\nIf this is intended, please notify a maintainer.")
+        check_failed = True
+
+    # Fail if '/archive/' is part of the path
+    if "archive" in path_parts:
+        print(f"❗ {file_path} is changed/added in the archive directory.\nIf this is intended, please notify a maintainer.")
+        check_failed = True
+
+    if check_failed:
+        error_handler = True
+        results["Directory check"] = "Failed"
+
+def non_innodb_engine_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+
+    engine_pattern = re.compile(r'ENGINE\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
+
+    for line_number, line in enumerate(file, start=1):
+        match = engine_pattern.search(line)
+        if match:
+            engine = match.group(1).lower()
+            if engine != "innodb":
+                print(f"❌ Non-InnoDB engine found: '{engine}' in {file_path} at line {line_number}")
+                check_failed = True
+
+    if check_failed:
+        error_handler = True
+        results["Table engine check"] = "Failed"    
+
 # Collect all files from matching directories
-all_files = collect_files_from_directories(src_directory)
+all_files = collect_files_from_directories(src_directory) + collect_files_from_directories(base_directory) + collect_files_from_directories(archive_directory)
 
 # Main function
 parsing_file(all_files)

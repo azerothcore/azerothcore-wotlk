@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -183,13 +183,13 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 index) override
+        void SetGUID(ObjectGuid const& guid, int32 index) override
         {
             if (index == GO_LAVA_BURST)
             {
                 if (_lavaBurstGUIDS.empty())
                 {
-                    extraEvents.ScheduleEvent(EVENT_LAVA_BURST_TRIGGER, 1);
+                    extraEvents.ScheduleEvent(EVENT_LAVA_BURST_TRIGGER, 1ms);
                 }
 
                 _lavaBurstGUIDS.insert(guid);
@@ -309,7 +309,7 @@ public:
                                 }
 
                                 _lavaBurstGUIDS.erase(lavaBurstGUID);
-                                extraEvents.RepeatEvent(1000);
+                                extraEvents.Repeat(1s);
                             }
                             else
                             {
@@ -350,7 +350,7 @@ public:
                         {
                             Talk(SAY_WRATH);
                         }
-                        events.RepeatEvent(25000);
+                        events.Repeat(25s);
                         break;
                     }
                     case EVENT_HAND_OF_RAGNAROS:
@@ -362,7 +362,7 @@ public:
                             _isKnockbackEmoteAllowed = false;
                             extraEvents.RescheduleEvent(EVENT_RESET_KNOCKBACK_EMOTE, 5s);
                         }
-                        events.RepeatEvent(20000);
+                        events.Repeat(20s);
                         break;
                     }
                     case EVENT_LAVA_BURST:
@@ -401,7 +401,7 @@ public:
                                 extraEvents.RescheduleEvent(EVENT_RESET_KNOCKBACK_EMOTE, 5s);
                             }
                         }
-                        events.RepeatEvent(urand(11000, 30000));
+                        events.Repeat(11s, 30s);
                         break;
                     }
                     case EVENT_SUBMERGE:

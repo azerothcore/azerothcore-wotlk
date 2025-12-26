@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -170,7 +170,7 @@ struct boss_ouro : public BossAI
             }
         }
 
-        me->DespawnOrUnsummon(1000);
+        me->DespawnOrUnsummon(1s);
     }
 
     void CastGroundRupture()
@@ -178,7 +178,7 @@ struct boss_ouro : public BossAI
         std::list<WorldObject*> targets;
         Acore::AllWorldObjectsInRange checker(me, 10.0f);
         Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(me, targets, checker);
-        Cell::VisitAllObjects(me, searcher, 10.0f);
+        Cell::VisitObjects(me, searcher, 10.0f);
 
         for (WorldObject* target : targets)
         {
@@ -273,7 +273,7 @@ struct boss_ouro : public BossAI
         if (me->GetThreatMgr().GetThreatList().empty())
         {
             DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
             instance->SetBossState(DATA_OURO, FAIL);
             if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 200.f))
                 base->DespawnOrUnsummon();
@@ -334,7 +334,7 @@ struct npc_dirt_mound : ScriptedAI
         scheduler.Schedule(30s, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_SUMMON_SCARABS, true);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         })
             .Schedule(100ms, [this](TaskContext context)
         {

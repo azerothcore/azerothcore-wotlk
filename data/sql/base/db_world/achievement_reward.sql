@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -44,6 +44,9 @@ INSERT INTO `achievement_reward` VALUES
 (45,0,0,43348,28070,'You\'ve Been Around!','Well, look at ye!$B$BAnd I thought I had seen some things in this icy place! It seems obvious to this dwarf that you have the fire of the explorer burning in your eyes.$B$BWear this tabard with pride. That way your friends will know who to ask for directions when the time comes!$B$BKeep on the move!$B$BBrann Bronzebeard',0),
 (46,78,78,0,0,'','',0),
 (230,72,0,0,0,'','',0),
+(418,62,62,0,0,'','',0),
+(419,71,71,0,0,'','',0),
+(420,80,80,0,0,'','',0),
 (431,64,64,0,0,NULL,NULL,0),
 (432,53,53,0,0,NULL,NULL,0),
 (456,139,139,0,0,'','',0),
@@ -89,6 +92,10 @@ INSERT INTO `achievement_reward` VALUES
 (1956,0,0,43824,16128,'Higher Learning','Congratulations on completing your studies on The Schools of Arcane Magic. In recognition of your dedication, I\'m enclosing this special volume completing the series.$B$BI believe you\'ll find this tome particularly entertaining. But I\'ll leave that for your discovery.$B$BSincerely,$B$BRhonin',0),
 (2051,140,140,0,0,'','',0),
 (2054,121,121,0,0,'','',0),
+(2090,45,45,0,0,'','',0),
+(2091,42,42,0,0,'','',0),
+(2092,43,43,0,0,'','',0),
+(2093,44,44,0,0,'','',0),
 (2096,0,0,44430,29478,'The Coin Master','Greetings and congratulations on collecting the full set of Dalaran coins! As a reward for all your hard work I have enclosed a freshly minted Titanium Seal of Dalaran. This is a special coin that we only grant to the most ardent of collectors.$B$BI hope you enjoy this special reward. You\'ve earned it!$B$BSincerely,$BJepetto Joybuzz',0),
 (2136,0,0,44160,26917,'Glory of the Hero','Champion,$B$BWord has traveled to Wyrmrest Temple of the great heroic deeds you have accomplished since arriving in Northrend.$B$BYour bravery should not go unrecognized. Please accept this gift on behalf of the Aspects. Together we shall rid Azeroth of evil, once and for eternity.$B$BAlexstrasza the Life-Binder',0),
 (2143,0,0,44178,32216,'Leading the Cavalry','I couldn\'t help but to notice how good you are with the livestock. With all the activity around here, business has been better than ever for me. I don\'t suppose you\'d mind looking after this Albino Drake for me? I simply don\'t have enough spare minutes in the day to care for all of these animals. Yours, Mei',0),
@@ -125,8 +132,11 @@ INSERT INTO `achievement_reward` VALUES
 (3117,158,158,0,0,'','',0),
 (3259,159,159,0,0,'','',0),
 (3316,166,166,0,0,'','',0),
+(3336,157,157,0,0,'','',0),
+(3436,167,167,0,0,'','',0),
 (3478,168,0,44810,28951,'A Gobbler not yet Gobbled','Can you believe this Plump Turkey made it through November alive?$N$NSince all his friends have been served up on Bountiful Tables with sides of Cranberry Chutney and Spice Bread and... ooo... I\'m getting hungry. But anyhow! He\'s all alone, now, so I was hoping you might be willing to take care of him. There simply isn\'t enough room left in my shop!$N$NJust keep him away from cooking fires, please. He gets this strange look in his eyes around them...$N$N-Breanni',0),
 (3656,0,168,44810,28951,'A Gobbler not yet Gobbled','Can you believe this Plump Turkey made it through November alive?\r\n\r\nSince all this friends have been served up on Bountiful Tables with sides of Cranberry Chutney and Spice Bread Stuffing and... ooo... I\'m getting hungry. But anyhow! He\'s all alone, now, so I was hoping you might be willing to take care of him. There simply isn\'t enough room left in my shop!\r\n\r\nJust keep him away from cooking fires, please. He gets this strange look in his eyes around them...',0),
+(3758,169,169,0,0,'','',0),
 (3857,0,0,49052,34924,'Master of Isle of Conquest','Honorable $N,$B$BFor your deeds upon the Isle of Conquest, it is my honor to present you with this tabard. Wear it proudly.$B$BHigh Commander, 7th Legion',0),
 (3957,0,0,49054,34922,'Master of Isle of Conquest','Honorable $N,$B$BFor your deeds upon the Isle of Conquest, it is my honor to present you with this tabard. Wear it proudly.$B$BOverlord Agmar',0),
 (4078,170,170,0,0,'','',0),
@@ -140,6 +150,7 @@ INSERT INTO `achievement_reward` VALUES
 (4584,173,173,0,0,'','',0),
 (4597,175,175,0,0,'','',0),
 (4598,176,176,0,0,'','',0),
+(4599,177,177,0,0,'','',0),
 (4602,0,0,51954,37120,'Glory of the Icecrown Raider','$N,$B$BAs the Lich King\'s influence wanes, some of his more powerful minions have wrested free of his grasp.$B$BThis frost wyrm drake my men captured is a prime example. She has a will of her own and then some.$B$BOne of my men lost an arm breaking her in, but she now takes to riders fairly well -- provided they themselves are skilled and strong willed.$B$BPlease accept this magnificent beast as a gift from the Knights of the Ebon Blade. It was an honor to fight along your side in this greatest of battles.$B$BWith honor,$BDarion Mograine.',0),
 (4603,0,0,51955,37120,'Glory of the Icecrown Raider','$N,$B$BAs the Lich King\'s influence wanes, some of his more powerful minions have wrested free of his grasp.$B$BThis frost wyrm drake my men captured is a prime example. She has a will of her own and then some.$B$BOne of my men lost an arm breaking her in, but she now takes to riders fairly well -- provided they themselves are skilled and strong willed.$B$BPlease accept this magnificent beast as a gift from the Knights of the Ebon Blade. It was an honor to fight along your side in this greatest of battles.$B$BWith honor,$BDarion Mograine.',0),
 (4784,0,0,0,37942,'Emblem Quartermasters in Dalaran\'s Silver Enclave','Your achievements in Northrend have not gone unnoticed, friend.$B$BThe Emblems you have earned may be used to purchase equipment from the various Emblem Quartermasters in Dalaran.$B$BYou may find us there, in the Silver Enclave, where each variety of Emblem has its own quartermaster.$B$BWe look forward to your arrival!',0),
@@ -155,5 +166,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:14
-
+-- Dump completed on 2025-07-19 12:08:35

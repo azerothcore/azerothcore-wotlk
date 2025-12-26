@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -38,7 +38,7 @@ public:
                 _owner.GetMotionMaster()->Clear();
                 _owner.SetVisible(true);
                 _owner.NearTeleportTo(5300.53f, 1987.80f, 707.70f, 3.89f);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, 2), _owner.m_Events.CalculateTime(1000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 2), 1s);
                 break;
             case 2:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_HALT);
@@ -52,12 +52,12 @@ public:
                 {
                     quel->AI()->Talk(EMOTE_QUEL_SPAWN);
                 }
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, 4), _owner.m_Events.CalculateTime(3500));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 4), 3500ms);
                 break;
             case 4:
                 _owner.SetWalk(false);
                 _owner.GetMotionMaster()->MovePoint(0, 5337.53f, 1981.21f, 709.32f);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, 5), _owner.m_Events.CalculateTime(6000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 5), 6s);
                 break;
             case 5:
                 _owner.SetFacingTo(2.82f);
@@ -66,7 +66,7 @@ public:
             case 6:
                 if (InstanceScript* instance = _owner.GetInstanceScript())
                     instance->SetData(DATA_BATTERED_HILT, 6);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, 7), _owner.m_Events.CalculateTime(2000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 7), 2s);
                 break;
             case 7:
                 if (InstanceScript* instance = _owner.GetInstanceScript())
@@ -77,7 +77,7 @@ public:
                 {
                     quel->AI()->Talk(EMOTE_QUEL_PREPARE);
                 }
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, 8), _owner.m_Events.CalculateTime(4000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 8), 4s);
                 break;
             case 8:
                 _owner.SetReactState(REACT_AGGRESSIVE);
@@ -87,23 +87,23 @@ public:
                 break;
             case 9:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO1);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(11000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 11s);
                 break;
             case 10:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO2);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(7500));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 7500ms);
                 break;
             case 11:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO3);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(8000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 8s);
                 break;
             case 12:
                 _owner.AI()->Talk(SAY_BATTERED_HILT_OUTRO4);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(5000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 5s);
                 break;
             case 13:
                 _owner.CastSpell((Unit*)nullptr, 73036, true);
-                _owner.m_Events.AddEvent(new UtherBatteredHiltEvent(_owner, _eventId + 1), _owner.m_Events.CalculateTime(3000));
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, _eventId + 1), 3s);
                 break;
             case 14:
                 {
@@ -594,7 +594,7 @@ public:
                                 if (Creature* c = instance->GetCreature(NPC_AltarBunnyGUID))
                                     c->CastSpell(c, 70720, true);
                                 if (Creature* c = instance->GetCreature(NPC_UtherGUID))
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 1), c->m_Events.CalculateTime(3000));
+                                    c->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*c, 1), 3s);
                                 break;
                             case 3:
                                 if ((BatteredHiltStatus & BHSF_STARTED) == 0 || (BatteredHiltStatus & BHSF_THROWN))
@@ -602,7 +602,7 @@ public:
                                 BatteredHiltStatus |= BHSF_THROWN;
                                 if (Creature* c = instance->GetCreature(NPC_UtherGUID))
                                 {
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 3), c->m_Events.CalculateTime(5500));
+                                    c->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*c, 3), 5500ms);
                                 }
                                 break;
                             case 4:
@@ -614,7 +614,7 @@ public:
                                 break;
                             case 5:
                                 if (Creature* c = instance->GetCreature(NPC_UtherGUID))
-                                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 6), c->m_Events.CalculateTime(3000));
+                                    c->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*c, 6), 3s);
                                 break;
                             case 6:
                                 if (Creature* c = instance->GetCreature(NPC_QuelDelarGUID))
@@ -726,7 +726,7 @@ public:
                     c->SetStandState(UNIT_STAND_STATE_STAND);
                     c->SetWalk(false);
                     c->GetMotionMaster()->MovePoint(0, 5313.92f, 1989.36f, 707.70f);
-                    c->m_Events.AddEvent(new UtherBatteredHiltEvent(*c, 9), c->m_Events.CalculateTime(7000));
+                    c->m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(*c, 9), 7s);
                 }
         }
 

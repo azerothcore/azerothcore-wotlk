@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -82,53 +82,69 @@ struct npc_dragonflayer_forge_master : public ScriptedAI
 
 enum EnslavedProtoDrake
 {
-    TYPE_PROTODRAKE_AT      = 28,
-    DATA_PROTODRAKE_MOVE    = 6,
-
-    PATH_PROTODRAKE         = 125946,
-
-    EVENT_REND              = 1,
-    EVENT_FLAME_BREATH      = 2,
-    EVENT_KNOCKAWAY         = 3,
-
     SPELL_REND              = 43931,
     SPELL_FLAME_BREATH      = 50653,
     SPELL_KNOCK_AWAY        = 49722,
 
-    POINT_LAST              = 5,
+    EVENT_REND              = 1,
+    EVENT_FLAME_BREATH      = 2,
+    EVENT_KNOCKAWAY         = 3,
+    // Special
+    EVENT_PRE_LAND          = 4,
+    EVENT_LAND              = 5,
+
+    // Special
+    TYPE_PROTODRAKE_AT      = 28,
+    DATA_PROTODRAKE_MOVE    = 6,
+    POINT_TAKE_OFF          = 1,
+    POINT_PRE_LAND          = 2,
+    POINT_LAND              = 3,
 };
 
-const Position protodrakeCheckPos = {206.24f, -190.28f, 200.11f, 0.f};
+const Position protodrakeCheckPos{206.24f, -190.28f, 200.11f, 0.f};
+const Position protodrakeTakeOffPos{209.1206f, -187.86578f, 215.00346f};
+const Position protodrakePreLandPos{230.80234f, -164.99632f, 196.74878f};
+const Position protodrakeLandPos{241.2079f, -163.06265f, 193.47125f};
 
 struct npc_enslaved_proto_drake : public ScriptedAI
 {
-    npc_enslaved_proto_drake(Creature* creature) : ScriptedAI(creature)
-    {
-        _setData = false;
-    }
+    explicit npc_enslaved_proto_drake(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
         _events.Reset();
         _events.ScheduleEvent(EVENT_REND, 2s, 3s);
-        _events.ScheduleEvent(EVENT_FLAME_BREATH, 5500ms, 7000ms);
-        _events.ScheduleEvent(EVENT_KNOCKAWAY, 3500ms, 6000ms);
+        _events.ScheduleEvent(EVENT_FLAME_BREATH, 5500ms, 7s);
+        _events.ScheduleEvent(EVENT_KNOCKAWAY, 3500ms, 6s);
+        scheduler.CancelAll();
     }
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type == WAYPOINT_MOTION_TYPE && id == POINT_LAST)
+        if (type == EFFECT_MOTION_TYPE && id == POINT_TAKE_OFF)
         {
+            ScheduleUniqueTimedEvent(500ms, [&]
+            {
+                me->GetMotionMaster()->MovePoint(POINT_PRE_LAND, protodrakePreLandPos);
+            }, EVENT_PRE_LAND);
+        }
+
+        if (type == POINT_MOTION_TYPE && id == POINT_PRE_LAND)
+        {
+            ScheduleUniqueTimedEvent(0s, [&]
+            {
+                me->GetMotionMaster()->MovePoint(POINT_LAND, protodrakeLandPos);
+            }, EVENT_LAND);
+        }
+
+        if (type == POINT_MOTION_TYPE && id == POINT_LAND)
+        {
+            me->SetFacingTo(0.25f);
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
             if (Vehicle* v = me->GetVehicleKit())
                 if (Unit* p = v->GetPassenger(0))
                     if (Creature* rider = p->ToCreature())
                         rider->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
-
-            me->SetCanFly(false);
-            me->SetDisableGravity(false);
-            me->SetFacingTo(0.25f);
-            me->SetImmuneToAll(false);
         }
     }
 
@@ -137,14 +153,14 @@ struct npc_enslaved_proto_drake : public ScriptedAI
         if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
         {
             _setData = true;
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->GetMotionMaster()->MovePath(PATH_PROTODRAKE, false);
+            me->GetMotionMaster()->MoveTakeoff(POINT_TAKE_OFF, protodrakeTakeOffPos,  8.0f);
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
@@ -167,7 +183,7 @@ struct npc_enslaved_proto_drake : public ScriptedAI
                 break;
             case EVENT_KNOCKAWAY:
                 DoCast(SPELL_KNOCK_AWAY);
-                _events.ScheduleEvent(EVENT_KNOCKAWAY, 7000ms, 8500ms);
+                _events.ScheduleEvent(EVENT_KNOCKAWAY, 7s, 8500ms);
                 break;
             default:
                 break;
@@ -178,7 +194,7 @@ struct npc_enslaved_proto_drake : public ScriptedAI
     }
 
 private:
-    bool _setData;
+    bool _setData{false};
     EventMap _events;
 };
 

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -711,6 +711,10 @@ struct DungeonEncounter
 typedef std::list<DungeonEncounter const*> DungeonEncounterList;
 typedef std::unordered_map<uint32, DungeonEncounterList> DungeonEncounterContainer;
 
+typedef std::map<std::pair<SummonSlot /*TotemSlot*/, Races /*RaceId*/>, uint32 /*DisplayId*/> PlayerTotemModelMap;
+
+typedef std::map<std::tuple<ShapeshiftForm /*ShapeshiftID*/, uint8 /*RaceID*/, uint8 /*CustomizationID*/, uint8 /*GenderID*/>, uint32 /*ModelID*/> PlayerShapeshiftModelMap;
+
 static constexpr uint32 MAX_QUEST_MONEY_REWARDS = 10;
 typedef std::array<uint32, MAX_QUEST_MONEY_REWARDS> QuestMoneyRewardArray;
 typedef std::unordered_map<uint32, QuestMoneyRewardArray> QuestMoneyRewardStore;
@@ -776,6 +780,10 @@ public:
     ItemTemplate const* GetItemTemplate(uint32 entry);
     [[nodiscard]] ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
     [[nodiscard]] std::vector<ItemTemplate*> const* GetItemTemplateStoreFast() const { return &_itemTemplateStoreFast; }
+
+    uint32 GetModelForTotem(SummonSlot totemSlot, Races race) const;
+
+    uint32 GetModelForShapeshift(ShapeshiftForm form, Player* player) const;
 
     ItemSetNameEntry const* GetItemSetNameEntry(uint32 itemId)
     {
@@ -1035,6 +1043,8 @@ public:
     void LoadCreatureAddons();
     void LoadGameObjectAddons();
     void LoadCreatureModelInfo();
+    void LoadPlayerTotemModels();
+    void LoadPlayerShapeshiftModels();
     void LoadEquipmentTemplates();
     void LoadCreatureMovementOverrides();
     void LoadGameObjectLocales();
@@ -1621,6 +1631,10 @@ private:
     };
 
     std::set<uint32> _transportMaps; // Helper container storing map ids that are for transports only, loaded from gameobject_template
+
+    PlayerTotemModelMap _playerTotemModel;
+
+    PlayerShapeshiftModelMap _playerShapeshiftModel;
 
     QuestMoneyRewardStore _questMoneyRewards;
 

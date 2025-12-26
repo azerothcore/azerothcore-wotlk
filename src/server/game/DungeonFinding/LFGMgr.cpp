@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -408,11 +408,10 @@ namespace lfg
             DungeonProgressionRequirements const* ar = sObjectMgr->GetAccessRequirement(dungeon->map, Difficulty(dungeon->difficulty));
 
             uint32 lockData = 0;
+
             if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
-            else if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, dungeon->map, player))
-                lockData = LFG_LOCKSTATUS_RAID_LOCKED;
-            else if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, dungeon->map, player))
+            else if (IsDungeonDisabled(dungeon->map, dungeon->difficulty))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
             else if (dungeon->difficulty > DUNGEON_DIFFICULTY_NORMAL && (!mapEntry || !mapEntry->IsRaid()) && sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, Difficulty(dungeon->difficulty)))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -422,6 +421,8 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
             else if (dungeon->seasonal && !IsSeasonActive(dungeon->id))
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
+            else if (player->IsClass(CLASS_DEATH_KNIGHT) && !player->IsGameMaster() &&!(player->IsQuestRewarded(13188) || player->IsQuestRewarded(13189)))
+                lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
             else if (ar)
             {
                 // Check required items
@@ -686,7 +687,7 @@ namespace lfg
             // xinef: dont check compatibile dungeons for already running group (bind problems)
             if (!isContinue)
             {
-                GetCompatibleDungeons(dungeons, players, joinData.lockmap);
+                GetCompatibleDungeons(dungeons, players, joinData.lockmap, rDungeonId);
                 if (dungeons.empty())
                     joinData.result = grp ? LFG_JOIN_PARTY_NOT_MEET_REQS : LFG_JOIN_NOT_MEET_REQS;
             }
@@ -959,7 +960,7 @@ namespace lfg
         RBCacheMap::iterator itr = RBCacheStore[player->GetTeamId()].find(dungeonId);
         if (itr != RBCacheStore[player->GetTeamId()].end())
         {
-            player->GetSession()->SendPacket(&(itr->second));
+            player->SendDirectMessage(&(itr->second));
             return;
         }
         // send empty packet if cache not found
@@ -971,7 +972,7 @@ namespace lfg
         data << (uint32)0;
         data << (uint32)0;
         data << (uint32)0;
-        player->GetSession()->SendPacket(&data);
+        player->SendDirectMessage(&data);
     }
 
     void LFGMgr::UpdateRaidBrowser(uint32 diff)
@@ -1218,7 +1219,7 @@ namespace lfg
                 for (RBSearchersMap::const_iterator sitr = RBSearchersStore[team].begin(); sitr != RBSearchersStore[team].end(); ++sitr)
                     if (sitr->second == dungeonId)
                         if (Player* p = ObjectAccessor::FindConnectedPlayer(sitr->first))
-                            p->GetSession()->SendPacket(&differencePacket);
+                            p->SendDirectMessage(&differencePacket);
 
                 break; // one dungeon updated in one LFGMgr::UpdateRaidBrowser
             }
@@ -1482,8 +1483,9 @@ namespace lfg
        @param[in, out] dungeons Dungeons to check restrictions
        @param[in]     players Set of players to check their dungeon restrictions
        @param[out]    lockMap Map of players Lock status info of given dungeons (Empty if dungeons is not empty)
+       @param[in]     randomDungeonId Random dungeon ID (0 for non-random selections), used to filter disabled maps
     */
-    void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap)
+    void LFGMgr::GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId)
     {
         lockMap.clear();
         for (LfgGuidSet::const_iterator it = players.begin(); it != players.end() && !dungeons.empty(); ++it)
@@ -1493,6 +1495,14 @@ namespace lfg
             for (LfgLockMap::const_iterator it2 = cachedLockMap.begin(); it2 != cachedLockMap.end() && !dungeons.empty(); ++it2)
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
+
+                LFGDungeonData const* dungeon = GetLFGDungeon(dungeonId);
+
+                uint8 difficultyFlag = (randomDungeonId == RANDOM_DUNGEON_NORMAL_TBC || randomDungeonId == RANDOM_DUNGEON_NORMAL_WOTLK) ? 0 : 1;
+
+                if (dungeon && !IsDungeonDisabled(dungeon->map, (Difficulty)difficultyFlag) && it2->second == LFG_LOCKSTATUS_RAID_LOCKED && randomDungeonId && sWorld->getBoolConfig(CONFIG_LFG_ALLOW_COMPLETED))
+                    continue;
+
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
                 if (itDungeon != dungeons.end())
                 {
@@ -1505,7 +1515,7 @@ namespace lfg
             lockMap.clear();
     }
 
-    uint8 LFGMgr::CheckGroupRoles(LfgRolesMap& groles, bool removeLeaderFlag /*= true*/)
+    uint8 LFGMgr::CheckGroupRoles(LfgRolesMap& groles)
     {
         if (groles.empty())
             return 0;
@@ -1514,21 +1524,18 @@ namespace lfg
         uint8 tank = 0;
         uint8 healer = 0;
 
-        if (removeLeaderFlag)
-            for (LfgRolesMap::iterator it = groles.begin(); it != groles.end(); ++it)
-                it->second &= ~PLAYER_ROLE_LEADER;
-
         for (LfgRolesMap::iterator it = groles.begin(); it != groles.end(); ++it)
         {
-            if (it->second == PLAYER_ROLE_NONE)
+            uint8 const role = it->second & ~PLAYER_ROLE_LEADER;
+            if (role == PLAYER_ROLE_NONE)
                 return 0;
 
-            if (it->second & PLAYER_ROLE_DAMAGE)
+            if (role & PLAYER_ROLE_DAMAGE)
             {
-                if (it->second != PLAYER_ROLE_DAMAGE)
+                if (role != PLAYER_ROLE_DAMAGE)
                 {
                     it->second -= PLAYER_ROLE_DAMAGE;
-                    if (uint8 x = CheckGroupRoles(groles, false))
+                    if (uint8 x = CheckGroupRoles(groles))
                         return x;
                     it->second += PLAYER_ROLE_DAMAGE;
                 }
@@ -1538,12 +1545,12 @@ namespace lfg
                     damage++;
             }
 
-            if (it->second & PLAYER_ROLE_HEALER)
+            if (role & PLAYER_ROLE_HEALER)
             {
-                if (it->second != PLAYER_ROLE_HEALER)
+                if (role != PLAYER_ROLE_HEALER)
                 {
                     it->second -= PLAYER_ROLE_HEALER;
-                    if (uint8 x = CheckGroupRoles(groles, false))
+                    if (uint8 x = CheckGroupRoles(groles))
                         return x;
                     it->second += PLAYER_ROLE_HEALER;
                 }
@@ -1553,12 +1560,12 @@ namespace lfg
                     healer++;
             }
 
-            if (it->second & PLAYER_ROLE_TANK)
+            if (role & PLAYER_ROLE_TANK)
             {
-                if (it->second != PLAYER_ROLE_TANK)
+                if (role != PLAYER_ROLE_TANK)
                 {
                     it->second -= PLAYER_ROLE_TANK;
-                    if (uint8 x = CheckGroupRoles(groles, false))
+                    if (uint8 x = CheckGroupRoles(groles))
                         return x;
                     it->second += PLAYER_ROLE_TANK;
                 }
@@ -1668,11 +1675,8 @@ namespace lfg
             }
             else if (group != grp)
             {
-                // pussywizard:
                 if (!grp->IsFull())
                     grp->AddMember(player);
-                //else // some cleanup? LeaveLFG?
-                //  ;
             }
 
             grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
@@ -1765,10 +1769,8 @@ namespace lfg
                 else
                 {
                     // RDF removes all binds to that map
-                    if (randomDungeon && !sInstanceSaveMgr->PlayerIsPermBoundToInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty()))
-                    {
+                    if (randomDungeon)
                         sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
-                    }
                 }
 
                 playersTeleported.push_back(player);
@@ -2820,6 +2822,12 @@ namespace lfg
                 randomDungeons.insert(dungeon.Entry());
         }
         return randomDungeons;
+    }
+
+    bool LFGMgr::IsDungeonDisabled(uint32 mapId, Difficulty difficulty) const
+    {
+        return sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, mapId, nullptr, difficulty) ||
+            sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, mapId, nullptr);
     }
 
 } // namespace lfg
