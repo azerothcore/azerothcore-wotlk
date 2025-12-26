@@ -1,3 +1,4 @@
+-- DB update 2025_12_26_05 -> 2025_12_26_06
 -- Delete Duplicate
 DELETE FROM `creature` WHERE (`id1` = 24439) AND (`guid` IN (142710));
 
