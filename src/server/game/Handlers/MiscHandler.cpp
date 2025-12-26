@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -656,7 +656,8 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
     if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(GameTime::GetGameTime().count()))
         return;
 
-    if (!corpse->IsWithinDistInMap(_player, CORPSE_RECLAIM_RADIUS, true))
+    // skip phase check
+    if (!corpse->IsInMap(_player) || !corpse->IsWithinDist(_player, CORPSE_RECLAIM_RADIUS, true))
         return;
 
     // resurrect
@@ -1490,6 +1491,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
 {
     LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging((Opcodes)recv_data.GetOpcode()));
 
+    Opcodes opcode = (Opcodes)recv_data.GetOpcode();
+
     ObjectGuid guid;
     uint32 counter;
     uint32 isApplied;
@@ -1507,7 +1510,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
 
-    recv_data >> isApplied;
+    if (opcode != CMSG_MOVE_GRAVITY_DISABLE_ACK && opcode != CMSG_MOVE_GRAVITY_ENABLE_ACK)
+        recv_data >> isApplied;
 
     sScriptMgr->AnticheatSetCanFlybyServer(_player, movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
 
@@ -1515,6 +1519,19 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     Player* plrMover = mover->ToPlayer();
 
     mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
+
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
+
+    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
+    {
+        recv_data.rfinish();                     // prevent warnings spam
+        return;
+    }
+
+    if (_player->GetPendingFlightChange() == counter && opcode == CMSG_MOVE_SET_CAN_FLY_ACK)
+        _player->SetPendingFlightChange(false);
 
     Opcodes response;
 
@@ -1524,17 +1541,12 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
         case CMSG_MOVE_FEATHER_FALL_ACK: response = MSG_MOVE_FEATHER_FALL; break;
         case CMSG_MOVE_WATER_WALK_ACK: response = MSG_MOVE_WATER_WALK; break;
         case CMSG_MOVE_SET_CAN_FLY_ACK: response = MSG_MOVE_UPDATE_CAN_FLY; break;
+        case CMSG_MOVE_GRAVITY_DISABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
+        case CMSG_MOVE_GRAVITY_ENABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
         default: return;
     }
 
-    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
-    {
-        recv_data.rfinish();                     // prevent warnings spam
-        return;
-    }
-
     WorldPacket data(response, 8);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     _player->m_mover->SendMessageToSet(&data, _player);
 }

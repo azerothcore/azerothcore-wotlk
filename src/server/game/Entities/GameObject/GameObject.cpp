@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -517,7 +517,7 @@ void GameObject::Update(uint32 diff)
                                     WorldPacket packet;
                                     BuildValuesUpdateBlockForPlayer(&udata, caster->ToPlayer());
                                     udata.BuildPacket(packet);
-                                    caster->ToPlayer()->GetSession()->SendPacket(&packet);
+                                    caster->ToPlayer()->SendDirectMessage(&packet);
 
                                     SendCustomAnim(GetGoAnimProgress());
                                 }
@@ -637,7 +637,7 @@ void GameObject::Update(uint32 diff)
                                         caster->ToPlayer()->RemoveGameObject(this, false);
 
                                         WorldPacket data(SMSG_FISH_ESCAPED, 0);
-                                        caster->ToPlayer()->GetSession()->SendPacket(&data);
+                                        caster->ToPlayer()->SendDirectMessage(&data);
                                     }
                                     // can be delete
                                     m_lootState = GO_JUST_DEACTIVATED;
@@ -1466,7 +1466,7 @@ void GameObject::Use(Unit* user)
     // by default spell caster is user
     Unit* spellCaster = user;
     uint32 spellId = 0;
-    bool triggered = false;
+    uint32 triggeredFlags = TRIGGERED_NONE;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1485,6 +1485,10 @@ void GameObject::Use(Unit* user)
 
         m_cooldownTime = GameTime::GetGameTimeMS().count() + cooldown * IN_MILLISECONDS;
     }
+
+    if (user->IsPlayer() && GetGoType() != GAMEOBJECT_TYPE_TRAP) // workaround for GO casting
+        if (!m_goInfo->IsUsableMounted())
+            user->RemoveAurasByType(SPELL_AURA_MOUNTED);
 
     switch (GetGoType())
     {
@@ -1624,7 +1628,7 @@ void GameObject::Use(Unit* user)
                     {
                         WorldPacket data(SMSG_GAMEOBJECT_PAGETEXT, 8);
                         data << GetGUID();
-                        player->GetSession()->SendPacket(&data);
+                        player->SendDirectMessage(&data);
                     }
                     else if (info->goober.gossipID)
                     {
@@ -1794,7 +1798,7 @@ void GameObject::Use(Unit* user)
                             SetLootState(GO_JUST_DEACTIVATED);
 
                             WorldPacket data(SMSG_FISH_NOT_HOOKED, 0);
-                            player->GetSession()->SendPacket(&data);
+                            player->SendDirectMessage(&data);
                             break;
                         }
                 }
@@ -1886,7 +1890,6 @@ void GameObject::Use(Unit* user)
                     }
                 }
 
-                user->RemoveAurasByType(SPELL_AURA_MOUNTED);
                 spellId = info->spellcaster.spellId;
                 break;
             }
@@ -2031,7 +2034,7 @@ void GameObject::Use(Unit* user)
                 player->TeleportTo(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
 
                 WorldPacket data(SMSG_ENABLE_BARBER_SHOP, 0);
-                player->GetSession()->SendPacket(&data);
+                player->SendDirectMessage(&data);
 
                 player->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR + info->barberChair.chairheight);
                 return;
@@ -2056,12 +2059,15 @@ void GameObject::Use(Unit* user)
         return;
     }
 
+    if (m_goInfo->IsUsableMounted())
+        triggeredFlags |= TRIGGERED_IGNORE_CASTER_MOUNTED_OR_ON_VEHICLE;
+
     if (Player* player = user->ToPlayer())
         sOutdoorPvPMgr->HandleCustomSpell(player, spellId, this);
 
     if (spellCaster)
     {
-        if ((spellCaster->CastSpell(user, spellInfo, triggered) == SPELL_CAST_OK) && GetGoType() == GAMEOBJECT_TYPE_SPELLCASTER)
+        if ((spellCaster->CastSpell(user, spellInfo, TriggerCastFlags(triggeredFlags)) == SPELL_CAST_OK) && GetGoType() == GAMEOBJECT_TYPE_SPELLCASTER)
             AddUse();
     }
     else
@@ -2305,7 +2311,7 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
         data << uint32(-change);                    // change  < 0 triggers SPELL_BUILDING_HEAL combat log event
         // change >= 0 triggers SPELL_BUILDING_DAMAGE event
         data << uint32(spellId);
-        player->GetSession()->SendPacket(&data);
+        player->SendDirectMessage(&data);
     }
 
     GameObjectDestructibleState newState = GetDestructibleState();

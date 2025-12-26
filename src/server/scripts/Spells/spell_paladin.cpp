@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -473,11 +473,7 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
     {
         Unit* target = GetTarget();
         if (Unit* caster = GetCaster())
-        {
-            // xinef: hack
-            int32 value = 9;
-            caster->CastCustomSpell(target, SPELL_PALADIN_BLESSING_OF_SANCTUARY_BUFF, &value, &value, 0, true);
-        }
+            caster->CastSpell(target, SPELL_PALADIN_BLESSING_OF_SANCTUARY_BUFF, true);
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -965,6 +961,24 @@ class spell_pal_lay_on_hands : public SpellScript
         return true;
     }
 
+    void HandleMaxHealthHeal(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetExplTargetUnit();
+
+        if (!target || !caster)
+            return;
+
+        uint32 baseHeal = caster->GetMaxHealth();
+        uint32 modifiedHeal = target->SpellHealingBonusTaken(caster, GetSpellInfo(), baseHeal, HEAL);
+
+        // EffectHealMaxHealth() ignores healing modifiers, so we pre-apply the
+        // difference here; this delta will be added on top of the raw heal.
+        int64 healAdjustment = int64(modifiedHeal) - int64(baseHeal);
+
+        SetHitHeal(healAdjustment);
+    }
+
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
@@ -1004,6 +1018,7 @@ class spell_pal_lay_on_hands : public SpellScript
     {
         OnCheckCast += SpellCheckCastFn(spell_pal_lay_on_hands::CheckCast);
         AfterHit += SpellHitFn(spell_pal_lay_on_hands::HandleScript);
+        OnEffectHitTarget += SpellEffectFn(spell_pal_lay_on_hands::HandleMaxHealthHeal, EFFECT_0, SPELL_EFFECT_HEAL_MAX_HEALTH);
     }
 
     int32 _manaAmount;

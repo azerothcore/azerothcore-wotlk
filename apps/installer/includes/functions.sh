@@ -155,7 +155,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     # change the following version when needed
-    local VERSION=v17
+    local VERSION=v19
 
     echo "#######################"
     echo "Client data downloader"
@@ -183,3 +183,5 @@ function inst_download_client_data {
         && echo "Remove downloaded file" && rm "$zipPath" \
         && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
 }
+
+

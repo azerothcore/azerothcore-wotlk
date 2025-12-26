@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -388,30 +388,39 @@ bool DisableMgr::IsDisabledFor(DisableType type, uint32 entry, Unit const* unit,
             }
         case DISABLE_TYPE_MAP:
         case DISABLE_TYPE_LFG_MAP:
-            if (Player const* player = unit->ToPlayer())
+        {
+            MapEntry const* mapEntry = sMapStore.LookupEntry(entry);
+            if (!mapEntry)
+                return false;
+
+            if (!mapEntry->IsDungeon())
+                return mapEntry->map_type == MAP_COMMON;
+
+            uint8 disabledModes = itr->second.flags;
+
+            Difficulty targetDifficulty;
+            if (unit && unit->IsPlayer())
+                targetDifficulty = unit->ToPlayer()->GetDifficulty(mapEntry->IsRaid());
+            else
+                targetDifficulty = Difficulty(flags);
+
+            GetDownscaledMapDifficultyData(entry, targetDifficulty);
+
+            switch (targetDifficulty)
             {
-                MapEntry const* mapEntry = sMapStore.LookupEntry(entry);
-                if (mapEntry->IsDungeon())
-                {
-                    uint8 disabledModes = itr->second.flags;
-                    Difficulty targetDifficulty = player->GetDifficulty(mapEntry->IsRaid());
-                    GetDownscaledMapDifficultyData(entry, targetDifficulty);
-                    switch (targetDifficulty)
-                    {
-                        case DUNGEON_DIFFICULTY_NORMAL:
-                            return disabledModes & DUNGEON_STATUSFLAG_NORMAL;
-                        case DUNGEON_DIFFICULTY_HEROIC:
-                            return disabledModes & DUNGEON_STATUSFLAG_HEROIC;
-                        case RAID_DIFFICULTY_10MAN_HEROIC:
-                            return disabledModes & RAID_STATUSFLAG_10MAN_HEROIC;
-                        case RAID_DIFFICULTY_25MAN_HEROIC:
-                            return disabledModes & RAID_STATUSFLAG_25MAN_HEROIC;
-                    }
-                }
-                else if (mapEntry->map_type == MAP_COMMON)
-                    return true;
+                case DUNGEON_DIFFICULTY_NORMAL:
+                    return disabledModes & DUNGEON_STATUSFLAG_NORMAL;
+                case DUNGEON_DIFFICULTY_HEROIC:
+                    return disabledModes & DUNGEON_STATUSFLAG_HEROIC;
+                case RAID_DIFFICULTY_10MAN_HEROIC:
+                    return disabledModes & RAID_STATUSFLAG_10MAN_HEROIC;
+                case RAID_DIFFICULTY_25MAN_HEROIC:
+                    return disabledModes & RAID_STATUSFLAG_25MAN_HEROIC;
+                default:
+                    return false;
             }
             return false;
+        }
         case DISABLE_TYPE_VMAP:
             return flags & itr->second.flags;
         case DISABLE_TYPE_QUEST:

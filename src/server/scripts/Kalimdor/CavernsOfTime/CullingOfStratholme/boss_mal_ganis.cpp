@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,12 +22,9 @@
 
 enum Spells
 {
-    SPELL_CARRION_SWARM_N                       = 52720,
-    SPELL_CARRION_SWARM_H                       = 58852,
-    SPELL_MIND_BLAST_N                          = 52722,
-    SPELL_MIND_BLAST_H                          = 58850,
-    SPELL_SLEEP_N                               = 52721,
-    SPELL_SLEEP_H                               = 58849,
+    SPELL_CARRION_SWARM                         = 52720,
+    SPELL_MIND_BLAST                            = 52722,
+    SPELL_SLEEP                                 = 52721,
     SPELL_VAMPIRIC_TOUCH                        = 52723,
 };
 
@@ -145,18 +142,18 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_CARRION_SWARM:
-                    me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_CARRION_SWARM_N, SPELL_CARRION_SWARM_H), false);
+                    me->CastSpell(me->GetVictim(), SPELL_CARRION_SWARM, false);
                     events.Repeat(7s);
                     break;
                 case EVENT_SPELL_MIND_BLAST:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_MIND_BLAST_N, SPELL_MIND_BLAST_H), false);
+                        me->CastSpell(target, SPELL_MIND_BLAST, false);
                     events.Repeat(6s);
                     break;
                 case EVENT_SPELL_SLEEP:
                     Talk(SAY_SLEEP);
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_SLEEP_N, SPELL_SLEEP_H), false);
+                        me->CastSpell(target, SPELL_SLEEP, false);
                     events.Repeat(17s);
                     break;
                 case EVENT_SPELL_VAMPIRIC_TOUCH:
