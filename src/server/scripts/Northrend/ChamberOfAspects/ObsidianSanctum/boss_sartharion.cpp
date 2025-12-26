@@ -139,8 +139,8 @@ enum Misc
     LAVA_RIGHT_SIDE                             = 1,
 
     // Counters
-    MAX_LEFT_LAVA_TSUNAMIS                      = 3,
-    MAX_RIGHT_LAVA_TSUNAMIS                     = 2,
+    MAX_LEFT_LAVA_TSUNAMIS                      = 9,
+    MAX_RIGHT_LAVA_TSUNAMIS                     = 6,
     MAX_DRAGONS                                 = 3,
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
@@ -230,6 +230,19 @@ const float SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
     3275.69f,   // North X
     484.68f,    // East Y
     572.4f      // West Y
+};
+
+const float FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
+{
+    476.0f, 484.0f, 492.0f,
+    524.0f, 532.0f, 540.0f,
+    572.0f, 580.0f, 588.0f
+};
+
+const float FlameTsunamiRightOffsets[MAX_RIGHT_LAVA_TSUNAMIS] =
+{
+    500.0f, 508.0f, 516.0f,
+    548.0f, 556.0f, 564.0f
 };
 
 const Position bigIslandMiddlePos = { 3242.822754f, 477.279816f, 57.430473f };
@@ -628,7 +641,7 @@ public:
             {
                 for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3208.44f, 580.0f - (i * 50.0f), 55.8f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3211.0f, FlameTsunamiLeftOffsets[i], 57.083332f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
                 }
 
                 lastLavaSide = LAVA_LEFT_SIDE;
@@ -638,7 +651,7 @@ public:
             {
                 for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3283.44f, 555.0f - (i * 50.0f), 55.8f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3286.0f, FlameTsunamiRightOffsets[i], 57.083332f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 12000);
                 }
 
                 lastLavaSide = LAVA_RIGHT_SIDE;
@@ -648,26 +661,18 @@ public:
         void SendLavaWaves(bool start)
         {
             if (summons.empty())
-            {
                 return;
-            }
 
             for (ObjectGuid const& guid : summons)
             {
                 Creature* tsunami = ObjectAccessor::GetCreature(*me, guid);
                 if (!tsunami || tsunami->GetEntry() != NPC_FLAME_TSUNAMI)
-                {
                     continue;
-                }
 
-                if (start)
-                {
-                    tsunami->GetMotionMaster()->MovePoint(0, ((tsunami->GetPositionX() < 3250.0f) ? 3283.44f : 3208.44f), tsunami->GetPositionY(), tsunami->GetPositionZ());
-                }
+                if (start) // Movement possibly simplified from official, ideally reevaluate in the future.
+                    tsunami->GetMotionMaster()->MovePoint(0, ((tsunami->GetPositionX() < 3250.0f) ? 3286.0f : 3211.0f), tsunami->GetPositionY(), tsunami->GetPositionZ());
                 else
-                {
                     tsunami->SetObjectScale(0.1f);
-                }
             }
         }
 
