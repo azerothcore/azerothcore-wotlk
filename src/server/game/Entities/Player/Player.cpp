@@ -6145,7 +6145,7 @@ void Player::RewardReputation(Quest const* quest)
 
             if (hostile)
             {
-                LOG_ERROR("sql.sql", "{} is hostile with player, skipping!", templateEntry->ID);
+                LOG_DEBUG("sql.sql", "RewardReputation: {} is hostile with player ({}), skipping!", templateEntry->ID, GetGUID().ToString());
                 continue;
             }
         }
