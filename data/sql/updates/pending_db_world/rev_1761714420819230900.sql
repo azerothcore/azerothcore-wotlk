@@ -1,5 +1,6 @@
 -- Hellfire Peninsula - Pools of Aggonar ooze aggro linking
 DELETE FROM `creature_formations` WHERE `leaderGUID` BETWEEN 58465 and 58497;
+DELETE FROM `creature_formations` WHERE `leaderGUID` = 58786;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (58465, 58465, 3), (58465, 58498, 3), (58465, 58499, 3),
 (58466, 58466, 3), (58466, 58500, 3), (58466, 58504, 3),
