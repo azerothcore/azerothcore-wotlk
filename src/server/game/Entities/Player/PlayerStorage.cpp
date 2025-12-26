@@ -3672,6 +3672,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
         if (isUnequipingItem)
             sScriptMgr->OnPlayerUnequip(this, pSrcItem);
+
         return;
     }
 
