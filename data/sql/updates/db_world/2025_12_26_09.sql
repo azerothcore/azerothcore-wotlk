@@ -1,3 +1,4 @@
+-- DB update 2025_12_26_08 -> 2025_12_26_09
 -- Winterskorn Vrykul Dismembering Bunny should only be giblet
 DELETE FROM `creature_template_model` WHERE `CreatureID` = 24095;
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
