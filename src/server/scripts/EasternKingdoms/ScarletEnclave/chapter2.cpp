@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -64,12 +64,12 @@ enum Koltira
     //NPC_DEATH_KNIGHT_MOUNT        = 29201,
     MODEL_DEATH_KNIGHT_MOUNT        = 25278,
 
-    POINT_STAND_UP                  = 0,
-    POINT_BOX                       = 1,
-    POINT_ANTI_MAGIC_ZONE           = 2,
+    POINT_STAND_UP                  = 1,
+    POINT_BOX                       = 2,
+    POINT_ANTI_MAGIC_ZONE           = 3,
 
-    POINT_MOUNT                     = 0,
-    POINT_DESPAWN                   = 1
+    POINT_MOUNT                     = 1,
+    POINT_DESPAWN                   = 2
 };
 
 class npc_koltira_deathweaver : public CreatureScript

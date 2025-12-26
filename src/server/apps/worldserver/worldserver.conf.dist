@@ -398,6 +398,20 @@ Network.TcpNodelay = 1
 Network.EnableProxyProtocol = 0
 
 #
+#    Network.UseSocketActivation
+#        Description: [LINUX ONLY FEATURE] Enable systemd socket activation support for the worldserver.
+#                     When enabled and the process is started by systemd socket activation,
+#                     the server will use the socket passed by systemd instead of
+#                     creating and binding its own listening socket. Disabled by default.
+#
+#                     When enabled the realm is not automatically set as offline on shutdown.
+#
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.UseSocketActivation = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3360,6 +3374,15 @@ DungeonAccessRequirements.LFGLevelDBCOverride = 0
 #                     0 - (Disabled)
 
 DungeonFinder.CastDeserter = 1
+
+#
+#    DungeonFinder.AllowCompleted
+#
+#        Description: Controls whether completed heroic dungeons are excluded from LFG queue.
+#                     0 - (Classic WLK mode: Dungeons completed by any group member today are excluded (daily lockout enforced))
+#        Default:     1 - (Blizzlike: All dungeons are available for queue, even if already completed)
+
+DungeonFinder.AllowCompleted = 1
 
 #
 ###################################################################################################
