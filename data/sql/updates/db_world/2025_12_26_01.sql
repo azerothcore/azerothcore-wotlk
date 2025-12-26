@@ -1,3 +1,4 @@
+-- DB update 2025_12_26_00 -> 2025_12_26_01
 -- Thaurissan Relic smart ai
 SET @ENTRY := 153556;
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = @ENTRY;
