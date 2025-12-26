@@ -270,25 +270,13 @@ public:
         return true;
     }
 
-    static bool HandlePoolEnd(ChatHandler* handler, std::string fileName)
+    static bool HandlePoolEnd(ChatHandler* handler)
     {
         ObjectGuid playerGuid = handler->GetPlayer()->GetGUID();
         auto it = sPoolSessions.find(playerGuid);
         if (it == sPoolSessions.end()) return false;
 
         PoolSession& session = it->second; // Use reference from iterator
-
-        if (fileName.empty()) fileName = "pool.sql";
-        if (fileName.find(".sql") == std::string::npos) fileName += ".sql";
-
-        std::ofstream outfile;
-        outfile.open(fileName, std::ios_base::app);
-
-        if (!outfile.is_open())
-        {
-            handler->SendErrorMessage("Could not open file {}", fileName);
-            return false;
-        }
 
         auto EscapeSQL = [](std::string_view input) -> std::string {
             std::string safe;
@@ -303,29 +291,29 @@ public:
         bool complexPool = (session.CurrentTemplate.size() > 1);
 
         // SQL Variables and Header
-        outfile << fmt::format("-- Pool Dump: {}\n", session.ZoneName);
-        outfile << "SET @mother_pool := @mother_pool+1;\n";
+        LOG_DEBUG("sql.dev", "-- Pool Dump: {}\n", session.ZoneName);
+        LOG_DEBUG("sql.dev", "SET @mother_pool := @mother_pool+1;\n");
         if (complexPool)
-            outfile << "SET @pool_node := @pool_node+1;\n\n";
-        outfile << fmt::format("SET @max_limit   := {};\n\n", (session.CapturedGroups.size() + 3) / 4);
+            LOG_DEBUG("sql.dev", "SET @pool_node := @pool_node+1;\n");
+        LOG_DEBUG("sql.dev", fmt::format("SET @max_limit   := {};\n", (session.CapturedGroups.size() + 3) / 4));
 
         // DELETEs section
         if (!session.CapturedGroups.empty())
         {
-            outfile << "-- Cleanup specific object links\n";
-            outfile << "DELETE FROM `pool_gameobject` WHERE `guid` IN (";
+            LOG_DEBUG("sql.dev", "-- Cleanup specific object links\n");
+            LOG_DEBUG("sql.dev", "DELETE FROM `pool_gameobject` WHERE `guid` IN (");
 
             std::vector<std::string> guidList;
             for (auto const& group : session.CapturedGroups)
                 for (auto const& obj : group.FoundObjects)
                     guidList.push_back(std::to_string(obj.second));
 
-            outfile << fmt::format("{}", fmt::join(guidList, ", "));
-            outfile << ");\n\n";
+            LOG_DEBUG("sql.dev", fmt::format("{}", fmt::join(guidList, ", ")));
+            LOG_DEBUG("sql.dev", ");\n");
         }
 
-        outfile << "DELETE FROM `pool_template` WHERE `entry`=@mother_pool;\n";
-        outfile << fmt::format("INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@mother_pool, @max_limit, '{} - Mother Pool');\n", EscapeSQL(session.ZoneName));
+        LOG_DEBUG("sql.dev", "DELETE FROM `pool_template` WHERE `entry`=@mother_pool;\n");
+        LOG_DEBUG("sql.dev", fmt::format("INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@mother_pool, @max_limit, '{} - Mother Pool');\n", EscapeSQL(session.ZoneName)));
 
         int groupCounter = 0;
 
@@ -363,19 +351,19 @@ public:
             // Pool_pool integration
             else
             {
-                outfile << fmt::format("-- Group {}\n", groupCounter);
-                outfile << "SET @pool_node := @pool_node + 1;\n";
+                LOG_DEBUG("sql.dev", fmt::format("-- Group {}\n", groupCounter));
+                LOG_DEBUG("sql.dev", "SET @pool_node := @pool_node + 1;\n");
 
                 // Create the Sub-Pool Node
-                outfile << fmt::format("INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@pool_node, 1, '{} - Node {}');\n",
+                LOG_DEBUG("sql.dev", fmt::format("INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES (@pool_node, 1, '{} - Node {}');\n"),
                     EscapeSQL(session.ZoneName), groupCounter);
 
                 // Link Node to Mother Pool
-                outfile << fmt::format("INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@pool_node, @mother_pool, 0, '{} - {}');\n",
+                LOG_DEBUG("sql.dev", fmt::format("INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES (@pool_node, @mother_pool, 0, '{} - {}');\n"),
                     EscapeSQL(session.ZoneName), safeGroupDesc);
 
                 // Link Objects to Sub-Pool Node
-                outfile << "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES\n";
+                LOG_DEBUG("sql.dev", "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES\n");
 
                 std::vector<std::string> nodeInserts;
                 for (auto const& obj : group.FoundObjects)
@@ -390,18 +378,17 @@ public:
                     nodeInserts.push_back(fmt::format("({}, @pool_node, {}, '{} - {}')",
                         obj.second, chance, EscapeSQL(session.ZoneName), EscapeSQL(objName)));
                 }
-                outfile << fmt::format("{};\n\n", fmt::join(nodeInserts, ",\n"));
+                LOG_DEBUG("sql.dev", fmt::format("{};\n", fmt::join(nodeInserts, ",\n")));
             }
         }
 
         if (!complexPool && !bulkInserts.empty())
         {
-            outfile << "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES \n";
-            outfile << fmt::format("{};\n", fmt::join(bulkInserts, ",\n"));
+            LOG_DEBUG("sql.dev", "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES \n");
+            LOG_DEBUG("sql.dev", fmt::format("{};\n", fmt::join(bulkInserts, ",\n")));
         }
 
-        outfile.close();
-        handler->PSendSysMessage("Dumped {} groups to {}", groupCounter, fileName);
+        handler->PSendSysMessage("Dumped {} groups.", groupCounter);
 
         // Cleanup
         sPoolSessions.erase(it);

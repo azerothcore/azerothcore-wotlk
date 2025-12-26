@@ -6,5 +6,5 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('pooltools def', 3, 'Syntax: .pooltools def [EntryID] [Chance] [EntryID] [Chance]...\nDefines which IDs of detected groups along with their chances.'),
 ('pooltools add', 3, 'Syntax: .pooltools add [Radius]\nSearches for nodes defined in your template within 5 yards or the defined radius and adds to the current session.'),
 ('pooltools remove', 3, 'Syntax: .pooltools remove\nRemoves the last group added via .pooltools add'),
-('pooltools end', 3, 'Syntax: .pooltools end [Filename]\nGenerates the SQL.'),
+('pooltools end', 3, 'Syntax: .pooltools end\nLogs the SQL.'),
 ('pooltools clear', 3, 'Syntax: .pooltools clear\nClears the current session from memory.');
