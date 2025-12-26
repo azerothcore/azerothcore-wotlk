@@ -75,7 +75,6 @@ enum Events
 
 enum CreatureIds
 {
-    NPC_WORLD_TRIGGER                   = 22515,
     NPC_ANUBAR_GUARDIAN                 = 29216,
     NPC_ANUBAR_VENOMANCER               = 29217,
 };
