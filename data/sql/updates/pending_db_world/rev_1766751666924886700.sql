@@ -1,5 +1,6 @@
 --
 UPDATE `event_scripts` SET `x`=2932.6313, `y`=-4488.1055, `z`=287.76904, `o`=3.298672199249267578 WHERE `id`=15726;
+-- From Build 47720 sniff
 UPDATE `creature_template` SET `unit_flags` = 32768 WHERE (`entry` = 24173);
 
 DELETE FROM `waypoint_data` WHERE `id` = 241731;
