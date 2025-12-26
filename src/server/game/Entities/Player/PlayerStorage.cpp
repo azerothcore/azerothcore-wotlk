@@ -2528,14 +2528,14 @@ void Player::RemoveAmmo()
         UpdateDamagePhysical(RANGED_ATTACK);
 }
 
-Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId)
+Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId, bool refund)
 {
     AllowedLooterSet allowedLooters;
-    return StoreNewItem(dest, item, update, randomPropertyId, allowedLooters);
+    return StoreNewItem(dest, item, update, randomPropertyId, allowedLooters, refund);
 }
 
 // Return stored item (if stored to stack, it can diff. from pItem). And pItem ca be deleted in this case.
-Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId, AllowedLooterSet& allowedLooters)
+Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId, AllowedLooterSet& allowedLooters, bool refund)
 {
     uint32 count = 0;
     for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
@@ -2550,8 +2550,13 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
                 AdditionalSavingAddMask(ADDITIONAL_SAVING_INVENTORY_AND_GOLD);
 
         ItemAddedQuestCheck(item, count);
-        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
-        UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
+
+        if (!refund)
+        { // Don't update counter criteria for refunded items (primarily currencies)
+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_RECEIVE_EPIC_ITEM, item, count);
+            UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_ITEM, item, count);
+        }
+
         pItem = StoreItem(dest, pItem, update);
 
         if (allowedLooters.size() > 1 && pItem->GetTemplate()->GetMaxStackSize() == 1 && pItem->IsSoulBound() && sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
