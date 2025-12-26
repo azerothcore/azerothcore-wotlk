@@ -547,12 +547,17 @@ public:
                     }
                     case DONE:
                     {
+                        if (!horsemanKilled) // if no horsemen are found, assume wing is cleared
+                        {
+                            ActivateWingPortal(DATA_HORSEMAN_PORTAL);
+                            break;
+                        }
+
                         _events.RescheduleEvent(EVENT_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER, 15s);
 
                         if (horsemanKilled != HorsemanCount)
                             return false;
 
-                        // all horsemans are killed
                         if (Creature* cr = GetCreature(DATA_BARON_RIVENDARE_BOSS))
                             cr->CastSpell(cr, SPELL_THE_FOUR_HORSEMAN_CREDIT, true);
 
@@ -646,7 +651,9 @@ public:
                 return CreatureTalk(DATA_BARON_RIVENDARE_BOSS, SAY_HORSEMEN_DIALOG2);
             case EVENT_FROSTWYRM_WATERFALL_DOOR:
                 SetGoState(DATA_SAPPHIRON_GATE, GO_STATE_ACTIVE);
-                return _events.ScheduleEvent(EVENT_KELTHUZAD_LICH_KING_TALK1, 5s);
+                if (GetBossState(BOSS_KELTHUZAD) != DONE)
+                    _events.ScheduleEvent(EVENT_KELTHUZAD_LICH_KING_TALK1, 5s);
+                break;
             case EVENT_KELTHUZAD_LICH_KING_TALK1:
                 CreatureTalk(DATA_KELTHUZAD_BOSS, SAY_SAPP_DIALOG1);
                 return _events.ScheduleEvent(EVENT_KELTHUZAD_LICH_KING_TALK2, 10s);

@@ -570,14 +570,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
-    // Blessing of sanctuary stats
-    ApplySpellFix({ 67480 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].MiscValue = -1;
-        spellInfo->SpellFamilyName = SPELLFAMILY_UNK1; // allows stacking
-        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY; // just a marker
-    });
-
     ApplySpellFix({
         6940, // Hand of Sacrifice
         64205 // Divine Sacrifice
@@ -5170,6 +5162,24 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcCharges = 1;
     });
 
+    ApplySpellFix({
+        56917, // To Icecrown Airship - Teleport to Airship (A)
+        57417, // To Icecrown Airship - Teleport to Airship (H)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
+    });
+
+    ApplySpellFix({
+        60586, // Mighty Spear Thrust
+        60776, // Claw Swipe
+        60881, // Fatal Strike
+        60864, // Jaws of Death
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
@@ -5290,14 +5300,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     factionTemplateEntry->hostileMask |= 8;
     factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
     factionTemplateEntry->hostileMask |= 8;
-
-    // Remove 1 from guards friendly mask, making able to attack players
-    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1857)); // Area 52 Bruiser
-    factionTemplateEntry->friendlyMask &= ~1;
-    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1806)); // Netherstorm Agent
-    factionTemplateEntry->friendlyMask &= ~1;
-    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1812)); // K3 Bruiser
-    factionTemplateEntry->friendlyMask &= ~1;
 
     // Remove vehicles attr, making accessories selectable
     VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory
