@@ -483,7 +483,7 @@ struct npc_king_varian_wrynn : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/) override
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/)
     {
 
         if (quest->GetQuestId() == QUEST_WHERE_KINGS_WALK)
