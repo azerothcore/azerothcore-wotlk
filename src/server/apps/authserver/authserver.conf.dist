@@ -12,6 +12,7 @@
 #    CRYPTOGRAPHY
 #    UPDATE SETTINGS
 #    LOGGING SYSTEM SETTINGS
+#    NETWORK
 #
 ###################################################################################################
 
@@ -437,6 +438,23 @@ Appender.Auth=2,5,0,Auth.log,w
 #
 
 Logger.root=4,Console Auth
+
+#
+###################################################################################################
+
+###################################################################################################
+# NETWORK
+#
+#    Network.UseSocketActivation
+#        Description: [LINUX ONLY FEATURE] Enable systemd socket activation support for the authserver.
+#                     When enabled and the process is started by systemd socket activation,
+#                     the server will use the socket passed by systemd instead of
+#                     creating and binding its own listening socket. Disabled by default.
+#
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.UseSocketActivation = 0
 
 #
 ###################################################################################################
