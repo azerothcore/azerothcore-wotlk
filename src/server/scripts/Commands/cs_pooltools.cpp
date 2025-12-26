@@ -24,6 +24,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Cell.h"
+#include "CellImpl.h"
 #include "Tokenize.h"
 #include <fstream>
 #include <iostream>
