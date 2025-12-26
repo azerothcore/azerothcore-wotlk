@@ -224,7 +224,7 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
 };
 
-const float SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
+float const SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
 {
     3218.86f,   // South X
     3275.69f,   // North X
@@ -232,14 +232,14 @@ const float SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
     572.4f      // West Y
 };
 
-const float FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
+float const FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
 {
     476.0f, 484.0f, 492.0f,
     524.0f, 532.0f, 540.0f,
     572.0f, 580.0f, 588.0f
 };
 
-const float FlameTsunamiRightOffsets[MAX_RIGHT_LAVA_TSUNAMIS] =
+float const FlameTsunamiRightOffsets[MAX_RIGHT_LAVA_TSUNAMIS] =
 {
     500.0f, 508.0f, 516.0f,
     548.0f, 556.0f, 564.0f
