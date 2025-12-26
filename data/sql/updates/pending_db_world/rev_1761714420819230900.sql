@@ -1,5 +1,5 @@
 -- Hellfire Peninsula - Pools of Aggonar ooze aggro linking
-DELETE FROM `creature_formations` WHERE `leaderGUID` IN (SELECT `guid` FROM `creature` WHERE `id1` = 16901);
+DELETE FROM `creature_formations` WHERE `leaderGUID` BETWEEN 58465 and 58497;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (58465, 58465, 3), (58465, 58498, 3), (58465, 58499, 3),
 (58466, 58466, 3), (58466, 58500, 3), (58466, 58504, 3),
@@ -37,12 +37,12 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (58497, 58497, 3), (58497, 58563, 3), (58497, 58564, 3);
 
 -- Reposition oozes to be closer to group members
-UPDATE `creature` SET `position_x`=381.658, `position_y`=3482.38, `position_z`=61.609, `orientation`=5.43889 WHERE `guid` = 58496;
-UPDATE `creature` SET `position_x`=361.194, `position_y`=3460.88, `position_z`=60.7696, `orientation`=1.22522 WHERE `guid` = 58501;
-UPDATE `creature` SET `position_x`=363.189, `position_y`=3467.19, `position_z`=60.2405, `orientation`=4.88126 WHERE `guid` = 58503;
+UPDATE `creature` SET `position_x`=381.658, `position_y`=3482.38, `position_z`=61.609, `orientation`=5.43889 WHERE `guid` = 58496 AND `id1` = 16901;
+UPDATE `creature` SET `position_x`=361.194, `position_y`=3460.88, `position_z`=60.7696, `orientation`=1.22522 WHERE `guid` = 58501 AND `id1` = 16903;
+UPDATE `creature` SET `position_x`=363.189, `position_y`=3467.19, `position_z`=60.2405, `orientation`=4.88126 WHERE `guid` = 58503 AND `id1` = 16903;
 
 -- New creatures
-DELETE FROM `creature` WHERE `guid` IN (58786,58787);
+DELETE FROM `creature` WHERE `guid` IN (58786,58787) AND `id1` IN (16901, 16903);
 INSERT INTO `creature` VALUES
 -- Add 1 big ooze to group of 2 small
 (58786, 16901, 0, 0, 530, 0, 0, 1, 1, 0, 253.959, 3520.59, 64.9662, 4.6574, 300, 0, 0, 4385, 0, 0, 0, 0, 0, '', NULL, 0, NULL),
