@@ -389,7 +389,7 @@ public:
 
             if (why == EVADE_REASON_BOUNDARY)
                 instance->GetCreature(DATA_THADDIUS_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
-            
+
             ScriptedAI::EnterEvadeMode(why);
         }
 

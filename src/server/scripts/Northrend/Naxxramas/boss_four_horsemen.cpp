@@ -138,11 +138,8 @@ public:
                     horsemanId = HORSEMAN_KORTHAZZ;
                     break;
             }
-            instance = me->GetInstanceScript();
-            SetBoundary(instance->GetBossBoundary(BOSS_HORSEMAN));
         }
 
-        InstanceScript* instance;
         EventMap events;
         uint8 currentWaypoint{};
         uint8 movementPhase{};
@@ -177,7 +174,6 @@ public:
                 instance->GetCreature(DATA_SIR_ZELIEK_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
                 instance->GetCreature(DATA_THANE_KORTHAZZ_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
             }
-                
             BossAI::EnterEvadeMode();
         }
 
