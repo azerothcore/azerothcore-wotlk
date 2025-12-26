@@ -55,6 +55,7 @@ enum MageSpells
     SPELL_MAGE_SUMMON_WATER_ELEMENTAL_TEMPORARY  = 70907,
     SPELL_MAGE_GLYPH_OF_BLAST_WAVE               = 62126,
     SPELL_MAGE_FINGERS_OF_FROST                  = 44543,
+    SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA   = 44544,
     SPELL_MAGE_ARCANE_POTENCY_RANK_1             = 57529,
     SPELL_MAGE_ARCANE_POTENCY_RANK_2             = 57531,
     SPELL_MAGE_EMPOWERED_FIRE_PROC               = 67545,
@@ -967,119 +968,26 @@ class spell_mage_summon_water_elemental : public SpellScript
     }
 };
 
-#define FingersOfFrostScriptName "spell_mage_fingers_of_frost_proc_aura"
-class spell_mage_fingers_of_frost_proc_aura : public AuraScript
-{   PrepareAuraScript(spell_mage_fingers_of_frost_proc_aura);
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_CAST)
-        {
-            eventInfo.SetProcChance(_chance);
-        }
-
-        return true;
-    }
-
-    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-    {
-        if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_CAST)
-        {
-            eventInfo.ResetProcChance();
-        }
-
-        return isTriggeredAtSpellProcEvent;
-    }
-
-    void HandleOnEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_CAST)
-        {
-            _chance = 100.f;
-            _spell = eventInfo.GetProcSpell();
-            _procSpellDelayMoment = std::nullopt;
-
-            if (!_spell || _spell->GetDelayMoment() <= 0)
-                PreventDefaultAction();
-
-            if (_spell)
-                _procSpellDelayMoment = _spell->GetDelayMoment();
-        }
-        else
-        {
-            if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH || (_procSpellDelayMoment.value_or(0) > 0 || !eventInfo.GetDamageInfo()))
-                PreventDefaultAction();
-
-            ResetProcState();
-        }
-    }
-
-    void HandleAfterEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        switch (eventInfo.GetSpellPhaseMask())
-        {
-            case PROC_SPELL_PHASE_HIT:    _chance = 100.f; break;
-            case PROC_SPELL_PHASE_FINISH: ResetProcState(); break;
-            default: break;
-        }
-    }
-
-    void ResetProcState()
-    {
-        _chance = 0.f;
-        _spell = nullptr;
-        _procSpellDelayMoment = std::nullopt;
-    }
-
-    void Register()
-    {
-        DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckProc);
-        DoAfterCheckProc += AuraAfterCheckProcFn(spell_mage_fingers_of_frost_proc_aura::AfterCheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleOnEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        AfterEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleAfterEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-
-public:
-    // May point to a deleted object.
-    // Dereferencing is unsafe unless validity is guaranteed by the caller.
-    Spell const* GetProcSpell() const { return _spell; }
-
-private:
-    float _chance = 0.f;
-    std::optional<uint64> _procSpellDelayMoment = std::nullopt;
-
-    // May be dangling; points to memory that might no longer be valid.
-    Spell const* _spell = nullptr;
-};
-
-typedef spell_mage_fingers_of_frost_proc_aura spell_mage_fingers_of_frost_proc_aura_script;
-
-class spell_mage_fingers_of_frost_proc : public AuraScript
+// 74396 - Fingers of Frost
+// Charge consumption is handled by the default proc system in PrepareProcToTrigger
+// This script only handles removing the aura state aura (44544) when the buff expires
+class spell_mage_fingers_of_frost : public AuraScript
 {
-    PrepareAuraScript(spell_mage_fingers_of_frost_proc);
+    PrepareAuraScript(spell_mage_fingers_of_frost);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (Aura* aura = GetCaster()->GetAuraOfRankedSpell(SPELL_MAGE_FINGERS_OF_FROST))
-        {
-            if (spell_mage_fingers_of_frost_proc_aura_script* script = dynamic_cast<spell_mage_fingers_of_frost_proc_aura_script*>(aura->GetScriptByName(FingersOfFrostScriptName)))
-            {
-                if (Spell const* fofProcSpell = script->GetProcSpell())
-                {
-                    if (fofProcSpell == eventInfo.GetProcSpell())
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        return true;
+        return ValidateSpellInfo({ SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA });
     }
 
-    void Register()
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc::CheckProc);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_mage_fingers_of_frost::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1523,7 +1431,6 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_master_of_elements);
     RegisterSpellScript(spell_mage_polymorph_cast_visual);
     RegisterSpellScript(spell_mage_summon_water_elemental);
-    RegisterSpellScript(spell_mage_fingers_of_frost_proc_aura);
-    RegisterSpellScript(spell_mage_fingers_of_frost_proc);
+    RegisterSpellScript(spell_mage_fingers_of_frost);
     RegisterSpellScript(spell_mage_magic_absorption);
 }

@@ -4574,6 +4574,7 @@ class spell_item_dementia : public AuraScript
 };
 
 // 71564 - Deadly Precision
+// This spell uses STACKS (not charges) - must manually remove stacks on proc
 class spell_item_deadly_precision : public AuraScript
 {
     PrepareAuraScript(spell_item_deadly_precision);

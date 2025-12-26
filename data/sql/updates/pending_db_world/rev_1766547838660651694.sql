@@ -1780,3 +1780,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-51556, 'spe
 
 -- Remove obsolete reload spell_proc_event command (replaced by spell_proc)
 DELETE FROM `command` WHERE `name` = 'reload spell_proc_event';
+
+-- Fingers of Frost - register script for charge consumption buff (74396)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 74396 AND `ScriptName` = 'spell_mage_fingers_of_frost';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(74396, 'spell_mage_fingers_of_frost');

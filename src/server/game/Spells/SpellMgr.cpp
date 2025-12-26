@@ -825,7 +825,7 @@ bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcE
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
-            return false; // Can't match SpellFamily requirements without SpellInfo
+            return false;
 
         if (procEntry.SpellFamilyName && (procEntry.SpellFamilyName != spellInfo->SpellFamilyName))
             return false;

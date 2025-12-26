@@ -292,6 +292,20 @@ SpellInfo const* ProcEventInfo::GetSpellInfo() const
     return nullptr;
 }
 
+SpellSchoolMask ProcEventInfo::GetSchoolMask() const
+{
+    if (_spell)
+        return _spell->GetSpellInfo()->GetSchoolMask();
+
+    if (_damageInfo)
+        return _damageInfo->GetSchoolMask();
+
+    if (_healInfo)
+        return _healInfo->GetSchoolMask();
+
+    return SPELL_SCHOOL_MASK_NONE;
+}
+
 // we can disable this warning for this since it only
 // causes undefined behavior when passed to the base class constructor
 #ifdef _MSC_VER
@@ -6701,11 +6715,13 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
         uint32 spellTypeMask = 0;
         if (procExtra & (PROC_EX_INTERNAL_DOT | PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT))
         {
-            if (procExtra & PROC_EX_INTERNAL_HOT)
+            // Check for heals: either periodic heal (HOT) or direct heal (healInfo present)
+            if ((procExtra & PROC_EX_INTERNAL_HOT) || healInfo)
                 spellTypeMask = PROC_SPELL_TYPE_HEAL;
             else
                 spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
         }
+
         actor->TriggerAurasProcOnEvent(nullptr, nullptr, victim, procAttacker, procVictim, spellTypeMask, procPhase, procExtra, const_cast<Spell*>(procSpell), damageInfo, healInfo);
     }
 }

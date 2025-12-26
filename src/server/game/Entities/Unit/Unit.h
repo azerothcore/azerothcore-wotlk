@@ -458,7 +458,7 @@ public:
     [[nodiscard]] uint32 GetSpellPhaseMask() const { return _spellPhaseMask; }
     [[nodiscard]] uint32 GetHitMask() const { return _hitMask; }
     [[nodiscard]] SpellInfo const* GetSpellInfo() const;
-    [[nodiscard]] SpellSchoolMask GetSchoolMask() const { return SPELL_SCHOOL_MASK_NONE; }
+    [[nodiscard]] SpellSchoolMask GetSchoolMask() const;
     [[nodiscard]] Spell const* GetProcSpell() const { return _spell; }
     [[nodiscard]] DamageInfo* GetDamageInfo() const { return _damageInfo; }
     [[nodiscard]] HealInfo* GetHealInfo() const { return _healInfo; }

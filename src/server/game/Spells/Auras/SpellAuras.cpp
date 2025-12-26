@@ -2237,7 +2237,8 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
         }
     }
 
-    if (roll_chance_f(CalcProcChance(*procEntry, eventInfo)))
+    float procChance = CalcProcChance(*procEntry, eventInfo);
+    if (roll_chance_f(procChance))
         return procEffectMask;
 
     return 0;
