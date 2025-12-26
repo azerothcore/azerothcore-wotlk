@@ -15807,7 +15807,7 @@ void Player::RefundItem(Item* item)
             ItemPosCountVec dest;
             InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
             ASSERT(msg == EQUIP_ERR_OK); /// Already checked before
-            Item* it = StoreNewItem(dest, itemid, true);
+            Item* it = StoreNewItem(dest, itemid, true, true);
             SendNewItem(it, count, true, false, true);
         }
     }
