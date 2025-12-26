@@ -81,6 +81,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     _currentRangeMode = false;
     _attackDistance = 0.f;
+    _mainSpellId = 0;
 }
 
 bool SmartAI::IsAIControlled() const
@@ -1122,6 +1123,7 @@ void SmartAI::SetMainSpell(uint32 spellId)
     if (maxRange <= NOMINAL_MELEE_RANGE)
         return;
 
+    _mainSpellId = spellId;
     _attackDistance = std::max(maxRange - NOMINAL_MELEE_RANGE, 0.0f);
     _currentRangeMode = true;
 }
@@ -1220,6 +1222,27 @@ void SmartAI::DistancingEnded()
 {
     SetCurrentRangeMode(true, _pendingDistancing);
     _pendingDistancing = 0.f;
+}
+
+bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
+{
+    if (me->HasSpellCooldown(spellInfo->Id))
+        return true;
+
+    if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+        return true;
+    if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        return true;
+
+    return false;
+}
+
+void SmartAI::OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason)
+{
+    CreatureAI::OnSpellCastFinished(spell, reason);
+    if (reason == SPELL_FINISHED_CANCELED && _mainSpellId == spell->Id)
+        if (_currentRangeMode && IsMainSpellPrevented(spell))
+            SetCurrentRangeMode(false);
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)
