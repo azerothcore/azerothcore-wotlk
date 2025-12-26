@@ -376,14 +376,14 @@ public:
                     nodeInserts.push_back(fmt::format("({}, @pool_node, {}, '{} - {}')",
                         obj.second, chance, EscapeSQL(session.ZoneName), EscapeSQL(objName)));
                 }
-                LOG_DEBUG("sql.dev", "{};\n", fmt::join(nodeInserts, ","));
+                LOG_DEBUG("sql.dev", "{};", fmt::join(nodeInserts, ",\n"));
             }
         }
 
         if (!complexPool && !bulkInserts.empty())
         {
             LOG_DEBUG("sql.dev", "INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES");
-            LOG_DEBUG("sql.dev", "{};\n", fmt::join(bulkInserts, ",\n"));
+            LOG_DEBUG("sql.dev", "{};", fmt::join(bulkInserts, ",\n"));
         }
 
         handler->PSendSysMessage("Dumped {} groups.", groupCounter);
