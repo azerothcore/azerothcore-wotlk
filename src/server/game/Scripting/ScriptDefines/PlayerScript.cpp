@@ -599,12 +599,12 @@ bool ScriptMgr::OnPlayerCanAreaExploreAndOutdoor(Player* player)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_AREA_EXPLORE_AND_OUTDOOR, !script->OnPlayerCanAreaExploreAndOutdoor(player));
 }
 
-void ScriptMgr::OnPlayerVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title)
+void ScriptMgr::OnPlayerVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, int32& victim_rank)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_VICTIM_REWARD_BEFORE, script->OnPlayerVictimRewardBefore(player, victim, killer_title, victim_title));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_VICTIM_REWARD_BEFORE, script->OnPlayerVictimRewardBefore(player, victim, killer_title, victim_rank));
 }
 
-void ScriptMgr::OnPlayerVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f)
+void ScriptMgr::OnPlayerVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, int32& victim_rank, float& honor_f)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_VICTIM_REWARD_AFTER, script->OnPlayerVictimRewardAfter(player, victim, killer_title, victim_rank, honor_f));
 }
