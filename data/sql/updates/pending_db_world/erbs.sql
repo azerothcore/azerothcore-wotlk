@@ -7125,3 +7125,15 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (@POOL_NODE+099, 1, 'WintergraspHerbGroup - Node 6'),
 (@POOL_NODE+100, 1, 'WintergraspHerbGroup - Node 7'),
 (@POOL_NODE+101, 1, 'WintergraspHerbGroup - Node 8');
+
+-- Missed Frozen Herbs (thanks sudlud)
+DELETE FROM `pool_gameobject` WHERE `pool_entry` = @POOL_MOTHER+13;
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
+(@GUID+156, @POOL_MOTHER+13, 0, 'DragonblightFrozenHerbGroup - Frozen Herb'),
+(@GUID+157, @POOL_MOTHER+13, 0, 'DragonblightFrozenHerbGroup - Frozen Herb'),
+(@GUID+158, @POOL_MOTHER+13, 0, 'DragonblightFrozenHerbGroup - Frozen Herb'),
+(@GUID+159, @POOL_MOTHER+13, 0, 'DragonblightFrozenHerbGroup - Frozen Herb');
+
+DELETE FROM `pool_template` WHERE `entry` = @POOL_MOTHER+13;
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
+(@POOL_MOTHER+13, 1, 'DragonblightFrozenHerbGroup - Mother Pool');
