@@ -6330,7 +6330,6 @@ INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VA
 (@GUID+2202, @POOL_MOTHER+17, 0, 'SholazarBasinTigerLilyGroup - Tiger Lily'),
 (@GUID+2203, @POOL_MOTHER+17, 0, 'SholazarBasinTigerLilyGroup - Tiger Lily'),
 (@GUID+2204, @POOL_MOTHER+17, 0, 'SholazarBasinTigerLilyGroup - Tiger Lily'),
-(@GUID+2205, @POOL_MOTHER+17, 0, 'SholazarBasinTigerLilyGroup - Tiger Lily'),
 (@GUID+2206, @POOL_MOTHER+17, 0, 'SholazarBasinTigerLilyGroup - Tiger Lily'),
 (@GUID+2207, @POOL_MOTHER+17, 0, 'SholazarBasinTigerLilyGroup - Tiger Lily'),
 (@GUID+2208, @POOL_MOTHER+17, 0, 'SholazarBasinTigerLilyGroup - Tiger Lily'),
