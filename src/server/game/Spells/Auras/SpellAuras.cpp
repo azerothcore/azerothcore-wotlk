@@ -2161,6 +2161,14 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
     if (!sSpellMgr->CanSpellTriggerProcOnEvent(*procEntry, eventInfo))
         return 0;
 
+    // check if spell was affected by this aura's spellmod (used by Arcane Potency and similar effects)
+    if (procEntry->AttributesMask & PROC_ATTR_REQ_SPELLMOD)
+    {
+        Spell const* procSpell = eventInfo.GetProcSpell();
+        if (!procSpell || procSpell->m_appliedMods.find(const_cast<Aura*>(this)) == procSpell->m_appliedMods.end())
+            return 0;
+    }
+
     // do checks using conditions table
     ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_SPELL_PROC, GetId());
     ConditionSourceInfo condInfo = ConditionSourceInfo(eventInfo.GetActor(), eventInfo.GetActionTarget());

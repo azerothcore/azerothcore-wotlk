@@ -3904,7 +3904,11 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, false);
 
-    if (m_originalCaster)
+    // Handle procs on cast - only for non-triggered spells
+    // Triggered spells (from auras, items, etc.) should not fire CAST phase procs
+    // as they are not player-initiated casts. This prevents issues like Arcane Potency
+    // charges being consumed by periodic damage effects (e.g., Blizzard ticks).
+    if (m_originalCaster && !IsTriggered())
     {
         // Handle procs on cast
         uint32 procAttacker = m_procAttacker;

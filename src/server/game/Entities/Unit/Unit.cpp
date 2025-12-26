@@ -6696,7 +6696,18 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
 
     // Handle aura procs via new proc system (TriggerAurasProcOnEvent)
     if (actor)
-        actor->TriggerAurasProcOnEvent(nullptr, nullptr, victim, procAttacker, procVictim, 0, procPhase, procExtra, const_cast<Spell*>(procSpell), damageInfo, healInfo);
+    {
+        // Calculate spellTypeMask from procExtra flags
+        uint32 spellTypeMask = 0;
+        if (procExtra & (PROC_EX_INTERNAL_DOT | PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT))
+        {
+            if (procExtra & PROC_EX_INTERNAL_HOT)
+                spellTypeMask = PROC_SPELL_TYPE_HEAL;
+            else
+                spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
+        }
+        actor->TriggerAurasProcOnEvent(nullptr, nullptr, victim, procAttacker, procVictim, spellTypeMask, procPhase, procExtra, const_cast<Spell*>(procSpell), damageInfo, healInfo);
+    }
 }
 
 void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo)

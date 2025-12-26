@@ -804,6 +804,14 @@ bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcE
             if (eventInfo.GetActionTarget() && !actor->isHonorOrXPTarget(eventInfo.GetActionTarget()))
                 return false;
 
+    // check mana cost requirement (used by Clearcasting and similar effects)
+    if (procEntry.AttributesMask & PROC_ATTR_REQ_MANA_COST)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || (!spellInfo->ManaCost && !spellInfo->ManaCostPercentage))
+            return false;
+    }
+
     // always trigger for these types
     if (eventInfo.GetTypeMask() & (PROC_FLAG_KILLED | PROC_FLAG_KILL | PROC_FLAG_DEATH))
         return true;
@@ -815,10 +823,14 @@ bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcE
     // check spell family name/flags (if set) for spells
     if (eventInfo.GetTypeMask() & (PERIODIC_PROC_FLAG_MASK | SPELL_PROC_FLAG_MASK | PROC_FLAG_DONE_TRAP_ACTIVATION))
     {
-        if (procEntry.SpellFamilyName && (procEntry.SpellFamilyName != eventInfo.GetSpellInfo()->SpellFamilyName))
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false; // Can't match SpellFamily requirements without SpellInfo
+
+        if (procEntry.SpellFamilyName && (procEntry.SpellFamilyName != spellInfo->SpellFamilyName))
             return false;
 
-        if (procEntry.SpellFamilyMask && !(procEntry.SpellFamilyMask & eventInfo.GetSpellInfo()->SpellFamilyFlags))
+        if (procEntry.SpellFamilyMask && !(procEntry.SpellFamilyMask & spellInfo->SpellFamilyFlags))
             return false;
     }
 
