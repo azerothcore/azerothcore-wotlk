@@ -13019,13 +13019,13 @@ void Unit::TriggerAurasProcOnEvent(std::list<AuraApplication*>* myProcAuras, std
     // prepare data for target trigger
     ProcEventInfo targetProcEventInfo = ProcEventInfo(this, actionTarget, this, typeMaskActionTarget, spellTypeMask, spellPhaseMask, hitMask, spell, damageInfo, healInfo);
     AuraApplicationProcContainer targetAurasTriggeringProc;
-    if (typeMaskActionTarget)
-        GetProcAurasTriggeredOnEvent(targetAurasTriggeringProc, targetProcAuras, targetProcEventInfo);
+    if (typeMaskActionTarget && actionTarget)
+        actionTarget->GetProcAurasTriggeredOnEvent(targetAurasTriggeringProc, targetProcAuras, targetProcEventInfo);
 
     TriggerAurasProcOnEvent(myProcEventInfo, myAurasTriggeringProc);
 
-    if (typeMaskActionTarget)
-        TriggerAurasProcOnEvent(targetProcEventInfo, targetAurasTriggeringProc);
+    if (typeMaskActionTarget && actionTarget)
+        actionTarget->TriggerAurasProcOnEvent(targetProcEventInfo, targetAurasTriggeringProc);
 }
 
 void Unit::TriggerAurasProcOnEvent(ProcEventInfo& eventInfo, AuraApplicationProcContainer& aurasTriggeringProc)
