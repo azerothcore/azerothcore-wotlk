@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,6 +41,7 @@ enum VolkhanOther
     NPC_VOLKHAN_ANVIL                   = 28823,
     NPC_MOLTEN_GOLEM                    = 28695,
     NPC_BRITTLE_GOLEM                   = 28681,
+    NPC_SLAG                            = 28585,
 
     // Misc
     ACTION_SHATTER                      = 1,
@@ -77,7 +78,7 @@ enum Yells
 
 struct boss_volkhan : public BossAI
 {
-    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN), summons(creature) { }
+    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN) { }
 
     void Reset() override
     {
@@ -104,6 +105,18 @@ struct boss_volkhan : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
+
+        std::list<Creature*> slags;
+        GetCreatureListWithEntryInGrid(slags, me, NPC_SLAG, 100.0f);
+
+        if (!slags.empty())
+        {
+            for (Creature* slag : slags)
+            {
+                if (slag)
+                    slag->DespawnOrUnsummon();
+            }
+        }
     }
 
     void GetNextPos()
@@ -286,8 +299,6 @@ struct boss_volkhan : public BossAI
     }
 
     private:
-        EventMap events;
-        SummonList summons;
         float x, y, z;
         uint8 PointID;
         uint8 ShatteredCount;

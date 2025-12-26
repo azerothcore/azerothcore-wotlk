@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -209,14 +209,14 @@ public:
 enum BossIoCEvents
 {
     EVENT_CHECK_RAGE                = 1,
-    EVENT_BRUTAL_STRIKE             = 2,
+    EVENT_MORTAL_STRIKE             = 2,
     EVENT_CRUSHING_LEAP             = 3,
     EVENT_DAGGER_THROW              = 4,
 };
 
 enum BossIoCSpells
 {
-    SPELL_IOCBOSS_BRUTAL_STRIKE     = 58460,
+    SPELL_IOCBOSS_MORTAL_STRIKE     = 39171,
     SPELL_IOCBOSS_CRUSHING_LEAP     = 68506,
     SPELL_IOCBOSS_DAGGER_THROW      = 67280,
     SPELL_IOCBOSS_RAGE              = 66776,
@@ -262,7 +262,7 @@ public:
         void JustEngagedWith(Unit*  /*who*/) override
         {
             events.ScheduleEvent(EVENT_CHECK_RAGE, 2s);
-            events.ScheduleEvent(EVENT_BRUTAL_STRIKE, 6s);
+            events.ScheduleEvent(EVENT_MORTAL_STRIKE, 6s);
             events.ScheduleEvent(EVENT_CRUSHING_LEAP, 22s);
             events.ScheduleEvent(EVENT_DAGGER_THROW, 10s);
         }
@@ -282,8 +282,8 @@ public:
                     CheckRageBuff();
                     events.Repeat(2s);
                     break;
-                case EVENT_BRUTAL_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_IOCBOSS_BRUTAL_STRIKE, false);
+                case EVENT_MORTAL_STRIKE:
+                    DoCastVictim(SPELL_IOCBOSS_MORTAL_STRIKE);
                     events.Repeat(6s);
                     break;
                 case EVENT_CRUSHING_LEAP:
