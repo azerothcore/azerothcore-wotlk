@@ -1305,11 +1305,8 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
 
             if (player)
             {
-                LOG_ERROR("sql.sql", "Chance for ID {} = {}", item->itemid, chance);
                 chance *= player->GetLootChanceModifier(item->itemid);
                 chance = std::min(chance, 100.0f);
-
-                LOG_ERROR("sql.sql", "Chance for ID {} = {} (after recalc)", item->itemid, chance);
             }
 
             if (!sScriptMgr->OnItemRoll(player, item, chance, loot, store))
