@@ -14,7 +14,7 @@ This tool compares your existing configuration files (`.conf`) with the latest d
 - **Interactive Menu System** - Easy-to-use numbered menu options
 - **Server Config Support** - Update authserver.conf and worldserver.conf
 - **Module Config Support** - Update all or selected module configurations
-- **Automatic Backups** - Creates timestamped backups before making changes
+- **Automatic Backups** - Creates timestamped backups before making changes (e.g. `filename(d11_m12_y2025_14h_30m_45s).bak`)
 - **Selective Updates** - Choose which new config options to add (y/n prompts)
 - **Safe Operation** - Only creates backups and makes changes when new options are found
 
@@ -97,13 +97,13 @@ For each missing configuration option found, the tool will:
 1. **Show you the option** with its comments and default value
 2. **Ask for confirmation**: `Add [option_name] to config? (y/n):`
 3. **Add or skip** based on your choice
-4. **Create backup** automatically before making any changes (format: `filename(d11 m12 y2025 14h 30m 45s).bak`)
+4. **Create backup** automatically before making any changes (format: `filename(d11_m12_y2025_14h_30m_45s).bak`)
 
 ## Example Session
 
 ```
 Processing worldserver.conf ...
-  Backup created: worldserver.conf(d11 m12 y2025 14h 30m 45s).bak
+  Backup created: worldserver.conf(d11_m12_y2025_14h_30m_45s).bak
 
 # New feature for XP rates
 XP.Rate = 1
