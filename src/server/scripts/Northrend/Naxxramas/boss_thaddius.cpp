@@ -357,8 +357,11 @@ public:
         explicit boss_thaddius_summonAI(Creature* c) : ScriptedAI(c)
         {
             overload = false;
+            instance = c->GetInstanceScript();
+            SetBoundary(instance->GetBossBoundary(BOSS_THADDIUS));
         }
 
+        InstanceScript* instance;
         EventMap events;
         uint32 pullTimer{};
         uint32 visualTimer{};
@@ -383,6 +386,10 @@ public:
         void EnterEvadeMode(EvadeReason why) override
         {
             me->SetControlled(false, UNIT_STATE_STUNNED);
+
+            if (why == EVADE_REASON_BOUNDARY)
+                instance->GetCreature(DATA_THADDIUS_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
+
             ScriptedAI::EnterEvadeMode(why);
         }
 
