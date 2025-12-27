@@ -37,8 +37,8 @@ enum Spells
 {
     SPELL_IMPALE                    = 28783,
     SPELL_LOCUST_SWARM              = 28785,
-    SPELL_SUMMON_CORPSE_SCRABS_5    = 29105,
-    SPELL_SUMMON_CORPSE_SCRABS_10   = 28864,
+    SPELL_SUMMON_CORPSE_SCARABS_5   = 29105,
+    SPELL_SUMMON_CORPSE_SCARABS_10  = 28864,
     SPELL_BERSERK                   = 26662
 };
 
@@ -47,131 +47,133 @@ enum Misc
     NPC_CORPSE_SCARAB               = 16698,
     NPC_CRYPT_GUARD                 = 16573,
 
-    ACHIEV_TIMED_START_EVENT        = 9891
+    ACHIEV_TIMED_START_EVENT        = 9891,
+    EVENT_SPAWN_CRYPT_GUARDS_1      = 0,
+    EVENT_BERSERK                   = 1,
+    EVENT_SPAWN_CRYPT_GUARDS_EXTRA  = 2,
 };
 
-class boss_anubrekhan : public CreatureScript
-{
-public:
-    boss_anubrekhan() : CreatureScript("boss_anubrekhan") { }
+const Position cryptguardPositions[] = {
+    { 3299.732f, -3502.489f, 287.077f, 2.378f },
+    { 3299.086f, -3450.929f, 287.077f, 3.999f },
+    { 3331.217f, -3476.607f, 287.074f, 3.269f }
+};
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+struct boss_anubrekhan : public BossAI
+{
+    boss_anubrekhan(Creature* creature) : BossAI(creature, DATA_ANUBREKHAN_BOSS)
     {
-        return GetNaxxramasAI<boss_anubrekhanAI>(pCreature);
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
+        _sayGreet = false;
+        
+    }
+    void SummonCryptGuards()
+    {
+        if (Is25ManRaid())
+        {
+            me->SummonCreature(NPC_CRYPT_GUARD, cryptguardPositions[0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            me->SummonCreature(NPC_CRYPT_GUARD, cryptguardPositions[1], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+        }
     }
 
-    struct boss_anubrekhanAI : public BossAI
+    void Reset() override
     {
-        boss_anubrekhanAI(Creature* c) : BossAI(c, BOSS_ANUB)
-        {
-            sayGreet = false;
-        }
+        BossAI::Reset();
+        SummonCryptGuards();
+        _extraCryptGuardCount = 0;
+    }
 
-        void SummonCryptGuards()
+    void JustSummoned(Creature* cr) override
+    {
+        if (me->IsInCombat())
         {
-            if (Is25ManRaid())
-            {
-                me->SummonCreature(NPC_CRYPT_GUARD, 3299.732f, -3502.489f, 287.077f, 2.378f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-                me->SummonCreature(NPC_CRYPT_GUARD, 3299.086f, -3450.929f, 287.077f, 3.999f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-            }
-        }
-
-        void Reset() override
-        {
-            BossAI::Reset();
-            SummonCryptGuards();
-            me->m_Events.KillAllEvents(false);
-        }
-
-        void JustSummoned(Creature* cr) override
-        {
-            if (me->IsInCombat())
-            {
-                cr->SetInCombatWithZone();
-                if (cr->GetEntry() == NPC_CRYPT_GUARD)
-                    cr->AI()->Talk(EMOTE_SPAWN, me);
-            }
-            summons.Summon(cr);
-        }
-
-        void SummonedCreatureDies(Creature* cr, Unit*) override
-        {
+            cr->SetInCombatWithZone();
             if (cr->GetEntry() == NPC_CRYPT_GUARD)
-            {
-                cr->CastSpell(cr, SPELL_SUMMON_CORPSE_SCRABS_10, true, nullptr, nullptr, me->GetGUID());
-                cr->AI()->Talk(EMOTE_SCARAB);
-            }
+                cr->AI()->Talk(EMOTE_SPAWN, me);
         }
+        summons.Summon(cr);
+    }
 
-        void JustDied(Unit*  killer) override
+    void SummonedCreatureDies(Creature* cr, Unit*) override
+    {
+        if (cr->GetEntry() == NPC_CRYPT_GUARD)
         {
-            BossAI::JustDied(killer);
-            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+            cr->CastSpell(cr, SPELL_SUMMON_CORPSE_SCARABS_10, true, nullptr, nullptr, me->GetGUID());
+            cr->AI()->Talk(EMOTE_SCARAB);
         }
+    }
 
-        void KilledUnit(Unit* victim) override
+    void JustDied(Unit*  killer) override
+    {
+        BossAI::JustDied(killer);
+        instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (!victim->IsPlayer())
+            return;
+
+        Talk(SAY_SLAY);
+        victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCARABS_5, true, nullptr, nullptr, me->GetGUID());
+        instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        me->CallForHelp(30.0f);
+        Talk(SAY_AGGRO);
+
+        if (!summons.HasEntry(NPC_CRYPT_GUARD))
+            SummonCryptGuards();
+        if (!Is25ManRaid())
         {
-            if (!victim->IsPlayer())
-                return;
-
-            Talk(SAY_SLAY);
-            victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCRABS_5, true, nullptr, nullptr, me->GetGUID());
-            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
+            ScheduleUniqueTimedEvent(17500ms, [&] {
+                me->SummonCreature(NPC_CRYPT_GUARD, cryptguardPositions[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            }, EVENT_SPAWN_CRYPT_GUARDS_1);
         }
 
-        void JustEngagedWith(Unit* who) override
+        ScheduleTimedEvent(15s, [&] {
+            DoCastRandomTarget(SPELL_IMPALE);
+        }, 20s);
+
+        ScheduleTimedEvent(70s, 2min, [&] {
+            Talk(EMOTE_LOCUST);
+            DoCastSelf(SPELL_LOCUST_SWARM);
+            uint32 _cryptGuardEventCount = EVENT_SPAWN_CRYPT_GUARDS_EXTRA + _extraCryptGuardCount;
+
+            ScheduleUniqueTimedEvent(3s, [&] {
+                me->SummonCreature(NPC_CRYPT_GUARD, cryptguardPositions[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            }, _cryptGuardEventCount);
+            ++_extraCryptGuardCount;
+        }, 90s);
+
+
+        ScheduleUniqueTimedEvent(10min, [&] {
+            DoCastSelf(SPELL_BERSERK, true);
+        }, EVENT_BERSERK);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_sayGreet && who->IsPlayer())
         {
-            BossAI::JustEngagedWith(who);
-            me->CallForHelp(30.0f);
-            Talk(SAY_AGGRO);
-
-            if (!summons.HasEntry(NPC_CRYPT_GUARD))
-                SummonCryptGuards();
-            if (!Is25ManRaid())
-            {
-                me->m_Events.AddEventAtOffset([&]
-                {
-                    me->SummonCreature(NPC_CRYPT_GUARD, 3331.217f, -3476.607f, 287.074f, 3.269f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-                }, Milliseconds(urand(15000, 20000)));
-            }
-
-            ScheduleTimedEvent(15s, [&] {
-                DoCastRandomTarget(SPELL_IMPALE);
-            }, 20s);
-
-            ScheduleTimedEvent(70s, 2min, [&] {
-                Talk(EMOTE_LOCUST);
-                DoCastSelf(SPELL_LOCUST_SWARM);
-
-                me->m_Events.AddEventAtOffset([&]
-                {
-                    me->SummonCreature(NPC_CRYPT_GUARD, 3331.217f, -3476.607f, 287.074f, 3.269f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-                }, 3s);
-
-            }, 90s);
-
-            me->m_Events.AddEventAtOffset([&]
-            {
-                DoCastSelf(SPELL_BERSERK, true);
-            }, 10min);
+            Talk(SAY_GREET);
+            _sayGreet = true;
         }
+        BossAI::MoveInLineOfSight(who);
+    }
 
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (!sayGreet && who->IsPlayer())
-            {
-                Talk(SAY_GREET);
-                sayGreet = true;
-            }
-            ScriptedAI::MoveInLineOfSight(who);
-        }
-
-    private:
-        bool sayGreet;
-    };
+private:
+    bool _sayGreet;
+    uint32 _extraCryptGuardCount;
 };
 
 void AddSC_boss_anubrekhan()
 {
-    new boss_anubrekhan();
+    RegisterNaxxramasCreatureAI(boss_anubrekhan);
 }
