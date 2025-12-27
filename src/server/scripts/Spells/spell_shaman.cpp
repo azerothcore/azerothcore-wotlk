@@ -1570,7 +1570,6 @@ class spell_sha_imp_water_shield : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
-        // Get Water Shield
         AuraEffect const* waterShield = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x00000000, 0x00000020, 0x00000000, caster->GetGUID());
         if (!waterShield)
             return;
@@ -1714,8 +1713,6 @@ class spell_sha_static_shock : public AuraScript
         PreventDefaultAction();
 
         Unit* caster = eventInfo.GetActor();
-
-        // Get Lightning Shield
         AuraEffect const* lightningShield = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x00000400, 0x00000000, 0x00000000, caster->GetGUID());
         if (!lightningShield)
             return;

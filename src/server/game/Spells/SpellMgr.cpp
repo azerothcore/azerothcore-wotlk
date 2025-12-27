@@ -1767,13 +1767,9 @@ void SpellMgr::LoadSpellGroupStackRules()
     LOG_INFO("server.loading", " ");
 }
 
-// Used to check if aura can proc - from TrinityCore QAston proc system
 static bool InitTriggerAuraData();
-// Define can trigger auras
 static bool isTriggerAura[TOTAL_AURAS];
-// Triggered always, even from triggered spells
 static bool isAlwaysTriggeredAura[TOTAL_AURAS];
-// Prepare lists
 static bool procPrepared = InitTriggerAuraData();
 
 // List of auras that CAN trigger but may not exist in spell_proc

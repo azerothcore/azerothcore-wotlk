@@ -1389,7 +1389,6 @@ class spell_dru_leader_of_the_pack : public AuraScript
         int32 bp = target->CountPctFromMaxHealth(healAmount);
         target->CastCustomSpell(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
 
-        // Add 6 second cooldown
         if (target->IsPlayer())
             target->ToPlayer()->AddSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, 0, 6 * IN_MILLISECONDS);
 
@@ -1496,9 +1495,9 @@ class spell_dru_eclipse : public AuraScript
         // Set 30 second internal cooldown
         uint32 now = GameTime::GetGameTimeMS().count();
         if (isWrathSpell)
-            _lunarProcCooldownEnd = now + 30000; // 30 seconds
+            _lunarProcCooldownEnd = now + 30000;
         else
-            _solarProcCooldownEnd = now + 30000; // 30 seconds
+            _solarProcCooldownEnd = now + 30000;
 
         GetTarget()->CastSpell(GetTarget(), triggeredSpell, true, nullptr, aurEff);
     }

@@ -1276,7 +1276,6 @@ class spell_pal_sheath_of_light : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         HealInfo* healInfo = eventInfo.GetHealInfo();
-        // Use GetHeal() (base amount) not GetEffectiveHeal() - talent should proc on any crit heal
         return healInfo && healInfo->GetHeal();
     }
 
@@ -1288,7 +1287,6 @@ class spell_pal_sheath_of_light : public AuraScript
         Unit* target = eventInfo.GetActionTarget();
 
         SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_SHEATH_OF_LIGHT_HOT);
-        // Use GetHeal() (base amount) not GetEffectiveHeal() - HoT should be based on crit heal amount
         int32 amount = CalculatePct(static_cast<int32>(eventInfo.GetHealInfo()->GetHeal()), aurEff->GetAmount());
 
         ASSERT(spellInfo->GetMaxTicks() > 0);
