@@ -118,27 +118,27 @@ def update_conf(dist_path, conf_path, skip_prompts=False):
     if not missing:
         print("  No new config options to add.")
         return False
-    backup_file(conf_path)  # Only make a backup if changes are needed!
     updated = False
-    with open(conf_path, "a", encoding="utf-8") as f:
-        for key, (line, comments) in missing.items():
-            if skip_prompts:
+    lines_to_add = []
+    for key, (line, comments) in missing.items():
+        if skip_prompts:
+            lines_to_add.append((comments, line, key))
+        else:
+            print("\n" + "".join(comments if comments else []) + line, end="")
+            add = input(f"  Add {key} to config? (y/n): ").strip().lower()
+            if add in ("", "y", "yes"):
+                lines_to_add.append((comments, line, key))
+            else:
+                print(f"    Skipped {key}.")
+    if lines_to_add:
+        backup_file(conf_path)
+        with open(conf_path, "a", encoding="utf-8") as f:
+            for comments, line, key in lines_to_add:
                 if comments:
                     f.writelines(comments)
                 f.write(line)
                 print(f"    Added {key}.")
                 updated = True
-            else:
-                print("\n" + "".join(comments if comments else []) + line, end="")
-                add = input(f"  Add {key} to config? (y/n): ").strip().lower()
-                if add in ("", "y", "yes"):
-                    if comments:
-                        f.writelines(comments)
-                    f.write(line)
-                    print(f"    Added {key}.")
-                    updated = True
-                else:
-                    print(f"    Skipped {key}.")
     return updated
 
 def update_server_config(config_name, config_dir, skip_prompts=False):
