@@ -2652,6 +2652,14 @@ public:
     void SetMapChangeOrderCounter() { _mapChangeOrderCounter = GetSession()->GetOrderCounter(); }
     uint32 GetMapChangeOrderCounter() { return _mapChangeOrderCounter; }
 
+
+    float GetLootChanceModifier(uint32 itemID) const;
+    void SetLootChanceModifier(uint32 itemID, float mod);
+    void RemoveLootChanceModifier(uint32 itemId);
+
+private:
+    std::unordered_map<uint32, float> _lootChanceModifier;
+
     /*********************************************************/
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
