@@ -46,13 +46,22 @@ def prompt_module_selection(dist_files):
 def backup_file(filepath):
     timestamp = datetime.now().strftime("d%d m%m y%Y %Hh %Mm %Ss")
     bakpath = f"{filepath}({timestamp}).bak"
-    shutil.copy2(filepath, bakpath)
-    print(f"  Backup created: {bakpath}")
+    try:
+        shutil.copy2(filepath, bakpath)
+        print(f"  Backup created: {bakpath}")
+    except (OSError, IOError) as e:
+        print(f"[ERROR] Failed to create backup '{bakpath}': {e}")
+        return False
+    return True
 
 def parse_conf(filepath):
     # Returns a dict of key: (line, [preceding_comments])
-    with open(filepath, encoding="utf-8") as f:
-        lines = f.readlines()
+    try:
+        with open(filepath, encoding="utf-8") as f:
+            lines = f.readlines()
+    except (OSError, IOError) as e:
+        print(f"[ERROR] Failed to read config file '{filepath}': {e}")
+        return None
     conf = {}
     comments = []
     for line in lines:
