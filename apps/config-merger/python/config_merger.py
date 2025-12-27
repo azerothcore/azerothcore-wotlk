@@ -39,7 +39,25 @@ def prompt_module_selection(dist_files):
     for idx, fname in enumerate(dist_files, 1):
         print(f"  {idx}. {fname}")
     nums = input("Enter numbers of modules to update (comma-separated): ").strip()
-    indices = [int(x)-1 for x in nums.split(",") if x.strip().isdigit() and 0 < int(x) <= len(dist_files)]
+    raw_inputs = [x.strip() for x in nums.split(",") if x.strip()]
+    indices = []
+    invalid = []
+    for x in raw_inputs:
+        if not x.isdigit():
+            invalid.append(f"'{x}' (not a number)")
+            continue
+        idx = int(x)
+        if 0 < idx <= len(dist_files):
+            indices.append(idx-1)
+        else:
+            invalid.append(f"'{x}' (out of range, must be 1-{len(dist_files)})")
+    if invalid:
+        print("Invalid input:")
+        for msg in invalid:
+            print(f"  {msg}")
+    if not indices:
+        print("No valid module numbers were entered.")
+        return []
     selected = [dist_files[i] for i in indices]
     return selected
 
@@ -191,7 +209,7 @@ def main():
     if args.target is None:
         print(f"AzerothCore Config Updater/Merger (v. {VERSION})")
         print("==========================")
-        config_dir = input("Enter the path to your configs folder (default: .) which means current folder: ").strip()
+        config_dir = input("Enter the path to your configs folder (Default / Empty will use the folder where this script is located): ").strip()
         if not config_dir:
             config_dir = "."
         
