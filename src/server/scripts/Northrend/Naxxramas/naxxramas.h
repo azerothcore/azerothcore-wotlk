@@ -148,7 +148,6 @@ enum NaxxramasCreatureId
 {
     // Anub'Rekhan
     NPC_ANUBREKHAN                  = 15956,
-    NPC_CORPSE_SCARAB               = 16698,
     NPC_CRYPT_GUARD                 = 16573,
 
     // Patchwerk
