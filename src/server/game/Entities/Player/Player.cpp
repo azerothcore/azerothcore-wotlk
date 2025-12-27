@@ -16378,3 +16378,28 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 {
     ChatHandler(GetSession()).SendSysMessage(msg, escapeCharacters);
 }
+
+float Player::GetLootChanceModifier(uint32 itemID) const
+{
+    auto itr = _lootChanceModifier.find(itemID);
+    if (itr == _lootChanceModifier.end())
+        return 1.0f;
+
+    return itr->second;
+}
+
+void Player::SetLootChanceModifier(uint32 itemID, float mod)
+{
+    if (mod <= 0.0f)
+    {
+        RemoveLootChanceModifier(itemID);
+        return;
+    }
+
+    _lootChanceModifier[itemID] = mod;
+}
+
+void Player::RemoveLootChanceModifier(uint32 itemId)
+{
+    _lootChanceModifier.erase(itemId);
+}
