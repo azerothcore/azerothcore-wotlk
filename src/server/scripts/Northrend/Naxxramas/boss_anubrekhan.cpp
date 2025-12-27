@@ -68,8 +68,8 @@ struct boss_anubrekhan : public BossAI
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
         _sayGreet = false;
-        
     }
+
     void SummonCryptGuards()
     {
         if (Is25ManRaid())
@@ -151,7 +151,6 @@ struct boss_anubrekhan : public BossAI
             }, _cryptGuardEventCount);
             ++_extraCryptGuardCount;
         }, 90s);
-
 
         ScheduleUniqueTimedEvent(10min, [&] {
             DoCastSelf(SPELL_BERSERK, true);
