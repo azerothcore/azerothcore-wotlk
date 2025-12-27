@@ -67,7 +67,7 @@ def prompt_module_selection(dist_files):
     return selected
 
 def backup_file(filepath):
-    timestamp = datetime.now().strftime("d%d m%m y%Y %Hh %Mm %Ss")
+    timestamp = datetime.now().strftime("d%d_m%m_y%Y_%Hh_%Mm_%Ss")
     bakpath = f"{filepath}({timestamp}).bak"
     try:
         shutil.copy2(filepath, bakpath)
