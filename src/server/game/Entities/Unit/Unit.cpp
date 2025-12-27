@@ -6711,9 +6711,15 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
     // Handle aura procs via new proc system (TriggerAurasProcOnEvent)
     if (actor)
     {
-        // Calculate spellTypeMask based on actual damage/heal info
+        // Calculate spellTypeMask based on phase and actual damage/heal info
         uint32 spellTypeMask = 0;
-        if (healInfo && healInfo->GetHeal())
+        if (procPhase == PROC_SPELL_PHASE_CAST)
+        {
+            // At CAST phase, no damage/heal has occurred yet - use MASK_ALL to allow
+            // procs that check for damage/heal type based on spell info (like Backlash)
+            spellTypeMask = PROC_SPELL_TYPE_MASK_ALL;
+        }
+        else if (healInfo && healInfo->GetHeal())
             spellTypeMask = PROC_SPELL_TYPE_HEAL;
         else if (damageInfo && damageInfo->GetDamage())
             spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
