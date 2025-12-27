@@ -44,9 +44,6 @@ enum Spells
 
 enum Misc
 {
-    NPC_CORPSE_SCARAB               = 16698,
-    NPC_CRYPT_GUARD                 = 16573,
-
     ACHIEV_TIMED_START_EVENT        = 9891,
     EVENT_SPAWN_CRYPT_GUARDS_1      = 0,
     EVENT_BERSERK                   = 1,
