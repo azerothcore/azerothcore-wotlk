@@ -98,7 +98,6 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_GAME_EVENT_BATTLEGROUND_DATA, "SELECT eventEntry, bgflag FROM game_event_battleground_holiday", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_GAME_EVENT_POOL_DATA, "SELECT pool_template.entry, game_event_pool.eventEntry FROM pool_template JOIN game_event_pool ON pool_template.entry = game_event_pool.pool_entry", CONNECTION_SYNCH);
     PrepareStatement(WORLD_SEL_GAME_EVENT_ARENA_SEASON, "SELECT eventEntry FROM game_event_arena_seasons WHERE season = ?", CONNECTION_SYNCH);
-    PrepareStatement(WORLD_SEL_GAME_EVENT_HOLIDAY_DATES, "SELECT id, date_id, date_value, holiday_duration FROM holiday_dates", CONNECTION_SYNCH);
     PrepareStatement(WORLD_DEL_GAME_EVENT_CREATURE, "DELETE FROM game_event_creature WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_GAME_EVENT_MODEL_EQUIP, "DELETE FROM game_event_model_equip WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_SEL_GAME_EVENT_NPC_VENDOR, "SELECT eventEntry, guid, item, maxcount, incrtime, ExtendedCost FROM game_event_npc_vendor ORDER BY guid, slot ASC", CONNECTION_SYNCH);

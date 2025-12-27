@@ -1,0 +1,360 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "HolidayDateCalculator.h"
+#include "SharedDefines.h"
+#include <cmath>
+
+// Constants for astronomical calculations
+constexpr double PI = 3.14159265358979323846;
+constexpr double DEG_TO_RAD = PI / 180.0;
+
+// Helper: sin/cos in degrees
+inline double sind(double deg) { return std::sin(deg * DEG_TO_RAD); }
+
+// Static holiday rules configuration
+static const std::vector<HolidayRule> s_HolidayRules = {
+    // Lunar Festival: Chinese New Year - 1 day (event starts day before CNY)
+    { HOLIDAY_LUNAR_FESTIVAL, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, -1 },
+
+    // Love is in the Air: Fixed Feb 3
+    { HOLIDAY_LOVE_IS_IN_THE_AIR, HolidayCalculationType::FIXED_DATE, 2, 3, 0, 0 },
+
+    // Noblegarden: Day after Easter Sunday (Easter + 1 day)
+    { HOLIDAY_NOBLEGARDEN, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 1 },
+
+    // Children's Week: Fixed Apr 28
+    { HOLIDAY_CHILDRENS_WEEK, HolidayCalculationType::FIXED_DATE, 4, 28, 0, 0 },
+
+    // Midsummer Fire Festival: Fixed Jun 21
+    { HOLIDAY_FIRE_FESTIVAL, HolidayCalculationType::FIXED_DATE, 6, 21, 0, 0 },
+
+    // Fireworks Spectacular: Fixed Jul 4
+    { HOLIDAY_FIREWORKS_SPECTACULAR, HolidayCalculationType::FIXED_DATE, 7, 4, 0, 0 },
+
+    // Pirates' Day: Fixed Sep 19
+    { HOLIDAY_PIRATES_DAY, HolidayCalculationType::FIXED_DATE, 9, 19, 0, 0 },
+
+    // Brewfest: Fixed Sep 20
+    { HOLIDAY_BREWFEST, HolidayCalculationType::FIXED_DATE, 9, 20, 0, 0 },
+
+    // Harvest Festival: Fixed Oct 2
+    { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 10, 2, 0, 0 },
+
+    // Hallow's End: Fixed Oct 25
+    { HOLIDAY_HALLOWS_END, HolidayCalculationType::FIXED_DATE, 10, 25, 0, 0 },
+
+    // Day of the Dead: Fixed Nov 1
+    { HOLIDAY_DAY_OF_DEAD, HolidayCalculationType::FIXED_DATE, 11, 1, 0, 0 },
+
+    // Pilgrim's Bounty: Sunday before Thanksgiving (4th Thursday - 4 days)
+    { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), -4 },
+
+    // Winter Veil: Fixed Dec 19
+    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::FIXED_DATE, 12, 19, 0, 0 }
+};
+
+const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
+{
+    return s_HolidayRules;
+}
+
+std::tm HolidayDateCalculator::CalculateEasterSunday(int year)
+{
+    // Anonymous Gregorian algorithm (Computus)
+    // Reference: https://en.wikipedia.org/wiki/Date_of_Easter#Anonymous_Gregorian_algorithm
+    int a = year % 19;
+    int b = year / 100;
+    int c = year % 100;
+    int d = b / 4;
+    int e = b % 4;
+    int f = (b + 8) / 25;
+    int g = (b - f + 1) / 3;
+    int h = (19 * a + b - d - g + 15) % 30;
+    int i = c / 4;
+    int k = c % 4;
+    int l = (32 + 2 * e + 2 * i - h - k) % 7;
+    int m = (a + 11 * h + 22 * l) / 451;
+    int month = (h + l - 7 * m + 114) / 31;
+    int day = ((h + l - 7 * m + 114) % 31) + 1;
+
+    std::tm result = {};
+    result.tm_year = year - 1900;
+    result.tm_mon = month - 1;
+    result.tm_mday = day;
+    mktime(&result); // Normalize and fill in other fields
+
+    return result;
+}
+
+std::tm HolidayDateCalculator::CalculateNthWeekday(int year, int month, Weekday weekday, int n)
+{
+    // Start with first day of the month
+    std::tm date = {};
+    date.tm_year = year - 1900;
+    date.tm_mon = month - 1;
+    date.tm_mday = 1;
+    mktime(&date);
+
+    // Find first occurrence of the target weekday
+    int const daysUntilWeekday = (static_cast<int>(weekday) - date.tm_wday + 7) % 7;
+    date.tm_mday = 1 + daysUntilWeekday;
+
+    // Move to nth occurrence
+    date.tm_mday += (n - 1) * 7;
+
+    mktime(&date); // Normalize (handles month overflow)
+    return date;
+}
+
+// ============================================================================
+// LUNAR NEW YEAR CALCULATION
+// Based on Jean Meeus "Astronomical Algorithms" (1991), Chapter 49
+// Reference: https://celestialprogramming.com/moonphases.html
+// Chinese New Year = new moon falling between January 21 and February 20
+// ============================================================================
+
+double HolidayDateCalculator::DateToJulianDay(int year, int month, double day)
+{
+    if (month <= 2)
+    {
+        year -= 1;
+        month += 12;
+    }
+    int const A = year / 100;
+    int const B = 2 - A + (A / 4);
+    return std::floor(365.25 * (year + 4716)) + std::floor(30.6001 * (month + 1)) + day + B - 1524.5;
+}
+
+void HolidayDateCalculator::JulianDayToDate(double jd, int& year, int& month, int& day)
+{
+    jd += 0.5;
+    int const Z = static_cast<int>(jd);
+    int A = Z;
+    if (Z >= 2299161)
+    {
+        int const alpha = static_cast<int>((Z - 1867216.25) / 36524.25);
+        A = Z + 1 + alpha - (alpha / 4);
+    }
+    int const B = A + 1524;
+    int const C = static_cast<int>((B - 122.1) / 365.25);
+    int const D = static_cast<int>(365.25 * C);
+    int const E = static_cast<int>((B - D) / 30.6001);
+
+    day = B - D - static_cast<int>(30.6001 * E);
+    month = (E < 14) ? E - 1 : E - 13;
+    year = (month > 2) ? C - 4716 : C - 4715;
+}
+
+double HolidayDateCalculator::CalculateNewMoon(double k)
+{
+    // Meeus "Astronomical Algorithms" Chapter 49
+    double const T = k / 1236.85;
+    double const T2 = T * T;
+    double const T3 = T2 * T;
+    double const T4 = T3 * T;
+
+    // Mean phase (Eq 49.1)
+    double JDE = 2451550.09766 + 29.530588861 * k + 0.00015437 * T2
+               - 0.000000150 * T3 + 0.00000000073 * T4;
+
+    // Eccentricity correction
+    double const E = 1.0 - 0.002516 * T - 0.0000074 * T2;
+    double const E2 = E * E;
+
+    // Sun's mean anomaly (Eq 49.4)
+    double const M = 2.5534 + 29.10535670 * k - 0.0000014 * T2 - 0.00000011 * T3;
+
+    // Moon's mean anomaly (Eq 49.5)
+    double const MPrime = 201.5643 + 385.81693528 * k + 0.0107582 * T2
+                        + 0.00001238 * T3 - 0.000000058 * T4;
+
+    // Moon's argument of latitude (Eq 49.6)
+    double const F = 160.7108 + 390.67050284 * k - 0.0016118 * T2
+                   - 0.00000227 * T3 + 0.000000011 * T4;
+
+    // Longitude of ascending node (Eq 49.7)
+    double const Omega = 124.7746 - 1.56375588 * k + 0.0020672 * T2 + 0.00000215 * T3;
+
+    // New Moon corrections (Table 49.A)
+    double correction =
+        - 0.40720 * sind(MPrime)
+        + 0.17241 * E * sind(M)
+        + 0.01608 * sind(2 * MPrime)
+        + 0.01039 * sind(2 * F)
+        + 0.00739 * E * sind(MPrime - M)
+        - 0.00514 * E * sind(MPrime + M)
+        + 0.00208 * E2 * sind(2 * M)
+        - 0.00111 * sind(MPrime - 2 * F)
+        - 0.00057 * sind(MPrime + 2 * F)
+        + 0.00056 * E * sind(2 * MPrime + M)
+        - 0.00042 * sind(3 * MPrime)
+        + 0.00042 * E * sind(M + 2 * F)
+        + 0.00038 * E * sind(M - 2 * F)
+        - 0.00024 * E * sind(2 * MPrime - M)
+        - 0.00017 * sind(Omega);
+
+    // Additional planetary corrections (Table 49.B)
+    double const A1  = 299.77 +  0.107408 * k - 0.009173 * T2;
+    double const A2  = 251.88 +  0.016321 * k;
+    double const A3  = 251.83 + 26.651886 * k;
+    double const A4  = 349.42 + 36.412478 * k;
+    double const A5  =  84.66 + 18.206239 * k;
+    double const A6  = 141.74 + 53.303771 * k;
+    double const A7  = 207.14 +  2.453732 * k;
+    double const A8  = 154.84 +  7.306860 * k;
+    double const A9  =  34.52 + 27.261239 * k;
+    double const A10 = 207.19 +  0.121824 * k;
+    double const A11 = 291.34 +  1.844379 * k;
+    double const A12 = 161.72 + 24.198154 * k;
+    double const A13 = 239.56 + 25.513099 * k;
+    double const A14 = 331.55 +  3.592518 * k;
+
+    correction += 0.000325 * sind(A1) + 0.000165 * sind(A2) + 0.000164 * sind(A3)
+                + 0.000126 * sind(A4) + 0.000110 * sind(A5) + 0.000062 * sind(A6)
+                + 0.000060 * sind(A7) + 0.000056 * sind(A8) + 0.000047 * sind(A9)
+                + 0.000042 * sind(A10) + 0.000040 * sind(A11) + 0.000037 * sind(A12)
+                + 0.000035 * sind(A13) + 0.000023 * sind(A14);
+
+    return JDE + correction;
+}
+
+std::tm HolidayDateCalculator::CalculateLunarNewYear(int year)
+{
+    // Chinese New Year always falls on the new moon between Jan 21 and Feb 20
+    double const jan21JD = DateToJulianDay(year, 1, 21.0);
+    double const feb21JD = DateToJulianDay(year, 2, 21.0);
+
+    // Approximate lunation number k for January of target year
+    double const approxK = (year - 2000.0) * 12.3685;
+    double k = std::floor(approxK);
+
+    // Search for the new moon in the valid range
+    for (int i = -2; i <= 2; ++i)
+    {
+        double nmJDE = CalculateNewMoon(k + i);
+
+        // Convert TT (Terrestrial Time) to UT (approximate DeltaT ~70s for 2020s)
+        double nmJD = nmJDE - 70.0 / 86400.0;
+
+        // Add 8 hours for China Standard Time (UTC+8)
+        nmJD += 8.0 / 24.0;
+
+        if (nmJD >= jan21JD && nmJD < feb21JD)
+        {
+            int cnyYear, cnyMonth, cnyDay;
+            JulianDayToDate(nmJD, cnyYear, cnyMonth, cnyDay);
+
+            std::tm result = {};
+            result.tm_year = cnyYear - 1900;
+            result.tm_mon = cnyMonth - 1;
+            result.tm_mday = cnyDay;
+            mktime(&result);
+            return result;
+        }
+    }
+
+    // Fallback (should never happen for years 2000-2031)
+    std::tm fallback = {};
+    fallback.tm_year = year - 1900;
+    fallback.tm_mon = 0;  // January
+    fallback.tm_mday = 25;
+    mktime(&fallback);
+    return fallback;
+}
+
+std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int year)
+{
+    std::tm result = {};
+
+    switch (rule.type)
+    {
+        case HolidayCalculationType::FIXED_DATE:
+        {
+            result.tm_year = year - 1900;
+            result.tm_mon = rule.month - 1;
+            result.tm_mday = rule.day;
+            mktime(&result);
+            break;
+        }
+        case HolidayCalculationType::NTH_WEEKDAY:
+        {
+            result = CalculateNthWeekday(year, rule.month, static_cast<Weekday>(rule.weekday), rule.day);
+            if (rule.offset != 0)
+            {
+                result.tm_mday += rule.offset;
+                mktime(&result); // Normalize
+            }
+            break;
+        }
+        case HolidayCalculationType::EASTER_OFFSET:
+        {
+            result = CalculateEasterSunday(year);
+            result.tm_mday += rule.offset;
+            mktime(&result); // Normalize
+            break;
+        }
+        case HolidayCalculationType::LUNAR_NEW_YEAR:
+        {
+            result = CalculateLunarNewYear(year);
+            if (rule.offset != 0)
+            {
+                result.tm_mday += rule.offset;
+                mktime(&result); // Normalize
+            }
+            break;
+        }
+    }
+
+    return result;
+}
+
+uint32_t HolidayDateCalculator::PackDate(const std::tm& date)
+{
+    // WoW packed date format:
+    // bits 14-19: day (0-indexed)
+    // bits 20-23: month (0-indexed)
+    // bits 24-28: year offset from 2000
+    uint32_t yearOffset = static_cast<uint32_t>((date.tm_year + 1900) - 2000);
+    uint32_t month = static_cast<uint32_t>(date.tm_mon);         // Already 0-indexed
+    uint32_t day = static_cast<uint32_t>(date.tm_mday - 1);      // Convert to 0-indexed
+
+    return (yearOffset << 24) | (month << 20) | (day << 14);
+}
+
+std::tm HolidayDateCalculator::UnpackDate(uint32_t packed)
+{
+    std::tm result = {};
+    result.tm_year = static_cast<int>(((packed >> 24) & 0x1F) + 2000 - 1900);
+    result.tm_mon = static_cast<int>((packed >> 20) & 0xF);
+    result.tm_mday = static_cast<int>(((packed >> 14) & 0x3F) + 1);
+    mktime(&result);
+    return result;
+}
+
+uint32_t HolidayDateCalculator::GetPackedHolidayDate(uint32_t holidayId, int year)
+{
+    for (auto const& rule : s_HolidayRules)
+    {
+        if (rule.holidayId == holidayId)
+        {
+            std::tm date = CalculateHolidayDate(rule, year);
+            return PackDate(date);
+        }
+    }
+    return 0; // Holiday not found
+}
