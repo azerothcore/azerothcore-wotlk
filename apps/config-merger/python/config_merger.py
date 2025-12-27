@@ -137,13 +137,16 @@ def update_conf(dist_path, conf_path, skip_prompts=False):
                 print(f"    Skipped {key}.")
     if lines_to_add:
         backup_file(conf_path)
-        with open(conf_path, "a", encoding="utf-8") as f:
+        # Write using system's default line ending to avoid mixing CRLF and LF in the config file
+        newline = os.linesep.encode('utf-8')
+        with open(conf_path, "ab") as f:
             for comments, line, key in lines_to_add:
                 if comments:
-                    f.writelines(comments)
-                f.write(line)
+                    for c in comments:
+                        f.write(c.rstrip('\r\n').encode('utf-8') + newline)
+                f.write(line.rstrip('\r\n').encode('utf-8') + newline)
                 print(f"    Added {key}.")
-                updated = True
+        updated = True
     return updated
 
 def update_server_config(config_name, config_dir, skip_prompts=False):
