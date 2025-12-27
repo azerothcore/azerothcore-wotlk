@@ -1,3 +1,4 @@
+-- DB update 2025_12_27_01 -> 2025_12_27_02
 --
 DELETE FROM `item_loot_template` WHERE `Entry` = 43575;
 INSERT INTO `item_loot_template` (`entry`, `item`, `Chance`, `groupid`, `mincount`, `maxcount`, `reference`, `comment`) VALUES
