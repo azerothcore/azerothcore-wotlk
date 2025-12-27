@@ -29,7 +29,12 @@ from datetime import datetime
 
 def find_modules(folder):
     dist_files = []
-    for file in os.listdir(folder):
+    try:
+        files = os.listdir(folder)
+    except (OSError, IOError) as e:
+        print(f"[ERROR] Could not list directory '{folder}': {e}")
+        return []
+    for file in files:
         if file.endswith('.conf.dist'):
             dist_files.append(file)
     return sorted(dist_files)
