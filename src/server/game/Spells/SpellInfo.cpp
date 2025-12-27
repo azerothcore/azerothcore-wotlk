@@ -1313,7 +1313,6 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
     if (affectSpell->SpellFamilyName != SpellFamilyName)
         return false;
 
-    // true
     if (mod->mask & SpellFamilyFlags)
         return true;
 

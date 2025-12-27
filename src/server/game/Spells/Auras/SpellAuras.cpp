@@ -2149,6 +2149,23 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
     if (!procEntry)
         return 0;
 
+    // check spell triggering us
+    if (Spell const* spell = eventInfo.GetProcSpell())
+    {
+        // Do not allow auras to proc from effect triggered from itself
+        if (spell->GetTriggeredByAuraSpellInfo() == m_spellInfo)
+            return 0;
+
+        // check if aura can proc when spell is triggered (exception for hunter auto shot & wands)
+        if (!GetSpellInfo()->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS) &&
+            !(procEntry->AttributesMask & PROC_ATTR_TRIGGERED_CAN_PROC) &&
+            !(eventInfo.GetTypeMask() & AUTO_ATTACK_PROC_FLAG_MASK))
+        {
+            if (spell->IsTriggered() && !spell->GetSpellInfo()->HasAttribute(SPELL_ATTR3_NOT_A_PROC))
+                return 0;
+        }
+    }
+
     // check if we have charges to proc with
     if (IsUsingCharges() && !GetCharges())
         return 0;
