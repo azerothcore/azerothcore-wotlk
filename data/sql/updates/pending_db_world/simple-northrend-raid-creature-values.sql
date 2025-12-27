@@ -1,5 +1,4 @@
 -- Obsidian Sanctum
-
 UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 28860; -- sartharion
 UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 30449; -- vesperon
 UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 30451; -- shadron
