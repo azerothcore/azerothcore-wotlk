@@ -82,9 +82,6 @@ struct boss_eck : public BossAI
         ScheduleUniqueTimedEvent(77s, [&] {
             Talk(EMOTE_CRAZED);
         }, EVENT_ECK_CRAZED_EMOTE);
-        ScheduleUniqueTimedEvent(90s, [&] {
-            DoCastSelf(SPELL_ECK_BERSERK);
-        }, EVENT_ECK_BERSERK);
         ScheduleTimedEvent(5s, [&] {
             DoCastVictim(SPELL_ECK_BITE);
         }, 8s, 12s);
@@ -94,6 +91,7 @@ struct boss_eck : public BossAI
         ScheduleTimedEvent(10s, 24s, [&] {
             DoCastRandomTarget(SPELL_ECK_SPRING, 0, 30.0f, true);
         }, 10s, 24s);
+        ScheduleEnrageTimer(SPELL_ECK_BERSERK, 90s);
     }
 };
 
