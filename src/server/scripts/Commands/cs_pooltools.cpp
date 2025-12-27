@@ -288,8 +288,10 @@ public:
             std::string safe;
             safe.reserve(input.size());
             for (char c : input) {
-                if (c == '\'') safe += "\\'";
-                else safe += c;
+                if (c == '\'')
+                    safe += "\\'";
+                else
+                    safe += c;
             }
             return safe;
         };
