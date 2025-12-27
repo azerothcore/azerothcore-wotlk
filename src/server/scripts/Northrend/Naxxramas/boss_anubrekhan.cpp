@@ -142,9 +142,7 @@ struct boss_anubrekhan : public BossAI
             ++_extraCryptGuardCount;
         }, 90s);
 
-        ScheduleUniqueTimedEvent(10min, [&] {
-            DoCastSelf(SPELL_BERSERK, true);
-        }, EVENT_BERSERK);
+        ScheduleEnrageTimer(SPELL_BERSERK, 10min);
     }
 
     void MoveInLineOfSight(Unit* who) override
