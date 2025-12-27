@@ -69,6 +69,10 @@ def parse_conf(filepath):
         if not stripped or stripped.startswith("#"):
             comments.append(line)
             continue
+        if stripped.startswith("[") and stripped.endswith("]"):
+            # Ignore [headers of configs]
+            comments.clear()
+            continue
         if "=" in stripped:
             key = stripped.split("=")[0].strip()
             conf[key] = (line, comments.copy())
