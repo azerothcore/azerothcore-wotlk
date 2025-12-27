@@ -204,6 +204,9 @@ void Player::Update(uint32 p_time)
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
                     resetAttackTimer(BASE_ATTACK);
+
+                    // Blizzlike: Reset ranged swing timer when performing melee attack
+                    resetAttackTimer(RANGED_ATTACK);
                 }
             }
 
@@ -223,6 +226,9 @@ void Player::Update(uint32 p_time)
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
                     resetAttackTimer(OFF_ATTACK);
+
+                    // Blizzlike: Reset ranged swing timer when performing melee attack
+                    resetAttackTimer(RANGED_ATTACK);
                 }
             }
 
