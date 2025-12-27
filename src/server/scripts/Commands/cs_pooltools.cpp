@@ -15,21 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Cell.h"
+#include "CellImpl.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GameObject.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "MapMgr.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "Cell.h"
-#include "CellImpl.h"
+#include "MapMgr.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 #include "Tokenize.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
 
 using namespace Acore::ChatCommands;
 
@@ -42,7 +38,9 @@ struct PoolTemplateItem
 // Represents one "spawn point" which might contain multiple GUIDs
 struct NodeGroup
 {
-    float X, Y, Z;
+    float X = 0.0f;
+    float Y = 0.0f;
+    float Z = 0.0f;
     std::vector<std::pair<uint32, uint32>> FoundObjects;
 };
 
@@ -53,7 +51,7 @@ struct PoolSession
     std::vector<NodeGroup> CapturedGroups;
 };
 
-static std::map<ObjectGuid, PoolSession> sPoolSessions;
+static std::map<ObjectGuid, PoolSession> PoolSessions;
 
 class pooltools_commandscript : public CommandScript
 {
@@ -81,9 +79,9 @@ public:
 
     static bool HandlePoolStart(ChatHandler* handler, std::string description)
     {
-        ObjectGuid playerGuid = handler->GetPlayer()->GetGUID();
+        ObjectGuid const playerGuid = handler->GetPlayer()->GetGUID();
 
-        if (sPoolSessions.find(playerGuid) != sPoolSessions.end())
+        if (PoolSessions.find(playerGuid) != PoolSessions.end())
         {
             handler->SendErrorMessage("Session already active. Use .pooltools clear first.");
             return false;
@@ -92,7 +90,7 @@ public:
         PoolSession session;
         session.ZoneName = description;
 
-        sPoolSessions[playerGuid] = session;
+        PoolSessions[playerGuid] = session;
 
         handler->PSendSysMessage("|cff00ff00Pool Session Started.|r Description: {}", description);
         return true;
@@ -101,7 +99,7 @@ public:
     static bool HandlePoolDef(ChatHandler* handler, Tail args)
     {
         ObjectGuid playerGuid = handler->GetPlayer()->GetGUID();
-        if (sPoolSessions.find(playerGuid) == sPoolSessions.end())
+        if (PoolSessions.find(playerGuid) == PoolSessions.end())
         {
             handler->SendErrorMessage("No active session.");
             return false;
@@ -118,14 +116,16 @@ public:
         std::vector<PoolTemplateItem> newTemplate;
         for (size_t i = 0; i < tokens.size(); i += 2)
         {
-            uint32 entry = Acore::StringTo<uint32>(tokens[i]).value_or(0);
-            uint32 chance = Acore::StringTo<uint32>(tokens[i + 1]).value_or(0);
+            uint32 const entry = Acore::StringTo<uint32>(tokens[i]).value_or(0);
+            uint32 const chance = Acore::StringTo<uint32>(tokens[i + 1]).value_or(0);
 
-            if (entry == 0) continue;
+            if (entry == 0)
+                continue;
+
             newTemplate.push_back({ entry, chance });
         }
 
-        sPoolSessions[playerGuid].CurrentTemplate = newTemplate;
+        PoolSessions[playerGuid].CurrentTemplate = newTemplate;
         handler->PSendSysMessage("Template Defined ({} items).", newTemplate.size());
         return true;
     }
@@ -133,9 +133,10 @@ public:
     static bool HandlePoolAdd(ChatHandler* handler, Optional<float> radiusArg)
     {
         ObjectGuid playerGuid = handler->GetPlayer()->GetGUID();
-        if (sPoolSessions.find(playerGuid) == sPoolSessions.end()) return false;
+        if (PoolSessions.find(playerGuid) == PoolSessions.end())
+            return false;
 
-        PoolSession& session = sPoolSessions[playerGuid];
+        PoolSession& session = PoolSessions[playerGuid];
         if (session.CurrentTemplate.empty())
         {
             handler->SendErrorMessage("Define a template first with .pooltools def");
@@ -143,7 +144,7 @@ public:
         }
 
         Player* player = handler->GetPlayer();
-        float radius = radiusArg.value_or(5.0f);
+        float const radius = radiusArg.value_or(5.0f);
 
         float searchX = player->GetPositionX();
         float searchY = player->GetPositionY();
@@ -179,9 +180,10 @@ public:
                     break;
                 }
             }
-            if (!isTemplateMatch) continue;
+            if (!isTemplateMatch)
+                continue;
 
-            uint32 spawnId = go->GetSpawnId();
+            uint32 const spawnId = go->GetSpawnId();
 
             bool alreadyCaptured = false;
             for (auto const& group : session.CapturedGroups)
@@ -194,9 +196,11 @@ public:
                         break;
                     }
                 }
-                if (alreadyCaptured) break;
+                if (alreadyCaptured)
+                    break;
             }
-            if (alreadyCaptured) continue;
+            if (alreadyCaptured)
+                continue;
 
             // Clustering
             NodeGroup* existingGroup = nullptr;
@@ -249,14 +253,14 @@ public:
 
     static bool HandlePoolRemove(ChatHandler* handler)
     {
-        ObjectGuid playerGuid = handler->GetPlayer()->GetGUID();
-        if (sPoolSessions.find(playerGuid) == sPoolSessions.end())
+        ObjectGuid const playerGuid = handler->GetPlayer()->GetGUID();
+        if (PoolSessions.find(playerGuid) == PoolSessions.end())
         {
             handler->SendErrorMessage("No active session.");
             return false;
         }
 
-        PoolSession& session = sPoolSessions[playerGuid];
+        PoolSession& session = PoolSessions[playerGuid];
 
         if (session.CapturedGroups.empty())
         {
@@ -274,8 +278,9 @@ public:
     static bool HandlePoolEnd(ChatHandler* handler)
     {
         ObjectGuid playerGuid = handler->GetPlayer()->GetGUID();
-        auto it = sPoolSessions.find(playerGuid);
-        if (it == sPoolSessions.end()) return false;
+        auto it = PoolSessions.find(playerGuid);
+        if (it == PoolSessions.end())
+            return false;
 
         PoolSession& session = it->second; // Use reference from iterator
 
@@ -287,15 +292,17 @@ public:
                 else safe += c;
             }
             return safe;
-            };
+        };
 
-        bool complexPool = (session.CurrentTemplate.size() > 1);
+        bool const complexPool = (session.CurrentTemplate.size() > 1);
 
         // SQL Variables and Header
         LOG_DEBUG("sql.dev", "-- Pool Dump: {}", session.ZoneName);
         LOG_DEBUG("sql.dev", "SET @mother_pool := @mother_pool+1;");
+
         if (complexPool)
             LOG_DEBUG("sql.dev", "SET @pool_node := @pool_node+1;");
+
         LOG_DEBUG("sql.dev", "SET @max_limit   := {};", (session.CapturedGroups.size() + 3) / 4);
 
         // DELETEs section
@@ -343,7 +350,8 @@ public:
                 {
                     float chance = 0.0f;
                     for (auto const& tpl : session.CurrentTemplate)
-                        if (tpl.Entry == obj.first) chance = (float)tpl.Chance;
+                        if (tpl.Entry == obj.first)
+                            chance = (float)tpl.Chance;
 
                     bulkInserts.push_back(fmt::format("({}, @mother_pool, {}, '{} - {}')",
                         obj.second, chance, EscapeSQL(session.ZoneName), safeGroupDesc));
@@ -390,13 +398,13 @@ public:
         handler->PSendSysMessage("Dumped {} groups.", groupCounter);
 
         // Cleanup
-        sPoolSessions.erase(it);
+        PoolSessions.erase(it);
         return true;
     }
 
     static bool HandlePoolClear(ChatHandler* handler)
     {
-        sPoolSessions.erase(handler->GetPlayer()->GetGUID());
+        PoolSessions.erase(handler->GetPlayer()->GetGUID());
         handler->PSendSysMessage("Session cleared.");
         return true;
     }
