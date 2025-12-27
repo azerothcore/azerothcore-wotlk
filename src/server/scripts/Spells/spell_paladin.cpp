@@ -1267,27 +1267,34 @@ class spell_pal_sheath_of_light : public AuraScript
         return ValidateSpellInfo({ SPELL_PALADIN_SHEATH_OF_LIGHT_HOT });
     }
 
-    void HandleProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        // Use GetHeal() (base amount) not GetEffectiveHeal() - talent should proc on any crit heal
+        return healInfo && healInfo->GetHeal();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        HealInfo* healInfo = eventInfo.GetHealInfo();
-        if (!healInfo || !healInfo->GetEffectiveHeal())
-            return;
 
-        AuraEffect const* aurEff = GetEffect(EFFECT_0);
-        if (!aurEff)
-            return;
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetActionTarget();
 
         SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_SHEATH_OF_LIGHT_HOT);
-        int32 amount = CalculatePct(static_cast<int32>(healInfo->GetEffectiveHeal()), aurEff->GetAmount());
+        // Use GetHeal() (base amount) not GetEffectiveHeal() - HoT should be based on crit heal amount
+        int32 amount = CalculatePct(static_cast<int32>(eventInfo.GetHealInfo()->GetHeal()), aurEff->GetAmount());
+
+        ASSERT(spellInfo->GetMaxTicks() > 0);
         amount /= spellInfo->GetMaxTicks();
 
-        GetTarget()->CastCustomSpell(SPELL_PALADIN_SHEATH_OF_LIGHT_HOT, SPELLVALUE_BASE_POINT0, amount, GetTarget(), true, nullptr, aurEff);
+        caster->CastCustomSpell(SPELL_PALADIN_SHEATH_OF_LIGHT_HOT, SPELLVALUE_BASE_POINT0, amount, target, true, nullptr, aurEff);
     }
 
     void Register() override
     {
-        OnProc += AuraProcFn(spell_pal_sheath_of_light::HandleProc);
+        DoCheckProc += AuraCheckProcFn(spell_pal_sheath_of_light::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pal_sheath_of_light::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
