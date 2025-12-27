@@ -1252,9 +1252,9 @@ class spell_pal_righteous_vengeance : public AuraScript
         if (!damageInfo || !damageInfo->GetDamage())
             return;
 
-        // 4 damage ticks
-        int32 bp = aurEff->GetAmount() * damageInfo->GetDamage() / 400;
-        target->CastDelayedSpellWithPeriodicAmount(GetTarget(), SPELL_PALADIN_RIGHTEOUS_VENGEANCE_DOT, SPELL_AURA_PERIODIC_DAMAGE, bp);
+        // Calculate total DoT damage (percentage of crit damage), divided by 4 ticks
+        int32 amount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount()) / 4;
+        target->CastDelayedSpellWithPeriodicAmount(GetTarget(), SPELL_PALADIN_RIGHTEOUS_VENGEANCE_DOT, SPELL_AURA_PERIODIC_DAMAGE, amount);
     }
 
     void Register() override

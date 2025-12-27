@@ -1381,15 +1381,22 @@ class spell_dru_leader_of_the_pack : public AuraScript
         if (healAmount <= 0)
             return;
 
+        // 6 second internal cooldown
+        if (target->IsPlayer() && target->ToPlayer()->HasSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL))
+            return;
+
         int32 bp = target->CountPctFromMaxHealth(healAmount);
         target->CastCustomSpell(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
+
+        // Add 6 second cooldown
+        if (target->IsPlayer())
+            target->ToPlayer()->AddSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, 0, 6 * IN_MILLISECONDS);
 
         // Improved Leader of the Pack - mana regen (only for self-cast aura)
         if (aurEff->GetCasterGUID() == target->GetGUID())
         {
             int32 manaAmount = CalculatePct(target->GetMaxPower(POWER_MANA), healAmount * 2);
-            if (target->IsPlayer() && !target->ToPlayer()->HasSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL))
-                target->CastCustomSpell(SPELL_DRUID_LEADER_OF_THE_PACK_MANA, SPELLVALUE_BASE_POINT0, manaAmount, target, true, nullptr, aurEff);
+            target->CastCustomSpell(SPELL_DRUID_LEADER_OF_THE_PACK_MANA, SPELLVALUE_BASE_POINT0, manaAmount, target, true, nullptr, aurEff);
         }
     }
 

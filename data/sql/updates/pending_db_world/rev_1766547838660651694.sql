@@ -1140,11 +1140,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (47570, 'spell_pri_improved_shadowform');      -- Improved Shadowform Rank 2
 
 -- Spell script names for Warlock proc handlers
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_warl_nightfall');
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(18094, 'spell_warl_nightfall'),               -- Nightfall Rank 1
-(18095, 'spell_warl_nightfall'),               -- Nightfall Rank 2
-(56218, 'spell_warl_nightfall');               -- Glyph of Corruption
+-- Note: Nightfall uses -18094 with 'spell_warl_glyph_of_corruption_nightfall' (covers all ranks)
+-- Glyph of Corruption (56218) also uses same script via RegisterSpellScriptWithArgs
 
 -- ============================================================================
 -- Phase 2: Migrate spell_proc_event entries with non-default values to spell_proc
