@@ -1,3 +1,4 @@
+-- DB update 2025_12_27_00 -> 2025_12_27_01
 -- Obsidian Sanctum
 UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 28860; -- sartharion
 UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 30449; -- vesperon
