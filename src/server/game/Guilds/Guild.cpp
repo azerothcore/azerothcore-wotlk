@@ -387,25 +387,26 @@ void Guild::BankTab::LoadFromDB(Field* fields)
 bool Guild::BankTab::LoadItemFromDB(Field* fields)
 {
     uint8 slotId = fields[13].Get<uint8>();
-    ObjectGuid::LowType itemGuid = fields[14].Get<uint32>();
+    uint64 itemGuidDb = fields[14].Get<uint64>();
     uint32 itemEntry = fields[15].Get<uint32>();
     if (slotId >= GUILD_BANK_MAX_SLOTS)
     {
-        LOG_ERROR("guild", "Invalid slot for item (GUID: {}, id: {}) in guild bank, skipped.", itemGuid, itemEntry);
+        LOG_ERROR("guild", "Invalid slot for item (GUID: {}, id: {}) in guild bank, skipped.", itemGuidDb, itemEntry);
         return false;
     }
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry);
     if (!proto)
     {
-        LOG_ERROR("guild", "Unknown item (GUID: {}, id: {}) in guild bank, skipped.", itemGuid, itemEntry);
+        LOG_ERROR("guild", "Unknown item (GUID: {}, id: {}) in guild bank, skipped.", itemGuidDb, itemEntry);
         return false;
     }
 
     Item* pItem = NewItemOrBag(proto);
-    if (!pItem->LoadFromDB(itemGuid, ObjectGuid::Empty, fields, itemEntry))
+    bool ok = pItem->LoadFromDB64(itemGuidDb, ObjectGuid::Empty, fields, itemEntry);
+    if (!ok)
     {
-        LOG_ERROR("guild", "Item (GUID {}, id: {}) not found in item_instance, deleting from guild bank!", itemGuid, itemEntry);
+        LOG_ERROR("guild", "Item (GUID {}, id: {}) not found in item_instance, deleting from guild bank!", itemGuidDb, itemEntry);
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_NONEXISTENT_GUILD_BANK_ITEM);
         stmt->SetData(0, m_guildId);
