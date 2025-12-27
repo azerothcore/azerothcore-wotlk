@@ -94,7 +94,7 @@ struct boss_anubrekhan : public BossAI
         summons.Summon(cr);
     }
 
-    void SummonedCreatureDies(Creature* cr, Unit*) override
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
         if (cr->GetEntry() == NPC_CRYPT_GUARD)
         {
