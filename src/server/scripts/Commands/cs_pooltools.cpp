@@ -287,7 +287,8 @@ public:
         auto EscapeSQL = [](std::string_view input) -> std::string {
             std::string safe;
             safe.reserve(input.size());
-            for (char c : input) {
+            for (char c : input)
+            {
                 if (c == '\'')
                     safe += "\\'";
                 else
