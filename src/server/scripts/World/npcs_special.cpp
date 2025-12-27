@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -68,7 +68,7 @@ public:
         npc_elder_clearwaterAI(Creature* c) : ScriptedAI(c)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_CLEARWATER_ANNOUNCE, 1000, 1, 0);
+            events.ScheduleEvent(EVENT_CLEARWATER_ANNOUNCE, 1s, 1, 0);
             finished = false;
             preWarning = false;
             startWarning = false;
@@ -126,7 +126,7 @@ public:
                             }
                         }
 
-                        events.RepeatEvent(1000);
+                        events.Repeat(1s);
                         break;
                     }
             }
@@ -561,10 +561,6 @@ public:
 
         {
             if (!SpawnAssoc)
-                return;
-
-            // check if they're hostile
-            if (!(me->IsHostileTo(who) || who->IsHostileTo(me)))
                 return;
 
             if (me->IsValidAttackTarget(who))
@@ -1421,7 +1417,8 @@ public:
                                 break;
                         }
 
-                        Start(false, true);
+                        me->SetWalk(true);
+                        Start(false);
                     }
                     else
                         EnterEvadeMode();                       //something went wrong
@@ -2682,6 +2679,60 @@ struct npc_controller : public PossessedAI
     }
 };
 
+enum TravelerMammothVendor
+{
+    SAY_DISMISS      = 0,
+};
+
+struct npc_traveler_mammoth_vendor : public ScriptedAI
+{
+    npc_traveler_mammoth_vendor(Creature* creature) : ScriptedAI(creature) { }
+
+    bool _hasEjected = false;
+    ObjectGuid _playerGuid;
+
+    void Reset() override
+    {
+        _hasEjected = false;
+        _playerGuid.Clear();
+
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && !me->GetMap()->IsBattlegroundOrArena())
+            me->SetFaction(FACTION_FRIENDLY);
+
+        me->m_Events.KillAllEvents(false);
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (_playerGuid.IsEmpty() && me->GetVehicle())
+        {
+            _playerGuid = me->GetVehicleBase()->GetGUID();
+        }
+        if (!me->GetVehicle() && !_hasEjected)
+        {
+            _hasEjected = true;
+
+            me->m_Events.AddEventAtOffset([this] {
+                if (Unit* driver = ObjectAccessor::GetUnit(*me, _playerGuid))
+                    me->SetFacingToObject(driver);
+            }, 2500ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_VENDOR_MASK);
+            }, 3300ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_DISMISS);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+            }, 4100ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                me->DespawnOrUnsummon();
+            }, 10200ms);
+        }
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_elder_clearwater();
@@ -2708,4 +2759,5 @@ void AddSC_npcs_special()
     RegisterCreatureAI(npc_arcanite_dragonling);
     RegisterCreatureAI(npc_crashin_thrashin_robot);
     RegisterCreatureAI(npc_controller);
+    RegisterCreatureAI(npc_traveler_mammoth_vendor);
 }

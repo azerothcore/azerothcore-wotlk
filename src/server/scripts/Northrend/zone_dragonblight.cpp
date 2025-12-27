@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -491,9 +491,9 @@ public:
                         HideNozdormu();
                         if (Creature* cr = GetCopy())
                             cr->AI()->Talk(SAY_HOURGLASS_END_2, GetPlayer());
-                        me->DespawnOrUnsummon(500);
+                        me->DespawnOrUnsummon(500ms);
                         if (GetCopy())
-                            GetCopy()->DespawnOrUnsummon(500);
+                            GetCopy()->DespawnOrUnsummon(500ms);
                         break;
                     }
             }
@@ -614,7 +614,7 @@ public:
             uint32 path = me->GetEntry() * 10 + urand(0, 4);
             if (me->GetPositionY() > -1150.0f)
                 path += 5;
-            me->GetMotionMaster()->MovePath(path, false);
+            me->GetMotionMaster()->MoveWaypoint(path, false);
         }
 
         void MovementInform(uint32 type, uint32 point) override
@@ -622,11 +622,11 @@ public:
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
 
-            if (point == 8) // max-1
+            if (point == 9)
             {
                 Talk(0);
                 me->RemoveAllAuras();
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
                 if (TempSummon* summon = me->ToTempSummon())
                     if (Unit* owner = summon->GetSummonerUnit())
                         if (Player* player = owner->ToPlayer())
@@ -726,7 +726,7 @@ public:
                 }
                 case EVENT_TAKE_OFF:
                 {
-                    me->DespawnOrUnsummon(4050);
+                    me->DespawnOrUnsummon(4050ms);
                     me->SetOrientation(2.5f);
                     me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
                     Position pos = me->GetPosition();
@@ -789,7 +789,11 @@ class spell_q12237_rescue_villager : public SpellScript
             result = SPELL_FAILED_CUSTOM_ERROR;
         }
 
-        if (!GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_A, 5.0f) && !GetCaster()->FindNearestCreature(NPC_HELPLESS_VILLAGER_B, 5.0f))
+        std::list<Creature*> villagers;
+        GetCaster()->GetCreatureListWithEntryInGrid(villagers, { NPC_HELPLESS_VILLAGER_A, NPC_HELPLESS_VILLAGER_B }, 5.0f);
+        villagers.remove_if([](Creature* c) { return !c->IsAlive() || c->HasAura(SPELL_RIDE_VEHICLE); });
+
+        if (villagers.empty())
         {
             extension = SPELL_CUSTOM_ERROR_MUST_BE_NEAR_HELPLESS_VILLAGER;
             result = SPELL_FAILED_CUSTOM_ERROR;
@@ -1055,12 +1059,12 @@ public:
             if (fromReset)
             {
                 if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
-                    c->DespawnOrUnsummon(1);
+                    c->DespawnOrUnsummon(1ms);
                 if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_1, 150.0f, true))
                     c->RemoveAllAuras();
             }
             if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE_VEH_2, 150.0f, true))
-                c->DespawnOrUnsummon(1);
+                c->DespawnOrUnsummon(1ms);
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_1, 150.0f))
                 go->Delete();
             if (GameObject* go = me->FindNearestGameObject(GO_SAC_LIGHTS_VENGEANCE_2, 150.0f))
@@ -1093,9 +1097,9 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32  /*id*/) override
+        void SetGUID(ObjectGuid const& guid, int32  /*id*/) override
         {
-            if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
+            if (playerGUID || events.HasTimeUntilEvent(998) || events.HasTimeUntilEvent(2))
                 return;
 
             me->setActive(true);
@@ -1289,18 +1293,18 @@ public:
                                 {
                                     c->CastSpell(v, SPELL_SAC_KILL_VEGARD, true);
                                     v->SetDisplayId(11686);
-                                    v->DespawnOrUnsummon(1000);
+                                    v->DespawnOrUnsummon(1s);
                                     b->CastSpell(b, SPELL_SAC_HOLY_BOMB_EXPLOSION, true);
                                     b->CastSpell(b, SPELL_SAC_SUMMON_GO_2, true);
                                     if (Unit* vb = c->GetVehicleBase())
                                     {
                                         if (Unit* pass = vb->GetVehicleKit()->GetPassenger(0))
                                             if (pass->IsCreature())
-                                                pass->ToCreature()->DespawnOrUnsummon(1);
+                                                pass->ToCreature()->DespawnOrUnsummon(1ms);
                                         vb->RemoveAllAuras();
-                                        vb->ToCreature()->DespawnOrUnsummon(1);
+                                        vb->ToCreature()->DespawnOrUnsummon(1ms);
                                     }
-                                    c->ToCreature()->DespawnOrUnsummon(1);
+                                    c->ToCreature()->DespawnOrUnsummon(1ms);
                                 }
                     }
                     break;
@@ -1325,7 +1329,7 @@ public:
             if (spell->Id == SPELL_SAC_REPEL_HAMMER && target->IsCreature())
             {
                 target->CastSpell((Unit*)nullptr, SPELL_SAC_THROW_HAMMER, true);
-                target->ToCreature()->DespawnOrUnsummon(1);
+                target->ToCreature()->DespawnOrUnsummon(1ms);
                 if (Unit* c = target->GetVehicleBase())
                     c->RemoveAurasDueToSpell(SPELL_SAC_HOLY_ZONE_AURA);
             }
@@ -1439,7 +1443,7 @@ public:
         {
             me->SetDisplayId(me->GetNativeDisplayId());
             me->CastSpell(me, SPELL_SAC_EMERGE, true);
-            me->m_Events.AddEvent(new SACActivateEvent(me), me->m_Events.CalculateTime(4000));
+            me->m_Events.AddEventAtOffset(new SACActivateEvent(me), 4s);
         }
 
         void Deactivate()
@@ -1452,7 +1456,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             me->RemoveAurasDueToSpell(SPELL_SAC_GHOUL_AREA_AURA);
-            me->m_Events.AddEvent(new SACDeactivateEvent(me), me->m_Events.CalculateTime(4000));
+            me->m_Events.AddEventAtOffset(new SACDeactivateEvent(me), 4s);
         }
 
         void JustRespawned() override
@@ -1559,7 +1563,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(1);
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
             if (Creature* c = me->FindNearestCreature(NPC_SAC_LICH_KING, 200.0f, true))
                 c->AI()->SetData(3, 3);
         }
@@ -2062,7 +2066,7 @@ class spell_q12096_q12092_dummy : public SpellScript
         {
             tree->CastSpell(player, SPELL_CREATE_ITEM_BARK);
             tree->AI()->Talk(SAY_WALKER_FRIENDLY, player);
-            tree->DespawnOrUnsummon(1000);
+            tree->DespawnOrUnsummon(1s);
         }
         else if (roll == 0) // enemy version
         {
@@ -2114,8 +2118,8 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            _events.ScheduleEvent(EVENT_HEMORRHAGE, urand(5000, 8000));
-            _events.ScheduleEvent(EVENT_KIDNEY_SHOT, urand(12000, 15000));
+            _events.ScheduleEvent(EVENT_HEMORRHAGE, 5s, 8s);
+            _events.ScheduleEvent(EVENT_KIDNEY_SHOT, 12s, 15s);
 
             if (Player* player = who->ToPlayer())
                 Talk (SAY_AGGRO, player);
@@ -2321,7 +2325,7 @@ class spell_dragonblight_devour_ghoul_periodic : public AuraScript
         if (GetUnitOwner() && GetUnitOwner()->ToCreature())
         {
             GetUnitOwner()->ExitVehicle();
-            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
+            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2s);
         }
     }
 

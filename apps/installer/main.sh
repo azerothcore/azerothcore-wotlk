@@ -41,9 +41,11 @@ menu_items=(
     "client-data|gd|download client data from github repository (beta)"
     "run-worldserver|rw|execute a simple restarter for worldserver"
     "run-authserver|ra|execute a simple restarter for authserver"
+    "test|t|Run test framework"
     "docker|dr|Run docker tools"
     "version|v|Show AzerothCore version"
     "service-manager|sm|Run service manager to run authserver and worldserver in background"
+    "config|cf|Configuration manager"
     "quit|q|Exit from this menu"
 )
 
@@ -84,6 +86,9 @@ function handle_menu_command() {
         "run-authserver")
             inst_simple_restarter authserver
             ;;
+        "test")
+            bash "$AC_PATH_APPS/test-framework/test-main.sh" "$@"
+            ;;
         "docker")
             DOCKER=1 bash "$AC_PATH_ROOT/apps/docker/docker-cmd.sh" "$@"
             exit
@@ -95,6 +100,9 @@ function handle_menu_command() {
         "service-manager")
             bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "$@"
             exit
+            ;;
+        "config")
+            bash "$AC_PATH_APPS/installer/includes/config/config-main.sh" "$@"
             ;;
         "quit")
             echo "Goodbye!"

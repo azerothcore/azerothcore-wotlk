@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,7 +16,6 @@
  */
 
 #include "AchievementCriteriaScript.h"
-#include "Containers.h"
 #include "CreatureScript.h"
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
@@ -54,12 +53,9 @@ enum Spells
 
     // FIGHT
     SPELL_GIFT_OF_THE_HERALD                = 56219,
-    SPELL_CYCLONE_STRIKE                    = 56855, // Self
-    SPELL_CYCLONE_STRIKE_H                  = 60030,
-    SPELL_LIGHTNING_BOLT                    = 56891, // 40Y
-    SPELL_LIGHTNING_BOLT_H                  = 60032, // 40Y
-    SPELL_THUNDERSHOCK                      = 56926, // 30Y
-    SPELL_THUNDERSHOCK_H                    = 60029  // 30Y
+    SPELL_CYCLONE_STRIKE                    = 56855,
+    SPELL_LIGHTNING_BOLT                    = 56891,
+    SPELL_THUNDERSHOCK                      = 56926,
 };
 
 enum Events
@@ -93,6 +89,7 @@ enum SummonGroups
 {
     SUMMON_GROUP_OOC                        = 0,
     SUMMON_GROUP_OOC_TRIGGERS               = 1,
+    SUMMON_GROUP_IC_WORSHIPPERS             = 2
 };
 
 enum Points
@@ -173,7 +170,7 @@ struct boss_jedoga_shadowseeker : public BossAI
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         me->SetDisableGravity(true);
         me->SetHover(true);
-        me->GetMotionMaster()->MovePoint(POINT_INITIAL, JedogaPosition[0], false);
+        me->GetMotionMaster()->MovePoint(POINT_INITIAL, JedogaPosition[0], FORCED_MOVEMENT_NONE, 0.f, false);
 
         _Reset();
         events.SetPhase(PHASE_NORMAL);
@@ -211,7 +208,7 @@ struct boss_jedoga_shadowseeker : public BossAI
             }
         }
 
-        sacraficeTarget_GUID.Clear();
+        sacrificeTargetGUID.Clear();
         sayPreachTimer = 120000;
         ritualTriggered = false;
         volunteerWork = true;
@@ -220,7 +217,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        if (summon->GetEntry() == NPC_JEDOGA_CONTROLLER)
+        if (summon->EntryEquals(NPC_JEDOGA_CONTROLLER, NPC_TWILIGHT_WORSHIPPER))
         {
             summons.Summon(summon);
         }
@@ -247,7 +244,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 DespawnOOCSummons();
                 DoCastSelf(SPELL_HOVER_FALL);
                 me->GetMotionMaster()->MoveIdle();
-                me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+                me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], FORCED_MOVEMENT_NONE, 0.f, false);
 
                 if (!combatSummonsSummoned)
                 {
@@ -270,12 +267,12 @@ struct boss_jedoga_shadowseeker : public BossAI
             }
             case NPC_TWILIGHT_VOLUNTEER:
             {
-                if (sacraficeTarget_GUID && summon->GetGUID() != sacraficeTarget_GUID)
+                if (sacrificeTargetGUID && summon->GetGUID() != sacrificeTargetGUID)
                 {
                     break;
                 }
 
-                if (killer != me && killer->GetGUID() != sacraficeTarget_GUID)
+                if (killer != me && killer->GetGUID() != sacrificeTargetGUID)
                 {
                     volunteerWork = false;
                 }
@@ -317,7 +314,7 @@ struct boss_jedoga_shadowseeker : public BossAI
     {
         if (action == ACTION_SACRAFICE)
         {
-            if (Creature* target = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+            if (Creature* target = ObjectAccessor::GetCreature(*me, sacrificeTargetGUID))
             {
                 Unit::Kill(me, target);
             }
@@ -329,6 +326,17 @@ struct boss_jedoga_shadowseeker : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
         ReschedulleCombatEvents();
+
+        std::list<TempSummon*> tempSummons;
+        me->SummonCreatureGroup(SUMMON_GROUP_IC_WORSHIPPERS, &tempSummons);
+        if (!tempSummons.empty())
+        {
+            for (TempSummon* summon : tempSummons)
+            {
+                if (summon)
+                    summon->SetStandState(UNIT_STAND_STATE_KNEEL);
+            }
+        }
     }
 
     void KilledUnit(Unit* who) override
@@ -386,9 +394,9 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->SetFacingTo(5.66f);
                 if (!summons.empty())
                 {
-                    sacraficeTarget_GUID = Acore::Containers::SelectRandomContainerElement(summons);
-                    if (ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_VOLUNTEER))
                     {
+                        sacrificeTargetGUID = creature->GetGUID();
                         events.ScheduleEvent(EVENT_JEDGA_START_RITUAL, 3s, 0, PHASE_RITUAL);
                     }
                     // Something failed, let players continue but do not grant achievement
@@ -397,7 +405,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                         volunteerWork = false;
                         me->GetMotionMaster()->Clear();
                         DoCastSelf(SPELL_HOVER_FALL);
-                        me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+                        me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], FORCED_MOVEMENT_NONE, 0.f, false);
                     }
                 }
                 break;
@@ -461,7 +469,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 // Normal phase
                 case EVENT_JEDOGA_CYCLONE:
                 {
-                    DoCastSelf(DUNGEON_MODE(SPELL_CYCLONE_STRIKE, SPELL_CYCLONE_STRIKE_H), false);
+                    DoCastSelf(SPELL_CYCLONE_STRIKE, false);
                     events.Repeat(10s, 14s);
                     break;
                 }
@@ -469,7 +477,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
-                        DoCast(pTarget, DUNGEON_MODE(SPELL_LIGHTNING_BOLT, SPELL_LIGHTNING_BOLT_H), false);
+                        DoCast(pTarget, SPELL_LIGHTNING_BOLT, false);
                     }
                     events.Repeat(11s, 15s);
                     break;
@@ -478,7 +486,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 {
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                     {
-                        DoCast(pTarget, DUNGEON_MODE(SPELL_THUNDERSHOCK, SPELL_THUNDERSHOCK_H), false);
+                        DoCast(pTarget, SPELL_THUNDERSHOCK, false);
                     }
 
                     events.Repeat(16s, 22s);
@@ -504,20 +512,21 @@ struct boss_jedoga_shadowseeker : public BossAI
                     summons.DespawnEntry(NPC_JEDOGA_CONTROLLER);
                     DoCastSelf(SPELL_HOVER_FALL);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], false);
+                    me->GetMotionMaster()->MovePoint(POINT_DOWN, JedogaPosition[1], FORCED_MOVEMENT_NONE, 0.f, false);
                     break;
                 }
                 case EVENT_JEDGA_START_RITUAL:
                 {
-                    sacraficeTarget_GUID = Acore::Containers::SelectRandomContainerElement(summons);
-                    if (Creature* volunteer = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_VOLUNTEER))
                     {
+                        sacrificeTargetGUID = creature->GetGUID();
                         Talk(SAY_SACRIFICE_1);
-                        sacraficeTarget_GUID = volunteer->GetGUID();
-                        volunteer->AI()->DoAction(ACTION_RITUAL_BEGIN);
+                        creature->AI()->DoAction(ACTION_RITUAL_BEGIN);
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -537,7 +546,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 private:
     GuidList oocSummons;
     GuidList oocTriggers;
-    ObjectGuid sacraficeTarget_GUID;
+    ObjectGuid sacrificeTargetGUID;
     uint32 sayPreachTimer;
     bool combatSummonsSummoned;
     bool ritualTriggered;
@@ -663,7 +672,7 @@ struct npc_twilight_volunteer : public ScriptedAI
                 me->GetMotionMaster()->Clear();
                 me->SetHomePosition(JedogaPosition[2]);
                 me->SetWalk(true);
-                me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
+                me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], FORCED_MOVEMENT_NONE, 0.f, false);
 
                 if (Creature* jedoga = pInstance->GetCreature(DATA_JEDOGA_SHADOWSEEKER))
                 {

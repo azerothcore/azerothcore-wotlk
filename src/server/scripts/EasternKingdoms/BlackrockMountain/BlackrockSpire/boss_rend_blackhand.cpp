@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -222,7 +222,7 @@ public:
                     if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 50.0f))
                         waveDoorGUID = portcullis->GetGUID();
 
-                    events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                    events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                     events.ScheduleEvent(EVENT_START_1, 1s);
                 }
             }
@@ -234,7 +234,7 @@ public:
             {
                 switch (id)
                 {
-                    case 5:
+                    case 6:
                         events.ScheduleEvent(EVENT_TELEPORT_1, 2s);
                         break;
                 }
@@ -264,7 +264,7 @@ public:
                             events.ScheduleEvent(EVENT_START_2, 4s);
                             break;
                         case EVENT_START_2:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                             events.ScheduleEvent(EVENT_START_3, 4s);
@@ -314,14 +314,14 @@ public:
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_TEXT_2:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_3);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_TEXT_3:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_4);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
@@ -334,14 +334,14 @@ public:
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_TEXT_5:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_5);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
                             events.ScheduleEvent(EVENT_SPAWN_WAVE, 3s);
                             break;
                         case EVENT_WAVES_COMPLETE_TEXT_1:
-                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0);
+                            events.ScheduleEvent(EVENT_TURN_TO_PLAYER, 0ms);
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
                                 victor->AI()->Talk(SAY_NEFARIUS_6);
                             events.ScheduleEvent(EVENT_TURN_TO_FACING_1, 4s);
@@ -362,10 +362,10 @@ public:
                             break;
                         case EVENT_PATH_NEFARIUS:
                             if (Creature* victor = ObjectAccessor::GetCreature(*me, victorGUID))
-                                victor->GetMotionMaster()->MovePath(NEFARIUS_PATH_1, true);
+                                victor->GetMotionMaster()->MoveWaypoint(NEFARIUS_PATH_1, true);
                             break;
                         case EVENT_PATH_REND:
-                            me->GetMotionMaster()->MovePath(REND_PATH_1, false);
+                            me->GetMotionMaster()->MoveWaypoint(REND_PATH_1, false);
                             break;
                         case EVENT_TELEPORT_1:
                             me->NearTeleportTo(194.2993f, -474.0814f, 121.4505f, -0.01225555f);

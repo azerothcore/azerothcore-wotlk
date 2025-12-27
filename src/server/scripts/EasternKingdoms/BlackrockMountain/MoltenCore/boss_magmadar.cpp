@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -73,13 +73,13 @@ public:
                 {
                     Talk(EMOTE_FRENZY);
                     DoCastSelf(SPELL_FRENZY);
-                    events.RepeatEvent(urand(15000, 20000));
+                    events.Repeat(15s, 20s);
                     break;
                 }
                 case EVENT_PANIC:
                 {
                     DoCastVictim(SPELL_PANIC);
-                    events.RepeatEvent(urand(31000, 38000));
+                    events.Repeat(31s, 38s);
                     break;
                 }
                 case EVENT_LAVA_BOMB:
@@ -89,7 +89,7 @@ public:
                         DoCast(target, SPELL_LAVA_BOMB);
                     }
 
-                    events.RepeatEvent(urand(12000, 15000));
+                    events.Repeat(12s, 15s);
                     break;
                 }
                 case EVENT_LAVA_BOMB_RANGED:
@@ -104,7 +104,7 @@ public:
                     {
                         DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
                     }
-                    events.RepeatEvent(urand(12000, 15000));
+                    events.Repeat(12s, 15s);
                     break;
                 }
             }

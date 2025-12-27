@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -140,7 +140,7 @@ struct boss_alar : public BossAI
                 _noQuillTimes = 0;
                 _platformRoll = RAND(0, 1);
                 _platform = _platformRoll ? 0 : 3;
-                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], false, true);
+                me->GetMotionMaster()->MovePoint(POINT_QUILL, alarPoints[POINT_QUILL], FORCED_MOVEMENT_NONE, 0.f, false, true);
                 _platformMoveRepeatTimer = 16s;
             }
             else
@@ -150,7 +150,7 @@ struct boss_alar : public BossAI
                     me->SetOrientation(alarPoints[_platform].GetOrientation());
                     SpawnPhoenixes(1, me);
                 }
-                me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], false, true);
+                me->GetMotionMaster()->MovePoint(POINT_PLATFORM, alarPoints[_platform], FORCED_MOVEMENT_NONE, 0.f, false, true);
                 _platform = (_platform+1)%4;
                 _platformMoveRepeatTimer = 30s;
             }
@@ -258,7 +258,7 @@ struct boss_alar : public BossAI
         }, 30s);
         ScheduleTimedEvent(34s, [&]
         {
-            me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
+            me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], FORCED_MOVEMENT_NONE, 0.f, false, true);
             scheduler.DelayAll(15s);
         }, 57s);
 
@@ -355,17 +355,7 @@ struct boss_alar : public BossAI
     void ConstructWaypointsAndMove()
     {
         me->StopMoving();
-        if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
-        {
-            Movement::PointsArray pathPoints;
-            pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            for (uint8 i = 0; i < i_path->size(); ++i)
-            {
-                WaypointData const* node = i_path->at(i);
-                pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-            }
-            me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-        }
+        me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
     }
 
     void UpdateAI(uint32 diff) override
@@ -452,10 +442,10 @@ class spell_alar_flame_quills : public AuraScript
 
         // 24 spells in total
         for (uint8 i = 0; i < 21; ++i)
-            GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_1 + i), GetUnitOwner()->m_Events.CalculateTime(i * 40));
-        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 0), GetUnitOwner()->m_Events.CalculateTime(22 * 40));
-        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 1), GetUnitOwner()->m_Events.CalculateTime(23 * 40));
-        GetUnitOwner()->m_Events.AddEvent(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 2), GetUnitOwner()->m_Events.CalculateTime(24 * 40));
+            GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_1 + i), Milliseconds(i * 40));
+        GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 0), Milliseconds(22 * 40));
+        GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 1), Milliseconds(23 * 40));
+        GetUnitOwner()->m_Events.AddEventAtOffset(new CastQuill(GetUnitOwner(), SPELL_QUILL_MISSILE_2 + 2), Milliseconds(24 * 40));
     }
 
     void Register() override

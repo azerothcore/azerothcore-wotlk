@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -193,7 +193,9 @@ public:
             { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  }
+            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  },
+            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::No  }
         };
 
         return commandTable;
@@ -485,7 +487,7 @@ public:
             uint32 queueSlot = 0;
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
 
             // Remove from LFG queues
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
@@ -504,6 +506,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -537,9 +540,6 @@ public:
             SetCommentatorMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
@@ -548,6 +548,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -582,9 +583,6 @@ public:
             SetDevMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleGPSCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
@@ -1895,13 +1893,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zoneid = player->GetZoneId();
 
-        Weather* weather = WeatherMgr::FindWeather(zoneid);
-
-        if (!weather)
-        {
-            weather = WeatherMgr::AddWeather(zoneid);
-        }
-
+        Weather* weather = player->GetMap()->GetOrGenerateZoneDefaultWeather(zoneid);
         if (!weather)
         {
             handler->SendErrorMessage(LANG_NO_WEATHER);
@@ -3075,6 +3067,75 @@ public:
         handler->SendErrorMessage(LANG_CMD_NO_DOOR_FOUND, range ? *range : 5.0f);
         return false;
     }
+
+    static bool HandleBMCommand(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+            return false;
+
+        auto SetBMMod = [&](bool enable)
+        {
+            char const* enabled = "ON";
+            char const* disabled = "OFF";
+            handler->SendNotification(LANG_COMMAND_BEASTMASTER_MODE, enable ? enabled : disabled);
+
+            session->GetPlayer()->SetBeastMaster(enable);
+        };
+
+        if (!enableArg)
+        {
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
+                SetBMMod(true);
+            else
+                SetBMMod(false);
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetBMMod(true);
+            return true;
+        }
+        else
+        {
+            SetBMMod(false);
+            return true;
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
+    static bool HandlePacketLog(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+            return false;
+
+        if (enableArg)
+        {
+            if (*enableArg)
+            {
+                session->SetPacketLogging(true);
+                handler->SendNotification(LANG_ON);
+                return true;
+            }
+            else
+            {
+                session->SetPacketLogging(false);
+                handler->SendNotification(LANG_OFF);
+                return true;
+            }
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
 };
 
 void AddSC_misc_commandscript()

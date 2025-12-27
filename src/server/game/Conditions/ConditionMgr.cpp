@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1081,6 +1081,7 @@ void ConditionMgr::LoadConditions(bool isReload)
 
         LOG_INFO("server.loading", "Reloading `gossip_menu_option` Table for Conditions!");
         sObjectMgr->LoadGossipMenuItems();
+        sSpellMgr->UnloadSpellInfoImplicitTargetConditionLists();
     }
 
     QueryResult result = WorldDatabase.Query("SELECT SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget, "
@@ -1404,7 +1405,7 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
 
         // build new shared mask with found effect
         uint32         sharedMask = (1 << i);
-        std::shared_ptr<ConditionList> cmp = spellInfo->Effects[i].ImplicitTargetConditions;
+        ConditionList* cmp        = spellInfo->Effects[i].ImplicitTargetConditions;
         for (uint8 effIndex = i + 1; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
         {
             if (spellInfo->Effects[effIndex].ImplicitTargetConditions == cmp)
@@ -1427,7 +1428,7 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
                 return false;
 
             // get shared data
-            std::shared_ptr<ConditionList> sharedList = spellInfo->Effects[firstEffIndex].ImplicitTargetConditions;
+            ConditionList* sharedList = spellInfo->Effects[firstEffIndex].ImplicitTargetConditions;
 
             // there's already data entry for that sharedMask
             if (sharedList)
@@ -1446,25 +1447,22 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
             else
             {
                 // add new list, create new shared mask
-                auto newList = std::make_shared<ConditionList>();
-
+                sharedList    = new ConditionList();
                 bool assigned = false;
                 for (uint8 i = firstEffIndex; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if ((1 << i) & commonMask)
                     {
-                        spellInfo->Effects[i].ImplicitTargetConditions = newList;
-                        assigned = true;
+                        spellInfo->Effects[i].ImplicitTargetConditions = sharedList;
+                        assigned                                       = true;
                     }
                 }
 
-                if (assigned)
-                    sharedList = newList;
+                if (!assigned)
+                    delete sharedList;
             }
-
             if (sharedList)
                 sharedList->push_back(cond);
-
             break;
         }
     }

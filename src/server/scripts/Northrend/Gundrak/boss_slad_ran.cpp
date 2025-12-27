@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -51,14 +51,7 @@ enum Misc
     MAX_CONSTRICTOR                             = 3,
     MAX_SUMMONS                                 = 5,
 
-    EVENT_POISON_NOVA                           = 1,
-    EVENT_POWERFULL_BITE                        = 2,
-    EVENT_VENOM_BOLT                            = 3,
-    EVENT_CHECK_HEALTH1                         = 4,
-    EVENT_CHECK_HEALTH2                         = 5,
-    EVENT_SUMMON1                               = 6,
-    EVENT_SUMMON2                               = 7,
-    EVENT_KILL_TALK                             = 8
+    EVENT_KILL_TALK                             = 1
 };
 
 const Position SpawnLoc[] =
@@ -121,17 +114,17 @@ public:
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
 
-            ScheduleTimedEvent(10s, [&]{
+            ScheduleTimedEvent(16s, 53s, [&]{
                 Talk(EMOTE_NOVA);
                 DoCastAOE(SPELL_POISON_NOVA);
-            }, 15s);
+            }, 16s, 53s);
 
             ScheduleTimedEvent(3s, [&] {
                 DoCastVictim(SPELL_POWERFULL_BITE);
             }, 10s);
 
             ScheduleTimedEvent(15s, [&] {
-                DoCastVictim(SPELL_VENOM_BOLT);
+                DoCastRandomTarget(SPELL_VENOM_BOLT, 0, 45.0f, false);
             }, 10s);
         }
 
@@ -144,7 +137,7 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_SLAY);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);

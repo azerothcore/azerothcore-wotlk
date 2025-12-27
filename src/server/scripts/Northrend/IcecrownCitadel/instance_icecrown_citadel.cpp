@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -268,7 +268,7 @@ public:
             if (GetBossState(DATA_LADY_DEATHWHISPER) == DONE && GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE)
                 SpawnGunship();
 
-            if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && Events.GetTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA) == Milliseconds::max())
+            if (GetBossState(DATA_SINDRAGOSA) != DONE && IsSindragosaIntroDone && !GetCreature(DATA_SINDRAGOSA) && !Events.HasTimeUntilEvent(EVENT_RESPAWN_SINDRAGOSA))
             {
                 Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
             }
@@ -499,7 +499,7 @@ public:
                     break;
                 case NPC_INFILTRATOR_MINCHAR_BQ:
                     if (BloodQuickeningState == DONE)
-                        creature->DespawnOrUnsummon(1);
+                        creature->DespawnOrUnsummon(1ms);
                     break;
                 case NPC_MINCHAR_BEAM_STALKER:
                     if (BloodQuickeningState != DONE)
@@ -513,7 +513,7 @@ public:
                             spellId = BLOOD_BEAM_VISUAL_LLEG;
                         else
                             spellId = BLOOD_BEAM_VISUAL_RLEG;
-                        creature->m_Events.AddEvent(new DelayedCastMincharEvent(creature, spellId), creature->m_Events.CalculateTime(1000));
+                        creature->m_Events.AddEventAtOffset(new DelayedCastMincharEvent(creature, spellId), 1s);
                     }
                     break;
                 case NPC_SKYBREAKER_DECKHAND:
@@ -608,7 +608,7 @@ public:
             std::string name2("Kor'kron ");
             if (!creature->GetTransport() && creature->GetPositionZ() <= 205.0f && creature->GetExactDist2d(-439.0f, 2210.0f) <= 150.0f && (creature->GetEntry() == 37544 || creature->GetEntry() == 37545 || creature->GetName().compare(0, name1.length(), name1) == 0 || creature->GetName().compare(0, name2.length(), name2) == 0))
                 if (!creature->GetLootRecipient())
-                    creature->m_Events.AddEvent(new RespawnEvent(*creature), creature->m_Events.CalculateTime(3000));
+                    creature->m_Events.AddEventAtOffset(new RespawnEvent(*creature), 3s);
 
             switch (creature->GetEntry())
             {
@@ -661,7 +661,7 @@ public:
                     {
                         c->CastSpell(c, VOID_ZONE_VISUAL, true);
                         unit->SummonCreature(NPC_RISEN_DEATHSPEAKER_SERVANT, *unit, TEMPSUMMON_MANUAL_DESPAWN);
-                        unit->ToCreature()->DespawnOrUnsummon(3000);
+                        unit->ToCreature()->DespawnOrUnsummon(3s);
                     }
                     break;
                 default:
@@ -1742,7 +1742,7 @@ public:
                             {
                                 sindragosa->setActive(true);
                                 sindragosa->SetDisableGravity(true);
-                                sindragosa->GetMotionMaster()->MovePath(NPC_SINDRAGOSA * 10, true);
+                                sindragosa->GetMotionMaster()->MoveWaypoint(NPC_SINDRAGOSA * 10, true);
 
                                 if (TempSummon* summon = sindragosa->ToTempSummon())
                                 {

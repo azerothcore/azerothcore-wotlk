@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -49,7 +49,7 @@ struct npc_pet_shaman_earth_elemental : public ScriptedAI
     void JustEngagedWith(Unit*) override
     {
         _events.Reset();
-        _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0);
+        _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0ms);
     }
 
     void InitializeAI() override { }
@@ -74,7 +74,7 @@ struct npc_pet_shaman_earth_elemental : public ScriptedAI
         if (_events.ExecuteEvent() == EVENT_SHAMAN_ANGEREDEARTH)
         {
             DoCastVictim(SPELL_SHAMAN_ANGEREDEARTH);
-            _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, urand(5000, 20000));
+            _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 5s, 20s);
         }
 
         DoMeleeAttackIfReady();
@@ -94,9 +94,9 @@ struct npc_pet_shaman_fire_elemental : public ScriptedAI
     void JustEngagedWith(Unit*) override
     {
         _events.Reset();
-        _events.ScheduleEvent(EVENT_SHAMAN_FIRENOVA, urand(5000, 20000));
-        _events.ScheduleEvent(EVENT_SHAMAN_FIREBLAST, urand(5000, 20000));
-        //_events.ScheduleEvent(EVENT_SHAMAN_FIRESHIELD, 0);
+        _events.ScheduleEvent(EVENT_SHAMAN_FIRENOVA, 5s, 20s);
+        _events.ScheduleEvent(EVENT_SHAMAN_FIREBLAST, 5s, 20s);
+        //_events.ScheduleEvent(EVENT_SHAMAN_FIRESHIELD, 0ms);
 
         me->RemoveAurasDueToSpell(SPELL_SHAMAN_FIRESHIELD);
         me->CastSpell(me, SPELL_SHAMAN_FIRESHIELD, true);
@@ -124,11 +124,11 @@ struct npc_pet_shaman_fire_elemental : public ScriptedAI
             {
                 case EVENT_SHAMAN_FIRENOVA:
                     me->CastSpell(me, SPELL_SHAMAN_FIRENOVA, false);
-                    _events.ScheduleEvent(EVENT_SHAMAN_FIRENOVA, urand(8000, 15000));
+                    _events.ScheduleEvent(EVENT_SHAMAN_FIRENOVA, 8s, 15s);
                     break;
                 case EVENT_SHAMAN_FIREBLAST:
                     me->CastSpell(me->GetVictim(), SPELL_SHAMAN_FIREBLAST, false);
-                    _events.ScheduleEvent(EVENT_SHAMAN_FIREBLAST, urand(4000, 8000));
+                    _events.ScheduleEvent(EVENT_SHAMAN_FIREBLAST, 4s, 8s);
                     break;
                 default:
                     break;

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -39,6 +39,7 @@ class ByteBuffer;
 class BasicEvent;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
+#define TRAJECTORY_MISSILE_SIZE 3.0f
 
 enum SpellCastFlags
 {
@@ -445,25 +446,12 @@ public:
 
     void SelectEffectTypeImplicitTargets(uint8 effIndex);
 
-    uint32 GetSearcherTypeMask(SpellTargetObjectTypes objType,
-                               std::shared_ptr<ConditionList> condList);
+    uint32 GetSearcherTypeMask(SpellTargetObjectTypes objType, ConditionList* condList);
     template<class SEARCHER> void SearchTargets(SEARCHER& searcher, uint32 containerMask, Unit* referer, Position const* pos, float radius);
 
-    WorldObject* SearchNearbyTarget(float range, SpellTargetObjectTypes objectType,
-                       SpellTargetCheckTypes selectionType,
-                       std::shared_ptr<ConditionList> condList = nullptr);
-    void SearchAreaTargets(std::list<WorldObject *> &targets, float range,
-                           Position const *position, Unit *referer,
-                           SpellTargetObjectTypes objectType,
-                           SpellTargetCheckTypes selectionType,
-                           std::shared_ptr<ConditionList> condList);
-    void SearchChainTargets(std::list<WorldObject *> &targets,
-                            uint32 chainTargets, WorldObject *target,
-                            SpellTargetObjectTypes objectType,
-                            SpellTargetCheckTypes selectType,
-                            SpellTargetSelectionCategories selectCategory,
-                            std::shared_ptr<ConditionList> condList,
-                            bool isChainHeal);
+    WorldObject* SearchNearbyTarget(float range, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList = nullptr);
+    void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
+    void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal);
 
     SpellCastResult prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
     void cancel(bool bySelf = false);
@@ -678,6 +666,9 @@ public:
     WorldLocation* destTarget;
     int32 damage;
     SpellEffectHandleMode effectHandleMode;
+    Unit* m_reflectionTarget;
+    ObjectGuid m_reflectionTargetGuid;
+    Position m_reflectionTargetPosition;
     // used in effects handlers
     Aura* m_spellAura;
 
@@ -814,10 +805,10 @@ namespace Acore
         SpellInfo const* _spellInfo;
         SpellTargetCheckTypes _targetSelectionType;
         ConditionSourceInfo* _condSrcInfo;
-        std::shared_ptr<ConditionList> _condList;
+        ConditionList* _condList;
 
         WorldObjectSpellTargetCheck(Unit* caster, Unit* referer, SpellInfo const* spellInfo,
-                                    SpellTargetCheckTypes selectionType, std::shared_ptr<ConditionList> condList);
+                                    SpellTargetCheckTypes selectionType, ConditionList* condList);
         ~WorldObjectSpellTargetCheck();
         bool operator()(WorldObject* target);
     };
@@ -827,7 +818,7 @@ namespace Acore
         float _range;
         Position const* _position;
         WorldObjectSpellNearbyTargetCheck(float range, Unit* caster, SpellInfo const* spellInfo,
-                                          SpellTargetCheckTypes selectionType, std::shared_ptr<ConditionList> condList);
+                                          SpellTargetCheckTypes selectionType, ConditionList* condList);
         bool operator()(WorldObject* target);
     };
 
@@ -836,7 +827,7 @@ namespace Acore
         float _range;
         Position const* _position;
         WorldObjectSpellAreaTargetCheck(float range, Position const* position, Unit* caster,
-                                        Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, std::shared_ptr<ConditionList> condList);
+                                        Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList);
         bool operator()(WorldObject* target);
     };
 
@@ -844,14 +835,14 @@ namespace Acore
     {
         float _coneAngle;
         WorldObjectSpellConeTargetCheck(float coneAngle, float range, Unit* caster,
-                                        SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, std::shared_ptr<ConditionList> condList);
+                                        SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList);
         bool operator()(WorldObject* target);
     };
 
     struct WorldObjectSpellTrajTargetCheck : public WorldObjectSpellAreaTargetCheck
     {
         WorldObjectSpellTrajTargetCheck(float range, Position const* position, Unit* caster,
-                                        SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, std::shared_ptr<ConditionList> condList);
+                                        SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList);
         bool operator()(WorldObject* target);
     };
 }

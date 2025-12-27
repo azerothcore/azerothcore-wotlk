@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,7 +63,7 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
         GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
         owner->SetFaction(FACTION_FRIENDLY);
         owner->SetImmuneToAll(true);
-        owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+        owner->DespawnOrUnsummon(180s);
     }
 
     void Register() override
@@ -464,7 +464,10 @@ public:
                 go->UseDoorOrButton();
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(true, player->GetGUID());
+            }
 
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
@@ -559,200 +562,13 @@ private:
     Position _fezzix;
 };
 
-/*######
-## Quest 11590: Abduction
-######*/
-
-// NPC 25316: Beryl Sorcerer
-enum BerylSorcerer
-{
-    EVENT_FROSTBOLT                                = 1,
-    EVENT_ARCANE_CHAINS                            = 2,
-    NPC_LIBRARIAN_DONATHAN                         = 25262,
-    NPC_CAPTURED_BERLY_SORCERER                    = 25474,
-    SPELL_FROSTBOLT                                = 9672,
-    SPELL_ARCANE_CHAINS                            = 45611,
-    SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST       = 45625,
-    SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER = 45626,
-    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF             = 45631,
-    SPELL_ARCANE_CHAINS_CHANNEL_II                 = 45735
-};
-
-class npc_beryl_sorcerer : public CreatureScript
-{
-public:
-    npc_beryl_sorcerer() : CreatureScript("npc_beryl_sorcerer") { }
-
-struct npc_beryl_sorcererAI : public CreatureAI
-    {
-        npc_beryl_sorcererAI(Creature* creature) : CreatureAI(creature)
-        {
-            Initialize();
-        }
-
-        void Initialize()
-        {
-            _playerGUID.Clear();
-            _chainsCast = false;
-        }
-
-        void Reset() override
-        {
-            me->SetReactState(REACT_AGGRESSIVE);
-            Initialize();
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            if (me->IsValidAttackTarget(who))
-            {
-                AttackStart(who);
-            }
-
-            _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
-        }
-
-        void SpellHit(Unit* unit, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_ARCANE_CHAINS && !_chainsCast)
-            {
-                if (Player* player = unit->ToPlayer())
-                {
-                    _playerGUID = player->GetGUID();
-                    _chainsCast = true;
-                    _events.ScheduleEvent(EVENT_ARCANE_CHAINS, 4s);
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-            {
-                return;
-            }
-
-            _events.Update(diff);
-
-            if (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_FROSTBOLT:
-                        DoCastVictim(SPELL_FROSTBOLT);
-                        _events.ScheduleEvent(EVENT_FROSTBOLT, 3s, 4s);
-                        break;
-                    case EVENT_ARCANE_CHAINS:
-                        if (me->HasAura(SPELL_ARCANE_CHAINS))
-                        {
-                            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                            {
-                                me->CastSpell(player, SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM));
-                                player->KilledMonsterCredit(NPC_CAPTURED_BERLY_SORCERER);
-                                me->DisappearAndDie();
-                            }
-                        }
-                        break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        EventMap   _events;
-        ObjectGuid _playerGUID;
-        bool       _chainsCast;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_beryl_sorcererAI(creature);
-    }
-};
-
-// NPC 25474: Captured Beryl Sorcerer
-enum CapturedBerylSorcerer
-{
-    EVENT_ADD_ARCANE_CHAINS                        = 1,
-    EVENT_FOLLOW_PLAYER                            = 2
-};
-
-class npc_captured_beryl_sorcerer : public CreatureScript
-{
-public:
-    npc_captured_beryl_sorcerer() : CreatureScript("npc_captured_beryl_sorcerer") {}
-
-    struct npc_captured_beryl_sorcererAI : public FollowerAI
-    {
-        npc_captured_beryl_sorcererAI(Creature* creature) : FollowerAI(creature)
-        {
-            Initialize();
-        }
-
-        void Initialize()
-        {
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            _events.ScheduleEvent(EVENT_ADD_ARCANE_CHAINS, 0ms);
-        }
-
-        void Reset() override
-        {
-            Initialize();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-
-            if (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_ADD_ARCANE_CHAINS:
-                        if (TempSummon* tempSummon = me->ToTempSummon())
-                        {
-                            if (Unit* summoner = tempSummon->GetSummonerUnit())
-                            {
-                                summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
-                                _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1s);
-                            }
-                        }
-                        break;
-
-                    case EVENT_FOLLOW_PLAYER:
-                        if (TempSummon* tempSummon = me->ToTempSummon())
-                        {
-                            if (Player* summoner = tempSummon->GetSummonerUnit()->ToPlayer())
-                            {
-                                StartFollow(summoner);
-                            }
-                        }
-                        break;
-                }
-            }
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            FollowerAI::MoveInLineOfSight(who);
-
-            if (who->GetEntry() == NPC_LIBRARIAN_DONATHAN && me->IsWithinDistInMap(who, INTERACTION_DISTANCE))
-            {
-                SetFollowComplete();
-                me->DespawnOrUnsummon();
-            }
-        }
-    private:
-        EventMap _events;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_captured_beryl_sorcererAI(creature);
-    }
-};
-
 // Spell 45625: - Arcane Chains: Character Force Cast
+enum ArcaneChains
+{
+    SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST       = 45625,
+    SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER = 45626
+};
+
 class spell_arcane_chains_character_force_cast : public SpellScript
 {
     PrepareSpellScript(spell_arcane_chains_character_force_cast);
@@ -778,7 +594,8 @@ class spell_arcane_chains_character_force_cast : public SpellScript
 ######*/
 enum ImprisionedBerylSorcerer
 {
-    SPELL_NEURAL_NEEDLE             = 45634,
+    SPELL_NEURAL_NEEDLE                 = 45634,
+    SPELL_COSMETIC_ENSLAVE_CHAINS_SELF  = 45631,
 
     NPC_IMPRISONED_BERYL_SORCERER   = 25478,
 
@@ -914,7 +731,8 @@ public:
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(true);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -959,7 +777,7 @@ public:
                     Talk(SAY_5);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
                     player->GroupEventHappens(QUEST_ESCAPING_THE_MIST, me);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
             }
         }
@@ -995,7 +813,7 @@ public:
         {
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, true, player->GetGUID());
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -1421,7 +1239,7 @@ public:
             _playerGUID.Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*action*/) override
+        void SetGUID(ObjectGuid const& guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1431,7 +1249,7 @@ public:
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                 me->SetFacingToObject(player);
 
-            _events.ScheduleEvent(EVENT_TALK, 1000);
+            _events.ScheduleEvent(EVENT_TALK, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1557,7 +1375,7 @@ public:
         void Reset() override
         {
             me->SetImmuneToAll(true);
-            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1000);
+            _events.ScheduleEvent(EVENT_THASSARIAN_CAST, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1648,7 +1466,7 @@ public:
 
         void MovementInform(uint32 type, uint32 param) override
         {
-            if (type == WAYPOINT_MOTION_TYPE && param == 2)
+            if (type == WAYPOINT_MOTION_TYPE && param == 3)
             {
                 me->SetWalk(false);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
@@ -1684,7 +1502,7 @@ public:
                         // Arthas load path
                         if (Creature* arthas = ObjectAccessor::GetCreature(*me, _arthasGUID))
                         {
-                            arthas->GetMotionMaster()->MovePath(PATH_ARTHAS, false);
+                            arthas->GetMotionMaster()->MoveWaypoint(PATH_ARTHAS, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_3, 1s);
                         break;
@@ -1692,7 +1510,7 @@ public:
                         // Talbot load path
                         if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
                         {
-                            talbot->GetMotionMaster()->MovePath(PATH_TALBOT, false);
+                            talbot->GetMotionMaster()->MoveWaypoint(PATH_TALBOT, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_4, 20s);
                         break;
@@ -1726,7 +1544,7 @@ public:
                             arlos->SetWalk(true);
                             arlos->SetImmuneToAll(true);
                             arlos->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                            arlos->GetMotionMaster()->MovePath(PATH_ARLOS, false);
+                            arlos->GetMotionMaster()->MoveWaypoint(PATH_ARLOS, false);
                         }
                         if (Creature* leryssa = me->SummonCreature(NPC_LERYSSA, 3751.0986f, 3614.9219f, 473.4048f, 4.5029f, TEMPSUMMON_CORPSE_TIMED_DESPAWN))
                         {
@@ -1734,7 +1552,7 @@ public:
                             leryssa->SetWalk(true);
                             leryssa->SetImmuneToAll(true);
                             leryssa->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                            leryssa->GetMotionMaster()->MovePath(PATH_LERYSSA, false);
+                            leryssa->GetMotionMaster()->MoveWaypoint(PATH_LERYSSA, false);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_7, 7s);
                         break;
@@ -1884,7 +1702,7 @@ public:
                         if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
                         {
                             leryssa->SetWalk(false);
-                            leryssa->MonsterMoveWithSpeed(3726.751f, 3568.1633f, 477.44086f, leryssa->GetSpeed(MOVE_RUN));
+                            leryssa->GetMotionMaster()->MovePoint(0, 3726.751f, 3568.1633f, 477.44086f, FORCED_MOVEMENT_RUN);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_23, 2s);
                         break;
@@ -1989,7 +1807,7 @@ public:
                 _playerGUID = player->GetGUID();
                 CloseGossipMenuFor(player);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->GetMotionMaster()->MovePath(PATH_THASSARIAN, false);
+                me->GetMotionMaster()->MoveWaypoint(PATH_THASSARIAN, false);
             }
         }
 
@@ -2020,7 +1838,7 @@ public:
 
         void MovementInform(uint32 type, uint32 param) override
         {
-            if (type == WAYPOINT_MOTION_TYPE && param == 2)
+            if (type == WAYPOINT_MOTION_TYPE && param == 3)
             {
                 if (me->IsSummon())
                 {
@@ -2171,6 +1989,40 @@ class spell_soul_deflection : public AuraScript
     }
 };
 
+enum SpellBloodHaze
+{
+    SPELL_BLOODSPORE_HAZE = 50380,
+    SPELL_PSYCHOSIS       = 50396
+};
+
+// 50380 - Bloodspore Haze
+class spell_bloodspore_haze : public SpellScript
+{
+    PrepareSpellScript(spell_bloodspore_haze);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PSYCHOSIS });
+    }
+
+    void HandleEffectHit(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetHitUnit())
+            return;
+
+        if (GetHitUnit()->GetAuraCount(SPELL_BLOODSPORE_HAZE) >= 5)
+        {
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PSYCHOSIS, true);
+            GetHitUnit()->RemoveAura(SPELL_BLOODSPORE_HAZE);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_bloodspore_haze::HandleEffectHit, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -2183,8 +2035,6 @@ void AddSC_borean_tundra()
     new npc_iruk();
     new npc_nerubar_victim();
     new npc_lurgglbr();
-    new npc_beryl_sorcerer();
-    new npc_captured_beryl_sorcerer();
     RegisterSpellScript(spell_arcane_chains_character_force_cast);
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
@@ -2197,4 +2047,5 @@ void AddSC_borean_tundra()
     RegisterCreatureAI(npc_jenny);
     RegisterSpellScript(spell_necropolis_beam);
     RegisterSpellScript(spell_soul_deflection);
+    RegisterSpellScript(spell_bloodspore_haze);
 }
