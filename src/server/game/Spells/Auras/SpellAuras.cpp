@@ -2145,6 +2145,7 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
 uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now) const
 {
     SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId());
+
     // only auras with spell proc entry can trigger proc
     if (!procEntry)
         return 0;

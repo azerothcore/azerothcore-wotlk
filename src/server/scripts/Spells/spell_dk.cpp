@@ -2740,8 +2740,12 @@ class spell_dk_threat_of_thassarian : public AuraScript
         if (!spellId)
             return;
 
+        Unit* target = eventInfo.GetActionTarget();
+        if (!target)
+            return;
+
         spellId = sSpellMgr->GetSpellWithRank(spellId, spellInfo->GetRank());
-        caster->CastSpell(eventInfo.GetActionTarget(), spellId, true, nullptr, aurEff);
+        caster->CastSpell(target, spellId, true, nullptr, aurEff);
     }
 
     void Register() override

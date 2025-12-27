@@ -1097,35 +1097,34 @@ class spell_pri_body_and_soul : public AuraScript
         return ValidateSpellInfo({ SPELL_PRIEST_BODY_AND_SOUL_SPEED });
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool CheckProcTriggerSpell(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
-        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-        if (!procSpell)
-            return false;
-
-        // Proc only from Abolish Disease on self
-        if (procSpell->Id != 552 || eventInfo.GetActionTarget() != GetTarget())
-            return false;
-
-        return true;
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        return spellInfo && (spellInfo->SpellFamilyFlags[0] & 0x00000001) != 0;
     }
 
-    void HandleProc(ProcEventInfo& /*eventInfo*/)
+    bool CheckProcDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActor() != eventInfo.GetActionTarget())
+            return false;
+
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        return spellInfo && spellInfo->Id == 552;
+    }
+
+    void HandleProcDummy(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        AuraEffect const* aurEff = GetEffect(EFFECT_1);
-        if (!aurEff)
-            return;
 
-        // Roll chance from Effect 1 (50%/100% for ranks 1/2)
         if (roll_chance_i(aurEff->GetAmount()))
-            GetTarget()->CastSpell(GetTarget(), SPELL_PRIEST_BODY_AND_SOUL_SPEED, true, nullptr, aurEff);
+            eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_PRIEST_BODY_AND_SOUL_SPEED, true, nullptr, aurEff);
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_pri_body_and_soul::CheckProc);
-        OnProc += AuraProcFn(spell_pri_body_and_soul::HandleProc);
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_pri_body_and_soul::CheckProcTriggerSpell, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_pri_body_and_soul::CheckProcDummy, EFFECT_1, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_pri_body_and_soul::HandleProcDummy, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 

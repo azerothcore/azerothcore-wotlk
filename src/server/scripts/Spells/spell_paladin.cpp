@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "Group.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -244,6 +245,9 @@ class spell_pal_sacred_shield_base : public AuraScript
 {
     PrepareAuraScript(spell_pal_sacred_shield_base);
 
+    static constexpr uint32 SACRED_SHIELD_ICD = 6 * IN_MILLISECONDS;
+    uint32 _cooldownEnd = 0;
+
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* caster = GetCaster())
@@ -311,19 +315,21 @@ class spell_pal_sacred_shield_base : public AuraScript
             return;
         }
 
-        uint32 triggered_spell_id = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-        if (eventInfo.GetActionTarget()->HasSpellCooldown(triggered_spell_id))
+        uint32 now = GameTime::GetGameTimeMS().count();
+        if (_cooldownEnd > now)
             return;
 
-        uint32 cooldown = eventInfo.GetProcCooldown();
-        int32 basepoints = aurEff->GetAmount();
+        uint32 cooldown = SACRED_SHIELD_ICD;
 
         // Item - Paladin T8 Holy 4P Bonus
         if (Unit* caster = aurEff->GetCaster())
             if (AuraEffect const* aurEffect = caster->GetAuraEffect(64895, 0))
                 cooldown = aurEffect->GetAmount() * IN_MILLISECONDS;
 
-        eventInfo.GetActionTarget()->AddSpellCooldown(triggered_spell_id, 0, cooldown);
+        _cooldownEnd = now + cooldown;
+
+        uint32 triggered_spell_id = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
+        int32 basepoints = aurEff->GetAmount();
         eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, nullptr, nullptr, true, nullptr, aurEff, eventInfo.GetActionTarget()->GetGUID());
     }
 
@@ -1308,34 +1314,20 @@ class spell_pal_judgement_of_light_heal : public AuraScript
         return ValidateSpellInfo({ SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL });
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        Unit* victim = eventInfo.GetActionTarget();
-        if (!victim || !victim->IsAlive())
-            return false;
-
-        Unit* caster = GetCaster();
-        if (!caster || !victim->IsFriendlyTo(caster))
-            return false;
-
-        return true;
-    }
-
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        Unit* victim = eventInfo.GetActionTarget();
-        if (!victim)
+
+        Unit* attacker = eventInfo.GetActor();
+        if (!attacker)
             return;
 
-        // 2% of max health
-        int32 bp = int32(victim->CountPctFromMaxHealth(2));
-        victim->CastCustomSpell(victim, SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL, &bp, nullptr, nullptr, true, nullptr, aurEff);
+        int32 bp = int32(attacker->CountPctFromMaxHealth(aurEff->GetAmount()));
+        attacker->CastCustomSpell(attacker, SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL, &bp, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_pal_judgement_of_light_heal::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_pal_judgement_of_light_heal::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
@@ -1352,27 +1344,19 @@ class spell_pal_judgement_of_wisdom_mana : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        Unit* victim = eventInfo.GetActionTarget();
-        if (!victim || !victim->IsAlive() || !victim->HasActivePowerType(POWER_MANA))
-            return false;
-
-        Unit* caster = GetCaster();
-        if (!caster || !victim->IsFriendlyTo(caster))
-            return false;
-
-        return true;
+        return eventInfo.GetActor()->getPowerType() == POWER_MANA;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        Unit* victim = eventInfo.GetActionTarget();
-        if (!victim)
+
+        Unit* attacker = eventInfo.GetActor();
+        if (!attacker)
             return;
 
-        // 2% of base mana
-        int32 bp = int32(CalculatePct(victim->GetCreateMana(), 2));
-        victim->CastCustomSpell(victim, SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA, &bp, nullptr, nullptr, true, nullptr, aurEff);
+        int32 bp = int32(CalculatePct(attacker->GetCreateMana(), aurEff->GetAmount()));
+        attacker->CastCustomSpell(attacker, SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA, &bp, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
     }
 
     void Register() override

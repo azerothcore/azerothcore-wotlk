@@ -3695,13 +3695,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_CHARM;
     });
 
-    // Persistent Shield
-    ApplySpellFix({ 26467 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 26470;
-    });
-
     // Deadly Swiftness
     ApplySpellFix({ 31255 }, [](SpellInfo* spellInfo)
     {

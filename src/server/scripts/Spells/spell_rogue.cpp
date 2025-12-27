@@ -825,7 +825,7 @@ class spell_rog_master_of_subtlety : public AuraScript
     }
 };
 
-// -35541 - Cut to the Chase
+// -51664 - Cut to the Chase
 class spell_rog_cut_to_the_chase : public AuraScript
 {
     PrepareAuraScript(spell_rog_cut_to_the_chase);
