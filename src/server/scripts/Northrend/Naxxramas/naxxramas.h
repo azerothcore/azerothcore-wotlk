@@ -44,19 +44,20 @@ enum NaxxramasEncouter
 
 enum NaxxramasData
 {
-    DATA_PATCHWERK_BOSS             = 100,
-    DATA_STALAGG_BOSS               = 101,
-    DATA_FEUGEN_BOSS                = 102,
-    DATA_THADDIUS_BOSS              = 103,
-    DATA_RAZUVIOUS_BOSS             = 104,
-    DATA_GOTHIK_BOSS                = 105,
-    DATA_BARON_RIVENDARE_BOSS       = 106,
-    DATA_SIR_ZELIEK_BOSS            = 107,
-    DATA_LADY_BLAUMEUX_BOSS         = 108,
-    DATA_THANE_KORTHAZZ_BOSS        = 109,
-    DATA_SAPPHIRON_BOSS             = 110,
-    DATA_KELTHUZAD_BOSS             = 111,
-    DATA_LICH_KING_BOSS             = 112,
+    DATA_ANUBREKHAN_BOSS            = 100,
+    DATA_PATCHWERK_BOSS             = 101,
+    DATA_STALAGG_BOSS               = 102,
+    DATA_FEUGEN_BOSS                = 103,
+    DATA_THADDIUS_BOSS              = 104,
+    DATA_RAZUVIOUS_BOSS             = 105,
+    DATA_GOTHIK_BOSS                = 106,
+    DATA_BARON_RIVENDARE_BOSS       = 107,
+    DATA_SIR_ZELIEK_BOSS            = 108,
+    DATA_LADY_BLAUMEUX_BOSS         = 109,
+    DATA_THANE_KORTHAZZ_BOSS        = 110,
+    DATA_SAPPHIRON_BOSS             = 111,
+    DATA_KELTHUZAD_BOSS             = 112,
+    DATA_LICH_KING_BOSS             = 113,
 
     DATA_LOATHEB_PORTAL             = 200,
     DATA_MAEXXNA_PORTAL             = 201,
@@ -145,6 +146,10 @@ enum NaxxramasGameObjectsDisplayId
 
 enum NaxxramasCreatureId
 {
+    // Anub'Rekhan
+    NPC_ANUBREKHAN                  = 15956,
+    NPC_CRYPT_GUARD                 = 16573,
+
     // Patchwerk
     NPC_PATCHWERK                   = 16028,
     NPC_PATCHWORK_GOLEM             = 16017,
