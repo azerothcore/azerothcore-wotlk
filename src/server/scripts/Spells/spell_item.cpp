@@ -119,7 +119,7 @@ class spell_item_lucky : public AuraScript
 {
     PrepareAuraScript(spell_item_lucky)
 
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetCaster();
         if (Player* player = target->ToPlayer())
