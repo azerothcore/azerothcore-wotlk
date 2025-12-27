@@ -328,7 +328,7 @@ HostileReference* ThreatContainer::SelectNextVictim(Creature* attacker, HostileR
         Unit* cvUnit = currentVictim->getTarget();
         if (!attacker->CanCreatureAttack(cvUnit)) // pussywizard: if currentVictim is not valid => don't compare the threat with it, just take the highest threat valid target
             currentVictim = nullptr;
-        else if (cvUnit->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()) || cvUnit->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE) || cvUnit->HasUnitState(UNIT_STATE_CONFUSED)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
+        else if (IsPreferredTarget(attacker, cvUnit)) // pussywizard: no 10%/30% if currentVictim is immune to damage or has auras breakable by damage
             currentVictim = nullptr;
     }
 
@@ -394,6 +394,8 @@ HostileReference* ThreatContainer::SelectNextVictim(Creature* attacker, HostileR
             }
             else // pussywizard: no currentVictim, first passing all checks is chosen (highest threat, list is sorted)
             {
+                // tie-breaker if multiple targets have the same threat: select closest target
+                currentRef = SelectNextVictimTieBreaker(attacker, iter);
                 found = true;
                 break;
             }
@@ -404,6 +406,69 @@ HostileReference* ThreatContainer::SelectNextVictim(Creature* attacker, HostileR
         currentRef = nullptr;
 
     return currentRef;
+}
+
+// Helper for Tie-breakers
+HostileReference* ThreatContainer::SelectNextVictimTieBreaker(Creature* attacker, ThreatContainer::StorageType::const_iterator currentIter) const
+{
+    HostileReference* bestRef = *currentIter;
+    float bestThreat = bestRef->GetThreat();
+    float shortestDistSq = attacker->GetDistance(bestRef->getTarget());
+
+    auto tieIter = next(currentIter);
+
+    while (tieIter != iThreatList.end())
+    {
+        HostileReference* nextRef = *tieIter;
+
+        if (!nextRef)
+        {
+            ++tieIter;
+            continue;
+        }
+
+        // Threatlist is sorted, so we can stop as soon as we find a lower threat
+        if (bestThreat - nextRef->GetThreat() > 0.01f)
+            break;
+
+        Unit* target = nextRef->getTarget();
+
+        if (!target)
+        {
+            ++tieIter;
+            continue;
+        }
+
+        if (attacker->CanCreatureAttack(target) && IsPreferredTarget(attacker, target))
+        {
+            float distSq = attacker->GetDistance(target);
+            if (distSq < shortestDistSq)
+            {
+                bestRef = nextRef;
+                shortestDistSq = distSq;
+            }
+        }
+        ++tieIter;
+    }
+    return bestRef;
+}
+
+// Helper for checking if a target is preferred (not immune, not confused, etc)
+bool ThreatContainer::IsPreferredTarget(Creature* attacker, Unit* target) const
+{
+    if (target->IsImmunedToDamageOrSchool(attacker->GetMeleeDamageSchoolMask()))
+        return false;
+
+    if (target->HasNegativeAuraWithInterruptFlag(AURA_INTERRUPT_FLAG_TAKE_DAMAGE))
+        return false;
+
+    if (target->HasUnitState(UNIT_STATE_CONFUSED))
+        return false;
+
+    if (target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID()))
+        return false;
+
+    return true;
 }
 
 //============================================================
