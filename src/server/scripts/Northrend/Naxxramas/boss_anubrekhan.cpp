@@ -58,13 +58,7 @@ const Position cryptguardPositions[] = {
 
 struct boss_anubrekhan : public BossAI
 {
-    boss_anubrekhan(Creature* creature) : BossAI(creature, DATA_ANUBREKHAN_BOSS)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    boss_anubrekhan(Creature* creature) : BossAI(creature, DATA_ANUBREKHAN_BOSS) { }
 
     void SummonCryptGuards()
     {
