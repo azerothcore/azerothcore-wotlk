@@ -64,7 +64,6 @@ struct boss_anubrekhan : public BossAI
             {
                 return !me->HasUnitState(UNIT_STATE_CASTING);
             });
-        _sayGreet = false;
     }
 
     void SummonCryptGuards()
@@ -96,10 +95,10 @@ struct boss_anubrekhan : public BossAI
 
     void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
     {
-        if (cr->GetEntry() == NPC_CRYPT_GUARD)
+        if (summon->GetEntry() == NPC_CRYPT_GUARD)
         {
-            cr->CastSpell(cr, SPELL_SUMMON_CORPSE_SCARABS_10, true, nullptr, nullptr, me->GetGUID());
-            cr->AI()->Talk(EMOTE_SCARAB);
+            summon->CastSpell(summon, SPELL_SUMMON_CORPSE_SCARABS_10, true, nullptr, nullptr, me->GetGUID());
+            summon->AI()->Talk(EMOTE_SCARAB);
         }
     }
 
@@ -165,7 +164,7 @@ struct boss_anubrekhan : public BossAI
     }
 
 private:
-    bool _sayGreet;
+    bool _sayGreet{false};
     uint32 _extraCryptGuardCount;
 };
 
