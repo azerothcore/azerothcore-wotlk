@@ -53,17 +53,8 @@ enum Misc
     SPELL_DARK_MATTER               = 51012,
     SPELL_SEARING_GAZE              = 51136,
 
-    // DARK RUNE PROTECTOR
-    SPELL_DRP_CHARGE                = 22120,
-    SPELL_DRP_CLEAVE                = 42724,
-
-    // DARK RUNE STORMCALLER
-    SPELL_DRS_LIGHTING_BOLT         = 12167,
-    SPELL_DRS_SHADOW_WORD_PAIN      = 15654,
-
-    // IRON GOLEM CUSTODIAN
-    SPELL_IGC_CRUSH_ARMOR           = 33661,
-    SPELL_IGC_GROUND_SMASH          = 12734,
+    // Serverside
+    SPELL_TRIBUNAL_CREDIT_MARKER    = 59046,
 
     // QUESTS
     QUEST_HALLS_OF_STONE            = 13207,
@@ -85,29 +76,17 @@ enum events
     EVENT_DARK_MATTER_START = 11,
     EVENT_DARK_MATTER_END = 12,
 
-    // DARK RUNE PROTECTOR
-    EVENT_DRP_CHARGE = 13,
-    EVENT_DRP_CLEAVE = 14,
-
-    // DARK RUNE STORMCALLER
-    EVENT_DRS_LIGHTNING_BOLD = 15,
-    EVENT_DRS_SHADOW_WORD_PAIN = 16,
-
-    // IRON GOLEM CUSTODIAN
-    EVENT_IGC_CRUSH = 17,
-    EVENT_IGC_GROUND_SMASH = 18,
-
-    EVENT_TRIBUNAL_END = 19,
-    EVENT_BREEN_WAITING = 20,
-    EVENT_TALK_FACE_CHANGE = 21,
-    EVENT_SKY_ROOM_FLOOR_CHANGE = 22,
+    EVENT_TRIBUNAL_END = 13,
+    EVENT_BREEN_WAITING = 14,
+    EVENT_TALK_FACE_CHANGE = 15,
+    EVENT_SKY_ROOM_FLOOR_CHANGE = 16,
 
     //BRANN AND SJONNIR
-    EVENT_GO_TO_SJONNIR = 23,
-    EVENT_DOOR_OPEN = 24,
-    EVENT_RESUME_ESCORT = 25,
-    EVENT_SJONNIR_END_BRANN_YELL = 26,
-    EVENT_SJONNIR_END_BRANN_LAST_YELL = 27,
+    EVENT_GO_TO_SJONNIR = 17,
+    EVENT_DOOR_OPEN = 18,
+    EVENT_RESUME_ESCORT = 19,
+    EVENT_SJONNIR_END_BRANN_YELL = 20,
+    EVENT_SJONNIR_END_BRANN_LAST_YELL = 21,
 };
 
 struct Yells
@@ -661,7 +640,7 @@ public:
                         {
                             pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
                             pInstance->SetData(BRANN_BRONZEBEARD, 3);
-                            me->CastSpell(me, 59046, true); // credit
+                            me->CastSpell(me, SPELL_TRIBUNAL_CREDIT_MARKER, true); // credit
                         }
 
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
@@ -774,7 +753,7 @@ public:
                 if (cr)
                 {
                     cr->AI()->AttackStart(me);
-                    cr->AddThreat(me, 100.0f);
+                    cr->AddThreat(me, 0.0f);
                     cr->SetInCombatWithZone();
                 }
             }
@@ -932,173 +911,6 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
     }
 }
 
-class dark_rune_protectors : public CreatureScript
-{
-public:
-    dark_rune_protectors() : CreatureScript("dark_rune_protectors") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new dark_rune_protectorsAI (creature);
-    }
-
-    struct dark_rune_protectorsAI : public ScriptedAI
-    {
-        dark_rune_protectorsAI(Creature* c) : ScriptedAI(c) { }
-
-        EventMap events;
-        void Reset() override
-        {
-            events.Reset();
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            events.ScheduleEvent(EVENT_DRP_CLEAVE, 7s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_DRP_CLEAVE:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_DRP_CLEAVE, false);
-                        events.Repeat(7s);
-                        break;
-                    }
-            }
-
-            if (Unit* victim = me->GetVictim())
-            {
-                if (!me->IsWithinMeleeRange(victim) && !me->HasUnitState(UNIT_STATE_CHARGING))
-                {
-                    me->CastSpell(victim, SPELL_DRP_CHARGE, false);
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-class dark_rune_stormcaller : public CreatureScript
-{
-public:
-    dark_rune_stormcaller() : CreatureScript("dark_rune_stormcaller") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new dark_rune_stormcallerAI (creature);
-    }
-
-    struct dark_rune_stormcallerAI : public ScriptedAI
-    {
-        dark_rune_stormcallerAI(Creature* c) : ScriptedAI(c) { }
-
-        EventMap events;
-        void Reset() override
-        {
-            events.Reset();
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            events.ScheduleEvent(EVENT_DRS_LIGHTNING_BOLD, 5s);
-            events.ScheduleEvent(EVENT_DRS_SHADOW_WORD_PAIN, 12s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_DRS_LIGHTNING_BOLD:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_DRS_LIGHTING_BOLT, false);
-                        events.Repeat(5s);
-                        break;
-                    }
-                case EVENT_DRS_SHADOW_WORD_PAIN:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_DRS_SHADOW_WORD_PAIN, false);
-                        events.Repeat(12s);
-                        break;
-                    }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-class iron_golem_custodian : public CreatureScript
-{
-public:
-    iron_golem_custodian() : CreatureScript("iron_golem_custodian") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new iron_golem_custodianAI (creature);
-    }
-
-    struct iron_golem_custodianAI : public ScriptedAI
-    {
-        iron_golem_custodianAI(Creature* c) : ScriptedAI(c) { }
-        EventMap events;
-        void Reset() override
-        {
-            events.Reset();
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            events.ScheduleEvent(EVENT_IGC_CRUSH, 6s);
-            events.ScheduleEvent(EVENT_IGC_GROUND_SMASH, 20s);
-        }
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_IGC_CRUSH:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_IGC_CRUSH_ARMOR, false);
-                        events.Repeat(6s);
-                        break;
-                    }
-                case EVENT_IGC_GROUND_SMASH:
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_IGC_GROUND_SMASH, false);
-                        events.Repeat(20s, 40s);
-                        break;
-                    }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
 class spell_hos_dark_matter : public AuraScript
 {
     PrepareAuraScript(spell_hos_dark_matter);
@@ -1139,9 +951,6 @@ class spell_hos_dark_matter_size : public SpellScript
 void AddSC_brann_bronzebeard()
 {
     new brann_bronzebeard();
-    new dark_rune_protectors();
-    new dark_rune_stormcaller();
-    new iron_golem_custodian();
     RegisterSpellScript(spell_hos_dark_matter);
     RegisterSpellScript(spell_hos_dark_matter_size);
 }
