@@ -73,10 +73,14 @@ def parse_conf(filepath):
             # Ignore [headers of configs]
             comments.clear()
             continue
-        if "=" in stripped:
-            key = stripped.split("=")[0].strip()
-            conf[key] = (line, comments.copy())
-            comments.clear()
+        if stripped.count("=") == 1:
+            key, value = [s.strip() for s in stripped.split("=", 1)]
+            if '#' in value:
+                value = value.split('#', 1)[0].rstrip()
+            if key:
+                conf[key] = (f"{key} = {value}\n", comments.copy())
+                comments.clear()
+            continue
     return conf
 
 def find_missing_keys(dist_conf, user_conf):
