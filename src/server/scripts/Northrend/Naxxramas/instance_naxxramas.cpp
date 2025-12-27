@@ -139,6 +139,7 @@ static DoorData const doorData[]
 
 static ObjectData const creatureData[]
 {
+    { NPC_ANUBREKHAN,      DATA_ANUBREKHAN_BOSS      },
     { NPC_PATCHWERK,       DATA_PATCHWERK_BOSS       },
     { NPC_STALAGG,         DATA_STALAGG_BOSS         },
     { NPC_FEUGEN,          DATA_FEUGEN_BOSS          },
