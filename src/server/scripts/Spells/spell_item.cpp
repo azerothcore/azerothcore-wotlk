@@ -5247,24 +5247,31 @@ class spell_item_tiny_abomination_in_a_jar : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetActionTarget();
 
-        if (Aura* aura = caster->GetAura(SPELL_MOTE_OF_ANGER))
-        {
-            if (aura->GetStackAmount() >= 8)
-            {
-                caster->RemoveAurasDueToSpell(SPELL_MOTE_OF_ANGER);
-                caster->CastSpell(nullptr, SPELL_MANIFEST_ANGER_MAIN_HAND, true, nullptr, aurEff);
-            }
-        }
-        else
-        {
-            caster->CastSpell(nullptr, SPELL_MOTE_OF_ANGER, true, nullptr, aurEff);
-        }
+        caster->CastSpell(nullptr, SPELL_MOTE_OF_ANGER, true, nullptr, aurEff);
+        Aura const* motes = caster->GetAura(SPELL_MOTE_OF_ANGER);
+        if (!motes || motes->GetStackAmount() < 8)
+            return;
+
+        caster->RemoveAurasDueToSpell(SPELL_MOTE_OF_ANGER);
+        uint32 spellId = SPELL_MANIFEST_ANGER_MAIN_HAND;
+        if (Player* player = caster->ToPlayer())
+            if (player->GetWeaponForAttack(OFF_ATTACK, true) && roll_chance_i(50))
+                spellId = SPELL_MANIFEST_ANGER_OFF_HAND;
+
+        caster->CastSpell(target, spellId, true, nullptr, aurEff);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_MOTE_OF_ANGER);
     }
 
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_item_tiny_abomination_in_a_jar::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_item_tiny_abomination_in_a_jar::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -5282,24 +5289,31 @@ class spell_item_tiny_abomination_in_a_jar_hero : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetActionTarget();
 
-        if (Aura* aura = caster->GetAura(SPELL_MOTE_OF_ANGER))
-        {
-            if (aura->GetStackAmount() >= 7)
-            {
-                caster->RemoveAurasDueToSpell(SPELL_MOTE_OF_ANGER);
-                caster->CastSpell(nullptr, SPELL_MANIFEST_ANGER_MAIN_HAND, true, nullptr, aurEff);
-            }
-        }
-        else
-        {
-            caster->CastSpell(nullptr, SPELL_MOTE_OF_ANGER, true, nullptr, aurEff);
-        }
+        caster->CastSpell(nullptr, SPELL_MOTE_OF_ANGER, true, nullptr, aurEff);
+        Aura const* motes = caster->GetAura(SPELL_MOTE_OF_ANGER);
+        if (!motes || motes->GetStackAmount() < 7)
+            return;
+
+        caster->RemoveAurasDueToSpell(SPELL_MOTE_OF_ANGER);
+        uint32 spellId = SPELL_MANIFEST_ANGER_MAIN_HAND;
+        if (Player* player = caster->ToPlayer())
+            if (player->GetWeaponForAttack(OFF_ATTACK, true) && roll_chance_i(50))
+                spellId = SPELL_MANIFEST_ANGER_OFF_HAND;
+
+        caster->CastSpell(target, spellId, true, nullptr, aurEff);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_MOTE_OF_ANGER);
     }
 
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_item_tiny_abomination_in_a_jar_hero::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_item_tiny_abomination_in_a_jar_hero::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
