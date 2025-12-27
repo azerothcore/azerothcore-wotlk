@@ -87,7 +87,8 @@ enum DruidSpells
     SPELL_DRUID_REVITALIZE_ENERGIZE_RP      = 48543,
     SPELL_DRUID_GLYPH_OF_RIP                = 54818,
     SPELL_DRUID_RIP_DURATION_LACERATE_DMG   = 60141,
-    SPELL_DRUID_REJUVENATION_T10_PROC       = 70691
+    SPELL_DRUID_REJUVENATION_T10_PROC       = 70691,
+    SPELL_DRUID_LANGUISH                    = 71023
 };
 
 enum DruidIcons
@@ -142,27 +143,27 @@ class spell_dru_t10_balance_4p_bonus : public AuraScript
 {
     PrepareAuraScript(spell_dru_t10_balance_4p_bonus);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return eventInfo.GetActor() && eventInfo.GetProcTarget();
+        return ValidateSpellInfo({ SPELL_DRUID_LANGUISH });
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        uint32 triggered_spell_id = 71023;
-        SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
 
-        int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
-        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0);
+        SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(SPELL_DRUID_LANGUISH);
 
-        //GetTarget()->CastCustomSpell(triggered_spell_id, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, nullptr, aurEff);
+        int32 amount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
+        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), SPELL_DRUID_LANGUISH, SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0);
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_dru_t10_balance_4p_bonus::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_dru_t10_balance_4p_bonus::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };

@@ -2393,7 +2393,13 @@ class spell_dk_unholy_blight : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_DK_UNHOLY_BLIGHT_DOT });
+        return ValidateSpellInfo({ SPELL_DK_UNHOLY_BLIGHT_DOT, SPELL_DK_GLYPH_OF_UNHOLY_BLIGHT });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        return damageInfo && damageInfo->GetDamage();
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -2420,6 +2426,7 @@ class spell_dk_unholy_blight : public AuraScript
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_dk_unholy_blight::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_dk_unholy_blight::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
@@ -2458,13 +2465,17 @@ class spell_dk_necrosis : public AuraScript
         return ValidateSpellInfo({ SPELL_DK_NECROSIS_DAMAGE });
     }
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        return damageInfo && damageInfo->GetDamage();
+    }
+
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         Unit* caster = GetTarget();
         Unit* target = eventInfo.GetActionTarget();
-        if (!target)
-            return;
 
         int32 bp = CalculatePct(static_cast<int32>(eventInfo.GetDamageInfo()->GetDamage()), aurEff->GetAmount());
         caster->CastCustomSpell(SPELL_DK_NECROSIS_DAMAGE, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
@@ -2472,6 +2483,7 @@ class spell_dk_necrosis : public AuraScript
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_dk_necrosis::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_dk_necrosis::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
