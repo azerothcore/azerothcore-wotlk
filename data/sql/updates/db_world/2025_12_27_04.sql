@@ -1,3 +1,4 @@
+-- DB update 2025_12_27_03 -> 2025_12_27_04
 -- Delete prowler script
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 118;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 118) AND (`source_type` = 0);
