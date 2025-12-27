@@ -2373,10 +2373,11 @@ class spell_dk_mark_of_blood : public AuraScript
         return ValidateSpellInfo({ SPELL_DK_MARK_OF_BLOOD_HEAL });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_DK_MARK_OF_BLOOD_HEAL, true, nullptr, aurEff);
+        // Heal the target that the marked enemy attacked (from TrinityCore)
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActionTarget(), SPELL_DK_MARK_OF_BLOOD_HEAL, true, nullptr, aurEff);
     }
 
     void Register() override
