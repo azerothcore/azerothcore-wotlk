@@ -12900,7 +12900,7 @@ void createProcFlags(SpellInfo const* spellInfo, WeaponAttackType attackType, bo
     }
 }
 
-void Unit::ProcSkillsAndReactives(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* procSpellInfo, uint32 damage, SpellInfo const* procAura, int8 procAuraEffectIndex, Spell const* procSpell, DamageInfo* damageInfo, HealInfo* healInfo, uint32 procPhase)
+void Unit::ProcSkillsAndReactives(bool isVictim, Unit* target, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellInfo const* /*procSpellInfo*/, uint32 /*damage*/, SpellInfo const* /*procAura*/, int8 /*procAuraEffectIndex*/, Spell const* procSpell, DamageInfo* /*damageInfo*/, HealInfo* /*healInfo*/, uint32 procPhase)
 {
     // Player is loaded now - do not allow passive spell casts to proc
     if (IsPlayer() && ToPlayer()->GetSession()->PlayerLoading())

@@ -1090,7 +1090,7 @@ class spell_warr_extra_proc : public AuraScript
         });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         Unit* caster = GetTarget();
         uint32 triggeredSpellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;

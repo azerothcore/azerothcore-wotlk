@@ -2325,7 +2325,7 @@ void Aura::TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, Pro
     ConsumeProcCharges(sSpellMgr->GetSpellProcEntry(GetId()));
 }
 
-void Aura::ConsumeProcCharges(SpellProcEntry const* procEntry)
+void Aura::ConsumeProcCharges(SpellProcEntry const* /*procEntry*/)
 {
     // Remove aura if we've used last charge to proc
     if (IsUsingCharges() && !GetCharges())
