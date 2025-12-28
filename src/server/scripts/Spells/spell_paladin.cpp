@@ -1944,7 +1944,6 @@ class spell_pal_seal_of_vengeance_aura : public AuraScript
         Unit* caster = eventInfo.GetActor();
         Unit* target = eventInfo.GetActionTarget();
 
-        uint32 dotSpell = _isVengeance ? SPELL_PALADIN_HOLY_VENGEANCE : SPELL_PALADIN_BLOOD_CORRUPTION;
         AuraEffect const* sealDot = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PALADIN, 0x00000000, 0x00000800, 0x00000000, caster->GetGUID());
         if (!sealDot)
             return;
