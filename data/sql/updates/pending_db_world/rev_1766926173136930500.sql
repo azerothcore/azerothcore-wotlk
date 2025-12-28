@@ -55,8 +55,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Thief Catcher Thunderbrew
 (14367, 0, 0, 0, 0, 0, 100, 0, 3250, 12750, 12500, 22250, 0, 0, 11, 14030, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Thief Catcher Thunderbrew - In Combat - Cast \'Hooked Net\'');
 
--- Adds "Invisibility and Stealth Detection (18950)"."
+-- Adds "Invisibility and Stealth Detection" (18950) to creatures:
 UPDATE `creature_addon` SET `auras` = '18950' WHERE `guid` IN (6496, 6495, 6494, 203394, 203420, 24786, 24782, 24785, 79818, 90484, 79768, 109, 1814, 91, 46219, 46220, 203395, 46216);
+
+-- Adds "Invisibility and Stealth Detection" (18950) to creature's templates:
+UPDATE `creature_addon` SET `auras` = '18950' WHERE `entry` IN (14402, 14403, 14404);
 
 -- For Testing use, will freeze them in place
 -- UPDATE `creature_addon` SET `auras` = '18950 39258' WHERE `guid` IN (6496, 6495, 6494, 203394, 203420, 24786, 24782, 24785, 79818, 90484, 79768, 109, 1814, 91, 46219, 46220, 203395, 46216);
