@@ -55,6 +55,8 @@ enum Misc
     PHASE_FAST_DANCE                = 1
 };
 
+const float heiganFastDanceFaceDirection = 2.40f;
+
 struct boss_heigan : public BossAI
 {
     boss_heigan(Creature* creature) : BossAI(creature, DATA_HEIGAN_BOSS) { }
@@ -128,7 +130,7 @@ struct boss_heigan : public BossAI
             me->StopMoving();
             me->SetReactState(REACT_PASSIVE);
             me->CastSpell(me, SPELL_TELEPORT_SELF, false);
-            me->SetFacingTo(2.40f);
+            me->SetFacingTo(heiganFastDanceFaceDirection);
             scheduler.Schedule(1s, [this](TaskContext /*context*/) {
                 DoCastSelf(SPELL_PLAGUE_CLOUD);
             });
