@@ -59,7 +59,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 UPDATE `creature_addon` SET `auras` = '18950' WHERE `guid` IN (6496, 6495, 6494, 203394, 203420, 24786, 24782, 24785, 79818, 90484, 79768, 109, 1814, 91, 46219, 46220, 203395, 46216);
 
 -- Adds "Invisibility and Stealth Detection" (18950) to creature's templates:
-UPDATE `creature_addon` SET `auras` = '18950' WHERE `entry` IN (14402, 14403, 14404);
+UPDATE `creature_template_addon` SET `auras` = '18950' WHERE `entry` IN (14402, 14403, 14404);
 
 -- For Testing use, will freeze them in place
 -- UPDATE `creature_addon` SET `auras` = '18950 39258' WHERE `guid` IN (6496, 6495, 6494, 203394, 203420, 24786, 24782, 24785, 79818, 90484, 79768, 109, 1814, 91, 46219, 46220, 203395, 46216);
