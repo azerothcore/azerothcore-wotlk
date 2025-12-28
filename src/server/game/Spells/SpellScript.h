@@ -888,7 +888,7 @@ public:
     DynamicObject* GetDynobjOwner() const;
 
     // removes aura with remove mode (see AuraRemoveMode enum)
-    void Remove(uint32 removeMode = 0);
+    void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
     // returns aura object of script
     Aura* GetAura() const;
 

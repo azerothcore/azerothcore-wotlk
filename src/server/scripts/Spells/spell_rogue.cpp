@@ -803,25 +803,37 @@ class spell_rog_glyph_of_backstab : public AuraScript
     }
 };
 
-// -31223 - Master of Subtlety
-class spell_rog_master_of_subtlety : public AuraScript
+// 31666 - Master of Subtlety
+// 58428 - Overkill
+template <uint32 RemoveSpellId>
+class spell_rog_stealth_buff_tracker : public AuraScript
 {
-    PrepareAuraScript(spell_rog_master_of_subtlety);
+    PrepareAuraScript(spell_rog_stealth_buff_tracker);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_ROGUE_MASTER_OF_SUBTLETY_DAMAGE });
+        return ValidateSpellInfo({ RemoveSpellId });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    void AfterApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PreventDefaultAction();
-        GetTarget()->CastCustomSpell(SPELL_ROGUE_MASTER_OF_SUBTLETY_DAMAGE, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff);
+        if (Aura* visualAura = GetTarget()->GetAura(RemoveSpellId))
+        {
+            int32 duration = aurEff->GetBase()->GetDuration();
+            visualAura->SetDuration(duration);
+            visualAura->SetMaxDuration(duration);
+        }
+    }
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(RemoveSpellId);
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_rog_master_of_subtlety::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_stealth_buff_tracker::AfterApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_stealth_buff_tracker::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -958,27 +970,6 @@ class spell_rog_turn_the_tables_proc : public AuraScript
     }
 };
 
-// 58426 - Overkill
-class spell_rog_overkill : public AuraScript
-{
-    PrepareAuraScript(spell_rog_overkill);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_ROGUE_OVERKILL_TRIGGERED });
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_ROGUE_OVERKILL_TRIGGERED, true, nullptr, aurEff);
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_rog_overkill::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
 
 void AddSC_rogue_spell_scripts()
 {
@@ -1000,12 +991,12 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_vanish);
     // Proc system scripts
     RegisterSpellScript(spell_rog_glyph_of_backstab);
-    RegisterSpellScript(spell_rog_master_of_subtlety);
+    RegisterSpellScriptWithArgs(spell_rog_stealth_buff_tracker<SPELL_ROGUE_MASTER_OF_SUBTLETY_DAMAGE>, "spell_rog_master_of_subtlety");
+    RegisterSpellScriptWithArgs(spell_rog_stealth_buff_tracker<SPELL_ROGUE_OVERKILL_TRIGGERED>, "spell_rog_overkill");
     RegisterSpellScript(spell_rog_cut_to_the_chase);
     RegisterSpellScript(spell_rog_deadly_brew);
     RegisterSpellScript(spell_rog_quick_recovery);
     RegisterSpellScript(spell_rog_setup);
     RegisterSpellScript(spell_rog_turn_the_tables);
     RegisterSpellScript(spell_rog_turn_the_tables_proc);
-    RegisterSpellScript(spell_rog_overkill);
 }

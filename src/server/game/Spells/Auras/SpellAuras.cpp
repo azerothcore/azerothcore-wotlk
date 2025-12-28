@@ -1766,24 +1766,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_ROGUE:
+                // Remove Vanish on stealth remove
+                if (GetId() == 1784)
                 {
-                    // Overkill, Master of Subtlety
-                    if (caster && GetSpellInfo()->SpellIconID == 250)
-                    {
-                        if (caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 2114, 0))
-                            caster->CastSpell(caster, 31666, true);
-
-                        if (caster->GetAuraEffectDummy(58426))
-                            caster->CastSpell(caster, 58428, true);
-                    }
-                    // Remove Vanish on stealth remove
-                    if (GetId() == 1784)
-                    {
-                        target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, ObjectGuid::Empty);
-                        target->RemoveAurasDueToSpell(18461);
-                    }
-                    break;
+                    target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, ObjectGuid::Empty);
+                    target->RemoveAurasDueToSpell(18461);
                 }
+                break;
             case SPELLFAMILY_SHAMAN:
             {
                 // Ghost Wolf Speed (PvP 58 lvl set)
@@ -1833,6 +1822,39 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
     // mods at aura apply or remove
     switch (GetSpellInfo()->SpellFamilyName)
     {
+        case SPELLFAMILY_ROGUE:
+            // Stealth
+            if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00400000)
+            {
+                // Master of Subtlety
+                if (AuraEffect const* aurEff = target->GetAuraEffectOfRankedSpell(31221, 0))
+                {
+                    if (!apply)
+                        target->CastSpell(target, 31666, true);
+                    else
+                    {
+                        // Remove counter aura
+                        target->RemoveAurasDueToSpell(31666);
+
+                        int32 amount = aurEff->GetAmount();
+                        target->CastCustomSpell(target, 31665, &amount, nullptr, nullptr, true);
+                    }
+                }
+                // Overkill
+                if (target->HasAura(58426))
+                {
+                    if (!apply)
+                        target->CastSpell(target, 58428, true);
+                    else
+                    {
+                        // Remove counter aura
+                        target->RemoveAurasDueToSpell(58428);
+
+                        target->CastSpell(target, 58427, true);
+                    }
+                }
+            }
+            break;
         case SPELLFAMILY_HUNTER:
             switch (GetId())
             {

@@ -108,7 +108,8 @@ enum DeathKnightSpellIcons
     DK_ICON_ID_BUTCHERY                         = 2664,
     DK_ICON_ID_NECROSIS                         = 2709,
     DK_ICON_ID_THREAT_OF_THASSARIAN             = 2023,
-    DK_ICON_ID_SUDDEN_DOOM                      = 1939
+    DK_ICON_ID_SUDDEN_DOOM                      = 1939,
+    DK_ICON_ID_EPIDEMIC                         = 234
 };
 
 enum Misc
@@ -2488,50 +2489,6 @@ class spell_dk_necrosis : public AuraScript
     }
 };
 
-// 61257 - Runic Power Back on Snare/Root
-class spell_dk_runic_power_back_on_snare_root : public AuraScript
-{
-    PrepareAuraScript(spell_dk_runic_power_back_on_snare_root);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_DK_RUNIC_RETURN });
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo)
-            return false;
-
-        // Only for spells and hit/crit
-        if (!(eventInfo.GetHitMask() & (PROC_HIT_NORMAL | PROC_HIT_CRITICAL)))
-            return false;
-
-        // Not from self
-        if (GetTarget() == eventInfo.GetActor())
-            return false;
-
-        // Need snare or root mechanic
-        if (!(spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_SNARE))))
-            return false;
-
-        return true;
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_DK_RUNIC_RETURN, true, nullptr, aurEff);
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_dk_runic_power_back_on_snare_root::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_dk_runic_power_back_on_snare_root::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
-
 // -49182 - Blade Barrier
 class spell_dk_blade_barrier : public AuraScript
 {
@@ -2830,12 +2787,20 @@ class spell_dk_glyph_of_scourge_strike_script : public SpellScript
             if (spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && (spellInfo->SpellFamilyFlags[2] & 0x2) &&
                 aurEff->GetCasterGUID() == caster->GetGUID())
             {
-                uint32 newDuration = aurEff->GetBase()->GetDuration() + 3000;
-                uint32 maxDuration = aurEff->GetBase()->GetMaxDuration();
-                if (newDuration > maxDuration)
-                    newDuration = maxDuration;
+                uint32 countMin = aurEff->GetBase()->GetMaxDuration();
+                uint32 countMax = spellInfo->GetMaxDuration();
 
-                aurEff->GetBase()->SetDuration(newDuration);
+                // this Glyph
+                countMax += 9000;
+                // talent Epidemic
+                if (AuraEffect const* epidemic = caster->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_DEATHKNIGHT, DK_ICON_ID_EPIDEMIC, EFFECT_0))
+                    countMax += epidemic->GetAmount();
+
+                if (countMin < countMax)
+                {
+                    aurEff->GetBase()->SetDuration(aurEff->GetBase()->GetDuration() + 3000);
+                    aurEff->GetBase()->SetMaxDuration(countMin + 3000);
+                }
             }
         }
     }
@@ -2932,7 +2897,6 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_unholy_blight);
     RegisterSpellScript(spell_dk_vendetta);
     RegisterSpellScript(spell_dk_necrosis);
-    RegisterSpellScript(spell_dk_runic_power_back_on_snare_root);
     RegisterSpellScript(spell_dk_blade_barrier);
     RegisterSpellScript(spell_dk_death_rune);
     RegisterSpellScript(spell_dk_rime);

@@ -1698,6 +1698,37 @@ class spell_sha_shamanistic_rage : public AuraScript
     }
 };
 
+// -324 - Lightning Shield
+class spell_sha_lightning_shield : public AuraScript
+{
+    PrepareAuraScript(spell_sha_lightning_shield);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHAMAN_LIGHTNING_SHIELD_DAMAGE_R1 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActionTarget())
+            return true;
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 triggerSpell = sSpellMgr->GetSpellWithRank(SPELL_SHAMAN_LIGHTNING_SHIELD_DAMAGE_R1, aurEff->GetSpellInfo()->GetRank());
+        eventInfo.GetActionTarget()->CastSpell(eventInfo.GetActor(), triggerSpell, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_sha_lightning_shield::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_sha_lightning_shield::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // -51525 - Static Shock
 class spell_sha_static_shock : public AuraScript
 {
@@ -2027,6 +2058,7 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_item_t6_trinket);
     RegisterSpellScript(spell_sha_maelstrom_weapon);
     RegisterSpellScript(spell_sha_shamanistic_rage);
+    RegisterSpellScript(spell_sha_lightning_shield);
     RegisterSpellScript(spell_sha_static_shock);
     RegisterSpellScript(spell_sha_t10_elemental_4p_bonus);
     RegisterSpellScript(spell_sha_t3_6p_bonus);

@@ -336,7 +336,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (-31641, 'spell_mage_blazing_speed'),
 (-53234, 'spell_hun_piercing_shots'),
 (-20234, 'spell_pal_illumination'),
-(58426,  'spell_rog_overkill'),
+(58428,  'spell_rog_overkill'),
 (44835,  'spell_dru_maim_interrupt'),
 (62337,  'spell_gen_petrified_bark'),
 (62933,  'spell_gen_petrified_bark'),
@@ -1095,7 +1095,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_rog_glyph_of_backstab', 'spell_rog_master_of_subtlety', 'spell_rog_cut_to_the_chase', 'spell_rog_deadly_brew', 'spell_rog_quick_recovery');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (56800, 'spell_rog_glyph_of_backstab'),     -- Glyph of Backstab
-(-31221, 'spell_rog_master_of_subtlety'),   -- Master of Subtlety (all ranks, first rank)
+(31666, 'spell_rog_master_of_subtlety'),    -- Master of Subtlety (periodic tracker)
 (-35541, 'spell_rog_cut_to_the_chase'),     -- Cut to the Chase (all ranks)
 (-51625, 'spell_rog_deadly_brew'),          -- Deadly Brew (all ranks)
 (-31244, 'spell_rog_quick_recovery');       -- Quick Recovery (all ranks)
@@ -1194,12 +1194,11 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (28460,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,  5000, 0),
 -- Arcane Power (Boss) - procFlags=4, customChance=100
 (29307,   0, 0, 0x00000000, 0x00000000, 0x00000000,       4, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
--- Master of Subtlety Rank 1 - procFlags=1024
-(31221,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
--- Master of Subtlety Rank 2 - procFlags=1024
-(31222,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
--- Master of Subtlety Rank 3 - procFlags=1024
-(31223,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
+-- NOTE: Master of Subtlety spell_proc entries removed - TC uses script on 31666 (periodic tracker) instead of talent proc
+-- If this causes regressions, uncomment these entries:
+-- (31221,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0), -- Master of Subtlety Rank 1
+-- (31222,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0), -- Master of Subtlety Rank 2
+-- (31223,   0, 0, 0x00000000, 0x00000000, 0x00000000,    1024, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0), -- Master of Subtlety Rank 3
 -- Zandalarian Hero Charm - Cooldown=17000
 (33511,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0, 17000, 0),
 -- Idol of the Raven Goddess - Cooldown=25000
@@ -1782,3 +1781,29 @@ DELETE FROM `command` WHERE `name` = 'reload spell_proc_event';
 DELETE FROM `spell_script_names` WHERE `spell_id` = 74396 AND `ScriptName` = 'spell_mage_fingers_of_frost';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (74396, 'spell_mage_fingers_of_frost');
+
+-- Remove non-existent Fingers of Frost script entries
+-- spell_mage_fingers_of_frost_proc and spell_mage_fingers_of_frost_proc_aura don't exist in code
+-- The proc system now handles charge consumption via PrepareProcToTrigger
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_mage_fingers_of_frost_proc';
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_mage_fingers_of_frost_proc_aura';
+
+-- Sheath of Light: procs on critical heals (from TrinityCore)
+-- ProcFlags=0 uses DBC flags, SpellTypeMask=2 (HEAL), SpellPhaseMask=2 (HIT), HitMask=2 (CRITICAL)
+DELETE FROM `spell_proc` WHERE `SpellId` = -53501;
+INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `DisableEffectsMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
+(-53501, 0, 0, 0, 0, 0, 0, 2, 2, 2, 0, 0, 0, 0, 0, 0);
+
+-- Fix Cut to the Chase spell_script_names (was incorrectly registered to Combat Potency -35541)
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_rog_cut_to_the_chase';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-51664, 'spell_rog_cut_to_the_chase');
+
+-- Fix Decimation DisableEffectsMask (was 0, should be 2 to disable EFFECT_1 from proccing)
+UPDATE `spell_proc` SET `DisableEffectsMask` = 2 WHERE `SpellId` = -63156;
+
+-- Vendetta: add missing spell_script_names entry (from TrinityCore)
+DELETE FROM `spell_script_names` WHERE `spell_id` = -49015 AND `ScriptName` = 'spell_dk_vendetta';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-49015, 'spell_dk_vendetta');
+
+-- Remove duplicate spell_dk_runic_power_back_on_snare_root (TC only has spell_dk_pvp_4p_bonus for 61257)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 61257 AND `ScriptName` = 'spell_dk_runic_power_back_on_snare_root';
