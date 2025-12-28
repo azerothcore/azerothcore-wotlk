@@ -37,8 +37,8 @@ enum Misc
     EMOTE_CRAZED                        = 1
 };
 
-const Position EckHomePosition = { 1642.712f, 934.646f, 107.205f, 0.767f };
-const Position EckCombatStartPosition = { 1638.55f, 919.76f, 104.95f, 0.00f };
+Position const EckHomePosition = { 1642.712f, 934.646f, 107.205f, 0.767f };
+Position const EckCombatStartPosition = { 1638.55f, 919.76f, 104.95f, 0.00f };
 
 struct boss_eck : public BossAI
 {
