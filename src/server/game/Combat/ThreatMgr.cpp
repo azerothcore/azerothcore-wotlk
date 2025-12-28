@@ -413,7 +413,7 @@ HostileReference* ThreatContainer::SelectNextVictimTieBreaker(Creature* attacker
 {
     HostileReference* bestRef = *currentIter;
     float bestThreat = bestRef->GetThreat();
-    float shortestDistSq = attacker->GetDistance(bestRef->getTarget());
+    float shortestDistSq = attacker->GetExactDistSq(bestRef->getTarget());
 
     auto tieIter = next(currentIter);
 
@@ -441,7 +441,7 @@ HostileReference* ThreatContainer::SelectNextVictimTieBreaker(Creature* attacker
 
         if (attacker->CanCreatureAttack(target) && IsPreferredTarget(attacker, target))
         {
-            float distSq = attacker->GetDistance(target);
+            float distSq = attacker->GetExactDistSq(target);
             if (distSq < shortestDistSq)
             {
                 bestRef = nextRef;
