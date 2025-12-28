@@ -151,18 +151,19 @@ struct boss_heigan : public BossAI
         }, 5s);
     }
 
-    // TODO: modernise still
     void CheckSafetyDance()
     {
-        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-        for (auto const& itr : pList)
+        if (Map* map = me->GetMap())
         {
-            if (IsInBoundary(itr.GetSource()) && !itr.GetSource()->IsAlive())
+            map->DoForAllPlayers([&](Player* p)
             {
-                instance->SetData(DATA_DANCE_FAIL, 0);
-                instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
-                return;
-            }
+                if (IsInBoundary(p) && !p->IsAlive())
+                {
+                    instance->SetData(DATA_DANCE_FAIL, 0);
+                    instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
+                    return;
+                }
+            });
         }
     }
 private:
