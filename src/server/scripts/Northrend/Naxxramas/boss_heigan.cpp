@@ -151,39 +151,13 @@ struct boss_heigan : public BossAI
         }, 5s);
     }
 
-    // TODO: convert to boundary. then we don't have to override UpdateAI
-    bool IsInRoom(Unit* who)
-    {
-        if (who->GetPositionX() > 2826 || who->GetPositionX() < 2723 || who->GetPositionY() > -3641 || who->GetPositionY() < -3736)
-        {
-            if (who->GetGUID() == me->GetGUID())
-                EnterEvadeMode();
-
-            return false;
-        }
-        return true;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!IsInRoom(me))
-            return;
-
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-
-        DoMeleeAttackIfReady();
-    }
-
     // TODO: modernise still
     void CheckSafetyDance()
     {
         Map::PlayerList const& pList = me->GetMap()->GetPlayers();
         for (auto const& itr : pList)
         {
-            if (IsInRoom(itr.GetSource()) && !itr.GetSource()->IsAlive())
+            if (IsInBoundary(itr.GetSource()) && !itr.GetSource()->IsAlive())
             {
                 instance->SetData(DATA_DANCE_FAIL, 0);
                 instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);

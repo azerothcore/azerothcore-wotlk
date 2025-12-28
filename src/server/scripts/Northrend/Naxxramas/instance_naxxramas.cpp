@@ -137,6 +137,12 @@ static ObjectData const gameObjectData[]
     { 0,                     0                       }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_HEIGAN_BOSS,      new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f)     },
+    { 0,                     0                                                               }
+};
+
 class instance_naxxramas : public InstanceScript
 {
 public:
@@ -147,6 +153,7 @@ public:
         SetPersistentDataCount(PERSISTENT_DATA_COUNT);
         LoadDoorData(doorData);
         LoadObjectData(creatureData, gameObjectData);
+        LoadBossBoundaries(boundaries);
 
         // GameObjects
         for (auto& i : _heiganEruption)
