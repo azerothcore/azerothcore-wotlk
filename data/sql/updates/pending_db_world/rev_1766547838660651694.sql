@@ -1806,3 +1806,11 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-49015, 'spe
 
 -- Remove duplicate spell_dk_runic_power_back_on_snare_root (TC only has spell_dk_pvp_4p_bonus for 61257)
 DELETE FROM `spell_script_names` WHERE `spell_id` = 61257 AND `ScriptName` = 'spell_dk_runic_power_back_on_snare_root';
+
+-- Lightning Shield: add missing spell_script_names entry
+DELETE FROM `spell_script_names` WHERE `spell_id` = -324 AND `ScriptName` = 'spell_sha_lightning_shield';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-324, 'spell_sha_lightning_shield');
+
+-- Nightfall (Glyph of Corruption): add missing spell_script_names entry
+DELETE FROM `spell_script_names` WHERE `spell_id` = 56218 AND `ScriptName` = 'spell_warl_nightfall';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (56218, 'spell_warl_nightfall');
