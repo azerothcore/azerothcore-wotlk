@@ -970,7 +970,6 @@ class spell_rog_turn_the_tables_proc : public AuraScript
     }
 };
 
-
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);

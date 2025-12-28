@@ -6,7 +6,7 @@ DROP PROCEDURE IF EXISTS add_disable_effects_mask;
 DELIMITER //
 CREATE PROCEDURE add_disable_effects_mask()
 BEGIN
-    IF NOT EXISTS (SELECT * FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'spell_proc' AND column_name = 'DisableEffectsMask') THEN
+    IF NOT EXISTS (SELECT * FROM `information_schema`.`columns` WHERE `table_schema` = DATABASE() AND `table_name` = 'spell_proc' AND `column_name` = 'DisableEffectsMask') THEN
         ALTER TABLE `spell_proc` ADD COLUMN `DisableEffectsMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesMask`;
     END IF;
 END //
@@ -1162,6 +1162,7 @@ DELETE FROM `spell_proc` WHERE `SpellId` IN (
 -- Insert migrated entries from spell_proc_event
 -- Schema: SpellId, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2,
 --         ProcFlags, SpellTypeMask, SpellPhaseMask, HitMask, AttributesMask, ProcsPerMinute, Chance, Cooldown, Charges
+DELETE FROM `spell_proc` WHERE `SpellId` IN (-31641,-16689,4524,9452);
 INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
 -- Blazing Speed (Mage) - procFlags=680 (TAKEN_MELEE_AUTO_ATTACK|TAKEN_DAMAGE)
 (-31641,  0, 0, 0x00000000, 0x00000000, 0x00000000,     680, 0x0, 0x0, 0, 0x0, 0,   0,     0, 0),
@@ -1364,7 +1365,6 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (72059,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,  1027, 0x2, 0, 0,   0,     0, 0), -- Frost Damage Immunity
 (75490,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x2,     0, 0x2, 0, 0,   0,     0, 0), -- Frostfire Orb
 (75495,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x2, 0x2,     0, 0x2, 0, 0,   0,     0, 0); -- Frostfire Orb
-
 
 -- Sync spell_proc values from TrinityCore
 -- SpellFamilyName, SpellFamilyMask, SchoolMask differences

@@ -2517,13 +2517,13 @@ class spell_dk_death_rune : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER && GetUnitOwner()->ToPlayer()->getClass() == CLASS_DEATH_KNIGHT;
+        return GetUnitOwner()->IsPlayer() && GetUnitOwner()->ToPlayer()->getClass() == CLASS_DEATH_KNIGHT;
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         Unit* caster = eventInfo.GetActor();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster || !caster->IsPlayer())
             return false;
 
         Player* player = caster->ToPlayer();
@@ -2590,7 +2590,7 @@ class spell_dk_rime : public AuraScript
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        return GetTarget()->GetTypeId() == TYPEID_PLAYER;
+        return GetTarget()->IsPlayer();
     }
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
