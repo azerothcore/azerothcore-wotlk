@@ -16399,7 +16399,7 @@ void Player::SetLootChanceModifier(uint32 itemID, float mod)
     _lootChanceModifier[itemID] = mod;
 }
 
-void Player::RemoveLootChanceModifier(uint32 itemId)
+void Player::RemoveLootChanceModifier(uint32 itemID)
 {
-    _lootChanceModifier.erase(itemId);
+    _lootChanceModifier.erase(itemID);
 }

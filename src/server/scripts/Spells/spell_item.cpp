@@ -121,8 +121,8 @@ class spell_item_lucky : public AuraScript
 
         void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Unit* target = GetCaster();
-        if (Player* player = target->ToPlayer())
+        Unit* caster = GetCaster();
+        if (Player* player = caster->ToPlayer())
         {
             for (uint32 itemID : CopperCoinIDs)
                 player->SetLootChanceModifier(itemID, MODIFIER_COPPER_COIN);
@@ -135,8 +135,8 @@ class spell_item_lucky : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Unit* target = GetCaster();
-        if (Player* player = target->ToPlayer())
+        Unit* caster = GetCaster();
+        if (Player* player = caster->ToPlayer())
         {
             for (uint32 itemID : CopperCoinIDs)
                 player->RemoveLootChanceModifier(itemID);
