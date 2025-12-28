@@ -1296,8 +1296,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 -- Deathbringer's Will Heroic 2 - customChance=100, Cooldown=10000
 (72674,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100, 10000, 0),
 -- Deathbringer's Will Heroic 3 - customChance=100, Cooldown=10000
-(72675,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100, 10000, 0)
-;
+(72675,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0, 100, 10000, 0);
 
 -- Additional spell_proc entries from TrinityCore (missing in AzerothCore)
 -- These entries provide refined proc configuration from TC's spell_proc table
