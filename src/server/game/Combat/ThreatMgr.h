@@ -156,7 +156,7 @@ public:
 
     HostileReference* SelectNextVictim(Creature* attacker, HostileReference* currentVictim) const;
 
-    HostileReference* SelectNextVictimTieBreaker(Creature* attacker, ThreatContainer::StorageType::const_iterator currentIter) const;
+    HostileReference* SelectNextVictimTieBreaker(Creature* attacker, ThreatContainer::StorageType::const_iterator currentIter, bool noPriorityTargetFound) const;
 
     bool IsPreferredTarget(Creature* attacker, Unit* target) const;
 
