@@ -55,7 +55,7 @@ enum Misc
     PHASE_FAST_DANCE                = 1
 };
 
-const float heiganFastDanceFaceDirection = 2.40f;
+float const heiganFastDanceFaceDirection = 2.40f;
 
 struct boss_heigan : public BossAI
 {
