@@ -109,6 +109,7 @@ static ObjectData const creatureData[]
     { NPC_THADDIUS,        DATA_THADDIUS_BOSS        },
     { NPC_RAZUVIOUS,       DATA_RAZUVIOUS_BOSS       },
     { NPC_GOTHIK,          DATA_GOTHIK_BOSS          },
+    { NPC_HEIGAN,          DATA_HEIGAN_BOSS          },
     { NPC_BARON_RIVENDARE, DATA_BARON_RIVENDARE_BOSS },
     { NPC_SIR_ZELIEK,      DATA_SIR_ZELIEK_BOSS      },
     { NPC_LADY_BLAUMEUX,   DATA_LADY_BLAUMEUX_BOSS   },
