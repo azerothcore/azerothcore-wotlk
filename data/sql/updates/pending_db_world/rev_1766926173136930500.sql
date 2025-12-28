@@ -1,7 +1,7 @@
 -- Adds AIName SAI to the following:
--- Huntress Ravenoak and Leafrunner 
+-- Huntress Ravenoak and Leafrunner
 -- Hunter Sagewind, Ragetotem and Thunderhorn
--- Dark Ranger Clea, Anya, Cyndia 
+-- Dark Ranger Clea, Anya, Cyndia
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (14379, 14380, 14440, 14441, 14442, 36224, 36225, 36226, 14378);
 
 -- Bluff Watcher, Darnassus Sentinel, Ancient of War and Exodar Peacekeeper were fixed with the removal of: https://github.com/azerothcore/azerothcore-wotlk/blob/f4bbbf34dd0e0227fc2a800396b182c33a3a1c27/src/server/game/AI/CoreAI/GuardAI.cpp#L36 in this PR
