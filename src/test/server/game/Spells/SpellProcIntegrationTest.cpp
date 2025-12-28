@@ -439,31 +439,80 @@ TEST_F(SpellProcIntegrationTest, MultipleHitMasks_CritOrNormal)
 // School Mask Tests
 // =============================================================================
 
-// NOTE: School mask tests require DamageInfo with school mask to be set.
-// The ProcScenarioBuilder doesn't currently support this.
-// TODO: Enhance ProcScenarioBuilder to support DamageInfo with school mask.
-
-/*
-TEST_F(SpellProcIntegrationTest, SchoolMaskFilter_FireOnly)
+TEST_F(SpellProcIntegrationTest, SchoolMaskFilter_FireOnly_FireDamage)
 {
-    auto* fireSpell = CreateSpellInfo(133, 3, 0);
-    // Note: School mask would be on the actual trigger spell
-    // This test verifies the integration works
-
+    // Proc entry requires fire school damage
     auto procEntry = SpellProcEntryBuilder()
         .WithProcFlags(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
         .WithSchoolMask(SPELL_SCHOOL_MASK_FIRE)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
         .Build();
 
-    // Fire damage should trigger
-    auto fireScenario = ProcScenarioBuilder()
-        .OnSpellDamage()
-        .WithNormalHit();
-    // Note: Full school mask check requires DamageInfo with school
-    // This basic test verifies the scenario builder works
-    EXPECT_PROC_TRIGGERS(procEntry, fireScenario);
+    // Create fire spell and fire damage info
+    auto* fireSpell = CreateSpellInfo(133, 3, 0); // Fireball
+    DamageInfo fireDamageInfo(nullptr, nullptr, 100, fireSpell, SPELL_SCHOOL_MASK_FIRE, SPELL_DIRECT_DAMAGE);
+
+    auto eventInfo = ProcEventInfoBuilder()
+        .WithTypeMask(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithHitMask(PROC_HIT_NORMAL)
+        .WithSpellTypeMask(PROC_SPELL_TYPE_DAMAGE)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
+        .WithDamageInfo(&fireDamageInfo)
+        .Build();
+
+    // Fire damage should trigger fire-only proc
+    EXPECT_TRUE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
 }
-*/
+
+TEST_F(SpellProcIntegrationTest, SchoolMaskFilter_FireOnly_FrostDamage)
+{
+    // Proc entry requires fire school damage
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSchoolMask(SPELL_SCHOOL_MASK_FIRE)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
+        .Build();
+
+    // Create frost spell and frost damage info
+    auto* frostSpell = CreateSpellInfo(116, 3, 0); // Frostbolt
+    DamageInfo frostDamageInfo(nullptr, nullptr, 100, frostSpell, SPELL_SCHOOL_MASK_FROST, SPELL_DIRECT_DAMAGE);
+
+    auto eventInfo = ProcEventInfoBuilder()
+        .WithTypeMask(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithHitMask(PROC_HIT_NORMAL)
+        .WithSpellTypeMask(PROC_SPELL_TYPE_DAMAGE)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
+        .WithDamageInfo(&frostDamageInfo)
+        .Build();
+
+    // Frost damage should NOT trigger fire-only proc
+    EXPECT_FALSE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
+}
+
+TEST_F(SpellProcIntegrationTest, SchoolMaskFilter_NoSchoolMask_AnySchoolTriggers)
+{
+    // Proc entry with no school mask filter (accepts all schools)
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSchoolMask(0) // No filter
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
+        .Build();
+
+    // Test with shadow damage
+    auto* shadowSpell = CreateSpellInfo(686, 5, 0); // Shadow Bolt
+    DamageInfo shadowDamageInfo(nullptr, nullptr, 100, shadowSpell, SPELL_SCHOOL_MASK_SHADOW, SPELL_DIRECT_DAMAGE);
+
+    auto eventInfo = ProcEventInfoBuilder()
+        .WithTypeMask(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithHitMask(PROC_HIT_NORMAL)
+        .WithSpellTypeMask(PROC_SPELL_TYPE_DAMAGE)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
+        .WithDamageInfo(&shadowDamageInfo)
+        .Build();
+
+    // Any school should trigger when no school mask filter is set
+    EXPECT_TRUE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
+}
 
 // =============================================================================
 // Edge Case Tests

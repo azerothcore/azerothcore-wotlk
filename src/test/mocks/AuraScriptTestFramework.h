@@ -244,25 +244,25 @@ private:
 
 /**
  * @brief Helper class for testing specific proc scenarios
+ *
+ * Uses shared_ptr for resource management to allow safe copying
+ * in fluent builder pattern usage.
  */
 class ProcScenarioBuilder
 {
 public:
     ProcScenarioBuilder()
     {
-        // Create a default SpellInfo for spell-type procs
-        _defaultSpellInfo = SpellInfoBuilder()
-            .WithId(99999)
-            .WithSpellFamilyName(0)
-            .Build();
+        // Create a default SpellInfo for spell-type procs using shared_ptr
+        _defaultSpellInfo = std::shared_ptr<SpellInfo>(
+            SpellInfoBuilder()
+                .WithId(99999)
+                .WithSpellFamilyName(0)
+                .Build()
+        );
     }
 
-    ~ProcScenarioBuilder()
-    {
-        delete _defaultSpellInfo;
-        delete _damageInfo;
-        delete _healInfo;
-    }
+    ~ProcScenarioBuilder() = default;
 
     // Configure the triggering action
     ProcScenarioBuilder& OnMeleeAutoAttack()
@@ -434,15 +434,15 @@ public:
             {
                 // Create new DamageInfo if needed
                 if (!_damageInfo)
-                    _damageInfo = new DamageInfo(nullptr, nullptr, 100, _defaultSpellInfo, SPELL_SCHOOL_MASK_FIRE, SPELL_DIRECT_DAMAGE);
-                builder.WithDamageInfo(_damageInfo);
+                    _damageInfo = std::make_shared<DamageInfo>(nullptr, nullptr, 100, _defaultSpellInfo.get(), SPELL_SCHOOL_MASK_FIRE, SPELL_DIRECT_DAMAGE);
+                builder.WithDamageInfo(_damageInfo.get());
             }
             else if (_usesHealInfo)
             {
                 // Create new HealInfo if needed
                 if (!_healInfo)
-                    _healInfo = new HealInfo(nullptr, nullptr, 100, _defaultSpellInfo, SPELL_SCHOOL_MASK_HOLY);
-                builder.WithHealInfo(_healInfo);
+                    _healInfo = std::make_shared<HealInfo>(nullptr, nullptr, 100, _defaultSpellInfo.get(), SPELL_SCHOOL_MASK_HOLY);
+                builder.WithHealInfo(_healInfo.get());
             }
         }
 
@@ -463,9 +463,9 @@ private:
     bool _needsSpellInfo = false;
     bool _usesDamageInfo = false;
     bool _usesHealInfo = false;
-    SpellInfo* _defaultSpellInfo = nullptr;
-    DamageInfo* _damageInfo = nullptr;
-    HealInfo* _healInfo = nullptr;
+    std::shared_ptr<SpellInfo> _defaultSpellInfo;
+    std::shared_ptr<DamageInfo> _damageInfo;
+    std::shared_ptr<HealInfo> _healInfo;
 };
 
 // Convenience macros for proc testing
