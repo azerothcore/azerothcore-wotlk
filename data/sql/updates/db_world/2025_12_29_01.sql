@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_00 -> 2025_12_29_01
 -- Fix A Sister's Pledge (12411) spawning multiple Sasha when turned in by multiple players
 -- Add condition to prevent Sasha spawn if she already exists nearby
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 27646 AND `SourceId` = 0;
