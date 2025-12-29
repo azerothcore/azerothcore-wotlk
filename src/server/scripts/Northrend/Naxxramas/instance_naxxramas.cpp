@@ -55,7 +55,10 @@ BossBoundaryData const boundaries =
 
     /* Frostwyrm Lair */
     { BOSS_SAPPHIRON, new CircleBoundary(Position(3517.627f, -5255.5f), 110.0) },
-    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0) }
+    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0) },
+
+    /* Heigan */
+    { DATA_HEIGAN_BOSS, new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f) }
 };
 
 struct LivingPoisonData
@@ -168,12 +171,6 @@ static ObjectData const gameObjectData[]
     { GO_KELTHUZAD_PORTAL_3, DATA_KELTHUZAD_PORTAL_3 },
     { GO_KELTHUZAD_PORTAL_4, DATA_KELTHUZAD_PORTAL_4 },
     { 0,                     0                       }
-};
-
-BossBoundaryData const boundaries =
-{
-    { DATA_HEIGAN_BOSS,      new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f)     },
-    { 0,                     0                                                               }
 };
 
 class instance_naxxramas : public InstanceScript
