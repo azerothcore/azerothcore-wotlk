@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_11 -> 2025_12_29_12
 --
 DROP TABLE IF EXISTS `trainer`;
 CREATE TABLE `trainer` (
