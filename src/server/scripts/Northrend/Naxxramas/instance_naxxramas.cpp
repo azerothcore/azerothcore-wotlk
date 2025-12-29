@@ -109,6 +109,7 @@ static ObjectData const creatureData[]
     { NPC_THADDIUS,        DATA_THADDIUS_BOSS        },
     { NPC_RAZUVIOUS,       DATA_RAZUVIOUS_BOSS       },
     { NPC_GOTHIK,          DATA_GOTHIK_BOSS          },
+    { NPC_HEIGAN,          DATA_HEIGAN_BOSS          },
     { NPC_BARON_RIVENDARE, DATA_BARON_RIVENDARE_BOSS },
     { NPC_SIR_ZELIEK,      DATA_SIR_ZELIEK_BOSS      },
     { NPC_LADY_BLAUMEUX,   DATA_LADY_BLAUMEUX_BOSS   },
@@ -136,6 +137,12 @@ static ObjectData const gameObjectData[]
     { 0,                     0                       }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_HEIGAN_BOSS,      new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f)     },
+    { 0,                     0                                                               }
+};
+
 class instance_naxxramas : public InstanceScript
 {
 public:
@@ -146,6 +153,7 @@ public:
         SetPersistentDataCount(PERSISTENT_DATA_COUNT);
         LoadDoorData(doorData);
         LoadObjectData(creatureData, gameObjectData);
+        LoadBossBoundaries(boundaries);
 
         // GameObjects
         for (auto& i : _heiganEruption)
