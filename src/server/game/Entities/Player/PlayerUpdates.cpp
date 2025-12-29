@@ -328,7 +328,7 @@ void Player::Update(uint32 p_time)
                     apply = true;
 
             if (apply)
-                ApplyItemEquipSpell(m_items[i], true, false);
+                ApplyItemEquipSpell(m_items[i], true, false);;
         }
     }
 
