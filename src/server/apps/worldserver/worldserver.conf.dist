@@ -53,6 +53,7 @@
 #    CHARTER
 #    GUILD
 #    FFAPVP
+#    OUTDOORPVP
 #    WINTERGRASP
 #    BATTLEGROUND
 #    ARENA
@@ -3511,6 +3512,18 @@ Guild.MemberLimit = 0
 #        Default:     30 sec
 
 FFAPvPTimer = 30
+
+#
+###################################################################################################
+
+###################################################################################################
+# OUTDOORPVP
+#
+#     OutdoorPvPCaptureRate
+#        Description: Specify rate multiplier for outdoor PvP capture points. (e.g. Eastern Plaguelands, Hellfire Peninsula)
+#        Default:     1.0
+
+OutdoorPvPCaptureRate = 1.0
 
 #
 ###################################################################################################
