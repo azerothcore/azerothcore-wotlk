@@ -51,7 +51,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `position_x`, `position_y`, `posit
 (58787, 16903, 530, 280.581, 3430.04, 66.0011, 5.03439, 300, 258);
 
 -- Make stationary oozes wander
-UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `guid` IN (58466,58468,58471,58786,58500,58501,58502,58503,58504,58505,58513,58514,58519,58537,58538,58539,58563,58564,58786,58787);
+UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `guid` IN (58466,58468,58471,58500,58501,58502,58503,58504,58505,58513,58514,58519,58537,58538,58539,58563,58564,58786,58787) AND `id1` IN (16901,16903);
 
 -- Make stationary Terrorfiends wander
-UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `guid` IN (59108,59109,59111,59121);
+UPDATE `creature` SET `MovementType` = 1, `wander_distance` = 5 WHERE `guid` IN (59108,59109,59111,59121) AND `id1` = 16951;
