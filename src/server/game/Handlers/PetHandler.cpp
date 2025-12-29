@@ -233,7 +233,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                         // Not let attack through obstructions
                         bool checkLos = !sDisableMgr->IsPathfindingEnabled(pet->GetMap()) ||
-                                        (TargetUnit->IsCreature() && TargetUnit->GetMap()->IsDungeon());
+                                        (TargetUnit->IsCreature() && (TargetUnit->GetMap()->IsDungeon() || TargetUnit->ToCreature()->isWorldBoss()));
 
                         if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
                         {
