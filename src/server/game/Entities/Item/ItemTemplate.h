@@ -732,7 +732,6 @@ struct ItemTemplate
     void GetOnEquipSpellIDs(std::vector<uint32>& spellEquipID) const
     {
         spellEquipID.clear();
-
         for (auto const& spell : Spells)
             if (spell.SpellId && spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP)
                 spellEquipID.push_back(spell.SpellId);
