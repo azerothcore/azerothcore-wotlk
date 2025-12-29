@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_16 -> 2025_12_29_17
 -- Cleanup
 
 -- SELECT DISTINCT `pool_entry` FROM `pool_gameobject` WHERE `guid` IN (
