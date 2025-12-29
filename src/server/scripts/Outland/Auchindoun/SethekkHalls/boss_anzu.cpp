@@ -139,7 +139,10 @@ struct boss_anzu : public BossAI
         me->CastSpell(me, SPELL_BANISH_SELF, true);
         for (uint8 i = 0; i < 5; ++i)
         {
-            me->SummonCreature(NPC_BROOD_OF_ANZU, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            Position spawnPos = me->GetNearPosition(20.0f, (float)i);
+            spawnPos.m_positionZ += 25.0f;
+            spawnPos.m_orientation = 0.0f;
+            me->SummonCreature(NPC_BROOD_OF_ANZU, spawnPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
         }
     }
 
