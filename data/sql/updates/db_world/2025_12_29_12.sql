@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS `npc_trainer`;
 
 -- Drop removed columns
 ALTER TABLE `creature_template`
-  DROP `trainer_type`,
-  DROP `trainer_spell`,
-  DROP `trainer_class`,
-  DROP `trainer_race`;
+  DROP IF EXISTS `trainer_type`,
+  DROP IF EXISTS `trainer_spell`,
+  DROP IF EXISTS `trainer_class`,
+  DROP IF EXISTS `trainer_race`;
