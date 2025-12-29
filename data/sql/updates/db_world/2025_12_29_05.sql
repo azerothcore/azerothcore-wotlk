@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_04 -> 2025_12_29_05
 -- Cleanup
 
 DELETE FROM `pool_template` WHERE `entry` IN (
