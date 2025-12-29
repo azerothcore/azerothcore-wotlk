@@ -88,9 +88,11 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             BossAI::JustEngagedWith(who);
-            me->CallForHelp(VISIBLE_RANGE);
-            summons.DoZoneInCombat();
             Talk(SAY_AGGRO);
+
+            scheduler.Schedule(1200ms, [this](TaskContext /*context*/) {
+                this->summons.DoZoneInCombat();
+            });
 
             ScheduleTimedEvent(7s, 15s, [&]{
                 if (!me->HasAura(SPELL_WIDOWS_EMBRACE))
