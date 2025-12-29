@@ -81,6 +81,7 @@ enum valhalas
     EVENT_VALHALAS_SECOND                       = 2,
     EVENT_VALHALAS_THIRD                        = 3,
     EVENT_VALHALAS_CHECK_PLAYER                 = 4,
+    EVENT_VALHALAS_THIRD_2                      = 5,
 
     // Fallen Heroes
     NPC_ELDRETH                                 = 31195,
@@ -111,12 +112,16 @@ public:
         EventMap events;
         SummonList summons;
         ObjectGuid playerGUID;
-        ObjectGuid playerGUID2;
         uint32 currentQuest;
 
         void Reset() override
         {
             ResetData();
+        }
+
+        void JustReachedHome() override
+        {
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void ResetData()
@@ -125,7 +130,7 @@ public:
             summons.DespawnAll();
             playerGUID.Clear();
             currentQuest = 0;
-            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
         }
 
         void JustSummoned(Creature* creature) override
@@ -170,63 +175,16 @@ public:
         {
             events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6s);
             events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30s);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             currentQuest = questId;
             playerGUID = guid;
         }
 
-        void CheckSummons()
+        void EndBattle()
         {
-            bool allow = true;
-            for (ObjectGuid const& guid : summons)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
-                    if (cr->IsAlive())
-                        allow = false;
-
-            if (allow)
-            {
-                uint32 quest = currentQuest;
-                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                {
-                    switch (quest)
-                    {
-                        case QUEST_BFV_FALLEN_HEROES:
-                            me->Yell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_DARK_MASTER:
-                            me->Yell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_SIGRID:
-                            me->Yell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_CARNAGE:
-                            me->Yell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_THANE:
-                            me->Yell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_FINAL:
-                            me->Yell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                    }
-                    player->GroupEventHappens(quest, player);
-                }
-                playerGUID2 = playerGUID;
-                EnterEvadeMode();
-                if (quest == QUEST_BFV_FINAL)
-                    events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7s);
-            }
-            else
-            {
-                uint32 quest = currentQuest;
-                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                {
-                    if (!player->HasQuest(quest))
-                    {
-                        ResetData();
-                        return;
-                    }
-                }
-            }
+            ResetData();
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->GetMotionMaster()->MoveTargetedHome();
         }
 
         void UpdateAI(uint32 diff) override
@@ -296,29 +254,65 @@ public:
                     }
                 case EVENT_VALHALAS_THIRD:
                     {
-                        me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                        events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7s);
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                            me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, player);
+                        events.ScheduleEvent(EVENT_VALHALAS_THIRD_2, 7s);
                         break;
                     }
-                case EVENT_VALHALAS_THIRD+2:
+                case EVENT_VALHALAS_THIRD_2:
                     {
-                        me->Yell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                            me->Yell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, player);
+                        EndBattle();
                         break;
                     }
                 case EVENT_VALHALAS_CHECK_PLAYER:
                     {
-                        bool fail = true;
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            if (me->GetDistance(player) < 100.0f)
+                        Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
+                        if (!player || me->GetDistance(player) >= 100.0f)
+                        {
+                            EndBattle();
+                            break;
+                        }
+
+                        if (summons.IsAnyCreatureAlive())
+                        {
+                            if (!player->HasQuest(currentQuest))
+                                EndBattle();
+                            else
+                                events.Repeat(5s);
+                        }
+                        else
+                        {
+                            switch (currentQuest)
                             {
-                                fail = false;
-                                CheckSummons();
+                                case QUEST_BFV_FALLEN_HEROES:
+                                    me->Yell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_DARK_MASTER:
+                                    me->Yell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_SIGRID:
+                                    me->Yell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_CARNAGE:
+                                    me->Yell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_THANE:
+                                    me->Yell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_FINAL:
+                                    me->Yell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, player);
+                                    break;
                             }
 
-                        if (fail)
-                            EnterEvadeMode();
+                            player->GroupEventHappens(currentQuest, player);
 
-                        events.Repeat(5s);
+                            if (currentQuest == QUEST_BFV_FINAL)
+                                events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7s);
+                            else
+                                EndBattle();
+                        }
                         break;
                     }
             }
