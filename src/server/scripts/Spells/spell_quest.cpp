@@ -82,7 +82,7 @@ class spell_q5561_kodo_roundup_kodo_kombobulator_despawn : public SpellScript
 };
 
 class spell_q11065_wrangle_some_aether_rays : public SpellScript
-{   
+{
     PrepareSpellScript(spell_q11065_wrangle_some_aether_rays);
 
     SpellCastResult CheckCast()
