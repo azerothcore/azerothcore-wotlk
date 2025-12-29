@@ -1657,21 +1657,68 @@ public:
                 return true;
             }
 
+            ++count;
+
             Field* fields           = result->Fetch();
             uint32 accountId        = fields[0].Get<uint32>();
             std::string accountName = fields[1].Get<std::string>();
 
-            bool banned = false;
+            bool banned = false; // BANNED > LOCKED > MUTED (order of priority).
             {
                 LoginDatabasePreparedStatement* stmtBan = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
                 stmtBan->SetData(0, accountId);
                 PreparedQueryResult banResult = LoginDatabase.Query(stmtBan);
-
                 if (banResult && banResult->GetRowCount() > 0)
                     banned = true;
             }
 
-            handler->PSendSysMessage("{} (Id: {}){}", accountName, accountId, banned ? " - [BANNED]" : "");
+            bool locked = false;
+            if (!banned) // If not banned, check lock status
+            {
+                LoginDatabasePreparedStatement* stmtLock = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LOCK);
+                stmtLock->SetData(0, accountId);
+                PreparedQueryResult lockResult = LoginDatabase.Query(stmtLock);
+                if (lockResult)
+                {
+                    Field* lockFields = lockResult->Fetch();
+                    locked = lockFields[0].Get<uint8>() != 0;
+                }
+            }
+            bool muted = false;
+            std::string muteReason, muteBy;
+            int64 mutetime = 0;
+            if (!banned && !locked) // If not banned or locked, check mute status
+            {
+                LoginDatabasePreparedStatement* stmtMute = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
+                stmtMute->SetData(0, accountId);
+                PreparedQueryResult muteResult = LoginDatabase.Query(stmtMute);
+                if (muteResult)
+                {
+                    do
+                    {
+                        Field* muteFields = muteResult->Fetch();
+                        int64 thisMuteTime = muteFields[1].Get<int64>();
+                        if (thisMuteTime > int64(time(nullptr)))
+                        {
+                            mutetime = thisMuteTime;
+                            muteReason = muteFields[2].Get<std::string>();
+                            muteBy = muteFields[3].Get<std::string>();
+                            muted = true;
+                            break; // Only needed for muted
+                        }
+                    } while (muteResult->NextRow());
+                }
+            }
+
+            std::string status;
+            if (banned)
+                status = " - [BANNED]";
+            else if (locked)
+                status = " - [LOCKED]";
+            else if (muted)
+                status = " - [MUTED]";
+
+            handler->PSendSysMessage("{} (Id: {}){}", accountName, accountId, status);
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->SetData(0, accountId);
@@ -1714,11 +1761,8 @@ public:
             handler->SendSysMessage("");
         } while (result->NextRow());
 
-
-
-        // handler->PSendSysMessage("Found a total of: {} accounts", count);
-        // handler->PSendSysMessage("Found a total of: {} characters", counter);
-
+        handler->PSendSysMessage("Found a total of: {} accounts", count);
+        handler->PSendSysMessage("Found a total of: {} characters", counter);
 
         return true;
     }
