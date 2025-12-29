@@ -1,4 +1,5 @@
 -- DB update 2025_12_29_12 -> 2025_12_29_13
+-- Update to rehash for reapply
 DELETE FROM `command` WHERE `name` IN ('reload trainer', 'reload npc_trainer');
 INSERT INTO `command` (`name`,`security`,`help`) VALUES ('reload trainer',3,'Syntax: .reload trainer\nReloads trainer,trainer_locale,trainer_spell and creature_default_trainer tables.');
 
