@@ -1645,8 +1645,8 @@ public:
     static bool LookupPlayerSearchCommand(PreparedQueryResult result, int32 limit, ChatHandler* handler)
     {
 
-        int32 counter = 0;
-        uint32 count = 0;
+        int32 counter = 0; // for characters
+        uint32 count = 0; // for accounts
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         do
