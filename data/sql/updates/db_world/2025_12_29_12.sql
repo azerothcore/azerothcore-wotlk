@@ -1,5 +1,6 @@
 -- DB update 2025_12_29_11 -> 2025_12_29_12
 --
+-- Update to rehash for reapply
 DROP TABLE IF EXISTS `trainer`;
 CREATE TABLE `trainer` (
     `Id` INT UNSIGNED DEFAULT 0 NOT NULL,
@@ -30,13 +31,15 @@ CREATE TABLE `trainer_spell` (
     `ReqAbility2` int unsigned DEFAULT 0 NOT NULL,
     `ReqAbility3` int unsigned DEFAULT 0 NOT NULL,
     `ReqLevel` tinyint unsigned DEFAULT 0 NOT NULL,
-    `VerifiedBuild` int DEFAULT 0 NULL
+    `VerifiedBuild` int DEFAULT 0 NULL,
+    ADD PRIMARY KEY (`TrainerId`, `SpellId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `creature_default_trainer`;
 CREATE TABLE `creature_default_trainer` (
     `CreatureId` int unsigned NOT NULL,
-    `TrainerId` int unsigned DEFAULT 0 NOT NULL
+    `TrainerId` int unsigned DEFAULT 0 NOT NULL,
+    ADD PRIMARY KEY (`CreatureId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Drop unused table
