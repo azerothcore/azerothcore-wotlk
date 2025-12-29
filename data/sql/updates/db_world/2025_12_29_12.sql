@@ -32,14 +32,14 @@ CREATE TABLE `trainer_spell` (
     `ReqAbility3` int unsigned DEFAULT 0 NOT NULL,
     `ReqLevel` tinyint unsigned DEFAULT 0 NOT NULL,
     `VerifiedBuild` int DEFAULT 0 NULL,
-    ADD PRIMARY KEY (`TrainerId`, `SpellId`)
+    PRIMARY KEY (`TrainerId`, `SpellId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 DROP TABLE IF EXISTS `creature_default_trainer`;
 CREATE TABLE `creature_default_trainer` (
     `CreatureId` int unsigned NOT NULL,
     `TrainerId` int unsigned DEFAULT 0 NOT NULL,
-    ADD PRIMARY KEY (`CreatureId`)
+    PRIMARY KEY (`CreatureId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Drop unused table
