@@ -50,6 +50,7 @@ ObjectData const summonData[] =
     { NPC_ANUB_AR_CHAMPION,      DATA_HADRONOX  },
     { NPC_ANUB_AR_NECROMANCER,   DATA_HADRONOX  },
     { NPC_ANUB_AR_CRYPTFIEND,    DATA_HADRONOX  },
+    { NPC_WORLD_TRIGGER_LAOI,    DATA_HADRONOX  },
     { 0, 0 }
 };
 
