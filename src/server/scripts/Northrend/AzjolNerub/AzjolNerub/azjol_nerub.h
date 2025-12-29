@@ -29,7 +29,11 @@ enum ANData
     DATA_KRIKTHIR                       = 0,
     DATA_HADRONOX                       = 1,
     DATA_ANUBARAK                       = 2,
-    MAX_ENCOUNTERS                      = 3
+    MAX_ENCOUNTERS                      = 3,
+
+    DATA_GASHRA                         = 4,
+    DATA_NARJIL                         = 5,
+    DATA_SILTHIK                        = 6
 };
 
 enum ANIds
@@ -43,6 +47,7 @@ enum ANIds
     NPC_HADRONOX                        = 28921,
     NPC_ANUBARAK                        = 29120,
 
+    NPC_WORLD_TRIGGER_LAOI              = 23472,
     NPC_ANUB_AR_CHAMPION                = 29062,
     NPC_ANUB_AR_NECROMANCER             = 29063,
     NPC_ANUB_AR_CRYPTFIEND              = 29064,

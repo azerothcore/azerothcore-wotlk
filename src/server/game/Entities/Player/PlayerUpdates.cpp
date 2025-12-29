@@ -701,7 +701,7 @@ void Player::UpdateRating(CombatRating cr)
 
 void Player::UpdateAllRatings()
 {
-    for (int cr = 0; cr < MAX_COMBAT_RATING; ++cr)
+    for (uint8 cr = 0; cr < MAX_COMBAT_RATING; ++cr)
         UpdateRating(CombatRating(cr));
 }
 
@@ -1439,6 +1439,9 @@ void Player::UpdatePvPState()
 
     if (pvpInfo.IsHostile) // in hostile area
     {
+        if (IsInFlight()) // on taxi
+            return;
+
         if (!IsPvP() || pvpInfo.EndTimer != 0)
             UpdatePvP(true, true);
     }

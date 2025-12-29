@@ -247,28 +247,6 @@ class spell_q10525_vision_guide : public AuraScript
     }
 };
 
-class spell_q11322_q11317_the_cleansing : public AuraScript
-{
-    PrepareAuraScript(spell_q11322_q11317_the_cleansing)
-
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* ar = GetCaster();
-        if (ar && ar->ToPlayer())
-        {
-            if (ar->ToPlayer()->GetQuestStatus(11317) == QUEST_STATUS_INCOMPLETE || ar->ToPlayer()->GetQuestStatus(11322) == QUEST_STATUS_INCOMPLETE)
-                ar->SummonCreature(27959, 3032.0f, -5095.0f, 723.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-
-            ar->SetStandState(UNIT_STAND_STATE_SIT);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_q11322_q11317_the_cleansing::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class spell_q10714_on_spirits_wings : public SpellScript
 {
     PrepareSpellScript(spell_q10714_on_spirits_wings);
@@ -2499,7 +2477,6 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q12014_steady_as_a_rock);
     RegisterSpellAndAuraScriptPair(spell_q11026_a11051_banish_the_demons, spell_q11026_a11051_banish_the_demons_aura);
     RegisterSpellScript(spell_q10525_vision_guide);
-    RegisterSpellScript(spell_q11322_q11317_the_cleansing);
     RegisterSpellScript(spell_q10714_on_spirits_wings);
     RegisterSpellScript(spell_q10720_the_smallest_creature);
     RegisterSpellScript(spell_q13086_last_line_of_defence);

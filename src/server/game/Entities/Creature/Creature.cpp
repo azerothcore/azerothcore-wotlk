@@ -38,6 +38,7 @@
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
+#include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellMgr.h"
 #include "TemporarySummon.h"
@@ -78,15 +79,6 @@ std::string CreatureMovementData::ToString() const
     str << ", InteractionPauseTimer: " << InteractionPauseTimer;
 
     return str.str();
-}
-
-TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
-{
-    TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
-    if (itr != spellList.end())
-        return &itr->second;
-
-    return nullptr;
 }
 
 bool VendorItemData::RemoveItem(uint32 item_id)
@@ -601,13 +593,13 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetMeleeDamageSchool(SpellSchools(cInfo->dmgschool));
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(GetLevel(), cInfo->unit_class);
     float armor = stats->GenerateArmor(cInfo);
-    SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
-    SetModifierValue(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_NATURE]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FROST]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_SHADOW]));
-    SetModifierValue(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_ARCANE]));
+    SetStatFlatModifier(UNIT_MOD_ARMOR,             BASE_VALUE, armor);
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_HOLY]));
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE,   BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FIRE]));
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_NATURE]));
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_FROST,  BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_FROST]));
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_SHADOW]));
+    SetStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(cInfo->resistance[SPELL_SCHOOL_ARCANE]));
 
     SetCanModifyStats(true);
     UpdateAllStats();
@@ -1017,10 +1009,7 @@ void Creature::Regenerate(Powers power)
     }
 
     // Apply modifiers (if any).
-    AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-    for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        if (Powers((*i)->GetMiscValue()) == power)
-            AddPct(addvalue, (*i)->GetAmount());
+    addvalue *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, power);
 
     addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * (power == POWER_FOCUS ? PET_FOCUS_REGEN_INTERVAL.count() : CREATURE_REGEN_INTERVAL) / (5 * IN_MILLISECONDS);
 
@@ -1056,9 +1045,7 @@ void Creature::RegenerateHealth()
     }
 
     // Apply modifiers (if any).
-    AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
-    for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        AddPct(addvalue, (*i)->GetAmount());
+    addvalue *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
 
     addvalue += GetTotalAuraModifier(SPELL_AURA_MOD_REGEN) * CREATURE_REGEN_INTERVAL  / (5 * IN_MILLISECONDS);
 
@@ -1268,52 +1255,13 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
     return true;
 }
 
-bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
+bool Creature::CanResetTalents(Player* player) const
 {
-    return player->GetLevel() >= 10
-        && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
-        && player->IsClass((Classes)GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER);
-}
-
-bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= nullptr*/) const
-{
-    if (!IsTrainer())
-    {
+    Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(GetEntry());
+    if (!trainer)
         return false;
-    }
 
-    switch (m_creatureInfo->trainer_type)
-    {
-        case TRAINER_TYPE_CLASS:
-        case TRAINER_TYPE_PETS:
-            if (m_creatureInfo->trainer_class && !player->IsClass((Classes)m_creatureInfo->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
-            {
-                if (npcFlags)
-                    *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_CLASS;
-
-                return false;
-            }
-            break;
-        case TRAINER_TYPE_MOUNTS:
-            if (m_creatureInfo->trainer_race && m_creatureInfo->trainer_race != player->getRace())
-            {
-                return false;
-            }
-            break;
-        case TRAINER_TYPE_TRADESKILLS:
-            if (m_creatureInfo->trainer_spell && !player->HasSpell(m_creatureInfo->trainer_spell))
-            {
-                if (npcFlags)
-                    *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_PROFESSION;
-
-                return false;
-            }
-            break;
-        default:
-            break;
-    }
-
-    return true;
+    return player->GetLevel() >= 10 && trainer->IsTrainerValidForPlayer(player);
 }
 
 Player* Creature::GetLootRecipient() const
@@ -1558,8 +1506,8 @@ void Creature::SelectLevel(bool changelevel)
 
     /// @todo: set UNIT_FIELD_POWER*, for some creature class case (energy, etc)
 
-    SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
-    SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, (float)mana);
+    SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, (float)health);
+    SetStatFlatModifier(UNIT_MOD_MANA, BASE_VALUE, (float)mana);
 
     // damage
 
@@ -1577,8 +1525,8 @@ void Creature::SelectLevel(bool changelevel)
     SetBaseWeaponDamage(RANGED_ATTACK, MINDAMAGE, weaponBaseMinDamage);
     SetBaseWeaponDamage(RANGED_ATTACK, MAXDAMAGE, weaponBaseMaxDamage);
 
-    SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
-    SetModifierValue(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
+    SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, stats->AttackPower);
+    SetStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, BASE_VALUE, stats->RangedAttackPower);
 
     sScriptMgr->OnCreatureSelectLevel(cInfo, this);
 }
@@ -3145,11 +3093,6 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
     vCount->count = vCount->count > used_count ? vCount->count - used_count : 0;
     vCount->lastIncrementTime = ptime;
     return vCount->count;
-}
-
-TrainerSpellData const* Creature::GetTrainerSpells() const
-{
-    return sObjectMgr->GetNpcTrainerSpells(GetEntry());
 }
 
 // overwrite WorldObject function for proper name localization

@@ -50,13 +50,14 @@ enum NaxxramasData
     DATA_THADDIUS_BOSS              = 103,
     DATA_RAZUVIOUS_BOSS             = 104,
     DATA_GOTHIK_BOSS                = 105,
-    DATA_BARON_RIVENDARE_BOSS       = 106,
-    DATA_SIR_ZELIEK_BOSS            = 107,
-    DATA_LADY_BLAUMEUX_BOSS         = 108,
-    DATA_THANE_KORTHAZZ_BOSS        = 109,
-    DATA_SAPPHIRON_BOSS             = 110,
-    DATA_KELTHUZAD_BOSS             = 111,
-    DATA_LICH_KING_BOSS             = 112,
+    DATA_HEIGAN_BOSS                = 106,
+    DATA_BARON_RIVENDARE_BOSS       = 107,
+    DATA_SIR_ZELIEK_BOSS            = 108,
+    DATA_LADY_BLAUMEUX_BOSS         = 109,
+    DATA_THANE_KORTHAZZ_BOSS        = 110,
+    DATA_SAPPHIRON_BOSS             = 111,
+    DATA_KELTHUZAD_BOSS             = 112,
+    DATA_LICH_KING_BOSS             = 113,
 
     DATA_LOATHEB_PORTAL             = 200,
     DATA_MAEXXNA_PORTAL             = 201,
@@ -75,17 +76,15 @@ enum NaxxramasData
     DATA_DANCE_FAIL                 = 301,
     DATA_SPORE_KILLED               = 302,
     DATA_FRENZY_REMOVED             = 303,
-    DATA_THADDIUS_INTRO             = 304,
-    DATA_CHARGES_CROSSED            = 305,
-    DATA_HUNDRED_CLUB               = 306,
-    DATA_ABOMINATION_KILLED         = 307,
+    DATA_CHARGES_CROSSED            = 304,
+    DATA_HUNDRED_CLUB               = 305,
+    DATA_ABOMINATION_KILLED         = 306,
 };
 
 enum NaxxramasPersistentData
 {
-    PERSISTENT_DATA_THADDIUS_INTRO   = 0,
-    PERSISTENT_DATA_KELTHUZAD_DIALOG = 1,
-    PERSISTENT_DATA_IMMORTAL_FAIL    = 2,
+    PERSISTENT_DATA_KELTHUZAD_DIALOG = 0,
+    PERSISTENT_DATA_IMMORTAL_FAIL    = 1,
     PERSISTENT_DATA_COUNT
 };
 
@@ -168,6 +167,9 @@ enum NaxxramasCreatureId
 
     // Gothik
     NPC_GOTHIK                      = 16060,
+
+    // Heigan the Unclean
+    NPC_HEIGAN                      = 15936,
 
     // Four horseman
     NPC_BARON_RIVENDARE             = 30549,

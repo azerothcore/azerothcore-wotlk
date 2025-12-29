@@ -26,6 +26,10 @@ enum OutdoorPvPGHenum
     GH_HORDE_DEFENSE_EVENT              = 66,
 
     GH_ZONE                             = 394,
+
+    GH_QUEST_KEEP_EM_ON_THEIR_HEELS     = 12284,
+    GH_QUEST_KICK_EM_WHILE_THEYRE_DOWN  = 12289,
+    GH_CREATURE_QUEST_BUNNY             = 27453,
 };
 
 class Unit;
@@ -38,6 +42,7 @@ public:
     OutdoorPvPGH();
     bool SetupOutdoorPvP() override;
     void SendRemoveWorldStates(Player* player) override;
+    void HandleKill(Player* killer, Unit* killed) override;
 };
 
 class OPvPCapturePointGH : public OPvPCapturePoint

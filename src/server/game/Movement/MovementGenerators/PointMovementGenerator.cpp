@@ -94,6 +94,9 @@ void PointMovementGenerator<T>::DoInitialize(T* unit)
         init.SetFacing(i_orientation);
     }
 
+    if (_animTier)
+        init.SetAnimation(*_animTier);
+
     init.Launch();
 }
 
@@ -151,6 +154,9 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 /*diff*/)
             init.SetWalk(true);
         else if (_forcedMovement == FORCED_MOVEMENT_RUN)
             init.SetWalk(false);
+
+        if (_animTier)
+            init.SetAnimation(*_animTier);
 
         if (i_orientation > 0.0f)
         {
@@ -210,9 +216,14 @@ template <> void PointMovementGenerator<Creature>::MovementInform(Creature* unit
     if (Unit* summoner = unit->GetCharmerOrOwner())
     {
         if (UnitAI* AI = summoner->GetAI())
-        {
             AI->SummonMovementInform(unit, POINT_MOTION_TYPE, id);
-        }
+    }
+    else
+    {
+        if (TempSummon* tempSummon = unit->ToTempSummon())
+            if (Unit* summoner = tempSummon->GetSummonerUnit())
+                if (UnitAI* AI = summoner->GetAI())
+                    AI->SummonMovementInform(unit, POINT_MOTION_TYPE, id);
     }
 }
 

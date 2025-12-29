@@ -583,8 +583,8 @@ void BattlegroundEY::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_HORDE_CONTROL, _capturePointInfo[POINT_DRAENEI_RUINS].IsUnderControl(TEAM_HORDE));
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_ALLIANCE_CONTROL, _capturePointInfo[POINT_DRAENEI_RUINS].IsUnderControl(TEAM_ALLIANCE));
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_UNCONTROL, _capturePointInfo[POINT_DRAENEI_RUINS].IsUncontrolled());
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_ALLIANCE_CONTROL, _capturePointInfo[POINT_MAGE_TOWER].IsUnderControl(TEAM_HORDE));
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_HORDE_CONTROL, _capturePointInfo[POINT_MAGE_TOWER].IsUnderControl(TEAM_ALLIANCE));
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_ALLIANCE_CONTROL, _capturePointInfo[POINT_MAGE_TOWER].IsUnderControl(TEAM_ALLIANCE));
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_HORDE_CONTROL, _capturePointInfo[POINT_MAGE_TOWER].IsUnderControl(TEAM_HORDE));
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_UNCONTROL, _capturePointInfo[POINT_MAGE_TOWER].IsUncontrolled());
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_HORDE_CONTROL, _capturePointInfo[POINT_FEL_REAVER].IsUnderControl(TEAM_HORDE));
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_ALLIANCE_CONTROL, _capturePointInfo[POINT_FEL_REAVER].IsUnderControl(TEAM_ALLIANCE));
