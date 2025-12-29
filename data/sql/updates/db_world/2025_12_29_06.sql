@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_05 -> 2025_12_29_06
 UPDATE `creature_template_addon` SET `auras` = '' WHERE `entry` = 30616;
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId` = 30616;
