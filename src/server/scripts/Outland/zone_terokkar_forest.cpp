@@ -583,7 +583,6 @@ enum AncientSkullPile
 
     GOSSIP_MENU_ANCIENT_SKULL_PILE        = 8687,
     GOSSIP_MENU_TEXT_ANCIENT_SKULL_PILE   = 11058
-
 };
 
 class go_ancient_skull_pile : public GameObjectScript
