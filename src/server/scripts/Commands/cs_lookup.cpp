@@ -1661,7 +1661,17 @@ public:
             uint32 accountId        = fields[0].Get<uint32>();
             std::string accountName = fields[1].Get<std::string>();
 
-            handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
+            bool banned = false;
+            {
+                LoginDatabasePreparedStatement* stmtBan = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
+                stmtBan->SetData(0, accountId);
+                PreparedQueryResult banResult = LoginDatabase.Query(stmtBan);
+
+                if (banResult && banResult->GetRowCount() > 0)
+                    banned = true;
+            }
+
+            handler->PSendSysMessage("{} (Id: {}){}", accountName, accountId, banned ? " - [BANNED]" : "");
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->SetData(0, accountId);
