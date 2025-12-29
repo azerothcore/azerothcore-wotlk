@@ -231,11 +231,14 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 if (!creaturePet->CanCreatureAttack(TargetUnit))
                                     return;
 
-                        // Not let attack through obstructions
-                        bool checkLos = !sDisableMgr->IsPathfindingEnabled(pet->GetMap()) ||
-                                        (TargetUnit->IsCreature() && (TargetUnit->GetMap()->IsDungeon() || TargetUnit->ToCreature()->isWorldBoss()));
+                        // Don't bother if pet is already attacking target
+                        if (pet->GetVictim() == TargetUnit && pet->GetCharmInfo()->IsCommandAttack())
+                            return;
 
-                        if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
+                        // Don't allow attacking targets out of LoS
+                        // If pathfinding is enabled, use owner's LoS, else use pet's LoS, otherwise they may phase through walls
+                        Unit* seer = sDisableMgr->IsPathfindingEnabled(pet->GetMap()) ? pet->GetOwner() : pet;
+                        if (seer && !seer->IsWithinLOSInMap(TargetUnit))
                         {
                             WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
                             data << uint8(0);
