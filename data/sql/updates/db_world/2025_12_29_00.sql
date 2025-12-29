@@ -1,3 +1,4 @@
+-- DB update 2025_12_28_00 -> 2025_12_29_00
 --
 DELETE FROM `command` WHERE `name` LIKE 'pooltools%';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
