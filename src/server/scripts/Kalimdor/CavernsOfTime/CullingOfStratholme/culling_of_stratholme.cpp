@@ -1297,7 +1297,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
     if (data >= COS_PROGRESS_KILLED_EPOCH)
         if (pInstance)
             if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_SHKAF_GATE)))
-                pGate->SetGoState(GO_STATE_READY);
+                pGate->SetGoState(GO_STATE_ACTIVE);
 
     pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 1);
 }
