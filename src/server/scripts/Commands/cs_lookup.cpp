@@ -1598,6 +1598,12 @@ public:
         stmt->SetData(0, *ip);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_IP_NOT_FOUND, *ip);
+            return false;
+        }
+
         return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
@@ -1612,6 +1618,12 @@ public:
         stmt->SetData(0, account);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, account);
+            return false;
+        }
+
         return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
@@ -1621,16 +1633,17 @@ public:
         stmt->SetData(0, email);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_EMAIL_NOT_FOUND, email);
+            return false;
+        }
+
         return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
     static bool LookupPlayerSearchCommand(PreparedQueryResult result, int32 limit, ChatHandler* handler)
     {
-        if (!result)
-        {
-            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
-            return false;
-        }
 
         int32 counter = 0;
         uint32 count = 0;
