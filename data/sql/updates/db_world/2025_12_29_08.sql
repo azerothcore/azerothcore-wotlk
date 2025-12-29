@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_07 -> 2025_12_29_08
 -- Fix Jagged Shard quest chain (Issue #23949)
 -- 1. Jagged Shard should drop while Spill Their Blood is active OR completed
 -- Remove PrevQuestID from Jagged Shards quest so loot conditions control the drop
