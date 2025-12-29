@@ -680,6 +680,7 @@ Appender.Server=2,5,0,Server.log,w
 # Appender.GM=2,5,15,gm_%s.log
 Appender.Errors=2,2,0,Errors.log,w
 # Appender.DB=3,5,0
+# Appender.Dev=2,5,0,Dev.log,a
 
 #  Logger config values: Given a logger "name"
 #    Logger.name
@@ -804,7 +805,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.spells.effect=4,Console Server
 #Logger.spells.scripts=4,Console Server
 #Logger.spells=4,Console Server
-#Logger.sql.dev=4,Console Server
+#Logger.sql.dev=4,Console Server Dev
 #Logger.sql.driver=4,Console Server
 #Logger.vehicles=4,Console Server
 #Logger.warden=4,Console Server
