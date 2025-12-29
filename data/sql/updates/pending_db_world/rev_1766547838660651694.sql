@@ -1804,3 +1804,6 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-324, 'spell
 -- Nightfall (Glyph of Corruption): add missing spell_script_names entry
 DELETE FROM `spell_script_names` WHERE `spell_id` = 56218 AND `ScriptName` = 'spell_warl_nightfall';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (56218, 'spell_warl_nightfall');
+
+-- Drop obsolete spell_proc_event table (replaced by spell_proc)
+DROP TABLE IF EXISTS `spell_proc_event`;
