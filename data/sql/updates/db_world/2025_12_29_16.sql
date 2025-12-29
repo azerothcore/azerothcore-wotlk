@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_15 -> 2025_12_29_16
 --
 ALTER TABLE `trainer`
     ADD PRIMARY KEY (`Id`);
