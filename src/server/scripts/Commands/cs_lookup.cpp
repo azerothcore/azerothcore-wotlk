@@ -1661,14 +1661,14 @@ public:
             uint32 accountId        = fields[0].Get<uint32>();
             std::string accountName = fields[1].Get<std::string>();
 
+            handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
+
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->SetData(0, accountId);
             PreparedQueryResult result2 = CharacterDatabase.Query(stmt);
 
             if (result2)
             {
-                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
-
                 do
                 {
                     Field* characterFields   = result2->Fetch();
@@ -1686,7 +1686,7 @@ public:
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
                     {
-                        handler->PSendSysMessage("  {} (GUID {}) - {} - {} - {}{}", name, guid, EnumUtils::ToTitle(Races(prace)), EnumUtils::ToTitle(Classes(pclass)), plevel, (online ? " - [ONLINE]" : ""));
+                        handler->PSendSysMessage("  {} (GUID: {}) - {} - {} - {}{}", name, guid, EnumUtils::ToTitle(Races(prace)), EnumUtils::ToTitle(Classes(pclass)), plevel, (online ? " - [ONLINE]" : ""));
                     }
                     else
                     {
@@ -1696,13 +1696,19 @@ public:
                     ++counter;
                 } while (result2->NextRow() && (limit == -1 || counter < limit));
             }
+            else // If no characters, only show the account names + no characters found message
+            {
+                handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
+            }
+
+            handler->SendSysMessage("");
         } while (result->NextRow());
 
-        if (!counter) // empty accounts only
-        {
-            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
-            return false;
-        }
+
+
+        // handler->PSendSysMessage("Found a total of: {} accounts", count);
+        // handler->PSendSysMessage("Found a total of: {} characters", counter);
+
 
         return true;
     }
