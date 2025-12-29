@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_09 -> 2025_12_29_10
 --
 -- HARD_RESET
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 2147483648 WHERE (`entry` IN (28921, 31611));
