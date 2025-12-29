@@ -1,3 +1,4 @@
+-- DB update 2025_12_29_03 -> 2025_12_29_04
 -- Adds AIName SAI to the following:
 -- Huntress Ravenoak and Leafrunner
 -- Hunter Sagewind, Ragetotem and Thunderhorn
