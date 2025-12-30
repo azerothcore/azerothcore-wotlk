@@ -155,6 +155,18 @@ struct boss_heigan : public BossAI
         }, 5s);
     }
 
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            return;
+        }
+
+        _eruptionScheduler.Update(diff);
+
+        BossAI::UpdateAI(diff);
+    }
+
     void CheckSafetyDance()
     {
         if (Map* map = me->GetMap())
