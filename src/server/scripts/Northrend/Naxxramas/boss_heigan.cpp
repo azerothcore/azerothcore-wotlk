@@ -81,6 +81,7 @@ struct boss_heigan : public BossAI
 
     void JustDied(Unit*  killer) override
     {
+        _eruptionScheduler.CancelAll();
         BossAI::JustDied(killer);
         Talk(EMOTE_DEATH);
     }
