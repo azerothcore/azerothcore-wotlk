@@ -2138,9 +2138,24 @@ void Aura::AddProcCooldown(TimePoint cooldownEnd)
     m_procCooldown = cooldownEnd;
 }
 
+void Aura::AddProcCooldown(SpellProcEntry const* procEntry, TimePoint now)
+{
+    AddProcCooldown(now + procEntry->Cooldown);
+}
+
 void Aura::ResetProcCooldown()
 {
     m_procCooldown = std::chrono::steady_clock::now();
+}
+
+void Aura::PrepareProcChargeDrop(SpellProcEntry const* procEntry, ProcEventInfo& eventInfo)
+{
+    // take one charge, aura expiration will be handled in Aura::TriggerProcOnEvent (if needed)
+    if (!(procEntry->AttributesMask & PROC_ATTR_USE_STACKS_FOR_CHARGES) && IsUsingCharges() && (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->HasAttribute(SPELL_ATTR6_DO_NOT_CONSUME_RESOURCES)))
+    {
+        --m_procCharges;
+        SetNeedClientUpdateForTargets();
+    }
 }
 
 void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now)
@@ -2206,7 +2221,8 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
         return 0;
 
     // check if spell was affected by this aura's spellmod (used by Arcane Potency and similar effects)
-    if (procEntry->AttributesMask & PROC_ATTR_REQ_SPELLMOD)
+    // only applies when consuming charges or stacks
+    if ((procEntry->AttributesMask & PROC_ATTR_REQ_SPELLMOD) && (IsUsingCharges() || (procEntry->AttributesMask & PROC_ATTR_USE_STACKS_FOR_CHARGES)))
     {
         Spell const* procSpell = eventInfo.GetProcSpell();
         if (!procSpell || procSpell->m_appliedMods.find(const_cast<Aura*>(this)) == procSpell->m_appliedMods.end())
@@ -2334,11 +2350,18 @@ void Aura::TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, Pro
     ConsumeProcCharges(sSpellMgr->GetSpellProcEntry(GetId()));
 }
 
-void Aura::ConsumeProcCharges(SpellProcEntry const* /*procEntry*/)
+void Aura::ConsumeProcCharges(SpellProcEntry const* procEntry)
 {
     // Remove aura if we've used last charge to proc
-    if (IsUsingCharges() && !GetCharges())
-        Remove();
+    if (procEntry->AttributesMask & PROC_ATTR_USE_STACKS_FOR_CHARGES)
+    {
+        ModStackAmount(-1);
+    }
+    else if (IsUsingCharges())
+    {
+        if (!GetCharges())
+            Remove();
+    }
 }
 
 void Aura::_DeleteRemovedApplications()

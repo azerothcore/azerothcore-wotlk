@@ -12993,6 +12993,30 @@ void Unit::GetProcAurasTriggeredOnEvent(AuraApplicationProcContainer& aurasTrigg
 {
     TimePoint now = std::chrono::steady_clock::now();
 
+    auto processAuraApplication = [&](AuraApplication* aurApp)
+    {
+        if (uint8 procEffectMask = aurApp->GetBase()->GetProcEffectMask(aurApp, eventInfo, now))
+        {
+            aurApp->GetBase()->PrepareProcToTrigger(aurApp, eventInfo, now);
+            aurasTriggeringProc.emplace_back(procEffectMask, aurApp);
+        }
+        else
+        {
+            if (aurApp->GetBase()->GetSpellInfo()->HasAttribute(SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE))
+            {
+                if (SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(aurApp->GetBase()->GetId()))
+                {
+                    aurApp->GetBase()->PrepareProcChargeDrop(procEntry, eventInfo);
+                    aurasTriggeringProc.emplace_back(0, aurApp);
+                }
+            }
+
+            if (aurApp->GetBase()->GetSpellInfo()->HasAttribute(SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE))
+                if (SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(aurApp->GetBase()->GetId()))
+                    aurApp->GetBase()->AddProcCooldown(procEntry, now);
+        }
+    };
+
     // use provided list of auras which can proc
     if (procAuras)
     {
@@ -13000,26 +13024,14 @@ void Unit::GetProcAurasTriggeredOnEvent(AuraApplicationProcContainer& aurasTrigg
         {
             ASSERT((*itr)->GetTarget() == this);
             if (!(*itr)->GetRemoveMode())
-            {
-                if (uint8 procEffectMask = (*itr)->GetBase()->GetProcEffectMask(*itr, eventInfo, now))
-                {
-                    (*itr)->GetBase()->PrepareProcToTrigger(*itr, eventInfo, now);
-                    aurasTriggeringProc.emplace_back(procEffectMask, *itr);
-                }
-            }
+                processAuraApplication(*itr);
         }
     }
     // or generate one on our own
     else
     {
         for (AuraApplicationMap::iterator itr = GetAppliedAuras().begin(); itr != GetAppliedAuras().end(); ++itr)
-        {
-            if (uint8 procEffectMask = itr->second->GetBase()->GetProcEffectMask(itr->second, eventInfo, now))
-            {
-                itr->second->GetBase()->PrepareProcToTrigger(itr->second, eventInfo, now);
-                aurasTriggeringProc.emplace_back(procEffectMask, itr->second);
-            }
-        }
+            processAuraApplication(itr->second);
     }
 }
 
