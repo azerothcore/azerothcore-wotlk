@@ -49,11 +49,11 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     // Pirates' Day: Fixed Sep 19
     { HOLIDAY_PIRATES_DAY, HolidayCalculationType::FIXED_DATE, 9, 19, 0, 0 },
 
-    // Brewfest: Fixed Sep 20
-    { HOLIDAY_BREWFEST, HolidayCalculationType::FIXED_DATE, 9, 20, 0, 0 },
+    // Brewfest: Oktoberfest rule - first Saturday on/after Sept 15, minus 7 for holidayStage offset
+    { HOLIDAY_BREWFEST, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 },
 
-    // Harvest Festival: Fixed Oct 2
-    { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 10, 2, 0, 0 },
+    // Harvest Festival: 2 days before autumn equinox (Sept 20-21)
+    { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::AUTUMN_EQUINOX, 0, 0, 0, -2 },
 
     // Hallow's End: Fixed Oct 18
     { HOLIDAY_HALLOWS_END, HolidayCalculationType::FIXED_DATE, 10, 18, 0, 0 },
@@ -64,8 +64,8 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     // Pilgrim's Bounty: Sunday before Thanksgiving (4th Thursday - 4 days)
     { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), -4 },
 
-    // Winter Veil: Fixed Dec 15
-    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::FIXED_DATE, 12, 15, 0, 0 }
+    // Winter Veil: 6 days before winter solstice (Dec 15-16)
+    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::WINTER_SOLSTICE, 0, 0, 0, -6 }
 };
 
 const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
@@ -294,6 +294,112 @@ std::tm HolidayDateCalculator::CalculateLunarNewYear(int year)
     return fallback;
 }
 
+// ============================================================================
+// AUTUMN EQUINOX CALCULATION
+// Based on Jean Meeus "Astronomical Algorithms" (1991), Chapter 27
+// Reference: https://en.wikipedia.org/wiki/Equinox#Calculation
+// ============================================================================
+
+std::tm HolidayDateCalculator::CalculateAutumnEquinox(int year)
+{
+    // Meeus algorithm for mean September equinox (Table 27.C)
+    // Valid for years 2000-3000
+    double const Y = (year - 2000.0) / 1000.0;
+    double const Y2 = Y * Y;
+    double const Y3 = Y2 * Y;
+    double const Y4 = Y3 * Y;
+
+    // Mean equinox JDE0 (Eq 27.1 for September equinox after 2000)
+    double JDE0 = 2451810.21715 + 365242.01767 * Y - 0.11575 * Y2
+                + 0.00337 * Y3 + 0.00078 * Y4;
+
+    // Periodic terms for correction (Table 27.B)
+    double const T = (JDE0 - 2451545.0) / 36525.0;
+    double const W = 35999.373 * T - 2.47;
+    double const deltaLambda = 1.0 + 0.0334 * std::cos(W * DEG_TO_RAD)
+                             + 0.0007 * std::cos(2.0 * W * DEG_TO_RAD);
+
+    // Simplified correction (sum of periodic terms from Table 27.C)
+    // Using first few significant terms
+    double S = 485 * std::cos((324.96 + 1934.136 * T) * DEG_TO_RAD)
+             + 203 * std::cos((337.23 + 32964.467 * T) * DEG_TO_RAD)
+             + 199 * std::cos((342.08 + 20.186 * T) * DEG_TO_RAD)
+             + 182 * std::cos((27.85 + 445267.112 * T) * DEG_TO_RAD)
+             + 156 * std::cos((73.14 + 45036.886 * T) * DEG_TO_RAD)
+             + 136 * std::cos((171.52 + 22518.443 * T) * DEG_TO_RAD)
+             + 77 * std::cos((222.54 + 65928.934 * T) * DEG_TO_RAD)
+             + 74 * std::cos((296.72 + 3034.906 * T) * DEG_TO_RAD)
+             + 70 * std::cos((243.58 + 9037.513 * T) * DEG_TO_RAD)
+             + 58 * std::cos((119.81 + 33718.147 * T) * DEG_TO_RAD)
+             + 52 * std::cos((297.17 + 150.678 * T) * DEG_TO_RAD)
+             + 50 * std::cos((21.02 + 2281.226 * T) * DEG_TO_RAD);
+
+    double const JDE = JDE0 + (0.00001 * S) / deltaLambda;
+
+    // Convert JDE to calendar date
+    int eqYear, eqMonth, eqDay;
+    JulianDayToDate(JDE, eqYear, eqMonth, eqDay);
+
+    std::tm result = {};
+    result.tm_year = eqYear - 1900;
+    result.tm_mon = eqMonth - 1;
+    result.tm_mday = eqDay;
+    mktime(&result);
+    return result;
+}
+
+// ============================================================================
+// WINTER SOLSTICE CALCULATION
+// Based on Jean Meeus "Astronomical Algorithms" (1991), Chapter 27
+// ============================================================================
+
+std::tm HolidayDateCalculator::CalculateWinterSolstice(int year)
+{
+    // Meeus algorithm for mean December solstice (Table 27.C)
+    // Valid for years 2000-3000
+    double const Y = (year - 2000.0) / 1000.0;
+    double const Y2 = Y * Y;
+    double const Y3 = Y2 * Y;
+    double const Y4 = Y3 * Y;
+
+    // Mean solstice JDE0 (Eq 27.1 for December solstice after 2000)
+    double JDE0 = 2451900.05952 + 365242.74049 * Y - 0.06223 * Y2
+                - 0.00823 * Y3 + 0.00032 * Y4;
+
+    // Periodic terms for correction (Table 27.B)
+    double const T = (JDE0 - 2451545.0) / 36525.0;
+    double const W = 35999.373 * T - 2.47;
+    double const deltaLambda = 1.0 + 0.0334 * std::cos(W * DEG_TO_RAD)
+                             + 0.0007 * std::cos(2.0 * W * DEG_TO_RAD);
+
+    // Simplified correction (sum of periodic terms from Table 27.C)
+    double S = 485 * std::cos((324.96 + 1934.136 * T) * DEG_TO_RAD)
+             + 203 * std::cos((337.23 + 32964.467 * T) * DEG_TO_RAD)
+             + 199 * std::cos((342.08 + 20.186 * T) * DEG_TO_RAD)
+             + 182 * std::cos((27.85 + 445267.112 * T) * DEG_TO_RAD)
+             + 156 * std::cos((73.14 + 45036.886 * T) * DEG_TO_RAD)
+             + 136 * std::cos((171.52 + 22518.443 * T) * DEG_TO_RAD)
+             + 77 * std::cos((222.54 + 65928.934 * T) * DEG_TO_RAD)
+             + 74 * std::cos((296.72 + 3034.906 * T) * DEG_TO_RAD)
+             + 70 * std::cos((243.58 + 9037.513 * T) * DEG_TO_RAD)
+             + 58 * std::cos((119.81 + 33718.147 * T) * DEG_TO_RAD)
+             + 52 * std::cos((297.17 + 150.678 * T) * DEG_TO_RAD)
+             + 50 * std::cos((21.02 + 2281.226 * T) * DEG_TO_RAD);
+
+    double const JDE = JDE0 + (0.00001 * S) / deltaLambda;
+
+    // Convert JDE to calendar date
+    int solYear, solMonth, solDay;
+    JulianDayToDate(JDE, solYear, solMonth, solDay);
+
+    std::tm result = {};
+    result.tm_year = solYear - 1900;
+    result.tm_mon = solMonth - 1;
+    result.tm_mday = solDay;
+    mktime(&result);
+    return result;
+}
+
 std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int year)
 {
     std::tm result = {};
@@ -338,6 +444,26 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
         case HolidayCalculationType::WEEKDAY_ON_OR_AFTER:
         {
             result = CalculateWeekdayOnOrAfter(year, rule.month, rule.day, static_cast<Weekday>(rule.weekday));
+            if (rule.offset != 0)
+            {
+                result.tm_mday += rule.offset;
+                mktime(&result); // Normalize
+            }
+            break;
+        }
+        case HolidayCalculationType::AUTUMN_EQUINOX:
+        {
+            result = CalculateAutumnEquinox(year);
+            if (rule.offset != 0)
+            {
+                result.tm_mday += rule.offset;
+                mktime(&result); // Normalize
+            }
+            break;
+        }
+        case HolidayCalculationType::WINTER_SOLSTICE:
+        {
+            result = CalculateWinterSolstice(year);
             if (rule.offset != 0)
             {
                 result.tm_mday += rule.offset;

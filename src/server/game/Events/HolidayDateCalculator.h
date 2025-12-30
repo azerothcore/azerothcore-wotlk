@@ -28,7 +28,9 @@ enum class HolidayCalculationType
     NTH_WEEKDAY,       // Nth weekday of month (e.g., 4th Thursday of Nov)
     EASTER_OFFSET,     // Days relative to Easter Sunday
     LUNAR_NEW_YEAR,    // Chinese New Year (new moon between Jan 21 - Feb 20)
-    WEEKDAY_ON_OR_AFTER // First weekday on or after a date (e.g., first Monday on or after Feb 3)
+    WEEKDAY_ON_OR_AFTER, // First weekday on or after a date (e.g., first Monday on or after Feb 3)
+    AUTUMN_EQUINOX,    // Days relative to autumn equinox (offset in days)
+    WINTER_SOLSTICE    // Days relative to winter solstice (offset in days)
 };
 
 enum class Weekday
@@ -67,6 +69,14 @@ public:
     // Calculate Chinese New Year (Lunar New Year) using astronomical algorithm
     // Based on Jean Meeus "Astronomical Algorithms" - finds new moon between Jan 21 - Feb 20
     static std::tm CalculateLunarNewYear(int year);
+
+    // Calculate Autumn Equinox using astronomical algorithm
+    // Based on Jean Meeus "Astronomical Algorithms" Chapter 27
+    static std::tm CalculateAutumnEquinox(int year);
+
+    // Calculate Winter Solstice using astronomical algorithm
+    // Based on Jean Meeus "Astronomical Algorithms" Chapter 27
+    static std::tm CalculateWinterSolstice(int year);
 
     // Calculate holiday start date for a given year
     static std::tm CalculateHolidayDate(const HolidayRule& rule, int year);
