@@ -27,6 +27,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 {
@@ -396,16 +397,23 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
-    {
-        if (itr->path().extension() != ".sql")
-            continue;
+    std::vector<std::filesystem::path> sqlFiles;
 
-        LOG_INFO("sql.updates", ">> Applying \'{}\'...", itr->path().filename().generic_string());
+    for (const auto &entry : std::filesystem::directory_iterator(DirPath))
+    {
+        if (entry.path().extension() == ".sql")
+            sqlFiles.push_back(entry.path());
+    }
+
+    std::sort(sqlFiles.begin(), sqlFiles.end());
+
+    for (const auto &file : sqlFiles)
+    {
+        LOG_INFO("sql.updates", ">> Applying \'{}\'...", file.filename().generic_string());
 
         try
         {
-            ApplyFile(pool, itr->path());
+            ApplyFile(pool, file);
         }
         catch (UpdateException&)
         {
