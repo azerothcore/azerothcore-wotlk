@@ -67,6 +67,7 @@ struct boss_heigan : public BossAI
         _currentPhase = 0;
         _currentSection = 3;
         _moveRight = true;
+        _eruptionScheduler.CancelAll();
     }
 
     void KilledUnit(Unit* who) override
@@ -97,18 +98,19 @@ struct boss_heigan : public BossAI
         _currentSection = 3;
         _currentPhase = phase;
         scheduler.CancelAll();
+        _eruptionScheduler.CancelAll();
         if (phase == PHASE_SLOW_DANCE)
         {
             me->CastStop();
             me->SetReactState(REACT_AGGRESSIVE);
             DoZoneInCombat();
             ScheduleTimedEvent(12s, 15s, [&] {
-                DoCastSelf(SPELL_ERUPTION);
+                DoCastSelf(SPELL_SPELL_DISRUPTION);
             }, 10s);
             ScheduleTimedEvent(17s, [&] {
                 DoCastSelf(SPELL_DECREPIT_FEVER);
             }, 22s, 25s);
-            ScheduleTimedEvent(15s, [&] {
+            _eruptionScheduler.Schedule(15s, [this](TaskContext context){
                 instance->SetData(DATA_HEIGAN_ERUPTION, _currentSection);
                 if (_currentSection == 3)
                     _moveRight = false;
@@ -117,8 +119,8 @@ struct boss_heigan : public BossAI
 
                 _moveRight ? _currentSection++ : _currentSection--;
                 Talk(SAY_TAUNT);
-            }, 10s);
-            scheduler.Schedule(90s, [this](TaskContext /*context*/) {
+                context.Repeat(10s);
+            }).Schedule(90s, [this](TaskContext /*context*/) {
                 StartFightPhase(PHASE_FAST_DANCE);
             });
         }
@@ -134,7 +136,7 @@ struct boss_heigan : public BossAI
             scheduler.Schedule(1s, [this](TaskContext /*context*/) {
                 DoCastSelf(SPELL_PLAGUE_CLOUD);
             });
-            ScheduleTimedEvent(7s, [&] {
+            _eruptionScheduler.Schedule(7s, [this](TaskContext context){
                 instance->SetData(DATA_HEIGAN_ERUPTION, _currentSection);
                 if (_currentSection == 3)
                     _moveRight = false;
@@ -142,8 +144,8 @@ struct boss_heigan : public BossAI
                     _moveRight = true;
 
                 _moveRight ? _currentSection++ : _currentSection--;
-            }, 4s);
-            scheduler.Schedule(45s, [this](TaskContext /*context*/) {
+                context.Repeat(4s);
+            }).Schedule(45s, [this](TaskContext /*context*/) {
                 StartFightPhase(PHASE_SLOW_DANCE);
                 Talk(EMOTE_DANCE_END); // avoid play the emote on aggro
             });
@@ -172,6 +174,7 @@ private:
     uint8 _currentPhase{};
     uint8 _currentSection{};
     bool _moveRight{true};
+    TaskScheduler _eruptionScheduler;
 };
 
 void AddSC_boss_heigan()
