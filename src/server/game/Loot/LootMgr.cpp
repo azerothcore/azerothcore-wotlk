@@ -1451,7 +1451,7 @@ void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStor
                 for (uint32 loop = 0; loop < maxcount; ++loop) // Ref multiplicator
                     // This reference needs to be processed further, but it is marked isTopLevel=false so that any groups inside
                     // the reference are not multiplied by Rate.Drop.Item.GroupAmount
-                    Referenced->Process(loot, store, lootMode, player, item->groupid, false);
+                    Referenced->Process(loot, store, lootMode, player, 0, false);
             }
         }
         else
@@ -1563,7 +1563,7 @@ void LootTemplate::AddEntry(LootStoreItem* item)
 {
     // `item->reference` > 0 --> Reference is counted as a normal and non grouped entry
     // `item->reference` < 0 --> Reference is counted as grouped entry within shared groupid
-    if (item->groupid > 0 && item->reference <= 0)  // Group and grouped reference
+    if (item->groupid > 0)  // Group and grouped reference
     {
         if (item->groupid >= Groups.size())
         {
