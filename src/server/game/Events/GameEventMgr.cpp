@@ -1147,7 +1147,8 @@ void GameEventMgr::LoadHolidayDates()
             uint32_t const yearOffset = static_cast<uint32_t>(year - 2000);
             uint32_t const month = static_cast<uint32_t>(timeInfo.tm_mon);
             uint32_t const day = static_cast<uint32_t>(timeInfo.tm_mday - 1);
-            entry->Date[0] = (yearOffset << 24) | (month << 20) | (day << 14);
+            uint32_t const weekday = static_cast<uint32_t>(timeInfo.tm_wday);
+            entry->Date[0] = (yearOffset << 24) | (month << 20) | (day << 14) | (weekday << 11);
 
             ++dbCount;
         } while (result->NextRow());

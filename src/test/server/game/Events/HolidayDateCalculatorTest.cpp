@@ -371,16 +371,15 @@ TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2
     // Fixed date holidays should have same month/day every year
     struct FixedHolidayTestCase { uint32_t holidayId; int month; int day; const char* name; };
     std::vector<FixedHolidayTestCase> testCases = {
-        { 423, 2,  3, "Love is in the Air" },
-        { 201, 4, 28, "Children's Week" },
+        // Note: Love is in the Air and Children's Week are now WEEKDAY_ON_OR_AFTER
         { 341, 6, 21, "Midsummer Fire Festival" },
         { 62,  7,  4, "Fireworks Spectacular" },
         { 398, 9, 19, "Pirates' Day" },
         { 372, 9, 20, "Brewfest" },
         { 321, 10, 2, "Harvest Festival" },
-        { 324, 10, 25, "Hallow's End" },
+        { 324, 10, 18, "Hallow's End" },
         { 409, 11,  1, "Day of the Dead" },
-        { 141, 12, 19, "Winter Veil" },
+        { 141, 12, 15, "Winter Veil" },
     };
 
     for (auto const& tc : testCases)
@@ -396,6 +395,81 @@ TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2
             EXPECT_EQ(date.tm_year + 1900, year);
             EXPECT_EQ(date.tm_mon + 1, tc.month);
             EXPECT_EQ(date.tm_mday, tc.day);
+        }
+    }
+}
+
+// ============================================================
+// Love is in the Air (First Monday on or after Feb 3)
+// ============================================================
+
+TEST_F(HolidayDateCalculatorTest, LoveIsInTheAir_FirstMondayOnOrAfterFeb3)
+{
+    // Verify "first Monday on or after Feb 3" calculation
+    struct LoveTestCase { int year; int expectedDay; };
+    std::vector<LoveTestCase> testCases = {
+        { 2024, 5 },   // Feb 3 is Sat, first Mon after is Feb 5
+        { 2025, 3 },   // Feb 3 is Mon, so Feb 3
+        { 2026, 9 },   // Feb 3 is Tue, first Mon after is Feb 9
+        { 2027, 8 },   // Feb 3 is Wed, first Mon after is Feb 8
+        { 2028, 7 },   // Feb 3 is Thu, first Mon after is Feb 7
+        { 2029, 5 },   // Feb 3 is Sat, first Mon after is Feb 5
+        { 2030, 4 },   // Feb 3 is Sun, first Mon after is Feb 4
+    };
+
+    for (auto const& tc : testCases)
+    {
+        std::tm date = HolidayDateCalculator::CalculateWeekdayOnOrAfter(tc.year, 2, 3, Weekday::MONDAY);
+
+        SCOPED_TRACE("Year: " + std::to_string(tc.year));
+
+        EXPECT_EQ(date.tm_year + 1900, tc.year);
+        EXPECT_EQ(date.tm_mon + 1, 2);  // February
+        EXPECT_EQ(date.tm_mday, tc.expectedDay);
+        EXPECT_EQ(date.tm_wday, 1);     // Monday
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, ChildrensWeek_FirstMondayOnOrAfterApr25)
+{
+    // Verify "first Monday on or after Apr 25" calculation (Monday closest to May 1)
+    struct ChildrensWeekTestCase { int year; int expectedMonth; int expectedDay; };
+    std::vector<ChildrensWeekTestCase> testCases = {
+        { 2023, 5,  1 },   // Apr 25 is Tue, first Mon after is May 1
+        { 2024, 4, 29 },   // Apr 25 is Thu, first Mon after is Apr 29
+        { 2025, 4, 28 },   // Apr 25 is Fri, first Mon after is Apr 28
+        { 2026, 4, 27 },   // Apr 25 is Sat, first Mon after is Apr 27
+        { 2027, 4, 26 },   // Apr 25 is Sun, first Mon after is Apr 26
+    };
+
+    for (auto const& tc : testCases)
+    {
+        std::tm date = HolidayDateCalculator::CalculateWeekdayOnOrAfter(tc.year, 4, 25, Weekday::MONDAY);
+
+        SCOPED_TRACE("Year: " + std::to_string(tc.year));
+
+        EXPECT_EQ(date.tm_year + 1900, tc.year);
+        EXPECT_EQ(date.tm_mon + 1, tc.expectedMonth);
+        EXPECT_EQ(date.tm_mday, tc.expectedDay);
+        EXPECT_EQ(date.tm_wday, 1);     // Monday
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, WeekdayOnOrAfter_AlwaysCorrectWeekday_1900_2200)
+{
+    // Verify the result is always the correct weekday for entire range
+    for (int year = 1900; year <= 2200; ++year)
+    {
+        for (int weekday = 0; weekday <= 6; ++weekday)
+        {
+            std::tm date = HolidayDateCalculator::CalculateWeekdayOnOrAfter(year, 2, 3, static_cast<Weekday>(weekday));
+
+            SCOPED_TRACE("Year: " + std::to_string(year) + " Weekday: " + std::to_string(weekday));
+
+            EXPECT_EQ(date.tm_wday, weekday);
+            EXPECT_EQ(date.tm_mon + 1, 2);  // Should stay in February
+            EXPECT_GE(date.tm_mday, 3);     // Should be on or after Feb 3
+            EXPECT_LE(date.tm_mday, 9);     // At most 6 days later
         }
     }
 }

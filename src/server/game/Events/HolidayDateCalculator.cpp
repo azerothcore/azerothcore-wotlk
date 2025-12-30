@@ -31,14 +31,14 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     // Lunar Festival: Chinese New Year - 1 day (event starts day before CNY)
     { HOLIDAY_LUNAR_FESTIVAL, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, -1 },
 
-    // Love is in the Air: Fixed Feb 3
-    { HOLIDAY_LOVE_IS_IN_THE_AIR, HolidayCalculationType::FIXED_DATE, 2, 3, 0, 0 },
+    // Love is in the Air: First Monday on or after Feb 3
+    { HOLIDAY_LOVE_IS_IN_THE_AIR, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 2, 3, static_cast<int>(Weekday::MONDAY), 0 },
 
     // Noblegarden: Day after Easter Sunday (Easter + 1 day)
     { HOLIDAY_NOBLEGARDEN, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 1 },
 
-    // Children's Week: Fixed Apr 28
-    { HOLIDAY_CHILDRENS_WEEK, HolidayCalculationType::FIXED_DATE, 4, 28, 0, 0 },
+    // Children's Week: First Monday on or after Apr 25 (Monday closest to May 1)
+    { HOLIDAY_CHILDRENS_WEEK, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 4, 25, static_cast<int>(Weekday::MONDAY), 0 },
 
     // Midsummer Fire Festival: Fixed Jun 21
     { HOLIDAY_FIRE_FESTIVAL, HolidayCalculationType::FIXED_DATE, 6, 21, 0, 0 },
@@ -55,8 +55,8 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     // Harvest Festival: Fixed Oct 2
     { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::FIXED_DATE, 10, 2, 0, 0 },
 
-    // Hallow's End: Fixed Oct 25
-    { HOLIDAY_HALLOWS_END, HolidayCalculationType::FIXED_DATE, 10, 25, 0, 0 },
+    // Hallow's End: Fixed Oct 18
+    { HOLIDAY_HALLOWS_END, HolidayCalculationType::FIXED_DATE, 10, 18, 0, 0 },
 
     // Day of the Dead: Fixed Nov 1
     { HOLIDAY_DAY_OF_DEAD, HolidayCalculationType::FIXED_DATE, 11, 1, 0, 0 },
@@ -64,8 +64,8 @@ static const std::vector<HolidayRule> s_HolidayRules = {
     // Pilgrim's Bounty: Sunday before Thanksgiving (4th Thursday - 4 days)
     { HOLIDAY_PILGRIMS_BOUNTY, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), -4 },
 
-    // Winter Veil: Fixed Dec 19
-    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::FIXED_DATE, 12, 19, 0, 0 }
+    // Winter Veil: Fixed Dec 15
+    { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::FIXED_DATE, 12, 15, 0, 0 }
 };
 
 const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
@@ -118,6 +118,23 @@ std::tm HolidayDateCalculator::CalculateNthWeekday(int year, int month, Weekday 
     date.tm_mday += (n - 1) * 7;
 
     mktime(&date); // Normalize (handles month overflow)
+    return date;
+}
+
+std::tm HolidayDateCalculator::CalculateWeekdayOnOrAfter(int year, int month, int day, Weekday weekday)
+{
+    // Start with the specified date
+    std::tm date = {};
+    date.tm_year = year - 1900;
+    date.tm_mon = month - 1;
+    date.tm_mday = day;
+    mktime(&date);
+
+    // Find days until the target weekday (0 if already on that day)
+    int const daysUntilWeekday = (static_cast<int>(weekday) - date.tm_wday + 7) % 7;
+    date.tm_mday += daysUntilWeekday;
+
+    mktime(&date); // Normalize
     return date;
 }
 
@@ -318,6 +335,16 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             }
             break;
         }
+        case HolidayCalculationType::WEEKDAY_ON_OR_AFTER:
+        {
+            result = CalculateWeekdayOnOrAfter(year, rule.month, rule.day, static_cast<Weekday>(rule.weekday));
+            if (rule.offset != 0)
+            {
+                result.tm_mday += rule.offset;
+                mktime(&result); // Normalize
+            }
+            break;
+        }
     }
 
     return result;
@@ -325,15 +352,19 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
 
 uint32_t HolidayDateCalculator::PackDate(const std::tm& date)
 {
-    // WoW packed date format:
-    // bits 14-19: day (0-indexed)
-    // bits 20-23: month (0-indexed)
+    // WoW packed date format (same as ByteBuffer::AppendPackedTime):
     // bits 24-28: year offset from 2000
+    // bits 20-23: month (0-indexed)
+    // bits 14-19: day (0-indexed)
+    // bits 11-13: weekday (0=Sunday, 6=Saturday - POSIX tm_wday)
+    // bits 6-10: hour
+    // bits 0-5: minute
     uint32_t yearOffset = static_cast<uint32_t>((date.tm_year + 1900) - 2000);
     uint32_t month = static_cast<uint32_t>(date.tm_mon);         // Already 0-indexed
     uint32_t day = static_cast<uint32_t>(date.tm_mday - 1);      // Convert to 0-indexed
+    uint32_t weekday = static_cast<uint32_t>(date.tm_wday);      // 0=Sunday, 6=Saturday
 
-    return (yearOffset << 24) | (month << 20) | (day << 14);
+    return (yearOffset << 24) | (month << 20) | (day << 14) | (weekday << 11);
 }
 
 std::tm HolidayDateCalculator::UnpackDate(uint32_t packed)
@@ -342,7 +373,10 @@ std::tm HolidayDateCalculator::UnpackDate(uint32_t packed)
     result.tm_year = static_cast<int>(((packed >> 24) & 0x1F) + 2000 - 1900);
     result.tm_mon = static_cast<int>((packed >> 20) & 0xF);
     result.tm_mday = static_cast<int>(((packed >> 14) & 0x3F) + 1);
-    mktime(&result);
+    result.tm_wday = static_cast<int>((packed >> 11) & 0x7);
+    result.tm_hour = static_cast<int>((packed >> 6) & 0x1F);
+    result.tm_min = static_cast<int>(packed & 0x3F);
+    mktime(&result); // Normalize and fill in tm_yday, tm_isdst
     return result;
 }
 
