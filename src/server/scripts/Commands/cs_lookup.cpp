@@ -1687,7 +1687,7 @@ public:
             bool muted = false;
             std::string muteReason, muteBy;
             int64 mutetime = 0;
-            if (!banned && !locked) // If not banned or locked, check mute status
+            if (!banned && !locked) // If not banned and locked, check mute status
             {
                 LoginDatabasePreparedStatement* stmtMute = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
                 stmtMute->SetData(0, accountId);
