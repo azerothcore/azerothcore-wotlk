@@ -1,5 +1,6 @@
 -- DB update 2025_12_29_13 -> 2025_12_29_14
 --
+-- Update to rehash for reapply
 -- Truesilver gauntlets require skill 225, not 245
 UPDATE `trainer_spell` SET `ReqSkillRank`=225 WHERE `TrainerId`=124 AND `SpellId`=9954;
 
