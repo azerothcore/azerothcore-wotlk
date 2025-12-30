@@ -38,6 +38,7 @@ CREATE TABLE `account` (
   `last_login` timestamp NULL DEFAULT NULL,
   `online` int unsigned NOT NULL DEFAULT '0',
   `expansion` tinyint unsigned NOT NULL DEFAULT '2',
+  `Flags` int unsigned NOT NULL DEFAULT '0',
   `mutetime` bigint NOT NULL DEFAULT '0',
   `mutereason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `muteby` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -67,4 +68,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:10:19
+-- Dump completed on 2025-12-29 17:55:16
