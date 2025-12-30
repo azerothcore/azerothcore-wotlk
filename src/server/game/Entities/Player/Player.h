@@ -210,14 +210,6 @@ struct SpellCooldown
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
 typedef std::unordered_map<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
-enum TrainerSpellState
-{
-    TRAINER_SPELL_GREEN = 0,
-    TRAINER_SPELL_RED   = 1,
-    TRAINER_SPELL_GRAY  = 2,
-    TRAINER_SPELL_GREEN_DISABLED = 10                       // custom value, not send to client: formally green but learn not allowed
-};
-
 enum ActionButtonUpdateState
 {
     ACTIONBUTTON_UNCHANGED = 0,
@@ -1684,7 +1676,6 @@ public:
     void SendRemoveControlBar();
     [[nodiscard]] bool HasSpell(uint32 spell) const override;
     [[nodiscard]] bool HasActiveSpell(uint32 spell) const;            // show in spellbook
-    TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
     [[nodiscard]] bool IsSpellFitByClassAndRace(uint32 spell_id) const;
     bool IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const;
 
@@ -2560,6 +2551,8 @@ public:
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeTrainer(Creature const* creature) const;
+
 private:
     [[nodiscard]] bool AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const;
 public:
