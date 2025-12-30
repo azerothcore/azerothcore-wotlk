@@ -1028,11 +1028,9 @@ class spell_pri_vampiric_embrace : public AuraScript
         if (!damageInfo || !damageInfo->GetDamage())
             return;
 
-        int32 total = CalculatePct(int32(damageInfo->GetDamage()), aurEff->GetAmount());
-        int32 team = total / 5;
-        int32 self = total - team;
-        GetTarget()->CastCustomSpell(SPELL_PRIEST_VAMPIRIC_EMBRACE_HEAL, SPELLVALUE_BASE_POINT0, team, GetTarget(), true, nullptr, aurEff);
-        GetTarget()->CastCustomSpell(SPELL_PRIEST_VAMPIRIC_EMBRACE_HEAL, SPELLVALUE_BASE_POINT1, self, GetTarget(), true, nullptr, aurEff);
+        int32 selfHeal = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
+        int32 partyHeal = selfHeal / 5;
+        GetTarget()->CastCustomSpell(GetTarget(), SPELL_PRIEST_VAMPIRIC_EMBRACE_HEAL, &partyHeal, &selfHeal, nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
