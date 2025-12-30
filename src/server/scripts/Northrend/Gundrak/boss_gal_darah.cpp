@@ -43,8 +43,8 @@ enum Yells
     SAY_SLAY                            = 1,
     SAY_DEATH                           = 2,
     SAY_SUMMON_RHINO                    = 3,
-    SAY_TRANSFORM_1                     = 4,
-    SAY_TRANSFORM_2                     = 5
+    SAY_TRANSFORM                       = 4,
+    SAY_IMPALE                          = 5
 };
 
 enum Events
@@ -78,6 +78,7 @@ struct boss_gal_darah : public BossAI
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
                 {
                     DoCast(target, SPELL_IMPALING_CHARGE);
+                    Talk(SAY_IMPALE, target);
                     impaledList.insert(target->GetGUID());
                 }
             }, 16s, 17s);
@@ -123,6 +124,7 @@ struct boss_gal_darah : public BossAI
         me->m_Events.AddEventAtOffset([&] {
             scheduler.CancelAll();
             DoCastSelf(SPELL_TRANSFORM_TO_RHINO);
+            Talk(SAY_TRANSFORM);
         }, 32s);
     }
 
