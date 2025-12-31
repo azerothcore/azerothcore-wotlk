@@ -1561,8 +1561,6 @@ LootTemplate::~LootTemplate()
 // Adds an entry to the group (at loading stage)
 void LootTemplate::AddEntry(LootStoreItem* item)
 {
-    // `item->reference` > 0 --> Reference is counted as a normal and non grouped entry
-    // `item->reference` < 0 --> Reference is counted as grouped entry within shared groupid
     if (item->groupid > 0)  // Group and grouped reference
     {
         if (item->groupid >= Groups.size())
