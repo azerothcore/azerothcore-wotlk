@@ -3041,10 +3041,10 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
     // Temp enchantment duration
     uint32 duration = 3600; // Default 1 hour
-    
+
     // Exceptions
     switch (m_spellInfo->Id)
-    {  
+    {
         case 37360: // Consecrated Weapon
             duration = 300; // 5 mins
             break;
@@ -3070,7 +3070,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
                 duration = 1800; // 30 mins
             break;
     }
-    
+
     // item can be in trade slot and have owner diff. from caster
     Player* item_owner = itemTarget->GetOwner();
     if (!item_owner)
