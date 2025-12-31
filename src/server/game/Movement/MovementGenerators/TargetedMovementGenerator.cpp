@@ -480,7 +480,7 @@ static Position const PredictPosition(Unit* target)
 }
 
 template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bool& targetIsMoving, uint32 diff)
+bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool& targetIsMoving, uint32 diff)
 {
     if (!_lastTargetPosition)
         return false;
@@ -493,33 +493,8 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
         distanceTolerance += _range + _range;
     }
 
-    if (isPlayerPet)
-    {
-        targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
-    }
-
     if (exactDistSq > distanceTolerance)
         return false;
-
-    if (isPlayerPet)
-    {
-        if (!targetIsMoving)
-        {
-            if (i_recheckPredictedDistanceTimer.GetExpiry())
-            {
-                i_recheckPredictedDistanceTimer.Update(diff);
-                if (i_recheckPredictedDistanceTimer.Passed())
-                {
-                    i_recheckPredictedDistanceTimer = 0;
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
 
     return true;
 }
@@ -559,7 +534,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
-    if (!oPet && PositionOkay(target, false, targetIsMoving, time_diff)) // Skip check if pet
+    if (!oPet && PositionOkay(target, targetIsMoving, time_diff)) // Skip check if pet
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
