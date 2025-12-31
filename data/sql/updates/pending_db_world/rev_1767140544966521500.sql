@@ -36,8 +36,8 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 2749) AND (`Item` IN (2403
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (2749, 24037, 24037, 1, 0, 1, 0, 1, 1, 'Siege Golem - (ReferenceTable)'),
 (2749, 24039, 24039, 1, 0, 1, 0, 1, 1, 'Siege Golem - (ReferenceTable)'),
-(2749, 24041, 24041, 5, 0, 1, 0, 1, 1, 'Siege Golem - (ReferenceTable)'),
-(2749, 24047, 24047, 5, 0, 1, 0, 1, 1, 'Siege Golem - (ReferenceTable)'),
+(2749, 24041, 24041, 50, 0, 1, 1, 1, 1, 'Siege Golem - (ReferenceTable)'),
+(2749, 24047, 24047, 50, 0, 1, 1, 1, 1, 'Siege Golem - (ReferenceTable)'),
 (2749, 24056, 24056, 1, 0, 1, 0, 1, 1, 'Siege Golem - (ReferenceTable)');
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 14507) AND (`Item` IN (34086));
@@ -116,9 +116,12 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (11501, 35019, 35019, 100, 0, 1, 0, 2, 2, 'King Gordok - (ReferenceTable)');
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 24018) AND (`Item` IN (44003, 44004));
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(24018, 44003, 44003, 100, 0, 1, 0, 1, 1, 'Necro Overlord Mezhen - (ReferenceTable)'),
-(24018, 44004, 44004, 100, 0, 1, 0, 1, 1, 'Necro Overlord Mezhen - (ReferenceTable)');
+-- Redundant Loot
+-- INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+-- (24018, 44003, 44003, 100, 0, 1, 0, 1, 1, 'Necro Overlord Mezhen - (ReferenceTable)'),
+-- (24018, 44004, 44004, 100, 0, 1, 0, 1, 1, 'Necro Overlord Mezhen - (ReferenceTable)');
+
+DELETE FROM `reference_loot_template` WHERE (`Entry` IN (44003, 44004));
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 14888) AND (`Item` IN (34002, 34005, 190003));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
