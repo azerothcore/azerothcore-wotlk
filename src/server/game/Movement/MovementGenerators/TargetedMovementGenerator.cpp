@@ -559,7 +559,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
-    if (PositionOkay(target, owner->IsGuardian() && target->IsPlayer(), targetIsMoving, time_diff))
+    if (!oPet && PositionOkay(target, false, targetIsMoving, time_diff)) // Skip check if pet
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -598,9 +598,19 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         }
 
         if (!i_path)
+        {
             i_path = std::make_unique<PathGenerator>(owner);
+        }
         else
+        {
+            i_checkTimer.Update(time_diff);
+            if (!i_checkTimer.Passed())
+                return true; // Wait for next tick
+
+            i_checkTimer.Reset(400);
             i_path->Clear();
+        }
+            
 
         target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
 
@@ -611,10 +621,14 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             owner->UpdateAllowedPositionZ(x, y, z);
 
         bool success = i_path->CalculatePath(x, y, z, forceDest);
-        if (!success || (i_path->GetPathType() & PATHFIND_NOPATH && !followingMaster))
+        if (!success || (i_path->GetPathType() & PATHFIND_NOPATH))
         {
             if (!owner->IsStopped())
                 owner->StopMoving();
+
+            // Teleport if stuck, it's fairly blizzlike and preferrable to clipping through geometry
+            if (owner->GetDistance(target) > 20.0f)
+                owner->NearTeleportTo(x, y, z, target->GetOrientation());
 
             return true;
         }
@@ -626,6 +640,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         if (_inheritWalkState)
             init.SetWalk(target->IsWalking() || target->movespline->isWalking());
 
+        // not blizzlike in Classic
         if (_inheritSpeed)
             if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
                 init.SetVelocity(*velocity);
@@ -641,6 +656,7 @@ void FollowMovementGenerator<T>::DoInitialize(T* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     owner->AddUnitState(UNIT_STATE_FOLLOW);
+    i_checkTimer.Reset(400);
 }
 
 template<class T>
