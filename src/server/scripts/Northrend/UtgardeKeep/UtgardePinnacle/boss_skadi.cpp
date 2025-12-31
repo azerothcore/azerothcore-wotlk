@@ -505,7 +505,9 @@ public:
 
                 if (Creature* grauf = ObjectAccessor::GetCreature(*pPlayer, m_pInstance->GetGuidData(DATA_GRAUF)))
                 {
-                    if (count >= 3)
+                    uint8 harpoonTargetCount = go->GetMap()->IsHeroic() ? 5 : 3;
+
+                    if (count >= harpoonTargetCount)
                     {
                         m_pInstance->SetData(SKADI_IN_RANGE, 0);
                         grauf->AI()->DoAction(ACTION_REMOVE_SKADI);
