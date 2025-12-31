@@ -1,7 +1,7 @@
 --
 DELETE FROM `acore_string` WHERE `entry` = 603;
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
-(603, 'SetData performed on [GUID: {}, entry: {}, name: {}] Action: {}');
+(603, 'Do Action performed on [GUID: {}, entry: {}, name: {}] Action: {}');
 
 DELETE FROM `command` WHERE `name` = 'npc do';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
