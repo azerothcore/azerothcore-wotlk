@@ -3039,36 +3039,47 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         return;
     }
 
-    // Temp enchantment duration
+    // Enchantment duration
     uint32 duration = 3600; // Default 1 hour
 
     // Exceptions
-    switch (m_spellInfo->Id)
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)  // Shaman weapon enchants
+        duration = 1800; // 30 mins
+    else
     {
-        case 37360: // Consecrated Weapon
-            duration = 300; // 5 mins
-            break;
-        case 8087: // Shiny Bauble
-        case 8088: // Nightcrawlers
-        case 8089: // Aquadynamic Fish Attractor
-        case 8090: // Bright Baubles
-        case 8532: // Aquadynamic Fish Lens
-        case 9092: // Flesh Eating Worm
-        case 43699: // Fishing Hat Lure
-        case 45731: // Sharpened Fish Hook
-            duration = 600; // 10 mins
-            break;
-        case 3594: // Shadow Oil
-        case 3595: // Frost Oil
-        case 6650: // Instant Toxin
-        case 38615: // Bloodboil Poison
-            duration = 1800; // 30 mins
-            break;
-        default:
-            // Shaman weapon enchants
-            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN || m_spellInfo->SpellVisual[0] == 0) // Rockbiter Weapon has no spellfamily so also using spellvisual
+        switch (m_spellInfo->Id)
+        {  
+            case 37360: // Consecrated Weapon
+                duration = 300; // 5 mins
+                break;
+            case 8087: // Shiny Bauble
+            case 8088: // Nightcrawlers
+            case 8089: // Aquadynamic Fish Attractor
+            case 8090: // Bright Baubles
+            case 8532: // Aquadynamic Fish Lens
+            case 9092: // Flesh Eating Worm
+            case 43699: // Fishing Hat Lure
+            case 45731: // Sharpened Fish Hook
+                duration = 600; // 10 mins
+                break;
+            case 3594: // Shadow Oil
+            case 3595: // Frost Oil
+            case 6650: // Instant Toxin
+            case 38615: // Bloodboil Poison
+            // Explicitly listing Rockbiter Weapon because it isn't caught by spellfamily check
+            case 36744: // Rockbiter Weapon Rank 1
+            case 36753: // Rockbiter Weapon Rank 2
+            case 36751: // Rockbiter Weapon Rank 2
+            case 36754: // Rockbiter Weapon Rank 3
+            case 36755: // Rockbiter Weapon Rank 3
+            case 36761: // Rockbiter Weapon Rank 4
+            case 36758: // Rockbiter Weapon Rank 4
+            case 36760: // Rockbiter Weapon Rank 4
                 duration = 1800; // 30 mins
-            break;
+                break;
+            default:
+                break;
+        }
     }
 
     // item can be in trade slot and have owner diff. from caster
