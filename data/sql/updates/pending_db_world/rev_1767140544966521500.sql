@@ -170,7 +170,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 15340) AND (`Item` IN (34024, 190024));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (15340, 34024, 34024, 100, 0, 1, 0, 2, 2, 'Moam - (ReferenceTable)'),
-(15340, 190024, 34024, 1, 0, 1, 0, 1, 1, '');
+(15340, 190024, 34024, 1, 0, 1, 0, 1, 1, 'Moam - (ReferenceTable)');
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 14510) AND (`Item` IN (34086));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
