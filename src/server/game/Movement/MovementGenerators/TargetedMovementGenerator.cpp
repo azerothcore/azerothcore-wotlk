@@ -585,7 +585,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             i_checkTimer.Reset(400);
             i_path->Clear();
         }
-            
 
         target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
 
