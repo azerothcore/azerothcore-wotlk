@@ -167,10 +167,21 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 14326) AND (`Item` IN (350
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (14326, 35018, 35018, 100, 0, 1, 0, 1, 1, 'Guard Mol\'dar - (ReferenceTable)');
 
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 15340) AND (`Item` IN (34024, 190024));
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 15340) AND (`Item` IN (34024, 34026, 190024));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (15340, 34024, 34024, 100, 0, 1, 0, 2, 2, 'Moam - (ReferenceTable)'),
-(15340, 190024, 34024, 1, 0, 1, 0, 1, 1, '');
+(15340, 34026, 34026, 1, 0, 1, 0, 1, 1, 'Moam - Enchanting Formulas');
+
+DELETE FROM `reference_loot_template` WHERE `Entry` = 34024 AND `Item` IN (20727,20728,20729,20730,20731,20734,20736);
+DELETE FROM `reference_loot_template` WHERE `Entry` = 34026;
+INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(34026, 20727, 0, 0, 0, 1, 1, 1, 1, 'Formula: Enchant Gloves - Shadow Power'),
+(34026, 20728, 0, 0, 0, 1, 1, 1, 1, 'Formula: Enchant Gloves - Frost Power'),
+(34026, 20729, 0, 0, 0, 1, 1, 1, 1, 'Formula: Enchant Gloves - Fire Power'),
+(34026, 20730, 0, 0, 0, 1, 1, 1, 1, 'Formula: Enchant Gloves - Healing Power'),
+(34026, 20731, 0, 0, 0, 1, 1, 1, 1, 'Formula: Enchant Gloves - Superior Agility'),
+(34026, 20734, 0, 0, 0, 1, 1, 1, 1, 'Formula: Enchant Cloak - Stealth'),
+(34026, 20736, 0, 0, 0, 1, 1, 1, 1, 'Formula: Enchant Cloak - Dodge');
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 14510) AND (`Item` IN (34086));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
@@ -201,10 +212,10 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (25166, 34081, 34081, 100, 0, 1, 0, 1, 1, 'Grand Warlock Alythess - (ReferenceTable 2)'),
 (25166, 34085, 34085, 100, 0, 1, 0, 4, 4, 'Grand Warlock Alythess - (ReferenceTable)');
 
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 15348) AND (`Item` IN (34024, 190024));
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 15348) AND (`Item` IN (34024, 34026, 190024));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (15348, 34024, 34024, 100, 0, 1, 0, 2, 2, 'Kurinnaxx - (ReferenceTable)'),
-(15348, 190024, 34024, 1, 0, 1, 0, 1, 1, '');
+(15348, 34026, 34026, 1, 0, 1, 0, 1, 1, 'Kurinnaxx - Enchanting Formulas');
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 17767) AND (`Item` IN (34063, 34064));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
