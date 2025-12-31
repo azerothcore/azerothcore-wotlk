@@ -6,7 +6,7 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (30656, 310
 -- Add Rhydian's text
 DELETE FROM `creature_text` WHERE `CreatureID` = 30656 AND `GroupID` = 0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(30656, 0, 0, 'Hail. I could not help but overhear your conversation. Please allow me to lend some assistance.', 12, 0, 100, 0, 0, 0, 0, 0, 'Rhydian - Quest 13081');
+(30656, 0, 0, 'Hail. I could not help but overhear your conversation. Please allow me to lend some assistance.', 12, 0, 100, 0, 0, 0, 31380, 0, 'Rhydian - Quest 13081');
 
 -- Tirion: On quest 13081 accepted, SetData on Rhydian
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 31044 AND `source_type` = 0;
