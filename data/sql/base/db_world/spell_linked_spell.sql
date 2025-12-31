@@ -93,6 +93,7 @@ INSERT INTO `spell_linked_spell` VALUES
 (-52010,-51966,0,'Remove Scourge Disguise [51966]'),
 (-51966,-51971,0,'Remove Scourge Disguise Instability [51971]'),
 (-51221,44280,0,'On spellfade Taxi to Explorers\' League Outpost - Spellcast Taxi to Explorers\' League'),
+(-50845,-50844,0,'Tenris Mirkblood Blood Mirror'),
 (-50493,-50314,0,'Disco Ball(Listening to Music)'),
 (-50314,-50493,0,'Disco Ball'),
 (-50098,50099,0,'The Beast Within - trigger Unleash the Beast!'),
@@ -128,7 +129,6 @@ INSERT INTO `spell_linked_spell` VALUES
 (-43883,-42992,0,'Rental racing ram removed removes Trot'),
 (-43883,-42146,0,'Remove Brewfest Ram DND when Rental racing ram removed'),
 (-43369,-68347,0,'Worg Disguise'),
-(-43351,50167,0,''),
 (-43351,61720,0,''),
 (-42846,-36032,0,'Arcane Missiles Rank 13'),
 (-42843,-36032,0,'Arcane Missiles Rank 12'),
@@ -479,6 +479,7 @@ INSERT INTO `spell_linked_spell` VALUES
 (52192,-51966,0,'Remove Scourge Disguise [51966]'),
 (52192,51971,0,'Add Scourge Disguise Instability [51971]'),
 (52214,51407,2,'Looking for treasure aura triggered by Rainspeaker Treasures: See Invisibility'),
+(52239,52240,1,'Teleport'),
 (52279,45254,1,'On spellhit Tua-Tua on Burn - Spellcast Suicide'),
 (52303,45254,1,'On spellhit Hawinni on Frozen - Spellcast Suicide'),
 (52322,52325,1,'Explode Scourgewagon'),
@@ -499,11 +500,8 @@ INSERT INTO `spell_linked_spell` VALUES
 (53355,-53371,1,'Freeze fix'),
 (53371,-53355,1,'Freeze fix'),
 (53563,53651,2,'Beacon of Light'),
+(54076,49511,0,'Taxi validate - Gryphon to Star Rest'),
 (54097,-54100,1,'Widow\'s Embrace - Frenzy (H)'),
-(54581,54623,0,'Mammoth Explosion Spell Spawner link to Quest - Mammoth Explosion Summon Object'),
-(54581,54627,0,'Mammoth Explosion Spell Spawner link to Quest - Mammoth Explosion Summon Object'),
-(54581,54628,0,'Mammoth Explosion Spell Spawner link to Quest - Mammoth Explosion Summon Object'),
-(54581,57444,0,'Mammoth Explosion Spell Spawner link to Summon Main Mammoth Meat'),
 (54640,54643,0,'WG teleporter'),
 (54643,-54643,2,'Wintergrasp Defender Teleport'),
 (54861,-34976,0,'Drop Flag on Nitro Boost EOS'),
@@ -658,4 +656,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:41
+-- Dump completed on 2025-12-29 17:54:36
