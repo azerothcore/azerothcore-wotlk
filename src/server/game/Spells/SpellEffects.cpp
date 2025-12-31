@@ -3048,7 +3048,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
     else
     {
         switch (m_spellInfo->Id)
-        {  
+        {
             case 37360: // Consecrated Weapon
                 duration = 300; // 5 mins
                 break;
