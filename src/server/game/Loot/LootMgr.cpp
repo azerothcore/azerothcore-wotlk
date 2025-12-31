@@ -376,9 +376,9 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
     {
         if (needs_quest)
             LOG_ERROR("sql.sql", "Table '{}' Entry {} Item {}: quest required will be ignored", store.GetName(), entry, itemid);
-        else if (chance == 0)                              // no chance for the reference
+        else if (chance == 0 && groupid == 0)
         {
-            LOG_ERROR("sql.sql", "Table '{}' Entry {} Item {}: zero chance is specified for a reference, skipped", store.GetName(), entry, itemid);
+            LOG_ERROR("sql.sql", "Table '{}' Entry {} Item {}: zero chance is specified for a ungrouped reference, skipped", store.GetName(), entry, itemid);
             return false;
         }
     }
