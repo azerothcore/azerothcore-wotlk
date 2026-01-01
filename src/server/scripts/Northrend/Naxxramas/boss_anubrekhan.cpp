@@ -58,7 +58,7 @@ Position const cryptguardPositions[] = {
 
 struct boss_anubrekhan : public BossAI
 {
-    boss_anubrekhan(Creature* creature) : BossAI(creature, DATA_ANUBREKHAN_BOSS) { }
+    boss_anubrekhan(Creature* creature) : BossAI(creature, BOSS_ANUB) { }
 
     void SummonCryptGuards()
     {
@@ -73,7 +73,6 @@ struct boss_anubrekhan : public BossAI
     {
         BossAI::Reset();
         SummonCryptGuards();
-        _extraCryptGuardCount = 0;
     }
 
     void JustSummoned(Creature* cr) override
@@ -134,12 +133,10 @@ struct boss_anubrekhan : public BossAI
         ScheduleTimedEvent(70s, 2min, [&] {
             Talk(EMOTE_LOCUST);
             DoCastSelf(SPELL_LOCUST_SWARM);
-            uint32 _cryptGuardEventCount = EVENT_SPAWN_CRYPT_GUARDS_EXTRA + _extraCryptGuardCount;
 
-            ScheduleUniqueTimedEvent(3s, [&] {
+            scheduler.Schedule(3s, [this](TaskContext /*context*/) {
                 me->SummonCreature(NPC_CRYPT_GUARD, cryptguardPositions[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-            }, _cryptGuardEventCount);
-            ++_extraCryptGuardCount;
+            });
         }, 90s);
 
         ScheduleEnrageTimer(SPELL_BERSERK, 10min);
@@ -157,7 +154,6 @@ struct boss_anubrekhan : public BossAI
 
 private:
     bool _sayGreet{false};
-    uint32 _extraCryptGuardCount;
 };
 
 void AddSC_boss_anubrekhan()
