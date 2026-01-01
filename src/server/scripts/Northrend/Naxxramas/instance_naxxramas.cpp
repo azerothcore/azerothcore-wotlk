@@ -36,6 +36,7 @@ BossBoundaryData const boundaries =
     /* Plague Quarter */
     { BOSS_NOTH,      new RectangleBoundary(2618.0f, 2754.0f, -3557.43f, -3450.0f) },
     { BOSS_HEIGAN,    new CircleBoundary(Position(2772.57f, -3685.28f), 56.0f) },
+    { BOSS_HEIGAN,    new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f) },
     { BOSS_LOATHEB,   new CircleBoundary(Position(2909.0f, -3997.41f), 57.0f) },
 
     /* Military Quarter */
@@ -55,10 +56,7 @@ BossBoundaryData const boundaries =
 
     /* Frostwyrm Lair */
     { BOSS_SAPPHIRON, new CircleBoundary(Position(3517.627f, -5255.5f), 110.0) },
-    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0) },
-
-    /* Heigan */
-    { DATA_HEIGAN_BOSS, new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f) }
+    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0) }
 };
 
 struct LivingPoisonData

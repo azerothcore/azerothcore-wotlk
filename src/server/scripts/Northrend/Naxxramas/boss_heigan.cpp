@@ -59,7 +59,7 @@ float const heiganFastDanceFaceDirection = 2.40f;
 
 struct boss_heigan : public BossAI
 {
-    boss_heigan(Creature* creature) : BossAI(creature, DATA_HEIGAN_BOSS) { }
+    boss_heigan(Creature* creature) : BossAI(creature, BOSS_HEIGAN) { }
 
     void Reset() override
     {
