@@ -671,7 +671,10 @@ enum AcoreStrings
 
     LANG_REWARDED                       = 602,
 
-    // 603-704 - free
+    LANG_IP_NOT_FOUND                   = 603,
+    LANG_EMAIL_NOT_FOUND                = 604,
+
+    // 605-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
     LANG_NOT_EQUIPPED_ITEM              = 706,
