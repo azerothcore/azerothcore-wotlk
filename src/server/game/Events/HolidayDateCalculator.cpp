@@ -49,7 +49,7 @@ static const std::vector<HolidayRule> HolidayRules = {
     // Pirates' Day: Fixed Sep 19
     { HOLIDAY_PIRATES_DAY, HolidayCalculationType::FIXED_DATE, 9, 19, 0, 0 },
 
-    // @todo: revisit this to properly handle the brewfest building event, too, which
+    /// @todo: revisit this to properly handle the brewfest building event, too, which
     // starts 7 days before the main brewfest event. this is also the reason, that the
     // brewfest event date for the calendar needs a 7 day offset added to the visible
     // calendar start date.
