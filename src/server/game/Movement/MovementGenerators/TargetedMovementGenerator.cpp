@@ -447,7 +447,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
 }
 
 template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(Unit* target, uint32 diff)
+bool FollowMovementGenerator<T>::PositionOkay(Unit* target)
 {
     if (!_lastTargetPosition)
         return false;
