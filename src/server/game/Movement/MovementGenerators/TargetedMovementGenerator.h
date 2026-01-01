@@ -116,6 +116,7 @@ public:
 private:
     std::unique_ptr<PathGenerator> i_path;
     TimeTrackerSmall i_recheckPredictedDistanceTimer;
+    TimeTrackerSmall i_checkTimer;
     bool i_recheckPredictedDistance;
 
     Optional<Position> _lastTargetPosition;
@@ -124,8 +125,6 @@ private:
     ChaseAngle _angle;
     bool _inheritWalkState;
     bool _inheritSpeed;
-private:
-    TimeTrackerSmall i_checkTimer;
 };
 
 #endif
