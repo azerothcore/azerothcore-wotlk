@@ -457,7 +457,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, uint32 diff)
     // For creatures, increase tolerance
     if (target->IsCreature())
     {
-        distanceTolerance += _range + _range;
+        distanceTolerance = 2.f;
     }
 
     if (exactDistSq > distanceTolerance)
@@ -495,12 +495,18 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             followingMaster = true;
     }
 
+    i_checkTimer.Update(time_diff);
+    if (!i_checkTimer.Passed())
+        return true; // Wait for next tick
+    i_checkTimer.Reset(oPet ? 400 : 1200); // Player pets need more frequent updates
+
     bool forceDest =
         (followingMaster) || // allow pets following their master to cheat while generating paths
         (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
-    if (!oPet && PositionOkay(target, time_diff)) // Skip check if pet
+    // Don't calculate path if target did not move significantly
+    if (PositionOkay(target, time_diff))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -510,60 +516,52 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
             owner->SetFacingTo(target->GetOrientation());
         }
+
+        return true;
     }
+
+    Position targetPosition = target->GetPosition();
+    _lastTargetPosition = targetPosition;
+
+    if (!i_path)
+        i_path = std::make_unique<PathGenerator>(owner);
     else
+        i_path->Clear();
+
+    target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
+
+    float x, y, z;
+    targetPosition.GetPosition(x, y, z);
+
+    if (owner->IsHovering())
+        owner->UpdateAllowedPositionZ(x, y, z);
+
+    bool success = i_path->CalculatePath(x, y, z, forceDest);
+    if (!success || (i_path->GetPathType() & PATHFIND_NOPATH))
     {
-        Position targetPosition = target->GetPosition();
-        _lastTargetPosition = targetPosition;
+        if (!owner->IsStopped())
+            owner->StopMoving();
 
-        if (!i_path)
-        {
-            i_path = std::make_unique<PathGenerator>(owner);
-        }
-        else
-        {
-            i_checkTimer.Update(time_diff);
-            if (!i_checkTimer.Passed())
-                return true; // Wait for next tick
+        // Teleport if stuck, it's fairly blizzlike and preferrable to clipping through geometry
+        if (owner->GetDistance(target) > 20.0f)
+            owner->NearTeleportTo(x, y, z, target->GetOrientation());
 
-            i_checkTimer.Reset(400);
-            i_path->Clear();
-        }
-
-        target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
-
-        float x, y, z;
-        targetPosition.GetPosition(x, y, z);
-
-        if (owner->IsHovering())
-            owner->UpdateAllowedPositionZ(x, y, z);
-
-        bool success = i_path->CalculatePath(x, y, z, forceDest);
-        if (!success || (i_path->GetPathType() & PATHFIND_NOPATH))
-        {
-            if (!owner->IsStopped())
-                owner->StopMoving();
-
-            // Teleport if stuck, it's fairly blizzlike and preferrable to clipping through geometry
-            if (owner->GetDistance(target) > 20.0f)
-                owner->NearTeleportTo(x, y, z, target->GetOrientation());
-
-            return true;
-        }
-
-        owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
-
-        Movement::MoveSplineInit init(owner);
-        init.MovebyPath(i_path->GetPath());
-        if (_inheritWalkState)
-            init.SetWalk(target->IsWalking() || target->movespline->isWalking());
-
-        // not blizzlike in Classic
-        if (_inheritSpeed)
-            if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
-                init.SetVelocity(*velocity);
-        init.Launch();
+        return true;
     }
+
+    owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
+
+    Movement::MoveSplineInit init(owner);
+    init.MovebyPath(i_path->GetPath());
+    if (_inheritWalkState)
+        init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+
+    // not blizzlike in Classic
+    if (_inheritSpeed)
+        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
+            init.SetVelocity(*velocity);
+
+    init.Launch();
 
     return true;
 }
