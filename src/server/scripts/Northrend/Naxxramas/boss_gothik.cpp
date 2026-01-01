@@ -465,10 +465,6 @@ public:
 
                         gateOpened = true;
                         Talk(EMOTE_GATE_OPENED);
-                        summons.DoForAllSummons([&](WorldObject* summon){
-                            if (Creature* summonedCreature = summon->ToCreature())
-                                summonedCreature->SetInCombatWithZone();
-                        });
                     }
                     break;
             }
