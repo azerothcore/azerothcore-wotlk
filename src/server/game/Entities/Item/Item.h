@@ -272,6 +272,13 @@ public:
     [[nodiscard]] uint32 GetCount() const { return GetUInt32Value(ITEM_FIELD_STACK_COUNT); }
     void SetCount(uint32 value) { SetUInt32Value(ITEM_FIELD_STACK_COUNT, value); }
     [[nodiscard]] uint32 GetMaxStackCount() const { return GetTemplate()->GetMaxStackSize(); }
+    void GetOnEquipSpellIDs(std::vector<uint32>& spellEquipID) const
+    {
+        if (ItemTemplate const* proto = GetTemplate())
+            proto->GetOnEquipSpellIDs(spellEquipID);
+        else
+            spellEquipID.clear();
+    };
     // Checks if this item has sockets, whether built-in or added by an upgrade.
     [[nodiscard]] bool HasSocket() const;
     [[nodiscard]] uint8 GetGemCountWithID(uint32 GemID) const;
