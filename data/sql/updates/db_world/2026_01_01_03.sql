@@ -1,3 +1,4 @@
+-- DB update 2026_01_01_02 -> 2026_01_01_03
 DELETE FROM `command` WHERE `name` IN ('list auras id', 'list auras name', 'account remove country', 'debug mapdata', 'debug visibilitydata', 'event info');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('list auras id', 1, 'Syntax: .list auras id\n\nLists all active auras on the selected unit by spell ID.'),
