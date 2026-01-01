@@ -27,7 +27,7 @@ constexpr double DEG_TO_RAD = PI / 180.0;
 inline double sind(double deg) { return std::sin(deg * DEG_TO_RAD); }
 
 // Static holiday rules configuration
-static const std::vector<HolidayRule> s_HolidayRules = {
+static const std::vector<HolidayRule> HolidayRules = {
     // Lunar Festival: Chinese New Year - 1 day (event starts day before CNY)
     { HOLIDAY_LUNAR_FESTIVAL, HolidayCalculationType::LUNAR_NEW_YEAR, 0, 0, 0, -1 },
 
@@ -70,7 +70,7 @@ static const std::vector<HolidayRule> s_HolidayRules = {
 
 const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
 {
-    return s_HolidayRules;
+    return HolidayRules;
 }
 
 std::tm HolidayDateCalculator::CalculateEasterSunday(int year)
@@ -508,7 +508,7 @@ std::tm HolidayDateCalculator::UnpackDate(uint32_t packed)
 
 uint32_t HolidayDateCalculator::GetPackedHolidayDate(uint32_t holidayId, int year)
 {
-    for (auto const& rule : s_HolidayRules)
+    for (auto const& rule : HolidayRules)
     {
         if (rule.holidayId == holidayId)
         {
