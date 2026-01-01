@@ -9176,7 +9176,6 @@ INSERT INTO `gameobject_loot_template` VALUES
 (4504,7226,0,100,1,1,0,1,1,'Bink\'s Toolbox - Mage-tastic Gizmonitor'),
 (4505,7227,0,100,1,1,0,1,1,'Balnir Snapdragons - Balnir Snapdragons'),
 (4564,7266,0,100,1,1,0,1,1,'Ur\'s Treatise on Shadow Magic - Ur\'s Treatise on Shadow Magic'),
-(4584,5535,0,1,1,1,0,1,1,'Rituals of Power - Compendium of the Fallen'),
 (4584,7274,0,100,1,1,0,1,1,'Rituals of Power - Rituals of Power'),
 (4589,7292,0,100,1,1,0,1,1,'Filled Containment Coffer - Filled Containment Coffer'),
 (4590,7294,0,100,1,1,0,1,1,'Andron\'s Bookshelf - Andron\'s Ledger'),
@@ -15665,9 +15664,9 @@ INSERT INTO `gameobject_loot_template` VALUES
 (21260,24608,0,0.6,0,1,0,1,1,'Solid Fel Iron Chest - Laughing Skull Gloves'),
 (21260,24609,0,0.5,0,1,0,1,1,'Solid Fel Iron Chest - Laughing Skull Cap'),
 (21260,24610,0,0.8,0,1,0,1,1,'Solid Fel Iron Chest - Laughing Skull Pants'),
-(21260,24611,0,0.5,0,1,0,1,1,'Solid Fel Iron Chest - Laughing Skull Shoulderpads');
+(21260,24611,0,0.5,0,1,0,1,1,'Solid Fel Iron Chest - Laughing Skull Shoulderpads'),
+(21260,24612,0,0.5,0,1,0,1,1,'Solid Fel Iron Chest - Laughing Skull Bracelets');
 INSERT INTO `gameobject_loot_template` VALUES
-(21260,24612,0,0.5,0,1,0,1,1,'Solid Fel Iron Chest - Laughing Skull Bracelets'),
 (21260,24621,0,0.7,0,1,0,1,1,'Solid Fel Iron Chest - Slavehandler Belt'),
 (21260,24622,0,0.5,0,1,0,1,1,'Solid Fel Iron Chest - Slavehandler Footpads'),
 (21260,24623,0,0.6,0,1,0,1,1,'Solid Fel Iron Chest - Slavehandler Jerkin'),
@@ -17506,11 +17505,11 @@ INSERT INTO `gameobject_loot_template` VALUES
 (25670,44475,0,0,0,1,1,1,1,'Moonglow Cuttlefish School - Reinforced Crate'),
 (25670,46109,0,0.01,0,1,2,1,1,'Moonglow Cuttlefish School - Sea Turtle'),
 (25670,50289,0,0.05,0,1,2,1,1,'Moonglow Cuttlefish School - Blacktip Shark'),
-(25671,37705,0,5,0,1,3,1,1,'Deep Sea Monsterbelly School - Crystallized Water'),
+(25671,37705,0,0,0,1,1,1,1,'Deep Sea Monsterbelly School - Crystallized Water'),
 (25671,40199,0,50,0,1,2,1,1,'Deep Sea Monsterbelly School - Pygmy Suckerfish'),
 (25671,41800,0,90,0,1,1,1,1,'Deep Sea Monsterbelly School - Deep Sea Monsterbelly'),
-(25671,44475,0,5,0,1,4,1,1,'Deep Sea Monsterbelly School - Reinforced Crate'),
-(25671,46109,0,0.01,0,1,5,1,1,'Deep Sea Monsterbelly School - Sea Turtle'),
+(25671,44475,0,0,0,1,1,1,1,'Deep Sea Monsterbelly School - Reinforced Crate'),
+(25671,46109,0,0.01,0,1,2,1,1,'Deep Sea Monsterbelly School - Sea Turtle'),
 (25671,50289,0,0.05,0,1,2,1,1,'Deep Sea Monsterbelly School - Blacktip Shark'),
 (25673,37705,0,0,0,1,1,1,1,'Nettlefish School - Crystallized Water'),
 (25673,40199,0,50,0,1,2,1,1,'Nettlefish School - Pygmy Suckerfish'),
@@ -17599,7 +17598,7 @@ INSERT INTO `gameobject_loot_template` VALUES
 (26682,44477,0,100,1,1,0,1,1,'Alumeth\'s Heart - Alumeth\'s Heart'),
 (26683,44478,0,100,1,1,0,1,1,'Alumeth\'s Scepter - Alumeth\'s Scepter'),
 (26684,44479,0,100,1,1,0,1,1,'Alumeth\'s Robes - Alumeth\'s Robes'),
-(26782,44724,0,100,1,1,0,1,1,'Everfrost Chip - Everfrost Chip'),
+(26782,44724,0,100,0,1,0,1,1,'Everfrost Chip - Everfrost Chip'),
 (26782,44725,0,20,0,1,0,1,1,'Everfrost Chip - Everfrost Chip'),
 (26782,44729,0,100,0,1,0,1,1,'Everfrost Chip - Everfrost Powder'),
 (26852,44921,0,100,1,1,0,1,1,'Gundrak Raptor Egg - Gundrak Raptor Egg'),
@@ -18012,4 +18011,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:02
+-- Dump completed on 2025-12-29 17:53:58
