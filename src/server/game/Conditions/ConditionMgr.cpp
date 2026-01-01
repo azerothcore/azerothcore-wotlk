@@ -553,7 +553,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                     if (!ConditionValue1)
                         condMeets = true;
                     else if (Map* map = player->GetMap())
-                        condMeets = map->GetDifficulty() == Difficulty{ConditionValue2};
+                        condMeets = map->GetDifficulty() == Difficulty(ConditionValue2);
                 }
             }
         }
