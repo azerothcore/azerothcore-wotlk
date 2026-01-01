@@ -282,7 +282,6 @@ public:
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
                     summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->CallForHelp(150.0f);
                 }
             }
         }
@@ -466,6 +465,10 @@ public:
 
                         gateOpened = true;
                         Talk(EMOTE_GATE_OPENED);
+                        summons.DoForAllSummons([&](WorldObject* summon){
+                            if (Creature* summonedCreature = summon->ToCreature())
+                                summonedCreature->SetInCombatWithZone();
+                        });
                     }
                     break;
             }
