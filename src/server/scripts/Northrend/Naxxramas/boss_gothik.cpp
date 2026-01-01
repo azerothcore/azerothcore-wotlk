@@ -501,9 +501,9 @@ public:
             events.Reset();
         }
 
-        void MoveInLineOfSight(Unit* who) override { }
+        void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void JustEngagedWith(Unit*  /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             switch (me->GetEntry())
             {
