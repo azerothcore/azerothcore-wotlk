@@ -729,6 +729,14 @@ struct ItemTemplate
         return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF - 1) : uint32(Stackable);
     }
 
+    void GetOnEquipSpellIDs(std::vector<uint32>& spellEquipID) const
+    {
+        spellEquipID.clear();
+        for (auto const& spell : Spells)
+            if (spell.SpellId && spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP)
+                spellEquipID.push_back(spell.SpellId);
+    }
+
     [[nodiscard]] float getDPS() const
     {
         if (Delay == 0)
