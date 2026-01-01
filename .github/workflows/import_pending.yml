@@ -10,7 +10,9 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-24.04
     permissions: write-all
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    if: github.event.pull_request.base.repo.full_name == github.repository
+    echo "Target / Base Repo: base.repo.full_name: ${{ github.event.pull_request.base.repo.full_name }}"
+    echo "Current Repo: github.repository: ${{ github.repository }}"  
     steps:
       - uses: actions/checkout@v4
         with:

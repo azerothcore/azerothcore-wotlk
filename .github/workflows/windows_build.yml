@@ -23,7 +23,9 @@ jobs:
     env:
       BOOST_ROOT: C:\local\boost_1_82_0
     if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
+      github.event.pull_request.base.repo.full_name == github.repository
+    echo "Target / Base Repo: base.repo.full_name: ${{ github.event.pull_request.base.repo.full_name }}"
+    echo "Current Repo: github.repository: ${{ github.repository }}"  
       && !github.event.pull_request.draft
       && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
