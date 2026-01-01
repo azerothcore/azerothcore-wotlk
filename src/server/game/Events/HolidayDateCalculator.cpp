@@ -53,7 +53,7 @@ static const std::vector<HolidayRule> HolidayRules = {
     // starts 7 days before the main brewfest event. this is also the reason, that the
     // brewfest event date for the calendar needs a 7 day offset added to the visible
     // calendar start date.
-    // currently the client automatically adds this event to the calendar at sept 20th
+    // currently the client automatically adds this event to the calendar at Sept 20th
     // if the server does not provide a different date
     // Brewfest: Oktoberfest rule - first Saturday on/after Sept 15, minus 7 for holidayStage offset
     // { HOLIDAY_BREWFEST, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 },
