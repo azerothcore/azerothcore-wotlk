@@ -427,6 +427,8 @@ struct SmartEvent
         struct
         {
             uint32 eventId;
+            uint32 cooldownMin;
+            uint32 cooldownMax;
         } doAction;
 
         struct
