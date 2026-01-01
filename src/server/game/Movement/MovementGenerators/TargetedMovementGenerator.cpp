@@ -457,7 +457,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target)
     // For creatures, increase tolerance
     if (target->IsCreature())
     {
-        distanceTolerance = 2.f;
+        distanceTolerance += _range + _range;
     }
 
     if (exactDistSq > distanceTolerance)
@@ -542,7 +542,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         if (!owner->IsStopped())
             owner->StopMoving();
 
-        // Teleport if stuck, it's fairly blizzlike and preferrable to clipping through geometry
+        // Teleport if stuck, it's fairly blizzlike and preferable to clipping through geometry
         if (owner->GetDistance(target) > 20.0f)
             owner->NearTeleportTo(x, y, z, target->GetOrientation());
 
@@ -556,7 +556,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (_inheritWalkState)
         init.SetWalk(target->IsWalking() || target->movespline->isWalking());
 
-    // not blizzlike in Classic
     if (_inheritSpeed)
         if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
             init.SetVelocity(*velocity);
