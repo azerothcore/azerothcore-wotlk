@@ -41,6 +41,10 @@ jobs:
     echo "Target / Base Repo: base.repo.full_name: ${{ github.event.pull_request.base.repo.full_name }}"
     echo "Current Repo: github.repository: ${{ github.repository }}"  
     steps:
+      - name: Repo Check
+        run: |
+          echo "Target / Base Repo: base.repo.full_name: ${{ github.event.pull_request.base.repo.full_name }}"
+          echo "Current Repo: github.repository: ${{ github.repository }}"
       - uses: actions/checkout@v4
       - uses: ./.github/actions/linux-build
         with:
