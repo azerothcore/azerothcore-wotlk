@@ -91,7 +91,7 @@ class FollowMovementGenerator : public MovementGeneratorMedium<T, FollowMovement
 {
 public:
     FollowMovementGenerator(Unit* target, float range, ChaseAngle angle, bool inheritWalkState, bool inheritSpeed)
-        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckPredictedDistanceTimer(0), i_checkTimer(0), i_recheckPredictedDistance(false), _range(range), _angle(angle), _inheritWalkState(inheritWalkState), _inheritSpeed(inheritSpeed) { }
+        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_checkTimer(0), _range(range), _angle(angle), _inheritWalkState(inheritWalkState), _inheritSpeed(inheritSpeed) { }
     ~FollowMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
@@ -106,7 +106,7 @@ public:
 
     void unitSpeedChanged() { _lastTargetPosition.reset(); }
 
-    bool PositionOkay(Unit* target, bool& targetIsMoving, uint32 diff);
+    bool PositionOkay(Unit* target, uint32 diff);
 
     static void _clearUnitStateMove(T* u) { u->ClearUnitState(UNIT_STATE_FOLLOW_MOVE); }
     static void _addUnitStateMove(T* u) { u->AddUnitState(UNIT_STATE_FOLLOW_MOVE); }
@@ -115,12 +115,9 @@ public:
 
 private:
     std::unique_ptr<PathGenerator> i_path;
-    TimeTrackerSmall i_recheckPredictedDistanceTimer;
     TimeTrackerSmall i_checkTimer;
-    bool i_recheckPredictedDistance;
 
     Optional<Position> _lastTargetPosition;
-    Optional<Position> _lastPredictedPosition;
     float _range;
     ChaseAngle _angle;
     bool _inheritWalkState;

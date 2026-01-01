@@ -446,41 +446,8 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
     return speed;
 }
 
-static Position const PredictPosition(Unit* target)
-{
-    Position pos = target->GetPosition();
-
-     // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
-    float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
-    float orientation = target->GetOrientation();
-
-    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))
-    {
-        pos.m_positionX += cos(orientation) * speed;
-        pos.m_positionY += std::sin(orientation) * speed;
-    }
-    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_BACKWARD))
-    {
-        pos.m_positionX -= cos(orientation) * speed;
-        pos.m_positionY -= std::sin(orientation) * speed;
-    }
-
-    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
-    {
-        pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
-        pos.m_positionY += std::sin(orientation + M_PI / 2.f) * speed;
-    }
-    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
-    {
-        pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
-        pos.m_positionY += std::sin(orientation - M_PI / 2.f) * speed;
-    }
-
-    return pos;
-}
-
 template<class T>
-bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool& targetIsMoving, uint32 diff)
+bool FollowMovementGenerator<T>::PositionOkay(Unit* target, uint32 diff)
 {
     if (!_lastTargetPosition)
         return false;
@@ -533,19 +500,13 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
-    bool targetIsMoving = false;
-    if (!oPet && PositionOkay(target, targetIsMoving, time_diff)) // Skip check if pet
+    if (!oPet && PositionOkay(target, time_diff)) // Skip check if pet
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
             owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
             i_path = nullptr;
             MovementInform(owner);
-
-            if (i_recheckPredictedDistance)
-            {
-                i_recheckPredictedDistanceTimer.Reset(1000);
-            }
 
             owner->SetFacingTo(target->GetOrientation());
         }
@@ -554,23 +515,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         Position targetPosition = target->GetPosition();
         _lastTargetPosition = targetPosition;
-
-        // If player is moving and their position is not updated, we need to predict position
-        if (targetIsMoving)
-        {
-            Position predictedPosition = PredictPosition(target);
-            if (_lastPredictedPosition && _lastPredictedPosition->GetExactDistSq(&predictedPosition) < 0.25f)
-                return true;
-
-            _lastPredictedPosition = predictedPosition;
-            targetPosition = predictedPosition;
-            i_recheckPredictedDistance = true;
-        }
-        else
-        {
-            i_recheckPredictedDistance = false;
-            i_recheckPredictedDistanceTimer.Reset(0);
-        }
 
         if (!i_path)
         {
