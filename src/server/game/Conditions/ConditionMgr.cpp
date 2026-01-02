@@ -553,7 +553,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
                     if (!ConditionValue1)
                         condMeets = true;
                     else if (Map* map = player->GetMap())
-                        condMeets = map->GetDifficulty() == Difficulty(ConditionValue1);
+                        condMeets = map->GetDifficulty() == Difficulty(ConditionValue2);
                 }
             }
         }
@@ -2487,13 +2487,16 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
         }
         break;
     case CONDITION_RANDOM_DUNGEON:
-        if (cond->ConditionValue1 >= MAX_DIFFICULTY)
+        if (cond->ConditionValue1 > 1)
         {
-            LOG_ERROR("sql.sql", "RandomDungeon condition has invalid difficulty in value1 ({}).", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value1 ({}).", cond->ConditionValue1);
             return false;
         }
-        if (cond->ConditionValue2)
-            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value2 ({}).", cond->ConditionValue2);
+        if (cond->ConditionValue2 >= MAX_DIFFICULTY)
+        {
+            LOG_ERROR("sql.sql", "RandomDungeon condition has invalid difficulty in value2 ({}).", cond->ConditionValue1);
+            return false;
+        }
         if (cond->ConditionValue3)
             LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value3 ({}).", cond->ConditionValue3);
         break;
