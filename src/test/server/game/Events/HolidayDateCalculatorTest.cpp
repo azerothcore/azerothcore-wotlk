@@ -618,6 +618,44 @@ TEST_F(HolidayDateCalculatorTest, WeekdayOnOrAfter_AlwaysCorrectWeekday_1900_220
     }
 }
 
+TEST_F(HolidayDateCalculatorTest, WeekdayOnOrAfter_MonthBoundary_RollsIntoNextMonth)
+{
+    // Test dates near month-end that may roll into the next month
+    // Apr 25 looking for Monday can roll into May (e.g., if Apr 25 is Sunday, Monday is May 1)
+
+    for (int year = 1900; year <= 2200; ++year)
+    {
+        // Test Apr 25 (Children's Week reference date)
+        std::tm apr25 = HolidayDateCalculator::CalculateWeekdayOnOrAfter(year, 4, 25, Weekday::MONDAY);
+        SCOPED_TRACE("Apr 25, Year: " + std::to_string(year));
+        EXPECT_EQ(apr25.tm_wday, 1);  // Monday
+        EXPECT_TRUE(apr25.tm_mon == 3 || apr25.tm_mon == 4);  // April or May (0-indexed: 3 or 4)
+        // If still in April, must be >= 25. If in May, can be 1-6.
+        if (apr25.tm_mon == 3)
+            EXPECT_GE(apr25.tm_mday, 25);
+        else
+            EXPECT_LE(apr25.tm_mday, 6);
+
+        // Test Apr 30 - more likely to roll into May
+        std::tm apr30 = HolidayDateCalculator::CalculateWeekdayOnOrAfter(year, 4, 30, Weekday::MONDAY);
+        SCOPED_TRACE("Apr 30, Year: " + std::to_string(year));
+        EXPECT_EQ(apr30.tm_wday, 1);  // Monday
+        EXPECT_TRUE(apr30.tm_mon == 3 || apr30.tm_mon == 4);  // April or May
+        if (apr30.tm_mon == 3)
+            EXPECT_EQ(apr30.tm_mday, 30);  // Apr 30 must be the Monday
+        else
+            EXPECT_LE(apr30.tm_mday, 6);   // May 1-6
+
+        // Test Dec 31 - can roll into January of next year
+        std::tm dec31 = HolidayDateCalculator::CalculateWeekdayOnOrAfter(year, 12, 31, Weekday::MONDAY);
+        SCOPED_TRACE("Dec 31, Year: " + std::to_string(year));
+        EXPECT_EQ(dec31.tm_wday, 1);  // Monday
+        // Could be Dec 31 or Jan 1-6 of next year
+        EXPECT_TRUE((dec31.tm_mon == 11 && dec31.tm_mday == 31) ||
+                    (dec31.tm_mon == 0 && dec31.tm_mday <= 6));
+    }
+}
+
 // ============================================================
 // Stress Tests - Verify No Crashes or Invalid Dates
 // ============================================================
