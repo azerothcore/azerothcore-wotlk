@@ -19,3 +19,6 @@ UPDATE `game_event` SET `start_time` = NULL, `end_time` = NULL WHERE `eventEntry
     70, -- Brewfest Building (Iron Forge)
     72  -- Fireworks Spectacular
 );
+
+-- drop unused table
+DROP TABLE IF EXISTS `holiday_dates`;
