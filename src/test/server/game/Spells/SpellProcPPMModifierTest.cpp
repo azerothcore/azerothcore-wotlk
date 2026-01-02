@@ -397,4 +397,3 @@ TEST_F(SpellProcPPMModifierTest, EdgeCase_ZeroWeaponSpeed)
 
     EXPECT_EQ(chance, 0.0f);
 }
-

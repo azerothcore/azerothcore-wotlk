@@ -407,4 +407,3 @@ TEST_F(SpellProcChargeTest, ProcTestScenario_ChargesWithCooldown)
     EXPECT_TRUE(scenario.SimulateProc(procEntry));
     EXPECT_EQ(scenario.GetAura()->GetCharges(), 1);
 }
-

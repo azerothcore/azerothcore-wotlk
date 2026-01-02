@@ -389,4 +389,3 @@ TEST_F(SpellProcTriggeredFilterTest, EdgeCase_AllExceptionsDisabled)
         config, procEntry, PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG))
         << "No exceptions should block triggered spell";
 }
-

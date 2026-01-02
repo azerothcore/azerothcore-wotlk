@@ -443,4 +443,3 @@ TEST_F(SpellProcAttributeTest, AttributeFlags_NonOverlapping)
         }
     }
 }
-

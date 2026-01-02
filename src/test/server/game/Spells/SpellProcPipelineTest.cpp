@@ -460,4 +460,3 @@ TEST_F(SpellProcPipelineTest, WeaponSpeed_AffectsPPMChance)
     // Roll of 30 should pass (< 33%)
     EXPECT_TRUE(_scenario->SimulateProc(procEntry, 30.0f));
 }
-

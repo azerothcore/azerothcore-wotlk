@@ -273,4 +273,3 @@ TEST_F(SpellProcDisableEffectsTest, Scenario_DualEffectAura)
     // Disabling both blocks the proc
     EXPECT_TRUE(ProcChanceTestHelper::ShouldBlockDueToDisabledEffects(dualEffectMask, 0x03));
 }
-
