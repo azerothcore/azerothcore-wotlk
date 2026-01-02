@@ -1093,13 +1093,13 @@ void GameEventMgr::LoadHolidayDates()
             continue;
 
         // Generate dates for current year + 2 ahead (year capped at 2030 due to 5-bit client limitation)
-        for (int yearOffset = 0; yearOffset <= 2; ++yearOffset)
+        for (int yearOffset = -1; yearOffset <= 2; ++yearOffset)
         {
             int const year = currentYear + yearOffset;
             if (year > 2030)
                 break;
 
-            uint8 const dateId = static_cast<uint8>(yearOffset);
+            uint8 const dateId = static_cast<uint8>(yearOffset + 1);
             if (dateId >= MAX_HOLIDAY_DATES)
                 break;
 
