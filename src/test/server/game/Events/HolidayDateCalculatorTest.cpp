@@ -967,33 +967,30 @@ TEST_F(HolidayDateCalculatorTest, LunarNewYear_19YearMetonicCycle)
 
 // ============================================================
 // Darkmoon Faire Tests
-// First Sunday of the month, rotating through 3 locations
+// First Sunday of the month, alternating between 2 locations (WotLK)
 // ============================================================
 
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_LocationRotation)
 {
-    // Verify the rotation pattern:
-    // Elwynn (offset 0): months 3, 6, 9, 12 (Mar, Jun, Sep, Dec) - month % 3 == 0
-    // Mulgore (offset 1): months 1, 4, 7, 10 (Jan, Apr, Jul, Oct) - month % 3 == 1
-    // Terokkar (offset 2): months 2, 5, 8, 11 (Feb, May, Aug, Nov) - month % 3 == 2
+    // Verify the WotLK rotation pattern (alternates monthly):
+    // Elwynn (offset 1): odd months (Jan, Mar, May, Jul, Sep, Nov) - month % 2 == 1
+    // Mulgore (offset 0): even months (Feb, Apr, Jun, Aug, Oct, Dec) - month % 2 == 0
 
-    // Elwynn months
-    EXPECT_EQ(3 % 3, 0);
-    EXPECT_EQ(6 % 3, 0);
-    EXPECT_EQ(9 % 3, 0);
-    EXPECT_EQ(12 % 3, 0);
+    // Elwynn months (odd)
+    EXPECT_EQ(1 % 2, 1);
+    EXPECT_EQ(3 % 2, 1);
+    EXPECT_EQ(5 % 2, 1);
+    EXPECT_EQ(7 % 2, 1);
+    EXPECT_EQ(9 % 2, 1);
+    EXPECT_EQ(11 % 2, 1);
 
-    // Mulgore months
-    EXPECT_EQ(1 % 3, 1);
-    EXPECT_EQ(4 % 3, 1);
-    EXPECT_EQ(7 % 3, 1);
-    EXPECT_EQ(10 % 3, 1);
-
-    // Terokkar months
-    EXPECT_EQ(2 % 3, 2);
-    EXPECT_EQ(5 % 3, 2);
-    EXPECT_EQ(8 % 3, 2);
-    EXPECT_EQ(11 % 3, 2);
+    // Mulgore months (even)
+    EXPECT_EQ(2 % 2, 0);
+    EXPECT_EQ(4 % 2, 0);
+    EXPECT_EQ(6 % 2, 0);
+    EXPECT_EQ(8 % 2, 0);
+    EXPECT_EQ(10 % 2, 0);
+    EXPECT_EQ(12 % 2, 0);
 }
 
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_FirstSundayOfMonth_KnownDates)
@@ -1035,14 +1032,14 @@ TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_FirstSundayOfMonth_KnownDates)
 
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Elwynn)
 {
-    // Elwynn (offset 0): months 3, 6, 9, 12
-    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(0, 2025, 1);
+    // Elwynn (offset 1): odd months (Jan, Mar, May, Jul, Sep, Nov)
+    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(1, 2025, 1);
 
-    // Should have exactly 4 dates for one year
-    EXPECT_EQ(dates.size(), 4u);
+    // Should have exactly 6 dates for one year (one per odd month)
+    EXPECT_EQ(dates.size(), 6u);
 
     // Verify each date is in the correct month and is a Sunday
-    std::vector<int> expectedMonths = { 3, 6, 9, 12 };
+    std::vector<int> expectedMonths = { 1, 3, 5, 7, 9, 11 };
     for (size_t i = 0; i < dates.size(); ++i)
     {
         std::tm date = HolidayDateCalculator::UnpackDate(dates[i]);
@@ -1059,32 +1056,13 @@ TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Elwynn)
 
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Mulgore)
 {
-    // Mulgore (offset 1): months 1, 4, 7, 10
-    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(1, 2025, 1);
+    // Mulgore (offset 0): even months (Feb, Apr, Jun, Aug, Oct, Dec)
+    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(0, 2025, 1);
 
-    EXPECT_EQ(dates.size(), 4u);
+    // Should have exactly 6 dates for one year (one per even month)
+    EXPECT_EQ(dates.size(), 6u);
 
-    std::vector<int> expectedMonths = { 1, 4, 7, 10 };
-    for (size_t i = 0; i < dates.size(); ++i)
-    {
-        std::tm date = HolidayDateCalculator::UnpackDate(dates[i]);
-
-        SCOPED_TRACE("Date index: " + std::to_string(i));
-
-        EXPECT_EQ(date.tm_year + 1900, 2025);
-        EXPECT_EQ(date.tm_mon + 1, expectedMonths[i]);
-        EXPECT_EQ(date.tm_wday, 0) << "Should be Sunday";
-    }
-}
-
-TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Terokkar)
-{
-    // Terokkar (offset 2): months 2, 5, 8, 11
-    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(2, 2025, 1);
-
-    EXPECT_EQ(dates.size(), 4u);
-
-    std::vector<int> expectedMonths = { 2, 5, 8, 11 };
+    std::vector<int> expectedMonths = { 2, 4, 6, 8, 10, 12 };
     for (size_t i = 0; i < dates.size(); ++i)
     {
         std::tm date = HolidayDateCalculator::UnpackDate(dates[i]);
@@ -1099,11 +1077,11 @@ TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Terokkar)
 
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_MultiYear)
 {
-    // Get 4 years of dates
+    // Get 4 years of dates for Mulgore (even months)
     std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(0, 2025, 4);
 
-    // 4 dates per year * 4 years = 16 dates
-    EXPECT_EQ(dates.size(), 16u);
+    // 6 dates per year * 4 years = 24 dates
+    EXPECT_EQ(dates.size(), 24u);
 
     // Verify dates are in chronological order
     for (size_t i = 1; i < dates.size(); ++i)
@@ -1121,7 +1099,8 @@ TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_MultiYear)
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_AlwaysSunday_AllLocations_2000_2030)
 {
     // Verify all Darkmoon Faire dates are Sundays for entire valid range
-    for (int offset = 0; offset <= 2; ++offset)
+    // WotLK has 2 locations: offset 0 (even months/Mulgore), offset 1 (odd months/Elwynn)
+    for (int offset = 0; offset <= 1; ++offset)
     {
         std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(offset, 2000, 31);
 
@@ -1140,50 +1119,37 @@ TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_AlwaysSunday_AllLocations_2000_2
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_CalculateHolidayDate_ReturnsFirstOccurrence)
 {
     // Using CalculateHolidayDate with DARKMOON_FAIRE should return the first occurrence of the year
-    HolidayRule elwynnRule = { 374, HolidayCalculationType::DARKMOON_FAIRE, 0, 0, 0, 0 };
-    HolidayRule mulgoreRule = { 375, HolidayCalculationType::DARKMOON_FAIRE, 1, 0, 0, 0 };
-    HolidayRule terokkarRule = { 376, HolidayCalculationType::DARKMOON_FAIRE, 2, 0, 0, 0 };
+    // WotLK: Elwynn (offset 1) = odd months, Mulgore (offset 0) = even months
+    HolidayRule elwynnRule = { 374, HolidayCalculationType::DARKMOON_FAIRE, 1, 0, 0, -2 };
+    HolidayRule mulgoreRule = { 375, HolidayCalculationType::DARKMOON_FAIRE, 0, 0, 0, -2 };
 
     // 2025 first occurrences:
-    // Elwynn (offset 0): March (first month % 3 == 0 is 3)
+    // Elwynn (offset 1): January (first odd month)
     std::tm elwynn2025 = HolidayDateCalculator::CalculateHolidayDate(elwynnRule, 2025);
-    EXPECT_EQ(elwynn2025.tm_mon + 1, 3) << "Elwynn first occurrence should be March";
+    EXPECT_EQ(elwynn2025.tm_mon + 1, 1) << "Elwynn first occurrence should be January";
     EXPECT_EQ(elwynn2025.tm_wday, 0) << "Should be Sunday";
 
-    // Mulgore (offset 1): January (first month % 3 == 1 is 1)
+    // Mulgore (offset 0): February (first even month)
     std::tm mulgore2025 = HolidayDateCalculator::CalculateHolidayDate(mulgoreRule, 2025);
-    EXPECT_EQ(mulgore2025.tm_mon + 1, 1) << "Mulgore first occurrence should be January";
+    EXPECT_EQ(mulgore2025.tm_mon + 1, 2) << "Mulgore first occurrence should be February";
     EXPECT_EQ(mulgore2025.tm_wday, 0) << "Should be Sunday";
-
-    // Terokkar (offset 2): February (first month % 3 == 2 is 2)
-    std::tm terokkar2025 = HolidayDateCalculator::CalculateHolidayDate(terokkarRule, 2025);
-    EXPECT_EQ(terokkar2025.tm_mon + 1, 2) << "Terokkar first occurrence should be February";
-    EXPECT_EQ(terokkar2025.tm_wday, 0) << "Should be Sunday";
 }
 
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_NoOverlap_AllLocations)
 {
-    // Verify no two locations have the same date (they should be in different months)
+    // Verify the two locations don't share dates (they're in different months)
     for (int year = 2000; year <= 2030; ++year)
     {
-        std::vector<uint32_t> elwynn = HolidayDateCalculator::GetDarkmoonFaireDates(0, year, 1);
-        std::vector<uint32_t> mulgore = HolidayDateCalculator::GetDarkmoonFaireDates(1, year, 1);
-        std::vector<uint32_t> terokkar = HolidayDateCalculator::GetDarkmoonFaireDates(2, year, 1);
+        std::vector<uint32_t> elwynn = HolidayDateCalculator::GetDarkmoonFaireDates(1, year, 1);  // odd months
+        std::vector<uint32_t> mulgore = HolidayDateCalculator::GetDarkmoonFaireDates(0, year, 1); // even months
 
         SCOPED_TRACE("Year: " + std::to_string(year));
 
-        // Check no overlap between any pair
+        // Check no overlap between Elwynn and Mulgore
         for (auto const& e : elwynn)
         {
             for (auto const& m : mulgore)
                 EXPECT_NE(e, m) << "Elwynn and Mulgore should not share dates";
-            for (auto const& t : terokkar)
-                EXPECT_NE(e, t) << "Elwynn and Terokkar should not share dates";
-        }
-        for (auto const& m : mulgore)
-        {
-            for (auto const& t : terokkar)
-                EXPECT_NE(m, t) << "Mulgore and Terokkar should not share dates";
         }
     }
 }

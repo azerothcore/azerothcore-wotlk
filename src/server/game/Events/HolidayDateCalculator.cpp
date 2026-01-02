@@ -481,13 +481,13 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
         case HolidayCalculationType::DARKMOON_FAIRE:
         {
             // Return first occurrence for the year
-            // rule.month contains the location offset (0, 1, or 2)
+            // rule.month contains the location offset (0 or 1)
             int const locationOffset = rule.month;
 
-            // Find first month in the year where month % 3 == locationOffset
+            // Find first month in the year where month % 2 == locationOffset
             for (int month = 1; month <= 12; ++month)
             {
-                if (month % 3 == locationOffset)
+                if (month % 2 == locationOffset)
                 {
                     result = CalculateNthWeekday(year, month, Weekday::SUNDAY, 1);
                     break;
