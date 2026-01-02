@@ -1,7 +1,7 @@
 -- correctly link brewfest building event in ironforge to brewfest
 UPDATE `game_event` SET `holiday` = 372, `holidayStage` = 1 WHERE `eventEntry` = 70;
 
--- remove start end end times from automatically handled events
+-- remove start and end times from automatically handled events
 UPDATE `game_event` SET `start_time` = NULL, `end_time` = NULL WHERE `eventEntry` IN
 (
     1,  -- Midsummer Fire Festival
