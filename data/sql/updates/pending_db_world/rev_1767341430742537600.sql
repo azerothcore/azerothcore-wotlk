@@ -6,18 +6,24 @@ UPDATE `game_event` SET `start_time` = NULL, `end_time` = NULL WHERE `eventEntry
 (
     1,  -- Midsummer Fire Festival
     2,  -- Winter Veil
+    3,  -- Darkmoon Faire (Terokkar Forest)
+    4,  -- Darkmoon Faire (Elwynn Forest)
+    5,  -- Darkmoon Faire (Mulgore)
     7,  -- Lunar Festival
     8,  -- Love is in the Air
     9,  -- Noblegarden
     10, -- Children's Week
     11, -- Harvest Festival
     12, -- Hallow's End
+    23, -- Darkmoon Faire Building (Elwynn Forest)
     24, -- Brewfest
     26, -- Pilgrim's Bounty
     50, -- Pirates' Day
     51, -- Day of the Dead
     70, -- Brewfest Building (Iron Forge)
-    72  -- Fireworks Spectacular
+    71, -- Darkmoon Faire Building (Mulgore)
+    72, -- Fireworks Spectacular,
+    77  -- Darkmoon Faire Building (Terokkar Forest)
 );
 
 -- drop unused table
