@@ -1190,21 +1190,18 @@ TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_NoOverlap_AllLocations)
 
 TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_InHolidayRules)
 {
-    // Verify all three Darkmoon Faire locations are in the HolidayRules
+    // Verify both Darkmoon Faire locations are in the HolidayRules (WotLK has 2 locations)
     auto const& rules = HolidayDateCalculator::GetHolidayRules();
 
-    bool foundElwynn = false, foundMulgore = false, foundTerokkar = false;
+    bool foundElwynn = false, foundMulgore = false;
     for (auto const& rule : rules)
     {
         if (rule.holidayId == 374 && rule.type == HolidayCalculationType::DARKMOON_FAIRE)
             foundElwynn = true;
         if (rule.holidayId == 375 && rule.type == HolidayCalculationType::DARKMOON_FAIRE)
             foundMulgore = true;
-        if (rule.holidayId == 376 && rule.type == HolidayCalculationType::DARKMOON_FAIRE)
-            foundTerokkar = true;
     }
 
     EXPECT_TRUE(foundElwynn) << "Darkmoon Faire Elwynn (374) should be in HolidayRules";
     EXPECT_TRUE(foundMulgore) << "Darkmoon Faire Mulgore (375) should be in HolidayRules";
-    EXPECT_TRUE(foundTerokkar) << "Darkmoon Faire Terokkar (376) should be in HolidayRules";
 }
