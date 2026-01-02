@@ -132,7 +132,9 @@ struct boss_anomalus : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
+        if (!me->HasAura(SPELL_RIFT_SHIELD))
+            events.Update(diff);
+
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
@@ -164,10 +166,6 @@ struct boss_anomalus : public BossAI
             }
 
             events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
-
-            if (me->HasAura(SPELL_RIFT_SHIELD))
-                events.DelayEvents(46s);
-
             break;
         }
 
