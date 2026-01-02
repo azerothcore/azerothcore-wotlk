@@ -1090,7 +1090,40 @@ void GameEventMgr::LoadHolidayDates()
     {
         HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(rule.holidayId));
         if (!entry)
+        {
+            LOG_INFO("server.loading", ">> Holiday {} not found in DBC - cannot set dynamic dates", rule.holidayId);
             continue;
+        }
+
+        // Special handling for Darkmoon Faire - needs multiple dates per year (4 occurrences)
+        if (rule.type == HolidayCalculationType::DARKMOON_FAIRE)
+        {
+            int const locationOffset = rule.month;
+            std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(locationOffset, currentYear - 1, 4, rule.offset);
+
+            uint8 dateId = 0;
+            for (auto const& packedDate : dates)
+            {
+                if (dateId >= MAX_HOLIDAY_DATES)
+                    break;
+
+                entry->Date[dateId++] = packedDate;
+                ++dynamicCount;
+            }
+
+            // Darkmoon Faire lasts 7 days (168 hours) - set Duration if not already set
+            if (!entry->Duration[0])
+            {
+                entry->Duration[0] = 168; // 7 days in hours
+            }
+
+            auto itr = std::lower_bound(ModifiedHolidays.begin(), ModifiedHolidays.end(), entry->Id);
+            if (itr == ModifiedHolidays.end() || *itr != entry->Id)
+            {
+                ModifiedHolidays.insert(itr, entry->Id);
+            }
+            continue;
+        }
 
         // Generate dates for current year + 2 ahead (year capped at 2030 due to 5-bit client limitation)
         for (int yearOffset = -1; yearOffset <= 2; ++yearOffset)
@@ -1103,7 +1136,14 @@ void GameEventMgr::LoadHolidayDates()
             if (dateId >= MAX_HOLIDAY_DATES)
                 break;
 
-            entry->Date[dateId] = HolidayDateCalculator::GetPackedHolidayDate(rule.holidayId, year);
+            uint32_t packedDate = HolidayDateCalculator::GetPackedHolidayDate(rule.holidayId, year);
+            entry->Date[dateId] = packedDate;
+
+            // Debug: decode and log the date
+            std::tm date = HolidayDateCalculator::UnpackDate(packedDate);
+            LOG_INFO("server.loading", ">> Holiday {} Date[{}] = {}-{:02d}-{:02d}",
+                rule.holidayId, dateId, date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
+
             ++dynamicCount;
         }
 

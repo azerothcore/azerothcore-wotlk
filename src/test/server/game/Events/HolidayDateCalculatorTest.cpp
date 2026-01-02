@@ -369,17 +369,14 @@ TEST_F(HolidayDateCalculatorTest, PilgrimsBounty_SundayBeforeThanksgiving_1900_2
 TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2200)
 {
     // Fixed date holidays should have same month/day every year
+    // Note: Brewfest, Harvest Festival, and Winter Veil are now dynamic (not fixed date)
     struct FixedHolidayTestCase { uint32_t holidayId; int month; int day; const char* name; };
     std::vector<FixedHolidayTestCase> testCases = {
-        // Note: Love is in the Air and Children's Week are now WEEKDAY_ON_OR_AFTER
         { 341, 6, 21, "Midsummer Fire Festival" },
         { 62,  7,  4, "Fireworks Spectacular" },
         { 398, 9, 19, "Pirates' Day" },
-        { 372, 9, 20, "Brewfest" },
-        { 321, 10, 2, "Harvest Festival" },
         { 324, 10, 18, "Hallow's End" },
         { 409, 11,  1, "Day of the Dead" },
-        { 141, 12, 15, "Winter Veil" },
     };
 
     for (auto const& tc : testCases)
@@ -396,6 +393,153 @@ TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2
             EXPECT_EQ(date.tm_mon + 1, tc.month);
             EXPECT_EQ(date.tm_mday, tc.day);
         }
+    }
+}
+
+// ============================================================
+// Brewfest Tests (Oktoberfest rule)
+// First Saturday on or after Sept 15, minus 7 days for holidayStage offset
+// ============================================================
+
+TEST_F(HolidayDateCalculatorTest, Brewfest_OktoberfestRule)
+{
+    // Brewfest follows the Oktoberfest rule:
+    // Oktoberfest starts the Saturday after Sept 15 (or on Sept 15 if it's Saturday)
+    // Brewfest holidayStage 1 starts 7 days before that
+    HolidayRule brewfest = { 372, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 };
+
+    struct BrewfestTestCase { int year; int expectedMonth; int expectedDay; };
+    std::vector<BrewfestTestCase> testCases = {
+        // Sept 15, 2024 is Sunday, first Sat after is Sept 21, minus 7 = Sept 14
+        { 2024, 9, 14 },
+        // Sept 15, 2025 is Monday, first Sat after is Sept 20, minus 7 = Sept 13
+        { 2025, 9, 13 },
+        // Sept 15, 2026 is Tuesday, first Sat after is Sept 19, minus 7 = Sept 12
+        { 2026, 9, 12 },
+        // Sept 15, 2027 is Wednesday, first Sat after is Sept 18, minus 7 = Sept 11
+        { 2027, 9, 11 },
+        // Sept 15, 2028 is Friday, first Sat after is Sept 16, minus 7 = Sept 9
+        { 2028, 9, 9 },
+        // Sept 15, 2029 is Saturday, so Sept 15, minus 7 = Sept 8
+        { 2029, 9, 8 },
+    };
+
+    for (auto const& tc : testCases)
+    {
+        std::tm date = HolidayDateCalculator::CalculateHolidayDate(brewfest, tc.year);
+
+        SCOPED_TRACE("Year: " + std::to_string(tc.year));
+
+        EXPECT_EQ(date.tm_year + 1900, tc.year);
+        EXPECT_EQ(date.tm_mon + 1, tc.expectedMonth);
+        EXPECT_EQ(date.tm_mday, tc.expectedDay);
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, Brewfest_AlwaysInSeptember_1900_2200)
+{
+    HolidayRule brewfest = { 372, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 };
+
+    for (int year = 1900; year <= 2200; ++year)
+    {
+        std::tm date = HolidayDateCalculator::CalculateHolidayDate(brewfest, year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Brewfest should always be in September (after -7 offset from Sept 15-21)
+        EXPECT_EQ(date.tm_mon + 1, 9) << "Brewfest should be in September";
+        // Should be between Sept 8 and Sept 14 (7 days before Sept 15-21)
+        EXPECT_GE(date.tm_mday, 8) << "Brewfest should be >= Sept 8";
+        EXPECT_LE(date.tm_mday, 14) << "Brewfest should be <= Sept 14";
+    }
+}
+
+// ============================================================
+// Harvest Festival Tests (Autumn Equinox based)
+// 2 days before autumn equinox
+// ============================================================
+
+TEST_F(HolidayDateCalculatorTest, HarvestFestival_AutumnEquinoxBased)
+{
+    HolidayRule harvestFestival = { 321, HolidayCalculationType::AUTUMN_EQUINOX, 0, 0, 0, -2 };
+
+    // Autumn equinox is typically Sept 22-23, so Harvest Festival is Sept 20-21
+    for (int year = 2000; year <= 2030; ++year)
+    {
+        std::tm equinox = HolidayDateCalculator::CalculateAutumnEquinox(year);
+        std::tm harvest = HolidayDateCalculator::CalculateHolidayDate(harvestFestival, year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Harvest should be exactly 2 days before equinox
+        // Convert to time_t to handle month boundaries correctly
+        time_t equinoxTime = mktime(&equinox);
+        time_t harvestTime = mktime(&harvest);
+
+        double diffDays = difftime(equinoxTime, harvestTime) / (60 * 60 * 24);
+        EXPECT_NEAR(diffDays, 2.0, 0.1) << "Harvest Festival should be 2 days before equinox";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, HarvestFestival_AlwaysInSeptember_1900_2200)
+{
+    HolidayRule harvestFestival = { 321, HolidayCalculationType::AUTUMN_EQUINOX, 0, 0, 0, -2 };
+
+    for (int year = 1900; year <= 2200; ++year)
+    {
+        std::tm date = HolidayDateCalculator::CalculateHolidayDate(harvestFestival, year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Harvest Festival should always be in September (2 days before Sept 22-23 equinox)
+        EXPECT_EQ(date.tm_mon + 1, 9) << "Harvest Festival should be in September";
+        // Should be around Sept 20-21
+        EXPECT_GE(date.tm_mday, 18) << "Harvest Festival should be >= Sept 18";
+        EXPECT_LE(date.tm_mday, 22) << "Harvest Festival should be <= Sept 22";
+    }
+}
+
+// ============================================================
+// Winter Veil Tests (Winter Solstice based)
+// 6 days before winter solstice
+// ============================================================
+
+TEST_F(HolidayDateCalculatorTest, WinterVeil_WinterSolsticeBased)
+{
+    HolidayRule winterVeil = { 141, HolidayCalculationType::WINTER_SOLSTICE, 0, 0, 0, -6 };
+
+    // Winter solstice is typically Dec 21-22, so Winter Veil starts Dec 15-16
+    for (int year = 2000; year <= 2030; ++year)
+    {
+        std::tm solstice = HolidayDateCalculator::CalculateWinterSolstice(year);
+        std::tm winterVeilDate = HolidayDateCalculator::CalculateHolidayDate(winterVeil, year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Winter Veil should be exactly 6 days before solstice
+        time_t solsticeTime = mktime(&solstice);
+        time_t winterVeilTime = mktime(&winterVeilDate);
+
+        double diffDays = difftime(solsticeTime, winterVeilTime) / (60 * 60 * 24);
+        EXPECT_NEAR(diffDays, 6.0, 0.1) << "Winter Veil should be 6 days before solstice";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, WinterVeil_AlwaysInDecember_1900_2200)
+{
+    HolidayRule winterVeil = { 141, HolidayCalculationType::WINTER_SOLSTICE, 0, 0, 0, -6 };
+
+    for (int year = 1900; year <= 2200; ++year)
+    {
+        std::tm date = HolidayDateCalculator::CalculateHolidayDate(winterVeil, year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Winter Veil should always be in December
+        EXPECT_EQ(date.tm_mon + 1, 12) << "Winter Veil should be in December";
+        // Should be around Dec 15-16 (6 days before Dec 21-22)
+        EXPECT_GE(date.tm_mday, 14) << "Winter Veil should be >= Dec 14";
+        EXPECT_LE(date.tm_mday, 17) << "Winter Veil should be <= Dec 17";
     }
 }
 
@@ -819,4 +963,248 @@ TEST_F(HolidayDateCalculatorTest, LunarNewYear_19YearMetonicCycle)
         int diff = std::abs(doy1 - doy2);
         EXPECT_LE(diff, 30) << "19-year Metonic cycle should keep dates within ~30 days";
     }
+}
+
+// ============================================================
+// Darkmoon Faire Tests
+// First Sunday of the month, rotating through 3 locations
+// ============================================================
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_LocationRotation)
+{
+    // Verify the rotation pattern:
+    // Elwynn (offset 0): months 3, 6, 9, 12 (Mar, Jun, Sep, Dec) - month % 3 == 0
+    // Mulgore (offset 1): months 1, 4, 7, 10 (Jan, Apr, Jul, Oct) - month % 3 == 1
+    // Terokkar (offset 2): months 2, 5, 8, 11 (Feb, May, Aug, Nov) - month % 3 == 2
+
+    // Elwynn months
+    EXPECT_EQ(3 % 3, 0);
+    EXPECT_EQ(6 % 3, 0);
+    EXPECT_EQ(9 % 3, 0);
+    EXPECT_EQ(12 % 3, 0);
+
+    // Mulgore months
+    EXPECT_EQ(1 % 3, 1);
+    EXPECT_EQ(4 % 3, 1);
+    EXPECT_EQ(7 % 3, 1);
+    EXPECT_EQ(10 % 3, 1);
+
+    // Terokkar months
+    EXPECT_EQ(2 % 3, 2);
+    EXPECT_EQ(5 % 3, 2);
+    EXPECT_EQ(8 % 3, 2);
+    EXPECT_EQ(11 % 3, 2);
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_FirstSundayOfMonth_KnownDates)
+{
+    // Verify first Sunday calculation against known dates
+    struct FirstSundayTestCase { int year; int month; int expectedDay; };
+    std::vector<FirstSundayTestCase> testCases = {
+        // 2024
+        { 2024, 1,  7 },  // Jan 2024: First Sunday = Jan 7
+        { 2024, 2,  4 },  // Feb 2024: First Sunday = Feb 4
+        { 2024, 3,  3 },  // Mar 2024: First Sunday = Mar 3
+        { 2024, 4,  7 },  // Apr 2024: First Sunday = Apr 7
+        { 2024, 9,  1 },  // Sep 2024: First Sunday = Sep 1
+        { 2024, 12, 1 },  // Dec 2024: First Sunday = Dec 1
+        // 2025
+        { 2025, 1,  5 },  // Jan 2025: First Sunday = Jan 5
+        { 2025, 2,  2 },  // Feb 2025: First Sunday = Feb 2
+        { 2025, 3,  2 },  // Mar 2025: First Sunday = Mar 2
+        { 2025, 6,  1 },  // Jun 2025: First Sunday = Jun 1
+        { 2025, 9,  7 },  // Sep 2025: First Sunday = Sep 7
+        { 2025, 12, 7 },  // Dec 2025: First Sunday = Dec 7
+        // 2026
+        { 2026, 1,  4 },  // Jan 2026: First Sunday = Jan 4
+        { 2026, 3,  1 },  // Mar 2026: First Sunday = Mar 1
+    };
+
+    for (auto const& tc : testCases)
+    {
+        std::tm date = HolidayDateCalculator::CalculateNthWeekday(tc.year, tc.month, Weekday::SUNDAY, 1);
+
+        SCOPED_TRACE("Year: " + std::to_string(tc.year) + " Month: " + std::to_string(tc.month));
+
+        EXPECT_EQ(date.tm_year + 1900, tc.year);
+        EXPECT_EQ(date.tm_mon + 1, tc.month);
+        EXPECT_EQ(date.tm_mday, tc.expectedDay);
+        EXPECT_EQ(date.tm_wday, 0) << "Should be Sunday";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Elwynn)
+{
+    // Elwynn (offset 0): months 3, 6, 9, 12
+    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(0, 2025, 1);
+
+    // Should have exactly 4 dates for one year
+    EXPECT_EQ(dates.size(), 4u);
+
+    // Verify each date is in the correct month and is a Sunday
+    std::vector<int> expectedMonths = { 3, 6, 9, 12 };
+    for (size_t i = 0; i < dates.size(); ++i)
+    {
+        std::tm date = HolidayDateCalculator::UnpackDate(dates[i]);
+
+        SCOPED_TRACE("Date index: " + std::to_string(i));
+
+        EXPECT_EQ(date.tm_year + 1900, 2025);
+        EXPECT_EQ(date.tm_mon + 1, expectedMonths[i]);
+        EXPECT_EQ(date.tm_wday, 0) << "Should be Sunday";
+        EXPECT_GE(date.tm_mday, 1);
+        EXPECT_LE(date.tm_mday, 7) << "First Sunday must be within first 7 days";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Mulgore)
+{
+    // Mulgore (offset 1): months 1, 4, 7, 10
+    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(1, 2025, 1);
+
+    EXPECT_EQ(dates.size(), 4u);
+
+    std::vector<int> expectedMonths = { 1, 4, 7, 10 };
+    for (size_t i = 0; i < dates.size(); ++i)
+    {
+        std::tm date = HolidayDateCalculator::UnpackDate(dates[i]);
+
+        SCOPED_TRACE("Date index: " + std::to_string(i));
+
+        EXPECT_EQ(date.tm_year + 1900, 2025);
+        EXPECT_EQ(date.tm_mon + 1, expectedMonths[i]);
+        EXPECT_EQ(date.tm_wday, 0) << "Should be Sunday";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_Terokkar)
+{
+    // Terokkar (offset 2): months 2, 5, 8, 11
+    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(2, 2025, 1);
+
+    EXPECT_EQ(dates.size(), 4u);
+
+    std::vector<int> expectedMonths = { 2, 5, 8, 11 };
+    for (size_t i = 0; i < dates.size(); ++i)
+    {
+        std::tm date = HolidayDateCalculator::UnpackDate(dates[i]);
+
+        SCOPED_TRACE("Date index: " + std::to_string(i));
+
+        EXPECT_EQ(date.tm_year + 1900, 2025);
+        EXPECT_EQ(date.tm_mon + 1, expectedMonths[i]);
+        EXPECT_EQ(date.tm_wday, 0) << "Should be Sunday";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_GetDates_MultiYear)
+{
+    // Get 4 years of dates
+    std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(0, 2025, 4);
+
+    // 4 dates per year * 4 years = 16 dates
+    EXPECT_EQ(dates.size(), 16u);
+
+    // Verify dates are in chronological order
+    for (size_t i = 1; i < dates.size(); ++i)
+    {
+        std::tm prev = HolidayDateCalculator::UnpackDate(dates[i - 1]);
+        std::tm curr = HolidayDateCalculator::UnpackDate(dates[i]);
+
+        time_t prevTime = mktime(&prev);
+        time_t currTime = mktime(&curr);
+
+        EXPECT_GT(currTime, prevTime) << "Dates should be in chronological order";
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_AlwaysSunday_AllLocations_2000_2030)
+{
+    // Verify all Darkmoon Faire dates are Sundays for entire valid range
+    for (int offset = 0; offset <= 2; ++offset)
+    {
+        std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(offset, 2000, 31);
+
+        SCOPED_TRACE("Location offset: " + std::to_string(offset));
+
+        for (size_t i = 0; i < dates.size(); ++i)
+        {
+            std::tm date = HolidayDateCalculator::UnpackDate(dates[i]);
+            EXPECT_EQ(date.tm_wday, 0)
+                << "Date " << (date.tm_year + 1900) << "-" << (date.tm_mon + 1) << "-" << date.tm_mday
+                << " should be Sunday";
+        }
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_CalculateHolidayDate_ReturnsFirstOccurrence)
+{
+    // Using CalculateHolidayDate with DARKMOON_FAIRE should return the first occurrence of the year
+    HolidayRule elwynnRule = { 374, HolidayCalculationType::DARKMOON_FAIRE, 0, 0, 0, 0 };
+    HolidayRule mulgoreRule = { 375, HolidayCalculationType::DARKMOON_FAIRE, 1, 0, 0, 0 };
+    HolidayRule terokkarRule = { 376, HolidayCalculationType::DARKMOON_FAIRE, 2, 0, 0, 0 };
+
+    // 2025 first occurrences:
+    // Elwynn (offset 0): March (first month % 3 == 0 is 3)
+    std::tm elwynn2025 = HolidayDateCalculator::CalculateHolidayDate(elwynnRule, 2025);
+    EXPECT_EQ(elwynn2025.tm_mon + 1, 3) << "Elwynn first occurrence should be March";
+    EXPECT_EQ(elwynn2025.tm_wday, 0) << "Should be Sunday";
+
+    // Mulgore (offset 1): January (first month % 3 == 1 is 1)
+    std::tm mulgore2025 = HolidayDateCalculator::CalculateHolidayDate(mulgoreRule, 2025);
+    EXPECT_EQ(mulgore2025.tm_mon + 1, 1) << "Mulgore first occurrence should be January";
+    EXPECT_EQ(mulgore2025.tm_wday, 0) << "Should be Sunday";
+
+    // Terokkar (offset 2): February (first month % 3 == 2 is 2)
+    std::tm terokkar2025 = HolidayDateCalculator::CalculateHolidayDate(terokkarRule, 2025);
+    EXPECT_EQ(terokkar2025.tm_mon + 1, 2) << "Terokkar first occurrence should be February";
+    EXPECT_EQ(terokkar2025.tm_wday, 0) << "Should be Sunday";
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_NoOverlap_AllLocations)
+{
+    // Verify no two locations have the same date (they should be in different months)
+    for (int year = 2000; year <= 2030; ++year)
+    {
+        std::vector<uint32_t> elwynn = HolidayDateCalculator::GetDarkmoonFaireDates(0, year, 1);
+        std::vector<uint32_t> mulgore = HolidayDateCalculator::GetDarkmoonFaireDates(1, year, 1);
+        std::vector<uint32_t> terokkar = HolidayDateCalculator::GetDarkmoonFaireDates(2, year, 1);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Check no overlap between any pair
+        for (auto const& e : elwynn)
+        {
+            for (auto const& m : mulgore)
+                EXPECT_NE(e, m) << "Elwynn and Mulgore should not share dates";
+            for (auto const& t : terokkar)
+                EXPECT_NE(e, t) << "Elwynn and Terokkar should not share dates";
+        }
+        for (auto const& m : mulgore)
+        {
+            for (auto const& t : terokkar)
+                EXPECT_NE(m, t) << "Mulgore and Terokkar should not share dates";
+        }
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_InHolidayRules)
+{
+    // Verify all three Darkmoon Faire locations are in the HolidayRules
+    auto const& rules = HolidayDateCalculator::GetHolidayRules();
+
+    bool foundElwynn = false, foundMulgore = false, foundTerokkar = false;
+    for (auto const& rule : rules)
+    {
+        if (rule.holidayId == 374 && rule.type == HolidayCalculationType::DARKMOON_FAIRE)
+            foundElwynn = true;
+        if (rule.holidayId == 375 && rule.type == HolidayCalculationType::DARKMOON_FAIRE)
+            foundMulgore = true;
+        if (rule.holidayId == 376 && rule.type == HolidayCalculationType::DARKMOON_FAIRE)
+            foundTerokkar = true;
+    }
+
+    EXPECT_TRUE(foundElwynn) << "Darkmoon Faire Elwynn (374) should be in HolidayRules";
+    EXPECT_TRUE(foundMulgore) << "Darkmoon Faire Mulgore (375) should be in HolidayRules";
+    EXPECT_TRUE(foundTerokkar) << "Darkmoon Faire Terokkar (376) should be in HolidayRules";
 }

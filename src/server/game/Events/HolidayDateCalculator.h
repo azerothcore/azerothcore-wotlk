@@ -30,7 +30,8 @@ enum class HolidayCalculationType
     LUNAR_NEW_YEAR,    // Chinese New Year (new moon between Jan 21 - Feb 20)
     WEEKDAY_ON_OR_AFTER, // First weekday on or after a date (e.g., first Monday on or after Feb 3)
     AUTUMN_EQUINOX,    // Days relative to autumn equinox (offset in days)
-    WINTER_SOLSTICE    // Days relative to winter solstice (offset in days)
+    WINTER_SOLSTICE,   // Days relative to winter solstice (offset in days)
+    DARKMOON_FAIRE     // First Sunday of months matching (month % 3 == locationOffset)
 };
 
 enum class Weekday
@@ -92,6 +93,12 @@ public:
 
     // Calculate date for a specific holiday ID and year
     static uint32_t GetPackedHolidayDate(uint32_t holidayId, int year);
+
+    // Calculate Darkmoon Faire dates for a location over a year range
+    // locationOffset: 0=Elwynn (months 3,6,9,12), 1=Mulgore (months 1,4,7,10), 2=Terokkar (months 2,5,8,11)
+    // dayOffset: days to offset from first Sunday (e.g., -2 for Friday start)
+    // Returns packed dates for all occurrences in the year range
+    static std::vector<uint32_t> GetDarkmoonFaireDates(int locationOffset, int startYear, int numYears, int dayOffset = 0);
 
 private:
     // Julian Date conversions for lunar calculations
