@@ -504,13 +504,16 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
 uint32_t HolidayDateCalculator::PackDate(const std::tm& date)
 {
     // WoW packed date format (same as ByteBuffer::AppendPackedTime):
-    // bits 24-28: year offset from 2000
+    // bits 24-28: year offset from 2000 (5 bits = 0-31, valid years 2000-2031)
     // bits 20-23: month (0-indexed)
     // bits 14-19: day (0-indexed)
     // bits 11-13: weekday (0=Sunday, 6=Saturday - POSIX tm_wday)
     // bits 6-10: hour
     // bits 0-5: minute
-    uint32_t yearOffset = static_cast<uint32_t>((date.tm_year + 1900) - 2000);
+    int const year = date.tm_year + 1900;
+    // Client uses 5-bit year offset from 2000, so years before 2000 clamp to 0.
+    // If client is patched to support earlier years, update this logic.
+    uint32_t yearOffset = (year < 2000) ? 0 : static_cast<uint32_t>(year - 2000);
     uint32_t month = static_cast<uint32_t>(date.tm_mon);         // Already 0-indexed
     uint32_t day = static_cast<uint32_t>(date.tm_mday - 1);      // Convert to 0-indexed
     uint32_t weekday = static_cast<uint32_t>(date.tm_wday);      // 0=Sunday, 6=Saturday

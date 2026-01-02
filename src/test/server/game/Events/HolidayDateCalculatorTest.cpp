@@ -959,9 +959,10 @@ TEST_F(HolidayDateCalculatorTest, LunarNewYear_19YearMetonicCycle)
         int doy1 = (date1.tm_mon == 0) ? date1.tm_mday : 31 + date1.tm_mday;
         int doy2 = (date2.tm_mon == 0) ? date2.tm_mday : 31 + date2.tm_mday;
 
-        // Dates should be within ~3 days of each other due to the Metonic cycle
+        // The Metonic cycle is approximate - typically within a few days, but can shift
+        // by up to a lunar month (~29 days) at cycle boundaries due to intercalary months
         int diff = std::abs(doy1 - doy2);
-        EXPECT_LE(diff, 30) << "19-year Metonic cycle should keep dates within ~30 days";
+        EXPECT_LE(diff, 30) << "19-year Metonic cycle should keep dates within one lunar month";
     }
 }
 

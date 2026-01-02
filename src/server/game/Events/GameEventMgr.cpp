@@ -1141,7 +1141,7 @@ void GameEventMgr::LoadHolidayDates()
 
             // Debug: decode and log the date
             std::tm date = HolidayDateCalculator::UnpackDate(packedDate);
-            LOG_INFO("server.loading", ">> Holiday {} Date[{}] = {}-{:02d}-{:02d}",
+            LOG_DEBUG("server.loading", ">> Holiday {} Date[{}] = {}-{:02d}-{:02d}",
                 rule.holidayId, dateId, date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
 
             ++dynamicCount;
