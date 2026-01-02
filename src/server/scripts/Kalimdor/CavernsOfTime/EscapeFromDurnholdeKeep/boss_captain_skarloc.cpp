@@ -52,7 +52,7 @@ const Position startPath[WAYPOINTS_COUNT] =
 
 struct boss_captain_skarloc : public BossAI
 {
-    boss_captain_skarloc(Creature* creature) : BossAI(creature, DATA_CAPTAIN_SKARLOC), summons(me)
+    boss_captain_skarloc(Creature* creature) : BossAI(creature, DATA_CAPTAIN_SKARLOC), summons(me), _spawnedAdds(false)
     {
         scheduler.SetValidator([this]
         {
