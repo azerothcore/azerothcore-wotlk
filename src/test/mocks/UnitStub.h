@@ -129,6 +129,57 @@ public:
         _attackTimes[attType] = time;
     }
 
+    // PPM modifier tracking for proc tests
+    // Simulates Player::ApplySpellMod(spellId, SPELLMOD_PROC_PER_MINUTE, ppm)
+    void SetPPMModifier(uint32_t spellId, float modifier)
+    {
+        _ppmModifiers[spellId] = modifier;
+    }
+
+    void ClearPPMModifiers()
+    {
+        _ppmModifiers.clear();
+    }
+
+    /**
+     * @brief Calculate PPM proc chance with modifiers
+     * Mimics Unit::GetPPMProcChance() formula: (WeaponSpeed * PPM) / 600.0f
+     */
+    virtual float GetPPMProcChance(uint32_t weaponSpeed, float ppm, uint32_t spellId = 0) const
+    {
+        if (ppm <= 0.0f)
+            return 0.0f;
+
+        // Apply PPM modifier if set for this spell
+        float modifiedPPM = ppm;
+        if (spellId > 0 && _ppmModifiers.count(spellId))
+            modifiedPPM += _ppmModifiers.at(spellId);
+
+        return (static_cast<float>(weaponSpeed) * modifiedPPM) / 600.0f;
+    }
+
+    // Chance modifier tracking for proc tests
+    // Simulates Player::ApplySpellMod(spellId, SPELLMOD_CHANCE_OF_SUCCESS, chance)
+    void SetChanceModifier(uint32_t spellId, float modifier)
+    {
+        _chanceModifiers[spellId] = modifier;
+    }
+
+    void ClearChanceModifiers()
+    {
+        _chanceModifiers.clear();
+    }
+
+    /**
+     * @brief Apply chance modifier for a spell
+     */
+    float ApplyChanceModifier(uint32_t spellId, float baseChance) const
+    {
+        if (spellId > 0 && _chanceModifiers.count(spellId))
+            return baseChance + _chanceModifiers.at(spellId);
+        return baseChance;
+    }
+
     // Cooldowns
     virtual bool HasSpellCooldown(uint32_t spellId) const
     {
@@ -161,6 +212,8 @@ private:
     std::vector<CastRecord> _castHistory;
     std::map<uint32_t, bool> _cooldowns;
     std::map<uint8_t, uint32_t> _attackTimes;
+    std::map<uint32_t, float> _ppmModifiers;      // PPM modifiers by spell ID
+    std::map<uint32_t, float> _chanceModifiers;   // Chance modifiers by spell ID
 
     uint32_t _maxHealth = 10000;
     uint32_t _health = 10000;
@@ -185,6 +238,7 @@ public:
     MOCK_METHOD(bool, HasSpellCooldown, (uint32_t spellId), (const, override));
     MOCK_METHOD(uint8_t, GetClass, (), (const, override));
     MOCK_METHOD(uint8_t, GetLevel, (), (const, override));
+    MOCK_METHOD(float, GetPPMProcChance, (uint32_t weaponSpeed, float ppm, uint32_t spellId), (const, override));
 };
 
 #endif //AZEROTHCORE_UNIT_STUB_H

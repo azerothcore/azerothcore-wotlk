@@ -202,12 +202,38 @@ public:
     [[nodiscard]] uint8_t GetStackAmount() const { return _stackAmount; }
     void SetStackAmount(uint8_t amount) { _stackAmount = amount; }
 
+    /**
+     * @brief Modify stack amount (for PROC_ATTR_USE_STACKS_FOR_CHARGES)
+     * Mimics Aura::ModStackAmount() - removes aura if stacks reach 0
+     */
+    virtual bool ModStackAmount(int32_t amount, bool /* resetPeriodicTimer */ = true)
+    {
+        int32_t newAmount = static_cast<int32_t>(_stackAmount) + amount;
+        if (newAmount <= 0)
+        {
+            _stackAmount = 0;
+            Remove();
+            return true; // Aura removed
+        }
+        _stackAmount = static_cast<uint8_t>(newAmount);
+        return false;
+    }
+
     // Aura flags
     [[nodiscard]] bool IsPassive() const { return _isPassive; }
     [[nodiscard]] bool IsRemoved() const { return _isRemoved; }
 
     void SetPassive(bool isPassive) { _isPassive = isPassive; }
     void SetRemoved(bool isRemoved) { _isRemoved = isRemoved; }
+
+    /**
+     * @brief Mark aura as removed (for charge exhaustion)
+     * Mimics Aura::Remove()
+     */
+    virtual void Remove()
+    {
+        _isRemoved = true;
+    }
 
     // Application management
     AuraApplicationStub& GetOrCreateApplication()
@@ -253,6 +279,8 @@ public:
         : AuraStub(id, spellFamilyName) {}
 
     MOCK_METHOD(bool, DropCharge, (), (override));
+    MOCK_METHOD(bool, ModStackAmount, (int32_t amount, bool resetPeriodicTimer), (override));
+    MOCK_METHOD(void, Remove, (), (override));
 };
 
 /**
