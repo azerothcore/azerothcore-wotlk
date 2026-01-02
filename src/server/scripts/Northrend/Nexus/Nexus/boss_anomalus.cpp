@@ -168,7 +168,7 @@ struct boss_anomalus : public BossAI
 
             if (me->HasAura(SPELL_RIFT_SHIELD))
                 events.DelayEvents(46s);
-            
+
             break;
         }
 
