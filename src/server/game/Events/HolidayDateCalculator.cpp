@@ -67,12 +67,13 @@ static const std::vector<HolidayRule> HolidayRules = {
     // Winter Veil: 6 days before winter solstice (Dec 15-16)
     { HOLIDAY_FEAST_OF_WINTER_VEIL, HolidayCalculationType::WINTER_SOLSTICE, 0, 0, 0, -6 },
 
-    // Darkmoon Faire: First Sunday of months matching (month % 2 == locationOffset)
-    // Alternates monthly: odd months = Elwynn, even months = Mulgore
-    // rule.month stores the location offset (1=Elwynn/odd months, 0=Mulgore/even months)
+    // Darkmoon Faire: First Sunday of months matching (month % 3 == locationOffset)
+    // Rotates monthly: Mulgore (Jan) -> Terokkar (Feb) -> Elwynn (Mar) -> repeat
+    // rule.month stores the location offset
     // rule.offset is -2 (building phase starts Friday, 2 days before faire opens on Sunday)
-    { HOLIDAY_DARKMOON_FAIRE_ELWYNN, HolidayCalculationType::DARKMOON_FAIRE, 1, 0, 0, -2 },
-    { HOLIDAY_DARKMOON_FAIRE_THUNDER, HolidayCalculationType::DARKMOON_FAIRE, 0, 0, 0, -2 }
+    { HOLIDAY_DARKMOON_FAIRE_ELWYNN, HolidayCalculationType::DARKMOON_FAIRE, 0, 0, 0, -2 },    // Mar, Jun, Sep, Dec
+    { HOLIDAY_DARKMOON_FAIRE_THUNDER, HolidayCalculationType::DARKMOON_FAIRE, 1, 0, 0, -2 },   // Jan, Apr, Jul, Oct
+    { HOLIDAY_DARKMOON_FAIRE_SHATTRATH, HolidayCalculationType::DARKMOON_FAIRE, 2, 0, 0, -2 }  // Feb, May, Aug, Nov
 };
 
 const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
@@ -481,13 +482,13 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
         case HolidayCalculationType::DARKMOON_FAIRE:
         {
             // Return first occurrence for the year
-            // rule.month contains the location offset (0 or 1)
+            // rule.month contains the location offset (0, 1, or 2)
             int const locationOffset = rule.month;
 
-            // Find first month in the year where month % 2 == locationOffset
+            // Find first month in the year where month % 3 == locationOffset
             for (int month = 1; month <= 12; ++month)
             {
-                if (month % 2 == locationOffset)
+                if (month % 3 == locationOffset)
                 {
                     result = CalculateNthWeekday(year, month, Weekday::SUNDAY, 1);
                     break;
@@ -547,15 +548,16 @@ std::vector<uint32_t> HolidayDateCalculator::GetDarkmoonFaireDates(int locationO
 {
     std::vector<uint32_t> dates;
 
-    // Darkmoon Faire is first Sunday of months where (month % 2) == locationOffset
-    // locationOffset 1: odd months (Jan, Mar, May, Jul, Sep, Nov) - Elwynn (Alliance)
-    // locationOffset 0: even months (Feb, Apr, Jun, Aug, Oct, Dec) - Mulgore (Horde)
+    // Darkmoon Faire is first Sunday of months where (month % 3) == locationOffset
+    // locationOffset 0: Mar, Jun, Sep, Dec - Elwynn (Alliance)
+    // locationOffset 1: Jan, Apr, Jul, Oct - Mulgore (Horde)
+    // locationOffset 2: Feb, May, Aug, Nov - Terokkar (Outland)
 
     for (int year = startYear; year < startYear + numYears && year <= 2030; ++year)
     {
         for (int month = 1; month <= 12; ++month)
         {
-            if (month % 2 == locationOffset)
+            if (month % 3 == locationOffset)
             {
                 // Calculate first Sunday of this month, then apply day offset
                 std::tm date = CalculateNthWeekday(year, month, Weekday::SUNDAY, 1);
