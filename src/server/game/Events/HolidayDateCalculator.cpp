@@ -85,20 +85,20 @@ std::tm HolidayDateCalculator::CalculateEasterSunday(int year)
 {
     // Anonymous Gregorian algorithm (Computus)
     // Reference: https://en.wikipedia.org/wiki/Date_of_Easter#Anonymous_Gregorian_algorithm
-    int a = year % 19;
-    int b = year / 100;
-    int c = year % 100;
-    int d = b / 4;
-    int e = b % 4;
-    int f = (b + 8) / 25;
-    int g = (b - f + 1) / 3;
-    int h = (19 * a + b - d - g + 15) % 30;
-    int i = c / 4;
-    int k = c % 4;
-    int l = (32 + 2 * e + 2 * i - h - k) % 7;
-    int m = (a + 11 * h + 22 * l) / 451;
-    int month = (h + l - 7 * m + 114) / 31;
-    int day = ((h + l - 7 * m + 114) % 31) + 1;
+    int const a = year % 19;
+    int const b = year / 100;
+    int const c = year % 100;
+    int const d = b / 4;
+    int const e = b % 4;
+    int const f = (b + 8) / 25;
+    int const g = (b - f + 1) / 3;
+    int const h = (19 * a + b - d - g + 15) % 30;
+    int const i = c / 4;
+    int const k = c % 4;
+    int const l = (32 + 2 * e + 2 * i - h - k) % 7;
+    int const m = (a + 11 * h + 22 * l) / 451;
+    int const month = (h + l - 7 * m + 114) / 31;
+    int const day = ((h + l - 7 * m + 114) % 31) + 1;
 
     std::tm result = {};
     result.tm_year = year - 1900;
@@ -194,8 +194,8 @@ double HolidayDateCalculator::CalculateNewMoon(double k)
     double const T4 = T3 * T;
 
     // Mean phase (Eq 49.1)
-    double JDE = 2451550.09766 + 29.530588861 * k + 0.00015437 * T2
-               - 0.000000150 * T3 + 0.00000000073 * T4;
+    double const JDE = 2451550.09766 + 29.530588861 * k + 0.00015437 * T2
+                     - 0.000000150 * T3 + 0.00000000073 * T4;
 
     // Eccentricity correction
     double const E = 1.0 - 0.002516 * T - 0.0000074 * T2;
@@ -266,12 +266,12 @@ std::tm HolidayDateCalculator::CalculateLunarNewYear(int year)
 
     // Approximate lunation number k for January of target year
     double const approxK = (year - 2000.0) * 12.3685;
-    double k = std::floor(approxK);
+    double const k = std::floor(approxK);
 
     // Search for the new moon in the valid range
     for (int i = -2; i <= 2; ++i)
     {
-        double nmJDE = CalculateNewMoon(k + i);
+        double const nmJDE = CalculateNewMoon(k + i);
 
         // Convert TT (Terrestrial Time) to UT (approximate DeltaT ~70s for 2020s)
         double nmJD = nmJDE - 70.0 / 86400.0;
@@ -318,8 +318,8 @@ std::tm HolidayDateCalculator::CalculateAutumnEquinox(int year)
     double const Y4 = Y3 * Y;
 
     // Mean equinox JDE0 (Eq 27.1 for September equinox after 2000)
-    double JDE0 = 2451810.21715 + 365242.01767 * Y - 0.11575 * Y2
-                + 0.00337 * Y3 + 0.00078 * Y4;
+    double const JDE0 = 2451810.21715 + 365242.01767 * Y - 0.11575 * Y2
+                      + 0.00337 * Y3 + 0.00078 * Y4;
 
     // Periodic terms for correction (Table 27.B)
     double const T = (JDE0 - 2451545.0) / 36525.0;
@@ -329,23 +329,25 @@ std::tm HolidayDateCalculator::CalculateAutumnEquinox(int year)
 
     // Simplified correction (sum of periodic terms from Table 27.C)
     // Using first few significant terms
-    double S = 485 * std::cos((324.96 + 1934.136 * T) * DEG_TO_RAD)
-             + 203 * std::cos((337.23 + 32964.467 * T) * DEG_TO_RAD)
-             + 199 * std::cos((342.08 + 20.186 * T) * DEG_TO_RAD)
-             + 182 * std::cos((27.85 + 445267.112 * T) * DEG_TO_RAD)
-             + 156 * std::cos((73.14 + 45036.886 * T) * DEG_TO_RAD)
-             + 136 * std::cos((171.52 + 22518.443 * T) * DEG_TO_RAD)
-             + 77 * std::cos((222.54 + 65928.934 * T) * DEG_TO_RAD)
-             + 74 * std::cos((296.72 + 3034.906 * T) * DEG_TO_RAD)
-             + 70 * std::cos((243.58 + 9037.513 * T) * DEG_TO_RAD)
-             + 58 * std::cos((119.81 + 33718.147 * T) * DEG_TO_RAD)
-             + 52 * std::cos((297.17 + 150.678 * T) * DEG_TO_RAD)
-             + 50 * std::cos((21.02 + 2281.226 * T) * DEG_TO_RAD);
+    double const S = 485 * std::cos((324.96 + 1934.136 * T) * DEG_TO_RAD)
+                   + 203 * std::cos((337.23 + 32964.467 * T) * DEG_TO_RAD)
+                   + 199 * std::cos((342.08 + 20.186 * T) * DEG_TO_RAD)
+                   + 182 * std::cos((27.85 + 445267.112 * T) * DEG_TO_RAD)
+                   + 156 * std::cos((73.14 + 45036.886 * T) * DEG_TO_RAD)
+                   + 136 * std::cos((171.52 + 22518.443 * T) * DEG_TO_RAD)
+                   + 77 * std::cos((222.54 + 65928.934 * T) * DEG_TO_RAD)
+                   + 74 * std::cos((296.72 + 3034.906 * T) * DEG_TO_RAD)
+                   + 70 * std::cos((243.58 + 9037.513 * T) * DEG_TO_RAD)
+                   + 58 * std::cos((119.81 + 33718.147 * T) * DEG_TO_RAD)
+                   + 52 * std::cos((297.17 + 150.678 * T) * DEG_TO_RAD)
+                   + 50 * std::cos((21.02 + 2281.226 * T) * DEG_TO_RAD);
 
     double const JDE = JDE0 + (0.00001 * S) / deltaLambda;
 
     // Convert JDE to calendar date
-    int eqYear, eqMonth, eqDay;
+    int eqYear;
+    int eqMonth;
+    int eqDay;
     JulianDayToDate(JDE, eqYear, eqMonth, eqDay);
 
     std::tm result = {};
@@ -371,8 +373,8 @@ std::tm HolidayDateCalculator::CalculateWinterSolstice(int year)
     double const Y4 = Y3 * Y;
 
     // Mean solstice JDE0 (Eq 27.1 for December solstice after 2000)
-    double JDE0 = 2451900.05952 + 365242.74049 * Y - 0.06223 * Y2
-                - 0.00823 * Y3 + 0.00032 * Y4;
+    double const JDE0 = 2451900.05952 + 365242.74049 * Y - 0.06223 * Y2
+                      - 0.00823 * Y3 + 0.00032 * Y4;
 
     // Periodic terms for correction (Table 27.B)
     double const T = (JDE0 - 2451545.0) / 36525.0;
@@ -381,23 +383,25 @@ std::tm HolidayDateCalculator::CalculateWinterSolstice(int year)
                              + 0.0007 * std::cos(2.0 * W * DEG_TO_RAD);
 
     // Simplified correction (sum of periodic terms from Table 27.C)
-    double S = 485 * std::cos((324.96 + 1934.136 * T) * DEG_TO_RAD)
-             + 203 * std::cos((337.23 + 32964.467 * T) * DEG_TO_RAD)
-             + 199 * std::cos((342.08 + 20.186 * T) * DEG_TO_RAD)
-             + 182 * std::cos((27.85 + 445267.112 * T) * DEG_TO_RAD)
-             + 156 * std::cos((73.14 + 45036.886 * T) * DEG_TO_RAD)
-             + 136 * std::cos((171.52 + 22518.443 * T) * DEG_TO_RAD)
-             + 77 * std::cos((222.54 + 65928.934 * T) * DEG_TO_RAD)
-             + 74 * std::cos((296.72 + 3034.906 * T) * DEG_TO_RAD)
-             + 70 * std::cos((243.58 + 9037.513 * T) * DEG_TO_RAD)
-             + 58 * std::cos((119.81 + 33718.147 * T) * DEG_TO_RAD)
-             + 52 * std::cos((297.17 + 150.678 * T) * DEG_TO_RAD)
-             + 50 * std::cos((21.02 + 2281.226 * T) * DEG_TO_RAD);
+    double const S = 485 * std::cos((324.96 + 1934.136 * T) * DEG_TO_RAD)
+                   + 203 * std::cos((337.23 + 32964.467 * T) * DEG_TO_RAD)
+                   + 199 * std::cos((342.08 + 20.186 * T) * DEG_TO_RAD)
+                   + 182 * std::cos((27.85 + 445267.112 * T) * DEG_TO_RAD)
+                   + 156 * std::cos((73.14 + 45036.886 * T) * DEG_TO_RAD)
+                   + 136 * std::cos((171.52 + 22518.443 * T) * DEG_TO_RAD)
+                   + 77 * std::cos((222.54 + 65928.934 * T) * DEG_TO_RAD)
+                   + 74 * std::cos((296.72 + 3034.906 * T) * DEG_TO_RAD)
+                   + 70 * std::cos((243.58 + 9037.513 * T) * DEG_TO_RAD)
+                   + 58 * std::cos((119.81 + 33718.147 * T) * DEG_TO_RAD)
+                   + 52 * std::cos((297.17 + 150.678 * T) * DEG_TO_RAD)
+                   + 50 * std::cos((21.02 + 2281.226 * T) * DEG_TO_RAD);
 
     double const JDE = JDE0 + (0.00001 * S) / deltaLambda;
 
     // Convert JDE to calendar date
-    int solYear, solMonth, solDay;
+    int solYear;
+    int solMonth;
+    int solDay;
     JulianDayToDate(JDE, solYear, solMonth, solDay);
 
     std::tm result = {};
@@ -513,10 +517,10 @@ uint32_t HolidayDateCalculator::PackDate(const std::tm& date)
     int const year = date.tm_year + 1900;
     // Client uses 5-bit year offset from 2000, so years before 2000 clamp to 0.
     // If client is patched to support earlier years, update this logic.
-    uint32_t yearOffset = (year < 2000) ? 0 : static_cast<uint32_t>(year - 2000);
-    uint32_t month = static_cast<uint32_t>(date.tm_mon);         // Already 0-indexed
-    uint32_t day = static_cast<uint32_t>(date.tm_mday - 1);      // Convert to 0-indexed
-    uint32_t weekday = static_cast<uint32_t>(date.tm_wday);      // 0=Sunday, 6=Saturday
+    uint32_t const yearOffset = (year < 2000) ? 0 : static_cast<uint32_t>(year - 2000);
+    uint32_t const month = static_cast<uint32_t>(date.tm_mon);         // Already 0-indexed
+    uint32_t const day = static_cast<uint32_t>(date.tm_mday - 1);      // Convert to 0-indexed
+    uint32_t const weekday = static_cast<uint32_t>(date.tm_wday);      // 0=Sunday, 6=Saturday
 
     return (yearOffset << 24) | (month << 20) | (day << 14) | (weekday << 11);
 }
@@ -540,7 +544,7 @@ uint32_t HolidayDateCalculator::GetPackedHolidayDate(uint32_t holidayId, int yea
     {
         if (rule.holidayId == holidayId)
         {
-            std::tm date = CalculateHolidayDate(rule, year);
+            std::tm const date = CalculateHolidayDate(rule, year);
             return PackDate(date);
         }
     }

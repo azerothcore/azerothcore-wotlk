@@ -1071,7 +1071,7 @@ void GameEventMgr::LoadFromDB()
 
 void GameEventMgr::LoadHolidayDates()
 {
-    uint32 oldMSTime = getMSTime();
+    uint32 const oldMSTime = getMSTime();
     uint32 dynamicCount = 0;
     uint32 dbCount = 0;
 
@@ -1099,7 +1099,7 @@ void GameEventMgr::LoadHolidayDates()
         if (rule.type == HolidayCalculationType::DARKMOON_FAIRE)
         {
             int const locationOffset = rule.month;
-            std::vector<uint32_t> dates = HolidayDateCalculator::GetDarkmoonFaireDates(locationOffset, currentYear - 1, 4, rule.offset);
+            std::vector<uint32_t> const dates = HolidayDateCalculator::GetDarkmoonFaireDates(locationOffset, currentYear - 1, 4, rule.offset);
 
             uint8 dateId = 0;
             for (auto const& packedDate : dates)
@@ -1113,15 +1113,12 @@ void GameEventMgr::LoadHolidayDates()
 
             // Darkmoon Faire lasts 7 days (168 hours) - set Duration if not already set
             if (!entry->Duration[0])
-            {
                 entry->Duration[0] = 168; // 7 days in hours
-            }
 
             auto itr = std::lower_bound(ModifiedHolidays.begin(), ModifiedHolidays.end(), entry->Id);
             if (itr == ModifiedHolidays.end() || *itr != entry->Id)
-            {
                 ModifiedHolidays.insert(itr, entry->Id);
-            }
+
             continue;
         }
 
@@ -1136,11 +1133,11 @@ void GameEventMgr::LoadHolidayDates()
             if (dateId >= MAX_HOLIDAY_DATES)
                 break;
 
-            uint32_t packedDate = HolidayDateCalculator::GetPackedHolidayDate(rule.holidayId, year);
+            uint32_t const packedDate = HolidayDateCalculator::GetPackedHolidayDate(rule.holidayId, year);
             entry->Date[dateId] = packedDate;
 
             // Debug: decode and log the date
-            std::tm date = HolidayDateCalculator::UnpackDate(packedDate);
+            std::tm const date = HolidayDateCalculator::UnpackDate(packedDate);
             LOG_DEBUG("server.loading", ">> Holiday {} Date[{}] = {}-{:02d}-{:02d}",
                 rule.holidayId, dateId, date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
 
@@ -1149,9 +1146,7 @@ void GameEventMgr::LoadHolidayDates()
 
         auto itr = std::lower_bound(ModifiedHolidays.begin(), ModifiedHolidays.end(), entry->Id);
         if (itr == ModifiedHolidays.end() || *itr != entry->Id)
-        {
             ModifiedHolidays.insert(itr, entry->Id);
-        }
     }
 
     // Step 2: Check game_event.start_time for overrides (allows custom servers to override calculated dates)
@@ -1176,7 +1171,7 @@ void GameEventMgr::LoadHolidayDates()
             if (startTime == 0)
                 continue;
 
-            std::tm timeInfo = Acore::Time::TimeBreakdown(startTime);
+            std::tm const timeInfo = Acore::Time::TimeBreakdown(startTime);
 
             int const year = timeInfo.tm_year + 1900;
             // Only override if start_time is current year or later (ignore old static dates)
