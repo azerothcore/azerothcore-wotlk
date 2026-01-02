@@ -153,15 +153,14 @@ struct boss_anomalus : public BossAI
             me->CastSpell(me, SPELL_CREATE_RIFT, false);
 
             //Once we hit 51% hp mark, alternate between empowered and normal rifts
-            if (me->HealthBelowPct(51) && _empowered)
+            if (me->HealthBelowPct(51))
             {
-                me->CastSpell(me, SPELL_RIFT_SHIELD, true);
-                me->m_Events.AddEventAtOffset(new ChargeRifts(me), 1s);
-                _empowered = false;
-            }
-            else if (me->HealthBelowPct(51) && !_empowered)
-            {
-                _empowered = true;
+                if (_empowered)
+                {
+                    me->CastSpell(me, SPELL_RIFT_SHIELD, true);
+                    me->m_Events.AddEventAtOffset(new ChargeRifts(me), 1s);
+                }
+                _empowered = !_empowered;
             }
 
             events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
