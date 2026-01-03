@@ -2442,8 +2442,6 @@ class spell_item_shadowmourne : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        if (GetTarget()->HasAura(SPELL_SHADOWMOURNE_CHAOS_BANE_BUFF))
-            return;
 
         // Throttle fragment procs to avoid high-frequency spam.
         if (GetTarget()->HasSpellCooldown(SPELL_SHADOWMOURNE_SOUL_FRAGMENT))
