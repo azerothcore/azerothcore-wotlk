@@ -24,10 +24,12 @@
 #include "ScriptedCreature.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "GameTime.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldSession.h"
+#include <unordered_map>
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC spells used by items.
  * Ordered alphabetically using scriptname.
@@ -2442,6 +2444,19 @@ class spell_item_shadowmourne : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+        if (GetTarget()->HasAura(SPELL_SHADOWMOURNE_CHAOS_BANE_BUFF))
+            return;
+
+        static std::unordered_map<ObjectGuid, uint64> shadowmourneLastProcMs;
+        uint64 nowMs = GameTime::GetGameTimeMS().count();
+        ObjectGuid ownerGuid = GetTarget()->GetGUID();
+        auto lastIt = shadowmourneLastProcMs.find(ownerGuid);
+
+        // this prevent DoS caused by chaos bane & soul fragments
+        if (lastIt != shadowmourneLastProcMs.end() && (nowMs - lastIt->second) < 200)
+            return;
+        shadowmourneLastProcMs[ownerGuid] = nowMs;
+
         GetTarget()->CastSpell(GetTarget(), SPELL_SHADOWMOURNE_SOUL_FRAGMENT, true, nullptr, aurEff);
 
         // this can't be handled in AuraScript of SoulFragments because we need to know victim
