@@ -1892,6 +1892,12 @@ bool Creature::CanStartAttack(Unit const* who) const
     if (!_IsTargetAcceptable(who))
         return false;
 
+    if (who->IsTotem() && !IsEngaged())
+        return false;
+
+    if (!IsEngaged() && !who->IsEngaged())
+        return false;
+
     if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance, true, false, false)) // pussywizard: +m_combatDistance for turrets and similar
         return false;
 
