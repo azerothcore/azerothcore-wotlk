@@ -428,77 +428,74 @@ enum DyingKodo
     SPELL_KODO_KOMBO_GOSSIP         = 18362
 };
 
-class npc_aged_dying_ancient_kodo : public CreatureScript
+struct npc_aged_dying_ancient_kodo : public ScriptedAI
 {
-public:
-    npc_aged_dying_ancient_kodo() : CreatureScript("npc_aged_dying_ancient_kodo") { }
+    npc_aged_dying_ancient_kodo(Creature* creature) : ScriptedAI(creature) {}
 
-    struct npc_aged_dying_ancient_kodoAI : public ScriptedAI
+    void JustRespawned() override
     {
-        npc_aged_dying_ancient_kodoAI(Creature* creature) : ScriptedAI(creature) {}
+        me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO));
+    }
 
-        void JustRespawned() override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetEntry() == NPC_SMEED && me->IsWithinDistInMap(who, 10.0f) && !me->HasAura(SPELL_KODO_KOMBO_GOSSIP))
         {
-            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), nullptr, false);
+            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+
+            DoCast(me, SPELL_KODO_KOMBO_GOSSIP, true);
+            if (Creature* smeed = who->ToCreature())
+                smeed->AI()->Talk(SAY_SMEED_HOME);
         }
+    }
 
-        void MoveInLineOfSight(Unit* who) override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_KODO_KOMBO_ITEM)
         {
-            if (who->GetEntry() == NPC_SMEED && me->IsWithinDistInMap(who, 10.0f) && !me->HasAura(SPELL_KODO_KOMBO_GOSSIP))
-            {
-                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
+            me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
+            EnterEvadeMode();
+            me->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, me->GetFollowAngle());
 
-                DoCast(me, SPELL_KODO_KOMBO_GOSSIP, true);
-                if (Creature* smeed = who->ToCreature())
-                    smeed->AI()->Talk(SAY_SMEED_HOME);
-            }
+            caster->CastSpell(caster, SPELL_KODO_KOMBO_PLAYER_BUFF);
+            DoCastSelf(SPELL_KODO_KOMBO_DESPAWN_BUFF, true);
         }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        else if (spell->Id == SPELL_KODO_KOMBO_GOSSIP)
         {
-            if (spell->Id == SPELL_KODO_KOMBO_ITEM)
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->DespawnOrUnsummon(60s);
+        }
+    }
+
+    bool OnGossipHello(Player* player, Creature* creature)
+    {
+        if (creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
+        {
+            if (Group* group = player->GetGroup())
             {
-                if (!(caster->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) || me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
-                        && (me->GetEntry() == NPC_AGED_KODO || me->GetEntry() == NPC_DYING_KODO || me->GetEntry() == NPC_ANCIENT_KODO))
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
-                    me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
-                    EnterEvadeMode();
-                    me->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, me->GetFollowAngle());
-
-                    caster->CastSpell(caster, SPELL_KODO_KOMBO_PLAYER_BUFF, true);
-                    DoCast(me, SPELL_KODO_KOMBO_DESPAWN_BUFF, true);
+                    Player* grpPlayer = itr->GetSource();
+                    if (grpPlayer->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF))
+                        grpPlayer->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
                 }
             }
-            else if (spell->Id == SPELL_KODO_KOMBO_GOSSIP)
-            {
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->DespawnOrUnsummon(60s);
-            }
-        }
-    };
+            else
+                if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF))
+                    player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) && creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
-        {
-            player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 
         SendGossipMenuFor(player, NPC_TEXT_KODO, creature->GetGUID());
         return true;
     }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_aged_dying_ancient_kodoAI(creature);
-    }
 };
 
 void AddSC_desolace()
 {
     new npc_cork_gizelton();
-    new npc_aged_dying_ancient_kodo();
+    RegisterCreatureAI(npc_aged_dying_ancient_kodo);
 }
