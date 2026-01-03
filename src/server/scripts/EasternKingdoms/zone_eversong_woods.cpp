@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 
@@ -215,8 +216,29 @@ private:
     float    _facing;
 };
 
+// 16802 - Lor'themar Theron
+/// @todo add abilities/timers
+struct npc_lor_themar_theron : public ScriptedAI
+{
+    npc_lor_themar_theron(Creature* creature) : ScriptedAI(creature) { }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoRewardPlayersInArea();
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 void AddSC_eversong_woods()
 {
     RegisterCreatureAI(npc_partygoer_pather);
     RegisterCreatureAI(npc_partygoer);
+    RegisterCreatureAI(npc_lor_themar_theron);
 }
