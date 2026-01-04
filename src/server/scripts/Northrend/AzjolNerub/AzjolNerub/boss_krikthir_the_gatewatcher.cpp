@@ -19,6 +19,7 @@
 #include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellInfo.h"
 #include "azjol_nerub.h"
 
 enum Spells
@@ -28,13 +29,6 @@ enum Spells
     SPELL_MIND_FLAY                     = 52586,
     SPELL_CURSE_OF_FATIGUE              = 52592,
     SPELL_FRENZY                        = 28747
-};
-
-enum Npcs
-{
-    NPC_WARRIOR                         = 28732,
-    NPC_SKIRMISHER                      = 28734,
-    NPC_SHADOWCASTER                    = 28733
 };
 
 enum Yells
@@ -50,7 +44,8 @@ enum Yells
 enum MiscActions
 {
     ACTION_MINION_ENGAGED               = 1,
-    GROUP_SWARM                         = 1
+    GROUP_SWARM                         = 1,
+    GROUP_WATCHERS                      = 2
 };
 
 class boss_krik_thir : public CreatureScript
@@ -91,6 +86,11 @@ public:
 
             _canTalk = true;
             _minionInCombat = false;
+            _firstCall = true;
+            _minionsEngaged = 0;
+
+            if (me->IsInEvadeMode())
+                return;
 
             Creature* narjil = instance->GetCreature(DATA_NARJIL);
             Creature* gashra = instance->GetCreature(DATA_GASHRA);
@@ -117,6 +117,9 @@ public:
 
         void DoAction(int32 actionId) override
         {
+            if (actionId == ACTION_MINION_ENGAGED)
+                ++_minionsEngaged;
+
             if (actionId == ACTION_MINION_ENGAGED && !_minionInCombat)
             {
                 _minionInCombat = true;
@@ -124,20 +127,46 @@ public:
                 Talk(SAY_SEND_GROUP, 10s);
 
                 for (Seconds const& timer : { 60s, 120s })
-                {
-                    me->m_Events.AddEventAtOffset([this] {
-                        Talk(SAY_SEND_GROUP);
-
-                        me->m_Events.AddEventAtOffset([this] {
-                            me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
-                        }, 5s);
-                    }, timer);
-                }
+                    CallWatcher(timer);
 
                 me->m_Events.AddEventAtOffset([this] {
                     me->SetInCombatWithZone();
                 }, IsHeroic() ? 200s : 180s);
             }
+            else if (actionId == ACTION_MINION_DIED)
+            {
+                me->m_Events.CancelEventGroup(GROUP_WATCHERS);
+
+                // Check if any of the watchers is alive
+                if (!me->FindNearestCreature(NPC_WATCHER_SILTHIK, 100.0f) &&
+                    !me->FindNearestCreature(NPC_WATCHER_NARJIL, 100.0f) &&
+                    !me->FindNearestCreature(NPC_WATCHER_GASHRA, 100.0f))
+                    return;
+
+                me->m_Events.AddEventAtOffset([this] {
+                    SummonWatcher();
+                }, 5s, GROUP_WATCHERS);
+
+                // Schedule the next (10s + 60s)
+                CallWatcher(70s);
+            }
+        }
+
+        void CallWatcher(Seconds timer)
+        {
+            me->m_Events.AddEventAtOffset([this] {
+                _firstCall = false;
+                Talk(SAY_SEND_GROUP);
+                SummonWatcher();
+            }, timer, GROUP_WATCHERS);
+        }
+
+        void SummonWatcher()
+        {
+            me->m_Events.AddEventAtOffset([this] {
+                me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                _firstCall = false;
+            }, 5s, GROUP_WATCHERS);
         }
 
         uint32 GetData(uint32 data) const override
@@ -182,7 +211,26 @@ public:
                 DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE);
             }, 27s, 35s);
 
-            summons.DoZoneInCombat();
+            if (Creature* narjil = instance->GetCreature(DATA_NARJIL))
+                narjil->SetInCombatWithZone();
+
+            if (Creature* gashra = instance->GetCreature(DATA_GASHRA))
+                gashra->SetInCombatWithZone();
+
+            if (Creature* silthik = instance->GetCreature(DATA_SILTHIK))
+                silthik->SetInCombatWithZone();
+        }
+
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_SUBBOSS_AGGRO_TRIGGER)
+            {
+                if (_minionsEngaged == 2 && _firstCall)
+                    return;
+
+                if (Creature* creature = target->ToCreature())
+                    creature->SetInCombatWithZone();
+            }
         }
 
         void JustDied(Unit* killer) override
@@ -212,6 +260,8 @@ public:
         bool _initTalk;
         bool _canTalk;
         bool _minionInCombat;
+        uint8 _minionsEngaged;
+        bool _firstCall;
 
         [[nodiscard]] bool IsInFrenzy() const { return me->HasAura(SPELL_FRENZY); }
     };
