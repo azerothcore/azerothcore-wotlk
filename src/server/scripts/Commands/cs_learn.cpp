@@ -132,6 +132,7 @@ public:
             {
                 if (!trainer->IsTrainerValidForPlayer(player))
                     continue;
+
                 for (Trainer::Spell const& trainerSpell : trainer->GetSpells())
                 {
                     if (!trainer->CanTeachSpell(player, &trainerSpell))
