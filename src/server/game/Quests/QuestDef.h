@@ -249,6 +249,7 @@ public:
     [[nodiscard]] int32  GetPrevQuestId() const { return PrevQuestId; }
     [[nodiscard]] uint32 GetNextQuestId() const { return NextQuestId; }
     [[nodiscard]] int32  GetExclusiveGroup() const { return ExclusiveGroup; }
+    [[nodiscard]] uint32 GetBreadcrumbForQuestId() const { return BreadcrumbForQuestId; }
     [[nodiscard]] uint32 GetNextQuestInChain() const { return RewardNextQuest; }
     [[nodiscard]] uint32 GetCharTitleId() const { return RewardTitleId; }
     [[nodiscard]] uint32 GetPlayersSlain() const { return RequiredPlayerKills; }
@@ -401,6 +402,7 @@ protected:
     uint32 StartItemCount         = 0;
     uint32 RewardMailSenderEntry  = 0;
     uint32 SpecialFlags           = 0; // custom flags, not sniffed/WDB
+    uint32 BreadcrumbForQuestId   = 0;
 };
 
 struct QuestStatusData
