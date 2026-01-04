@@ -595,6 +595,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         Position targetPosition = target->GetPosition();
         _lastTargetPosition = targetPosition;
 
+        // If player is moving and their position is not updated, we need to predict position
         if (targetIsMoving)
         {
             Position predictedPosition = PredictPosition(target);
