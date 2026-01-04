@@ -449,7 +449,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
 static Position const PredictPosition(Unit* target)
 {
     Position pos = target->GetPosition();
-
+    // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
     float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
     float orientation = target->GetOrientation();
 
@@ -472,7 +472,7 @@ static Position const PredictPosition(Unit* target)
     else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
     {
         pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
-        pos.m_positionY -= std::sin(orientation - M_PI / 2.f) * speed;
+        pos.m_positionY += std::sin(orientation - M_PI / 2.f) * speed;
     }
 
     return pos;
@@ -501,6 +501,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
     float exactDistSq = target->GetExactDistSq(_lastTargetPosition->GetPositionX(), _lastTargetPosition->GetPositionY(), _lastTargetPosition->GetPositionZ());
     float distanceTolerance = 0.25f;
 
+    // For creatures, increase tolerance
     if (target->IsCreature())
     {
         distanceTolerance += _range + _range;
@@ -527,10 +528,13 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
                     return false;
                 }
             }
+
             return true;
         }
+
         return false;
     }
+
     return true;
 }
 
