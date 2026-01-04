@@ -1,3 +1,4 @@
+-- DB update 2026_01_04_00 -> 2026_01_04_01
 --
 DELETE FROM `creature_formations` WHERE `leaderGUID` IN (12758, 12759, 12760);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
