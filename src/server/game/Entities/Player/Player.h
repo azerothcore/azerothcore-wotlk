@@ -38,6 +38,7 @@
 #include "QuestDef.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "TaskScheduler.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
@@ -3030,6 +3031,14 @@ private:
     bool _expectingChangeTransport;
     uint32 _pendingFlightChangeCounter;
     uint32 _mapChangeOrderCounter;
+
+    /*********************************************************/
+    /***               SCHEDULE SYSTEM                     ***/
+    /*********************************************************/
+public:
+    void SchedulePlayerEvent(Seconds timerMin, Seconds timerMax, std::function<void()> exec);
+    void SchedulePlayerEvent(Seconds timerMax, std::function<void()> exec);
+    TaskScheduler _taskScheduler;
 };
 
 void AddItemsSetItem(Player* player, Item* item);
