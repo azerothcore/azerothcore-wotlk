@@ -37,8 +37,9 @@ public:
         {
             { "class",      HandleLearnAllMyClassCommand,      SEC_GAMEMASTER, Console::No },
             { "pettalents", HandleLearnAllMyPetTalentsCommand, SEC_GAMEMASTER, Console::No },
-            { "spells",     HandleLearnAllMySpellsCommand,     SEC_GAMEMASTER, Console::No },
-            { "talents",    HandleLearnAllMyTalentsCommand,    SEC_GAMEMASTER, Console::No }
+            { "trainer",    HandleLearnAllMyTrainerSpellsCommand, SEC_GAMEMASTER, Console::No },
+            { "talents",    HandleLearnAllMyTalentsCommand,    SEC_GAMEMASTER, Console::No },
+            { "quest",      HandleLearnAllMyQuestSpells,       SEC_GAMEMASTER, Console::No }
         };
 
         static ChatCommandTable learnAllCommandTable =
@@ -98,51 +99,53 @@ public:
 
     static bool HandleLearnAllMyClassCommand(ChatHandler* handler)
     {
-        HandleLearnAllMySpellsCommand(handler);
+        HandleLearnAllMyTrainerSpellsCommand(handler);
         HandleLearnAllMyTalentsCommand(handler);
+        HandleLearnAllMyQuestSpells(handler);
         return true;
     }
 
-    static bool HandleLearnAllMySpellsCommand(ChatHandler* handler)
+    static bool HandleLearnAllMyQuestSpells(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        for (auto const& [id, quest] : sObjectMgr->GetQuestTemplates())
+            if (quest->GetRequiredClasses() && player->SatisfyQuestClass(quest, false))
+                player->learnQuestRewardedSpells(quest);
+
+        return true;
+    }
+
+    static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
     {
         ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass());
         if (!classEntry)
             return true;
-        uint32 family = classEntry->spellfamily;
 
-        for (uint32 i = 0; i < sSkillLineAbilityStore.GetNumRows(); ++i)
+        Player* player = handler->GetPlayer();
+        std::vector<Trainer::Trainer const*> const& trainers = sObjectMgr->GetClassTrainers(player->getClass());
+
+        bool hadNew;
+        do
         {
-            SkillLineAbilityEntry const* entry = sSkillLineAbilityStore.LookupEntry(i);
-            if (!entry)
-                continue;
+            hadNew = false;
+            for (Trainer::Trainer const* trainer : trainers)
+            {
+                if (!trainer->IsTrainerValidForPlayer(player))
+                    continue;
+                for (Trainer::Spell const& trainerSpell : trainer->GetSpells())
+                {
+                    if (!trainer->CanTeachSpell(player, &trainerSpell))
+                        continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry->Spell);
-            if (!spellInfo)
-                continue;
+                    if (trainerSpell.IsCastable())
+                        player->CastSpell(player, trainerSpell.SpellId, true);
+                    else
+                        player->learnSpell(trainerSpell.SpellId, false);
 
-            // skip server-side/triggered spells
-            if (spellInfo->SpellLevel == 0)
-                continue;
-
-            // skip wrong class/race skills
-            if (!handler->GetSession()->GetPlayer()->IsSpellFitByClassAndRace(spellInfo->Id))
-                continue;
-
-            // skip other spell families
-            if (spellInfo->SpellFamilyName != family)
-                continue;
-
-            // skip spells with first rank learned as talent (and all talents then also)
-            uint32 firstRank = sSpellMgr->GetFirstSpellInChain(spellInfo->Id);
-            if (GetTalentSpellCost(firstRank) > 0)
-                continue;
-
-            // skip broken spells
-            if (!SpellMgr::IsSpellValid(spellInfo))
-                continue;
-
-            handler->GetSession()->GetPlayer()->learnSpell(spellInfo->Id);
-        }
+                    hadNew = true;
+                }
+            }
+        } while (hadNew);
 
         handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_SPELLS);
         return true;
