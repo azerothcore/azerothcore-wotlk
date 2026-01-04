@@ -990,12 +990,6 @@ bool Aura::ModStackAmount(int32 num, AuraRemoveMode removeMode, bool periodicRes
 
         // reset charges
         SetCharges(CalcMaxCharges());
-        // FIXME: not a best way to synchronize charges, but works
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            if (AuraEffect* aurEff = GetEffect(i))
-                if (aurEff->GetAuraType() == SPELL_AURA_ADD_FLAT_MODIFIER || aurEff->GetAuraType() == SPELL_AURA_ADD_PCT_MODIFIER)
-                    if (SpellModifier* mod = aurEff->GetSpellModifier())
-                        mod->charges = GetCharges();
     }
 
     SetStackAmount(stackAmount);
@@ -1772,24 +1766,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 break;
             case SPELLFAMILY_ROGUE:
+                // Remove Vanish on stealth remove
+                if (GetId() == 1784)
                 {
-                    // Overkill, Master of Subtlety
-                    if (caster && GetSpellInfo()->SpellIconID == 250)
-                    {
-                        if (caster->GetDummyAuraEffect(SPELLFAMILY_ROGUE, 2114, 0))
-                            caster->CastSpell(caster, 31666, true);
-
-                        if (caster->GetAuraEffectDummy(58426))
-                            caster->CastSpell(caster, 58428, true);
-                    }
-                    // Remove Vanish on stealth remove
-                    if (GetId() == 1784)
-                    {
-                        target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, ObjectGuid::Empty);
-                        target->RemoveAurasDueToSpell(18461);
-                    }
-                    break;
+                    target->RemoveAurasWithFamily(SPELLFAMILY_ROGUE, 0x800, 0, 0, ObjectGuid::Empty);
+                    target->RemoveAurasDueToSpell(18461);
                 }
+                break;
             case SPELLFAMILY_SHAMAN:
             {
                 // Ghost Wolf Speed (PvP 58 lvl set)
@@ -1839,6 +1822,39 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
     // mods at aura apply or remove
     switch (GetSpellInfo()->SpellFamilyName)
     {
+        case SPELLFAMILY_ROGUE:
+            // Stealth
+            if (GetSpellInfo()->SpellFamilyFlags[0] & 0x00400000)
+            {
+                // Master of Subtlety
+                if (AuraEffect const* aurEff = target->GetAuraEffectOfRankedSpell(31221, 0))
+                {
+                    if (!apply)
+                        target->CastSpell(target, 31666, true);
+                    else
+                    {
+                        // Remove counter aura
+                        target->RemoveAurasDueToSpell(31666);
+
+                        int32 amount = aurEff->GetAmount();
+                        target->CastCustomSpell(target, 31665, &amount, nullptr, nullptr, true);
+                    }
+                }
+                // Overkill
+                if (target->HasAura(58426))
+                {
+                    if (!apply)
+                        target->CastSpell(target, 58428, true);
+                    else
+                    {
+                        // Remove counter aura
+                        target->RemoveAurasDueToSpell(58428);
+
+                        target->CastSpell(target, 58427, true);
+                    }
+                }
+            }
+            break;
         case SPELLFAMILY_HUNTER:
             switch (GetId())
             {
@@ -2112,22 +2128,37 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     return true;
 }
 
-bool Aura::IsProcOnCooldown() const
+bool Aura::IsProcOnCooldown(TimePoint now) const
 {
-    /*if (m_procCooldown)
+    return m_procCooldown > now;
+}
+
+void Aura::AddProcCooldown(TimePoint cooldownEnd)
+{
+    m_procCooldown = cooldownEnd;
+}
+
+void Aura::AddProcCooldown(SpellProcEntry const* procEntry, TimePoint now)
+{
+    AddProcCooldown(now + procEntry->Cooldown);
+}
+
+void Aura::ResetProcCooldown()
+{
+    m_procCooldown = std::chrono::steady_clock::now();
+}
+
+void Aura::PrepareProcChargeDrop(SpellProcEntry const* procEntry, ProcEventInfo& eventInfo)
+{
+    // take one charge, aura expiration will be handled in Aura::TriggerProcOnEvent (if needed)
+    if (!(procEntry->AttributesMask & PROC_ATTR_USE_STACKS_FOR_CHARGES) && IsUsingCharges() && (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->HasAttribute(SPELL_ATTR6_DO_NOT_CONSUME_RESOURCES)))
     {
-        if (m_procCooldown > GameTime::GetGameTime().count())
-            return true;
-    }*/
-    return false;
+        --m_procCharges;
+        SetNeedClientUpdateForTargets();
+    }
 }
 
-void Aura::AddProcCooldown(Milliseconds /*msec*/)
-{
-    //m_procCooldown = std:chrono::steady_clock::now() + msec;
-}
-
-void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now)
 {
     bool prepare = CallScriptPrepareProcHandlers(aurApp, eventInfo);
     if (!prepare)
@@ -2145,50 +2176,89 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
     ASSERT(procEntry);
 
     // cooldowns should be added to the whole aura (see 51698 area aura)
-    AddProcCooldown(procEntry->Cooldown);
+    AddProcCooldown(now + procEntry->Cooldown);
 }
 
-bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo) const
+uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now) const
 {
     SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId());
+
     // only auras with spell proc entry can trigger proc
     if (!procEntry)
-        return false;
+        return 0;
+
+    // check spell triggering us
+    if (Spell const* spell = eventInfo.GetProcSpell())
+    {
+        // Do not allow auras to proc from effect triggered from itself
+        if (spell->GetTriggeredByAuraSpellInfo() == m_spellInfo)
+            return 0;
+
+        // check if aura can proc when spell is triggered (exception for hunter auto shot & wands)
+        if (!GetSpellInfo()->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS) &&
+            !(procEntry->AttributesMask & PROC_ATTR_TRIGGERED_CAN_PROC) &&
+            !(eventInfo.GetTypeMask() & AUTO_ATTACK_PROC_FLAG_MASK))
+        {
+            if (spell->IsTriggered() && !spell->GetSpellInfo()->HasAttribute(SPELL_ATTR3_NOT_A_PROC))
+                return 0;
+        }
+
+        // do not allow aura proc if proc is caused by a spell cast by item
+        if (spell->m_CastItem && (procEntry->AttributesMask & PROC_ATTR_CANT_PROC_FROM_ITEM_CAST))
+            return 0;
+    }
 
     // check if we have charges to proc with
     if (IsUsingCharges() && !GetCharges())
-        return false;
+        return 0;
 
     // check proc cooldown
-    if (IsProcOnCooldown())
-        return false;
-
-    /// @todo:
-    // something about triggered spells triggering, and add extra attack effect
+    if (IsProcOnCooldown(now))
+        return 0;
 
     // do checks against db data
     if (!sSpellMgr->CanSpellTriggerProcOnEvent(*procEntry, eventInfo))
-        return false;
+        return 0;
+
+    // check if spell was affected by this aura's spellmod (used by Arcane Potency and similar effects)
+    // only applies when consuming charges or stacks
+    if ((procEntry->AttributesMask & PROC_ATTR_REQ_SPELLMOD) && (IsUsingCharges() || (procEntry->AttributesMask & PROC_ATTR_USE_STACKS_FOR_CHARGES)))
+    {
+        Spell const* procSpell = eventInfo.GetProcSpell();
+        if (!procSpell || procSpell->m_appliedMods.find(const_cast<Aura*>(this)) == procSpell->m_appliedMods.end())
+            return 0;
+    }
 
     // do checks using conditions table
     ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_SPELL_PROC, GetId());
     ConditionSourceInfo condInfo = ConditionSourceInfo(eventInfo.GetActor(), eventInfo.GetActionTarget());
     if (!sConditionMgr->IsObjectMeetToConditions(condInfo, conditions))
-        return false;
+        return 0;
 
     // AuraScript Hook
     bool check = const_cast<Aura*>(this)->CallScriptCheckProcHandlers(aurApp, eventInfo);
     if (!check)
-        return false;
+        return 0;
 
-    /// @todo:
-    // do allow additional requirements for procs
-    // this is needed because this is the last moment in which you can prevent aura charge drop on proc
-    // and possibly a way to prevent default checks (if there're going to be any)
+    // At least one effect has to pass checks to proc aura
+    uint8 procEffectMask = aurApp->GetEffectMask();
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (AuraEffect* aurEff = GetEffect(i))
+        {
+            if (procEffectMask & (1 << i))
+            {
+                if ((procEntry->DisableEffectsMask & (1u << i)) || !aurEff->CheckEffectProc(aurApp, eventInfo))
+                    procEffectMask &= ~(1 << i);
+            }
+        }
+    }
+
+    if (!procEffectMask)
+        return 0;
 
     // Check if current equipment meets aura requirements
     // do that only for passive spells
-    /// @todo: this needs to be unified for all kinds of auras
     Unit* target = aurApp->GetTarget();
     if (IsPassive() && target->IsPlayer() && GetSpellInfo()->EquippedItemClass != -1)
     {
@@ -2198,7 +2268,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             if (GetSpellInfo()->EquippedItemClass == ITEM_CLASS_WEAPON)
             {
                 if (target->ToPlayer()->IsInFeralForm())
-                    return false;
+                    return 0;
 
                 if (DamageInfo const* damageInfo = eventInfo.GetDamageInfo())
                 {
@@ -2223,13 +2293,15 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
             }
 
             if (!item || item->IsBroken() || !item->IsFitToSpellRequirements(GetSpellInfo()))
-            {
                 return 0;
-            }
         }
     }
 
-    return roll_chance_f(CalcProcChance(*procEntry, eventInfo));
+    float procChance = CalcProcChance(*procEntry, eventInfo);
+    if (roll_chance_f(procChance))
+        return procEffectMask;
+
+    return 0;
 }
 
 float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const
@@ -2249,23 +2321,47 @@ float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& event
         if (Player* modOwner = caster->GetSpellModOwner())
             modOwner->ApplySpellMod(GetId(), SPELLMOD_CHANCE_OF_SUCCESS, chance);
     }
+
+    // proc chance is reduced by an additional 3.333% per level past 60
+    if ((procEntry.AttributesMask & PROC_ATTR_REDUCE_PROC_60) && eventInfo.GetActor()->GetLevel() > 60)
+        chance = std::max(0.f, (1.f - ((eventInfo.GetActor()->GetLevel() - 60) * 1.f / 30.f)) * chance);
+
     return chance;
 }
 
-void Aura::TriggerProcOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+void Aura::TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, ProcEventInfo& eventInfo)
 {
-    CallScriptProcHandlers(aurApp, eventInfo);
+    bool prevented = CallScriptProcHandlers(aurApp, eventInfo);
+    if (!prevented)
+    {
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (!(procEffectMask & (1 << i)))
+                continue;
 
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        if (aurApp->HasEffect(i))
             // OnEffectProc / AfterEffectProc hooks handled in AuraEffect::HandleProc()
-            GetEffect(i)->HandleProc(aurApp, eventInfo);
+            if (aurApp->HasEffect(i))
+                GetEffect(i)->HandleProc(aurApp, eventInfo);
+        }
 
-    CallScriptAfterProcHandlers(aurApp, eventInfo);
+        CallScriptAfterProcHandlers(aurApp, eventInfo);
+    }
 
+    ConsumeProcCharges(sSpellMgr->GetSpellProcEntry(GetId()));
+}
+
+void Aura::ConsumeProcCharges(SpellProcEntry const* procEntry)
+{
     // Remove aura if we've used last charge to proc
-    if (IsUsingCharges() && !GetCharges())
-        Remove();
+    if (procEntry->AttributesMask & PROC_ATTR_USE_STACKS_FOR_CHARGES)
+    {
+        ModStackAmount(-1);
+    }
+    else if (IsUsingCharges())
+    {
+        if (!GetCharges())
+            Remove();
+    }
 }
 
 void Aura::_DeleteRemovedApplications()
@@ -2563,6 +2659,23 @@ bool Aura::CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventI
         std::list<AuraScript::CheckProcHandler>::iterator hookItrEnd = (*scritr)->DoCheckProc.end(), hookItr = (*scritr)->DoCheckProc.begin();
         for (; hookItr != hookItrEnd; ++hookItr)
             result &= hookItr->Call(*scritr, eventInfo);
+
+        (*scritr)->_FinishScriptCall();
+    }
+
+    return result;
+}
+
+bool Aura::CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo)
+{
+    bool result = true;
+    for (std::list<AuraScript*>::iterator scritr = m_loadedScripts.begin(); scritr != m_loadedScripts.end(); ++scritr)
+    {
+        (*scritr)->_PrepareScriptCall(AURA_SCRIPT_HOOK_CHECK_EFFECT_PROC, aurApp);
+        std::list<AuraScript::CheckEffectProcHandler>::iterator effEndItr = (*scritr)->DoCheckEffectProc.end(), effItr = (*scritr)->DoCheckEffectProc.begin();
+        for (; effItr != effEndItr; ++effItr)
+            if (effItr->IsEffectAffected(m_spellInfo, aurEff->GetEffIndex()))
+                result &= effItr->Call(*scritr, aurEff, eventInfo);
 
         (*scritr)->_FinishScriptCall();
     }
