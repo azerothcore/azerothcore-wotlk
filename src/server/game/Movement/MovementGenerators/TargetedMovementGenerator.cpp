@@ -603,7 +603,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             if (_lastPredictedPosition && _lastPredictedPosition->GetExactDistSq(&predictedPosition) < 0.25f)
                 return true;
 
-            if (IsValidPredictedPosition(owner, target, predictedPosition))
+            if (IsValidPredictedPosition(target, predictedPosition))
             {
                 _lastPredictedPosition = predictedPosition;
                 targetPosition = predictedPosition;
