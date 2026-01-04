@@ -1365,6 +1365,7 @@ public:
     bool DeleteGameTele(std::string_view name);
 
     Trainer::Trainer* GetTrainer(uint32 creatureId);
+    std::vector<Trainer::Trainer const*> const& GetClassTrainers(uint8 classId) const { return _classTrainers.at(classId); }
 
     [[nodiscard]] VendorItemData const* GetNpcVendorItemList(uint32 entry) const
     {
@@ -1611,6 +1612,7 @@ private:
 
     CacheVendorItemContainer _cacheVendorItemStore;
     std::unordered_map<uint32, Trainer::Trainer> _trainers;
+    std::unordered_map<uint8, std::vector<Trainer::Trainer const*>> _classTrainers;
     std::unordered_map<uint32, uint32> _creatureDefaultTrainers;
 
     std::set<uint32> _difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures, used in CheckCreatureTemplate
