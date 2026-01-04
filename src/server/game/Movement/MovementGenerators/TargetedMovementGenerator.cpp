@@ -432,13 +432,33 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
 
         UnitMoveType moveType = Movement::SelectSpeedType(moveFlags);
         speed = target->GetSpeed(moveType);
+
         if (playerPet)
         {
-            float distance = owner->GetDistance2d(dest.x, dest.y) - target->GetObjectSize() - (*speed / 2.f);
-            if (distance > 0.f)
+            float distance = owner->GetDistance2d(dest.x, dest.y);
+            float targetSize = target->GetObjectSize();
+
+            // How far behind the pet is from its ideal position
+            float lag = distance - targetSize - (*speed * 0.5f);
+
+            if (lag > 0.f)
             {
-                float multiplier = 1.f + (distance / 10.f);
+                // More aggressive catch-up curve
+                // At 5 yards behind: 1.5x speed
+                // At 10 yards behind: 2.0x speed  
+                // At 15 yards behind: 2.5x speed
+                float multiplier = 1.f + (lag / 10.f);
+
+                // Cap the multiplier to avoid absurd speeds
+                multiplier = std::min(multiplier, 3.0f);
+
                 *speed *= multiplier;
+            }
+            else
+            {
+                // Pet is close or ahead - match target speed exactly
+                // Small boost to maintain position when moving together
+                *speed *= 1.05f;
             }
         }
     }
@@ -466,6 +486,60 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target)
     return true;
 }
 
+static Position const PredictPosition(Unit* target)
+{
+    Position pos = target->GetPosition();
+
+    // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
+    float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
+    float orientation = target->GetOrientation();
+
+    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))
+    {
+        pos.m_positionX += cos(orientation) * speed;
+        pos.m_positionY += std::sin(orientation) * speed;
+    }
+    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_BACKWARD))
+    {
+        pos.m_positionX -= cos(orientation) * speed;
+        pos.m_positionY -= std::sin(orientation) * speed;
+    }
+
+    if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_LEFT))
+    {
+        pos.m_positionX += cos(orientation + M_PI / 2.f) * speed;
+        pos.m_positionY += std::sin(orientation + M_PI / 2.f) * speed;
+    }
+    else if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_STRAFE_RIGHT))
+    {
+        pos.m_positionX += cos(orientation - M_PI / 2.f) * speed;
+        pos.m_positionY += std::sin(orientation - M_PI / 2.f) * speed;
+    }
+
+    return pos;
+}
+
+// New helper function to validate if prediction is safe
+static bool IsValidPredictedPosition(Unit* owner, Unit* target, Position const& predicted)
+{
+    Position current = target->GetPosition();
+
+    // Check if predicted position is reasonably close (sanity check)
+    if (current.GetExactDist2d(&predicted) > 15.0f)
+        return false;
+
+    // Check line of sight from target's current position to predicted position
+    // This catches most geometry issues
+    if (!target->IsWithinLOS(predicted.GetPositionX(), predicted.GetPositionY(), predicted.GetPositionZ()))
+        return false;
+
+    // Additional check: ensure the owner can see the predicted position
+    if (!owner->IsWithinLOS(predicted.GetPositionX(), predicted.GetPositionY(), predicted.GetPositionZ()))
+        return false;
+
+    return true;
+}
+
 template<class T>
 bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 {
@@ -478,7 +552,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     Creature* cOwner = owner->ToCreature();
     Unit* target = i_target.getTarget();
 
-    // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || (cOwner && owner->ToCreature()->IsMovementPreventedByCasting()))
     {
         i_path = nullptr;
@@ -495,40 +568,73 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             followingMaster = true;
     }
 
+    bool isPlayerPet = owner->IsGuardian() && target->IsPlayer();
+
+    bool targetIsMoving = false;
+    if (isPlayerPet)
+    {
+        targetIsMoving = target->m_movementInfo.HasMovementFlag(
+            MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD |
+            MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+    }
+
+    // Calculate how far behind the pet is
+    float distanceToTarget = owner->GetDistance2d(target);
+    bool isFallingBehind = isPlayerPet && targetIsMoving && (distanceToTarget > 3.0f);
+
+    // Adaptive timer - update much more frequently when falling behind
     i_checkTimer.Update(time_diff);
     if (!i_checkTimer.Passed())
-        return true; // Wait for next tick
-    i_checkTimer.Reset(oPet ? 400 : 1200); // Player pets need more frequent updates
+        return true;
+
+    if (isPlayerPet)
+    {
+        i_checkTimer.Reset(400);  // Normal when stationary
+    }
+    else
+    {
+        i_checkTimer.Reset(1200);
+    }
 
     bool forceDest =
-        (followingMaster) || // allow pets following their master to cheat while generating paths
-        (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
-        ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
+        (followingMaster) ||
+        (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster());
 
-    // Don't calculate path if target did not move significantly
-    if (PositionOkay(target))
+    if (PositionOkay(target) && !isFallingBehind)
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
             owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
             i_path = nullptr;
             MovementInform(owner);
-
             owner->SetFacingTo(target->GetOrientation());
         }
-
         return true;
     }
 
     Position targetPosition = target->GetPosition();
-    _lastTargetPosition = targetPosition;
+    bool usedPrediction = false;
+
+    if (isPlayerPet && targetIsMoving)
+    {
+        Position predictedPosition = PredictPosition(target);
+
+        if (IsValidPredictedPosition(owner, target, predictedPosition))
+        {
+            targetPosition = predictedPosition;
+            usedPrediction = true;
+        }
+    }
+
+    _lastTargetPosition = target->GetPosition();
 
     if (!i_path)
         i_path = std::make_unique<PathGenerator>(owner);
     else
         i_path->Clear();
 
-    target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range, target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
+    target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range,
+        target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
 
     float x, y, z;
     targetPosition.GetPosition(x, y, z);
@@ -536,14 +642,45 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (owner->IsHovering())
         owner->UpdateAllowedPositionZ(x, y, z);
 
+    if (!owner->movespline->Finalized() && isPlayerPet)
+    {
+        G3D::Vector3 currentDest = owner->movespline->FinalDestination();
+
+        float destDiff = std::sqrt(
+            (currentDest.x - x) * (currentDest.x - x) +
+            (currentDest.y - y) * (currentDest.y - y)
+        );
+
+        float threshold = targetIsMoving ? 3.0f : 1.5f;
+
+        if (destDiff < threshold && !isFallingBehind)
+        {
+            return true; // Don't interrupt - let current movement finish
+        }
+    }
+
     bool success = i_path->CalculatePath(x, y, z, forceDest);
+
+    if (usedPrediction && (!success || (i_path->GetPathType() & PATHFIND_NOPATH)))
+    {
+        targetPosition = target->GetPosition();
+        target->MovePositionToFirstCollision(targetPosition, owner->GetCombatReach() + _range,
+            target->ToAbsoluteAngle(_angle.RelativeAngle) - target->GetOrientation());
+        targetPosition.GetPosition(x, y, z);
+
+        if (owner->IsHovering())
+            owner->UpdateAllowedPositionZ(x, y, z);
+
+        i_path->Clear();
+        success = i_path->CalculatePath(x, y, z, forceDest);
+    }
+
     if (!success || (i_path->GetPathType() & PATHFIND_NOPATH))
     {
         if (!owner->IsStopped())
             owner->StopMoving();
 
-        // Teleport if stuck, it's fairly blizzlike and preferable to clipping through geometry
-        if (owner->GetDistance(target) > 20.0f)
+        if (distanceToTarget > 20.0f)
             owner->NearTeleportTo(x, y, z, target->GetOrientation());
 
         return true;
@@ -553,12 +690,40 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(i_path->GetPath());
+
     if (_inheritWalkState)
         init.SetWalk(target->IsWalking() || target->movespline->isWalking());
 
-    if (_inheritSpeed)
-        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
+    // Enhanced velocity calculation
+    if (isPlayerPet)
+    {
+        float baseSpeed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags()));
+        float finalSpeed = baseSpeed;
+
+        // Calculate distance to destination (where pet needs to be)
+        float distToDest = owner->GetDistance2d(x, y);
+
+        if (distToDest > 2.0f)
+        {
+            // Aggressive catch-up: scale speed based on how far behind we are
+            // This ensures the pet actually catches up, not just keeps pace
+            float catchUpMultiplier = 1.0f + (distToDest / 8.0f);
+            catchUpMultiplier = std::min(catchUpMultiplier, 2.5f);
+            finalSpeed *= catchUpMultiplier;
+        }
+        else
+        {
+            // Close to target - tiny boost to stay alongside
+            finalSpeed *= 1.1f;
+        }
+
+        init.SetVelocity(finalSpeed);
+    }
+    else if (_inheritSpeed)
+    {
+        if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), false))
             init.SetVelocity(*velocity);
+    }
 
     init.Launch();
 
