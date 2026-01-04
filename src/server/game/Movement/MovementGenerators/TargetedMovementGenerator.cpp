@@ -478,7 +478,7 @@ static Position const PredictPosition(Unit* target)
     return pos;
 }
 
-static bool IsValidPredictedPosition(Unit* owner, Unit* target, Position const& predicted)
+static bool IsValidPredictedPosition(Unit* target, Position const& predicted)
 {
     Position current = target->GetPosition();
 
