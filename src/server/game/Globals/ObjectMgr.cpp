@@ -9359,10 +9359,7 @@ void ObjectMgr::LoadTrainers()
                 spellsByTrainer.erase(spellsItr);
             }
 
-            auto [it, isNew] = _trainers.emplace(std::piecewise_construct, std::forward_as_tuple(trainerId), std::forward_as_tuple(trainerId, trainerType, requirement, std::move(greeting), std::move(spells)));
-            ASSERT(isNew);
-            if (trainerType == Trainer::Type::Class)
-                _classTrainers[requirement].push_back(&it->second);
+            _trainers.emplace(std::piecewise_construct, std::forward_as_tuple(trainerId), std::forward_as_tuple(trainerId, trainerType, requirement, std::move(greeting), std::move(spells)));
         } while (trainersResult->NextRow());
     }
 
