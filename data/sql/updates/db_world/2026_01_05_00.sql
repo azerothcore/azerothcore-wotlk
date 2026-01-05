@@ -1,3 +1,4 @@
+-- DB update 2026_01_04_01 -> 2026_01_05_00
 -- Everfrost Chip (quest starter) should always drop.
 UPDATE `gameobject_loot_template` SET `Chance` = 100 WHERE `Entry` = 26782 AND `Item` = 44725;
 
