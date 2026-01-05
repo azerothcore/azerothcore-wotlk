@@ -188,6 +188,7 @@ public:
             { "whisper",        HandleNpcWhisperCommand,           SEC_GAMEMASTER, Console::No },
             { "yell",           HandleNpcYellCommand,              SEC_GAMEMASTER, Console::No },
             { "tame",           HandleNpcTameCommand,              SEC_GAMEMASTER, Console::No },
+            { "do",             HandleNpcDoActionCommand,          SEC_GAMEMASTER, Console::No },
             { "add",            npcAddCommandTable },
             { "delete",         npcDeleteCommandTable },
             { "follow",         npcFollowCommandTable },
@@ -1209,6 +1210,20 @@ public:
             return false;
         }
 
+        return true;
+    }
+
+    static bool HandleNpcDoActionCommand(ChatHandler* handler, uint32 actionId)
+    {
+        Creature* creature = handler->getSelectedCreature();
+        if (!creature)
+        {
+            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            return false;
+        }
+
+        creature->AI()->DoAction(actionId);
+        handler->PSendSysMessage(LANG_NPC_DO_ACTION, creature->GetGUID().ToString(), creature->GetEntry(), creature->GetName(), actionId);
         return true;
     }
 
