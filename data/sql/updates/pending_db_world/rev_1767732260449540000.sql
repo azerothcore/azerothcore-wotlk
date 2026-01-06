@@ -30,7 +30,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (30136, 0, 2, 0, 0, 0, 25, 1, 0, 500, 0, 0, 0, 0, 11, 56621, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormforged Soldier - In Combat - Cast \'Thunder Orb\' Hit (No Repeat)'),
 (30136, 0, 3, 0, 0, 0, 100, 0, 3000, 5000, 4000, 6000, 0, 0, 11, 56622, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormforged Soldier - In Combat - Cast \'Thunder Orb\' Miss');
 
--- DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 30134 AND `spell_id` IN (52391, 55089);
+-- DELETE FROM `npc_spellclick_spells` WHERE `npc_entry` = 30134 AND `spell_id` IN (52391, 55089); -- Breaking Brann, I think
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 55089) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 30134) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 55089, 0, 0, 31, 0, 3, 30134, 0, 0, 0, 0, '', '55089 \'Mount Brann\'s Flying Machine\' Targets Brann\'s Flying Machine (30134)');
