@@ -12344,6 +12344,10 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
         if (_spell_idx->second->ClassMask && (_spell_idx->second->ClassMask & classmask) == 0)
             continue;
 
+        // skip wrong class and race skill saved in SkillRaceClassInfo.dbc
+        if (!GetSkillRaceClassInfo(_spell_idx->second->SkillLine, getRace(), getClass()))
+            continue;
+
         return true;
     }
 
