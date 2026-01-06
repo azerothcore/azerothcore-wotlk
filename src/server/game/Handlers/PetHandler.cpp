@@ -231,19 +231,20 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 if (!creaturePet->CanCreatureAttack(TargetUnit))
                                     return;
 
-                        // Not let attack through obstructions
-                        bool checkLos = !sDisableMgr->IsPathfindingEnabled(pet->GetMap()) ||
-                                        (TargetUnit->IsCreature() && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
-
-                        if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
-                        {
-                            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
-                            data << uint8(0);
-                            data << uint32(7389);
-                            data << uint8(SPELL_FAILED_LINE_OF_SIGHT);
-                            SendPacket(&data);
+                        // Don't bother if pet is already attacking target
+                        if (pet->GetVictim() == TargetUnit && pet->GetCharmInfo()->IsCommandAttack())
                             return;
-                        }
+
+                        // Check line of sight either from pet or owner depending if pet is charmed
+                        Unit* seer = pet;
+                        if (Unit* owner = pet->GetOwner())
+                            if (owner->IsPlayer() && owner->ToPlayer()->GetCharm() != pet && owner->ToPlayer()->GetVehicleBase() != pet)
+                                if (sDisableMgr->IsPathfindingEnabled(pet->GetMap()))
+                                    seer = owner;
+
+                        // Fail on LoS
+                        if (seer && !seer->IsWithinLOSInMap(TargetUnit, VMAP::ModelIgnoreFlags::M2))
+                            return;
 
                         pet->ClearUnitState(UNIT_STATE_FOLLOW);
                         // This is true if pet has no target or has target but targets differs.
@@ -428,7 +429,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         // This is true if pet has no target or has target but targets differs.
                         if (pet->GetVictim() != unit_target)
                         {
-                            if (pet->ToCreature()->IsAIEnabled)
+                            if (pet->ToCreature()->IsAIEnabled && pet->IsWithinLOSInMap(unit_target, VMAP::ModelIgnoreFlags::M2))
                                 pet->ToCreature()->AI()->AttackStart(unit_target);
                         }
                     }
@@ -510,7 +511,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 charmInfo->SetIsCommandFollow(false);
                                 charmInfo->SetIsReturning(false);
 
-                                pet->ToCreature()->AI()->AttackStart(TargetUnit);
+                                if (pet->IsWithinLOSInMap(TargetUnit, VMAP::ModelIgnoreFlags::M2))
+                                    pet->ToCreature()->AI()->AttackStart(TargetUnit);
 
                                 if (pet->IsPet() && pet->ToPet()->getPetType() == SUMMON_PET && pet != TargetUnit && roll_chance_i(10))
                                     pet->SendPetActionSound(PET_ACTION_SPECIAL_SPELL);
