@@ -2471,7 +2471,7 @@ class spell_darkfallen_blood_mirror : public SpellScript
     {
         targets.remove_if([](WorldObject* target)
             {
-                return target->GetTypeId() != TYPEID_PLAYER;
+                return !target->IsPlayer();
             });
 
         if (targets.size() < 2)

@@ -9,12 +9,7 @@ UPDATE `creature_template` SET `ScriptName`='npc_darkfallen_advisor' WHERE `entr
 UPDATE `creature_template` SET `ScriptName`='npc_darkfallen_tactician' WHERE `entry`=37666;
 UPDATE `gameobject_template` SET `ScriptName`='go_empowering_blood_orb' WHERE `entry`=201741;
 
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN (
-'spell_icc_empowered_blood',
-'spell_icc_empowered_blood_3',
-'spell_icc_siphon_essence',
-'spell_darkfallen_blood_mirror',
-'spell_generic_remove_empowered_blood');
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (70227,70304,70299,70450,72131,70939);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (70227,'spell_icc_empowered_blood'),
 (70304,'spell_icc_empowered_blood_3'),
