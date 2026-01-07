@@ -249,13 +249,13 @@ public:
         {
             summons.Summon(summon);
             // If central gate is open, attack any one
+            summon->SetReactState(REACT_AGGRESSIVE);
             if (gateOpened)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
                 {
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
-                    summon->SetReactState(REACT_AGGRESSIVE);
                     summon->CallForHelp(150.0f);
                 }
             }
@@ -281,7 +281,6 @@ public:
                     Player* target = tList[urand(0, tList.size() - 1)];
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
-                    summon->SetReactState(REACT_AGGRESSIVE);
                 }
             }
         }
@@ -464,6 +463,19 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
 
                         gateOpened = true;
+                        summons.DoForAllSummons([&](WorldObject* summon)
+                        {
+                            if (Creature* gothikMinion = summon->ToCreature())
+                                if (gothikMinion->IsAlive())
+                                {
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
+                                    {
+                                        gothikMinion->AI()->AttackStart(target);
+                                        gothikMinion->SetReactState(REACT_AGGRESSIVE);
+                                        gothikMinion->SetInCombatWithZone();
+                                    }
+                                }
+                        });
                         Talk(EMOTE_GATE_OPENED);
                     }
                     break;
