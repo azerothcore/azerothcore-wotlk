@@ -441,9 +441,9 @@ void FlightPathMovementGenerator::DoReset(Player* player)
     uint32 end = GetPathAtMapEnd();
     uint32 currentNodeId = GetCurrentNode();
 
-    if (currentNodeId == end)
+    if (i_path.empty() || currentNodeId >= end)
     {
-        LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::DoReset: trying to start a flypath from the end point. {}", player->GetGUID().ToString());
+        LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::DoReset: invalid path state - path empty: {}, currentNode: {}, end: {}. {}", i_path.empty(), currentNodeId, end, player->GetGUID().ToString());
         return;
     }
 
@@ -454,7 +454,7 @@ void FlightPathMovementGenerator::DoReset(Player* player)
     Movement::MoveSplineInit init(player);
     // Providing a starting vertex since the taxi paths do not provide such
     init.Path().push_back(G3D::Vector3(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ()));
-    for (uint32 i = currentNodeId; i != end; ++i)
+    for (uint32 i = currentNodeId; i < end && i < i_path.size(); ++i)
     {
         G3D::Vector3 vertice(i_path[i]->x, i_path[i]->y, i_path[i]->z);
         init.Path().push_back(vertice);
