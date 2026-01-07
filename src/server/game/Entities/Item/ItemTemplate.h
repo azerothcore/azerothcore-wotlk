@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -727,6 +727,14 @@ struct ItemTemplate
     [[nodiscard]] uint32 GetMaxStackSize() const
     {
         return (Stackable == 2147483647 || Stackable <= 0) ? uint32(0x7FFFFFFF - 1) : uint32(Stackable);
+    }
+
+    void GetOnEquipSpellIDs(std::vector<uint32>& spellEquipID) const
+    {
+        spellEquipID.clear();
+        for (auto const& spell : Spells)
+            if (spell.SpellId && spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP)
+                spellEquipID.push_back(spell.SpellId);
     }
 
     [[nodiscard]] float getDPS() const

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -165,14 +165,16 @@ public:
             me->GetMotionMaster()->MovePoint(currentWaypoint, WaypointPositions[currentWaypoint]);
         }
 
-        bool IsInRoom()
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (me->GetExactDist(2535.1f, -2968.7f, 241.3f) > 100.0f)
+            if (why == EVADE_REASON_BOUNDARY)
             {
-                EnterEvadeMode();
-                return false;
+                instance->GetCreature(DATA_BARON_RIVENDARE_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                instance->GetCreature(DATA_LADY_BLAUMEUX_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                instance->GetCreature(DATA_SIR_ZELIEK_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                instance->GetCreature(DATA_THANE_KORTHAZZ_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
             }
-            return true;
+            BossAI::EnterEvadeMode();
         }
 
         void Reset() override
@@ -208,7 +210,7 @@ public:
                 me->SetInCombatWithZone();
                 if (!UpdateVictim())
                 {
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
                     return;
                 }
                 if (me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK)
@@ -277,9 +279,6 @@ public:
                 me->GetMotionMaster()->MovePoint(currentWaypoint, WaypointPositions[currentWaypoint]);
                 currentWaypoint = 0;
             }
-
-            if (!IsInRoom())
-                return;
 
             if (movementPhase < MOVE_PHASE_FINISHED || !UpdateVictim())
                 return;

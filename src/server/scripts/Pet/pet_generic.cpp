@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -821,6 +821,16 @@ struct npc_pet_darting_hatchling : public NullCreatureAI
     }
 };
 
+struct npc_pet_proto_drake_whelp : public NullCreatureAI
+{
+    npc_pet_proto_drake_whelp(Creature* c) : NullCreatureAI(c) { }
+
+    void Reset() override
+    {
+        me->SetAnimTier(AnimTier::Fly);
+    }
+};
+
 void AddSC_generic_pet_scripts()
 {
     RegisterCreatureAI(npc_pet_gen_soul_trader_beacon);
@@ -836,4 +846,5 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_pet_gen_fetch_ball);
     RegisterCreatureAI(npc_pet_gen_moth);
     RegisterCreatureAI(npc_pet_darting_hatchling);
+    RegisterCreatureAI(npc_pet_proto_drake_whelp);
 }

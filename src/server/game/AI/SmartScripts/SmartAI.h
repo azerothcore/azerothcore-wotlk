@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -67,6 +67,7 @@ public:
     void SetAutoAttack(bool on) { mCanAutoAttack = on; }
     void SetCombatMovement(bool on, bool stopOrStartMovement);
     void SetCurrentRangeMode(bool on, float range = 0.f);
+    void SetMainSpell(uint32 spellId);
     void DistanceYourself(float range);
     void SetFollow(Unit* target, float dist = 0.0f, float angle = 0.0f, uint32 credit = 0, uint32 end = 0, uint32 creditType = 0, bool aliveState = true);
     void StopFollow(bool complete);
@@ -213,6 +214,10 @@ public:
 
     void DistancingEnded() override;
 
+    bool IsMainSpellPrevented(SpellInfo const* spellInfo) const;
+
+    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override;
+
 private:
     bool mIsCharmed;
     uint32 mFollowCreditType;
@@ -264,6 +269,7 @@ private:
     bool _currentRangeMode;
     float _attackDistance;
     float _pendingDistancing;
+    uint32 _mainSpellId;
 };
 
 class SmartGameObjectAI : public GameObjectAI

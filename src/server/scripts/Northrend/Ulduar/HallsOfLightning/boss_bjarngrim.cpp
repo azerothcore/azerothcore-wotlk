@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -110,7 +110,7 @@ enum Yells
 
 struct boss_bjarngrim : public npc_escortAI
 {
-    boss_bjarngrim(Creature* creature) : npc_escortAI(creature), summons(creature)
+    boss_bjarngrim(Creature* creature) : npc_escortAI(creature), summons(creature), m_uiStance(STANCE_BATTLE)
     {
         m_pInstance = creature->GetInstanceScript();
         InitializeWaypoints();
@@ -301,18 +301,19 @@ struct boss_bjarngrim : public npc_escortAI
     {
         events.Update(diff);
 
-        if (uint32 eventId = events.ExecuteEvent())
-        {
-            if (eventId == EVENT_CHARGE_UP)
-            {
-                me->CastSpell(me, SPELL_CHARGE_UP, true);
-                me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
-                return;
-            }
-        }
-
         if (!me->IsInCombat())
+        {
+            // Handle charge-up only when out of combat
+            if (uint32 eventId = events.ExecuteEvent())
+            {
+                if (eventId == EVENT_CHARGE_UP)
+                {
+                    DoCastSelf(SPELL_CHARGE_UP, true);
+                    DoCastSelf(SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
+                }
+            }
             return;
+        }
 
         // Return since we have no target
         if (!UpdateVictim())

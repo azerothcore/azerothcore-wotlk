@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -471,7 +471,7 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
  *
  * For transition movement between the ground and the air, use MoveLand or MoveTakeoff instead.
  */
-void MotionMaster::MovePoint(uint32 id, float x, float y, float z, ForcedMovement forcedMovement, float speed, float orientation, bool generatePath, bool forceDestination, MovementSlot slot)
+void MotionMaster::MovePoint(uint32 id, float x, float y, float z, ForcedMovement forcedMovement, float speed, float orientation, bool generatePath, bool forceDestination, MovementSlot slot, std::optional<AnimTier> animTier)
 {
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
@@ -479,12 +479,12 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, ForcedMovemen
     if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) targeted point (Id: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Player>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination), slot);
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination, animTier), slot);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) targeted point (ID: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
-        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination), slot);
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, forcedMovement, speed, orientation, nullptr, generatePath, forceDestination, animTier), slot);
     }
 }
 
@@ -556,7 +556,7 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0
         init.SetVelocity(speed);
     }
 
-    init.SetAnimation(Movement::ToGround);
+    init.SetAnimation(AnimTier::Ground);
 
     Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_ACTIVE);
 }
@@ -590,7 +590,7 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 
         init.SetVelocity(speed);
 
     if (!skipAnimation)
-        init.SetAnimation(Movement::ToFly);
+        init.SetAnimation(AnimTier::Hover);
 
     Mutate(new EffectMovementGenerator(init, id), MOTION_SLOT_ACTIVE);
 }
@@ -727,12 +727,12 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) charge point (X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), x, y, z);
-        Mutate(new PointMovementGenerator<Player>(id, x, y, z, FORCED_MOVEMENT_NONE, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, FORCED_MOVEMENT_NONE, speed, orientation, path, generatePath, generatePath, std::nullopt, targetGUID), MOTION_SLOT_CONTROLLED);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) charge point (X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), x, y, z);
-        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, FORCED_MOVEMENT_NONE, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, FORCED_MOVEMENT_NONE, speed, orientation, path, generatePath, generatePath, std::nullopt, targetGUID), MOTION_SLOT_CONTROLLED);
     }
 }
 

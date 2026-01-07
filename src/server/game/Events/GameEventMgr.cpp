@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,6 +21,7 @@
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
+#include "HolidayDateCalculator.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"
@@ -34,7 +35,7 @@
 #include "WorldSessionMgr.h"
 #include "WorldState.h"
 #include "WorldStatePackets.h"
-#include <time.h>
+#include <chrono>
 
 GameEventMgr* GameEventMgr::instance()
 {
@@ -1070,51 +1071,126 @@ void GameEventMgr::LoadFromDB()
 
 void GameEventMgr::LoadHolidayDates()
 {
-    uint32 oldMSTime = getMSTime();
+    uint32 const oldMSTime = getMSTime();
+    uint32 dynamicCount = 0;
+    uint32 dbCount = 0;
 
-    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_HOLIDAY_DATES);
-    PreparedQueryResult result = WorldDatabase.Query(stmt);
+    // Step 1: Generate dynamic holiday dates based on current year
+    std::chrono::system_clock::time_point const now = std::chrono::system_clock::now();
+    std::time_t const nowTime = std::chrono::system_clock::to_time_t(now);
+    std::tm localTime = {};
+#ifdef _WIN32
+    localtime_s(&localTime, &nowTime);
+#else
+    localtime_r(&nowTime, &localTime);
+#endif
+    int const currentYear = localTime.tm_year + 1900;
 
-    if (!result)
+    for (auto const& rule : HolidayDateCalculator::GetHolidayRules())
     {
-        LOG_WARN("server.loading", ">> Loaded 0 holiday dates. DB table `holiday_dates` is empty.");
-        return;
-    }
-
-    uint32 count = 0;
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint32 holidayId = fields[0].Get<uint32>();
-        HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(holidayId));
+        HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(rule.holidayId));
         if (!entry)
         {
-            LOG_ERROR("sql.sql", "holiday_dates entry has invalid holiday id {}.", holidayId);
+            LOG_INFO("server.loading", ">> Holiday {} not found in DBC - cannot set dynamic dates", rule.holidayId);
             continue;
         }
 
-        uint8 dateId = fields[1].Get<uint8>();
-        if (dateId >= MAX_HOLIDAY_DATES)
+        // Special handling for Darkmoon Faire - needs multiple dates per year (4 occurrences)
+        if (rule.type == HolidayCalculationType::DARKMOON_FAIRE)
         {
-            LOG_ERROR("sql.sql", "holiday_dates entry has out of range date_id {}.", dateId);
+            int const locationOffset = rule.month;
+            std::vector<uint32_t> const dates = HolidayDateCalculator::GetDarkmoonFaireDates(locationOffset, currentYear - 1, 4, rule.offset);
+
+            uint8 dateId = 0;
+            for (auto const& packedDate : dates)
+            {
+                if (dateId >= MAX_HOLIDAY_DATES)
+                    break;
+
+                entry->Date[dateId++] = packedDate;
+                ++dynamicCount;
+            }
+
+            // Darkmoon Faire lasts 7 days (168 hours) - set Duration if not already set
+            if (!entry->Duration[0])
+                entry->Duration[0] = 168; // 7 days in hours
+
+            auto itr = std::lower_bound(ModifiedHolidays.begin(), ModifiedHolidays.end(), entry->Id);
+            if (itr == ModifiedHolidays.end() || *itr != entry->Id)
+                ModifiedHolidays.insert(itr, entry->Id);
+
             continue;
         }
-        entry->Date[dateId] = fields[2].Get<uint32>();
 
-        if (uint32 duration = fields[3].Get<uint32>())
-            entry->Duration[0] = duration;
+        // Generate dates for current year + 2 ahead (year capped at 2030 due to 5-bit client limitation)
+        for (int yearOffset = -1; yearOffset <= 2; ++yearOffset)
+        {
+            int const year = currentYear + yearOffset;
+            if (year > 2030)
+                break;
+
+            uint8 const dateId = static_cast<uint8>(yearOffset + 1);
+            if (dateId >= MAX_HOLIDAY_DATES)
+                break;
+
+            uint32_t const packedDate = HolidayDateCalculator::GetPackedHolidayDate(rule.holidayId, year);
+            entry->Date[dateId] = packedDate;
+
+            // Debug: decode and log the date
+            std::tm const date = HolidayDateCalculator::UnpackDate(packedDate);
+            LOG_DEBUG("server.loading", ">> Holiday {} Date[{}] = {}-{:02d}-{:02d}",
+                rule.holidayId, dateId, date.tm_year + 1900, date.tm_mon + 1, date.tm_mday);
+
+            ++dynamicCount;
+        }
 
         auto itr = std::lower_bound(ModifiedHolidays.begin(), ModifiedHolidays.end(), entry->Id);
         if (itr == ModifiedHolidays.end() || *itr != entry->Id)
-        {
             ModifiedHolidays.insert(itr, entry->Id);
-        }
+    }
 
-        ++count;
-    } while (result->NextRow());
+    // Step 2: Check game_event.start_time for overrides (allows custom servers to override calculated dates)
+    // Only use as override if start_time year >= current year (ignore old static dates)
+    QueryResult result = WorldDatabase.Query("SELECT holiday, UNIX_TIMESTAMP(start_time) FROM game_event WHERE holiday != 0 AND start_time > '2000-12-31'");
 
-    LOG_INFO("server.loading", ">> Loaded {} Holiday Dates in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 const holidayId = fields[0].Get<uint32>();
+            HolidaysEntry* entry = const_cast<HolidaysEntry*>(sHolidaysStore.LookupEntry(holidayId));
+            if (!entry)
+                continue;
+
+            if (fields[1].IsNull())
+                continue;
+
+            time_t const startTime = fields[1].Get<uint64>();
+            if (startTime == 0)
+                continue;
+
+            std::tm const timeInfo = Acore::Time::TimeBreakdown(startTime);
+
+            int const year = timeInfo.tm_year + 1900;
+            // Only override if start_time is current year or later (ignore old static dates)
+            if (year < currentYear || year > 2030)
+                continue;
+
+            // Pack the date in WoW format and override Date[0]
+            uint32_t const yearOffset = static_cast<uint32_t>(year - 2000);
+            uint32_t const month = static_cast<uint32_t>(timeInfo.tm_mon);
+            uint32_t const day = static_cast<uint32_t>(timeInfo.tm_mday - 1);
+            uint32_t const weekday = static_cast<uint32_t>(timeInfo.tm_wday);
+            entry->Date[0] = (yearOffset << 24) | (month << 20) | (day << 14) | (weekday << 11);
+
+            ++dbCount;
+        } while (result->NextRow());
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} Holiday Dates ({} dynamic, {} game_event overrides) in {} ms",
+        dynamicCount + dbCount, dynamicCount, dbCount, GetMSTimeDiffToNow(oldMSTime));
 }
 
 uint32 GameEventMgr::GetNPCFlag(Creature* cr)
@@ -1926,7 +2002,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
         }
         else
         {
-            // date is due and not a singleDate event, try with next DBC date (modified by holiday_dates)
+            // date is due and not a singleDate event, try with next DBC date (dynamically calculated or overridden by game_event.start_time)
             // if none is found we don't modify start date and use the one in game_event
         }
     }

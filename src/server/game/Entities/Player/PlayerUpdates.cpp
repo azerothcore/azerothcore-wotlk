@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -204,6 +204,9 @@ void Player::Update(uint32 p_time)
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
                     resetAttackTimer(BASE_ATTACK);
+
+                    // Blizzlike: Reset ranged swing timer when performing melee attack
+                    resetAttackTimer(RANGED_ATTACK);
                 }
             }
 
@@ -223,6 +226,9 @@ void Player::Update(uint32 p_time)
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
                     resetAttackTimer(OFF_ATTACK);
+
+                    // Blizzlike: Reset ranged swing timer when performing melee attack
+                    resetAttackTimer(RANGED_ATTACK);
                 }
             }
 
@@ -313,6 +319,23 @@ void Player::Update(uint32 p_time)
     {
         m_regenTimer += p_time;
         RegenerateAll();
+
+        // Apply buffs from items with Apply on Equip trigger if they are not present.
+        for (uint8 i = 0; i < INVENTORY_SLOT_BAG_END; ++i)
+        {
+            if (!m_items[i])
+                continue;
+
+            std::vector<uint32> spellIDs;
+            m_items[i]->GetOnEquipSpellIDs(spellIDs);
+            bool apply = false;
+            for (uint32 spellID : spellIDs)
+                if (!apply && !HasAura(spellID))
+                    apply = true;
+
+            if (apply)
+                ApplyItemEquipSpell(m_items[i], true, false);
+        }
     }
 
     if (m_deathState == DeathState::JustDied)
@@ -701,7 +724,7 @@ void Player::UpdateRating(CombatRating cr)
 
 void Player::UpdateAllRatings()
 {
-    for (int cr = 0; cr < MAX_COMBAT_RATING; ++cr)
+    for (uint8 cr = 0; cr < MAX_COMBAT_RATING; ++cr)
         UpdateRating(CombatRating(cr));
 }
 
@@ -1439,6 +1462,9 @@ void Player::UpdatePvPState()
 
     if (pvpInfo.IsHostile) // in hostile area
     {
+        if (IsInFlight()) // on taxi
+            return;
+
         if (!IsPvP() || pvpInfo.EndTimer != 0)
             UpdatePvP(true, true);
     }
