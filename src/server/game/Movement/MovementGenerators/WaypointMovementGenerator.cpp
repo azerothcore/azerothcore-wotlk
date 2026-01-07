@@ -399,8 +399,6 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
         // Lets choose the second last element so that a player would still have some flight.
         if (i_path.size() >= 2)
             i_currentNode = uint32(i_path.size() - 2);
-        else if (i_path.size() == 1)
-            i_currentNode = 0;
         else
             i_currentNode = 0;
     }
