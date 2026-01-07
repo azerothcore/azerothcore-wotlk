@@ -9629,22 +9629,21 @@ void ObjectMgr::LoadGossipMenuItems()
     // Warn if any trainer creature templates reference a GossipMenuId that has no gossip_menu_option entries
     // This will cause the gossip menu to fallback to MenuID 0 at runtime which will display: "I wish to unlearn my talents."
     std::set<uint32> checkedMenuIds;
-    for (CreatureTemplateContainer::const_iterator citr = _creatureTemplateStore.begin(); citr != _creatureTemplateStore.end(); ++citr)
+    for (auto const& [entry, tmpl] : _creatureTemplateStore)
     {
-        uint32 menuId = citr->second.GossipMenuId;
+        uint32 menuId = tmpl.GossipMenuId;
         if (!menuId)
             continue;
 
-        if (!(citr->second.npcflag & UNIT_NPC_FLAG_TRAINER))
+        if (!(tmpl.npcflag & UNIT_NPC_FLAG_TRAINER))
             continue;
 
-        if (checkedMenuIds.find(menuId) != checkedMenuIds.end())
+        if (checkedMenuIds.contains(menuId))
             continue;
 
         checkedMenuIds.insert(menuId);
 
-        GossipMenuItemsContainer::const_iterator first = _gossipMenuItemsStore.lower_bound(menuId);
-        GossipMenuItemsContainer::const_iterator second = _gossipMenuItemsStore.upper_bound(menuId);
+        auto [first, second] = _gossipMenuItemsStore.equal_range(menuId);
         if (first == second)
             LOG_WARN("server.loading", "Trainer creature template references GossipMenuId {} has no `gossip_menu_option` entries. This will fallback to MenuID 0.", menuId);
     }
