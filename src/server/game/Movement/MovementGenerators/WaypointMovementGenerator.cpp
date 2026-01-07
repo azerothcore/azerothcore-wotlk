@@ -397,10 +397,12 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
         LOG_ERROR("movement.flightpath", "Failed to build correct path for player: {}. Current node: {}, max nodes: {}. Paths: {}. Player pos: {}.", player->GetGUID().ToString(), GetCurrentNode(), i_path.size(), paths, player->GetPosition().ToString());
 
         // Lets choose the second last element so that a player would still have some flight.
-        if (int(i_path.size()) - 2 >= 0)
+        if (i_path.size() >= 2)
             i_currentNode = uint32(i_path.size() - 2);
+        else if (i_path.size() == 1)
+            i_currentNode = 0;
         else
-            i_currentNode = uint32(i_path.size() - 1);
+            i_currentNode = 0;
     }
 }
 
@@ -441,9 +443,9 @@ void FlightPathMovementGenerator::DoReset(Player* player)
     uint32 end = GetPathAtMapEnd();
     uint32 currentNodeId = GetCurrentNode();
 
-    if (i_path.empty() || currentNodeId >= end)
+    if (currentNodeId == end)
     {
-        LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::DoReset: invalid path state - path empty: {}, currentNode: {}, end: {}. {}", i_path.empty(), currentNodeId, end, player->GetGUID().ToString());
+        LOG_DEBUG("movement.flightpath", "FlightPathMovementGenerator::DoReset: trying to start a flypath from the end point. {}", player->GetGUID().ToString());
         return;
     }
 
@@ -454,7 +456,7 @@ void FlightPathMovementGenerator::DoReset(Player* player)
     Movement::MoveSplineInit init(player);
     // Providing a starting vertex since the taxi paths do not provide such
     init.Path().push_back(G3D::Vector3(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ()));
-    for (uint32 i = currentNodeId; i < end && i < i_path.size(); ++i)
+    for (uint32 i = currentNodeId; i != end; ++i)
     {
         G3D::Vector3 vertice(i_path[i]->x, i_path[i]->y, i_path[i]->z);
         init.Path().push_back(vertice);
