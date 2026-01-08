@@ -1,3 +1,4 @@
+-- DB update 2026_01_07_02 -> 2026_01_08_00
 --
 UPDATE `creature_summon_groups` SET `summonType` = 6, `summonTime` = 60000 WHERE `summonerId` = 32239 AND `summonerType` = 0 AND `groupId` = 1;
 
