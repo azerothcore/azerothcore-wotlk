@@ -1,6 +1,6 @@
 -- Lower these values to test the event
 SET @GUID := 52854;
-SET @KILL_THRESHOLD := 50;
+SET @KILL_THRESHOLD := 10;
 SET @EVENT_OCCURENCE := 60;
 SET @EVENT_LENGTH := 30;
 
@@ -41,43 +41,66 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (25453, 0, 0, 'I will take great pleasure in tearing the forces of the Horde apart... limb from limb and piece by piece...', 14, 0, 100, 0, 0, 0, 24672, 0, 'Ith\'rix the Harvester - What The Cold Wind Brings... Event');
 
 -- New Spawns
-DELETE FROM `creature` WHERE `guid` BETWEEN @GUID AND @GUID+24 AND `id1` IN (25446, 25453, 25439, 25244, 25451) AND `map` = 571 AND `VerifiedBuild` = 52237;
-INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `VerifiedBuild`, `CreateObject`) VALUES
+DELETE FROM `creature` WHERE `guid` BETWEEN @GUID AND @GUID+24 AND `id1` IN (25446, 25453, 25439, 25244, 25451) AND `map` = 571 AND `VerifiedBuild` IN (-52237, 52237);
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 -- Warsong Captain 25446
-(@GUID+0, 25446, 571, 1, 1, 1, 2729.2375, 6082.6777, 73.63885, 3.368485450744628906, 120, 52237, 2),
+(@GUID+0, 25446, 571, 1, 1, 1, 2729.2375, 6082.6777, 73.63885, 3.368485450744628906, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
 -- Ith'rix 25453
-(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 600, 52237, 2),
+(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 600, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
 -- Warsong Scout 25439
--- (@GUID+2, 25439, 571, 1, 1, 1, 2616.1462, 6083.162, 53.465275, 5.896511077880859375, 120, 52237, 2),
+-- (@GUID+2, 25439, 571, 1, 1, 1, 2616.1462, 6083.162, 53.465275, 5.896511077880859375, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
 -- Warsong Marksmen 25244
-(@GUID+3 , 25244, 571, 1, 1, 1, 2770.6533, 6123.831, 91.788445, 3.885649919509887695, 120, 52237, 2),
-(@GUID+4 , 25244, 571, 1, 1, 1, 2772.1545, 6125.37, 91.9547, 3.918198108673095703, 120, 52237, 2),
-(@GUID+5 , 25244, 571, 1, 1, 1, 2774.0427, 6127.1343, 91.95686, 3.822271108627319335, 120, 52237, 2),
-(@GUID+6 , 25244, 571, 1, 1, 1, 2775.6, 6128.577, 91.956795, 4.136430263519287109, 120, 52237, 2),
-(@GUID+7 , 25244, 571, 1, 1, 1, 2777.2427, 6130.19, 91.95759, 0.48869219422340393, 120, 52237, 2),
-(@GUID+8 , 25244, 571, 1, 1, 1, 2780.2751, 6132.911, 91.74803, 3.298672199249267578, 120, 52237, 2),
-(@GUID+9 , 25244, 571, 1, 1, 1, 2781.4375, 6134.131, 90.92266, 0.104719758033752441, 120, 52237, 2),
-(@GUID+10, 25244, 571, 1, 1, 1, 2782.5786, 6135.2393, 90.14071, 2.617993831634521484, 120, 52237, 2),
-(@GUID+11, 25244, 571, 1, 1, 1, 2783.7375, 6136.151, 89.41592, 0.157079637050628662, 120, 52237, 2),
-(@GUID+12, 25244, 571, 1, 1, 1, 2785.7144, 6137.814, 88.14427, 5.585053443908691406, 120, 52237, 2),
-(@GUID+13, 25244, 571, 1, 1, 1, 2787.284, 6139.4194, 87.04321, 2.111848354339599609, 120, 52237, 2),
-(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 120, 52237, 2),
+(@GUID+3 , 25244, 571, 1, 1, 1, 2770.6533, 6123.831, 91.788445, 3.885649919509887695, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+4 , 25244, 571, 1, 1, 1, 2772.1545, 6125.37, 91.9547, 3.918198108673095703, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+5 , 25244, 571, 1, 1, 1, 2774.0427, 6127.1343, 91.95686, 3.822271108627319335, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+6 , 25244, 571, 1, 1, 1, 2775.6, 6128.577, 91.956795, 4.136430263519287109, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+7 , 25244, 571, 1, 1, 1, 2777.2427, 6130.19, 91.95759, 0.48869219422340393, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+8 , 25244, 571, 1, 1, 1, 2780.2751, 6132.911, 91.74803, 3.298672199249267578, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+9 , 25244, 571, 1, 1, 1, 2781.4375, 6134.131, 90.92266, 0.104719758033752441, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+10, 25244, 571, 1, 1, 1, 2782.5786, 6135.2393, 90.14071, 2.617993831634521484, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+11, 25244, 571, 1, 1, 1, 2783.7375, 6136.151, 89.41592, 0.157079637050628662, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+12, 25244, 571, 1, 1, 1, 2785.7144, 6137.814, 88.14427, 5.585053443908691406, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+13, 25244, 571, 1, 1, 1, 2787.284, 6139.4194, 87.04321, 2.111848354339599609, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
 -- Sky Darkeners 25451
-(@GUID+15, 25451, 571, 1, 1, 0, 2586.0503, 6045.1733, 149.66963, 5.983277797698974609, 120, 52237, 2),
-(@GUID+16, 25451, 571, 1, 1, 0, 2592.336, 6055.209, 149.38055, 4.575495719909667968, 120, 52237, 2),
-(@GUID+17, 25451, 571, 1, 1, 0, 2582.3564, 6072.7163, 150.72621, 0.256311208009719848, 120, 52237, 2),
-(@GUID+18, 25451, 571, 1, 1, 0, 2586.5847, 6043.062, 150.77448, 6.154862403869628906, 120, 52237, 2),
-(@GUID+19, 25451, 571, 1, 1, 0, 2590.9182, 6052.6157, 146.73918, 2.318624496459960937, 120, 52237, 2),
-(@GUID+20, 25451, 571, 1, 1, 0, 2584.9631, 6067.6963, 148.27704, 1.537565231323242187, 120, 52237, 2),
-(@GUID+21, 25451, 571, 1, 1, 0, 2588.828, 6049.6763, 146.88951, 2.722152233123779296, 120, 52237, 2),
-(@GUID+22, 25451, 571, 1, 1, 0, 2585.2322, 6061.892, 151.63135, 0.06164625659584999, 120, 52237, 2),
-(@GUID+23, 25451, 571, 1, 1, 0, 2586.2327, 6049.5854, 150.27066, 1.737332820892333984, 120, 52237, 2),
-(@GUID+24, 25451, 571, 1, 1, 0, 2588.501, 6063.269, 147.57248, 3.455328941345214843, 120, 52237, 2);
+(@GUID+15, 25451, 571, 1, 1, 0, 2586.0503, 6045.1733, 149.66963, 5.983277797698974609, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+16, 25451, 571, 1, 1, 0, 2592.336, 6055.209, 149.38055, 4.575495719909667968, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+17, 25451, 571, 1, 1, 0, 2582.3564, 6072.7163, 150.72621, 0.256311208009719848, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+18, 25451, 571, 1, 1, 0, 2586.5847, 6043.062, 150.77448, 6.154862403869628906, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+19, 25451, 571, 1, 1, 0, 2590.9182, 6052.6157, 146.73918, 2.318624496459960937, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+20, 25451, 571, 1, 1, 0, 2584.9631, 6067.6963, 148.27704, 1.537565231323242187, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+21, 25451, 571, 1, 1, 0, 2588.828, 6049.6763, 146.88951, 2.722152233123779296, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+22, 25451, 571, 1, 1, 0, 2585.2322, 6061.892, 151.63135, 0.06164625659584999, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+23, 25451, 571, 1, 1, 0, 2586.2327, 6049.5854, 150.27066, 1.737332820892333984, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+24, 25451, 571, 1, 1, 0, 2588.501, 6063.269, 147.57248, 3.455328941345214843, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event');
 
 -- Create Event
-DELETE FROM `game_event_creature` WHERE `guid` = @GUID+1 AND `eventEntry` = 91;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @GUID+1 AND @GUID+24 AND `eventEntry` = 91;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
-(91, @GUID+1);
+(91, @GUID+1 ),
+(91, @GUID+3 ),
+(91, @GUID+4 ),
+(91, @GUID+5 ),
+(91, @GUID+6 ),
+(91, @GUID+7 ),
+(91, @GUID+8 ),
+(91, @GUID+9 ),
+(91, @GUID+10),
+(91, @GUID+11),
+(91, @GUID+12),
+(91, @GUID+13),
+(91, @GUID+14),
+(91, @GUID+15),
+(91, @GUID+16),
+(91, @GUID+17),
+(91, @GUID+18),
+(91, @GUID+19),
+(91, @GUID+20),
+(91, @GUID+21),
+(91, @GUID+22),
+(91, @GUID+23),
+(91, @GUID+24);
+
 DELETE FROM `game_event` WHERE `eventEntry` = 91 AND `description` = 'What the Cold Wind Brings...';
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `description`, `announce`) VALUES
 (91, '2026-01-07 20:00:00', '2030-12-31 12:00:00', @EVENT_OCCURENCE, @EVENT_LENGTH, 'What the Cold Wind Brings...', 0);
@@ -223,7 +246,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25446, 0, 3, 0, 14, 0, 100, 0, 3000, 40, 10000, 14000, 0, 0, 11, 15799, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Friendly Hurt - Cast \'Chain Heal\''),
 (25446, 0, 4, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 80, 2544600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Ith\'rix Started Event, Summoned Warsong Scout, Scout Relayed Action to Captain - Run Script'),
 (25446, 0, 5, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 80, 2544601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Action Received from Ith\'rix - Run Script End Event'),
-(25446, 0, 6, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2544602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Reached Carapace - Run Gloat Script');
+(25446, 0, 6, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2544602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Reached Carapace - Run Gloat Script'),
+(25446, 0, 7, 0, 68, 0, 100, 0, 91, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event 91 Started - Set Invincibility Hp 1'),
+(25446, 0, 8, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event 91 Ended - Reset Invincibility Hp');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -445,7 +470,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@GUID+1), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Set Visibility Off'),
 (-(@GUID+1), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Set Flags Immune To Players & Immune To NPC\'s'),
 (-(@GUID+1), 0, 1002, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25439, 8, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2616.1462, 6083.162, 53.465275, 5.896511077880859, 'Ith\'rix the Harvester - On Respawn - Summon Creature \'Warsong Scout\' to Start Event'),
-(-(@GUID+1), 0, 1003, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 226, 2, 0, 0, 5, 0, 0, 9, 25451, 0, 100, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Action Relayed by Warsong Captain - Start Spawning Sky Darkeners'),
+(-(@GUID+1), 0, 1003, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 226, 2, 0, 0, 3, 0, 0, 9, 25451, 0, 100, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Action Relayed by Warsong Captain - Start Spawning Sky Darkeners'),
 (-(@GUID+1), 0, 1004, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 63, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Set Sky Darkener Kill Counter to 0'),
 (-(@GUID+1), 0, 1005, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Action Received by Sky Darkener - Add 1 to Sky Darkener Kill Counter'),
 (-(@GUID+1), 0, 1006, 0, 77, 0, 100, 0, 1, @KILL_THRESHOLD, 0, 0, 0, 0, 80, 2545300, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - After 50 Kills - Start Script');
@@ -456,13 +481,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2545300, 9, 1 , 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Say Line 0'),
 (2545300, 9, 2 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
 (2545300, 9, 3 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+1), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Start Path 52855'),
-(2545300, 9, 4 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+15), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 5 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+16), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 6 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+17), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 7 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+18), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 8 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+19), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 9 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+20), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+21), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+22), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+23), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
-(2545300, 9, 13, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 1, 0, 10, (@GUID+24), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener');
+(2545300, 9, 4 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+15), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 5 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+16), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 6 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+17), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 7 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+18), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 8 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+19), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 9 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+20), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+21), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 11, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+22), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+23), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener'),
+(2545300, 9, 13, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 1, 10, (@GUID+24), 25451, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Stop Spawning Sky Darkener');
