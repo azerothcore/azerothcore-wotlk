@@ -30,9 +30,11 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (25446, 2, 0, 'Marksmen! Front and center! Scourge attack incoming!', 14, 1, 100, 22, 0, 0, 24657, 0, 'Warsong Captain - What The Cold Wind Brings... Event'),
 (25446, 3, 0, 'Marksmen, lock and load!', 14, 1, 100, 22, 0, 0, 24659, 0, 'Warsong Captain - What The Cold Wind Brings... Event'),
 (25446, 4, 0, 'The Nerub\'ar have been punished for their transgression!', 14, 1, 100, 22, 0, 0, 24660, 0, 'Warsong Captain - What The Cold Wind Brings... Event'),
-(25446, 5, 0, 'Leave no survivors! Let Arthas sort \'em out...', 14, 1, 100, 0, 0, 0, 24663, 0, 'Warsong Captain'),
-(25446, 5, 1, 'For Hellscream! For the Horde!', 14, 1, 100, 0, 0, 0, 24664, 0, 'Warsong Captain'),
-(25446, 5, 2, 'Yes... Let the rage consume you!', 14, 1, 100, 0, 0, 0, 24665, 0, 'Warsong Captain');
+(25446, 5, 0, 'Leave no survivors! Let Arthas sort \'em out...', 12, 1, 100, 0, 0, 0, 24663, 0, 'Warsong Captain'),
+(25446, 5, 1, 'For Hellscream! For the Horde!', 12, 1, 100, 0, 0, 0, 24664, 0, 'Warsong Captain'),
+(25446, 5, 2, 'Yes... Let the rage consume you!', 12, 1, 100, 0, 0, 0, 24665, 0, 'Warsong Captain'),
+(25446, 6, 0, 'Let the forces of the Lich King gaze upon the carcass of this wretch and know that the Horde will not relent!', 14, 1, 100, 22, 0, 0, 24673, 0, 'Warsong Captain - What The Cold Wind Brings... Event'),
+(25446, 7, 0, 'Gather, soldiers! Gather and take your trophies from the carapace of the enemy!', 12, 1, 100, 1, 0, 0, 24674, 0, 'Warsong Captain - What The Cold Wind Brings... Event');
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 25453);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -220,7 +222,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25446, 0, 2, 0, 0, 0, 100, 0, 2000, 8000, 4000, 9000, 0, 0, 11, 12058, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - In Combat - Cast \'Chain Lightning\''),
 (25446, 0, 3, 0, 14, 0, 100, 0, 3000, 40, 10000, 14000, 0, 0, 11, 15799, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Friendly Hurt - Cast \'Chain Heal\''),
 (25446, 0, 4, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 80, 2544600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Ith\'rix Started Event, Summoned Warsong Scout, Scout Relayed Action to Captain - Run Script'),
-(25446, 0, 5, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 80, 2544601, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Action Received from Ith\'rix - Run Script End Event');
+(25446, 0, 5, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 80, 2544601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Action Received from Ith\'rix - Run Script End Event'),
+(25446, 0, 6, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2544602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Reached Carapace - Run Gloat Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -244,8 +247,15 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2544601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 4'),
-(2544601, 9, 1, 0, 0, 0, 100, 0, 30000, 30000, 0, 0, 0, 0, 111, 91, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - End Event');
+(2544601, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 111, 91, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - End Event'),
+(2544601, 9, 1, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 0, 69, 1, 0, 0, 5, 0, 0, 20, 187674, 60, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Move To Gameobject \'Ith\'rix\'s Hardened Carapace\'');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544602);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2544602, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 4'),
+(2544602, 9, 1, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 6'),
+(2544602, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 7'),
+(2544602, 9, 3, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Evade');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25439;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25439);
