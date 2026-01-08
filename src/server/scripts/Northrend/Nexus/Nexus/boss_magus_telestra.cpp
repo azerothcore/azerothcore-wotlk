@@ -173,7 +173,7 @@ struct boss_magus_telestra : public BossAI
         switch (events.ExecuteEvent())
         {
         case EVENT_MAGUS_HEALTH1:
-            if (me->HealthBelowPct(51))
+            if (me->HealthBelowPct(51) && me->HealthAbovePct(11))
             {
                 me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
                 events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);
