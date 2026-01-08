@@ -362,7 +362,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25451);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25451, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Despawn In 5000 ms'),
 (25451, 0, 1, 0, 0, 0, 100, 0, 9000, 13000, 17000, 23000, 0, 0, 11, 45587, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - In Combat - Cast \'Web Bolt\''),
-(25451, 0, 2, 0, 0, 0, 100, 0, 0, 3000, 3000, 6000, 0, 0, 11, 45577, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - In Combat - Cast \'Venom Spit\''),
+(25451, 0, 2, 0, 0, 0, 100, 0, 0, 1500, 1500, 2000, 0, 0, 11, 45577, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - In Combat - Cast \'Venom Spit\''),
 (25451, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Spawned - Set Fly Mode');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` BETWEEN -(@GUID+24) AND -(@GUID+15));
@@ -421,9 +421,9 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25453;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25453);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25453, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45593, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Cast \'Ith`rix`s Carapace\''),
-(25453, 0, 1, 0, 0, 0, 100, 0, 7000, 9000, 8000, 11000, 0, 0, 11, 25748, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Poison Stinger\''),
-(25453, 0, 2, 0, 0, 0, 100, 0, 6000, 8000, 16000, 21000, 0, 0, 11, 34392, 64, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Stinger Rage\''),
-(25453, 0, 3, 0, 0, 0, 100, 0, 2000, 4000, 3000, 6000, 0, 0, 11, 45592, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Venom Spit\''),
+(25453, 0, 1, 0, 0, 0, 100, 0, 7000, 9000, 8000, 11000, 0, 0, 11, 25748, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Poison Stinger\''),
+(25453, 0, 2, 0, 0, 0, 100, 0, 6000, 8000, 16000, 21000, 0, 0, 11, 34392, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Stinger Rage\''),
+(25453, 0, 3, 0, 0, 0, 100, 0, 2000, 4000, 3000, 6000, 0, 0, 11, 45592, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Venom Spit\''),
 (25453, 0, 4, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 19, 25446, 100, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Relay to Warsong Captain End Event'),
 (25453, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Spawned - Set Fly Mode'),
 (25453, 0, 6, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 25446, 100, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Path Finished - Start Attacking');
