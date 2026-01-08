@@ -63,4 +63,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3143201, 9, 3, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 86, 59091, 2, 19, 31428, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Cross Cast \'Ride Ghostwing\''),
 (3143201, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 19, 30631, 40, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Store Arly as Target'),
 (3143201, 9, 5, 0, 0, 0, 100, 0, 2840, 2840, 0, 0, 0, 0, 69, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 6690.6504, 3177.2793, 860.5705, 0, 'Ghostwing - Actionlist - Move To Position'),
-(3143201, 9, 6, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Arly Say Line 0');
+(3143201, 9, 6, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Arly Say Line 0');
