@@ -1,6 +1,8 @@
 --
 SET @GUID := 52854;
 SET @KILL_THRESHOLD := 50; -- Lower to test
+SET @EVENT_OCCURENCE := 60;
+SET @EVENT_LENGTH := 30;
 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 25439);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -42,7 +44,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 -- Warsong Captain 25446
 (@GUID+0, 25446, 571, 1, 1, 1, 2729.2375, 6082.6777, 73.63885, 3.368485450744628906, 120, 52237, 2),
 -- Ith'rix 25453
-(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 120, 52237, 2),
+(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 600, 52237, 2),
 -- Warsong Scout 25439
 -- (@GUID+2, 25439, 571, 1, 1, 1, 2616.1462, 6083.162, 53.465275, 5.896511077880859375, 120, 52237, 2),
 -- Warsong Marksmen 25244
@@ -76,7 +78,7 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (91, @GUID+1);
 DELETE FROM `game_event` WHERE `eventEntry` = 91 AND `description` = 'What the Cold Wind Brings...';
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `description`, `announce`) VALUES
-(91, '2026-01-07 20:00:00', '2030-12-31 12:00:00', 60, 30, 'What the Cold Wind Brings...', 0);
+(91, '2026-01-07 20:00:00', '2030-12-31 12:00:00', @EVENT_OCCURENCE, @EVENT_LENGTH, 'What the Cold Wind Brings...', 0);
 
 DELETE FROM `waypoint_data` WHERE `id` = 254391;
 DELETE FROM `waypoint_data` WHERE `id` IN (@GUID+1,@GUID+2,@GUID+3,@GUID+4,@GUID+5,@GUID+6,@GUID+7,@GUID+8,@GUID+9,@GUID+10,@GUID+11,@GUID+12,@GUID+13,@GUID+14,@GUID+15,@GUID+16,@GUID+17,@GUID+18,@GUID+19,@GUID+20,@GUID+21,@GUID+22,@GUID+23,@GUID+24);
