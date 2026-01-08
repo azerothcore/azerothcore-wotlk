@@ -1,6 +1,6 @@
 -- Lower these values to test the event
 SET @GUID := 52854;
-SET @KILL_THRESHOLD := 10;
+SET @KILL_THRESHOLD := 50;
 SET @EVENT_OCCURENCE := 60;
 SET @EVENT_LENGTH := 30;
 
