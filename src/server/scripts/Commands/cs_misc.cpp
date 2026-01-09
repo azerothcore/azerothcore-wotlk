@@ -677,7 +677,7 @@ public:
             shapeStr, blend, rScale, clamp, gmode, neps, vmapAcc, vdelta, dynAcc, dyndelta);
         handler->PSendSysMessage("Accurate Height Grid: {}", GridZAccurate);
         handler->PSendSysMessage("Accurate Height Map: {}", MapZAccurate);
-        handler->PSendSysMessage("Probe radius (pre-scale): {:0.3f}", probeR);
+        handler->PSendSysMessage("Probe radius (pre-scale): {:.3f}", probeR);
 
         LiquidData const& liquidData = object->GetLiquidData();
 
