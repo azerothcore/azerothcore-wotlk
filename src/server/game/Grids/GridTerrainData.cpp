@@ -809,7 +809,7 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     if (radius <= 0.0f)
         return zPlane;
 
-    float totalSlope = slopeL2; // por defecto: círculo (o blend==1)
+    float totalSlope = slopeL2; // default: circle (or blend==1)
     if (shape == GroundFootprintShape::Square && blend < 1.0f)
     {
         float slopeL1 = 0.0f;
