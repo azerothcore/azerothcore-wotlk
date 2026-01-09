@@ -389,10 +389,10 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
         LOG_ERROR("movement.flightpath", "Failed to build correct path for player: {}. Current node: {}, max nodes: {}. Paths: {}. Player pos: {}.", player->GetGUID().ToString(), GetCurrentNode(), i_path.size(), paths, player->GetPosition().ToString());
 
         // Lets choose the second last element so that a player would still have some flight.
-        if (int(i_path.size()) - 2 >= 0)
+        if (i_path.size() >= 2)
             i_currentNode = uint32(i_path.size() - 2);
         else
-            i_currentNode = uint32(i_path.size() - 1);
+            i_currentNode = 0;
     }
 }
 
