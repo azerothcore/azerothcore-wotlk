@@ -35,7 +35,7 @@ VAR_PATH="$CURRENT_PATH/../../../../var"
 # Version
 MYSQL_APT_CONFIG_VERSION=0.8.36-1
 # # # # #
-mkdir -p $VAR_PATH/mysqlpackages && cd $VAR_PATH/mysqlpackages
+mkdir -p "$VAR_PATH/mysqlpackages" && cd "$VAR_PATH/mysqlpackages"
 # Download
 wget "https://dev.mysql.com/get/mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb"
 # Install
