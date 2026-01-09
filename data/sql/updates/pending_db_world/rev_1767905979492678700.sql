@@ -17,10 +17,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 31428) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 23) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 4530) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, 31428, 0, 0, 23, 1, 4530, 0, 0, 0, 0, 0, '', 'Only run script for if summon occurs in Sanctum of Reanimation (4530)');
+(22, 1, 31428, 0, 0, 23, 1, 4530, 0, 0, 0, 0, 0, '', 'Only run script if summon occurs in Sanctum of Reanimation (4530)');
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 6) AND (`SourceEntry` = 31428) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 23) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 4588) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 6, 31428, 0, 0, 23, 1, 4588, 0, 0, 0, 0, 0, '', 'Only run script for if summon occurs in Blackwatch (4588)');
+(22, 6, 31428, 0, 0, 23, 1, 4588, 0, 0, 0, 0, 0, '', 'Only run script if summon occurs in Blackwatch (4588)');
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 59091) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 31432) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 59091, 0, 0, 31, 0, 3, 31432, 0, 0, 0, 0, '', 'Ride Ghostwing (59091) Only Targets Ghostwing (31432)');
