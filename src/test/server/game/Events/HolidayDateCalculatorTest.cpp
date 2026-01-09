@@ -397,60 +397,45 @@ TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2
 }
 
 // ============================================================
-// Brewfest Tests (Oktoberfest rule)
-// First Saturday on or after Sept 15, minus 7 days for holidayStage offset
+// Brewfest Tests (Fixed Sept 20 main event)
 // ============================================================
 
-TEST_F(HolidayDateCalculatorTest, Brewfest_OktoberfestRule)
+TEST_F(HolidayDateCalculatorTest, Brewfest_FixedSept13)
 {
-    // Brewfest follows the Oktoberfest rule:
-    // Oktoberfest starts the Saturday after Sept 15 (or on Sept 15 if it's Saturday)
-    // Brewfest holidayStage 1 starts 7 days before that
-    HolidayRule brewfest = { 372, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 };
+    // Brewfest is now fixed: prep starts Sept 13, main event Sept 20
+    // This avoids any potential overlap with Pirates' Day (Sept 19)
+    HolidayRule brewfest = { 372, HolidayCalculationType::FIXED_DATE, 9, 13, 0, 0 };
 
-    struct BrewfestTestCase { int year; int expectedMonth; int expectedDay; };
-    std::vector<BrewfestTestCase> testCases = {
-        // Sept 15, 2024 is Sunday, first Sat after is Sept 21, minus 7 = Sept 14
-        { 2024, 9, 14 },
-        // Sept 15, 2025 is Monday, first Sat after is Sept 20, minus 7 = Sept 13
-        { 2025, 9, 13 },
-        // Sept 15, 2026 is Tuesday, first Sat after is Sept 19, minus 7 = Sept 12
-        { 2026, 9, 12 },
-        // Sept 15, 2027 is Wednesday, first Sat after is Sept 18, minus 7 = Sept 11
-        { 2027, 9, 11 },
-        // Sept 15, 2028 is Friday, first Sat after is Sept 16, minus 7 = Sept 9
-        { 2028, 9, 9 },
-        // Sept 15, 2029 is Saturday, so Sept 15, minus 7 = Sept 8
-        { 2029, 9, 8 },
-    };
-
-    for (auto const& tc : testCases)
-    {
-        std::tm date = HolidayDateCalculator::CalculateHolidayDate(brewfest, tc.year);
-
-        SCOPED_TRACE("Year: " + std::to_string(tc.year));
-
-        EXPECT_EQ(date.tm_year + 1900, tc.year);
-        EXPECT_EQ(date.tm_mon + 1, tc.expectedMonth);
-        EXPECT_EQ(date.tm_mday, tc.expectedDay);
-    }
-}
-
-TEST_F(HolidayDateCalculatorTest, Brewfest_AlwaysInSeptember_1900_2200)
-{
-    HolidayRule brewfest = { 372, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 };
-
-    for (int year = 1900; year <= 2200; ++year)
+    for (int year = 2000; year <= 2030; ++year)
     {
         std::tm date = HolidayDateCalculator::CalculateHolidayDate(brewfest, year);
 
         SCOPED_TRACE("Year: " + std::to_string(year));
 
-        // Brewfest should always be in September (after -7 offset from Sept 15-21)
-        EXPECT_EQ(date.tm_mon + 1, 9) << "Brewfest should be in September";
-        // Should be between Sept 8 and Sept 14 (7 days before Sept 15-21)
-        EXPECT_GE(date.tm_mday, 8) << "Brewfest should be >= Sept 8";
-        EXPECT_LE(date.tm_mday, 14) << "Brewfest should be <= Sept 14";
+        EXPECT_EQ(date.tm_year + 1900, year);
+        EXPECT_EQ(date.tm_mon + 1, 9);   // September
+        EXPECT_EQ(date.tm_mday, 13);     // Always Sept 13
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, Brewfest_NoPiratesDayConflict)
+{
+    // Brewfest main event (Sept 20) is always after Pirates' Day (Sept 19)
+    HolidayRule brewfest = { 372, HolidayCalculationType::FIXED_DATE, 9, 13, 0, 0 };
+    HolidayRule piratesDay = { 398, HolidayCalculationType::FIXED_DATE, 9, 19, 0, 0 };
+
+    for (int year = 2000; year <= 2030; ++year)
+    {
+        std::tm brewfestDate = HolidayDateCalculator::CalculateHolidayDate(brewfest, year);
+        std::tm piratesDate = HolidayDateCalculator::CalculateHolidayDate(piratesDay, year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Brewfest prep is Sept 13, main event is Sept 20
+        // Pirates' Day is Sept 19, which falls between prep and main event
+        EXPECT_EQ(brewfestDate.tm_mday, 13);  // Brewfest prep
+        EXPECT_EQ(piratesDate.tm_mday, 19);   // Pirates' Day
+        // Main event (Sept 20) > Pirates' Day (Sept 19)
     }
 }
 
