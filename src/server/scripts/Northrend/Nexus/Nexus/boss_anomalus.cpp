@@ -43,10 +43,8 @@ enum Yells
 enum Events
 {
     EVENT_ANOMALUS_SPARK                = 1,
-    EVENT_ANOMALUS_HEALTH               = 2,
-    EVENT_ANOMALUS_ARCANE_ATTRACTION    = 3,
-    EVENT_ANOMALUS_SPAWN_RIFT           = 4,
-    EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED = 5
+    EVENT_ANOMALUS_ARCANE_ATTRACTION    = 2,
+    EVENT_ANOMALUS_SPAWN_RIFT           = 3
 };
 
 class ChargeRifts : public BasicEvent
@@ -71,6 +69,7 @@ struct boss_anomalus : public BossAI
 {
     boss_anomalus(Creature* creature) : BossAI(creature, DATA_ANOMALUS_EVENT) { }
 
+    bool _empowered;
     bool achievement;
     uint16 activeRifts;
 
@@ -78,6 +77,7 @@ struct boss_anomalus : public BossAI
     {
         BossAI::Reset();
         achievement = true;
+        _empowered = true;
         me->CastSpell(me, SPELL_CLOSE_RIFTS, true);
     }
 
@@ -115,7 +115,6 @@ struct boss_anomalus : public BossAI
 
         activeRifts = 0;
         events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
-        events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
         events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
         if (IsHeroic())
             events.ScheduleEvent(EVENT_ANOMALUS_ARCANE_ATTRACTION, 8s);
@@ -133,7 +132,9 @@ struct boss_anomalus : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
+        if (!me->HasAura(SPELL_RIFT_SHIELD))
+            events.Update(diff);
+
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
@@ -142,16 +143,6 @@ struct boss_anomalus : public BossAI
         case EVENT_ANOMALUS_SPARK:
             me->CastSpell(me->GetVictim(), SPELL_SPARK, false);
             events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
-            break;
-        case EVENT_ANOMALUS_HEALTH:
-            if (me->HealthBelowPct(51))
-            {
-                //First time we reach 51%, the next rift going to be empowered following timings.
-                events.CancelEvent(EVENT_ANOMALUS_SPAWN_RIFT);
-                events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED, 1s);
-                break;
-            }
-            events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
             break;
         case EVENT_ANOMALUS_ARCANE_ATTRACTION:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
@@ -162,18 +153,18 @@ struct boss_anomalus : public BossAI
             Talk(SAY_RIFT);
             Talk(EMOTE_RIFT);
             me->CastSpell(me, SPELL_CREATE_RIFT, false);
-            //Once we hit 51% hp mark, after each rift we spawn an empowered
-            events.ScheduleEvent(me->HealthBelowPct(51) ? EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED : EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
-            break;
-        case EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED:
-            Talk(SAY_RIFT);
-            Talk(EMOTE_RIFT);
 
-            me->CastSpell(me, SPELL_CREATE_RIFT, false);
-            me->CastSpell(me, SPELL_RIFT_SHIELD, true);
-            me->m_Events.AddEventAtOffset(new ChargeRifts(me), 1s);
-            events.DelayEvents(46s);
-            //As we just spawned an empowered spawn a normal one
+            //Once we hit 51% hp mark, alternate between empowered and normal rifts
+            if (me->HealthBelowPct(51))
+            {
+                if (_empowered)
+                {
+                    me->CastSpell(me, SPELL_RIFT_SHIELD, true);
+                    me->m_Events.AddEventAtOffset(new ChargeRifts(me), 1s);
+                }
+                _empowered = !_empowered;
+            }
+
             events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
             break;
         }

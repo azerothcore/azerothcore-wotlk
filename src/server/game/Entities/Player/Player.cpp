@@ -9077,13 +9077,6 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     if (pet)
     {
-        // xinef: dont save dead pet as current, save him not in slot
-        if (!pet->IsAlive() && mode == PET_SAVE_AS_CURRENT && pet->getPetType() == HUNTER_PET)
-        {
-            mode = PET_SAVE_NOT_IN_SLOT;
-            m_temporaryUnsummonedPetNumber = 0;
-        }
-
         LOG_DEBUG("entities.pet", "RemovePet {}, {}, {}", pet->GetEntry(), mode, returnreagent);
         if (pet->m_removed)
             return;
