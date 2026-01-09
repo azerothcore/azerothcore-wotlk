@@ -88,8 +88,9 @@ enum ConditionTypes
     CONDITION_HAS_AURA_TYPE            = 102,           // aura_type        0              0                  true if has aura type
     CONDITION_WORLD_SCRIPT             = 103,           // conditionId      state          0                  true if WorldState::IsConditionFulfilled returns true
     CONDITION_AI_DATA                  = 104,           // dataId           value          0                  true if AI::GetData returns value
+    CONDITION_RANDOM_DUNGEON           = 105,           // difficulty (0 = any) 0          0                  true if player is queued for a random dungeon via RDF (param1 = Difficulty)
 
-    CONDITION_AC_END                   = 105            // placeholder
+    CONDITION_AC_END                   = 106            // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
