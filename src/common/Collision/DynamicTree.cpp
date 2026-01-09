@@ -359,23 +359,6 @@ float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSear
     return h0 + radius * totalSlope;
 }
 
-bool DynamicMapTree::GetAreaInfo(float x, float y, float& z, uint32 phasemask, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
-{
-    G3D::Vector3 v(x, y, z + 0.5f);
-    DynamicTreeAreaInfoCallback intersectionCallBack(phasemask);
-    impl->intersectPoint(v, intersectionCallBack);
-    if (intersectionCallBack.GetAreaInfo().result)
-    {
-        flags = intersectionCallBack.GetAreaInfo().flags;
-        adtId = intersectionCallBack.GetAreaInfo().adtId;
-        rootId = intersectionCallBack.GetAreaInfo().rootId;
-        groupId = intersectionCallBack.GetAreaInfo().groupId;
-        z = intersectionCallBack.GetAreaInfo().ground_Z;
-        return true;
-    }
-    return false;
-}
-
 bool DynamicMapTree::GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, Optional<uint8> reqLiquidType, VMAP::AreaAndLiquidData& data) const
 {
     G3D::Vector3 v(x, y, z + 0.5f);
