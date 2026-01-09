@@ -511,7 +511,6 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
 
     float exactDistSq = target->GetExactDistSq(_lastTargetPosition->GetPositionX(), _lastTargetPosition->GetPositionY(), _lastTargetPosition->GetPositionZ());
     float distanceTolerance = 0.25f;
-
     // For creatures, increase tolerance
     if (target->IsCreature())
     {
@@ -561,6 +560,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     Creature* cOwner = owner->ToCreature();
     Unit* target = i_target.getTarget();
 
+    // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || (cOwner && owner->ToCreature()->IsMovementPreventedByCasting()))
     {
         i_path = nullptr;
@@ -578,8 +578,9 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     }
 
     bool forceDest =
-        (followingMaster) ||
-        (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster());
+        (followingMaster) || // allow pets following their master to cheat while generating paths
+        (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
+        ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
     bool isPlayerPet = owner->IsGuardian() && target->IsPlayer();
@@ -610,7 +611,6 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         if (targetIsMoving)
         {
             Position predictedPosition = PredictPosition(target);
-
             if (_lastPredictedPosition && _lastPredictedPosition->GetExactDistSq(&predictedPosition) < 0.25f)
                 return true;
 
@@ -672,14 +672,12 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
-
         if (_inheritWalkState)
             init.SetWalk(target->IsWalking() || target->movespline->isWalking());
 
         if (_inheritSpeed)
             if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
                 init.SetVelocity(*velocity);
-
         init.Launch();
     }
 
