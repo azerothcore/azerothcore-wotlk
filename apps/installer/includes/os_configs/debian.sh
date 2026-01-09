@@ -32,8 +32,19 @@ $SUDO apt-get install -y gdbserver gdb unzip curl \
 VAR_PATH="$CURRENT_PATH/../../../../var"
 
 # run noninteractive install for MYSQL
+# Version
 MYSQL_APT_CONFIG_VERSION=0.8.36-1
-wget "https://dev.mysql.com/get/mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb" -P "$VAR_PATH"
-DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb"
-$SUDO apt-get update
-DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-server libmysqlclient-dev
+# # # # #
+mkdir -p $VAR_PATH/mysqlpackages && cd $VAR_PATH/mysqlpackages
+# Download
+wget "https://dev.mysql.com/get/mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb"
+wget "https://dev.mysql.com/downloads/gpg/?file=mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb&p=37" -O mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb.asc
+# Verify
+#gpg --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
+#gpg --verify mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb.asc mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb
+# Install
+sudo DEBIAN_FRONTEND="noninteractive" dpkg -i ./mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb
+sudo apt update
+sudo DEBIAN_FRONTEND="noninteractive" apt install -y mysql-server libmysqlclient-dev
+# Cleanup
+rm -v mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all* && unset MYSQL_APT_CONFIG_VERSION
