@@ -1,26 +1,27 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Containers.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "TemporarySummon.h"
 
@@ -139,6 +140,23 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
     }
 
     return nullptr;
+}
+
+Creature* SummonList::GetRandomCreatureWithEntry(uint32 entry) const
+{
+    std::vector<ObjectGuid> candidates;
+    candidates.reserve(storage_.size());
+
+    for (auto const guid : storage_)
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+            if (summon->GetEntry() == entry)
+                candidates.push_back(guid);
+
+    if (candidates.empty())
+        return nullptr;
+
+    ObjectGuid randomGuid = Acore::Containers::SelectRandomContainerElement(candidates);
+    return ObjectAccessor::GetCreature(*me, randomGuid);
 }
 
 bool SummonList::IsAnyCreatureAlive() const
@@ -566,7 +584,7 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
     std::vector<Player*> tList;
     for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
     {
-        if (!me->IsWithinDistInMap(itr->GetSource(), maxdist, true, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+        if (!me->IsWithinDistInMap(itr->GetSource(), maxdist, true, false, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
             continue;
         if (excludeAura && itr->GetSource()->HasAura(excludeAura))
             continue;

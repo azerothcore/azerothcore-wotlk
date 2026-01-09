@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -47,7 +47,8 @@ enum Creatures
     NPC_CYANIGOSA                   = 31134,
 
     NPC_PORTAL_GUARDIAN             = 30660,
-    NPC_PORTAL_KEEPER               = 30695,
+    NPC_PORTAL_KEEPER_1             = 30695,
+    NPC_PORTAL_KEEPER_2             = 30893,
     NPC_AZURE_INVADER_1             = 30661,
     NPC_AZURE_INVADER_2             = 30961,
     NPC_AZURE_SPELLBREAKER_1        = 30662,

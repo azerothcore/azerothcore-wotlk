@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -57,10 +57,8 @@ enum MovementInformPoints
 enum MalygosSpells
 {
     SPELL_BERSERK                       = 64238,
-    SPELL_ARCANE_BREATH_N               = 56272,
-    SPELL_ARCANE_BREATH_H               = 60072,
-    SPELL_ARCANE_STORM_N                = 61693,
-    SPELL_ARCANE_STORM_H                = 61694,
+    SPELL_ARCANE_BREATH                 = 56272,
+    SPELL_ARCANE_STORM                  = 61693,
 
     SPELL_VORTEX_VISUAL                 = 55873,
     SPELL_VORTEX_CONTROL_VEHICLE        = 56263,
@@ -80,18 +78,13 @@ enum MalygosSpells
     SPELL_DESTROY_PLATFORM_VISUAL       = 59084,
 
     SPELL_ARCANE_PULSE                  = 57432,
-    SPELL_PH3_SURGE_OF_POWER_N          = 57407,
-    SPELL_PH3_SURGE_OF_POWER_H          = 60936,
+    SPELL_PH3_SURGE_OF_POWER            = 57407,
 
     SPELL_STATIC_FIELD_MAIN             = 57430,
     SPELL_STATIC_FIELD_SUMMON           = 57431,
     SPELL_STATIC_FIELD_AURA             = 57428,
     SPELL_STATIC_FIELD_DAMAGE           = 57429,
 };
-
-#define SPELL_ARCANE_BREATH             DUNGEON_MODE(SPELL_ARCANE_BREATH_N, SPELL_ARCANE_BREATH_H)
-#define SPELL_ARCANE_STORM              DUNGEON_MODE(SPELL_ARCANE_STORM_N, SPELL_ARCANE_STORM_H)
-#define SPELL_PH3_SURGE_OF_POWER        DUNGEON_MODE(SPELL_PH3_SURGE_OF_POWER_N, SPELL_PH3_SURGE_OF_POWER_H)
 
 enum MalygosEvents
 {
@@ -241,6 +234,8 @@ public:
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
 
+            me->SetAnimTier(AnimTier::Fly);
+
             if (pInstance)
             {
                 pInstance->SetData(DATA_ENCOUNTER_STATUS, NOT_STARTED);
@@ -284,12 +279,6 @@ public:
                     case MI_POINT_SURGE_OF_POWER_CENTER:
                         events.RescheduleEvent(EVENT_SURGE_OF_POWER_WARNING, 0ms, 1);
                         break;
-                }
-            }
-            else if (type == EFFECT_MOTION_TYPE)
-            {
-                switch (id)
-                {
                     case MI_POINT_INTRO_LAND:
                         me->SetDisableGravity(false);
                         events.RescheduleEvent(EVENT_START_FIGHT, 0ms, 1);
@@ -408,7 +397,7 @@ public:
                     }
                 case EVENT_INTRO_LAND:
                     {
-                        me->GetMotionMaster()->MoveLand(MI_POINT_INTRO_LAND, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), 7.0f);
+                        me->GetMotionMaster()->MovePoint(MI_POINT_INTRO_LAND, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Ground);
                         break;
                     }
                 case EVENT_START_FIGHT:
@@ -469,7 +458,7 @@ public:
                         me->GetMotionMaster()->MoveIdle();
                         me->StopMoving();
                         me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MoveTakeoff(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, 7.0f);
+                        me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_TAKEOFF, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ() + 20.0f, FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Fly);
 
                         events.DelayEvents(25s, 1); // don't delay berserk (group 0)
                     }
@@ -546,7 +535,7 @@ public:
                         break;
                     }
                 case EVENT_VORTEX_LAND_0:
-                    me->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, CenterPos, 7.0f);
+                    me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_LAND, CenterPos, FORCED_MOVEMENT_RUN, 0.f, true, true, AnimTier::Ground);
 
                     break;
                 case EVENT_VORTEX_LAND_1:
@@ -580,7 +569,7 @@ public:
                         me->GetMotionMaster()->MoveIdle();
                         me->DisableSpline();
                         me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MoveTakeoff(MI_POINT_CENTER_AIR_PH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 32.0f, 7.0f);
+                        me->GetMotionMaster()->MovePoint(MI_POINT_CENTER_AIR_PH_2, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 32.0f, FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Fly);
                         events.RescheduleEvent(EVENT_START_PHASE_2_MOVE_TO_SIDE, 22s + 500ms, 1);
                         break;
                     }
@@ -706,7 +695,7 @@ public:
                 case EVENT_MOVE_TO_PHASE_3_POSITION:
                     {
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->GetMotionMaster()->MoveTakeoff(MI_POINT_PH_3_FIGHT_POSITION, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() - 5.0f, me->GetSpeed(MOVE_RUN));
+                        me->GetMotionMaster()->MovePoint(MI_POINT_PH_3_FIGHT_POSITION, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() - 5.0f, FORCED_MOVEMENT_RUN, 0.f, 0.f, true, true, MOTION_SLOT_ACTIVE, AnimTier::Fly);
 
                         me->GetThreatMgr().ClearAllThreat(); // players on vehicle are unattackable -> leads to EnterEvadeMode() because target is not acceptable!
 
