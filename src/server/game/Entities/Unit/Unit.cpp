@@ -14711,7 +14711,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
     }
     else if (s == DeathState::JustRespawned)
     {
-        RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
+        RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
     }
 }
 

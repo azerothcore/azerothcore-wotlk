@@ -282,7 +282,6 @@ public:
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
                     summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->CallForHelp(150.0f);
                 }
             }
         }
@@ -501,7 +500,7 @@ public:
             events.Reset();
         }
 
-        void JustEngagedWith(Unit*  /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             switch (me->GetEntry())
             {
