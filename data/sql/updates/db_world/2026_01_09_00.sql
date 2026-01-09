@@ -1,3 +1,4 @@
+-- DB update 2026_01_08_00 -> 2026_01_09_00
 --
 DELETE FROM `creature` WHERE `guid` IN (106509, 106879, 106611, 106612, 106613) AND `id1` IN (23666, 23667, 23670);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `unit_flags`, `CreateObject`, `VerifiedBuild`) VALUES
