@@ -274,6 +274,7 @@ UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 2206 WHERE `ID` = 220
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 2242 WHERE `ID` = 2241;
 
 -- Find Sage Mistwalker (breadcrumb for The Artifacts of Steel Gate)
+UPDATE `quest_template_addon` SET `PrevQuestID` = 0, `ExclusiveGroup` = 0 WHERE (`ID` = 11286);
 UPDATE `quest_template_addon` SET `ExclusiveGroup` = 0, `BreadcrumbForQuestId` = 11286 WHERE `ID` = 11287;
 
 -- Judgment Day Comes! (Alliance/Horde breadcrumbs for Honor Above All Else)
