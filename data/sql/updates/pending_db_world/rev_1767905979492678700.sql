@@ -59,7 +59,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 3143201
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (3143201, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 5, 460, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Play Emote 460 (OneShotFlyDragonSpit)'),
 (3143201, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Say Line 0'),
-(3143201, 9, 2, 0, 0, 0, 100, 0, 6470, 6470, 0, 0, 0, 0, 5, 452, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Play Emote 452 (OneShotFlyDragonSpit)'),
+(3143201, 9, 2, 0, 0, 0, 100, 0, 6470, 6470, 0, 0, 0, 0, 5, 452, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Play Emote 452 (OneShotFlyGrab)'),
 (3143201, 9, 3, 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 86, 59091, 2, 19, 31428, 40, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Cross Cast \'Ride Ghostwing\''),
 (3143201, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 19, 30631, 40, 0, 0, 0, 0, 0, 0, 'Ghostwing - Actionlist - Store Arly as Target'),
 (3143201, 9, 5, 0, 0, 0, 100, 0, 2840, 2840, 0, 0, 0, 0, 69, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 6690.6504, 3177.2793, 860.5705, 0, 'Ghostwing - Actionlist - Move To Position'),
