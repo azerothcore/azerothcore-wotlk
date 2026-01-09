@@ -391,6 +391,7 @@ protected:
     int32  PrevQuestId            = 0;
     uint32 NextQuestId            = 0;
     int32  ExclusiveGroup         = 0;
+    uint32 BreadcrumbForQuestId   = 0;
     uint32 RewardMailTemplateId   = 0;
     uint32 RewardMailDelay        = 0;
     uint32 RequiredSkillId        = 0;
@@ -402,7 +403,6 @@ protected:
     uint32 StartItemCount         = 0;
     uint32 RewardMailSenderEntry  = 0;
     uint32 SpecialFlags           = 0; // custom flags, not sniffed/WDB
-    uint32 BreadcrumbForQuestId   = 0;
 };
 
 struct QuestStatusData
