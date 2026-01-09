@@ -2034,7 +2034,6 @@ struct npc_icc_orb_controller : public ScriptedAI
         }
     }
 
-    // void SpellHit(WorldObject* caster, SpellInfo const* spellInfo) override
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_ORB_CONTROLLER_ACTIVE)
