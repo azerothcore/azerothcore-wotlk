@@ -172,7 +172,7 @@ struct boss_hadronox : public BossAI
             SummonCrusherPack(SUMMON_GROUP_CRUSHER_3);
             events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 0s);
             events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 45s);
-            events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 90s);
+            events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 70s);
         }
     }
 
