@@ -112,6 +112,7 @@ public:
     void MemberEngagingTarget(Creature* member, Unit* target);
     Unit* GetNewTargetForMember(Creature* member);
     void MemberEvaded(Creature* member);
+    void DespawnFormation(Milliseconds timeToDespawn = 0ms, Seconds forcedRespawnTimer = 0s);
     void RespawnFormation(bool force = false);
     [[nodiscard]] bool IsFormationInCombat();
     [[nodiscard]] bool IsAnyMemberAlive(bool ignoreLeader = false);

@@ -76,12 +76,6 @@ struct boss_talon_king_ikiss : public BossAI
         });
     }
 
-    /// @todo: remove this once pets stop going through doors.
-    bool CanAIAttack(Unit const* /*victim*/) const override
-    {
-        return _spoken;
-    }
-
     void MoveInLineOfSight(Unit* who) override
     {
         if (!_spoken && who->IsPlayer())
