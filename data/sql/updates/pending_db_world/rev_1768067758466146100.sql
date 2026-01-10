@@ -1,7 +1,7 @@
 -- Delete quest credit hack
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30954) AND (`source_type` = 0) AND (`id` IN (3)); -- Rokir: 31160
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30956) AND (`source_type` = 0) AND (`id` IN (6)); -- Sapph: 31161
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30953) AND (`source_type` = 0) AND (`id` IN (3)); -- Baelok: 31159
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30954) AND (`source_type` = 0) AND (`id` IN (3));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30956) AND (`source_type` = 0) AND (`id` IN (6));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30953) AND (`source_type` = 0) AND (`id` IN (3));
 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 31159);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
