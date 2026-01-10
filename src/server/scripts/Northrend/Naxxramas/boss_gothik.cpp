@@ -464,6 +464,19 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
 
                         gateOpened = true;
+                        summons.DoForAllSummons([&](WorldObject* summon)
+                        {
+                            if (Creature* gothikMinion = summon->ToCreature())
+                                if (gothikMinion->IsAlive())
+                                {
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
+                                    {
+                                        gothikMinion->AI()->AttackStart(target);
+                                        gothikMinion->SetReactState(REACT_AGGRESSIVE);
+                                        gothikMinion->SetInCombatWithZone();
+                                    }
+                                }
+                        });
                         Talk(EMOTE_GATE_OPENED);
                     }
                     break;
