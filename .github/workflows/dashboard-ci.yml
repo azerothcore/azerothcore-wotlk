@@ -16,8 +16,19 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  # One concurrency group per workflow + ref.
+  #
+  # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
+  #   in-progress runs for the same PR.
+  # - When a PR is merged, a push to the target branch starts a new group,
+  #   canceling any still-running PR CI.
+  # - Branch pushes are isolated by ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  actions: write
+  contents: read
 
 env:
   CONTINUOUS_INTEGRATION: true
@@ -42,15 +53,19 @@ jobs:
 
       - name: Install requirements
         run: |
-          sudo apt install -y bats
+          sudo apt-get update
+          # Install bats-core >= 1.5.0 to support bats_require_minimum_version
+          sudo apt-get install -y git curl
+          git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core
+          sudo /tmp/bats-core/install.sh /usr/local
+          bats --version
           ./acore.sh install-deps
 
       - name: Run bash script tests for ${{ matrix.test-module }}
         env:
           TERM: xterm-256color
         run: |
-          cd apps/test-framework
-          ./run-tests.sh --tap
+          ./acore.sh test bash --tap --all
 
   build-and-test:
     name: Build and Integration Test
@@ -68,27 +83,204 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Install ccache
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ccache
+          ccache --version
+
+      # Detect the compilers that acore.sh / CMake will end up using.
+      # We record both the binary name and a short version tag for the cache key.
+      - name: Detect compiler
+        id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          CC_BIN="${CC:-}"
+          CXX_BIN="${CXX:-}"
+          [[ -z "$CC_BIN"  ]] && CC_BIN="$(command -v clang || command -v gcc)"
+          [[ -z "$CXX_BIN" ]] && CXX_BIN="$(command -v clang++ || command -v g++)"
+
+          make_ver_id() {
+            local bin="$1"; local base="$(basename "$bin")"
+            case "$base" in
+              clang)
+                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "$maj" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
+                echo "clang-${maj:-unknown}"
+                ;;
+              clang++)
+                maj="$("$bin" -dumpversion 2>/dev/null | cut -d. -f1)"; [[ -z "$maj" ]] && maj="$( "$bin" --version | sed -n 's/.*version \([0-9][0-9]*\).*/\1/p' | head -1 )"
+                echo "clang++-${maj:-unknown}"
+                ;;
+              gcc)
+                maj="$("$bin" -dumpfullversion -dumpversion 2>/dev/null || "$bin" -dumpversion 2>/dev/null)"; maj="${maj%%.*}"
+                echo "gcc-${maj:-unknown}"
+                ;;
+              g++)
+                maj="$("$bin" -dumpfullversion -dumpversion 2>/dev/null || "$bin" -dumpversion 2>/dev/null)"; maj="${maj%%.*}"
+                echo "g++-${maj:-unknown}"
+                ;;
+              *)
+                echo "$base"
+                ;;
+            esac
+          }
+
+          echo "cc_id=$(make_ver_id "$CC_BIN")"   >> "$GITHUB_OUTPUT"
+          echo "cxx_id=$(make_ver_id "$CXX_BIN")" >> "$GITHUB_OUTPUT"
+          echo "Detected: $CC_BIN, $CXX_BIN"
+
+      - name: Prepare ccache dir
+        shell: bash
+        run: mkdir -p "${{ github.workspace }}/var/ccache"
+
+      - name: Echo cache key
+        shell: bash
+        run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}"
+
+      - name: Restore ccache
+        id: restore_ccache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ github.workspace }}/var/ccache
+          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          restore-keys: |
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=false:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=true:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:
+
+      - name: Setup ccache env
+        shell: bash
+        env:
+          CCACHE_DIR: ${{ github.workspace }}/var/ccache
+        run: |
+          mkdir -p "$CCACHE_DIR"
+          cat <<EOF >> "$GITHUB_ENV"
+          CCACHE_BASEDIR=${{ github.workspace }}
+          CCACHE_DIR=${{ github.workspace }}/var/ccache
+          CCACHE_HASHDIR=1
+          CCACHE_MAXSIZE=5G
+          CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
+          CCACHE_COMPRESS=1
+          CCACHE_COMPRESSLEVEL=9
+          CCACHE_COMPILERCHECK=content
+          CCACHE_LOGFILE=${{ github.workspace }}/var/ccache/cache.debug
+          CMAKE_C_COMPILER_LAUNCHER=ccache
+          CMAKE_CXX_COMPILER_LAUNCHER=ccache
+          EOF
+
+      - name: ccache snapshot (before)
+        shell: bash
+        run: |
+          echo "==== Effective ccache configuration ===="
+          ccache -p | egrep 'base_dir|hash_dir|compiler_check|sloppiness|max_size' || true
+          echo
+          echo "==== Previous cache stats ===="
+          ccache -s || true
+          echo
+          echo "==== Top cache results (from prior runs) ===="
+          grep -o 'result: .*' "${{ github.workspace }}/var/ccache/cache.debug" 2>/dev/null | sort | uniq -c | sort -nr | head || true
+
+      - name: Reset ccache stats
+        shell: bash
+        run: ccache -z || true
+
       - name: Configure AzerothCore settings
         run: |
-          # Create basic configuration
-          cp conf/dist/config.sh conf/config.sh
-          # Configure dashboard
-          sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
+            touch conf/config.sh
+            echo 'MTHREADS=4' >> conf/config.sh
+            echo 'CBUILD_TESTING=ON' >> conf/config.sh
+            echo 'AC_ENABLE_ROOT_CMAKE_INSTALL=1' >> conf/config.sh
+            echo 'export AC_CONFIG_POLICY=$AC_CONFIG_POLICY_PRESET_ZERO_CONF' >> conf/config.sh
+            echo 'AC_ENABLE_CONF_COPY_ON_INSTALL=0' >> conf/config.sh
+            cat conf/config.sh
+
+            # debug content of AC_CONFIG_POLICY
+            ./acore.sh config show AC_CONFIG_POLICY
+
+      - name: Test module commands
+        run: |
+          ./acore.sh module install mod-autobalance
+          ./acore.sh module install mod-duel-reset
+          
+          ./acore.sh module list
+
+          ./acore.sh module install --all
+          ./acore.sh module update mod-autobalance
+          ./acore.sh module update --all
 
       - name: Run complete installation (deps, compile, database, client-data)
         run: |
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init
+          sudo npm install -g pm2
         timeout-minutes: 120
+
+      - name: Test module removal
+        run: |
+          ./acore.sh module remove mod-autobalance
+          ./acore.sh module list
+          ./acore.sh module remove mod-duel-reset
+          ./acore.sh module list
+
+      - name: Run core tests
+        run: |
+          ./acore.sh test core
 
       - name: Test authserver dry-run
         run: |
+          source ./acore.sh config load
           cd env/dist/bin
           timeout 5m ./authserver -dry-run
         continue-on-error: false
 
       - name: Test worldserver dry-run
         run: |
+          source ./acore.sh config load
           cd env/dist/bin
           timeout 5m ./worldserver -dry-run
         continue-on-error: false
+
+
+      - name: Test worldserver with startup scripts
+        run: |
+          ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm show-config worldserver
+          ./acore.sh sm start worldserver
+          ./acore.sh sm wait-uptime worldserver 10 300
+          ./acore.sh sm send worldserver "account create tester password 3"
+          ./acore.sh sm send worldserver "account set gm tester 3"
+          ./acore.sh sm send worldserver "account set addon tester 1"
+          ./acore.sh sm wait-uptime worldserver 10 300
+          ./acore.sh sm stop worldserver
+          ./acore.sh sm delete worldserver
+        timeout-minutes: 30
+        continue-on-error: false
+
+      - name: Test authserver with startup scripts
+        run: |
+          ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm show-config authserver
+          ./acore.sh sm start authserver
+          ./acore.sh sm wait-uptime authserver 10 300
+          ./acore.sh sm stop authserver
+          ./acore.sh sm delete authserver
+        timeout-minutes: 30
+        continue-on-error: false
+
+      # save only if we didn't hit the cache
+      - name: Save ccache
+        if: steps.restore_ccache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ github.workspace }}/var/ccache
+          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+
+      - name: ccache stats (after)
+        shell: bash
+        run: ccache -s || true

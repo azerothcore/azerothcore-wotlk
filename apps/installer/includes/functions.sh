@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 # Set SUDO variable - one liner
-SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+if [[ "$OSTYPE" == "msys"* ]]; then
+    SUDO=""
+else
+    SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+fi
 
 function inst_configureOS() {
     echo "Platform: $OSTYPE"
@@ -67,7 +71,7 @@ function inst_dbCreate() {
     # In CI environments or when no password is set, try without password first
     if [[ "$CONTINUOUS_INTEGRATION" == "true" ]]; then
         echo "CI environment detected, attempting connection without password..."
-        
+
         if $SUDO mysql -u root < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
             echo "Database created successfully."
             return 0
@@ -75,7 +79,7 @@ function inst_dbCreate() {
             echo "Failed to connect without password, falling back to interactive mode..."
         fi
     fi
-    
+
     # Try with password (interactive mode)
     echo "Please enter your sudo and your MySQL root password if prompted."
     $SUDO mysql -u root -p < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql"
@@ -118,142 +122,28 @@ function inst_allInOne() {
     inst_download_client_data
 }
 
-function inst_getVersionBranch() {
-    local res="master"
-    local v="not-defined"
-    local MODULE_MAJOR=0
-    local MODULE_MINOR=0
-    local MODULE_PATCH=0
-    local MODULE_SPECIAL=0;
-    local ACV_MAJOR=0
-    local ACV_MINOR=0
-    local ACV_PATCH=0
-    local ACV_SPECIAL=0;
-    local curldata=$(curl -f --silent -H 'Cache-Control: no-cache' "$1" || echo "{}")
-    local parsed=$(echo "$curldata" | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.compatibility.*.[version,branch]')
+############################################################
+# Module helpers and dispatcher                             #
+############################################################
 
-    semverParseInto "$ACORE_VERSION" ACV_MAJOR ACV_MINOR ACV_PATCH ACV_SPECIAL
-
-    if [[ ! -z "$parsed" ]]; then
-        readarray -t vers < <(echo "$parsed")
-        local idx
-        res="none"
-        # since we've the pair version,branch alternated in not associative and one-dimensional
-        # array, we've to simulate the association with length/2 trick
-        for idx in `seq 0 $((${#vers[*]}/2-1))`; do
-            semverParseInto "${vers[idx*2]}" MODULE_MAJOR MODULE_MINOR MODULE_PATCH MODULE_SPECIAL
-            if [[ $MODULE_MAJOR -eq $ACV_MAJOR && $MODULE_MINOR -le $ACV_MINOR ]]; then
-                res="${vers[idx*2+1]}"
-                v="${vers[idx*2]}"
-            fi
-        done
+# Returns the default branch name of a GitHub repo in the azerothcore org.
+# If the API call fails, defaults to "master".
+function inst_get_default_branch() {
+    local repo="$1"
+    local def
+    def=$(curl --silent "https://api.github.com/repos/azerothcore/${repo}" \
+        | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.default_branch')
+    if [ -z "$def" ]; then
+        def="master"
     fi
-
-    echo "$v" "$res"
+    echo "$def"
 }
 
-function inst_module_search {
-
-    local res="$1"
-    local idx=0;
-
-    if [ -z "$1" ]; then
-        echo "Type what to search or leave blank for full list"
-        read -p "Insert name: " res
-    fi
-
-    local search="+$res"
-
-    echo "Searching $res..."
-    echo "";
-
-    readarray -t MODS < <(curl --silent "https://api.github.com/search/repositories?q=org%3Aazerothcore${search}+fork%3Atrue+topic%3Acore-module+sort%3Astars&type=" \
-        | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.items.*.name')
-    while (( ${#MODS[@]} > idx )); do
-        mod="${MODS[idx++]}"
-        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$mod/master/acore-module.json")
-
-        if [[ "$b" != "none" ]]; then
-            echo "-> $mod (tested with AC version: $v)"
-        else
-            echo "-> $mod (no revision available for AC v$AC_VERSION, it could not work!)"
-        fi
-    done
-
-    echo "";
-    echo "";
-}
-
-function inst_module_install {
-    local res
-    if [ -z "$1" ]; then
-        echo "Type the name of the module to install"
-        read -p "Insert name: " res
-    else
-        res="$1"
-    fi
-
-    read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
-
-    if [[ "$b" != "none" ]]; then
-        Joiner:add_repo "https://github.com/azerothcore/$res" "$res" "$b" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
-    else
-        echo "Cannot install $res module: it doesn't exists or no version compatible with AC v$ACORE_VERSION are available"
-    fi
-
-    echo "";
-    echo "";
-}
-
-function inst_module_update {
-    local res;
-    local _tmp;
-    local branch;
-    local p;
-
-    if [ -z "$1" ]; then
-        echo "Type the name of the module to update"
-        read -p "Insert name: " res
-    else
-        res="$1"
-    fi
-
-    _tmp=$PWD
-
-    if [ -d "$J_PATH_MODULES/$res/" ]; then
-        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
-
-        cd "$J_PATH_MODULES/$res/"
-
-        # use current branch if something wrong with json
-        if [[ "$v" == "none" || "$v" == "not-defined" ]]; then
-            b=`git rev-parse --abbrev-ref HEAD`
-        fi
-
-        Joiner:upd_repo "https://github.com/azerothcore/$res" "$res" "$b" && echo "Done, please re-run compiling and db assembly" || echo "Cannot update"
-        cd $_tmp
-    else
-        echo "Cannot update! Path doesn't exist"
-    fi;
-
-    echo "";
-    echo "";
-}
-
-function inst_module_remove {
-    if [ -z "$1" ]; then
-        echo "Type the name of the module to remove"
-        read -p "Insert name: " res
-    else
-        res="$1"
-    fi
-
-    Joiner:remove "$res" && echo "Done, please re-run compiling"  || echo "Cannot remove"
-
-    echo "";
-    echo "";
-}
-
+# =============================================================================
+# Module Management System
+# =============================================================================
+# Load the module manager functions from the dedicated modules-manager directory
+source "$AC_PATH_INSTALLER/includes/modules-manager/modules.sh"
 
 function inst_simple_restarter {
     echo "Running $1 ..."
@@ -265,7 +155,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     # change the following version when needed
-    local VERSION=v16
+    local VERSION=v19
 
     echo "#######################"
     echo "Client data downloader"
@@ -293,3 +183,5 @@ function inst_download_client_data {
         && echo "Remove downloaded file" && rm "$zipPath" \
         && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
 }
+
+

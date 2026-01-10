@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -443,15 +443,16 @@ class spell_dru_enrage : public AuraScript
 
     void RecalculateBaseArmor()
     {
+        // Recalculate modifies the list while we're iterating through it, so let's copy it instead
         Unit::AuraEffectList const& auras = GetTarget()->GetAuraEffectsByType(SPELL_AURA_MOD_BASE_RESISTANCE_PCT);
-        for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+        std::vector<AuraEffect*> aurEffs(auras.begin(), auras.end());
+
+        for (AuraEffect* aurEff : aurEffs)
         {
-            SpellInfo const* spellInfo = (*i)->GetSpellInfo();
+            SpellInfo const* spellInfo = aurEff->GetSpellInfo();
             // Dire- / Bear Form (Passive)
             if (spellInfo->SpellFamilyName == SPELLFAMILY_DRUID && spellInfo->SpellFamilyFlags.HasFlag(0x0, 0x0, 0x2))
-            {
-                (*i)->RecalculateAmount();
-            }
+                aurEff->RecalculateAmount();
         }
     }
 
@@ -923,6 +924,21 @@ class spell_dru_starfall_dummy : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
+        // Get caster object
+        Unit* caster = GetCaster();
+
+        // Remove targets if they are outside line of sight with respect to caster
+        targets.remove_if([caster](WorldObject const* target)
+          {
+              if (target)
+              {
+                  if (!caster->IsWithinLOS(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()))
+                      return true;
+              }
+              return false;
+          });
+
+        // Take 2 random targets from remaining within line of sight targets
         Acore::Containers::RandomResize(targets, 2);
     }
 

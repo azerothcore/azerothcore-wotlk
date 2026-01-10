@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -125,7 +125,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     m_playerLogout(false),
     m_playerRecentlyLogout(false),
     m_playerSave(false),
-    m_sessionDbcLocale(sWorld->GetDefaultDbcLocale()),
+    m_sessionDbcLocale(sWorld->GetAvailableDbcLocale(locale)),
     m_sessionDbLocaleIndex(locale),
     m_latency(0),
     m_TutorialsChanged(false),
@@ -136,7 +136,8 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _addonMessageReceiveCount(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
-    _pendingTimeSyncRequests()
+    _pendingTimeSyncRequests(),
+    _orderCounter(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 
@@ -1508,4 +1509,10 @@ void WorldSession::InitializeSessionCallback(CharacterDatabaseQueryHolder const&
     SendAddonsInfo();
     SendClientCacheVersion(clientCacheVersion);
     SendTutorialsData();
+}
+
+void WorldSession::SetPacketLogging(bool state)
+{
+    if (m_Socket)
+        m_Socket->SetPacketLogging(state);
 }

@@ -1,23 +1,25 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "gundrak.h"
+#include "GameObjectAI.h"
 
 DoorData const doorData[] =
 {
@@ -104,6 +106,9 @@ public:
                     break;
                 case GO_ECK_DOORS:
                 case GO_ECK_UNDERWATER_GATE:
+                    if (instance->IsHeroic())
+                        AddDoor(gameobject);
+                    break;
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
@@ -118,6 +123,9 @@ public:
             {
                 case GO_ECK_DOORS:
                 case GO_ECK_UNDERWATER_GATE:
+                    if (instance->IsHeroic())
+                        RemoveDoor(gameobject);
+                    break;
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
@@ -130,13 +138,6 @@ public:
         {
             switch (type)
             {
-                case NPC_ECK_THE_FEROCIOUS:
-                    if (GetBossState(DATA_ECK_THE_FEROCIOUS_INIT) != DONE)
-                    {
-                        SetBossState(DATA_ECK_THE_FEROCIOUS_INIT, NOT_STARTED);
-                        SetBossState(DATA_ECK_THE_FEROCIOUS_INIT, DONE);
-                    }
-                    break;
                 case GO_ALTAR_OF_SLAD_RAN:
                     if (GameObject* statue = instance->GetGameObject(_bridgeGUIDs[0]))
                         statue->SetGoState(GO_STATE_READY);
@@ -187,19 +188,36 @@ public:
                     if (GameObject* altar = instance->GetGameObject(_drakkariAltarGUID))
                         altar->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     break;
-                case DATA_ECK_THE_FEROCIOUS_INIT:
-                    {
-                        Position pos = {1624.70f, 891.43f, 95.08f, 1.2f};
-                        if (instance->IsHeroic())
-                            instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, pos);
-                        break;
-                    }
             }
             return true;
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (!instance->IsHeroic() || !unit->EntryEquals(NPC_RUINS_DWELLER) || IsBossDone(DATA_ECK_THE_FEROCIOUS))
+                return;
+
+            if (Creature* dweller = unit->ToCreature())
+                if (CreatureGroup* formation = dweller->GetFormation())
+                {
+                    scheduler.CancelAll();
+                    scheduler.Schedule(1s, [this, dweller, formation](TaskContext /*context*/)
+                    {
+                        if (!formation->IsAnyMemberAlive())
+                        {
+                            if (dweller)
+                                dweller->AI()->Talk(EMOTE_SUMMON_ECK);
+
+                            instance->SummonCreature(NPC_ECK_THE_FEROCIOUS, { 1624.70f, 891.43f, 95.08f, 1.2f });
+                        }
+                    });
+                }
+        }
+
         void Update(uint32 diff) override
         {
+            scheduler.Update(diff);
+
             if (!_activateTimer)
                 return;
 
@@ -211,6 +229,9 @@ public:
                     if (GameObject* go = instance->GetGameObject(_bridgeGUIDs[i]))
                         go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             }
+            if (GameObject* collision = instance->GetGameObject(_bridgeGUIDs[4]))
+                if (collision->AI())
+                    collision->AI()->SetData(0, 1);
         }
     };
 };

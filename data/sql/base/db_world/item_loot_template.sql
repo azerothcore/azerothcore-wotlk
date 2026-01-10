@@ -4081,8 +4081,8 @@ INSERT INTO `item_loot_template` VALUES
 (23846,23844,0,100,0,1,0,1,1,'Nolkai\'s Box - Nolkai\'s Lantern'),
 (23846,23847,0,100,0,1,0,1,1,'Nolkai\'s Box - Nolkai\'s Band'),
 (23846,23852,0,100,0,1,0,1,1,'Nolkai\'s Box - Nolkai\'s Bag'),
-(24336,23682,0,96.1,0,1,0,1,1,'Fireproof Satchel - Ritual Torch'),
-(24336,24335,0,99.8,0,1,0,1,1,'Fireproof Satchel - Orb of Returning'),
+(24336,23682,0,0,1,1,1,1,1,'Fireproof Satchel - Ritual Torch'),
+(24336,24335,0,0,0,1,2,1,1,'Fireproof Satchel - Orb of Returning'),
 (24402,765,0,0.4,0,1,4,1,1,'Package of Identified Plants - Silverleaf'),
 (24402,785,0,0.4,0,1,4,1,1,'Package of Identified Plants - Mageroyal'),
 (24402,2447,0,0.4,0,1,4,1,1,'Package of Identified Plants - Peacebloom'),
@@ -4603,6 +4603,11 @@ INSERT INTO `item_loot_template` VALUES
 (43575,24282,0,4.2,0,1,0,1,1,'Reinforced Junkbox - Rogue\'s Diary'),
 (43575,27729,0,2.6,0,1,0,1,1,'Reinforced Junkbox - Humanoid Skull'),
 (43575,33447,0,12.6,0,1,0,1,1,'Reinforced Junkbox - Runic Healing Potion'),
+(43575,36422,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Filigree Ring'),
+(43575,36423,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Posy Ring'),
+(43575,36424,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Cameo Ring'),
+(43575,36427,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Engraved Ring'),
+(43575,36436,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Jasper Bead Necklace'),
 (43575,36918,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Scarlet Ruby'),
 (43575,36921,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Autumn\'s Glow'),
 (43575,36924,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Sky Sapphire'),
@@ -4613,6 +4618,9 @@ INSERT INTO `item_loot_template` VALUES
 (43575,43234,0,10.4,0,1,0,1,1,'Reinforced Junkbox - Wound Poison VI'),
 (43575,43235,0,11.1,0,1,0,1,1,'Reinforced Junkbox - Wound Poison VII'),
 (43575,43237,0,10.3,0,1,0,1,1,'Reinforced Junkbox - Anesthetic Poison II'),
+(43575,43611,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Krol Cleaver'),
+(43575,43612,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Spineslicer'),
+(43575,43613,0,0.1,0,1,0,1,1,'Reinforced Junkbox - The Dusk Blade'),
 (43622,35979,0,1.3,0,1,0,1,1,'Froststeel Lockbox - Foothold Belt'),
 (43622,35980,0,0.6,0,1,0,1,1,'Froststeel Lockbox - Foothold Boots'),
 (43622,35981,0,0.4,0,1,0,1,1,'Froststeel Lockbox - Foothold Robe'),
@@ -5042,4 +5050,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:10
+-- Dump completed on 2025-12-29 17:54:07

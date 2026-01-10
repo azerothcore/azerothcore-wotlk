@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -361,8 +361,9 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
         if (member == m_leader || !member->IsAlive() || member->GetVictim() || !pFormationInfo.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
             continue;
 
-        // Xinef: If member is stunned / rooted etc don't allow to move him
-        if (member->HasUnitState(UNIT_STATE_NOT_MOVE))
+        // If member is stunned / rooted etc don't allow to move him
+        // Or if charmed/controlled
+        if (member->HasUnitState(UNIT_STATE_NOT_MOVE) || member->isPossessed() || member->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
             continue;
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle
@@ -413,6 +414,15 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
             member->GetMotionMaster()->MovePoint(0, dx, dy, dz);
             member->SetHomePosition(dx, dy, dz, pathAngle);
         }
+    }
+}
+
+void CreatureGroup::DespawnFormation(Milliseconds timeToDespawn /*=0ms*/, Seconds forcedRespawnTimer /*=0s*/)
+{
+    for (auto const& itr : m_members)
+    {
+        if (itr.first)
+            itr.first->DespawnOrUnsummon(timeToDespawn, forcedRespawnTimer);
     }
 }
 

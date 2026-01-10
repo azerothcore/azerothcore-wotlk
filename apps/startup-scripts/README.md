@@ -305,6 +305,31 @@ Services support two restart policies:
 ./service-manager.sh delete auth
 ```
 
+#### Health and Console Commands
+
+Use these commands to programmatically check service health and interact with the console (used by CI workflows):
+
+```bash
+# Check if service is currently running (exit 0 if running)
+./service-manager.sh is-running world
+
+# Print current uptime in seconds (fails if not running)
+./service-manager.sh uptime-seconds world
+
+# Wait until uptime >= 10s (optional timeout 240s)
+./service-manager.sh wait-uptime world 10 240
+
+# Send a console command (uses pm2 send or tmux/screen)
+./service-manager.sh send world "server info"
+
+# Show provider, configs and run-engine settings
+./service-manager.sh show-config world
+```
+
+Notes:
+- For `send`, PM2 provider uses `pm2 send` with the process ID; systemd provider requires a session manager (tmux/screen). If no attachable session is configured, the command fails.
+- `wait-uptime` fails with a non-zero exit code if the service does not reach the requested uptime within the timeout window.
+
 #### Service Configuration
 ```bash
 # Update service settings
@@ -312,6 +337,9 @@ Services support two restart policies:
 
 # Edit configuration
 ./service-manager.sh edit world
+
+# Restore missing services from registry
+./service-manager.sh restore
 ```
 
 ## 🌍 Multiple Realms Setup
@@ -384,28 +412,118 @@ cp examples/restarter-world.sh restarter-realm2.sh
 
 ## 🛠️ Service Management
 
+### Service Registry and Persistence
+
+The service manager includes a comprehensive registry system that tracks all created services and enables automatic restoration:
+
+#### Service Registry Features
+
+- **Automatic Tracking**: All services are automatically registered when created
+- **Cross-Reboot Persistence**: PM2 services are configured with startup persistence
+- **Service Restoration**: Missing services can be detected and restored from registry
+- **Migration Support**: Legacy service configurations can be migrated to the new format
+
+#### Using the Registry
+
+```bash
+# Check for missing services and restore them
+./service-manager.sh restore
+
+# List all registered services (includes status)
+./service-manager.sh list
+
+# Services are automatically added to registry on creation
+./service-manager.sh create auth authserver --bin-path /path/to/bin
+```
+
+#### Custom Configuration Directories
+
+You can customize where service configurations and PM2/systemd files are stored:
+
+```bash
+# Set custom directories
+export AC_SERVICE_CONFIG_DIR="/path/to/your/project/services"
+
+# Now all service operations will use these custom directories
+./service-manager.sh create auth authserver --bin-path /path/to/bin
+```
+
+This is particularly useful for:
+- **Version Control**: Keep service configurations in your project repository
+- **Multiple Projects**: Separate service configurations per project
+- **Team Collaboration**: Share service setups across development teams
+
+#### Service Configuration Portability
+
+The service manager automatically stores binary and configuration paths as relative paths when they are located under the `AC_SERVICE_CONFIG_DIR`, making service configurations portable across environments:
+
+```bash
+# Set up a portable project structure
+export AC_SERVICE_CONFIG_DIR="/opt/myproject/services"
+mkdir -p "$AC_SERVICE_CONFIG_DIR"/{bin,etc}
+
+# Copy your binaries and configs
+cp /path/to/compiled/authserver "$AC_SERVICE_CONFIG_DIR/bin/"
+cp /path/to/authserver.conf "$AC_SERVICE_CONFIG_DIR/etc/"
+
+# Create service - paths under AC_SERVICE_CONFIG_DIR will be stored as relative
+./service-manager.sh create auth authserver \
+  --bin-path "$AC_SERVICE_CONFIG_DIR/bin" \
+  --server-config "$AC_SERVICE_CONFIG_DIR/etc/authserver.conf"
+
+# Registry will contain relative paths like "bin/authserver" and "etc/authserver.conf"
+# instead of absolute paths, making the entire directory portable
+```
+
+**Benefits:**
+- **Environment Independence**: Move the entire services directory between machines
+- **Container Friendly**: Perfect for Docker volumes and bind mounts
+- **Backup/Restore**: Archive and restore complete service configurations
+- **Development/Production Parity**: Same relative structure across environments
+
+**How it works:**
+- Paths under `AC_SERVICE_CONFIG_DIR` are automatically stored as relative paths
+- Paths outside `AC_SERVICE_CONFIG_DIR` are stored as absolute paths for safety
+- When services are restored or started, relative paths are resolved from `AC_SERVICE_CONFIG_DIR`
+- If `AC_SERVICE_CONFIG_DIR` is not set, all paths are stored as absolute paths (traditional behavior)
+
+#### Migration from Legacy Format
+
+If you have existing services in the old format, use the migration script:
+
+```bash
+# Migrate existing registry to new format
+./migrate-registry.sh
+
+# The script will:
+# - Detect old format automatically
+# - Create a backup of the old registry
+# - Convert to new format with proper tracking
+# - Preserve all existing service information
+```
+
 ### PM2 Services
 
 When using PM2 as the service provider:
 
-```bash
-# PM2-specific commands
-pm2 list                    # List all PM2 processes
-pm2 logs auth              # View logs
-pm2 monit                  # Real-time monitoring
-pm2 restart auth           # Restart service
-pm2 delete auth            # Remove service
+* [PM2 CLI Documentation](https://pm2.io/docs/runtime/reference/pm2-cli/)
 
-# Save PM2 configuration
-pm2 save
-pm2 startup                # Auto-start on boot
-```
+**Automatic PM2 Persistence**: The service manager automatically configures PM2 for persistence across reboots by:
+- Running `pm2 startup` to set up the startup script
+- Running `pm2 save` after each service creation/modification
+- This ensures your services automatically start when the system reboots
 
 NOTE: pm2 cannot run tmux/screen sessions, but you can always use the `attach` command to connect to the service console because pm2 supports interactive mode.
 
 ### Environment Variables
 
 The startup scripts recognize several environment variables for configuration and runtime behavior:
+
+#### Configuration Directory Variables
+
+- **`AC_SERVICE_CONFIG_DIR`**: Override the default configuration directory for services registry and configurations
+  - Default: `${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services`
+  - Used for storing service registry and run-engine configurations
 
 #### Service Detection Variables
 
@@ -549,6 +667,19 @@ Error: PM2 is not installed
 npm install -g pm2
 # or
 sudo npm install -g pm2
+```
+
+#### 7. Registry Out of Sync
+```bash
+# If the service registry shows services that don't actually exist
+```
+**Solution**: Use registry sync or restore
+```bash
+# Check and restore missing services (also cleans up orphaned entries)
+./service-manager.sh restore
+
+# If you have a very old registry format, migrate it
+./migrate-registry.sh
 ```
 
 

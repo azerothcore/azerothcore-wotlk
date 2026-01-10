@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,6 +25,7 @@
 #include "SharedDefines.h"
 #include "Timer.h"
 
+class Map;
 class Player;
 
 #define WEATHER_SEASONS 4
@@ -63,7 +64,7 @@ enum WeatherState : uint32
 class Weather
 {
 public:
-    Weather(uint32 zone, WeatherData const* weatherChances);
+    Weather(Map* map, uint32 zone, WeatherData const* weatherChances);
     ~Weather() = default;
 
     bool Update(uint32 diff);
@@ -71,6 +72,7 @@ public:
     bool UpdateWeather();
 
     void SendWeatherUpdateToPlayer(Player* player);
+    static void SendFineWeatherUpdateToPlayer(Player* player);
     void SetWeather(WeatherType type, float grade);
 
     /// For which zone is this weather?
@@ -79,6 +81,7 @@ public:
 
 private:
     [[nodiscard]] WeatherState GetWeatherState() const;
+    Map* m_map;
     uint32 m_zone;
     WeatherType m_type;
     float m_grade;

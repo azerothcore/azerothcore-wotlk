@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -45,12 +45,9 @@ enum EadricEvents
 
 enum PaletressSpells
 {
-    SPELL_SMITE_N                       = 66536,
-    SPELL_SMITE_H                       = 67674,
-    SPELL_HOLY_FIRE_N                   = 66538,
-    SPELL_HOLY_FIRE_H                   = 67676,
-    SPELL_RENEW_N                       = 66537,
-    SPELL_RENEW_H                       = 67675,
+    SPELL_SMITE                         = 66536,
+    SPELL_HOLY_FIRE                     = 66538,
+    SPELL_RENEW                         = 66537,
 
     SPELL_HOLY_NOVA                     = 66546,
     SPELL_SHIELD                        = 66515,
@@ -58,20 +55,10 @@ enum PaletressSpells
     SPELL_SUMMON_MEMORY                 = 66545,
 
     //Memory
-    SPELL_OLD_WOUNDS_N                  = 66620,
-    SPELL_OLD_WOUNDS_H                  = 67679,
-    SPELL_SHADOWS_PAST_N                = 66619,
-    SPELL_SHADOWS_PAST_H                = 67678,
-    SPELL_WAKING_NIGHTMARE_N            = 66552,
-    SPELL_WAKING_NIGHTMARE_H            = 67677,
+    SPELL_OLD_WOUNDS                    = 66620,
+    SPELL_SHADOWS_PAST                  = 66619,
+    SPELL_WAKING_NIGHTMARE              = 66552,
 };
-
-#define SPELL_SMITE                     DUNGEON_MODE(SPELL_SMITE_N, SPELL_SMITE_H)
-#define SPELL_HOLY_FIRE                 DUNGEON_MODE(SPELL_HOLY_FIRE_N, SPELL_HOLY_FIRE_H)
-#define SPELL_RENEW                     DUNGEON_MODE(SPELL_RENEW_N, SPELL_RENEW_H)
-#define SPELL_OLD_WOUNDS                DUNGEON_MODE(SPELL_OLD_WOUNDS_N, SPELL_OLD_WOUNDS_H)
-#define SPELL_SHADOWS_PAST              DUNGEON_MODE(SPELL_SHADOWS_PAST_N, SPELL_SHADOWS_PAST_H)
-#define SPELL_WAKING_NIGHTMARE          DUNGEON_MODE(SPELL_WAKING_NIGHTMARE_N, SPELL_WAKING_NIGHTMARE_H)
 
 enum PaletressEvents
 {
@@ -125,8 +112,8 @@ public:
         void JustEngagedWith(Unit*  /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16000);
-            events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25000);
+            events.ScheduleEvent(EVENT_SPELL_RADIANCE, 16s);
+            events.ScheduleEvent(EVENT_SPELL_HAMMER_RIGHTEOUS, 25s);
             Talk(SAY_EADRIC_AGGRO);
             me->CastSpell(me, SPELL_VENGEANCE, false);
             if (pInstance)
@@ -409,7 +396,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(20000);
+            me->DespawnOrUnsummon(20s);
             if (pInstance)
                 if (Creature* paletress = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_PALETRESS)))
                     paletress->AI()->DoAction(1);
@@ -477,28 +464,21 @@ enum ArgentSoldierSpells
     // monk
     SPELL_FLURRY_OF_BLOWS               = 67233,
     SPELL_PUMMEL                        = 67235,
-    SPELL_DIVINE_SHIELD_H               = 67251,
-    SPELL_FINAL_MEDITATION_H            = 67255,
+    SPELL_DIVINE_SHIELD               = 67251,
+    SPELL_FINAL_MEDITATION            = 67255,
 
     // priestess
-    SPELL_HOLY_SMITE_N                  = 36176,
-    SPELL_HOLY_SMITE_H                  = 67289,
+    SPELL_HOLY_SMITE                    = 36176,
     SPELL_FOUNTAIN_OF_LIGHT             = 67194,
     NPC_FOUNTAIN_OF_LIGHT               = 35311,
-    SPELL_SHADOW_WORD_PAIN_N            = 34941,
-    SPELL_SHADOW_WORD_PAIN_H            = 34942,
-    SPELL_MIND_CONTROL_H                = 67229,
+    SPELL_SHADOW_WORD_PAIN              = 34941,
+    SPELL_MIND_CONTROL                  = 67229,
 
     // lightwielder
-    SPELL_BLAZING_LIGHT_N               = 67247,
-    SPELL_BLAZING_LIGHT_H               = 67290,
+    SPELL_BLAZING_LIGHT                 = 67247,
     SPELL_CLEAVE                        = 15284,
-    SPELL_UNBALANCING_STRIKE_H          = 67237,
+    SPELL_UNBALANCING_STRIKE            = 67237,
 };
-
-#define SPELL_HOLY_SMITE                DUNGEON_MODE(SPELL_HOLY_SMITE_N, SPELL_HOLY_SMITE_H)
-#define SPELL_SHADOW_WORD_PAIN          DUNGEON_MODE(SPELL_SHADOW_WORD_PAIN_N, SPELL_SHADOW_WORD_PAIN_H)
-#define SPELL_BLAZING_LIGHT             DUNGEON_MODE(SPELL_BLAZING_LIGHT_N, SPELL_BLAZING_LIGHT_H)
 
 enum ArgentSoldierEvents
 {
@@ -507,10 +487,10 @@ enum ArgentSoldierEvents
     EVENT_PRIESTESS_SPELL_HOLY_SMITE,
     EVENT_PRIESTESS_SPELL_SHADOW_WORD_PAIN,
     EVENT_PRIESTESS_SPELL_FOUNTAIN_OF_LIGHT,
-    EVENT_PRIESTESS_SPELL_MIND_CONTROL_H,
+    EVENT_PRIESTESS_SPELL_MIND_CONTROL,
     EVENT_LIGHTWIELDER_SPELL_BLAZING_LIGHT,
     EVENT_LIGHTWIELDER_SPELL_CLEAVE,
-    EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE_H,
+    EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE,
 };
 
 class npc_argent_soldier : public CreatureScript
@@ -607,7 +587,8 @@ public:
                     break;
             }
 
-            Start(false, true);
+            me->SetWalk(false);
+            Start(false);
             uiWaypoint = uiType;
         }
 
@@ -618,8 +599,8 @@ public:
                 bCheck = false;
                 damage = me->GetHealth() - 1;
                 events.DelayEvents(10s);
-                me->CastSpell(me, SPELL_DIVINE_SHIELD_H, true);
-                me->CastSpell((Unit*)nullptr, SPELL_FINAL_MEDITATION_H, true);
+                me->CastSpell(me, SPELL_DIVINE_SHIELD, true);
+                me->CastSpell((Unit*)nullptr, SPELL_FINAL_MEDITATION, true);
             }
         }
 
@@ -638,13 +619,13 @@ public:
                     events.RescheduleEvent(EVENT_PRIESTESS_SPELL_SHADOW_WORD_PAIN, 3s, 6s);
                     events.RescheduleEvent(EVENT_PRIESTESS_SPELL_FOUNTAIN_OF_LIGHT, 8s, 15s);
                     if (IsHeroic())
-                        events.RescheduleEvent(EVENT_PRIESTESS_SPELL_MIND_CONTROL_H, 12s);
+                        events.RescheduleEvent(EVENT_PRIESTESS_SPELL_MIND_CONTROL, 12s);
                     break;
                 case NPC_ARGENT_LIGHTWIELDER:
                     events.RescheduleEvent(EVENT_LIGHTWIELDER_SPELL_BLAZING_LIGHT, 12s, 15s);
                     events.RescheduleEvent(EVENT_LIGHTWIELDER_SPELL_CLEAVE, 3s, 5s);
                     if (IsHeroic())
-                        events.RescheduleEvent(EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE_H, 8s, 12s);
+                        events.RescheduleEvent(EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE, 8s, 12s);
                     break;
             }
         }
@@ -690,9 +671,9 @@ public:
                     me->CastSpell((Unit*)nullptr, SPELL_FOUNTAIN_OF_LIGHT, false);
                     events.Repeat(35s, 45s);
                     break;
-                case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
+                case EVENT_PRIESTESS_SPELL_MIND_CONTROL:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
-                        me->CastSpell(target, SPELL_MIND_CONTROL_H, false);
+                        me->CastSpell(target, SPELL_MIND_CONTROL, false);
                     events.Repeat(22s, 30s);
                     break;
 
@@ -710,9 +691,9 @@ public:
                         me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
                     events.Repeat(6s, 8s);
                     break;
-                case EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE_H:
+                case EVENT_LIGHTWIELDER_SPELL_UNBALANCING_STRIKE:
                     if (me->GetVictim())
-                        me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE_H, false);
+                        me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
                     events.Repeat(12s, 15s);
                     break;
             }
@@ -722,7 +703,7 @@ public:
 
         void JustDied(Unit* /*pKiller*/) override
         {
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
             if (pInstance)
                 pInstance->SetData(DATA_ARGENT_SOLDIER_DEFEATED, 0);
         }

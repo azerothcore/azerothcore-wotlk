@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -78,6 +78,7 @@ enum ServerConfigs
     CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
+    CONFIG_CREATURE_REPOSITION_AGAINST_NPCS,
     CONFIG_VMAP_INDOOR_CHECK,
     CONFIG_PET_LOS,
     CONFIG_START_CUSTOM_SPELLS,
@@ -93,6 +94,7 @@ enum ServerConfigs
     CONFIG_ALLOW_TICKETS,
     CONFIG_DELETE_CHARACTER_TICKET_TRACE,
     CONFIG_LFG_CAST_DESERTER,
+    CONFIG_LFG_ALLOW_COMPLETED,
     CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES,
     CONFIG_PRESERVE_CUSTOM_CHANNELS,
     CONFIG_PDUMP_NO_PATHS,
@@ -129,6 +131,7 @@ enum ServerConfigs
     CONFIG_ALLOW_JOIN_BG_AND_LFG,
     CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS,
     CONFIG_LEAVE_GROUP_ON_LOGOUT,
+    CONFIG_RANDOM_ROLL_MAXIMUM,
     CONFIG_QUEST_POI_ENABLED,
     CONFIG_VMAP_BLIZZLIKE_PVP_LOS,
     CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD,
@@ -140,6 +143,7 @@ enum ServerConfigs
     CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH,
     CONFIG_MUNCHING_BLIZZLIKE,
     CONFIG_ENABLE_DAZE,
+    CONFIG_ENABLE_INFINITEAMMO,
     CONFIG_SPELL_QUEUE_ENABLED,
     CONFIG_GROUP_XP_DISTANCE,
     CONFIG_MAX_RECRUIT_A_FRIEND_DISTANCE,
@@ -368,6 +372,7 @@ enum ServerConfigs
     CONFIG_NPC_EVADE_IF_NOT_REACHABLE,
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
+    CONFIG_OUTDOOR_PVP_CAPTURE_RATE,
     CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
     CONFIG_LFG_MAX_KICK_COUNT,
     CONFIG_LFG_KICK_PREVENTION_TIMER,
@@ -377,6 +382,9 @@ enum ServerConfigs
     CONFIG_AUCTIONHOUSE_WORKERTHREADS,
     CONFIG_SPELL_QUEUE_WINDOW,
     CONFIG_SUNSREACH_COUNTER_MAX,
+    CONFIG_SCOURGEINVASION_COUNTER_FIRST,
+    CONFIG_SCOURGEINVASION_COUNTER_SECOND,
+    CONFIG_SCOURGEINVASION_COUNTER_THIRD,
     CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT,
     CONFIG_RESPAWN_DYNAMICMINIMUM_CREATURE,
     RATE_HEALTH,
@@ -431,6 +439,9 @@ enum ServerConfigs
     RATE_XP_PET_NEXT_LEVEL,
     RATE_REPAIRCOST,
     RATE_REPUTATION_GAIN,
+    RATE_REPUTATION_GAIN_AB,
+    RATE_REPUTATION_GAIN_AV,
+    RATE_REPUTATION_GAIN_WSG,
     RATE_REPUTATION_LOWLEVEL_KILL,
     RATE_REPUTATION_LOWLEVEL_QUEST,
     RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS,

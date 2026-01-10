@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -30,12 +30,10 @@
 enum Spells
 {
     // Razorscale
-    SPELL_FLAMEBUFFET_10                    = 64016,
-    SPELL_FLAMEBUFFET_25                    = 64023,
+    SPELL_FLAMEBUFFET                       = 64016,
     SPELL_FIREBALL                          = 63815,
     SPELL_WINGBUFFET                        = 62666,
-    SPELL_FLAMEBREATH_10                    = 63317,
-    SPELL_FLAMEBREATH_25                    = 64021,
+    SPELL_FLAMEBREATH                       = 63317,
     SPELL_FUSEARMOR                         = 64771,
     SPELL_FUSED_ARMOR                       = 64774, // Applied on 5th stack of SPELL_FUSEARMOR
     SPELL_DEVOURINGFLAME                    = 63236,
@@ -50,25 +48,17 @@ enum Spells
 
     // Dark Rune Sentinel
     SPELL_WHIRLWIND                         = 63808,
-    SPELL_BATTLE_SHOUT_10                   = 46763,
-    SPELL_BATTLE_SHOUT_25                   = 64062,
+    SPELL_BATTLE_SHOUT                      = 46763,
 
     // Dark Rune Guardian
     SPELL_STORMSTRIKE_DMG                   = 65971,
     SPELL_STORMSTRIKE_DEBUFF                = 64757,
 
     // Dark Rune Watcher
-    SPELL_LIGHTINGBOLT_10                   = 63809,
-    SPELL_LIGHTINGBOLT_25                   = 64696,
-    SPELL_CHAINLIGHTNING_10                 = 64758,
-    SPELL_CHAINLIGHTNING_25                 = 64759,
+    SPELL_LIGHTINGBOLT                      = 63809,
+    SPELL_CHAINLIGHTNING                    = 64758,
 };
 
-#define SPELL_FLAMEBUFFET                   RAID_MODE(SPELL_FLAMEBUFFET_10, SPELL_FLAMEBUFFET_25)
-#define SPELL_FLAMEBREATH                   RAID_MODE(SPELL_FLAMEBREATH_10, SPELL_FLAMEBREATH_25)
-#define SPELL_BATTLE_SHOUT                  RAID_MODE(SPELL_BATTLE_SHOUT_10, SPELL_BATTLE_SHOUT_25)
-#define SPELL_LIGHTINGBOLT                  RAID_MODE(SPELL_LIGHTINGBOLT_10, SPELL_LIGHTINGBOLT_25)
-#define SPELL_CHAINLIGHTNING                RAID_MODE(SPELL_CHAINLIGHTNING_10, SPELL_CHAINLIGHTNING_25)
 #define REQ_CHAIN_COUNT                     RAID_MODE(2, 4)
 
 enum NPCs
@@ -354,17 +344,7 @@ public:
             {
                 me->StopMoving();
                 startPath = false;
-                if (WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetWaypointPath()))
-                {
-                    Movement::PointsArray pathPoints;
-                    pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                    for (uint8 i = 0; i < i_path->size(); ++i)
-                    {
-                        WaypointData const* node = i_path->at(i);
-                        pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
-                    }
-                    me->GetMotionMaster()->MoveSplinePath(&pathPoints);
-                }
+                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
             }
 
             if (!UpdateVictim())
@@ -683,7 +663,7 @@ public:
                 {
                     razorscale->AI()->AttackStart(player);
                     razorscale->GetMotionMaster()->MoveIdle();
-                    razorscale->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_INIT, 588.0f, -178.0f, 490.0f, false, false);
+                    razorscale->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_INIT, 588.0f, -178.0f, 490.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, false);
                 }
             }
         }

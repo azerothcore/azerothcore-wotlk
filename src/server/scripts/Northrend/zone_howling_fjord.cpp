@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,6 +22,7 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 
 class npc_attracted_reef_bull : public CreatureScript
 {
@@ -43,9 +44,9 @@ public:
             if (Creature* cow = me->FindNearestCreature(24797, 5.0f, true))
             {
                 me->CastSpell(me, 44460, true);
-                me->DespawnOrUnsummon(10000);
+                me->DespawnOrUnsummon(10s);
                 cow->CastSpell(cow, 44460, true);
-                cow->DespawnOrUnsummon(10000);
+                cow->DespawnOrUnsummon(10s);
                 if (me->IsSummon())
                     if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                         owner->CastSpell(owner, 44463, true);
@@ -62,109 +63,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_attracted_reef_bullAI(creature);
-    }
-};
-
-// The cleansing
-enum TurmoilTexts
-{
-    SAY_TURMOIL_0                = 0,
-    SAY_TURMOIL_1                = 1,
-    SAY_TURMOIL_HALF_HP          = 2,
-    SAY_TURMOIL_DEATH            = 3,
-};
-
-class npc_your_inner_turmoil : public CreatureScript
-{
-public:
-    npc_your_inner_turmoil() : CreatureScript("npc_your_inner_turmoil") { }
-
-    struct npc_your_inner_turmoilAI : public ScriptedAI
-    {
-        npc_your_inner_turmoilAI(Creature* creature) : ScriptedAI(creature) {}
-
-        uint32 timer;
-        short phase;
-        bool health50;
-
-        void Reset() override
-        {
-            timer = 0;
-            phase = 0;
-            health50 = false;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (timer >= 6000 && phase < 2)
-            {
-                phase++;
-                setphase(phase);
-                timer = 0;
-            }
-
-            timer += diff;
-
-            DoMeleeAttackIfReady();
-        }
-
-        void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType  /*damagetype*/, SpellSchoolMask  /*damageSchoolMask*/) override
-        {
-            if (HealthBelowPct(50) && !health50)
-            {
-                if (TempSummon const* tempSummon = me->ToTempSummon())
-                {
-                    if (WorldObject* summoner = tempSummon->GetSummonerUnit())
-                    {
-                        Talk(SAY_TURMOIL_HALF_HP, summoner);
-                    }
-                }
-
-                health50 = true;
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (TempSummon const* tempSummon = me->ToTempSummon())
-            {
-                if (WorldObject* summoner = tempSummon->GetSummonerUnit())
-                {
-                    Talk(SAY_TURMOIL_DEATH, summoner);
-                }
-            }
-        }
-
-        void setphase(short newPhase)
-        {
-            Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
-            if (!summoner || !summoner->IsPlayer())
-                return;
-
-            switch (newPhase)
-            {
-                case 1:
-                    Talk(SAY_TURMOIL_0, summoner->ToPlayer());
-                    return;
-                case 2:
-                {
-                    Talk(SAY_TURMOIL_1, summoner->ToPlayer());
-                    me->SetLevel(summoner->GetLevel());
-                    me->SetFaction(FACTION_MONSTER);
-                    if (me->GetExactDist(summoner) < 50.0f)
-                    {
-                        me->UpdatePosition(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ(), 0.0f, true);
-                        summoner->CastSpell(me, 50218, true); // clone caster
-                        AttackStart(summoner);
-                    }
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_your_inner_turmoilAI(creature);
     }
 };
 
@@ -190,7 +88,8 @@ public:
         if (quest->GetQuestId() == QUEST_TRAIL_OF_FIRE)
         {
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(true);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -237,7 +136,7 @@ public:
             {
                 case 1:
                     me->SetReactState(REACT_AGGRESSIVE);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
                 case 23:
                     player->GroupEventHappens(QUEST_TRAIL_OF_FIRE, me);
@@ -246,32 +145,32 @@ public:
                 case 5:
                     if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
                         Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 6:
                     if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
                         Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
                 case 8:
                     if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
                         Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 9:
                     if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
                         Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
                     break;
                 case 10:
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
                 case 13:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 14:
                     if (Unit* Trigger = me->FindNearestCreature(NPC_HANES_FIRE_TRIGGER, 10.0f))
                         Trigger->CastSpell(Trigger, SPELL_COSMETIC_LOW_POLY_FIRE, false);
-                    SetRun(true);
+                    me->SetWalk(false);
                     break;
             }
         }
@@ -308,7 +207,7 @@ public:
                 return;
 
             me->SetWalk(true);
-            Start(false, false, summonerGUID);
+            Start(false, summonerGUID);
         }
 
         void WaypointReached(uint32 waypointId) override
@@ -393,11 +292,207 @@ public:
     }
 };
 
+enum RodinLightningSpells
+{
+    SPELL_RODIN_LIGHTNING_START = 44787,
+    SPELL_RODIN_LIGHTNING_END   = 44791,
+
+    NPC_RODIN                   = 24876
+};
+
+struct npc_rodin_lightning_enabler : public ScriptedAI
+{
+    npc_rodin_lightning_enabler(Creature* creature) : ScriptedAI(creature) {}
+
+    void Reset() override
+    {
+        _scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (Creature* rodin = me->FindNearestCreature(NPC_RODIN, 10.0f))
+                DoCast(rodin, urand(SPELL_RODIN_LIGHTNING_START, SPELL_RODIN_LIGHTNING_END));
+
+            context.Repeat(2s, 8s);
+        });
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        _scheduler.Update();
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
+enum HawkHunting
+{
+    SPELL_HAWK_HUNTING_ITEM = 44408
+};
+
+// 44407 - Spell hawk Hunting
+class spell_hawk_hunting : public SpellScript
+{
+    PrepareSpellScript(spell_hawk_hunting);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HAWK_HUNTING_ITEM });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster())
+            return;
+
+        GetCaster()->CastSpell(GetCaster(), SPELL_HAWK_HUNTING_ITEM, true);
+        GetHitUnit()->ToCreature()->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_hawk_hunting::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+/*######
+## Quest 11317, 11322: The Cleansing
+######*/
+
+enum TheCleansing
+{
+    SPELL_CLEANSING_SOUL            = 43351,
+    SPELL_SUMMON_INNER_TURMOIL      = 50167,
+    SPELL_RECENT_MEDITATION         = 61720,
+    SPELL_MIRROR_IMAGE_AURA         = 50218,
+
+    QUEST_THE_CLEANSING_H           = 11317,
+    QUEST_THE_CLEANSING_A           = 11322
+};
+
+// 43365 - The Cleansing: Shrine Cast
+class spell_the_cleansing_shrine_cast : public SpellScript
+{
+    PrepareSpellScript(spell_the_cleansing_shrine_cast);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_RECENT_MEDITATION, SPELL_CLEANSING_SOUL }) &&
+            sObjectMgr->GetQuestTemplate(QUEST_THE_CLEANSING_H) &&
+            sObjectMgr->GetQuestTemplate(QUEST_THE_CLEANSING_A);
+    }
+
+    SpellCastResult CheckCast()
+    {
+        // Error is correct for quest check but may be not correct for aura and this may be a wrong place to send error
+        if (Player* target = GetExplTargetUnit()->ToPlayer())
+        {
+            if (target->HasAura(SPELL_RECENT_MEDITATION) || (!(target->GetQuestStatus(QUEST_THE_CLEANSING_H) == QUEST_STATUS_INCOMPLETE ||
+                target->GetQuestStatus(QUEST_THE_CLEANSING_A) == QUEST_STATUS_INCOMPLETE)))
+            {
+                Spell::SendCastResult(target, GetSpellInfo(), 0, SPELL_FAILED_FIZZLE);
+                return SPELL_FAILED_FIZZLE;
+            }
+        }
+        return SPELL_CAST_OK;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_CLEANSING_SOUL, true);
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_the_cleansing_shrine_cast::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_the_cleansing_shrine_cast::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 43351 - Cleansing Soul
+class spell_the_cleansing_cleansing_soul : public AuraScript
+{
+    PrepareAuraScript(spell_the_cleansing_cleansing_soul);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_INNER_TURMOIL, SPELL_RECENT_MEDITATION });
+    }
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->SetStandState(UNIT_STAND_STATE_SIT);
+    }
+
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        target->SetStandState(UNIT_STAND_STATE_STAND);
+        target->CastSpell(target, SPELL_SUMMON_INNER_TURMOIL, true);
+        target->CastSpell(target, SPELL_RECENT_MEDITATION, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_the_cleansing_cleansing_soul::AfterApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_cleansing_cleansing_soul::AfterRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 50217 - The Cleansing: Script Effect Player Cast Mirror Image
+class spell_the_cleansing_mirror_image_script_effect : public SpellScript
+{
+    PrepareSpellScript(spell_the_cleansing_mirror_image_script_effect);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MIRROR_IMAGE_AURA });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_MIRROR_IMAGE_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_cleansing_mirror_image_script_effect::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 50238 - The Cleansing: Your Inner Turmoil's On Death Cast on Master
+class spell_the_cleansing_on_death_cast_on_master : public SpellScript
+{
+    PrepareSpellScript(spell_the_cleansing_on_death_cast_on_master);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (TempSummon* casterSummon = caster->ToTempSummon())
+                if (Unit* summoner = casterSummon->GetSummonerUnit())
+                    summoner->CastSpell(summoner, GetSpellInfo()->Effects[EFFECT_0].CalcValue(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_the_cleansing_on_death_cast_on_master::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_howling_fjord()
 {
     new npc_attracted_reef_bull();
-    new npc_your_inner_turmoil();
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();
+    RegisterCreatureAI(npc_rodin_lightning_enabler);
+    RegisterSpellScript(spell_hawk_hunting);
+    RegisterSpellScript(spell_the_cleansing_shrine_cast);
+    RegisterSpellScript(spell_the_cleansing_cleansing_soul);
+    RegisterSpellScript(spell_the_cleansing_mirror_image_script_effect);
+    RegisterSpellScript(spell_the_cleansing_on_death_cast_on_master);
 }

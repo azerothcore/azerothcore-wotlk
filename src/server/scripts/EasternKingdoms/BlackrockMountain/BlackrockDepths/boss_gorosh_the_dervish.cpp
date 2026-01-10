@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,12 +26,9 @@ enum Spells
     SPELL_BLOODLUST    = 21049
 };
 
-enum Timers
-{
-    TIMER_WHIRLWIND = 12000,
-    TIMER_MORTAL    = 22000,
-    TIMER_BLOODLUST = 30000
-};
+constexpr Milliseconds TIMER_WHIRLWIND = 12s;
+constexpr Milliseconds TIMER_MORTAL = 22s;
+constexpr Milliseconds TIMER_BLOODLUST = 30s;
 
 class boss_gorosh_the_dervish : public CreatureScript
 {
@@ -47,14 +44,14 @@ public:
     {
         boss_gorosh_the_dervishAI(Creature* creature) : BossAI(creature, DATA_GOROSH) { }
 
-        uint32 nextWhirlwindTime;
+        Milliseconds nextWhirlwindTime;
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             _JustEngagedWith();
-            events.ScheduleEvent(SPELL_WHIRLWIND, 0.2 * (int) TIMER_WHIRLWIND);
-            events.ScheduleEvent(SPELL_MORTALSTRIKE, 0.2 * (int) TIMER_MORTAL);
-            events.ScheduleEvent(SPELL_BLOODLUST, 0.2 * (int) TIMER_BLOODLUST);
+            events.ScheduleEvent(SPELL_WHIRLWIND, TIMER_WHIRLWIND / 5);
+            events.ScheduleEvent(SPELL_MORTALSTRIKE, TIMER_MORTAL / 5);
+            events.ScheduleEvent(SPELL_BLOODLUST, TIMER_BLOODLUST / 5);
         }
 
         void UpdateAI(uint32 diff) override
@@ -78,22 +75,22 @@ public:
                     if (me->GetDistance2d(me->GetVictim()) < 10.0f)
                     {
                         DoCastVictim(SPELL_WHIRLWIND);
-                        nextWhirlwindTime = urand(TIMER_WHIRLWIND - 2000, TIMER_WHIRLWIND + 2000);
+                        nextWhirlwindTime = randtime(TIMER_WHIRLWIND - 2s, TIMER_WHIRLWIND + 2s);
                     }
                     else
                     {
                         // reschedule sooner
-                        nextWhirlwindTime = 0.3 * urand(TIMER_WHIRLWIND - 2000, TIMER_WHIRLWIND + 2000);
+                        nextWhirlwindTime = randtime(TIMER_WHIRLWIND - 2s, TIMER_WHIRLWIND + 2s) / 3;
                     }
                     events.ScheduleEvent(SPELL_WHIRLWIND, nextWhirlwindTime);
                     break;
                 case SPELL_MORTALSTRIKE:
                     DoCastVictim(SPELL_MORTALSTRIKE);
-                    events.ScheduleEvent(SPELL_MORTALSTRIKE, urand(TIMER_MORTAL - 2000, TIMER_MORTAL + 2000));
+                    events.ScheduleEvent(SPELL_MORTALSTRIKE, TIMER_MORTAL - 2s, TIMER_MORTAL + 2s);
                     break;
                 case SPELL_BLOODLUST:
                     DoCastSelf(SPELL_BLOODLUST);
-                    events.ScheduleEvent(SPELL_BLOODLUST, urand(TIMER_BLOODLUST - 2000, TIMER_BLOODLUST + 2000));
+                    events.ScheduleEvent(SPELL_BLOODLUST, TIMER_BLOODLUST - 2s, TIMER_BLOODLUST + 2s);
                     break;
                 default:
                     break;

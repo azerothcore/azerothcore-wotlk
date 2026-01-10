@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -231,19 +231,9 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 if (!creaturePet->CanCreatureAttack(TargetUnit))
                                     return;
 
-                        // Not let attack through obstructions
-                        bool checkLos = !sDisableMgr->IsPathfindingEnabled(pet->GetMap()) ||
-                                        (TargetUnit->IsCreature() && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
-
-                        if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
-                        {
-                            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
-                            data << uint8(0);
-                            data << uint32(7389);
-                            data << uint8(SPELL_FAILED_LINE_OF_SIGHT);
-                            SendPacket(&data);
+                        // Don't bother if pet is already attacking target
+                        if (pet->GetVictim() == TargetUnit && pet->GetCharmInfo()->IsCommandAttack())
                             return;
-                        }
 
                         pet->ClearUnitState(UNIT_STATE_FOLLOW);
                         // This is true if pet has no target or has target but targets differs.
@@ -262,8 +252,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 pet->ToCreature()->AI()->AttackStart(TargetUnit);
 
                                 //10% chance to play special pet attack talk, else growl
-                                if (pet->IsPet() && ((Pet*)pet)->getPetType() == SUMMON_PET && pet != TargetUnit && urand(0, 100) < 10)
-                                    pet->SendPetTalk((uint32)PET_TALK_ATTACK);
+                                if (pet->IsPet() && pet->ToPet()->getPetType() == SUMMON_PET && pet != TargetUnit && roll_chance_i(10))
+                                    pet->SendPetActionSound(PET_ACTION_ATTACK);
                                 else
                                 {
                                     // 90% chance for pet and 100% chance for charmed creature
@@ -297,8 +287,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             if (pet->ToPet()->getPetType() == HUNTER_PET)
                                 GetPlayer()->RemovePet(pet->ToPet(), PET_SAVE_AS_DELETED);
                             else
+                            {
+                                pet->SendPetDismissSound();
                                 //dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
                                 pet->setDeathState(DeathState::Corpse);
+                            }
                         }
                         else if (pet->HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLLABLE_GUARDIAN))
                         {
@@ -413,8 +406,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                     //10% chance to play special pet attack talk, else growl
                     //actually this only seems to happen on special spells, fire shield for imp, torment for voidwalker, but it's stupid to check every spell
-                    if (pet->IsPet() && (((Pet*)pet)->getPetType() == SUMMON_PET) && (pet != unit_target) && (urand(0, 100) < 10))
-                        pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
+                    if (pet->IsPet() && (pet->ToPet()->getPetType() == SUMMON_PET) && (pet != unit_target) && roll_chance_i(10))
+                        pet->SendPetActionSound(PET_ACTION_SPECIAL_SPELL);
                     else
                     {
                         pet->SendPetAIReaction(guid1);
@@ -425,8 +418,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         // This is true if pet has no target or has target but targets differs.
                         if (pet->GetVictim() != unit_target)
                         {
-                            if (pet->ToCreature()->IsAIEnabled)
-                                pet->ToCreature()->AI()->AttackStart(unit_target);
+                            pet->ToCreature()->AI()->AttackStart(unit_target);
                         }
                     }
 
@@ -509,8 +501,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                                 pet->ToCreature()->AI()->AttackStart(TargetUnit);
 
-                                if (pet->IsPet() && ((Pet*)pet)->getPetType() == SUMMON_PET && pet != TargetUnit && urand(0, 100) < 10)
-                                    pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
+                                if (pet->IsPet() && pet->ToPet()->getPetType() == SUMMON_PET && pet != TargetUnit && roll_chance_i(10))
+                                    pet->SendPetActionSound(PET_ACTION_SPECIAL_SPELL);
                                 else
                                     pet->SendPetAIReaction(guid1);
                             }
@@ -558,8 +550,8 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                             pet->GetMotionMaster()->MoveFollow(unit_target, PET_FOLLOW_DIST, rand_norm() * 2 * M_PI);
 
-                            if (pet->IsPet() && ((Pet*)pet)->getPetType() == SUMMON_PET && pet != unit_target && urand(0, 100) < 10)
-                                pet->SendPetTalk((uint32)PET_TALK_SPECIAL_SPELL);
+                            if (pet->IsPet() && pet->ToPet()->getPetType() == SUMMON_PET && pet != unit_target && roll_chance_i(10))
+                                pet->SendPetActionSound(PET_ACTION_SPECIAL_SPELL);
                             else
                             {
                                 pet->SendPetAIReaction(guid1);
@@ -1059,8 +1051,8 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
             {
                 // 10% chance to play special pet attack talk, else growl
                 // actually this only seems to happen on special spells, fire shield for imp, torment for voidwalker, but it's stupid to check every spell
-                if (pet->getPetType() == SUMMON_PET && (urand(0, 100) < 10))
-                    pet->SendPetTalk(PET_TALK_SPECIAL_SPELL);
+                if (pet->getPetType() == SUMMON_PET && roll_chance_i(10))
+                    pet->SendPetActionSound(PET_ACTION_SPECIAL_SPELL);
                 else
                     pet->SendPetAIReaction(guid);
             }

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -347,7 +347,7 @@ class spell_item_rocket_chicken : public AuraScript
     {
         if (roll_chance_i(5))
         {
-            GetTarget()->ToCreature()->DespawnOrUnsummon(8000);
+            GetTarget()->ToCreature()->DespawnOrUnsummon(8s);
             GetTarget()->Kill(GetTarget(), GetTarget());
         }
         else if (roll_chance_i(50))
@@ -468,7 +468,7 @@ class spell_item_toxic_wasteling : public SpellScript
             GetCaster()->GetMotionMaster()->MoveIdle();
             GetCaster()->ToCreature()->SetHomePosition(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f);
             GetCaster()->GetMotionMaster()->MoveJump(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 12.0f, 3.0f, 1);
-            target->DespawnOrUnsummon(1500);
+            target->DespawnOrUnsummon(1500ms);
         }
     }
 
@@ -505,7 +505,7 @@ class spell_item_lil_xt : public SpellScript
             return;
         if (GetCaster()->IsCreature() && GetCaster()->ToCreature()->AI())
             GetCaster()->ToCreature()->AI()->Talk(2);
-        target->DespawnOrUnsummon(500);
+        target->DespawnOrUnsummon(500ms);
     }
 
     void Register() override
@@ -1083,7 +1083,7 @@ class spell_item_enchanted_broom_periodic : public AuraScript
         {
             if (owner->isMoving())
             {
-                GetTarget()->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, GetTarget()->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+                GetTarget()->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, MINI_PET_FOLLOW_ANGLE, MOTION_SLOT_ACTIVE);
             }
             else
             {
@@ -1206,27 +1206,38 @@ class spell_item_direbrew_remote_aura : public AuraScript
     }
 };
 
-enum EyeOfGruul
+enum HealingTrance
 {
-    SPELL_DRUID_ITEM_HEALING_TRANCE   = 37721,
-    SPELL_PALADIN_ITEM_HEALING_TRANCE = 37723,
-    SPELL_PRIEST_ITEM_HEALING_TRANCE  = 37706,
-    SPELL_SHAMAN_ITEM_HEALING_TRANCE  = 37722
+    SPELL_HEALING_DISCOUNT                      = 37705,
+    SPELL_SOUL_PRESERVER                        = 60510,
+    SPELL_PRIEST_EYE_OF_GRUUL_HEALING_TRANCE    = 37706,
+    SPELL_DRUID_EYE_OF_GRUUL_HEALING_TRANCE     = 37721,
+    SPELL_SHAMAN_EYE_OF_GRUUL_HEALING_TRANCE    = 37722,
+    SPELL_PALADIN_EYE_OF_GRUUL_HEALING_TRANCE   = 37723,
+    SPELL_DRUID_SOUL_PRESERVER_HEALING_TRANCE   = 60512,
+    SPELL_PALADIN_SOUL_PRESERVER_HEALING_TRANCE = 60513,
+    SPELL_PRIEST_SOUL_PRESERVER_HEALING_TRANCE  = 60514,
+    SPELL_SHAMAN_SOUL_PRESERVER_HEALING_TRANCE  = 60515,
 };
 
 // 37705 - Healing Discount
-class spell_item_eye_of_gruul_healing_discount : public AuraScript
+// 60510 - Soul Preserver
+class spell_item_healing_trance : public AuraScript
 {
-    PrepareAuraScript(spell_item_eye_of_gruul_healing_discount);
+    PrepareAuraScript(spell_item_healing_trance);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
-                SPELL_DRUID_ITEM_HEALING_TRANCE,
-                SPELL_PALADIN_ITEM_HEALING_TRANCE,
-                SPELL_PRIEST_ITEM_HEALING_TRANCE,
-                SPELL_SHAMAN_ITEM_HEALING_TRANCE
+                SPELL_PRIEST_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_DRUID_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_SHAMAN_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_PALADIN_EYE_OF_GRUUL_HEALING_TRANCE,
+                SPELL_DRUID_SOUL_PRESERVER_HEALING_TRANCE,
+                SPELL_PALADIN_SOUL_PRESERVER_HEALING_TRANCE,
+                SPELL_PRIEST_SOUL_PRESERVER_HEALING_TRANCE,
+                SPELL_SHAMAN_SOUL_PRESERVER_HEALING_TRANCE,
             });
     }
 
@@ -1235,32 +1246,57 @@ class spell_item_eye_of_gruul_healing_discount : public AuraScript
         PreventDefaultAction();
         if (Unit* unitTarget = GetTarget())
         {
-            uint32 spell_id = 0;
-            switch (unitTarget->getClass())
+            uint32 const itemSpell = GetSpellInfo()->Id;
+            uint32 spellId = 0;
+
+            if (itemSpell == SPELL_HEALING_DISCOUNT)
             {
+                switch (unitTarget->getClass())
+                {
                 case CLASS_DRUID:
-                    spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_DRUID_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 case CLASS_PALADIN:
-                    spell_id = SPELL_PALADIN_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_PALADIN_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 case CLASS_PRIEST:
-                    spell_id = SPELL_PRIEST_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_PRIEST_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 case CLASS_SHAMAN:
-                    spell_id = SPELL_SHAMAN_ITEM_HEALING_TRANCE;
+                    spellId = SPELL_SHAMAN_EYE_OF_GRUUL_HEALING_TRANCE;
                     break;
                 default:
                     return; // ignore for non-healing classes
+                }
+            }
+            else if (itemSpell == SPELL_SOUL_PRESERVER)
+            {
+                switch (unitTarget->getClass())
+                {
+                case CLASS_DRUID:
+                    spellId = SPELL_DRUID_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                case CLASS_PALADIN:
+                    spellId = SPELL_PALADIN_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                case CLASS_PRIEST:
+                    spellId = SPELL_PRIEST_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                case CLASS_SHAMAN:
+                    spellId = SPELL_SHAMAN_SOUL_PRESERVER_HEALING_TRANCE;
+                    break;
+                default:
+                    return; // ignore for non-healing classes
+                }
             }
 
-            unitTarget->CastSpell(unitTarget, spell_id, true, nullptr, aurEff);
+            unitTarget->CastSpell(unitTarget, spellId, true, nullptr, aurEff);
         }
     }
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_item_eye_of_gruul_healing_discount::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectProc += AuraEffectProcFn(spell_item_healing_trance::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1467,16 +1503,20 @@ class spell_item_blessing_of_ancient_kings : public AuraScript
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
         if (!healInfo)
-        {
             return;
-        }
 
         int32 absorb = int32(CalculatePct(healInfo->GetHeal(), 15.0f));
         // xinef: all heals contribute to one bubble
         if (AuraEffect* protEff = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PROTECTION_OF_ANCIENT_KINGS, 0/*, eventInfo.GetActor()->GetGUID()*/))
         {
-            // The shield can grow to a maximum size of 20,000 damage absorbtion
-            protEff->SetAmount(std::min<int32>(protEff->GetAmount() + absorb, 20000));
+            // The shield is supposed to cap out at 20,000 absorption...
+            absorb += protEff->GetAmount();
+
+            // ...but Blizz wrote this instead. See #23152 for details
+            if (absorb > 20000)
+                absorb = 200000;
+
+            protEff->SetAmount(absorb);
 
             // Refresh and return to prevent replacing the aura
             protEff->GetBase()->RefreshDuration();
@@ -1629,7 +1669,7 @@ public:
             _player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_DANCESPECIAL, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
         }
 
-        _player->m_Events.AddEvent(this, RAND(_player->m_Events.CalculateTime(5000), _player->m_Events.CalculateTime(10000), _player->m_Events.CalculateTime(15000)));
+        _player->m_Events.AddEventAtOffset(this, RAND(5s, 10s, 15s));
 
         return false; // do not delete re-added event in EventProcessor::Update
     }
@@ -1650,7 +1690,7 @@ class spell_item_party_time : public AuraScript
             return;
         }
 
-        player->m_Events.AddEvent(new PartyTimeEmoteEvent(player), RAND(player->m_Events.CalculateTime(5000), player->m_Events.CalculateTime(10000), player->m_Events.CalculateTime(15000)));
+        player->m_Events.AddEventAtOffset(new PartyTimeEmoteEvent(player), RAND(5s, 10s, 15s));
     }
 
     void Register() override
@@ -3147,6 +3187,7 @@ enum BrewfestMountTransformation
     SPELL_MOUNT_KODO_60                         = 49378,
     SPELL_BREWFEST_MOUNT_TRANSFORM              = 49357,
     SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE      = 52845,
+    SPELL_FRESH_DWARVEN_HOPS                    = 66050,
 };
 
 class spell_item_brewfest_mount_transformation : public SpellScript
@@ -3169,25 +3210,26 @@ class spell_item_brewfest_mount_transformation : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
 
         if (!caster)
-        {
             return;
-        }
 
         if (caster->HasMountedAura())
         {
+            float speed = caster->GetSpeedRate(MOVE_RUN);
+
             caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
+
             uint32 spell_id;
 
             switch (GetSpellInfo()->Id)
             {
             case SPELL_BREWFEST_MOUNT_TRANSFORM:
-                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                if (speed >= 2.0f)
                     spell_id = caster->GetTeamId() == TEAM_ALLIANCE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                 else
                     spell_id = caster->GetTeamId() == TEAM_ALLIANCE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
                 break;
             case SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE:
-                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                if (speed >= 2.0f)
                     spell_id = caster->GetTeamId() == TEAM_HORDE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                 else
                     spell_id = caster->GetTeamId() == TEAM_HORDE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
@@ -3203,6 +3245,48 @@ class spell_item_brewfest_mount_transformation : public SpellScript
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_brewfest_mount_transformation::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
+};
+
+class spell_item_brewfest_hops : public AuraScript
+{
+    PrepareAuraScript(spell_item_brewfest_hops);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_BREWFEST_MOUNT_TRANSFORM,
+                SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE,
+            });
+    }
+
+    bool Load() override
+    {
+        _spell_id = GetSpellInfo()->Id == SPELL_FRESH_DWARVEN_HOPS ? SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE : SPELL_BREWFEST_MOUNT_TRANSFORM;
+        return true;
+    }
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = 3 * IN_MILLISECONDS;
+    }
+
+    void Update(AuraEffect* /*effect*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->HasAnyAuras(SPELL_MOUNT_RAM_100, SPELL_MOUNT_RAM_60, SPELL_MOUNT_KODO_100, SPELL_MOUNT_KODO_60))
+            return;
+        caster->CastSpell(caster, _spell_id, true);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_item_brewfest_hops::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_item_brewfest_hops::Update, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+private:
+    uint32 _spell_id;
 };
 
 enum NitroBoots
@@ -4248,7 +4332,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_summon_or_dismiss);
     RegisterSpellScript(spell_item_draenic_pale_ale);
     RegisterSpellAndAuraScriptPair(spell_item_direbrew_remote, spell_item_direbrew_remote_aura);
-    RegisterSpellScript(spell_item_eye_of_gruul_healing_discount);
+    RegisterSpellScript(spell_item_healing_trance);
     RegisterSpellScript(spell_item_summon_argent_knight);
     RegisterSpellScript(spell_item_instant_statue);
     // 23074 Arcanite Dragonling
@@ -4338,4 +4422,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_spell_reflectors);
     RegisterSpellScript(spell_item_multiphase_goggles);
     RegisterSpellScript(spell_item_bloodsail_admiral_hat);
+    RegisterSpellScript(spell_item_brewfest_hops);
 }
