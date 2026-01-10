@@ -55,6 +55,8 @@ public:
                          float pModifyDist) const;
 
     [[nodiscard]] float getHeight(float x, float y, float z, float maxSearchDist, uint32 phasemask) const;
+    [[nodiscard]] float getHeightAccurate(float x, float y, float z, float maxSearchDist, uint32 phasemask,
+                            float radius, float yaw, float blend, float clamp, float sampleDelta) const;
 
     void insert(const GameObjectModel&);
     void remove(const GameObjectModel&);
