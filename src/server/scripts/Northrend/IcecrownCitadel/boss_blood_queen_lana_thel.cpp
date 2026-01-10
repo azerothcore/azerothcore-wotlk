@@ -71,6 +71,7 @@ enum Spells
     SPELL_INCITE_TERROR                     = 73070,
     SPELL_BLOODBOLT_WHIRL                   = 71772,
     SPELL_ANNIHILATE                        = 71322,
+    SPELL_CLEAR_ALL_STATUS_AILMENTS         = 70939,
 };
 
 enum Shadowmourne
@@ -221,6 +222,7 @@ public:
             Talk(SAY_AGGRO);
             if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != DONE)
                 instance->SetBossState(DATA_BLOOD_QUEEN_LANA_THEL, IN_PROGRESS);
+            DoCastSelf(SPELL_CLEAR_ALL_STATUS_AILMENTS, true);
             _creditBloodQuickening = instance->GetData(DATA_BLOOD_QUICKENING_STATE) == IN_PROGRESS;
         }
 
