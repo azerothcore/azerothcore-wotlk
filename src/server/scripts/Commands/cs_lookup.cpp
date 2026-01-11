@@ -1646,7 +1646,8 @@ public:
     {
         if (!result)
         {
-            handler->SendErrorMessage(LANG_LOOKUP_NOT_VALID);
+            // Error handling should be done prior running LookupPlayerSearchCommand if not this will display an error here
+            handler->SendErrorMessage(LANG_LOOKUP_NOT_VALID, __func__ ,__LINE__);
             return false;
         }
     
