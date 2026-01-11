@@ -2167,17 +2167,17 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     if (owner)
         victimResistance += std::max((float(victim->GetLevel()) - float(owner->GetLevel())) * 5.0f, 0.0f);
 
-    static uint32 const BOSS_LEVEL = 83;
-    static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
     uint32 level = victim->GetLevel();
     float resistanceConstant = 0.0f;
 
-    if (level == BOSS_LEVEL)
-        resistanceConstant = BOSS_RESISTANCE_CONSTANT;
+    if (level > 60)
+        resistanceConstant = 150 + (level - 60) * (level - 67.5f);
+    else if (level > 20)
+        resistanceConstant = 50 + (level - 20) * 2.5f;
     else
-        resistanceConstant = level * 5.0f;
+        resistanceConstant = 50;
 
-    return victimResistance / (victimResistance + resistanceConstant);
+    return std::max(victimResistance / (victimResistance + resistanceConstant), 0.75f);
 }
 
 void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
