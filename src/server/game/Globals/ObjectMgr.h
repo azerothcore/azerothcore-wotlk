@@ -1145,6 +1145,18 @@ public:
 
     ExclusiveQuestGroups mExclusiveQuestGroups;
 
+    typedef std::unordered_map<uint32, std::vector<uint32>> BreadcrumbQuestMap;
+    BreadcrumbQuestMap _breadcrumbsForQuest;
+
+    [[nodiscard]] std::vector<uint32> const* GetBreadcrumbsForQuest(uint32 questId) const
+    {
+        auto itr = _breadcrumbsForQuest.find(questId);
+        if (itr != _breadcrumbsForQuest.end())
+            return &itr->second;
+
+        return nullptr;
+    }
+
     MailLevelReward const* GetMailLevelReward(uint32 level, uint32 raceMask)
     {
         MailLevelRewardContainer::const_iterator map_itr = _mailLevelRewardStore.find(level);

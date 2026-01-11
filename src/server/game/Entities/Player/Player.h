@@ -1446,6 +1446,7 @@ public:
     bool SatisfyQuestConditions(Quest const* qInfo, bool msg);
     bool SatisfyQuestTimed(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestExclusiveGroup(Quest const* qInfo, bool msg) const;
+    bool SatisfyQuestBreadcrumb(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestNextChain(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestPrevChain(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestDay(Quest const* qInfo, bool msg) const;
