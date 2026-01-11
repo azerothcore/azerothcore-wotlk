@@ -72,7 +72,7 @@ class AC_GAME_API WorldSocket final : public Socket<WorldSocket>
     typedef Socket<WorldSocket> BaseSocket;
 
 public:
-    WorldSocket(tcp::socket&& socket);
+    WorldSocket(IoContextTcpSocket&& socket);
     ~WorldSocket();
 
     WorldSocket(WorldSocket const& right) = delete;

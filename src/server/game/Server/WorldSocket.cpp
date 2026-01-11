@@ -116,7 +116,7 @@ void EncryptableAndCompressiblePacket::CompressIfNeeded()
     SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
 }
 
-WorldSocket::WorldSocket(tcp::socket&& socket)
+WorldSocket::WorldSocket(IoContextTcpSocket&& socket)
     : Socket(std::move(socket)), _OverSpeedPings(0), _worldSession(nullptr), _authed(false), _sendBufferSize(4096), _loggingPackets(false)
 {
     Acore::Crypto::GetRandomBytes(_authSeed);

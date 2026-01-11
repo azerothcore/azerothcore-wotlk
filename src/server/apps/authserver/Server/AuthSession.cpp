@@ -162,7 +162,7 @@ void AccountInfo::LoadResult(Field* fields)
     Utf8ToUpperOnlyLatin(Login);
 }
 
-AuthSession::AuthSession(tcp::socket&& socket) :
+AuthSession::AuthSession(IoContextTcpSocket&& socket) :
     Socket(std::move(socket)), _status(STATUS_CHALLENGE), _build(0), _expversion(0) { }
 
 void AuthSession::Start()

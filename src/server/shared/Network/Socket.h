@@ -21,9 +21,8 @@
 #include "Log.h"
 #include "MessageBuffer.h"
 #include <atomic>
-#include <boost/asio.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <functional>
 #include <memory>
 #include <queue>
 #include <type_traits>
@@ -34,6 +33,10 @@ using boost::asio::ip::tcp;
 #ifdef BOOST_ASIO_HAS_IOCP
 #define AC_SOCKET_USE_IOCP
 #endif
+
+// Specialize boost socket for io_context executor instead of type-erased any_io_executor
+// This avoids the type-erasure overhead of any_io_executor
+using IoContextTcpSocket = boost::asio::basic_stream_socket<boost::asio::ip::tcp, boost::asio::io_context::executor_type>;
 
 enum class SocketReadCallbackResult
 {
@@ -64,7 +67,7 @@ template<class T>
 class Socket : public std::enable_shared_from_this<T>
 {
 public:
-    explicit Socket(tcp::socket&& socket) : _socket(std::move(socket)), _remoteAddress(_socket.remote_endpoint().address()),
+    explicit Socket(IoContextTcpSocket&& socket) : _socket(std::move(socket)), _remoteAddress(_socket.remote_endpoint().address()),
         _remotePort(_socket.remote_endpoint().port()), _readBuffer(), _state(SocketState::Open), _isWritingAsync(false),
         _proxyHeaderReadingState(PROXY_HEADER_READING_STATE_NOT_STARTED)
     {
@@ -212,7 +215,7 @@ protected:
         _socket.async_write_some(boost::asio::buffer(buffer.GetReadPointer(), buffer.GetActiveSize()), std::bind(&Socket<T>::WriteHandler,
             this->shared_from_this(), std::placeholders::_1, std::placeholders::_2));
 #else
-        _socket.async_wait(tcp::socket::wait_write, [self = this->shared_from_this()](boost::system::error_code error)
+        _socket.async_wait(boost::asio::socket_base::wait_write, [self = this->shared_from_this()](boost::system::error_code error)
         {
             self->WriteHandlerWrapper(error, 0);
         });
@@ -440,7 +443,7 @@ private:
     }
 #endif
 
-    tcp::socket _socket;
+    IoContextTcpSocket _socket;
 
     boost::asio::ip::address _remoteAddress;
     uint16 _remotePort;

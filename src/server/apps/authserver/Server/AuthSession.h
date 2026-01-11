@@ -67,7 +67,7 @@ class AuthSession final : public Socket<AuthSession>
 public:
     static std::unordered_map<uint8, AuthHandler> InitHandlers();
 
-    AuthSession(tcp::socket&& socket);
+    AuthSession(IoContextTcpSocket&& socket);
 
     void Start() override;
     bool Update() final;
