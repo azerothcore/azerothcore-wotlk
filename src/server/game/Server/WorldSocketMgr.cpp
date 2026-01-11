@@ -22,16 +22,16 @@
 #include "WorldSocket.h"
 #include <boost/system/error_code.hpp>
 
-class WorldSocketThread : public NetworkThread<WorldSocket>
+class WorldSocketThread final : public NetworkThread<WorldSocket>
 {
 public:
-    void SocketAdded(std::shared_ptr<WorldSocket> sock) override
+    void SocketAdded(std::shared_ptr<WorldSocket> sock) final
     {
         sock->SetSendBufferSize(sWorldSocketMgr.GetApplicationSendBufferSize());
         sScriptMgr->OnSocketOpen(sock);
     }
 
-    void SocketRemoved(std::shared_ptr<WorldSocket> sock) override
+    void SocketRemoved(std::shared_ptr<WorldSocket> sock) final
     {
         sScriptMgr->OnSocketClose(sock);
     }
