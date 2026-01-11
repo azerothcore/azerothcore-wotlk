@@ -238,10 +238,10 @@ void WorldSocket::OnClose()
     }
 }
 
-void WorldSocket::ReadHandler()
+SocketReadCallbackResult WorldSocket::ReadHandler()
 {
     if (!IsOpen())
-        return;
+        return SocketReadCallbackResult::Stop;
 
     MessageBuffer& packet = GetReadBuffer();
     while (packet.GetActiveSize() > 0)
@@ -264,7 +264,7 @@ void WorldSocket::ReadHandler()
             if (!ReadHeaderHandler())
             {
                 CloseSocket();
-                return;
+                return SocketReadCallbackResult::Stop;
             }
         }
 
@@ -295,11 +295,11 @@ void WorldSocket::ReadHandler()
                 CloseSocket();
             }
 
-            return;
+            return SocketReadCallbackResult::Stop;
         }
     }
 
-    AsyncRead();
+    return SocketReadCallbackResult::KeepReading;
 }
 
 bool WorldSocket::ReadHeaderHandler()

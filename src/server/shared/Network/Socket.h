@@ -35,6 +35,19 @@ using boost::asio::ip::tcp;
 #define AC_SOCKET_USE_IOCP
 #endif
 
+enum class SocketReadCallbackResult
+{
+    KeepReading,
+    Stop
+};
+
+enum class SocketState : uint8
+{
+    Open = 0,
+    Closing = 1,
+    Closed = 2
+};
+
 enum ProxyHeaderReadingState {
     PROXY_HEADER_READING_STATE_NOT_STARTED,
     PROXY_HEADER_READING_STATE_STARTED,
@@ -52,7 +65,7 @@ class Socket : public std::enable_shared_from_this<T>
 {
 public:
     explicit Socket(tcp::socket&& socket) : _socket(std::move(socket)), _remoteAddress(_socket.remote_endpoint().address()),
-        _remotePort(_socket.remote_endpoint().port()), _readBuffer(), _closed(false), _closing(false), _isWritingAsync(false),
+        _remotePort(_socket.remote_endpoint().port()), _readBuffer(), _state(SocketState::Open), _isWritingAsync(false),
         _proxyHeaderReadingState(PROXY_HEADER_READING_STATE_NOT_STARTED)
     {
         _readBuffer.Resize(READ_BLOCK_SIZE);
@@ -60,7 +73,7 @@ public:
 
     virtual ~Socket()
     {
-        _closed = true;
+        _state = SocketState::Closed;
         boost::system::error_code error;
         _socket.close(error);
     }
@@ -69,13 +82,14 @@ public:
 
     virtual bool Update()
     {
-        if (_closed)
+        SocketState state = _state.load();
+        if (state == SocketState::Closed)
         {
             return false;
         }
 
 #ifndef AC_SOCKET_USE_IOCP
-        if (_isWritingAsync || (_writeQueue.empty() && !_closing))
+        if (_isWritingAsync || (_writeQueue.empty() && state != SocketState::Closing))
         {
             return true;
         }
@@ -150,12 +164,18 @@ public:
 
     [[nodiscard]] ProxyHeaderReadingState GetProxyHeaderReadingState() const { return _proxyHeaderReadingState; }
 
-    [[nodiscard]] bool IsOpen() const { return !_closed && !_closing; }
+    [[nodiscard]] bool IsOpen() const { return _state.load() == SocketState::Open; }
 
     void CloseSocket()
     {
-        if (_closed.exchange(true))
-            return;
+        SocketState expected = SocketState::Open;
+        if (!_state.compare_exchange_strong(expected, SocketState::Closed))
+        {
+            // If it was Closing, try to transition to Closed
+            expected = SocketState::Closing;
+            if (!_state.compare_exchange_strong(expected, SocketState::Closed))
+                return; // Already closed
+        }
 
         boost::system::error_code shutdownError;
         _socket.shutdown(boost::asio::socket_base::shutdown_send, shutdownError);
@@ -168,13 +188,17 @@ public:
     }
 
     /// Marks the socket for closing after write buffer becomes empty
-    void DelayedCloseSocket() { _closing = true; }
+    void DelayedCloseSocket()
+    {
+        SocketState expected = SocketState::Open;
+        _state.compare_exchange_strong(expected, SocketState::Closing);
+    }
 
     MessageBuffer& GetReadBuffer() { return _readBuffer; }
 
 protected:
     virtual void OnClose() { }
-    virtual void ReadHandler() = 0;
+    virtual SocketReadCallbackResult ReadHandler() = 0;
 
     bool AsyncProcessQueue()
     {
@@ -216,7 +240,8 @@ private:
         }
 
         _readBuffer.WriteCompleted(transferredBytes);
-        ReadHandler();
+        if (ReadHandler() == SocketReadCallbackResult::KeepReading)
+            AsyncRead();
     }
 
     // ProxyReadHeaderHandler reads Proxy Protocol v2 header (v1 is not supported).
@@ -344,7 +369,7 @@ private:
 
             if (!_writeQueue.empty())
                 AsyncProcessQueue();
-            else if (_closing)
+            else if (_state.load() == SocketState::Closing)
                 CloseSocket();
         }
         else
@@ -380,7 +405,7 @@ private:
 
             _writeQueue.pop();
 
-            if (_closing && _writeQueue.empty())
+            if (_state.load() == SocketState::Closing && _writeQueue.empty())
             {
                 CloseSocket();
             }
@@ -391,7 +416,7 @@ private:
         {
             _writeQueue.pop();
 
-            if (_closing && _writeQueue.empty())
+            if (_state.load() == SocketState::Closing && _writeQueue.empty())
             {
                 CloseSocket();
             }
@@ -406,7 +431,7 @@ private:
 
         _writeQueue.pop();
 
-        if (_closing && _writeQueue.empty())
+        if (_state.load() == SocketState::Closing && _writeQueue.empty())
         {
             CloseSocket();
         }
@@ -423,8 +448,7 @@ private:
     MessageBuffer _readBuffer;
     std::queue<MessageBuffer> _writeQueue;
 
-    std::atomic<bool> _closed;
-    std::atomic<bool> _closing;
+    std::atomic<SocketState> _state;
 
     bool _isWritingAsync;
 

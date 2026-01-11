@@ -60,7 +60,7 @@ struct AccountInfo
     AccountTypes SecurityLevel = SEC_PLAYER;
 };
 
-class AuthSession : public Socket<AuthSession>
+class AuthSession final : public Socket<AuthSession>
 {
     typedef Socket<AuthSession> AuthSocket;
 
@@ -70,12 +70,12 @@ public:
     AuthSession(tcp::socket&& socket);
 
     void Start() override;
-    bool Update() override;
+    bool Update() final;
 
     void SendPacket(ByteBuffer& packet);
 
 protected:
-    void ReadHandler() override;
+    SocketReadCallbackResult ReadHandler() final;
 
 private:
     bool HandleLogonChallenge();
