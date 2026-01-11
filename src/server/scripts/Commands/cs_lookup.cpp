@@ -1644,7 +1644,12 @@ public:
 
     static bool LookupPlayerSearchCommand(PreparedQueryResult result, int32 limit, ChatHandler* handler)
     {
-
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_LOOKUP_NOT_VALID);
+            return false;
+        }
+    
         int32 counter = 0; // for characters
         uint32 count = 0; // for accounts
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
