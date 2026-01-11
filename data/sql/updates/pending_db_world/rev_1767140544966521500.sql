@@ -928,3 +928,6 @@ UPDATE `creature_loot_template` SET `Reference` = 34214 WHERE `Entry` = 17968 AN
 -- Hacked Quest Item?
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 10) AND (`SourceGroup` = 44003) AND (`SourceEntry` = 34090) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 9) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 11236) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 10) AND (`SourceGroup` = 44004) AND (`SourceEntry` = 34091) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 9) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 11264) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+
+-- Thorium Prospecting was the only ever entry with negative References
+UPDATE `prospecting_loot_template` SET `Reference` = 13001 WHERE `Entry` = 10620 AND `Item` = 1 AND `Reference` = -13001;
