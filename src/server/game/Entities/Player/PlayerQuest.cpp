@@ -1228,6 +1228,7 @@ bool Player::SatisfyQuestBreadcrumb(Quest const* qInfo, bool msg) const
         {
             if (msg)
                 SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
             return false;
         }
     }
@@ -1241,6 +1242,7 @@ bool Player::SatisfyQuestBreadcrumb(Quest const* qInfo, bool msg) const
             {
                 if (msg)
                     SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
                 return false;
             }
         }

@@ -1153,6 +1153,7 @@ public:
         auto itr = _breadcrumbsForQuest.find(questId);
         if (itr != _breadcrumbsForQuest.end())
             return &itr->second;
+
         return nullptr;
     }
 
