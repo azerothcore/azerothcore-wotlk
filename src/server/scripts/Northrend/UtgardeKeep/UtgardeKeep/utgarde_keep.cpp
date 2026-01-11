@@ -203,6 +203,44 @@ enum TickingTimeBomb
     SPELL_TICKING_TIME_BOMB_EXPLODE = 59687
 };
 
+enum SecondWind
+{
+    SPELL_SECOND_WIND_TRIGGER = 42771
+};
+
+// 42770 - Second Wind
+class spell_uk_second_wind : public AuraScript
+{
+    PrepareAuraScript(spell_uk_second_wind);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SECOND_WIND_TRIGGER });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_STUN))) != 0;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActionTarget();
+        caster->CastSpell(caster, SPELL_SECOND_WIND_TRIGGER, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_uk_second_wind::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_uk_second_wind::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 class spell_ticking_time_bomb_aura : public AuraScript
 {
     PrepareAuraScript(spell_ticking_time_bomb_aura);
@@ -231,5 +269,6 @@ void AddSC_utgarde_keep()
     RegisterUtgardeKeepCreatureAI(npc_dragonflayer_forge_master);
     RegisterUtgardeKeepCreatureAI(npc_enslaved_proto_drake);
 
+    RegisterSpellScript(spell_uk_second_wind);
     RegisterSpellScript(spell_ticking_time_bomb_aura);
 }

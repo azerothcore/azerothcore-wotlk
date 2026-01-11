@@ -98,6 +98,7 @@ public:
     void PeriodicTick(AuraApplication* aurApp, Unit* caster) const;
 
     void HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    bool CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventInfo) const;
 
     void CleanupTriggeredSpells(Unit* target);
 
