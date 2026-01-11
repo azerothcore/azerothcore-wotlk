@@ -427,6 +427,8 @@ struct SmartEvent
         struct
         {
             uint32 eventId;
+            uint32 cooldownMin;
+            uint32 cooldownMax;
         } doAction;
 
         struct
@@ -721,8 +723,9 @@ enum SMART_ACTION
     SMART_ACTION_MOVEMENT_RESUME                    = 236,    // timerOverride
     SMART_ACTION_WORLD_SCRIPT                       = 237,    // eventId, param
     SMART_ACTION_DISABLE_REWARD                     = 238,    // reputation 0/1, loot 0/1
+    SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
 
-    SMART_ACTION_AC_END                             = 239,    // placeholder
+    SMART_ACTION_AC_END                             = 240,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1502,6 +1505,11 @@ struct SmartAction
             SAIBool reputation;
             SAIBool loot;
         } reward;
+
+        struct
+        {
+            uint32 animTier;
+        } animTier;
     };
 };
 

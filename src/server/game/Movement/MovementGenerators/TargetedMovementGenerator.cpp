@@ -105,11 +105,22 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
         owner->UpdateAllowedPositionZ(x, y, z);
 
     bool success = i_path->CalculatePath(x, y, z, forceDest);
-    if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
+    uint32 pathType = i_path->GetPathType();
+    bool pathFailed = !success || (pathType & PATHFIND_NOPATH);
+
+    // For pets, treat incomplete paths as failures to avoid clipping through geometry
+    if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer()))
+        if (pathType & PATHFIND_INCOMPLETE)
+            pathFailed = true;
+
+    if (pathFailed)
     {
         if (cOwner)
         {
             cOwner->SetCannotReachTarget(i_target.getTarget()->GetGUID());
+
+            if (cOwner->IsPet() || cOwner->IsControlledByPlayer())
+                cOwner->AttackStop();
         }
 
         owner->StopMoving();

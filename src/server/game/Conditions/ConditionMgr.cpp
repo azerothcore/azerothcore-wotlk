@@ -542,6 +542,23 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         condMeets = object->GetMap()->GetDifficulty() == ConditionValue1;
         break;
     }
+    case CONDITION_RANDOM_DUNGEON:
+    {
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (sLFGMgr->selectedRandomLfgDungeon(player->GetGUID()))
+                {
+                    if (!ConditionValue1)
+                        condMeets = true;
+                    else if (Map* map = player->GetMap())
+                        condMeets = map->GetDifficulty() == Difficulty(ConditionValue2);
+                }
+            }
+        }
+        break;
+    }
     case CONDITION_PET_TYPE:
     {
         if (Unit* unit = object->ToUnit())
@@ -785,6 +802,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_CHARMED:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_RANDOM_DUNGEON:
+        mask |= GRID_MAP_TYPE_MASK_PLAYER;
         break;
     case CONDITION_WORLD_SCRIPT:
         mask |= GRID_MAP_TYPE_MASK_ALL;
@@ -2465,6 +2485,20 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "CONDITION_DIFFICULTY_ID has non existing difficulty in value1 ({}), skipped.", cond->ConditionValue1);
             return false;
         }
+        break;
+    case CONDITION_RANDOM_DUNGEON:
+        if (cond->ConditionValue1 > 1)
+        {
+            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value1 ({}).", cond->ConditionValue1);
+            return false;
+        }
+        if (cond->ConditionValue2 >= MAX_DIFFICULTY)
+        {
+            LOG_ERROR("sql.sql", "RandomDungeon condition has invalid difficulty in value2 ({}).", cond->ConditionValue1);
+            return false;
+        }
+        if (cond->ConditionValue3)
+            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value3 ({}).", cond->ConditionValue3);
         break;
     case CONDITION_PET_TYPE:
         if (cond->ConditionValue1 >= (1 << MAX_PET_TYPE))
