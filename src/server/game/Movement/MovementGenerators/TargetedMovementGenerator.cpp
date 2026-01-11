@@ -658,7 +658,10 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
                 float distance = owner->GetDistance(target);
                 if (distance > 20.f)
                 {
-                    float teleX, teleY, teleZ;
+                    float teleX;
+                    float teleY;
+                    float teleZ;
+
                     target->GetClosePoint(teleX, teleY, teleZ, owner->GetCombatReach());
                     owner->NearTeleportTo(teleX, teleY, teleZ, target->GetOrientation());
                     _lastTargetPosition.reset();
