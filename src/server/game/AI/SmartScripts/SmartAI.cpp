@@ -1119,6 +1119,10 @@ void SmartAI::SetMainSpell(uint32 spellId)
     if (!spellInfo)
         return;
 
+    // Don't use positive (healing/buff) spells to determine attack distance
+    if (spellInfo->IsPositive())
+        return;
+
     float maxRange = spellInfo->GetMaxRange(false);
     if (maxRange <= NOMINAL_MELEE_RANGE)
         return;
