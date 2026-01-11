@@ -210,14 +210,6 @@ struct SpellCooldown
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
 typedef std::unordered_map<uint32 /*instanceId*/, time_t/*releaseTime*/> InstanceTimeMap;
 
-enum TrainerSpellState
-{
-    TRAINER_SPELL_GREEN = 0,
-    TRAINER_SPELL_RED   = 1,
-    TRAINER_SPELL_GRAY  = 2,
-    TRAINER_SPELL_GREEN_DISABLED = 10                       // custom value, not send to client: formally green but learn not allowed
-};
-
 enum ActionButtonUpdateState
 {
     ACTIONBUTTON_UNCHANGED = 0,
@@ -978,6 +970,9 @@ enum PlayerRestState
 {
     REST_STATE_RESTED                                = 0x01,
     REST_STATE_NOT_RAF_LINKED                        = 0x02,
+    REST_STATE_TIRED                                 = 0x03,
+    REST_STATE_TIRED_XP_REDUCED                      = 0x04, // 50% XP
+    REST_STATE_EXHAUSTED                             = 0x05, // 25% XP
     REST_STATE_RAF_LINKED                            = 0x06
 };
 
@@ -1303,8 +1298,8 @@ public:
     InventoryResult CanUseItem(ItemTemplate const* pItem) const;
     [[nodiscard]] InventoryResult CanUseAmmo(uint32 item) const;
     InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
-    Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0);
-    Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId, AllowedLooterSet& allowedLooters);
+    Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0, bool refund = false);
+    Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId, AllowedLooterSet& allowedLooters, bool refund = false);
     Item* StoreItem(ItemPosCountVec const& pos, Item* pItem, bool update);
     Item* EquipNewItem(uint16 pos, uint32 item, bool update);
     Item* EquipItem(uint16 pos, Item* pItem, bool update);
@@ -1684,7 +1679,6 @@ public:
     void SendRemoveControlBar();
     [[nodiscard]] bool HasSpell(uint32 spell) const override;
     [[nodiscard]] bool HasActiveSpell(uint32 spell) const;            // show in spellbook
-    TrainerSpellState GetTrainerSpellState(TrainerSpell const* trainer_spell) const;
     [[nodiscard]] bool IsSpellFitByClassAndRace(uint32 spell_id) const;
     bool IsNeedCastPassiveSpellAtLearn(SpellInfo const* spellInfo) const;
 
@@ -2560,6 +2554,8 @@ public:
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeTrainer(Creature const* creature) const;
+
 private:
     [[nodiscard]] bool AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const;
 public:

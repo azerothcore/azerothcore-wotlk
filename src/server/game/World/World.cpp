@@ -766,6 +766,12 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading GameTeleports...");
     sObjectMgr->LoadGameTele();
 
+    LOG_INFO("server.loading", "Loading Trainers..."); // must be after LoadCreatureTemplates
+    sObjectMgr->LoadTrainers();
+
+    LOG_INFO("server.loading", "Loading Creature default trainers...");
+    sObjectMgr->LoadCreatureDefaultTrainers();
+
     LOG_INFO("server.loading", "Loading Gossip Menu...");
     sObjectMgr->LoadGossipMenu();
 
@@ -774,9 +780,6 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Vendors...");
     sObjectMgr->LoadVendors();                                   // must be after load CreatureTemplate and ItemTemplate
-
-    LOG_INFO("server.loading", "Loading Trainers...");
-    sObjectMgr->LoadTrainerSpell();                              // must be after load CreatureTemplate
 
     LOG_INFO("server.loading", "Loading Waypoints...");
     sWaypointMgr->Load();

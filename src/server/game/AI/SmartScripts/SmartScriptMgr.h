@@ -427,6 +427,8 @@ struct SmartEvent
         struct
         {
             uint32 eventId;
+            uint32 cooldownMin;
+            uint32 cooldownMax;
         } doAction;
 
         struct
@@ -721,8 +723,9 @@ enum SMART_ACTION
     SMART_ACTION_MOVEMENT_RESUME                    = 236,    // timerOverride
     SMART_ACTION_WORLD_SCRIPT                       = 237,    // eventId, param
     SMART_ACTION_DISABLE_REWARD                     = 238,    // reputation 0/1, loot 0/1
+    SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
 
-    SMART_ACTION_AC_END                             = 239,    // placeholder
+    SMART_ACTION_AC_END                             = 240,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1502,6 +1505,11 @@ struct SmartAction
             SAIBool reputation;
             SAIBool loot;
         } reward;
+
+        struct
+        {
+            uint32 animTier;
+        } animTier;
     };
 };
 
@@ -1932,16 +1940,17 @@ enum SmartEventFlags
 
 enum SmartCastFlags
 {
-    SMARTCAST_INTERRUPT_PREVIOUS     = 0x001,                     // Interrupt any spell casting
-    SMARTCAST_TRIGGERED              = 0x002,                     // Triggered (this makes spell cost zero mana and have no cast time)
-    //CAST_FORCE_CAST                  = 0x004,                     // Forces cast even if creature is out of mana or out of range
-    //CAST_NO_MELEE_IF_OOM             = 0x008,                     // Prevents creature from entering melee if out of mana or out of range
-    //CAST_FORCE_TARGET_SELF           = 0x010,                     // Forces the target to cast this spell on itself
-    SMARTCAST_AURA_NOT_PRESENT       = 0x020,                     // Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x040,                     // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
-    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
-    SMARTCAST_TARGET_POWER_MANA      = 0x100,                     // Only cast if the target has power type mana (e.g. Mana Drain)
-    SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS = 0x200,
+    SMARTCAST_INTERRUPT_PREVIOUS        = 0x001,                  // Interrupt any spell casting
+    SMARTCAST_TRIGGERED                 = 0x002,                  // Triggered (this makes spell cost zero mana and have no cast time)
+    //CAST_FORCE_CAST                   = 0x004,                  // Forces cast even if creature is out of mana or out of range
+    //CAST_NO_MELEE_IF_OOM              = 0x008,                  // Prevents creature from entering melee if out of mana or out of range
+    //CAST_FORCE_TARGET_SELF            = 0x010,                  // Forces the target to cast this spell on itself
+    SMARTCAST_AURA_NOT_PRESENT          = 0x020,                  // Only casts the spell if the target does not have an aura from the spell
+    SMARTCAST_COMBAT_MOVE               = 0x040,                  // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE     = 0x080,                  // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+    SMARTCAST_TARGET_POWER_MANA         = 0x100,                  // Only cast if the target has power type mana (e.g. Mana Drain)
+    SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS = 0x200,                  // Allows combat movement when not in line of sight
+    SMARTCAST_MAIN_SPELL                = 0x400,                  // Sets this spell's max range as the creature's chase distance on spawn
 };
 
 enum SmartFollowType
