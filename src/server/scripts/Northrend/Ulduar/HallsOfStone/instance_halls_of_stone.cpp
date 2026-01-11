@@ -32,6 +32,11 @@ ObjectData const creatureData[] =
     { 0,               0            }
 };
 
+BossBoundaryData const boundaries =
+{
+    { BOSS_SJONNIR, new RectangleBoundary(1206.56f, 1341.4185f, 579.9434f, 753.9599f) }
+};
+
 class instance_halls_of_stone : public InstanceMapScript
 {
 public:
@@ -72,6 +77,7 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             LoadObjectData(creatureData, nullptr);
             LoadSummonData(summonData);
+            LoadBossBoundaries(boundaries);
             memset(&Encounter, 0, sizeof(Encounter));
 
             brannAchievement = false;
