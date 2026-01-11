@@ -1650,7 +1650,7 @@ public:
             handler->SendErrorMessage(LANG_LOOKUP_NOT_VALID, __func__ ,__LINE__);
             return false;
         }
-    
+
         int32 counter = 0; // for characters
         uint32 count = 0; // for accounts
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
