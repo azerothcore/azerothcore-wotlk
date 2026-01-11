@@ -716,7 +716,6 @@ Logger.module=4,Console Server
 Logger.spells.scripts=2,Console Errors
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server
-#Logger.ahbot=4,Console Server
 #Logger.auctionHouse=4,Console Server
 #Logger.autobroadcast=4, Console Server
 #Logger.bg.arena=4,Console Server
