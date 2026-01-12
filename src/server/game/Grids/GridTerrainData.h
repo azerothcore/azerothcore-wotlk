@@ -274,6 +274,8 @@ public:
     float getMinHeight(float x, float y) const;
     float getLiquidLevel(float x, float y) const;
     LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType) const;
+private:
+    bool SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const;
 };
 
 #endif
