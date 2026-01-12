@@ -1057,6 +1057,11 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     auto const& itr2 = PlayerScores.find(player->GetGUID().GetCounter());
     if (itr2 != PlayerScores.end())
     {
+        // Save stats to ArenaLogEntries before deleting score (for arena logging)
+        auto itr3 = ArenaLogEntries.find(player->GetGUID());
+        if (itr3 != ArenaLogEntries.end())
+            itr3->second.SaveStats(itr2->second->GetDamageDone(), itr2->second->GetHealingDone(), itr2->second->GetKillingBlows());
+
         delete itr2->second;
         PlayerScores.erase(itr2);
     }
