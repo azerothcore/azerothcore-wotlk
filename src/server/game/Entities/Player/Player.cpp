@@ -7366,6 +7366,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 Unit* checkTarget = spellInfo->IsPositive() ? this : target;
                 if (checkTarget->HasAura(spellInfo->Id, GetGUID()))
                 {
+		    aura->RefreshDuration();
                     continue;
                 }
             }
