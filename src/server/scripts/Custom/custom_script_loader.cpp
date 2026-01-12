@@ -20,7 +20,10 @@
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
+void AddSC_SurveyorCandressFix();
+
 void AddCustomScripts()
 {
     // MyExampleScript()
+    AddSC_SurveyorCandressFix();
 }
