@@ -3172,7 +3172,10 @@ void ObjectMgr::LoadItemTemplates()
             {
                 case ITEM_MOD_SPELL_HEALING_DONE:
                 case ITEM_MOD_SPELL_DAMAGE_DONE:
-                    LOG_WARN("sql.sql", "Item (Entry: {}) has deprecated stat_type{} ({})", entry, j + 1, itemTemplate.ItemStat[j].ItemStatType);
+                    // Skip warning for specific items: 13113 (Feathermoon Headdress - Blizzard oversight), 34967 (test item)
+                    if (entry != 13113 && entry != 34967)
+                        LOG_WARN("sql.sql", "Item (Entry: {}) has deprecated stat_type{} ({})", entry, j + 1, itemTemplate.ItemStat[j].ItemStatType);
+
                     break;
                 default:
                     break;

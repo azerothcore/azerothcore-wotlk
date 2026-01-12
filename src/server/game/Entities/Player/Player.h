@@ -970,6 +970,9 @@ enum PlayerRestState
 {
     REST_STATE_RESTED                                = 0x01,
     REST_STATE_NOT_RAF_LINKED                        = 0x02,
+    REST_STATE_TIRED                                 = 0x03,
+    REST_STATE_TIRED_XP_REDUCED                      = 0x04, // 50% XP
+    REST_STATE_EXHAUSTED                             = 0x05, // 25% XP
     REST_STATE_RAF_LINKED                            = 0x06
 };
 
