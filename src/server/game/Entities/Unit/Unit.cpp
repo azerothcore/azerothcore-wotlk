@@ -7940,9 +7940,9 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!victim)
                         return false;
 
-		    // Only proc from Paladin healing spells
+		        // Only proc from Paladin healing spells
                     if (procSpell->SpellFamilyName != SPELLFAMILY_PALADIN)
-		    {
+		            {
                         return false;
                     }
 
