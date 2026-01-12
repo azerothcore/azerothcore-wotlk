@@ -990,8 +990,7 @@ class spell_pri_prayer_of_healing : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        // Check that the target is in line of sight
-        if (!GetCaster()->IsWithinLOSInMap(GetExplTargetUnit()))
+        if (!GetCaster()->IsWithinLOSInMap(GetExplTargetUnit(), VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
             return SPELL_FAILED_LINE_OF_SIGHT;
         return SPELL_CAST_OK;
     }
