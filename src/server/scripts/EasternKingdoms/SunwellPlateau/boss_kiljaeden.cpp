@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -178,7 +178,12 @@ struct npc_kiljaeden_controller : public NullCreatureAI
     {
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_SINISTER_REFLECTION)
-            summon->SetInCombatWithZone();
+        {
+            summon->m_Events.AddEventAtOffset([summon] {
+                if (summon && summon->IsAlive() && !summon->IsInCombat())
+                    summon->SetInCombatWithZone();
+            }, 5s);
+        }
         else if (summon->GetEntry() == NPC_KALECGOS_KJ)
             summon->setActive(true);
     }
@@ -382,7 +387,7 @@ struct boss_kiljaeden : public BossAI
                     {
                         anveena->RemoveAllAuras();
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
-                        anveena->DespawnOrUnsummon(1500);
+                        anveena->DespawnOrUnsummon(1500ms);
                         DoCastSelf(SPELL_CUSTOM_08_STATE, true);
                         me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         scheduler.CancelAll();
@@ -549,8 +554,8 @@ struct boss_kiljaeden : public BossAI
             summon->SetDisableGravity(true);
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
-            summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            summon->DespawnOrUnsummon(urand(8000, 10000));
+            summon->m_Events.AddEventAtOffset(new CastArmageddon(summon), 6s);
+            summon->DespawnOrUnsummon(randtime(8s, 10s));
         }
     }
 
@@ -714,7 +719,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->CastSpell(me, SPELL_TELEPORT_AND_TRANSFORM, true);
-            events.ScheduleEvent(EVENT_SCENE_01, 35000);
+            events.ScheduleEvent(EVENT_SCENE_01, 35s);
         }
     }
 
@@ -724,25 +729,18 @@ struct npc_kalecgos_kj : public NullCreatureAI
         if (summon->GetEntry() == NPC_SHATTERED_SUN_RIFTWAKER)
         {
             summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
-            Movement::MoveSplineInit init(summon);
+
             if (summons.size() == 1)
-            {
-                init.MoveTo(1727.08f, 656.82f, 28.37f, false, true);
-                init.SetFacing(5.14f);
-            }
+                summon->GetMotionMaster()->MovePoint(0, 1727.08f, 656.82f, 28.37f, FORCED_MOVEMENT_NONE, 0.f, 5.14f, false, true);
             else
-            {
-                init.MoveTo(1738.84f, 627.32f, 28.26f, false, true);
-                init.SetFacing(2.0f);
-            }
-            init.Launch();
+                summon->GetMotionMaster()->MovePoint(0, 1738.84f, 627.32f, 28.26f, FORCED_MOVEMENT_NONE, 0.f, 2.0f, false, true);
         }
         else if (summon->GetEntry() == NPC_SHATTRATH_PORTAL_DUMMY)
         {
             if (Creature* riftwaker = summon->FindNearestCreature(NPC_SHATTERED_SUN_RIFTWAKER, 10.0f))
                 riftwaker->CastSpell(summon, SPELL_OPEN_PORTAL_FROM_SHATTRATH, false);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 30.0f, false, true);
+            summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 30.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
         }
         else if (summon->GetEntry() == NPC_INERT_PORTAL)
             summon->CastSpell(summon, SPELL_BOSS_ARCANE_PORTAL_STATE, true);
@@ -757,7 +755,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
         {
             summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
             summon->SetWalk(true);
-            summon->GetMotionMaster()->MovePoint(0, 1710.15f, 639.23f, 27.311f, false, true);
+            summon->GetMotionMaster()->MovePoint(0, 1710.15f, 639.23f, 27.311f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
         }
         else if (summon->GetEntry() == NPC_THE_CORE_OF_ENTROPIUS)
             summon->GetMotionMaster()->MovePoint(0, summon->GetPositionX(), summon->GetPositionY(), 30.0f);
@@ -770,69 +768,69 @@ struct npc_kalecgos_kj : public NullCreatureAI
         {
         case EVENT_SCENE_01:
             Talk(SAY_KALECGOS_GOODBYE);
-            events.ScheduleEvent(eventId + 1, 15000);
+            events.ScheduleEvent(eventId + 1, 15s);
             break;
         case EVENT_SCENE_02:
             me->SummonCreature(NPC_SHATTERED_SUN_RIFTWAKER, 1688.42f, 641.82f, 27.60f, 0.67f);
             me->SummonCreature(NPC_SHATTERED_SUN_RIFTWAKER, 1712.58f, 616.29f, 27.78f, 0.76f);
-            events.ScheduleEvent(eventId + 1, 6000);
+            events.ScheduleEvent(eventId + 1, 6s);
             break;
         case EVENT_SCENE_03:
             me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1727.08f + cos(5.14f), 656.82f + std::sin(5.14f), 28.37f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
             me->SummonCreature(NPC_SHATTRATH_PORTAL_DUMMY, 1738.84f + cos(2.0f), 627.32f + std::sin(2.0f), 28.26f + 2.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 10000);
-            events.ScheduleEvent(eventId + 1, 11000);
+            events.ScheduleEvent(eventId + 1, 11s);
             break;
         case EVENT_SCENE_04:
             me->SummonCreature(NPC_INERT_PORTAL, 1734.96f, 642.43f, 28.06f, 3.49f);
-            events.ScheduleEvent(eventId + 1, 4000);
+            events.ScheduleEvent(eventId + 1, 4s);
             break;
         case EVENT_SCENE_05:
             if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
             {
-                first->m_Events.AddEvent(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), first->m_Events.CalculateTime(5000));
-                first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(12000));
+                first->m_Events.AddEventAtOffset(new MoveDelayed(first, 1718.70f, 607.78f, 28.06f, 2.323f), 5s);
+                first->m_Events.AddEventAtOffset(new FixOrientation(first), 12s);
                 for (uint8 i = 0; i < 9; ++i)
                     if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                         follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
             }
-            events.ScheduleEvent(eventId + 1, 10000);
+            events.ScheduleEvent(eventId + 1, 10s);
             break;
         case EVENT_SCENE_06:
             if (Creature* first = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f, 640.49f, 28.06f, 3.49f))
             {
-                first->m_Events.AddEvent(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), first->m_Events.CalculateTime(5000));
-                first->m_Events.AddEvent(new FixOrientation(first), first->m_Events.CalculateTime(14500));
+                first->m_Events.AddEventAtOffset(new MoveDelayed(first, 1678.69f, 649.27f, 28.06f, 5.46f), 5s);
+                first->m_Events.AddEventAtOffset(new FixOrientation(first), 14500ms);
                 for (uint8 i = 0; i < 9; ++i)
                     if (Creature* follower = me->SummonCreature(NPC_SHATTERED_SUN_SOLDIER, 1729.48f + 5 * cos(i * 2.0f * M_PI / 9), 640.49f + 5 * std::sin(i * 2.0f * M_PI / 9), 28.06f, 3.49f))
                         follower->GetMotionMaster()->MoveFollow(first, 3.0f, follower->GetAngle(first));
             }
-            events.ScheduleEvent(eventId + 1, 12000);
+            events.ScheduleEvent(eventId + 1, 12s);
             break;
         case EVENT_SCENE_07:
             me->SummonCreature(NPC_LADY_LIADRIN, 1719.87f, 644.265f, 28.06f, 3.83f);
             me->SummonCreature(NPC_PROPHET_VELEN, 1717.97f, 646.44f, 28.06f, 3.94f);
-            events.ScheduleEvent(eventId + 1, 7000);
+            events.ScheduleEvent(eventId + 1, 7s);
             break;
         case EVENT_SCENE_08:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_01);
-            events.ScheduleEvent(eventId + 1, 25000);
+            events.ScheduleEvent(eventId + 1, 25s);
             break;
         case EVENT_SCENE_09:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_02);
-            events.ScheduleEvent(eventId + 1, 14500);
+            events.ScheduleEvent(eventId + 1, 14500ms);
             break;
         case EVENT_SCENE_10:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_03);
-            events.ScheduleEvent(eventId + 1, 12500);
+            events.ScheduleEvent(eventId + 1, 12500ms);
             break;
         case EVENT_SCENE_11:
             me->SummonCreature(NPC_THE_CORE_OF_ENTROPIUS, 1698.86f, 628.73f, 92.83f, 0.0f);
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->CastSpell(velen, SPELL_CALL_ENTROPIUS, false);
-            events.ScheduleEvent(eventId + 1, 8000);
+            events.ScheduleEvent(eventId + 1, 8s);
             break;
         case EVENT_SCENE_12:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
@@ -840,32 +838,32 @@ struct npc_kalecgos_kj : public NullCreatureAI
                 velen->InterruptNonMeleeSpells(false);
                 velen->AI()->Talk(SAY_VELEN_04);
             }
-            events.ScheduleEvent(eventId + 1, 20000);
+            events.ScheduleEvent(eventId + 1, 20s);
             break;
         case EVENT_SCENE_13:
             if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                 liadrin->GetMotionMaster()->MovePoint(0, 1711.28f, 637.29f, 27.29f);
-            events.ScheduleEvent(eventId + 1, 6000);
+            events.ScheduleEvent(eventId + 1, 6s);
             break;
         case EVENT_SCENE_14:
             if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                 liadrin->AI()->Talk(SAY_LIADRIN_01);
-            events.ScheduleEvent(eventId + 1, 10000);
+            events.ScheduleEvent(eventId + 1, 10s);
             break;
         case EVENT_SCENE_15:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_05);
-            events.ScheduleEvent(eventId + 1, 14000);
+            events.ScheduleEvent(eventId + 1, 14s);
             break;
         case EVENT_SCENE_16:
             if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                 liadrin->AI()->Talk(SAY_LIADRIN_02);
-            events.ScheduleEvent(eventId + 1, 2000);
+            events.ScheduleEvent(eventId + 1, 2s);
             break;
         case EVENT_SCENE_17:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_06);
-            events.ScheduleEvent(eventId + 1, 3000);
+            events.ScheduleEvent(eventId + 1, 3s);
             break;
         case EVENT_SCENE_18:
             if (Creature* core = summons.GetCreatureWithEntry(NPC_THE_CORE_OF_ENTROPIUS))
@@ -873,7 +871,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
                 core->RemoveAllAuras();
                 core->CastSpell(core, SPELL_BLAZE_TO_LIGHT, true);
             }
-            events.ScheduleEvent(eventId + 1, 8000);
+            events.ScheduleEvent(eventId + 1, 8s);
             break;
         case EVENT_SCENE_19:
             if (Creature* core = summons.GetCreatureWithEntry(NPC_THE_CORE_OF_ENTROPIUS))
@@ -881,42 +879,42 @@ struct npc_kalecgos_kj : public NullCreatureAI
                 core->SetObjectScale(0.75f);
                 core->GetMotionMaster()->MovePoint(0, core->GetPositionX(), core->GetPositionY(), 28.0f);
             }
-            events.ScheduleEvent(eventId + 1, 2000);
+            events.ScheduleEvent(eventId + 1, 2s);
             break;
         case EVENT_SCENE_20:
             if (Creature* core = summons.GetCreatureWithEntry(NPC_THE_CORE_OF_ENTROPIUS))
                 core->CastSpell(core, SPELL_SUNWELL_IGNITION, true);
-            events.ScheduleEvent(eventId + 1, 3000);
+            events.ScheduleEvent(eventId + 1, 3s);
             break;
         case EVENT_SCENE_21:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_07);
-            events.ScheduleEvent(eventId + 1, 15000);
+            events.ScheduleEvent(eventId + 1, 15s);
             break;
         case EVENT_SCENE_22:
             if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                 liadrin->AI()->Talk(SAY_LIADRIN_03);
-            events.ScheduleEvent(eventId + 1, 20000);
+            events.ScheduleEvent(eventId + 1, 20s);
             break;
         case EVENT_SCENE_23:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_08);
             if (Creature* liadrin = summons.GetCreatureWithEntry(NPC_LADY_LIADRIN))
                 liadrin->SetStandState(UNIT_STAND_STATE_KNEEL);
-            events.ScheduleEvent(eventId + 1, 8000);
+            events.ScheduleEvent(eventId + 1, 8s);
             break;
         case EVENT_SCENE_24:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
                 velen->AI()->Talk(SAY_VELEN_09);
-            events.ScheduleEvent(eventId + 1, 5000);
+            events.ScheduleEvent(eventId + 1, 5s);
             break;
         case EVENT_SCENE_25:
             if (Creature* velen = summons.GetCreatureWithEntry(NPC_PROPHET_VELEN))
             {
                 velen->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
-                velen->DespawnOrUnsummon(5000);
+                velen->DespawnOrUnsummon(5s);
             }
-            events.ScheduleEvent(eventId + 1, 3000);
+            events.ScheduleEvent(eventId + 1, 3s);
             break;
         case EVENT_SCENE_26:
             for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -924,9 +922,9 @@ struct npc_kalecgos_kj : public NullCreatureAI
                     if (summon->GetEntry() == NPC_SHATTERED_SUN_SOLDIER)
                     {
                         summon->GetMotionMaster()->MovePoint(0, 1739.38f, 643.79f, 28.06f);
-                        summon->DespawnOrUnsummon(summon->GetExactDist2d(1734.96f, 642.43f) * 100);
+                        summon->DespawnOrUnsummon(Milliseconds(uint32(summon->GetExactDist2d(1734.96f, 642.43f) * 100)));
                     }
-            events.ScheduleEvent(eventId + 1, 7000);
+            events.ScheduleEvent(eventId + 1, 7s);
             break;
         case EVENT_SCENE_27:
             me->setActive(false);
@@ -1181,6 +1179,26 @@ class spell_kiljaeden_dragon_breath : public SpellScript
     }
 };
 
+// 45848 - Shield of the Blue
+class spell_kiljaeden_shield_of_the_blue : public AuraScript
+{
+    PrepareAuraScript(spell_kiljaeden_shield_of_the_blue);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->RemoveAurasDueToSpell(SPELL_FIRE_BLOOM);
+            target->RemoveMovementImpairingAuras(false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_shield_of_the_blue::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_kiljaeden()
 {
     RegisterSunwellPlateauCreatureAI(npc_kiljaeden_controller);
@@ -1196,4 +1214,5 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     RegisterSpellScript(spell_kiljaeden_dragon_breath);
+    RegisterSpellScript(spell_kiljaeden_shield_of_the_blue);
 }

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,6 +23,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
@@ -34,8 +35,7 @@ enum ThorimSpells
     SPELL_SHEATH_OF_LIGHTNING               = 62276,
     SPELL_STORMHAMMER                       = 62042,
     SPELL_BERSERK_FRIENDS                   = 62560,
-    SPELL_CHAIN_LIGHTNING_10                = 62131,
-    SPELL_CHAIN_LIGHTNING_25                = 64390,
+    SPELL_CHAIN_LIGHTNING                   = 62131,
     SPELL_UNBALANCING_STRIKE                = 62130,
     SPELL_BERSERK                           = 26662,
 
@@ -54,17 +54,13 @@ enum ThorimSpells
     SPELL_SIF_CHANNEL_HOLOGRAM              = 64324,
     SPELL_FROSTBOLT                         = 62601,
     SPELL_FROSTBOLT_VALLEY                  = 62604,
-    SPELL_BLIZZARD_10                       = 62577,
-    SPELL_BLIZZARD_25                       = 62603,
+    SPELL_BLIZZARD                          = 62577,
     SPELL_FROST_NOVA                        = 62605,
 
     // DARK RUNE ACOLYTE
-    SPELL_GREATER_HEAL_10                   = 62334,
-    SPELL_GREATER_HEAL_25                   = 62442,
-    SPELL_HOLY_SMITE_10                     = 62335,
-    SPELL_HOLY_SMITE_25                     = 62443,
-    SPELL_RENEW_10                          = 62333,
-    SPELL_RENEW_25                          = 62441,
+    SPELL_GREATER_HEAL                      = 62334,
+    SPELL_HOLY_SMITE                        = 62335,
+    SPELL_RENEW                             = 62333,
 
     // CAPTURED MERCENARY SOLDIER
     SPELL_BARBED_SHOT                       = 62318,
@@ -76,19 +72,15 @@ enum ThorimSpells
     SPELL_HEROIC_STRIKE                     = 62444,
 
     // JORMUNGAR BEHEMOTH
-    SPELL_ACID_BREATH_10                    = 62315,
-    SPELL_ACID_BREATH_25                    = 62415,
-    SPELL_SWEEP_10                          = 62316,
-    SPELL_SWEEP_25                          = 62417,
+    SPELL_ACID_BREATH                       = 62315,
+    SPELL_SWEEP                             = 62316,
 
     // IRON RING GUARD
-    SPELL_IMPALE_10                         = 62331,
-    SPELL_IMPALE_25                         = 62418,
+    SPELL_IMPALE                            = 62331,
     SPELL_WHIRLING_TRIP                     = 64151,
 
     // IRON HONOR GUARD
-    SPELL_SHIELD_SMASH_10                   = 62332,
-    SPELL_SHIELD_SMASH_25                   = 62420,
+    SPELL_SHIELD_SMASH                      = 62332,
     SPELL_CLEAVE                            = 42724,
     SPELL_HAMSTRING                         = 48639,
 
@@ -97,12 +89,9 @@ enum ThorimSpells
     SPELL_RUNIC_STRIKE                      = 62322,
 
     // DARK RUNE EVOKER
-    SPELL_RUNIC_LIGHTNING_10                = 62327,
-    SPELL_RUNIC_LIGHTNING_25                = 62445,
-    SPELL_RUNIC_MENDING_10                  = 62328,
-    SPELL_RUNIC_MENDING_25                  = 62446,
-    SPELL_RUNIC_SHIELD_10                   = 62321,
-    SPELL_RUNIC_SHIELD_25                   = 62529,
+    SPELL_RUNIC_LIGHTNING                   = 62327,
+    SPELL_RUNIC_MENDING                     = 62328,
+    SPELL_RUNIC_SHIELD                      = 62321,
 
     // DARK RUNE CHAMPION
     SPELL_CHARGE                            = 32323,
@@ -114,8 +103,7 @@ enum ThorimSpells
     SPELL_PUMMEL                            = 38313,
 
     // RUNIC COLOSSUS
-    SPELL_COLOSSUS_CHARGE_10                = 62613,
-    SPELL_COLOSSUS_CHARGE_25                = 62614,
+    SPELL_COLOSSUS_CHARGE                   = 62613,
     SPELL_RUNIC_BARRIER                     = 62338,
     SPELL_SMASH                             = 62339,
     SPELL_RUNIC_SMASH_LEFT                  = 62057,
@@ -125,28 +113,13 @@ enum ThorimSpells
     // ANCIENT RUNE GIANT
     SPELL_RUNE_DETONATION                   = 62526,
     SPELL_RUNIC_FORTIFICATION               = 62942,
-    SPELL_STOMP_10                          = 62411,
-    SPELL_STOMP_25                          = 62413,
+    SPELL_STOMP                             = 62411,
 
     // TRAPS
     SPELL_LIGHTNING_FIELD                   = 64972,
     SPELL_PARALYTIC_FIELD_FIRST             = 62241,
     SPELL_PARALYTIC_FIELD_SECOND            = 63540,
 };
-
-#define SPELL_GREATER_HEAL          RAID_MODE(SPELL_GREATER_HEAL_10, SPELL_GREATER_HEAL_25)
-#define SPELL_HOLY_SMITE            RAID_MODE(SPELL_HOLY_SMITE_10, SPELL_HOLY_SMITE_25)
-#define SPELL_RENEW                 RAID_MODE(SPELL_RENEW_10, SPELL_RENEW_25)
-#define SPELL_ACID_BREATH           RAID_MODE(SPELL_ACID_BREATH_10, SPELL_ACID_BREATH_25)
-#define SPELL_SWEEP                 RAID_MODE(SPELL_SWEEP_10, SPELL_SWEEP_25)
-#define SPELL_IMPALE                RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25)
-#define SPELL_COLOSSUS_CHARGE       RAID_MODE(SPELL_COLOSSUS_CHARGE_10, SPELL_COLOSSUS_CHARGE_25)
-#define SPELL_STOMP                 RAID_MODE(SPELL_STOMP_10, SPELL_STOMP_25)
-#define SPELL_SHIELD_SMASH          RAID_MODE(SPELL_SHIELD_SMASH_10, SPELL_SHIELD_SMASH_25)
-#define SPELL_RUNIC_LIGHTNING       RAID_MODE(SPELL_RUNIC_LIGHTNING_10, SPELL_RUNIC_LIGHTNING_25)
-#define SPELL_RUNIC_MENDING         RAID_MODE(SPELL_RUNIC_MENDING_10, SPELL_RUNIC_MENDING_25)
-#define SPELL_RUNIC_SHIELD          RAID_MODE(SPELL_RUNIC_SHIELD_10, SPELL_RUNIC_SHIELD_25)
-#define SPELL_CHAIN_LIGHTNING       RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25)
 
 enum ThormNPCandGOs : uint32
 {
@@ -187,17 +160,20 @@ enum ThorimEvents
     EVENT_THORIM_CHARGE_ORB                 = 3,
     EVENT_THORIM_LIGHTNING_ORB              = 4,
     EVENT_THORIM_NOT_REACH_IN_TIME          = 5,
-    EVENT_THORIM_FILL_ARENA                 = 6,
-    EVENT_THORIM_UNBALANCING_STRIKE         = 7,
-    EVENT_THORIM_LIGHTNING_CHARGE           = 8,
-    EVENT_THORIM_CHAIN_LIGHTNING            = 9,
-    EVENT_THORIM_BERSERK                    = 10,
-    EVENT_THORIM_AGGRO                      = 11,
-    EVENT_THORIM_AGGRO2                     = 12,
-    EVENT_THORIM_OUTRO1                     = 13,
-    EVENT_THORIM_OUTRO2                     = 14,
-    EVENT_THORIM_OUTRO3                     = 15,
-    EVENT_THORIM_OUTRO4                     = 16,
+    EVENT_THORIM_ARENA_SPAWN_WARBRINGER     = 6,
+    EVENT_THORIM_ARENA_SPAWN_EVOKER         = 7,
+    EVENT_THORIM_ARENA_SPAWN_COMMONER       = 8,
+    EVENT_THORIM_ARENA_SPAWN_CHAMPION       = 9,
+    EVENT_THORIM_UNBALANCING_STRIKE         = 10,
+    EVENT_THORIM_LIGHTNING_CHARGE           = 11,
+    EVENT_THORIM_CHAIN_LIGHTNING            = 12,
+    EVENT_THORIM_BERSERK                    = 13,
+    EVENT_THORIM_AGGRO                      = 14,
+    EVENT_THORIM_AGGRO2                     = 15,
+    EVENT_THORIM_OUTRO1                     = 16,
+    EVENT_THORIM_OUTRO2                     = 17,
+    EVENT_THORIM_OUTRO3                     = 18,
+    EVENT_THORIM_OUTRO4                     = 19,
 
     EVENT_DR_ACOLYTE_GH                     = 20,
     EVENT_DR_ACOLYTE_HS                     = 21,
@@ -322,8 +298,6 @@ enum Misc
 };
 
 const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
-
-const uint32 RollTable[3] = { 32877, 32878, 32876 };
 
 class boss_thorim : public CreatureScript
 {
@@ -561,7 +535,7 @@ public:
                     me->AddThreat(player, 1000.0f);
             }
 
-            if (damage >= me->GetHealth())
+            if (damage >= me->GetHealth()|| me->GetHealth()<2)
             {
                 damage = 0;
                 if (!_encounterFinished)
@@ -604,22 +578,22 @@ public:
             }
         }
 
-        void SpawnArenaNPCs()
+        void SpawnAnArenaNPC(uint32 arenaNpc)
         {
             Creature* cr;
-            uint8 rnd;
-            if (_spawnCommoners || urand(0, 2))
-                _spawnCommoners = !_spawnCommoners;
+            uint8 rnd = urand(0,13);
+            if ((cr = me->SummonCreature(arenaNpc, ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
+                cr->GetMotionMaster()->MoveJump(
+                    Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
+                    Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
+                    Middle.GetPositionZ(), 20, 20);
+        }
 
-            for (uint8 i = 0; i < (_spawnCommoners ? 7 : 2); ++i)
-            {
-                rnd = urand(0, 13);
-                if ((cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0, 2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
-                    cr->GetMotionMaster()->MoveJump(
-                        Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
-                        Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
-                        Middle.GetPositionZ(), 20, 20);
-            }
+        void SpawnCommoners()
+        {
+            uint8 rnd = urand(6,7);
+            for (uint8 i = 0; i < rnd; ++i)
+                SpawnAnArenaNPC(NPC_DARK_RUNE_COMMONER);
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
@@ -685,10 +659,12 @@ public:
                     {
                         events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8s, 0, EVENT_PHASE_START);
                         events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14s, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_FILL_ARENA, 0ms, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_WARBRINGER, 0ms, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_EVOKER, 5s, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_COMMONER, 7s, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_CHAMPION, 10s, 0, EVENT_PHASE_START);
                         events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5s, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
                         events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 5min, 0, EVENT_PHASE_START);
-
                         EntryCheckPredicate pred(NPC_SIF);
                         summons.DoAction(ACTION_SIF_START_DOMINION, pred);
                         break;
@@ -724,9 +700,21 @@ public:
                     me->CastSpell(me, SPELL_BERSERK_FRIENDS, true);
                     me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                     break;
-                case EVENT_THORIM_FILL_ARENA:
-                    SpawnArenaNPCs();
-                    events.Repeat(10s);
+                case EVENT_THORIM_ARENA_SPAWN_WARBRINGER:
+                    SpawnAnArenaNPC(NPC_DARK_RUNE_WARBRINGER);
+                    events.Repeat(15s);
+                    break;
+                case EVENT_THORIM_ARENA_SPAWN_EVOKER:
+                    SpawnAnArenaNPC(NPC_DARK_RUNE_EVOKER);
+                    events.Repeat(20s);
+                    break;
+                case EVENT_THORIM_ARENA_SPAWN_COMMONER:
+                    SpawnCommoners();
+                    events.Repeat(21s);
+                    break;
+                case EVENT_THORIM_ARENA_SPAWN_CHAMPION:
+                    SpawnAnArenaNPC(NPC_DARK_RUNE_CHAMPION);
+                    events.Repeat(25s);
                     break;
                 case EVENT_THORIM_UNBALANCING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
@@ -844,7 +832,7 @@ public:
             else if (param == ACTION_SIF_TRANSFORM)
             {
                 me->CastSpell(me, SPELL_SIF_TRANSFORM, true);
-                me->DespawnOrUnsummon(5000);
+                me->DespawnOrUnsummon(5s);
                 events.Reset();
                 _allowCast = false;
             }
@@ -860,7 +848,7 @@ public:
             {
                 case EVENT_SIF_FINISH_DOMINION:
                     Talk(SAY_SIF_HM_MISSED);
-                    me->DespawnOrUnsummon(5000);
+                    me->DespawnOrUnsummon(5s);
                     break;
                 case EVENT_SIF_START_TALK:
                     Talk(SAY_SIF_AGGRO);
@@ -919,7 +907,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true);
+            Start(false);
         }
 
         uint32 Timer;
@@ -1005,7 +993,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true);
+            Start(false);
             SetDespawnAtEnd(false);
         }
 
@@ -1029,7 +1017,7 @@ public:
         {
             me->SetSpeed(MOVE_RUN, 1);
             me->SetSpeed(MOVE_WALK, 1);
-            me->CastSpell(me, RAID_MODE(SPELL_BLIZZARD_10, SPELL_BLIZZARD_25), true);
+            me->CastSpell(me, SPELL_BLIZZARD, true);
         }
 
         void WaypointReached(uint32  /*point*/) override
@@ -1191,7 +1179,7 @@ public:
                     events.Repeat(1600ms);
                     break;
                 case EVENT_DR_ACOLYTE_R:
-                    if (HealthBelowPct(75) && !me->HasAura(SPELL_RENEW))
+                    if (HealthBelowPct(75) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_RENEW, me)))
                         me->CastSpell(me, SPELL_GREATER_HEAL, false);
                     else if (Unit* target = DoSelectLowestHpFriendly(60.0f, 10))
                         me->CastSpell(target, SPELL_RENEW, false);
@@ -1316,7 +1304,7 @@ public:
                     events.Repeat(1600ms);
                     break;
                 case EVENT_DR_ACOLYTE_R:
-                    if (HealthBelowPct(75) && !me->HasAura(SPELL_RENEW))
+                    if (HealthBelowPct(75) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_RENEW, me)))
                         me->CastSpell(me, SPELL_GREATER_HEAL, false);
                     else if (Unit* target = DoSelectLowestHpFriendly(60.0f, 10))
                         me->CastSpell(target, SPELL_RENEW, false);

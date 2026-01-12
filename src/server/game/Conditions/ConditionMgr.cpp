@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -18,6 +18,8 @@
 #include "ConditionMgr.h"
 #include "AchievementMgr.h"
 #include "GameEventMgr.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
@@ -68,7 +70,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             {
                 // don't allow 0 items (it's checked during table load)
                 ASSERT(ConditionValue2);
-                bool checkBank = !!ConditionValue3;
+                bool checkBank = ConditionValue3;
                 condMeets = player->HasItemCount(ConditionValue1, ConditionValue2, checkBank);
             }
         }
@@ -540,6 +542,23 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         condMeets = object->GetMap()->GetDifficulty() == ConditionValue1;
         break;
     }
+    case CONDITION_RANDOM_DUNGEON:
+    {
+        if (Unit* unit = object->ToUnit())
+        {
+            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (sLFGMgr->selectedRandomLfgDungeon(player->GetGUID()))
+                {
+                    if (!ConditionValue1)
+                        condMeets = true;
+                    else if (Map* map = player->GetMap())
+                        condMeets = map->GetDifficulty() == Difficulty(ConditionValue2);
+                }
+            }
+        }
+        break;
+    }
     case CONDITION_PET_TYPE:
     {
         if (Unit* unit = object->ToUnit())
@@ -573,7 +592,15 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_WORLD_SCRIPT:
     {
-        condMeets = sWorldState->IsConditionFulfilled(static_cast<WorldStateCondition>(ConditionValue1), static_cast<WorldStateConditionState>(ConditionValue2));
+        condMeets = sWorldState->IsConditionFulfilled(ConditionValue1, ConditionValue2);
+        break;
+    }
+    case CONDITION_AI_DATA:
+    {
+        if (Creature* creature = object->ToCreature())
+            condMeets = creature->AI() && creature->AI()->GetData(ConditionValue1) == ConditionValue2;
+        else if (GameObject* go = object->ToGameObject())
+            condMeets = go->AI() && go->AI()->GetData(ConditionValue1) == ConditionValue2;
         break;
     }
     default:
@@ -776,8 +803,14 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
     case CONDITION_CHARMED:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
         break;
+    case CONDITION_RANDOM_DUNGEON:
+        mask |= GRID_MAP_TYPE_MASK_PLAYER;
+        break;
     case CONDITION_WORLD_SCRIPT:
         mask |= GRID_MAP_TYPE_MASK_ALL;
+        break;
+    case CONDITION_AI_DATA:
+        mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_GAMEOBJECT;
         break;
     default:
         ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
@@ -2452,6 +2485,20 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "CONDITION_DIFFICULTY_ID has non existing difficulty in value1 ({}), skipped.", cond->ConditionValue1);
             return false;
         }
+        break;
+    case CONDITION_RANDOM_DUNGEON:
+        if (cond->ConditionValue1 > 1)
+        {
+            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value1 ({}).", cond->ConditionValue1);
+            return false;
+        }
+        if (cond->ConditionValue2 >= MAX_DIFFICULTY)
+        {
+            LOG_ERROR("sql.sql", "RandomDungeon condition has invalid difficulty in value2 ({}).", cond->ConditionValue1);
+            return false;
+        }
+        if (cond->ConditionValue3)
+            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value3 ({}).", cond->ConditionValue3);
         break;
     case CONDITION_PET_TYPE:
         if (cond->ConditionValue1 >= (1 << MAX_PET_TYPE))

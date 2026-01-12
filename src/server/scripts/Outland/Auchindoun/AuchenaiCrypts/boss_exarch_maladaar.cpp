@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -67,8 +67,6 @@ struct boss_exarch_maladaar : public BossAI
         });
     }
 
-    bool _talked;
-
     void Reset() override
     {
         _Reset();
@@ -113,6 +111,7 @@ struct boss_exarch_maladaar : public BossAI
                 {
                     summon->CastSpell(summon, SPELL_STOLEN_SOUL_VISUAL, false);
                     summon->SetDisplayId(target->GetDisplayId());
+                    summon->AI()->SetGUID(target->GetGUID());
                     summon->AI()->DoAction(target->getClass());
                     summon->AI()->AttackStart(target);
                 }
@@ -152,20 +151,21 @@ struct boss_exarch_maladaar : public BossAI
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    bool _talked;
 };
 
 struct npc_stolen_soul : public ScriptedAI
 {
     npc_stolen_soul(Creature* creature) : ScriptedAI(creature) {}
 
-    uint8 myClass;
-
     void Reset() override
     {
-        myClass = CLASS_WARRIOR;
+        _myClass = CLASS_WARRIOR;
         _scheduler.Schedule(1s, [this] (TaskContext /*context*/)
         {
-            switch (myClass)
+            switch (_myClass)
             {
                 case CLASS_WARRIOR:
                     _scheduler.Schedule(0ms, [this](TaskContext context)
@@ -241,9 +241,14 @@ struct npc_stolen_soul : public ScriptedAI
         });
     }
 
+    void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
+    {
+        _targetGuid = guid;
+    }
+
     void DoAction(int32 pClass) override
     {
-        myClass = pClass;
+        _myClass = pClass;
     }
 
     void UpdateAI(uint32 diff) override
@@ -255,8 +260,16 @@ struct npc_stolen_soul : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGuid))
+            target->RemoveAurasDueToSpell(SPELL_STOLEN_SOUL);
+    }
+
 private:
     TaskScheduler _scheduler;
+    ObjectGuid _targetGuid;
+    uint8 _myClass;
 };
 
 void AddSC_boss_exarch_maladaar()

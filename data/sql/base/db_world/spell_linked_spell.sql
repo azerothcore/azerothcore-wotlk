@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -73,7 +73,6 @@ INSERT INTO `spell_linked_spell` VALUES
 (-62475,-62399,0,'System Shutdown - Overload Circuit'),
 (-62475,-62375,0,'System Shutdown - Gathering Speed'),
 (-62475,62472,0,'System Shutdown'),
-(-61874,24870,0,'Noblegarden Chocolate'),
 (-61291,-63311,0,'Glyph of Shadowflame Rank 2'),
 (-59907,7,0,'Lightwell Charges - Suicide'),
 (-59743,54343,0,''),
@@ -88,9 +87,13 @@ INSERT INTO `spell_linked_spell` VALUES
 (-52610,-62071,0,'Savage Roar'),
 (-52278,52279,0,'Hell Hath a Fury: High Priestess Tua-Tua on Burn'),
 (-52249,41909,0,'Hell Hath a Fury: Hex of Air Knockback'),
+(-52192,-51971,0,'Remove Scourge Disguise Instability [51971]'),
 (-52098,52092,0,'Charge Up - Temporary Electrical Charge'),
-(-52010,-51966,0,'Remove Scourge Disguise'),
+(-52010,-52192,0,'Remove Scourge Disguise [52192]'),
+(-52010,-51966,0,'Remove Scourge Disguise [51966]'),
+(-51966,-51971,0,'Remove Scourge Disguise Instability [51971]'),
 (-51221,44280,0,'On spellfade Taxi to Explorers\' League Outpost - Spellcast Taxi to Explorers\' League'),
+(-50845,-50844,0,'Tenris Mirkblood Blood Mirror'),
 (-50493,-50314,0,'Disco Ball(Listening to Music)'),
 (-50314,-50493,0,'Disco Ball'),
 (-50098,50099,0,'The Beast Within - trigger Unleash the Beast!'),
@@ -113,9 +116,12 @@ INSERT INTO `spell_linked_spell` VALUES
 (-46837,-46838,0,'Shattrath Flask of Pure Death'),
 (-46637,46638,0,'Break Ice (Madrigosa barrier'),
 (-46637,47030,0,'Break Ice (Madrigosa barrier'),
+(-46630,-45724,0,'Removing \'Torch Tossing Practice\' removes \'Braziers Hit!\''),
 (-45964,-46333,0,''),
 (-45717,-45726,0,'Fog of Corruption - Charm'),
+(-45716,-45724,0,'Removing \'Torch Tossing Training\' removes \'Braziers Hit!\''),
 (-45373,-45374,0,'Bloodberry Elixir'),
+(-44873,44874,0,'on Flame Ring removal cast Flame Ring explosion (Brutallus - Madrigosa)'),
 (-43883,-43332,0,'Rental racing ram removed removes Exhausted'),
 (-43883,-43310,0,'Remove Ram level Neutral when Rental racing ram removed'),
 (-43883,-42994,0,'Rental racing ram removed removes Gallop'),
@@ -123,7 +129,6 @@ INSERT INTO `spell_linked_spell` VALUES
 (-43883,-42992,0,'Rental racing ram removed removes Trot'),
 (-43883,-42146,0,'Remove Brewfest Ram DND when Rental racing ram removed'),
 (-43369,-68347,0,'Worg Disguise'),
-(-43351,50167,0,''),
 (-43351,61720,0,''),
 (-42846,-36032,0,'Arcane Missiles Rank 13'),
 (-42843,-36032,0,'Arcane Missiles Rank 12'),
@@ -252,7 +257,6 @@ INSERT INTO `spell_linked_spell` VALUES
 (23414,-1857,2,'Nefarian Rogue class call - Vanish'),
 (23414,-1856,2,'Nefarian Rogue class call - Vanish'),
 (24023,12021,1,'Charge (24023) will now trigger Fixate'),
-(24707,24870,2,'Bobbing Apple'),
 (24714,24750,1,'Trick cast Trick'),
 (24743,24730,1,'Cannon Prep - Link Teleport'),
 (24743,24754,1,'Cannon Prep - Link Stun'),
@@ -385,6 +389,8 @@ INSERT INTO `spell_linked_spell` VALUES
 (45458,45437,1,'Holiday - Midsummer, Stamp Out Bonfire, Quest Complete triggers Stamp Out Bonfire'),
 (45661,45665,1,'Encapsulate'),
 (45717,45726,1,'Fog of Corruption - Charm'),
+(45719,-46630,0,'\'Torch Tossing Training Success\' removes \'Torch Tossing Practice\''),
+(45719,-45716,0,'\'Torch Tossing Training Success\' removes \'Torch Tossing Training\''),
 (45750,45749,0,'Land Mine Barrier'),
 (45750,45751,0,'Land Mine Barrier'),
 (45750,45752,0,'Land Mine Barrier'),
@@ -393,6 +399,8 @@ INSERT INTO `spell_linked_spell` VALUES
 (45750,45755,0,'Land Mine Barrier'),
 (45750,45756,0,'Land Mine Barrier'),
 (45750,47839,0,'Land Mine Barrier'),
+(45848,47314,0,'Shield of the Blue 95% output damage reduction'),
+(45856,49725,1,'Power of the Blue Flight - Breath: Haste'),
 (45923,45922,1,'Shadow Prison Add'),
 (45950,-45922,1,'Shadow Prison Remove'),
 (45958,45956,1,'Signal Alliance'),
@@ -404,6 +412,8 @@ INSERT INTO `spell_linked_spell` VALUES
 (46242,46247,0,'Black Hole Visual (Birth)'),
 (46262,46265,0,'Void Zone Visual'),
 (46609,46610,1,'Freeze (Madrigosa barrier'),
+(46651,-46630,0,'\'Torch Tossing Training Success\' removes \'Torch Tossing Practice\''),
+(46651,-45716,0,'\'Torch Tossing Training Success\' removes \'Torch Tossing Training\''),
 (46671,46690,1,'Flame of Exodar'),
 (46672,46689,1,'Flame of Silvermoon'),
 (46770,47972,1,'Liquid Fire of Elune'),
@@ -463,8 +473,13 @@ INSERT INTO `spell_linked_spell` VALUES
 (51671,51717,1,'On Ghostly - Spellcast Altar of Quetz\'lun: Summon Material You'),
 (51690,61851,2,'Rogue - Killing Spree'),
 (51723,52874,0,'Fan Of Knives'),
+(51966,-52192,0,'Remove Scourge Disguise [52192]'),
+(51966,51971,0,'Add Scourge Disguise Instability [51971]'),
 (52089,52091,1,'Teleport'),
+(52192,-51966,0,'Remove Scourge Disguise [51966]'),
+(52192,51971,0,'Add Scourge Disguise Instability [51971]'),
 (52214,51407,2,'Looking for treasure aura triggered by Rainspeaker Treasures: See Invisibility'),
+(52239,52240,1,'Teleport'),
 (52279,45254,1,'On spellhit Tua-Tua on Burn - Spellcast Suicide'),
 (52303,45254,1,'On spellhit Hawinni on Frozen - Spellcast Suicide'),
 (52322,52325,1,'Explode Scourgewagon'),
@@ -485,11 +500,8 @@ INSERT INTO `spell_linked_spell` VALUES
 (53355,-53371,1,'Freeze fix'),
 (53371,-53355,1,'Freeze fix'),
 (53563,53651,2,'Beacon of Light'),
+(54076,49511,0,'Taxi validate - Gryphon to Star Rest'),
 (54097,-54100,1,'Widow\'s Embrace - Frenzy (H)'),
-(54581,54623,0,'Mammoth Explosion Spell Spawner link to Quest - Mammoth Explosion Summon Object'),
-(54581,54627,0,'Mammoth Explosion Spell Spawner link to Quest - Mammoth Explosion Summon Object'),
-(54581,54628,0,'Mammoth Explosion Spell Spawner link to Quest - Mammoth Explosion Summon Object'),
-(54581,57444,0,'Mammoth Explosion Spell Spawner link to Summon Main Mammoth Meat'),
 (54640,54643,0,'WG teleporter'),
 (54643,-54643,2,'Wintergrasp Defender Teleport'),
 (54861,-34976,0,'Drop Flag on Nitro Boost EOS'),
@@ -644,5 +656,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:39
-
+-- Dump completed on 2025-12-29 17:54:36

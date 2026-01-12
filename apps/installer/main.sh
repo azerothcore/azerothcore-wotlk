@@ -1,105 +1,119 @@
 #!/usr/bin/env bash
 
+# AzerothCore Dashboard Script
+#
+# This script provides an interactive menu system for AzerothCore management
+# using the unified menu system library.
+#
+# Usage:
+#   ./acore.sh                    - Interactive mode with numeric and text selection
+#   ./acore.sh <command> [args]   - Direct command execution (only text commands, no numbers)
+#
+# Interactive Mode:
+#   - Select options by number (1, 2, 3...), command name (init, compiler, etc.),
+#     or short alias (i, c, etc.)
+#   - All selection methods work in interactive mode
+#
+# Direct Command Mode:
+#   - Only command names and short aliases are accepted (e.g., './acore.sh compiler build', './acore.sh c build')
+#   - Numeric selection is disabled to prevent confusion with command arguments
+#   - Examples: './acore.sh init', './acore.sh compiler clean', './acore.sh module install mod-name'
+#
+# Menu System:
+#   - Uses unified menu system from bash_shared/menu_system.sh
+#   - Single source of truth for menu definitions
+#   - Consistent behavior across all AzerothCore tools
+
 CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 source "$CURRENT_PATH/includes/includes.sh"
+source "$AC_PATH_APPS/bash_shared/menu_system.sh"
 
-PS3='[Please enter your choice]: '
-options=(
-    "init (i): First Installation"                  # 1
-    "install-deps (d): Configure OS dep"            # 2
-    "pull (u): Update Repository"                   # 3
-    "reset (r): Reset & Clean Repository"           # 4
-    "compiler (c): Run compiler tool"               # 5
-    "module-search (ms): Module Search by keyword" # 6
-    "module-install (mi): Module Install by name"  # 7
-    "module-update (mu): Module Update by name"    # 8
-    "module-remove: (mr): Module Remove by name"   # 9
-    "client-data: (gd): download client data from github repository (beta)"   # 10
-    "run-worldserver (rw): execute a simple restarter for worldserver" # 11
-    "run-authserver (ra): execute a simple restarter for authserver" # 12
-    "docker (dr): Run docker tools" # 13
-    "version (v): Show AzerothCore version"         # 14
-    "service-manager (sm): Run service manager to run authserver and worldserver in background" # 15
-    "quit: Exit from this menu"                     # 16
-    )
+# Menu: single ordered source of truth (no functions in strings)
+# Format: "key|short|description"
+menu_items=(
+    "init|i|First Installation"
+    "install-deps|d|Configure OS dep"
+    "pull|u|Update Repository"
+    "reset|r|Reset & Clean Repository"
+    "setup-db|r|Install db only"
+    "compiler|c|Run compiler tool"
+    "module|m|Module manager (search/install/update/remove)"
+    "client-data|gd|download client data from github repository (beta)"
+    "run-worldserver|rw|execute a simple restarter for worldserver"
+    "run-authserver|ra|execute a simple restarter for authserver"
+    "test|t|Run test framework"
+    "docker|dr|Run docker tools"
+    "version|v|Show AzerothCore version"
+    "service-manager|sm|Run service manager to run authserver and worldserver in background"
+    "config|cf|Configuration manager"
+    "quit|q|Exit from this menu"
+)
 
-function _switch() {
-    _reply="$1"
-    _opt="$2"
 
-    case $_reply in
-        ""|"i"|"init"|"1")
+# Menu command handler - called by menu system for each command
+function handle_menu_command() {
+    local key="$1"
+    shift
+
+    case "$key" in
+        "init")
             inst_allInOne
             ;;
-        ""|"d"|"install-deps"|"2")
+        "install-deps")
             inst_configureOS
             ;;
-        ""|"u"|"pull"|"3")
+        "pull")
             inst_updateRepo
             ;;
-        ""|"r"|"reset"|"4")
+        "reset")
             inst_resetRepo
             ;;
-        ""|"c"|"compiler"|"5")
-            bash "$AC_PATH_APPS/compiler/compiler.sh" $_opt
+        "setup-db")
+            inst_dbCreate
             ;;
-        ""|"ms"|"module-search"|"6")
-            inst_module_search "$_opt"
+        "compiler")
+            bash "$AC_PATH_APPS/compiler/compiler.sh" "$@"
             ;;
-        ""|"mi"|"module-install"|"7")
-            inst_module_install "$_opt"
+        "module")
+            bash "$AC_PATH_APPS/installer/includes/modules-manager/module-main.sh" "$@"
             ;;
-        ""|"mu"|"module-update"|"8")
-            inst_module_update "$_opt"
-            ;;
-        ""|"mr"|"module-remove"|"9")
-            inst_module_remove "$_opt"
-            ;;
-        ""|"gd"|"client-data"|"10")
+        "client-data")
             inst_download_client_data
             ;;
-        ""|"rw"|"run-worldserver"|"11")
+        "run-worldserver")
             inst_simple_restarter worldserver
             ;;
-        ""|"ra"|"run-authserver"|"12")
+        "run-authserver")
             inst_simple_restarter authserver
             ;;
-        ""|"dr"|"docker"|"13")
-            DOCKER=1 bash "$AC_PATH_ROOT/apps/docker/docker-cmd.sh" "${@:2}"
+        "test")
+            bash "$AC_PATH_APPS/test-framework/test-main.sh" "$@"
+            ;;
+        "docker")
+            DOCKER=1 bash "$AC_PATH_ROOT/apps/docker/docker-cmd.sh" "$@"
             exit
             ;;
-        ""|"v"|"version"|"14")
-            # denoRunFile "$AC_PATH_APPS/installer/main.ts" "version"
+        "version")
             printf "AzerothCore Rev. %s\n" "$ACORE_VERSION"
             exit
             ;;
-        ""|"sm"|"service-manager"|"15")
-            bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "${@:2}"
+        "service-manager")
+            bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "$@"
             exit
             ;;
-        ""|"quit"|"16")
+        "config")
+            bash "$AC_PATH_APPS/installer/includes/config/config-main.sh" "$@"
+            ;;
+        "quit")
             echo "Goodbye!"
             exit
             ;;
-        ""|"--help")
-            echo "Available commands:"
-            printf '%s\n' "${options[@]}"
+        *)
+            echo "Invalid option. Use --help to see available commands."
+            return 1
             ;;
-        *) echo "invalid option, use --help option for the commands list";;
     esac
 }
 
-while true
-do
-    # run option directly if specified in argument
-    [ ! -z $1 ] && _switch $@ # old method: "${options[$cmdopt-1]}"
-    [ ! -z $1 ] && exit 0
-
-    echo "==== ACORE DASHBOARD ===="
-    select opt in "${options[@]}"
-    do
-        _switch $REPLY
-        break
-    done
-done
+# Run the menu system
+menu_run_with_items "ACORE DASHBOARD" handle_menu_command -- "${menu_items[@]}" -- "$@"

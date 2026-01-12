@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -2805,10 +2805,10 @@ INSERT INTO `item_loot_template` VALUES
 (17726,17722,0,17,0,1,1,1,1,'Smokywood Pastures Special Gift - Pattern: Gloves of the Greatfather'),
 (17726,17724,0,17,0,1,1,1,1,'Smokywood Pastures Special Gift - Pattern: Green Holiday Shirt'),
 (17726,17725,0,17,0,1,1,1,1,'Smokywood Pastures Special Gift - Formula: Enchant Weapon - Winter\'s Might'),
-(17727,785,0,27.5,0,1,0,10,10,'Smokywood Pastures Gift Pack - Mageroyal'),
-(17727,2318,0,24.2,0,1,0,10,10,'Smokywood Pastures Gift Pack - Light Leather'),
-(17727,2840,0,21.3,0,1,0,10,10,'Smokywood Pastures Gift Pack - Copper Bar'),
-(17727,2996,0,26.9,0,1,0,4,4,'Smokywood Pastures Gift Pack - Bolt of Linen Cloth'),
+(17727,785,0,0,0,1,1,10,10,'Smokywood Pastures Gift Pack - Mageroyal'),
+(17727,2318,0,0,0,1,1,10,10,'Smokywood Pastures Gift Pack - Light Leather'),
+(17727,2840,0,0,0,1,1,10,10,'Smokywood Pastures Gift Pack - Copper Bar'),
+(17727,2996,0,0,0,1,1,4,4,'Smokywood Pastures Gift Pack - Bolt of Linen Cloth'),
 (17962,1529,0,67.6,0,1,0,1,3,'Blue Sack of Gems - Jade'),
 (17962,3864,0,55.9,0,1,0,1,3,'Blue Sack of Gems - Citrine'),
 (17962,7909,0,64.7,0,1,0,1,3,'Blue Sack of Gems - Aquamarine'),
@@ -4081,8 +4081,8 @@ INSERT INTO `item_loot_template` VALUES
 (23846,23844,0,100,0,1,0,1,1,'Nolkai\'s Box - Nolkai\'s Lantern'),
 (23846,23847,0,100,0,1,0,1,1,'Nolkai\'s Box - Nolkai\'s Band'),
 (23846,23852,0,100,0,1,0,1,1,'Nolkai\'s Box - Nolkai\'s Bag'),
-(24336,23682,0,96.1,0,1,0,1,1,'Fireproof Satchel - Ritual Torch'),
-(24336,24335,0,99.8,0,1,0,1,1,'Fireproof Satchel - Orb of Returning'),
+(24336,23682,0,0,1,1,1,1,1,'Fireproof Satchel - Ritual Torch'),
+(24336,24335,0,0,0,1,2,1,1,'Fireproof Satchel - Orb of Returning'),
 (24402,765,0,0.4,0,1,4,1,1,'Package of Identified Plants - Silverleaf'),
 (24402,785,0,0.4,0,1,4,1,1,'Package of Identified Plants - Mageroyal'),
 (24402,2447,0,0.4,0,1,4,1,1,'Package of Identified Plants - Peacebloom'),
@@ -4603,6 +4603,11 @@ INSERT INTO `item_loot_template` VALUES
 (43575,24282,0,4.2,0,1,0,1,1,'Reinforced Junkbox - Rogue\'s Diary'),
 (43575,27729,0,2.6,0,1,0,1,1,'Reinforced Junkbox - Humanoid Skull'),
 (43575,33447,0,12.6,0,1,0,1,1,'Reinforced Junkbox - Runic Healing Potion'),
+(43575,36422,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Filigree Ring'),
+(43575,36423,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Posy Ring'),
+(43575,36424,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Cameo Ring'),
+(43575,36427,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Engraved Ring'),
+(43575,36436,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Jasper Bead Necklace'),
 (43575,36918,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Scarlet Ruby'),
 (43575,36921,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Autumn\'s Glow'),
 (43575,36924,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Sky Sapphire'),
@@ -4613,6 +4618,9 @@ INSERT INTO `item_loot_template` VALUES
 (43575,43234,0,10.4,0,1,0,1,1,'Reinforced Junkbox - Wound Poison VI'),
 (43575,43235,0,11.1,0,1,0,1,1,'Reinforced Junkbox - Wound Poison VII'),
 (43575,43237,0,10.3,0,1,0,1,1,'Reinforced Junkbox - Anesthetic Poison II'),
+(43575,43611,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Krol Cleaver'),
+(43575,43612,0,0.1,0,1,0,1,1,'Reinforced Junkbox - Spineslicer'),
+(43575,43613,0,0.1,0,1,0,1,1,'Reinforced Junkbox - The Dusk Blade'),
 (43622,35979,0,1.3,0,1,0,1,1,'Froststeel Lockbox - Foothold Belt'),
 (43622,35980,0,0.6,0,1,0,1,1,'Froststeel Lockbox - Foothold Boots'),
 (43622,35981,0,0.4,0,1,0,1,1,'Froststeel Lockbox - Foothold Robe'),
@@ -5042,5 +5050,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:00
-
+-- Dump completed on 2025-12-29 17:54:07

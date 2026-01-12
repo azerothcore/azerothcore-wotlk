@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -83,6 +83,7 @@ public:
             BossAI::Reset();
             events2.Reset();
             events2.ScheduleEvent(EVENT_PHANTOM, 21s);
+            me->SetCanDualWield(true);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -91,10 +92,16 @@ public:
             BossAI::JustEngagedWith(who);
             me->CastSpell(me, SPELL_MOJO_FRENZY, true);
 
-            events.ScheduleEvent(EVENT_GROUND_TREMOR, 18s);
-            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 10s);
+            events.ScheduleEvent(EVENT_GROUND_TREMOR, 13s, 30s);
+            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 8s, 38s);
             events.ScheduleEvent(EVENT_DETERMINED_STAB, 20s);
             events.ScheduleEvent(EVENT_TRANSFORMATION, 12s);
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            summons.DespawnAll();
+            BossAI::EnterEvadeMode(why);
         }
 
         void SpellHitTarget(Unit*  /*caster*/, SpellInfo const* spellInfo) override
@@ -104,6 +111,7 @@ public:
                 me->RemoveAurasDueToSpell(SPELL_MOJO_FRENZY);
                 events.CancelEvent(EVENT_TRANSFORMATION);
                 Talk(EMOTE_TRANSFORMED);
+                me->SetCanDualWield(false);
             }
         }
 
@@ -111,12 +119,13 @@ public:
         {
             Talk(SAY_DEATH);
             Talk(EMOTE_ALTAR);
+
             BossAI::JustDied(killer);
         }
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_SLAY);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -142,29 +151,52 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
+            while (uint32 eventId = events.ExecuteEvent())
             {
-                case EVENT_GROUND_TREMOR:
-                    if (roll_chance_i(50))
-                        Talk(SAY_QUAKE);
-                    me->CastSpell(me, me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_QUAKE : SPELL_GROUND_TREMOR, false);
-                    events.ScheduleEvent(EVENT_GROUND_TREMOR, 10s);
-                    break;
-                case EVENT_NUMBLING_SHOUT:
-                    me->CastSpell(me, me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_NUMBING_ROAR : SPELL_NUMBING_SHOUT, false);
-                    events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 10s);
-                    break;
-                case EVENT_DETERMINED_STAB:
-                    me->CastSpell(me->GetVictim(), me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_DETERMINED_GORE : SPELL_DETERMINED_STAB, false);
-                    events.ScheduleEvent(EVENT_DETERMINED_STAB, 8s);
-                    break;
-                case EVENT_TRANSFORMATION:
-                    Talk(EMOTE_TRANSFORM);
-                    Talk(SAY_TRANSFORM);
-                    me->CastSpell(me, SPELL_TRANSFORMATION, false);
-                    me->CastSpell(me, SPELL_SUMMON_PHANTOM_TRANSFORM, true);
-                    events.ScheduleEvent(EVENT_TRANSFORMATION, 10s);
-                    break;
+                switch (eventId)
+                {
+                    case EVENT_GROUND_TREMOR:
+                        if (roll_chance_i(50))
+                            Talk(SAY_QUAKE);
+
+                        if (me->GetDisplayId() != me->GetNativeDisplayId())
+                        {
+                            me->CastSpell(me, SPELL_QUAKE, false);
+                            events.ScheduleEvent(EVENT_GROUND_TREMOR, 16s, 63s);
+                        }
+                        else
+                        {
+                            me->CastSpell(me, SPELL_GROUND_TREMOR, false);
+                            events.ScheduleEvent(EVENT_GROUND_TREMOR, 13s, 27s);
+                        }
+                        return;
+
+                    case EVENT_NUMBLING_SHOUT:
+                        if (me->GetDisplayId() != me->GetNativeDisplayId())
+                        {
+                            me->CastSpell(me, SPELL_NUMBING_ROAR, false);
+                            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 8s, 54s);
+                        }
+                        else
+                        {
+                            me->CastSpell(me, SPELL_NUMBING_SHOUT, false);
+                            events.ScheduleEvent(EVENT_NUMBLING_SHOUT, 6s, 27s);
+                        }
+                        return;
+
+                    case EVENT_DETERMINED_STAB:
+                        me->CastSpell(me->GetVictim(), me->GetDisplayId() != me->GetNativeDisplayId() ? SPELL_DETERMINED_GORE : SPELL_DETERMINED_STAB, false);
+                        events.ScheduleEvent(EVENT_DETERMINED_STAB, 8s);
+                        return;
+
+                    case EVENT_TRANSFORMATION:
+                        Talk(EMOTE_TRANSFORM);
+                        Talk(SAY_TRANSFORM);
+                        me->CastSpell(me, SPELL_TRANSFORMATION, false);
+                        me->CastSpell(me, SPELL_SUMMON_PHANTOM_TRANSFORM, true);
+                        events.ScheduleEvent(EVENT_TRANSFORMATION, 10s);
+                        return;
+                }
             }
 
             DoMeleeAttackIfReady();

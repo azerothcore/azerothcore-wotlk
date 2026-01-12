@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,6 +23,7 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
+#include "Log.h"
 
 namespace Movement
 {
@@ -103,7 +104,13 @@ namespace Movement
 
         bool isOrientationOnly = args.path.size() == 2 && args.path[0] == args.path[1];
 
-        if ((moveFlags & MOVEMENTFLAG_ROOT) || isOrientationOnly)
+        if (moveFlags & MOVEMENTFLAG_ROOT) // This case should essentially never occur - hence the trace logging - hints to issues elsewhere
+        {
+            LOG_TRACE("movement", "Invalid movement during root. Entry: {} IsImmobilized {}, moveflags {}", unit->GetEntry(), unit->IsImmobilizedState() ? "true" : "false", moveFlags);
+            moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
+        }
+
+        if (isOrientationOnly)
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
 
         if (!args.HasVelocity)

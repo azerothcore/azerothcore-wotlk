@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -4034,8 +4034,12 @@ INSERT INTO `creature_questender` VALUES
 (16478,9260),
 (16478,9292),
 (16480,9281),
+(16484,9261),
+(16490,9264),
+(16493,9263),
 (16494,9265),
 (16494,9310),
+(16495,9262),
 (16499,9288),
 (16500,9290),
 (16501,9287),
@@ -6652,6 +6656,7 @@ INSERT INTO `creature_questender` VALUES
 (27720,12428),
 (27720,12429),
 (27720,12430),
+(27726,12431),
 (27759,12437),
 (27763,12448),
 (27763,12449),
@@ -7941,5 +7946,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:36
-
+-- Dump completed on 2025-12-29 17:53:45

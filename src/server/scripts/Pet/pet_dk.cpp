@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -47,6 +47,8 @@ enum DeathKnightSpells
     // Risen Ally
     SPELL_DK_RAISE_ALLY             = 46619,
     SPELL_GHOUL_FRENZY              = 62218,
+    // Gargoyle
+    SPELL_GARGOYLE_STRIKE           = 51963,
 };
 
 struct npc_pet_dk_ebon_gargoyle : ScriptedAI
@@ -89,12 +91,13 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         _selectionTimer = 2000;
         _initialCastTimer = 0;
+        _decisionTimer = 0;
     }
 
     void MySelectNextTarget()
     {
         Unit* owner = me->GetOwner();
-        if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
+        if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_GARGOYLE_STRIKE)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
         {
             Unit* selection = owner->ToPlayer()->GetSelectedUnit();
             if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))
@@ -118,7 +121,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         RemoveTargetAura();
         _targetGUID = who->GetGUID();
         me->AddAura(SPELL_DK_SUMMON_GARGOYLE_1, who);
-        ScriptedAI::AttackStart(who);
+        ScriptedAI::AttackStartCaster(who, 40);
     }
 
     void RemoveTargetAura()
@@ -171,7 +174,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
             std::list<Unit*> targets;
             Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50.0f);
             Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-            Cell::VisitAllObjects(me, searcher, 50.0f);
+            Cell::VisitObjects(me, searcher, 50.0f);
             for (auto const& target : targets)
                 if (target->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
                 {
@@ -184,6 +187,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         if (_despawnTimer > 4000)
         {
             _despawnTimer -= diff;
+            _decisionTimer -= diff;
             if (!UpdateVictimWithGaze())
             {
                 MySelectNextTarget();
@@ -197,8 +201,23 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
                 MySelectNextTarget();
                 _selectionTimer = 0;
             }
-            if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
-                me->CastSpell(me->GetVictim(), 51963, false);
+
+            if (_decisionTimer <= 0)
+            {
+                _decisionTimer += 400;
+                if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE && rand_chance() > 20.0f)
+                {
+                    if (me->HasSilenceAura() || me->IsSpellProhibited(SPELL_SCHOOL_MASK_NATURE))
+                    {
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    }
+                    else
+                    {
+                        me->GetMotionMaster()->MoveChase(me->GetVictim(), 40);
+                        DoCastVictim(SPELL_GARGOYLE_STRIKE);
+                    }
+                }
+            }
         }
         else
         {
@@ -217,6 +236,7 @@ private:
     uint32 _despawnTimer;
     uint32 _selectionTimer;
     uint32 _initialCastTimer;
+    int32 _decisionTimer;
     bool _despawning;
     bool _initialSelection;
 };
@@ -224,6 +244,20 @@ private:
 struct npc_pet_dk_ghoul : public CombatAI
 {
     npc_pet_dk_ghoul(Creature* c) : CombatAI(c) { }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (!summoner || !summoner->IsPlayer())
+            return;
+
+        Player* player = summoner->ToPlayer();
+
+        if (Unit* victim = player->GetVictim())
+        {
+            me->Attack(victim, true);
+            me->GetMotionMaster()->MoveChase(victim);
+        }
+    }
 
     void JustDied(Unit* /*who*/) override
     {
@@ -258,6 +292,28 @@ struct npc_pet_dk_army_of_the_dead : public CombatAI
         CombatAI::InitializeAI();
         ((Minion*)me)->SetFollowAngle(rand_norm() * 2 * M_PI);
     }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (Unit* owner = summoner->ToUnit())
+        {
+            Unit* victim = owner->GetVictim();
+
+            if (victim && me->IsValidAttackTarget(victim))
+            {
+                AttackStart(victim);
+            }
+            else
+            {
+                // If there is no valid target, attack the nearest enemy within 30m
+                if (Unit* nearest = me->SelectNearbyTarget(nullptr, 30.0f))
+                {
+                    if (me->IsValidAttackTarget(nearest))
+                        AttackStart(nearest);
+                }
+            }
+        }
+    }
 };
 
 struct npc_pet_dk_dancing_rune_weapon : public NullCreatureAI
@@ -280,17 +336,17 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
 
     void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
-        int32 damage = 60;
+        int32 damage = GetEffectValue();
         if (Unit* caster = GetCaster())
             if (caster->GetLevel() >= 60)
-                damage += (caster->GetLevel() - 60) * 4;
+                damage += (caster->GetLevel() - 60) * 3;
 
         SetEffectValue(damage);
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectLaunchTarget += SpellEffectFn(spell_pet_dk_gargoyle_strike::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 

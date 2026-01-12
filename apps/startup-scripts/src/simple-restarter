@@ -50,6 +50,8 @@ fi
 # Main restart loop
 while true; do
     STARTING_TIME=$(date +%s)
+
+    echo "AC_CONFIG_POLICY: $AC_CONFIG_POLICY"
     
     # Use starter script to launch the binary with all parameters
     "$STARTER_SCRIPT" "$BINPATH" "$BINFILE" "$GDB_FILE" "$CONFIG" "$SYSLOG" "$SYSERR" "$GDB_ENABLED" "$CRASHES_PATH"
@@ -66,7 +68,7 @@ while true; do
     echo "$(basename "$BINARY") terminated after $DIFFERENCE seconds, restart count: $_restart_count"
 
     # Crash loop detection
-    if [ $DIFFERENCE -lt 10 ]; then
+    if [ "$DIFFERENCE" -lt 10 ]; then
         # Increment instant crash count if runtime is lower than 10 seconds
         ((_instant_crash_count++))
         echo "Warning: Quick restart detected ($DIFFERENCE seconds) - instant crash count: $_instant_crash_count"
@@ -76,10 +78,16 @@ while true; do
     fi
 
     # Prevent infinite crash loops
-    if [ $_instant_crash_count -gt 5 ]; then
+    if [ "$_instant_crash_count" -gt 5 ]; then
         echo "Error: $(basename "$BINARY") restarter exited. Infinite crash loop prevented (6 crashes in under 10 seconds each)"
         echo "Please check your system configuration and logs"
         exit 1
+    fi
+
+    # Exit cleanly if shutdown was requested by command or SIGINT (exit code 0)
+    if [ "$_exit_code" -eq 0 ]; then
+        echo "$(basename "$BINARY") shutdown safely"
+        exit 0
     fi
     
     echo "$(basename "$BINARY") will restart in 3 seconds..."

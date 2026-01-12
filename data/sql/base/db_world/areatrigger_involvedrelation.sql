@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -68,6 +68,17 @@ INSERT INTO `areatrigger_involvedrelation` VALUES
 (3991,1658),
 (4064,9160),
 (4071,9193),
+(4092,9260),
+(4094,9260),
+(4095,9260),
+(4096,9260),
+(4098,9261),
+(4099,9261),
+(4100,9265),
+(4101,9263),
+(4103,9264),
+(4104,9262),
+(4105,9262),
 (4170,9400),
 (4200,9607),
 (4201,9608),
@@ -86,6 +97,14 @@ INSERT INTO `areatrigger_involvedrelation` VALUES
 (5003,12506),
 (5030,12575),
 (5052,12665),
+(5151,12817),
+(5152,12817),
+(5153,12817),
+(5154,12817),
+(5158,12816),
+(5159,12816),
+(5160,12816),
+(5161,12816),
 (5400,13607),
 (5703,24656),
 (5704,24656),
@@ -102,5 +121,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:15
-
+-- Dump completed on 2025-12-29 17:53:35

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -483,7 +483,7 @@ INSERT INTO `achievement_criteria_data` VALUES
 (3931,15,3,0,''),
 (3936,5,44827,0,''),
 (3937,5,44825,0,''),
-(3938,5,44824,0,''),
+(3938,11,0,0,'achievement_fa_la_la_la_ogrila'),
 (4071,5,45123,0,''),
 (4071,6,4395,0,''),
 (4090,0,0,0,''),
@@ -491,6 +491,7 @@ INSERT INTO `achievement_criteria_data` VALUES
 (4111,0,0,0,''),
 (4112,5,55005,0,''),
 (4112,6,4395,0,''),
+(4112,15,3,0,''),
 (4227,1,8403,0,''),
 (4227,11,0,0,'achievement_flirt_with_disaster_perf_check'),
 (4227,15,3,0,''),
@@ -2863,5 +2864,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:14
-
+-- Dump completed on 2025-12-29 17:53:32

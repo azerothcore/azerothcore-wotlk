@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -58,7 +58,7 @@ INSERT INTO `game_event` VALUES
 (14,'2016-10-29 00:00:00','2030-12-31 07:00:00',10080,1440,0,0,'Stranglethorn Fishing Extravaganza Announce',0,2),
 (15,'2016-10-30 14:00:00','2030-12-31 07:00:00',10080,120,301,0,'Stranglethorn Fishing Extravaganza Fishing Pools',0,2),
 (16,'2007-08-05 10:00:00','2030-12-31 12:00:00',180,120,0,0,'Gurubashi Arena Booty Run',0,2),
-(17,'2000-01-01 14:00:00','2000-01-01 14:00:00',525600,1,0,0,'Scourge Invasion',0,2),
+(17,'2000-01-01 14:00:00','2000-01-01 14:00:00',525600,1,0,0,'Scourge Invasion',5,2),
 (18,'2010-05-07 13:00:00','2030-12-31 12:00:00',60480,6240,283,1,'Call to Arms: Alterac Valley!',0,2),
 (19,'2010-04-02 13:00:00','2030-12-31 12:00:00',60480,6240,284,1,'Call to Arms: Warsong Gulch!',0,2),
 (20,'2010-04-23 13:00:00','2030-12-31 12:00:00',60480,6240,285,1,'Call to Arms: Arathi Basin!',0,2),
@@ -129,7 +129,97 @@ INSERT INTO `game_event` VALUES
 (87,'2008-01-02 11:55:00','2030-12-31 06:00:00',5184000,90,0,0,'Scarlet Oracle',0,2),
 (88,'2016-10-28 18:00:00','2030-12-30 23:00:00',1440,720,0,0,'Evening',0,2),
 (89,'2016-10-28 20:00:00','2030-12-30 23:00:00',1440,600,0,0,'Leprithus',0,2),
-(90,'2016-10-30 14:00:00','2030-12-31 07:00:00',10080,180,0,0,'Stranglethorn Fishing Extravaganza - Turn-ins',0,2);
+(90,'2016-10-30 14:00:00','2030-12-31 07:00:00',10080,180,0,0,'Stranglethorn Fishing Extravaganza - Turn-ins',0,2),
+(101,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase 1',5,2),
+(102,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase 2 Only',5,2),
+(103,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase 2 Permanent',5,2),
+(104,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase No Portal',5,2),
+(105,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase Portal',5,2),
+(106,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase 3 Only',5,2),
+(107,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase 3 Permanent',5,2),
+(108,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase No Anvil',5,2),
+(109,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase Anvil',5,2),
+(110,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase 4',5,2),
+(111,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase No Monument',5,2),
+(112,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase Monument',5,2),
+(113,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase No Alchemy Lab',5,2),
+(114,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase Alchemy Lab',5,2),
+(115,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Sun\'s Reach Reclamation Phase K\'iru',5,2),
+(116,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'SWP - All Gates Closed',5,2),
+(117,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'SWP - First Gate Open',5,2),
+(118,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'SWP - Second Gate Open',5,2),
+(119,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'SWP - All Gates Open',5,2),
+(120,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Boss in instance activation',5,2),
+(121,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Attacking Winterspring',5,2),
+(122,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Attacking Tanaris',5,2),
+(123,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Attacking Azshara',5,2),
+(124,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Attacking Blasted Lands',5,2),
+(125,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Attacking Eastern Plaguelands',5,2),
+(126,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Attacking Burning Steppes',5,2),
+(127,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - 50 Invasions Done',5,2),
+(128,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - 100 Invasions Done',5,2),
+(129,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - 150 Invasions Done',5,2),
+(130,'2000-01-01 18:00:00','2000-01-01 18:00:00',5184000,2592000,0,0,'Scourge Invasion - Invasions Done',5,2),
+(131,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bars Initial',5,2),
+(132,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bars Tier 1',5,2),
+(133,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bars Tier 2',5,2),
+(134,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bars Tier 3',5,2),
+(135,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bars Tier 4',5,2),
+(136,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bars Tier 5',5,2),
+(137,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Herbs Initial',5,2),
+(138,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Herbs Tier 1',5,2),
+(139,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Herbs Tier 2',5,2),
+(140,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Herbs Tier 3',5,2),
+(141,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Herbs Tier 4',5,2),
+(142,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Herbs Tier 5',5,2),
+(143,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Skins Initial',5,2),
+(144,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Skins Tier 1',5,2),
+(145,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Skins Tier 2',5,2),
+(146,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Skins Tier 3',5,2),
+(147,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Skins Tier 4',5,2),
+(148,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Skins Tier 5',5,2),
+(149,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bandages Initial',5,2),
+(150,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bandages Tier 1',5,2),
+(151,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bandages Tier 2',5,2),
+(152,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bandages Tier 3',5,2),
+(153,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bandages Tier 4',5,2),
+(154,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Bandages Tier 5',5,2),
+(155,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Cooked Goods Initial',5,2),
+(156,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Cooked Goods Tier 1',5,2),
+(157,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Cooked Goods Tier 2',5,2),
+(158,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Cooked Goods Tier 3',5,2),
+(159,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Cooked Goods Tier 4',5,2),
+(160,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Alliance Cooked Goods Tier 5',5,2),
+(161,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bars Initial',5,2),
+(162,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bars Tier 1',5,2),
+(163,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bars Tier 2',5,2),
+(164,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bars Tier 3',5,2),
+(165,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bars Tier 4',5,2),
+(166,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bars Tier 5',5,2),
+(167,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Herbs Initial',5,2),
+(168,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Herbs Tier 1',5,2),
+(169,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Herbs Tier 2',5,2),
+(170,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Herbs Tier 3',5,2),
+(171,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Herbs Tier 4',5,2),
+(172,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Herbs Tier 5',5,2),
+(173,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Skins Initial',5,2),
+(174,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Skins Tier 1',5,2),
+(175,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Skins Tier 2',5,2),
+(176,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Skins Tier 3',5,2),
+(177,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Skins Tier 4',5,2),
+(178,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Skins Tier 5',5,2),
+(179,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bandages Initial',5,2),
+(180,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bandages Tier 1',5,2),
+(181,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bandages Tier 2',5,2),
+(182,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bandages Tier 3',5,2),
+(183,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bandages Tier 4',5,2),
+(184,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Bandages Tier 5',5,2),
+(185,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Cooked Goods Initial',5,2),
+(186,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Cooked Goods Tier 1',5,2),
+(187,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Cooked Goods Tier 2',5,2),
+(188,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Cooked Goods Tier 3',5,2),
+(189,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Cooked Goods Tier 4',5,2),
+(190,'2000-01-01 14:00:00','2000-01-01 14:00:00',5184000,2592000,0,0,'Ahn\'Qiraj War Effort - Horde Cooked Goods Tier 5',5,2);
 /*!40000 ALTER TABLE `game_event` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -141,5 +231,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:46
-
+-- Dump completed on 2025-12-29 17:53:54

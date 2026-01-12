@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -514,7 +514,7 @@ public:
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
+                player->GetSession()->SendTrainerList(creature);
                 break;
             //Learn Alchemy
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -707,7 +707,7 @@ public:
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
+                player->GetSession()->SendTrainerList(creature);
                 break;
             //Learn Armor/Weapon
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -1019,7 +1019,7 @@ public:
         switch (action)
         {
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
+                player->GetSession()->SendTrainerList(creature);
                 break;
             case GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE:
                 AddGossipItemFor(player, GOSSIP_MENU_UNLEARN_CONFIRM_DRAGONSCALE, GOSSIP_MENU_OPTION_CONFIRM_UNLEARN_DRAGONSCALE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, DoMedUnlearnCost(player));
@@ -1121,7 +1121,7 @@ public:
                 player->GetSession()->SendListInventory(creature->GetGUID());
                 break;
             case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature->GetGUID());
+                player->GetSession()->SendTrainerList(creature);
                 break;
             //Learn Tailor
             case GOSSIP_ACTION_INFO_DEF + 1:

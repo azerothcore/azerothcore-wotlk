@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -85,6 +85,7 @@ INSERT INTO `areatrigger_scripts` VALUES
 (4036,'at_cthun_center'),
 (4047,'at_twin_emperors'),
 (4052,'at_battleguard_sartura'),
+(4089,'SmartTrigger'),
 (4113,'at_thaddius_entrance'),
 (4156,'at_naxxramas_hub_portal'),
 (4216,'at_karazhan_atiesh_aran'),
@@ -109,6 +110,9 @@ INSERT INTO `areatrigger_scripts` VALUES
 (4575,'SmartTrigger'),
 (4591,'at_coilfang_waterfall'),
 (4665,'SmartTrigger'),
+(4724,'SmartTrigger'),
+(4725,'SmartTrigger'),
+(4726,'SmartTrigger'),
 (4752,'at_nats_landing'),
 (4820,'at_brewfest'),
 (4829,'at_brewfest'),
@@ -122,9 +126,15 @@ INSERT INTO `areatrigger_scripts` VALUES
 (4873,'SmartTrigger'),
 (4896,'SmartTrigger'),
 (4937,'at_sunwell_eredar_twins'),
+(4946,'SmartTrigger'),
+(4947,'SmartTrigger'),
+(4948,'SmartTrigger'),
 (4951,'SmartTrigger'),
 (4956,'SmartTrigger'),
 (4990,'SmartTrigger'),
+(4991,'SmartTrigger'),
+(5014,'at_karazhan_mirkblood_approach'),
+(5015,'at_karazhan_mirkblood_entrance'),
 (5030,'SmartTrigger'),
 (5046,'SmartTrigger'),
 (5047,'SmartTrigger'),
@@ -133,8 +143,11 @@ INSERT INTO `areatrigger_scripts` VALUES
 (5058,'SmartTrigger'),
 (5059,'SmartTrigger'),
 (5060,'SmartTrigger'),
-(5079,'at_voltarus_middle'),
+(5079,'SmartTrigger'),
 (5080,'SmartTrigger'),
+(5082,'at_hol_hall_of_watchers'),
+(5083,'at_hol_hall_of_watchers'),
+(5084,'at_hol_hall_of_watchers'),
 (5095,'SmartTrigger'),
 (5096,'SmartTrigger'),
 (5097,'SmartTrigger'),
@@ -142,18 +155,26 @@ INSERT INTO `areatrigger_scripts` VALUES
 (5108,'at_stormwright_shelf'),
 (5140,'SmartTrigger'),
 (5173,'SmartTrigger'),
+(5174,'SmartTrigger'),
+(5175,'SmartTrigger'),
+(5176,'SmartTrigger'),
 (5187,'SmartTrigger'),
 (5190,'SmartTrigger'),
+(5250,'SmartTrigger'),
+(5251,'SmartTrigger'),
+(5252,'SmartTrigger'),
 (5284,'SmartTrigger'),
 (5285,'SmartTrigger'),
 (5286,'SmartTrigger'),
 (5287,'SmartTrigger'),
+(5291,'SmartTrigger'),
 (5332,'at_last_rites'),
 (5334,'at_last_rites'),
 (5338,'at_last_rites'),
 (5339,'at_last_rites'),
 (5340,'at_last_rites'),
 (5401,'at_celestial_planetarium_enterance'),
+(5440,'SmartTrigger'),
 (5578,'SmartTrigger'),
 (5579,'SmartTrigger'),
 (5580,'SmartTrigger'),
@@ -194,5 +215,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:16
-
+-- Dump completed on 2025-12-29 17:53:35

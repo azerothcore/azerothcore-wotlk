@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -107,18 +107,17 @@ void Metric::LoadFromConfigs()
         }
 
         std::vector<std::string_view> tokens = Acore::Tokenize(connectionInfo, ';', true);
-        if (tokens.size() != 2)
-        {
-            LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file.");
-            return;
-        }
-
-        _hostname.assign(tokens[0]);
-        _port.assign(tokens[1]);
-
         _useV2 = sConfigMgr->GetOption<bool>("Metric.InfluxDB.v2", false);
         if (_useV2)
         {
+            if (tokens.size() != 2)
+            {
+                LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file. (hostname;port)");
+                return;
+            }
+
+            _hostname.assign(tokens[0]);
+            _port.assign(tokens[1]);
             _org = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Org", "");
             _bucket = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Bucket", "");
             _token = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Token", "");
@@ -133,10 +132,12 @@ void Metric::LoadFromConfigs()
         {
             if (tokens.size() != 3)
             {
-                LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file.");
+                LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file. (hostname;port;database)");
                 return;
             }
 
+            _hostname.assign(tokens[0]);
+            _port.assign(tokens[1]);
             _databaseName.assign(tokens[2]);
         }
 

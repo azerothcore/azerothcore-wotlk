@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -38,6 +38,8 @@ public:
     virtual void RemovePassenger(WorldObject* passenger, bool withAll = false) = 0;
     PassengerSet const& GetPassengers() const { return _passengers; }
 
+    virtual void DelayedUpdate(uint32 /*diff*/) {}
+
     uint32 GetPathProgress() const { return GetGOValue()->Transport.PathProgress; }
     void SetPathProgress(uint32 val) { m_goValue.Transport.PathProgress = val; }
 
@@ -54,10 +56,10 @@ public:
 
     bool CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
+    void BuildUpdate(UpdateDataMapType& data_map) override;
 
     void Update(uint32 diff) override;
-    void DelayedUpdate(uint32 diff);
+    void DelayedUpdate(uint32 diff) override;
     void UpdatePosition(float x, float y, float z, float o);
 
     void AddPassenger(WorldObject* passenger, bool withAll = false) override;
@@ -115,9 +117,11 @@ public:
     StaticTransport();
     ~StaticTransport() override;
 
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) override { return LoadGameObjectFromDB(guid, map, false); }
+    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true) override;
     bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
+    void BuildUpdate(UpdateDataMapType& data_map) override;
 
     void Update(uint32 diff) override;
     void RelocateToProgress(uint32 progress);

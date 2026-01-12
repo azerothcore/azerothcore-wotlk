@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "WorldPacket.h"
+#include "World.h"
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp) :
     _pvp(pvp)
@@ -336,7 +337,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
     std::list<Player*> players;
     Acore::AnyPlayerInObjectRangeCheck checker(_capturePoint, radius);
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(_capturePoint, players, checker);
-    Cell::VisitWorldObjects(_capturePoint, searcher, radius);
+    Cell::VisitObjects(_capturePoint, searcher, radius);
 
     for (auto& itr : players)
     {
@@ -349,12 +350,12 @@ bool OPvPCapturePoint::Update(uint32 diff)
     }
 
     // get the difference of numbers
-    float factDiff = ((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * float(diff) / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL;
+    float factDiff = (((float)_activePlayers[0].size() - (float)_activePlayers[1].size()) * float(diff) / OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL) * sWorld->getFloatConfig(CONFIG_OUTDOOR_PVP_CAPTURE_RATE);
     if (factDiff == 0.f)
         return false;
 
     TeamId ChallengerId = TEAM_NEUTRAL;
-    float maxDiff = _maxSpeed * float(diff);
+    float maxDiff = (_maxSpeed * float(diff)) * sWorld->getFloatConfig(CONFIG_OUTDOOR_PVP_CAPTURE_RATE);
 
     if (factDiff < 0.f)
     {
@@ -635,7 +636,7 @@ void OutdoorPvP::BroadcastPacket(WorldPacket& data) const
     for (auto const& playerSet : _players)
         for (auto itr : playerSet)
             if (Player* const player = ObjectAccessor::FindPlayer(itr))
-                player->GetSession()->SendPacket(&data);
+                player->SendDirectMessage(&data);
 }
 
 void OutdoorPvP::RegisterZone(uint32 zoneId)

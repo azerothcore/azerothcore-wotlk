@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -33,6 +33,7 @@
 #include "Position.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
+#include "ObjectVisibilityContainer.h"
 #include <memory>
 #include <set>
 #include <sstream>
@@ -40,7 +41,7 @@
 
 #include "UpdateFields.h"
 
-class ElunaEventProcessor;
+class ALEEventProcessor;
 
 enum TempSummonType
 {
@@ -96,7 +97,6 @@ class MotionTransport;
 struct PositionFullTerrainStatus;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
-typedef GuidUnorderedSet UpdatePlayerSet;
 
 static constexpr Milliseconds HEARTBEAT_INTERVAL = 5s + 200ms;
 
@@ -165,7 +165,6 @@ public:
     void ApplyModUInt64Value(uint16 index, int32 val, bool apply);
     void ApplyModPositiveFloatValue(uint16 index, float val, bool apply);
     void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
-    void ApplyPercentModFloatValue(uint16 index, float val, bool apply);
 
     void SetFlag(uint16 index, uint32 newFlag);
     void RemoveFlag(uint16 index, uint32 oldFlag);
@@ -189,7 +188,7 @@ public:
 
     [[nodiscard]] virtual bool hasQuest(uint32 /* quest_id */) const { return false; }
     [[nodiscard]] virtual bool hasInvolvedQuest(uint32 /* quest_id */) const { return false; }
-    virtual void BuildUpdate(UpdateDataMapType&, UpdatePlayerSet&) {}
+    virtual void BuildUpdate(UpdateDataMapType&) {}
     void BuildFieldsUpdate(Player*, UpdateDataMapType&);
 
     void SetFieldNotifyFlag(uint16 flag) { _fieldNotifyFlags |= flag; }
@@ -358,9 +357,20 @@ template<class T>
 class GridObject
 {
 public:
-    [[nodiscard]] bool IsInGrid() const { return _gridRef.isValid(); }
-    void AddToGrid(GridRefMgr<T>& m) { ASSERT(!IsInGrid()); _gridRef.link(&m, (T*)this); }
-    void RemoveFromGrid() { ASSERT(IsInGrid()); _gridRef.unlink(); }
+    bool IsInGrid() const
+    {
+        return _gridRef.isValid();
+    }
+    void AddToGrid(GridRefMgr<T>& m)
+    {
+        ASSERT(!IsInGrid());
+        _gridRef.link(&m, (T*)this);
+    }
+    void RemoveFromGrid()
+    {
+        ASSERT(IsInGrid());
+        _gridRef.unlink();
+    }
 private:
     GridReference<T> _gridRef;
 };
@@ -460,7 +470,7 @@ private:
 class WorldObject : public Object, public WorldLocation
 {
 protected:
-    explicit WorldObject(bool isWorldObject); //note: here it means if it is in grid object list or world object list
+    explicit WorldObject();
 public:
     ~WorldObject() override;
 
@@ -530,8 +540,8 @@ public:
     [[nodiscard]] bool IsWithinDist2d(float x, float y, float dist) const;
     bool IsWithinDist2d(const Position* pos, float dist) const;
     // use only if you will sure about placing both object at same map
-    bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
-    bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool useBoundingRadius = true) const;
+    bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
+    bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
     [[nodiscard]] bool IsWithinLOS(float x, float y, float z, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS) const;
     [[nodiscard]] bool IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlags ignoreFlags = VMAP::ModelIgnoreFlags::Nothing, LineOfSightChecks checks = LINEOFSIGHT_ALL_CHECKS, Optional<float> collisionHeight = { }, Optional<float> combatReach = { }) const;
     [[nodiscard]] Position GetHitSpherePointFor(Position const& dest, Optional<float> collisionHeight = { }, Optional<float> combatReach = { }) const;
@@ -558,6 +568,29 @@ public:
     void PlayRadiusSound(uint32 sound_id, float radius);
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
     void PlayRadiusMusic(uint32 music_id, float radius);
+
+    // Warning: Possible iterator invalidation in uses that may modify visibility map
+    template<typename Worker>
+    void DoForAllVisiblePlayers(Worker&& worker)
+    {
+        for (auto const& kvPair : GetObjectVisibilityContainer().GetVisiblePlayersMap())
+            worker(kvPair.second);
+    }
+
+    // Warning: Possible iterator invalidation in uses that may modify visibility map
+    template<typename Worker>
+    void DoForAllVisibleWorldObjects(Worker&& worker)
+    {
+        // Not a player, no access to this map
+        VisibleWorldObjectsMap const* visibleWorldObjectsMap = GetObjectVisibilityContainer().GetVisibleWorldObjectsMap();
+        if (!visibleWorldObjectsMap)
+            return;
+
+        for (auto const& kvPair : *visibleWorldObjectsMap)
+            worker(kvPair.second);
+    }
+
+    void DestroyForVisiblePlayers();
 
     void SendObjectDeSpawnAnim(ObjectGuid guid);
 
@@ -604,13 +637,14 @@ public:
 
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
     void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
-    void DestroyForNearbyPlayers();
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     virtual void UpdateObjectVisibilityOnCreate() { UpdateObjectVisibility(true); }
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
+    void BuildUpdate(UpdateDataMapType& data_map) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
 
     void SetPositionDataUpdate();
@@ -630,12 +664,12 @@ public:
 
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
-    [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
-    [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
+    VisibilityDistanceType GetVisibilityOverrideType() const { return _visibilityDistanceOverrideType; }
+    bool IsVisibilityOverridden() const { return _visibilityDistanceOverrideType > VisibilityDistanceType::Normal; }
+    bool IsZoneWideVisible() const { return _visibilityDistanceOverrideType == VisibilityDistanceType::Infinite; }
+    bool IsFarVisible() const { return _visibilityDistanceOverrideType == VisibilityDistanceType::Large || _visibilityDistanceOverrideType == VisibilityDistanceType::Gigantic; }
+    float GetVisibilityOverrideDistance() const;
     void SetVisibilityDistanceOverride(VisibilityDistanceType type);
-    void SetWorldObject(bool apply);
-    [[nodiscard]] bool IsPermanentWorldObject() const { return m_isWorldObject; }
-    [[nodiscard]] bool IsWorldObject() const;
 
     [[nodiscard]] bool IsInWintergrasp() const
     {
@@ -688,16 +722,17 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    ObjectVisibilityContainer& GetObjectVisibilityContainer() { return _objectVisibilityContainer; }
+    ObjectVisibilityContainer const& GetObjectVisibilityContainer() const { return _objectVisibilityContainer; }
+
     // Event handler
-    ElunaEventProcessor* elunaEvents;
+    ALEEventProcessor* ALEEvents;
     EventProcessor m_Events;
 
 protected:
     std::string m_name;
     bool m_isActive;
-    bool m_isFarVisible;
-    Optional<float> m_visibilityDistanceOverride;
-    const bool m_isWorldObject;
+    VisibilityDistanceType _visibilityDistanceOverrideType;
     ZoneScript* m_zoneScript;
 
     virtual void ProcessPositionDataChanged(PositionFullTerrainStatus const& data);
@@ -734,7 +769,7 @@ private:
     uint16 m_notifyflags;
     uint16 m_executed_notifies;
 
-    virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius = true) const;
+    virtual bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius = true, bool incTargetRadius = true) const;
 
     bool CanNeverSee(WorldObject const* obj) const;
     virtual bool CanAlwaysSee(WorldObject const* /*obj*/) const { return false; }
@@ -744,7 +779,12 @@ private:
     //bool CanDetectStealthOf(WorldObject const* obj) const;
     bool CanDetectStealthOf(WorldObject const* obj, bool checkAlert = false) const;
 
+    void RemoveFromMapVisibilityOverrideContainers();
+    void AddToMapVisibilityOverrideContainers();
+
     GuidUnorderedSet _allowedLooters;
+
+    ObjectVisibilityContainer _objectVisibilityContainer;
 };
 
 namespace Acore

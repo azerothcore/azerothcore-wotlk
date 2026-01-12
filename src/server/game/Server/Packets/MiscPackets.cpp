@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,6 +63,21 @@ WorldPacket const* WorldPackets::Misc::PlayObjectSound::Write()
 WorldPacket const* WorldPackets::Misc::Playsound::Write()
 {
     _worldPacket << SoundKitID;
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Misc::MinimapPingClient::Read()
+{
+    _worldPacket >> MapX;
+    _worldPacket >> MapY;
+}
+
+WorldPacket const* WorldPackets::Misc::MinimapPing::Write()
+{
+    _worldPacket << SourceGuid;
+    _worldPacket << float(MapX);
+    _worldPacket << float(MapY);
 
     return &_worldPacket;
 }
@@ -122,6 +137,34 @@ WorldPacket const* WorldPackets::Misc::CrossedInebriationThreshold::Write()
 WorldPacket const* WorldPackets::Misc::UITime::Write()
 {
     _worldPacket << uint32(Time);
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Misc::Complain::Read()
+{
+    _worldPacket >> SpamType; // 0 - mail, 1 - chat
+    _worldPacket >> SpammerGuid;
+    switch (SpamType)
+    {
+    case 0:
+        _worldPacket >> Unk1; // const 0
+        _worldPacket >> Unk2; // probably mail id
+        _worldPacket >> Unk3; // const 0
+        break;
+    case 1:
+        _worldPacket >> Unk1; // probably language
+        _worldPacket >> Unk2; // message type?
+        _worldPacket >> Unk3; // probably channel id
+        _worldPacket >> Unk4; // unk random value
+        _worldPacket >> Description; // spam description string (messagetype, channel name, player name, message)
+        break;
+    }
+}
+
+WorldPacket const* WorldPackets::Misc::ComplainResult::Write()
+{
+    _worldPacket << Unk;
 
     return &_worldPacket;
 }

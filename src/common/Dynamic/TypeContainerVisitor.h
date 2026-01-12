@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -52,6 +52,27 @@ template<class VISITOR, class H, class T> void VisitorHelper(VISITOR& v, Contain
 
 // for TypeMapContainer
 template<class VISITOR, class OBJECT_TYPES> void VisitorHelper(VISITOR& v, TypeMapContainer<OBJECT_TYPES>& c)
+{
+    VisitorHelper(v, c.GetElements());
+}
+
+// VectorContainer
+template<class VISITOR> void VisitorHelper(VISITOR& /*v*/, ContainerVector<TypeNull>& /*c*/) {}
+
+template<class VISITOR, class T> void VisitorHelper(VISITOR& v, ContainerVector<T>& c)
+{
+    v.Visit(c._element);
+}
+
+// recursion container map list
+template<class VISITOR, class H, class T> void VisitorHelper(VISITOR& v, ContainerVector<TypeList<H, T>>& c)
+{
+    VisitorHelper(v, c._elements);
+    VisitorHelper(v, c._TailElements);
+}
+
+// for TypeMapContainer
+template<class VISITOR, class OBJECT_TYPES> void VisitorHelper(VISITOR& v, TypeVectorContainer<OBJECT_TYPES>& c)
 {
     VisitorHelper(v, c.GetElements());
 }

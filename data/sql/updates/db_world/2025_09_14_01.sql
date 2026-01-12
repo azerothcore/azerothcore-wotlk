@@ -1,0 +1,91 @@
+-- DB update 2025_09_14_00 -> 2025_09_14_01
+-- Delete old WP and add the new one (Sniffed).
+DELETE FROM `waypoints` WHERE `entry` IN (28308, 2830800);
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
+(2830800, 1, 5268.2256, 4425.439, -95.66463, NULL, 'Captive Crocolisk'),
+(2830800, 2, 5249.557, 4405.8916, -96.06503, NULL, 'Captive Crocolisk'),
+(2830800, 3, 5266.678, 4365.4644, -98.4554, NULL, 'Captive Crocolisk'),
+(2830800, 4, 5289.1377, 4366.553, -102.25680, NULL, 'Captive Crocolisk'),
+(2830800, 5, 5292.401, 4366.2607, -103.41171, NULL, 'Captive Crocolisk'),
+(2830800, 6, 5295.401, 4366.0107, -105.91171, NULL, 'Captive Crocolisk'),
+(2830800, 7, 5298.401, 4365.7607, -108.16171, NULL, 'Captive Crocolisk'),
+(2830800, 8, 5330.325, 4363.249, -121.41144, NULL, 'Captive Crocolisk'),
+(2830800, 9, 5333.6475, 4359.3447, -121.62401, NULL, 'Captive Crocolisk'),
+(2830800, 10, 5336.8975, 4355.5947, -122.37401, NULL, 'Captive Crocolisk'),
+(2830800, 11, 5340.1475, 4352.0947, -124.12401, NULL, 'Captive Crocolisk'),
+(2830800, 12, 5344.6475, 4346.8447, -127.37401, NULL, 'Captive Crocolisk'),
+(2830800, 13, 5349.2285, 4341.059, -134.14465, NULL, 'Captive Crocolisk'),
+(2830800, 14, 5353.7925, 4339.2725, -137.71663, NULL, 'Captive Crocolisk'),
+(2830800, 15, 5357.2925, 4337.5225, -138.96663, NULL, 'Captive Crocolisk'),
+(2830800, 16, 5361.0425, 4335.7725, -139.96663, NULL, 'Captive Crocolisk'),
+(2830800, 17, 5365.0376, 4333.716, -141.6359, NULL, 'Captive Crocolisk'),
+(2830800, 18, 5379.338, 4324.619, -145.39046, NULL, 'Captive Crocolisk'),
+(2830800, 19, 5386.838, 4319.869, -146.39046, NULL, 'Captive Crocolisk'),
+(2830800, 20, 5399.588, 4311.869, -146.14046, NULL, 'Captive Crocolisk'),
+(2830800, 21, 5405.4434, 4307.841, -142.1537, NULL, 'Captive Crocolisk'),
+(2830800, 22, 5434.999, 4305.6587, -136.43095, NULL, 'Captive Crocolisk'),
+(2830800, 23, 5464.708, 4302.0664, -133.22482, NULL, 'Captive Crocolisk'),
+(2830800, 24, 5479.955, 4297.8174, -132.47156, NULL, 'Captive Crocolisk'),
+(2830800, 25, 5490.5547, 4294.3945, -127.5686, NULL, 'Captive Crocolisk'),
+(2830800, 26, 5493.3965, 4289.1094, -124.03439, NULL, 'Captive Crocolisk'),
+(2830800, 27, 5495.7646, 4284.705, -120.702126, NULL, 'Captive Crocolisk'),
+(2830800, 28, 5497.1855, 4282.0625, -117.922264, NULL, 'Captive Crocolisk'),
+(2830800, 29, 5500.0273, 4276.7773, -113.96721, NULL, 'Captive Crocolisk'),
+(2830800, 30, 5503.343, 4270.6113, -110.756836, NULL, 'Captive Crocolisk'),
+(2830800, 31, 5506.246, 4267.8457, -108.97778, NULL, 'Captive Crocolisk'),
+(2830800, 32, 5510.246, 4263.5957, -106.22778, NULL, 'Captive Crocolisk'),
+(2830800, 33, 5513.746, 4260.0957, -104.22778, NULL, 'Captive Crocolisk'),
+(2830800, 34, 5518.3237, 4255.3076, -103.13711, NULL, 'Captive Crocolisk'),
+(2830800, 35, 5540.53, 4259.7695, -102.44651, NULL, 'Captive Crocolisk'),
+(2830800, 36, 5564.1943, 4263.4497, -102.82355, NULL, 'Captive Crocolisk'),
+(2830800, 37, 5585.45, 4261.137, -99.63063, NULL, 'Captive Crocolisk'),
+(2830800, 38, 5609.614, 4259.6567, -98.88536, NULL, 'Captive Crocolisk'),
+(2830800, 39, 5633.434, 4259.2275, -98.52627, NULL, 'Captive Crocolisk'),
+(2830800, 40, 5660.5684, 4260.9854, -98.672714, NULL, 'Captive Crocolisk'),
+(2830800, 41, 5681.639, 4266.3096, -99.25662, NULL, 'Captive Crocolisk'),
+(2830800, 42, 5708.1265, 4273.348, -102.968994, NULL, 'Captive Crocolisk'),
+(2830800, 43, 5748.7324, 4284.135, -112.09222, NULL, 'Captive Crocolisk'),
+(2830800, 44, 5756.953, 4291.7754, -114.66898, NULL, 'Captive Crocolisk'),
+(2830800, 45, 5767.6587, 4301.938, -115.26785, NULL, 'Captive Crocolisk'),
+(2830800, 46, 5786.5576, 4319.8975, -115.276024, NULL, 'Captive Crocolisk'),
+(2830800, 47, 5807.376, 4339.681, -115.28085, NULL, 'Captive Crocolisk'),
+(2830800, 48, 5825.895, 4357.28, -115.28085, NULL, 'Captive Crocolisk'),
+(2830800, 49, 5835.953, 4365.0254, -114.66898, NULL, 'Captive Crocolisk'),
+(2830800, 50, 5839.674, 4368.416, -112.15327, NULL, 'Captive Crocolisk'),
+(2830800, 51, 5843.9746, 4371.428, -109.06282, NULL, 'Captive Crocolisk'),
+(2830800, 52, 5851.4746, 4376.678, -106.31282, NULL, 'Captive Crocolisk'),
+(2830800, 53, 5855.4746, 4379.428, -104.56282, NULL, 'Captive Crocolisk'),
+(2830800, 54, 5859.7246, 4382.428, -100.31282, NULL, 'Captive Crocolisk'),
+(2830800, 55, 5866.2246, 4386.928, -100.31282, NULL, 'Captive Crocolisk'),
+(2830800, 56, 5875.7246, 4393.428, -98.31282, NULL, 'Captive Crocolisk'),
+(2830800, 57, 5897.276, 4408.4404, -95.29815, NULL, 'Captive Crocolisk'),
+(2830800, 58, 5925.311, 4440.6235, -94.795006, NULL, 'Captive Crocolisk'),
+(2830800, 59, 5964.229, 4503.729, -92.95698, NULL, 'Captive Crocolisk'),
+(2830800, 60, 5960.5825, 4546.558, -95.71041, NULL, 'Captive Crocolisk'),
+(2830800, 61, 5965.1665, 4579.1406, -97.459595, NULL, 'Captive Crocolisk'),
+(2830800, 62, 5969.2954, 4613.739, -98.09471, NULL, 'Captive Crocolisk'),
+(2830800, 63, 5975.858, 4659.6104, -99.32277, NULL, 'Captive Crocolisk'),
+(2830800, 64, 5992.961, 4699.5537, -99.39478, NULL, 'Captive Crocolisk'),
+(2830800, 65, 6015.1387, 4743.7524, -97.55353, NULL, 'Captive Crocolisk'),
+(2830800, 66, 6035.1826, 4788.787, -94.706436, NULL, 'Captive Crocolisk'),
+(2830800, 67, 6064.9507, 4827.5024, -94.57277, NULL, 'Captive Crocolisk'),
+(2830800, 68, 6065.5703, 4870.553, -94.4718, NULL, 'Captive Crocolisk'),
+(2830800, 69, 6096.6123, 4885.741, -94.4861, NULL, 'Captive Crocolisk'),
+(2830800, 70, 6120.3867, 4902.048, -95.10951, NULL, 'Captive Crocolisk'),
+(2830800, 71, 6139.616, 4913.3486, -94.939, NULL, 'Captive Crocolisk');
+
+-- Update SmartAI
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28308;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28308);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(28308, 0, 1, 0, 54, 0, 100, 512, 0, 0, 0, 0, 0, 0, 80, 2830800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captive Crocolisk - On Just Summoned - Run Script'),
+(28308, 0, 2, 3, 58, 0, 100, 512, 71, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captive Crocolisk - On Path 0 Finished - Despawn Instant'),
+(28308, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 15, 12536, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Captive Crocolisk - On Path 0 Finished - Quest Credit \'A Rough Ride\''),
+(28308, 0, 4, 0, 40, 0, 100, 512, 17, 0, 0, 0, 0, 0, 54, 4000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captive Crocolisk - On Point 17 of Path Any Reached - Pause Waypoint'),
+(28308, 0, 5, 0, 40, 0, 100, 512, 43, 0, 0, 0, 0, 0, 54, 4000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captive Crocolisk - On Point 43 of Path Any Reached - Pause Waypoint');
+
+-- Update Action List
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2830800);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2830800, 9, 1, 0, 0, 0, 100, 512, 0, 0, 0, 0, 0, 0, 53, 1, 2830800, 0, 12536, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Captive Crocolisk - Actionlist - Start Waypoint Path 2830800');

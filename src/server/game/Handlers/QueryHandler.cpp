@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,6 +24,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "QueryPackets.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -32,62 +33,55 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
 
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
-    data << guid.WriteAsPacked();
+    WorldPackets::Query::NameQueryResponse nameQueryResponse;
+    nameQueryResponse.Guid = guid.WriteAsPacked();
     if (!playerData)
     {
-        data << uint8(1);                           // name unknown
-        SendPacket(&data);
+        nameQueryResponse.NameUnknown = true;
+        SendPacket(nameQueryResponse.Write());
         return;
     }
 
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
 
-    data << uint8(0);                               // name known
-    data << playerData->Name;                       // played name
-    data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
-    data << uint8(player ? player->getRace() : playerData->Race);
-    data << uint8(playerData->Sex);
-    data << uint8(playerData->Class);
+    nameQueryResponse.NameUnknown = false;
+    nameQueryResponse.Name = playerData->Name;
+    nameQueryResponse.Race = player ? player->getRace() : playerData->Race;
+    nameQueryResponse.Sex = player ? player->getGender() : playerData->Sex;
+    nameQueryResponse.Class = player ? player->getClass() : playerData->Class;
 
-    // pussywizard: optimization
-    /*Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
     {
-        data << uint8(1);                           // Name is declined
-        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-            data << names->name[i];
+        nameQueryResponse.Declined = true;
+        nameQueryResponse.DeclinedNames = *names;
     }
-    else*/
-    data << uint8(0);                           // Name is not declined
+    else
+        nameQueryResponse.Declined = false;
 
-    SendPacket(&data);
+    SendPacket(nameQueryResponse.Write());
 }
 
-void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
+void WorldSession::HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet)
 {
-    ObjectGuid guid;
-    recvData >> guid;
-
     // This is disable by default to prevent lots of console spam
     // LOG_INFO("network.opcode", "HandleNameQueryOpcode {}", guid);
 
-    SendNameQueryOpcode(guid);
+    SendNameQueryOpcode(packet.Guid);
 }
 
-void WorldSession::HandleQueryTimeOpcode(WorldPacket& /*recvData*/)
+void WorldSession::HandleTimeQueryOpcode(WorldPackets::Query::TimeQuery& /*packet*/)
 {
-    SendQueryTimeResponse();
+    SendTimeQueryResponse();
 }
 
-void WorldSession::SendQueryTimeResponse()
+void WorldSession::SendTimeQueryResponse()
 {
     auto timeResponse = sWorld->GetNextDailyQuestsResetTime() - GameTime::GetGameTime();
 
-    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4 + 4);
-    data << uint32(GameTime::GetGameTime().count());
-    data << uint32(timeResponse.count());
-    SendPacket(&data);
+    WorldPackets::Query::TimeQueryResponse timeQueryResponse;
+    timeQueryResponse.ServerTime = GameTime::GetGameTime().count();
+    timeQueryResponse.TimeResponse = timeResponse.count();
+    SendPacket(timeQueryResponse.Write());
 }
 
 /// Only _static_ data is sent in this packet !!!
@@ -402,12 +396,9 @@ void WorldSession::HandlePageTextQueryOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleCorpseMapPositionQuery(WorldPacket& recvData)
+void WorldSession::HandleCorpseMapPositionQuery(WorldPackets::Query::CorpseMapPositionQuery& /*packet*/)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
-
-    uint32 unk;
-    recvData >> unk;
 
     WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4 + 4 + 4 + 4);
     data << float(0);

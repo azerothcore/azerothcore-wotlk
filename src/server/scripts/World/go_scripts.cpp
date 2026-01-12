@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,25 +41,6 @@ public:
     }
 };
 
-class go_mistwhisper_treasure : public GameObjectScript
-{
-public:
-    go_mistwhisper_treasure() : GameObjectScript("go_mistwhisper_treasure") { }
-
-    bool OnGossipHello(Player* pPlayer, GameObject* go) override
-    {
-        if (!go->FindNearestCreature(28105, 30.0f)) // Tartek
-        {
-            if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-            {
-                cr->Yell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL);
-                cr->AI()->AttackStart(pPlayer);
-            }
-        }
-        return false;
-    }
-};
-
 class go_witherbark_totem_bundle : public GameObjectScript
 {
 public:
@@ -80,7 +61,7 @@ public:
                 if (_timer > 5000)
                 {
                     me->CastSpell(nullptr, 9056);
-                    me->DestroyForNearbyPlayers();
+                    me->DestroyForVisiblePlayers();
                     _timer = 0;
                 }
             }
@@ -283,7 +264,7 @@ public:
                 for (std::list<Creature*>::const_iterator itr = cList.begin(); itr != cList.end(); ++itr)
                 {
                     player->KilledMonsterCredit(NPC_WINTERFIN_TADPOLE);
-                    (*itr)->DespawnOrUnsummon(urand(45000, 60000));
+                    (*itr)->DespawnOrUnsummon(randtime(45s, 60s));
                     (*itr)->GetMotionMaster()->MoveFollow(player, 1.0f, frand(0.0f, 2 * M_PI), MOTION_SLOT_CONTROLLED);
                 }
             }
@@ -322,7 +303,7 @@ public:
                 std::list<Player*> players;
                 Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
                 Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
-                Cell::VisitWorldObjects(me, searcher, 0.3f);
+                Cell::VisitObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -369,7 +350,7 @@ public:
                 std::list<Player*> players;
                 Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
                 Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
-                Cell::VisitWorldObjects(me, searcher, 0.3f);
+                Cell::VisitObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -412,7 +393,7 @@ public:
 
         void Initialize()
         {
-            _events.ScheduleEvent(EVENT_CHECK, 1000);
+            _events.ScheduleEvent(EVENT_CHECK, 1s);
         }
 
         void UpdateAI(uint32 const diff) override
@@ -432,7 +413,7 @@ public:
                         }
                         else
                         {
-                            _events.ScheduleEvent(EVENT_CHECK, 1000);
+                            _events.ScheduleEvent(EVENT_CHECK, 1s);
                         }
                         break;
                     }
@@ -474,7 +455,7 @@ public:
     {
         go_l70_etc_musicAI(GameObject* go) : GameObjectAI(go)
         {
-            _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);
+            _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -489,7 +470,7 @@ public:
                         me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC_LOUD);
                     else
                         me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
-                    _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);  // Every 1.6 seconds SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600ms);  // Every 1.6 seconds SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                     break;
                 default:
                     break;
@@ -521,15 +502,12 @@ enum BrewfestMusic
 };
 
 // These are in seconds
-enum BrewfestMusicTime
-{
-    EVENT_BREWFESTDWARF01_TIME = 95000,
-    EVENT_BREWFESTDWARF02_TIME = 155000,
-    EVENT_BREWFESTDWARF03_TIME = 23000,
-    EVENT_BREWFESTGOBLIN01_TIME = 68000,
-    EVENT_BREWFESTGOBLIN02_TIME = 93000,
-    EVENT_BREWFESTGOBLIN03_TIME = 28000
-};
+constexpr Milliseconds EVENT_BREWFESTDWARF01_TIME = 95s;
+constexpr Milliseconds EVENT_BREWFESTDWARF02_TIME = 155s;
+constexpr Milliseconds EVENT_BREWFESTDWARF03_TIME = 23s;
+constexpr Milliseconds EVENT_BREWFESTGOBLIN01_TIME = 68s;
+constexpr Milliseconds EVENT_BREWFESTGOBLIN02_TIME = 93s;
+constexpr Milliseconds EVENT_BREWFESTGOBLIN03_TIME = 28s;
 
 enum BrewfestMusicEvents
 {
@@ -546,8 +524,8 @@ public:
     {
         go_brewfest_musicAI(GameObject* go) : GameObjectAI(go)
         {
-            _events.ScheduleEvent(EVENT_BM_SELECT_MUSIC, 1000);
-            _events.ScheduleEvent(EVENT_BM_START_MUSIC, 1500);
+            _events.ScheduleEvent(EVENT_BM_SELECT_MUSIC, 1s);
+            _events.ScheduleEvent(EVENT_BM_START_MUSIC, 1500ms);
             _currentMusicEvent = EVENT_BREWFESTGOBLIN01;
         }
 
@@ -564,7 +542,7 @@ public:
                                 break;
                             // Select random music sample
                             uint32 rnd = urand(0, 2);
-                            uint32 musicTime = 1000;
+                            Milliseconds musicTime = 1s;
                             //Restart the current selected music
                             _currentMusicEvent = 0;
                             //Check zone to play correct music
@@ -652,7 +630,7 @@ public:
                         {
                             me->PlayDirectMusic(_currentMusicEvent);
                         }
-                        _events.ScheduleEvent(EVENT_BM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client
+                        _events.ScheduleEvent(EVENT_BM_START_MUSIC, 5s); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client
                         break;
                     default:
                         break;
@@ -695,7 +673,7 @@ public:
 
         go_pirate_day_musicAI(GameObject* go) : GameObjectAI(go)
         {
-            _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 1000);
+            _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -709,7 +687,7 @@ public:
                         if (!IsHolidayActive(HOLIDAY_PIRATES_DAY))
                             break;
                         me->PlayDirectMusic(MUSIC_PIRATE_DAY_MUSIC);
-                        _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                        _events.ScheduleEvent(EVENT_PDM_START_MUSIC, 5s);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                         break;
                     default:
                         break;
@@ -750,7 +728,7 @@ public:
 
         go_darkmoon_faire_musicAI(GameObject* go) : GameObjectAI(go)
         {
-            _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 1000);
+            _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -764,7 +742,7 @@ public:
                         if (!IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_ELWYNN) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_THUNDER) || !IsHolidayActive(HOLIDAY_DARKMOON_FAIRE_SHATTRATH))
                             break;
                         me->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
-                        _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                        _events.ScheduleEvent(EVENT_DFM_START_MUSIC, 5s);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                         break;
                     default:
                         break;
@@ -805,7 +783,7 @@ public:
     {
         go_midsummer_musicAI(GameObject* go) : GameObjectAI(go)
         {
-            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 1000);
+            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -823,7 +801,7 @@ public:
                             std::list<Player*> targets;
                             Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
                             Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
-                            Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
+                            Cell::VisitObjects(me, searcher, me->GetVisibilityRange());
                             for (Player* player : targets)
                             {
                                 if (player->GetTeamId() == TEAM_HORDE)
@@ -836,7 +814,7 @@ public:
                                 }
                             }
 
-                            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 5000); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                            _events.ScheduleEvent(EVENT_MM_START_MUSIC, 5s); // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                             break;
                         }
                     default:
@@ -895,7 +873,7 @@ public:
                     _playerGUID = player->GetGUID();
                     me->SetGameObjectFlag((GameObjectFlags)1);
                     me->RemoveByteFlag(GAMEOBJECT_BYTES_1, 0, 1);
-                    _events.ScheduleEvent(EVENT_STILLBLADE_SPAWN, 1000);
+                    _events.ScheduleEvent(EVENT_STILLBLADE_SPAWN, 1s);
                 }
             }
             return true;
@@ -914,7 +892,7 @@ public:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                     {
                         player->SummonCreature(NPC_STILLBLADE, 8032.587f, -7524.518f, 149.68073f, 6.161012172698974609f, TEMPSUMMON_DEAD_DESPAWN, 60000);
-                        _events.ScheduleEvent(EVENT_RESET_BRAZIER, 4000);
+                        _events.ScheduleEvent(EVENT_RESET_BRAZIER, 4s);
                     }
                     break;
                 }
@@ -1066,7 +1044,7 @@ class go_southfury_moonstone : public GameObjectScript
 public:
     go_southfury_moonstone() : GameObjectScript("go_southfury_moonstone") { }
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
         //implicitTarget=48 not implemented as of writing this code, and manual summon may be just ok for our purpose
         //player->CastSpell(player, SPELL_SUMMON_RIZZLE, false);
@@ -1076,6 +1054,7 @@ public:
             // no need casting spell blackjack, it's casted by script npc_rizzle_sprysprocket.
             //creature->CastSpell(player, SPELL_BLACKJACK, false);
             creature->AI()->AttackStart(player);
+            go->DespawnOrUnsummon(8000ms);
         }
 
         return false;
@@ -1696,7 +1675,7 @@ public:
             for (std::list<Creature*>::const_iterator itr = childrenList.begin(); itr != childrenList.end(); ++itr)
             {
                 player->KilledMonsterCredit(NPC_CAPTIVE_CHILD, (*itr)->GetGUID());
-                (*itr)->DespawnOrUnsummon(5000);
+                (*itr)->DespawnOrUnsummon(5s);
                 (*itr)->GetMotionMaster()->MovePoint(1, go->GetPositionX() + 5, go->GetPositionY(), go->GetPositionZ());
                 (*itr)->AI()->Talk(SAY_FREE_0);
                 (*itr)->GetMotionMaster()->Clear();
@@ -1821,7 +1800,7 @@ public:
             {
                 // Reset
                 once = false;
-                _events.ScheduleEvent(EVENT_TIME, 1000);
+                _events.ScheduleEvent(EVENT_TIME, 1s);
             }
 
             while (uint32 eventId = _events.ExecuteEvent())
@@ -1844,7 +1823,7 @@ public:
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
                     {
-                        _events.ScheduleEvent(EVENT_RING_BELL, (i * 4 + 1) * 1000);
+                        _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
                     }
                     break;
                 }
@@ -1898,7 +1877,6 @@ public:
 void AddSC_go_scripts()
 {
     new go_seer_of_zebhalak();
-    new go_mistwhisper_treasure();
     new go_witherbark_totem_bundle();
     new go_arena_ready_marker();
     new go_ethereum_prison();

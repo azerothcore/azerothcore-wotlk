@@ -35,7 +35,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-detailed-
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-dmf-switch modules/mod-dmf-switch
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset modules/mod-duel-reset
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-dynamic-xp modules/mod-dynamic-xp
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-eluna modules/mod-eluna
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ale modules/mod-ale
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-emblem-transfer modules/mod-emblem-transfer
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-fireworks-on-level modules/mod-fireworks-on-level
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-global-chat modules/mod-global-chat
@@ -100,7 +100,8 @@ git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-system-vi
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-tic-tac-toe modules/mod-tic-tac-toe
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-top-arena modules/mod-top-arena
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-transmog modules/mod-transmog
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-war-effort modules/mod-war-effort
+# archived / outdated
+#git clone --depth=1 --branch=master https://github.com/azerothcore/mod-war-effort modules/mod-war-effort
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-weekend-xp modules/mod-weekend-xp
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-who-logged modules/mod-who-logged
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-zone-difficulty modules/mod-zone-difficulty

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,69 +29,53 @@ void VisibleNotifier::Visit(GameObjectMapType& m)
     for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         GameObject* go = iter->GetSource();
-        if (i_largeOnly != go->IsVisibilityOverridden())
-            continue;
-
-        vis_guids.erase(go->GetGUID());
         i_player.UpdateVisibilityOf(go, i_data, i_visibleNow);
     }
 }
 
 void VisibleNotifier::SendToSelf()
 {
-    // at this moment i_clientGUIDs have guids that not iterate at grid level checks
-    // but exist one case when this possible and object not out of range: transports
-    if (Transport* transport = i_player.GetTransport())
-        for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
+    // Update far visible objects
+    ZoneWideVisibleWorldObjectsSet const* zoneWideVisibleObjects = i_player.GetMap()->GetZoneWideVisibleWorldObjectsForZone(i_player.GetZoneId());
+    if (zoneWideVisibleObjects)
+    {
+        for (WorldObject* obj : *zoneWideVisibleObjects)
         {
-            if (i_largeOnly != (*itr)->IsVisibilityOverridden())
-                continue;
-
-            if (vis_guids.find((*itr)->GetGUID()) != vis_guids.end())
+            switch (obj->GetTypeId())
             {
-                vis_guids.erase((*itr)->GetGUID());
-
-                switch ((*itr)->GetTypeId())
-                {
-                    case TYPEID_GAMEOBJECT:
-                        i_player.UpdateVisibilityOf((*itr)->ToGameObject(), i_data, i_visibleNow);
-                        break;
-                    case TYPEID_PLAYER:
-                        i_player.UpdateVisibilityOf((*itr)->ToPlayer(), i_data, i_visibleNow);
-                        (*itr)->ToPlayer()->UpdateVisibilityOf(&i_player);
-                        break;
-                    case TYPEID_UNIT:
-                        i_player.UpdateVisibilityOf((*itr)->ToCreature(), i_data, i_visibleNow);
-                        break;
-                    default:
-                        break;
-                }
+                case TYPEID_GAMEOBJECT:
+                    i_player.UpdateVisibilityOf(obj->ToGameObject(), i_data, i_visibleNow);
+                    break;
+                case TYPEID_UNIT:
+                    i_player.UpdateVisibilityOf(obj->ToCreature(), i_data, i_visibleNow);
+                    break;
+                case TYPEID_DYNAMICOBJECT:
+                    i_player.UpdateVisibilityOf(obj->ToDynObject(), i_data, i_visibleNow);
+                    break;
+                default:
+                    break;
             }
         }
+    }
 
-    for (GuidUnorderedSet::const_iterator it = vis_guids.begin(); it != vis_guids.end(); ++it)
+    VisibleWorldObjectsMap* visibleWorldObjects = i_player.GetObjectVisibilityContainer().GetVisibleWorldObjectsMap();
+    for (VisibleWorldObjectsMap::iterator itr = visibleWorldObjects->begin(); itr != visibleWorldObjects->end();)
     {
-        if (WorldObject* obj = ObjectAccessor::GetWorldObject(i_player, *it))
+        WorldObject* obj = itr->second;
+        if (!i_player.IsWorldObjectOutOfSightRange(obj)
+            || i_player.CanSeeOrDetect(obj, false, true))
         {
-            if (i_largeOnly != obj->IsVisibilityOverridden())
-                continue;
+            ++itr;
+            continue;
         }
 
-        // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
-        if ((*it).IsTransport())
-            if (GameObject* staticTrans = i_player.GetMap()->GetGameObject(*it))
-                if (i_player.CanSeeOrDetect(staticTrans, false, true))
-                    continue;
+        i_data.AddOutOfRangeGUID(obj->GetGUID());
 
-        i_player.m_clientGUIDs.erase(*it);
-        i_data.AddOutOfRangeGUID(*it);
+        if (Player* objPlayer = obj->ToPlayer())
+            objPlayer->UpdateVisibilityOf(&i_player);
 
-        if ((*it).IsPlayer())
-        {
-            Player* player = ObjectAccessor::FindPlayer(*it);
-            if (player && player->IsInMap(&i_player))
-                player->UpdateVisibilityOf(&i_player);
-        }
+        // Clean up references
+        itr = i_player.GetObjectVisibilityContainer().UnlinkVisibilityFromPlayer(obj, itr);
     }
 
     if (!i_data.HasData())
@@ -99,15 +83,10 @@ void VisibleNotifier::SendToSelf()
 
     WorldPacket packet;
     i_data.BuildPacket(packet);
-    i_player.GetSession()->SendPacket(&packet);
+    i_player.SendDirectMessage(&packet);
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)
-    {
-        if (i_largeOnly != (*it)->IsVisibilityOverridden())
-            continue;
-
         i_player.GetInitialVisiblePackets(*it);
-    }
 }
 
 void VisibleChangesNotifier::Visit(PlayerMapType& m)
@@ -170,7 +149,6 @@ void PlayerRelocationNotifier::Visit(PlayerMapType& m)
     for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         Player* player = iter->GetSource();
-        vis_guids.erase(player->GetGUID());
         i_player.UpdateVisibilityOf(player, i_data, i_visibleNow);
         player->UpdateVisibilityOf(&i_player); // this notifier with different Visit(PlayerMapType&) than VisibleNotifier is needed to update visibility of self for other players when we move (eg. stealth detection changes)
     }
@@ -205,6 +183,23 @@ void AIRelocationNotifier::Visit(CreatureMapType& m)
 
         if (self)
             CreatureUnitRelocationWorker((Creature*)&i_unit, c);
+    }
+}
+
+// Uses visibility map
+void MessageDistDeliverer::Visit(VisiblePlayersMap const& m)
+{
+    for (auto const& kvPair : m)
+    {
+        Player const* target = kvPair.second;
+        if (i_distSq != 0.0f && target->m_seer->GetExactDist2dSq(i_source) > i_distSq)
+            continue;
+
+        // @todo: Might not need this check anymore
+        if (skipped_receiver == target)
+            continue;
+
+        target->SendDirectMessage(i_message);
     }
 }
 

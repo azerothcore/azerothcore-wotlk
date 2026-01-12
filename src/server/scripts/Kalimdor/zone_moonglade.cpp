@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -333,7 +333,7 @@ public:
             std::list<Player*> playerOnQuestList;
             Acore::AnyPlayerInObjectRangeCheck checker(me, 5.0f);
             Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, playerOnQuestList, checker);
-            Cell::VisitWorldObjects(me, searcher, 5.0f);
+            Cell::VisitObjects(me, searcher, 5.0f);
             for (std::list<Player*>::const_iterator itr = playerOnQuestList.begin(); itr != playerOnQuestList.end(); ++itr)
             {
                 // Check if found player target has active quest
@@ -384,7 +384,8 @@ public:
                     AddWaypoint(i, Clintar_spirit_WP[i][0], Clintar_spirit_WP[i][1], Clintar_spirit_WP[i][2], (uint32)Clintar_spirit_WP[i][4]);
                 }
                 PlayerGUID = player->GetGUID();
-                Start(true, false, PlayerGUID);
+                me->SetWalk(true);
+                Start(true, PlayerGUID);
             }
             return;
         }

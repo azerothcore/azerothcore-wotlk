@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -979,6 +979,8 @@ struct FactionTemplateEntry
         return (hostileMask & entry.ourMask) != 0;
     }
     [[nodiscard]] bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
+    [[nodiscard]] bool IsHostileToAlliancePlayers() const { return (hostileMask & FACTION_MASK_ALLIANCE) != 0; }
+    [[nodiscard]] bool IsHostileToHordePlayers() const { return (hostileMask & FACTION_MASK_HORDE) != 0; }
     [[nodiscard]] bool IsNeutralToAll() const
     {
         for (unsigned int i : enemyFaction)
@@ -1208,8 +1210,7 @@ struct ItemRandomPropertiesEntry
 {
     uint32 ID;                                                          // 0
     //char const* InternalName;                                         // 1
-    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 2-4
-    //std::array<uint32, 2> UnusedEnchantment;                          // 5-6
+    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 2-6
     std::array<char const*, 16> Name;                                   // 7-22
     //uint32 Name_lang_mask;                                            // 23
 };
@@ -1220,10 +1221,8 @@ struct ItemRandomSuffixEntry
     std::array<char const*, 16> Name;                                   // 1-16
     //uint32 Name_lang_mask;                                            // 17
     //char const* InternalName;                                         // 18
-    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 19-21
-    //std::array<uint32, 2> UnusedEnchantment;                          // 22-23
-    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> AllocationPct;     // 24-26
-    //std::array<uint32, 2> UnusedAllocationPct;                        // 27-28
+    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 19-23
+    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> AllocationPct;     // 24-28
 };
 
 #define MAX_ITEM_SET_ITEMS 10

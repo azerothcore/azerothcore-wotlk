@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -46,14 +46,16 @@ INSERT INTO `reputation_reward_rate` VALUES
 (941,1,1,1,1,1,1,1),
 (970,1,1,1,1,1,1,3),
 (978,1,1,1,1,1,1,1),
+(1037,1,1,1,1,1,1.3,1.3),
+(1052,1,1,1,1,1,1.3,1.3),
 (1073,1,2,1,1,1,2,2),
-(1090,1,1,1,1,1,1.3,1.3),
-(1091,1,1,1,1,1,1.3,1.3),
-(1098,1,1,1,1,1,1.3,1.3),
+(1090,1.3,1.3,1.3,1.3,1.3,1.3,1.3),
+(1091,1.3,1.3,1.3,1.3,1.3,1.3,1.3),
+(1098,1.3,1.3,1.3,1.3,1.3,1.3,1.3),
 (1104,1,2,1,1,1,2,2),
 (1105,1,2,1,1,1,2,2),
-(1106,1,1,1,1,1,1.3,1.3),
-(1119,1,1,1,1,1,1.3,1.3);
+(1106,1.3,1.3,1.3,1.3,1.3,1.3,1.3),
+(1119,1.3,1.3,1.3,1.3,1.3,1.3,1.3);
 /*!40000 ALTER TABLE `reputation_reward_rate` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -65,5 +67,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:33
-
+-- Dump completed on 2025-12-29 17:54:30

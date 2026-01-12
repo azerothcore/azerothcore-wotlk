@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -119,7 +119,7 @@ struct boss_faction_championsAI : public ScriptedAI
     }
 
     /// @todo - Convert to std::chrono
-    void EventMapGCD(EventMap& e, uint32 delay, uint32 gcd = 0)
+    void EventMapGCD(EventMap& e, Milliseconds delay, uint32 gcd = 0)
     {
         e.DelayEventsToMax(delay, gcd);
     }
@@ -316,43 +316,43 @@ public:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_LIFEBLOOM, 40.0f))
                         me->CastSpell(target, SPELL_LIFEBLOOM, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_NOURISH:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_NOURISH, 40.0f))
                         me->CastSpell(target, SPELL_NOURISH, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_REGROWTH:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_REGROWTH, 40.0f))
                         me->CastSpell(target, SPELL_REGROWTH, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_REJUVENATION:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_REJUVENATION, 40.0f))
                         me->CastSpell(target, SPELL_REJUVENATION, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_THORNS:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_THORNS, 30.0f))
                         me->CastSpell(target, SPELL_THORNS, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_TRANQUILITY:
                     me->CastSpell(me, SPELL_TRANQUILITY, false);
                     events.Repeat(2min, 3min);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_BARKSKIN:
                     if (HealthBelowPct(50))
                     {
                         me->CastSpell(me, SPELL_BARKSKIN, false);
                         events.Repeat(1min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -360,7 +360,7 @@ public:
                 case EVENT_SPELL_NATURE_GRASP:
                     me->CastSpell(me, SPELL_NATURE_GRASP, false);
                     events.Repeat(1min);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
             }
 
@@ -445,19 +445,19 @@ public:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HEALING_WAVE, 40.0f))
                         me->CastSpell(target, SPELL_HEALING_WAVE, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_RIPTIDE:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_RIPTIDE, 40.0f))
                         me->CastSpell(target, SPELL_RIPTIDE, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_SPIRIT_CLEANSE:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_SPIRIT_CLEANSE, 40.0f))
                         me->CastSpell(target, SPELL_SPIRIT_CLEANSE, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_HEROISM_OR_BLOODLUST:
                     if (me->GetEntry() == NPC_ALLIANCE_SHAMAN_RESTORATION )
@@ -465,25 +465,25 @@ public:
                     else
                         me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
                     events.Repeat(10min);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_HEX:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
                         me->CastSpell(target, SPELL_HEX, false);
                     events.Repeat(45s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_EARTH_SHIELD:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_EARTH_SHIELD, 40.0f))
                         me->CastSpell(target, SPELL_EARTH_SHIELD, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_EARTH_SHOCK:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_EARTH_SHOCK, false);
                     events.Repeat(5s, 10s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
             }
 
@@ -568,14 +568,14 @@ public:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HAND_OF_FREEDOM, 30.0f))
                         me->CastSpell(target, SPELL_HAND_OF_FREEDOM, false);
                     events.Repeat(25s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_BUBBLE:
                     if (HealthBelowPct(25))
                     {
                         me->CastSpell(me, SPELL_BUBBLE, false);
                         events.Repeat(5min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(10s);
@@ -584,32 +584,32 @@ public:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_CLEANSE, 40.0f))
                         me->CastSpell(target, SPELL_CLEANSE, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_FLASH_OF_LIGHT:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_FLASH_OF_LIGHT, 40.0f))
                         me->CastSpell(target, SPELL_FLASH_OF_LIGHT, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_HOLY_LIGHT:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HOLY_LIGHT, 40.0f))
                         me->CastSpell(target, SPELL_HOLY_LIGHT, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_HOLY_SHOCK:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HOLY_SHOCK, 40.0f))
                         me->CastSpell(target, SPELL_HOLY_SHOCK, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_HAND_OF_PROTECTION:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_HAND_OF_PROTECTION, 40.0f))
                     {
                         me->CastSpell(target, SPELL_HAND_OF_PROTECTION, false);
                         events.Repeat(5min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(10s);
@@ -619,7 +619,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE, false);
                         events.Repeat(40s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(10s);
@@ -701,32 +701,32 @@ public:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_RENEW, 40.0f))
                         me->CastSpell(target, SPELL_RENEW, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_SHIELD:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_SHIELD, 40.0f))
                         me->CastSpell(target, SPELL_SHIELD, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_FLASH_HEAL:
                     if (Creature* target = SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_FLASH_HEAL, 40.0f))
                         me->CastSpell(target, SPELL_FLASH_HEAL, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_DISPEL:
                     if (Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)))
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_MANA_BURN:
                     if (Unit* target = SelectEnemyCaster(false, 30.0f))
                     {
                         me->CastSpell(target, SPELL_MANA_BURN, false);
                         events.Repeat(10s, 15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -736,7 +736,7 @@ public:
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
                         events.Repeat(30s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -825,7 +825,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_SILENCE, false);
                         events.Repeat(45s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                         break;
                     }
                     else
@@ -835,32 +835,32 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_VAMPIRIC_TOUCH, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_SW_PAIN:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SW_PAIN, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_MIND_FLAY:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MIND_FLAY, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_MIND_BLAST:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MIND_BLAST, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_HORROR:
                     if (me->GetVictim() && me->GetExactDist2d(me->GetVictim()) <= 30.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_HORROR, false);
                         events.Repeat(2min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(10s);
@@ -870,7 +870,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_DISPERSION, false);
                         events.Repeat(3min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -879,14 +879,14 @@ public:
                     if (Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)))
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_PSYCHIC_SCREAM:
                     if (EnemiesInRange(8.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_PSYCHIC_SCREAM, false);
                         events.Repeat(30s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -989,7 +989,7 @@ public:
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_HELLFIRE, false);
                         events.Repeat(30s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -998,43 +998,43 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_CORRUPTION, false);
                     events.Repeat(10s, 20s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_CURSE_OF_AGONY:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_AGONY, false);
                     events.Repeat(10s, 20s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_CURSE_OF_EXHAUSTION:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_EXHAUSTION, false);
                     events.Repeat(10s, 20s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_FEAR:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 20.0f, true))
                         me->CastSpell(target, SPELL_FEAR, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_SEARING_PAIN:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SEARING_PAIN, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_UNSTABLE_AFFLICTION:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_UNSTABLE_AFFLICTION, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
             }
 
@@ -1121,20 +1121,20 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_ARCANE_BARRAGE, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_ARCANE_BLAST:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_ARCANE_BLAST, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_ARCANE_EXPLOSION:
                     if (EnemiesInRange(9.0f) >= 3 )
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_ARCANE_EXPLOSION, false);
                         events.Repeat(6s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1144,7 +1144,7 @@ public:
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_FROST_NOVA, false);
                         events.Repeat(15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                         // blink disabled, movement not working
                     }
                     else
@@ -1155,7 +1155,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_COUNTERSPELL, false);
                         events.Repeat(24s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1164,14 +1164,14 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_ICE_BLOCK:
                     if (HealthBelowPct(25))
                     {
                         me->CastSpell(me, SPELL_ICE_BLOCK, false);
                         events.Repeat(5min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1180,7 +1180,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_POLYMORPH, false);
                     events.Repeat(15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
             }
 
@@ -1279,14 +1279,14 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_AIMED_SHOT, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_DETERRENCE:
                     if (HealthBelowPct(25))
                     {
                         me->CastSpell(me, SPELL_DETERRENCE, false);
                         events.Repeat(90s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1296,7 +1296,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_DISENGAGE, false);
                         events.Repeat(20s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1305,31 +1305,31 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_EXPLOSIVE_SHOT, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_FROST_TRAP:
                     me->CastSpell(me, SPELL_FROST_TRAP, false);
                     events.Repeat(30s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_STEADY_SHOT:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_STEADY_SHOT, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_WING_CLIP:
                     if (me->GetVictim() && me->GetDistance2d(me->GetVictim()) <= 5.0f )
                         me->CastSpell(me->GetVictim(), SPELL_WING_CLIP, false);
                     events.Repeat(8s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_WYVERN_STING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                     {
                         me->CastSpell(target, SPELL_WYVERN_STING, false);
                         events.Repeat(1min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                         break;
                     }
                     events.Repeat(10s);
@@ -1429,7 +1429,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_BARKSKIN, false);
                         events.Repeat(1min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1438,48 +1438,48 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_MOONFIRE:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_STARFIRE:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_STARFIRE, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_INSECT_SWARM:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_INSECT_SWARM, false);
                     events.Repeat(5s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_ENTANGLING_ROOTS, false);
                     events.Repeat(10s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_FAERIE_FIRE:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_FAERIE_FIRE, false);
                     events.Repeat(15s, 20s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_CYCLONE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 20.0f, true))
                         me->CastSpell(target, SPELL_CYCLONE, false);
                     events.Repeat(25s, 40s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_FORCE_OF_NATURE:
                     me->CastSpell((Unit*)nullptr, SPELL_FORCE_OF_NATURE, false);
                     events.Repeat(3min);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
             }
 
@@ -1583,7 +1583,7 @@ public:
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_INTIMIDATING_SHOUT, false);
                         events.Repeat(2min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1597,14 +1597,14 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
                     events.Repeat(6s, 8s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_CHARGE:
                     if (me->GetVictim() && me->GetDistance2d(me->GetVictim()) > 8.0f && me->GetDistance2d(me->GetVictim()) < 25.0f )
                     {
                         me->CastSpell(me->GetVictim(), SPELL_CHARGE, false);
                         events.Repeat(10s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1614,7 +1614,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DISARM, false);
                         events.Repeat(1min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1629,7 +1629,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_OVERPOWER, false);
                         events.Repeat(10s, 15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1644,7 +1644,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_SUNDER_ARMOR, false);
                         events.Repeat(10s, 15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1659,7 +1659,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_SHATTERING_THROW, false);
                         events.Repeat(5min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1674,7 +1674,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_RETALIATION, false);
                         events.Repeat(5min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1760,7 +1760,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_CHAINS_OF_ICE, false);
                         events.Repeat(10s, 15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1770,7 +1770,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_DEATH_COIL, false);
                         events.Repeat(5s, 8s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1785,7 +1785,7 @@ public:
                         pos.Relocate(x, y, z);
                         me->GetVictim()->CastSpell(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), 49575, true);
                         events.Repeat(35s);
-                        EventMapGCD(events, 2000);
+                        EventMapGCD(events, 2s);
                     }
                     else
                         events.Repeat(5s);
@@ -1800,7 +1800,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FROST_STRIKE, false);
                         events.Repeat(6s, 10s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1810,7 +1810,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_ICEBOUND_FORTITUDE, false);
                         events.Repeat(1min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1820,7 +1820,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_ICY_TOUCH, false);
                         events.Repeat(10s, 15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1830,7 +1830,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_STRANGULATE, false);
                         events.Repeat(2min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1922,7 +1922,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FAN_OF_KNIVES, false);
                         events.Repeat(6s, 10s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1932,7 +1932,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_BLIND, false);
                         events.Repeat(2min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1942,7 +1942,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_CLOAK, false);
                         events.Repeat(90s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(6s);
@@ -1954,7 +1954,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_BLADE_FLURRY, false);
                         events.Repeat(2min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     break;
                 case EVENT_SPELL_SHADOWSTEP:
@@ -1962,7 +1962,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_SHADOWSTEP, false);
                         events.Repeat(30s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1977,7 +1977,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_HEMORRHAGE, false);
                         events.Repeat(5s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -1992,7 +1992,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_EVISCERATE, false);
                         events.Repeat(15s, 25s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2037,7 +2037,7 @@ public:
         npc_toc_enh_shamanAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_MELEE)
         {
             SetEquipmentSlots(false, 51803, 48013, EQUIP_NO_CHANGE);
-            me->SetModifierValue(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
+            me->SetStatPctModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
             me->UpdateDamagePhysical(OFF_ATTACK);
 
             events.Reset();
@@ -2080,7 +2080,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_EARTH_SHOCK_ENH, false);
                         events.Repeat(6s, 8s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2095,7 +2095,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_LAVA_LASH, false);
                         events.Repeat(6s, 8s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2110,7 +2110,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_STORMSTRIKE, false);
                         events.Repeat(8s, 9s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2121,12 +2121,12 @@ public:
                     else
                         me->CastSpell((Unit*)nullptr, SPELL_BLOODLUST, true);
                     events.Repeat(10min);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SUMMON_TOTEM:
                     me->CastSpell((Unit*)nullptr, RAND(SPELL_GROUNDING_TOTEM, SPELL_WINDFURY_TOTEM, SPELL_TREMOR_TOTEM), false);
                     events.Repeat(30s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
             }
 
@@ -2211,7 +2211,7 @@ public:
                 case EVENT_SPELL_AVENGING_WRATH:
                     me->CastSpell(me, SPELL_AVENGING_WRATH, false);
                     events.Repeat(3min);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_CRUSADER_STRIKE:
                     if (me->HasUnitFlag(UNIT_FLAG_DISARMED))
@@ -2223,7 +2223,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_CRUSADER_STRIKE, false);
                         events.Repeat(6s, 8s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2233,7 +2233,7 @@ public:
                     {
                         me->CastSpell(me, SPELL_DIVINE_SHIELD, false);
                         events.Repeat(5min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2248,7 +2248,7 @@ public:
                     {
                         me->CastSpell((Unit*)nullptr, SPELL_DIVINE_STORM, false);
                         events.Repeat(10s, 15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2258,7 +2258,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE_RET, false);
                         events.Repeat(40s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2268,7 +2268,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_HAND_OF_PROTECTION_RET, false);
                         events.Repeat(5min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2278,7 +2278,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_JUDGEMENT_OF_COMMAND, false);
                         events.Repeat(10s, 15s);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2288,7 +2288,7 @@ public:
                     {
                         me->CastSpell(target, SPELL_REPENTANCE, false);
                         events.Repeat(1min);
-                        EventMapGCD(events, 1500);
+                        EventMapGCD(events, 1500ms);
                     }
                     else
                         events.Repeat(5s);
@@ -2357,13 +2357,13 @@ public:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_DEVOUR_MAGIC, false);
                     events.Repeat(8s, 15s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
                 case EVENT_SPELL_SPELL_LOCK:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SPELL_LOCK, false);
                     events.Repeat(24s);
-                    EventMapGCD(events, 1500);
+                    EventMapGCD(events, 1500ms);
                     break;
             }
 

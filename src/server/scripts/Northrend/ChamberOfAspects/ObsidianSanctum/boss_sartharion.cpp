@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -130,17 +130,17 @@ enum Misc
     ACTION_DRAKE_DIED                           = 3,
 
     // Movement points
-    POINT_FINAL_TENEBRON                        = 8,
-    POINT_FINAL_SHADRON                         = 4,
-    POINT_FINAL_VESPERON                        = 4,
+    POINT_FINAL_TENEBRON                        = 9,
+    POINT_FINAL_SHADRON                         = 5,
+    POINT_FINAL_VESPERON                        = 5,
 
     // Lava directions. Its used to identify to which side lava was moving by last time
     LAVA_LEFT_SIDE                              = 0,
     LAVA_RIGHT_SIDE                             = 1,
 
     // Counters
-    MAX_LEFT_LAVA_TSUNAMIS                      = 3,
-    MAX_RIGHT_LAVA_TSUNAMIS                     = 2,
+    MAX_LEFT_LAVA_TSUNAMIS                      = 9,
+    MAX_RIGHT_LAVA_TSUNAMIS                     = 6,
     MAX_DRAGONS                                 = 3,
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
@@ -224,12 +224,25 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
 };
 
-const float SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
+float const SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
 {
     3218.86f,   // South X
     3275.69f,   // North X
     484.68f,    // East Y
     572.4f      // West Y
+};
+
+float const FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
+{
+    476.0f, 484.0f, 492.0f,
+    524.0f, 532.0f, 540.0f,
+    572.0f, 580.0f, 588.0f
+};
+
+float const FlameTsunamiRightOffsets[MAX_RIGHT_LAVA_TSUNAMIS] =
+{
+    500.0f, 508.0f, 516.0f,
+    548.0f, 556.0f, 564.0f
 };
 
 const Position bigIslandMiddlePos = { 3242.822754f, 477.279816f, 57.430473f };
@@ -583,7 +596,7 @@ public:
                             }
                         }
 
-                        events.RepeatEvent((below11PctReached ? urand(1400, 2000) : urand(5000, 20000)));
+                        events.Repeat((below11PctReached ? randtime(1400ms, 2s) : randtime(5s, 20s)));
                         break;
                     }
                     case EVENT_SARTHARION_BERSERK:
@@ -620,15 +633,18 @@ public:
         {
             summons.RemoveNotExisting();
             Talk(WHISPER_LAVA_CHURN);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 2s);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9s);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 3600ms);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 11s);
 
             // Send wave from left
             if (lastLavaSide == LAVA_RIGHT_SIDE)
             {
                 for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3208.44f, 580.0f - (i * 50.0f), 55.8f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3211.0f, FlameTsunamiLeftOffsets[i], 57.083332f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13500);
+
+                    if (((i - 2) % 3 == 0) && tsunami) // If center of wave
+                        tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
                 }
 
                 lastLavaSide = LAVA_LEFT_SIDE;
@@ -638,7 +654,10 @@ public:
             {
                 for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3283.44f, 555.0f - (i * 50.0f), 55.8f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3286.0f, FlameTsunamiRightOffsets[i], 57.083332f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 13500);
+
+                    if (((i - 2) % 3 == 0) && tsunami) // If center of wave
+                        tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
                 }
 
                 lastLavaSide = LAVA_RIGHT_SIDE;
@@ -648,24 +667,22 @@ public:
         void SendLavaWaves(bool start)
         {
             if (summons.empty())
-            {
                 return;
-            }
 
             for (ObjectGuid const& guid : summons)
             {
                 Creature* tsunami = ObjectAccessor::GetCreature(*me, guid);
                 if (!tsunami || tsunami->GetEntry() != NPC_FLAME_TSUNAMI)
-                {
                     continue;
-                }
 
-                if (start)
+                if (start) // Movement possibly simplified from official, ideally reevaluate in the future.
                 {
-                    tsunami->GetMotionMaster()->MovePoint(0, ((tsunami->GetPositionX() < 3250.0f) ? 3283.44f : 3208.44f), tsunami->GetPositionY(), tsunami->GetPositionZ());
+                    tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_DAMAGE_AURA, true);
+                    tsunami->GetMotionMaster()->MovePoint(0, ((tsunami->GetPositionX() < 3250.0f) ? 3286.0f : 3211.0f), tsunami->GetPositionY(), tsunami->GetPositionZ());
                 }
                 else
                 {
+                    tsunami->RemoveAura(SPELL_FLAME_TSUNAMI_DAMAGE_AURA);
                     tsunami->SetObjectScale(0.1f);
                 }
             }
@@ -1071,7 +1088,7 @@ public:
                 Talk(SAY_TENEBRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1086,7 +1103,7 @@ public:
                         Talk(SAY_TENEBRON_BREATH);
                     }
                     DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
+                    events.Repeat(17500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
@@ -1095,7 +1112,7 @@ public:
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
-                    events.RepeatEvent(22500);
+                    events.Repeat(22500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_OPEN_PORTAL:
@@ -1254,7 +1271,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1270,7 +1287,7 @@ public:
                     }
 
                     DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
+                    events.Repeat(17500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
@@ -1279,7 +1296,7 @@ public:
                     {
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
-                    events.RepeatEvent(22500);
+                    events.Repeat(22500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_OPEN_PORTAL:
@@ -1370,7 +1387,7 @@ public:
                 Talk(SAY_SHADRON_RESPOND);
                 me->SetCanFly(true);
                 me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             }
         }
 
@@ -1480,7 +1497,7 @@ public:
         {
             if (param == ACTION_SWITCH_PHASE)
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
             }
         }
 

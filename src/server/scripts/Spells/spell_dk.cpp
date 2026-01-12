@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -74,6 +74,9 @@ enum DeathKnightSpells
     SPELL_DK_UNHOLY_PRESENCE_TRIGGERED          = 49772,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
+    SPELL_DK_ICY_TALONS_TALENT_R1               = 50880,
+    SPELL_DK_CRYPT_FEVER_R1                     = 50508,
+    SPELL_DK_EBON_PLAGUE_R1                     = 51726,
     // Risen Ally
     SPELL_DK_RAISE_ALLY                         = 46619,
     SPELL_DK_THRASH                             = 47480,
@@ -149,7 +152,7 @@ class spell_dk_raise_ally : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        Player* unitTarget = GetHitPlayer();
+        Unit* unitTarget = GetExplTargetUnit();
         if (!unitTarget)
             return SPELL_FAILED_BAD_TARGETS;
 
@@ -171,8 +174,8 @@ class spell_dk_raise_ally : public SpellScript
                 if (pInfo)                                      // exist in DB
                 {
                     ghoul->SetCreateHealth(pInfo->health);
-                    ghoul->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, pInfo->health);
-                    ghoul->SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
+                    ghoul->SetStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, pInfo->health);
+                    ghoul->SetStatFlatModifier(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
                     for (uint8 stat = 0; stat < MAX_STATS; ++stat)
                         ghoul->SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
                 }
@@ -191,9 +194,9 @@ class spell_dk_raise_ally : public SpellScript
 
                 // DK Ghoul haste refresh
                 float val = (GetCaster()->m_modAttackSpeedPct[BASE_ATTACK] - 1.0f) * 100.0f;
+                val = 2000.0f * (100.0f + val) / 100.0f;
                 ghoul->m_modAttackSpeedPct[BASE_ATTACK] = GetCaster()->m_modAttackSpeedPct[BASE_ATTACK];
-                ghoul->SetFloatValue(UNIT_FIELD_BASEATTACKTIME, 2000.0f);
-                ghoul->ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME, val, true); // we want to reduce attack time
+                ghoul->SetFloatValue(UNIT_FIELD_BASEATTACKTIME, val);
 
                 // Strength + Stamina
                 for (uint8 i = STAT_STRENGTH; i <= STAT_STAMINA; ++i)
@@ -220,20 +223,20 @@ class spell_dk_raise_ally : public SpellScript
                     value = float(GetCaster()->GetStat(stat)) * mod;
                     value = ghoul->GetTotalStatValue(stat, value);
                     ghoul->SetStat(stat, int32(value));
-                    ghoul->ApplyStatBuffMod(stat, value, true);
+                    ghoul->UpdateStatBuffMod(stat);
                 }
 
                 // Attack Power
-                ghoul->SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, 589 + ghoul->GetStat(STAT_STRENGTH) + ghoul->GetStat(STAT_AGILITY));
-                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER, (int32)ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE) * ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_PCT));
-                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS, (int32)ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE));
-                ghoul->SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, ghoul->GetModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT) - 1.0f);
+                ghoul->SetStatFlatModifier(UNIT_MOD_ATTACK_POWER, BASE_VALUE, 589 + ghoul->GetStat(STAT_STRENGTH) + ghoul->GetStat(STAT_AGILITY));
+                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER, (int32)ghoul->GetFlatModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE) * ghoul->GetPctModifierValue(UNIT_MOD_ATTACK_POWER, BASE_PCT));
+                ghoul->SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS, (int32)ghoul->GetFlatModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE));
+                ghoul->SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, ghoul->GetPctModifierValue(UNIT_MOD_ATTACK_POWER, TOTAL_PCT) - 1.0f);
 
                 // Health
-                ghoul->SetModifierValue(UNIT_MOD_HEALTH, TOTAL_VALUE, (ghoul->GetStat(STAT_STAMINA) - ghoul->GetCreateStat(STAT_STAMINA)) * 10.0f);
+                ghoul->SetStatFlatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, (ghoul->GetStat(STAT_STAMINA) - ghoul->GetCreateStat(STAT_STAMINA)) * 10.0f);
 
                 // Power Energy
-                ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
+                ghoul->SetStatFlatModifier(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
                 ghoul->UpdateAllStats();
                 ghoul->SetFullHealth();
 
@@ -776,19 +779,19 @@ class spell_dk_pet_scaling : public AuraScript
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: dk gargoyle inherits 33% of SP
         if (GetUnitOwner()->GetEntry() != NPC_EBON_GARGOYLE)
             return;
 
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 33;
+            // Percentage of the owner's attack power to be inherited as spell power
+            // This value was chosen based on experimental damage of Gargoyle Strike
+            int32 modifier = 75;
 
-            // xinef: impurity
-            if (owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
-                modifier = 40;
+            if (AuraEffect* impurityEff = owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, EFFECT_0))
+                AddPct(modifier, impurityEff->GetAmount());
 
-            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+            amount = CalculatePct(std::max<int32>(0, static_cast<int32>(owner->GetTotalAttackPowerValue(BASE_ATTACK))), modifier);
 
             // xinef: Update appropriate player field
             if (owner->IsPlayer())
@@ -800,8 +803,11 @@ class spell_dk_pet_scaling : public AuraScript
     {
         // xinef: scale haste with owners melee haste
         if (Unit* owner = GetUnitOwner()->GetOwner())
-            if (owner->m_modAttackSpeedPct[BASE_ATTACK] < 1.0f) // inherit haste only
-                amount = std::min<int32>(100, int32(((1.0f / owner->m_modAttackSpeedPct[BASE_ATTACK]) - 1.0f) * 100.0f));
+        {
+            float modSpeed = owner->m_modAttackSpeedPct[BASE_ATTACK];
+            modSpeed = std::ranges::clamp(modSpeed, 1e-6f, 1.0f);
+            amount = static_cast<int32>(((1.0f / modSpeed) - 1.0f) * 100.0f);
+        }
     }
 
     void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -860,13 +866,13 @@ class spell_dk_pet_scaling : public AuraScript
 
     void Register() override
     {
-        if (m_scriptSpellId == 54566)
+        if (m_scriptSpellId == SPELL_DK_PET_SCALING_01)
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
         }
 
-        if (m_scriptSpellId == 51996)
+        if (m_scriptSpellId == SPELL_DK_PET_SCALING_02)
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling::CalculateHasteAmount, EFFECT_ALL, SPELL_AURA_MELEE_SLOW);
 
         OnEffectApply += AuraEffectApplyFn(spell_dk_pet_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
@@ -1743,7 +1749,8 @@ class spell_dk_pestilence : public SpellScript
         {
             SPELL_DK_GLYPH_OF_DISEASE,
             SPELL_DK_BLOOD_PLAGUE,
-            SPELL_DK_FROST_FEVER
+            SPELL_DK_FROST_FEVER,
+            SPELL_DK_ICY_TALONS_TALENT_R1
         });
     }
 
@@ -1755,46 +1762,36 @@ class spell_dk_pestilence : public SpellScript
         if (!target)
             return;
 
-        if (target != hitUnit || caster->GetAura(SPELL_DK_GLYPH_OF_DISEASE))
+        // Spread on others
+        if (target != hitUnit)
         {
-            // xinef: checked in target selection
-            //if (!m_targets.GetUnitTarget()->IsWithinLOSInMap(unitTarget))
-            //  return;
-
-            // And spread them on target
             // Blood Plague
-            if (Aura* disOld = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
-                {
-                    float pctMods = effOld->GetPctMods();
-                    float crit = effOld->GetCritChance();
-                    caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
-
-                    if (Aura* disNew = hitUnit->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
-                        {
-                            effNew->SetPctMods(pctMods);
-                            effNew->SetCritChance(crit);
-                            effNew->SetAmount(effNew->CalculateAmount(effNew->GetCaster()));
-                        }
-                }
+            if (target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
+                caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
 
             // Frost Fever
-            if (Aura* disOld = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
-                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
-                {
-                    float pctMods = effOld->GetPctMods();
-                    float crit = effOld->GetCritChance();
-                    caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
+            if (target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
+                caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
+        }
+        // Refresh on target
+        else if (caster->GetAura(SPELL_DK_GLYPH_OF_DISEASE))
+        {
+            // Blood Plague
+            if (Aura* disease = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
+                disease->RefreshDuration();
 
-                    if (Aura* disNew = hitUnit->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
-                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
-                        {
-                            effNew->SetPctMods(pctMods);
-                            effNew->SetCritChance(crit);
-                            effNew->SetAmount(effNew->CalculateAmount(effNew->GetCaster()));
-                        }
-                }
+            // Frost Fever
+            if (Aura* disease = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
+            {
+                disease->RefreshDuration();
+                if (Aura const* talons = caster->GetAuraOfRankedSpell(SPELL_DK_ICY_TALONS_TALENT_R1))
+                    caster->CastSpell(caster, talons->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+            }
+
+            if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_EBON_PLAGUE_R1, caster->GetGUID()))
+                disease->RefreshDuration();
+            else if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_CRYPT_FEVER_R1, caster->GetGUID()))
+                disease->RefreshDuration();
         }
     }
 
@@ -2317,6 +2314,26 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
     }
 };
 
+// -49182 Blade Barrier
+class spell_dk_blade_barrier : public AuraScript
+{
+    PrepareAuraScript(spell_dk_blade_barrier);
+
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            if (player->getClass() == CLASS_DEATH_KNIGHT && player->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
+                return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dk_blade_barrier::CheckProc);
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     RegisterSpellScript(spell_dk_wandering_plague);
@@ -2365,4 +2382,5 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_will_of_the_necropolis);
     RegisterSpellScript(spell_dk_ghoul_thrash);
     RegisterSpellScript(spell_dk_army_of_the_dead_passive);
+    RegisterSpellScript(spell_dk_blade_barrier);
 }

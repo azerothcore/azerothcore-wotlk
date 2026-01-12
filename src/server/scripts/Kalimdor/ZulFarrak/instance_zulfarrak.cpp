@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -437,7 +437,7 @@ public:
             {
                 if (Creature* add = instance->GetCreature(*addsAtBase.begin()))
                 {
-                    add->GetMotionMaster()->MovePath(PATH_ADDS, false);
+                    add->GetMotionMaster()->MoveWaypoint(PATH_ADDS, false);
                     movedadds.push_back(add->GetGUID());
                 }
 
@@ -498,7 +498,7 @@ class spell_zulfarrak_unlocking : public SpellScript
         std::list<WorldObject*> cagesList;
         Acore::AllWorldObjectsInRange objects(GetCaster(), 15.0f);
         Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(GetCaster(), cagesList, objects);
-        Cell::VisitAllObjects(GetCaster(), searcher, 15.0f);
+        Cell::VisitObjects(GetCaster(), searcher, 15.0f);
         for (std::list<WorldObject*>::const_iterator itr = cagesList.begin(); itr != cagesList.end(); ++itr)
         {
             if (GameObject* go = (*itr)->ToGameObject())

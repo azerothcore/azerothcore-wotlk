@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,7 +16,9 @@
  */
 
 #include "ServerMailMgr.h"
+#include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "Common.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Log.h"
@@ -240,21 +242,28 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         case ServerMailConditionType::Faction:
             if (conditionValue < TEAM_ALLIANCE || conditionValue > TEAM_HORDE)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Faction' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Faction' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
             }
             break;
         case ServerMailConditionType::Race:
             if (conditionValue & ~RACEMASK_ALL_PLAYABLE)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Race' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Race' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
             }
             break;
         case ServerMailConditionType::Class:
             if (conditionValue & ~CLASSMASK_ALL_PLAYABLE)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Class' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Class' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                continue;
+            }
+            break;
+        case ServerMailConditionType::AccountFlags:
+            if ((conditionValue & ~ACCOUNT_FLAGS_ALL) != 0)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'AccountFlags' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
             }
             break;
@@ -344,6 +353,8 @@ bool ServerMailCondition::CheckCondition(Player* player) const
         return (player->getRaceMask() & value) != 0;
     case ServerMailConditionType::Class:
         return (player->getClassMask() & value) != 0;
+    case ServerMailConditionType::AccountFlags:
+        return player->GetSession()->HasAccountFlag(value);
     default:
         [[unlikely]] LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
         return false;

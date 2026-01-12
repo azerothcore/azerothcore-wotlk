@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -165,7 +165,7 @@ struct boss_wrath_scryer_soccothrates : public BossAI
         if (!preFight && who->IsPlayer() && me->IsWithinDistInMap(who, 70.0f))
         {
             Talk(SAY_SOCCOTHRATES_CONVO_1);
-            events2.ScheduleEvent(EVENT_PREFIGHT_1, 2000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_1, 2s);
             preFight = true;
         }
     }
@@ -178,38 +178,38 @@ struct boss_wrath_scryer_soccothrates : public BossAI
         case EVENT_PREFIGHT_1:
             if (Creature* dalliah = instance->GetCreature(DATA_DALLIAH))
                 dalliah->AI()->Talk(SAY_DALLIAH_CONVO_1);
-            events2.ScheduleEvent(EVENT_PREFIGHT_2, 3000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_2, 3s);
             break;
         case EVENT_PREFIGHT_2:
             Talk(SAY_SOCCOTHRATES_CONVO_2);
-            events2.ScheduleEvent(EVENT_PREFIGHT_3, 3000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_3, 3s);
             break;
         case EVENT_PREFIGHT_3:
             if (Creature* dalliah = instance->GetCreature(DATA_DALLIAH))
                 dalliah->AI()->Talk(SAY_DALLIAH_CONVO_2);
-            events2.ScheduleEvent(EVENT_PREFIGHT_4, 6000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_4, 6s);
             break;
         case EVENT_PREFIGHT_4:
             Talk(SAY_SOCCOTHRATES_CONVO_3);
-            events2.ScheduleEvent(EVENT_PREFIGHT_5, 2000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_5, 2s);
             break;
         case EVENT_PREFIGHT_5:
             if (Creature* dalliah = instance->GetCreature(DATA_DALLIAH))
                 dalliah->AI()->Talk(SAY_DALLIAH_CONVO_3);
-            events2.ScheduleEvent(EVENT_PREFIGHT_6, 3000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_6, 3s);
             break;
         case EVENT_PREFIGHT_6:
             Talk(SAY_SOCCOTHRATES_CONVO_4);
-            events2.ScheduleEvent(EVENT_PREFIGHT_7, 2000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_7, 2s);
             break;
         case EVENT_PREFIGHT_7:
             if (Creature* dalliah = instance->GetCreature(DATA_DALLIAH))
                 dalliah->GetMotionMaster()->MovePoint(0, 118.6048f, 96.84852f, 22.44115f);
-            events2.ScheduleEvent(EVENT_PREFIGHT_8, 4000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_8, 4s);
             break;
         case EVENT_PREFIGHT_8:
             me->GetMotionMaster()->MovePoint(0, 122.1035f, 192.7203f, 22.44115f);
-            events2.ScheduleEvent(EVENT_PREFIGHT_9, 4000);
+            events2.ScheduleEvent(EVENT_PREFIGHT_9, 4s);
             break;
         case EVENT_PREFIGHT_9:
             if (Creature* dalliah = instance->GetCreature(DATA_DALLIAH))

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -144,6 +144,9 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     bool result = _path->CalculatePath(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ());
     if (!result || (_path->GetPathType() & PathType(PATHFIND_NOPATH | PATHFIND_SHORTCUT | PATHFIND_FARFROMPOLY | PATHFIND_NOT_USING_PATH)))
     {
+        if (_fleeTargetGUID)
+            ++_invalidPathsCount;
+
         _timer.Reset(100);
         return;
     }
@@ -152,15 +155,13 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
     if (_path->getPathLength() < MIN_PATH_LENGTH)
     {
         if (_fleeTargetGUID)
-        {
-            ++_shortPathsCount;
-        }
+            ++_invalidPathsCount;
 
         _timer.Reset(100);
         return;
     }
 
-    _shortPathsCount = 0;
+    _invalidPathsCount = 0;
 
     Movement::MoveSplineInit init(owner);
     init.MovebyPath(_path->GetPath());
@@ -175,7 +176,7 @@ void FleeingMovementGenerator<T>::GetPoint(T* owner, Position& position)
     float casterDistance = 0.f;
     float casterAngle = 0.f;
     Unit* fleeTarget = nullptr;
-    if (_shortPathsCount < 5)
+    if (_invalidPathsCount < 5)
         fleeTarget = ObjectAccessor::GetUnit(*owner, _fleeTargetGUID);
 
     if (fleeTarget)

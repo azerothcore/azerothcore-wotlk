@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -152,7 +152,7 @@ public:
             if (action == ACTION_INTRO_BALTHARUS && !_introDone)
             {
                 _introDone = true;
-                me->m_Events.AddEvent(new DelayedTalk(me, SAY_BALTHARUS_INTRO), me->m_Events.CalculateTime(6000));
+                me->m_Events.AddEventAtOffset(new DelayedTalk(me, SAY_BALTHARUS_INTRO), 6s);
             }
             else if (action == ACTION_CLONE)
             {
@@ -191,7 +191,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -204,7 +204,7 @@ public:
             summon->SetHealth(me->GetHealth());
             summon->CastSpell(summon, SPELL_SPAWN_EFFECT, true);
             summon->SetReactState(REACT_PASSIVE);
-            summon->m_Events.AddEvent(new RestoreFight(summon), summon->m_Events.CalculateTime(2000));
+            summon->m_Events.AddEventAtOffset(new RestoreFight(summon), 2s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -379,7 +379,7 @@ public:
 
             // Xinef: after soft reset npc is no longer present
             if (me->GetInstanceScript()->GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE)
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
         }
 
         void DoAction(int32 action) override

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -185,6 +185,17 @@ enum ReputationRank : uint8
     REP_HONORED     = 5,
     REP_REVERED     = 6,
     REP_EXALTED     = 7
+};
+
+enum ReputationSource
+{
+    REPUTATION_SOURCE_KILL,
+    REPUTATION_SOURCE_QUEST,
+    REPUTATION_SOURCE_DAILY_QUEST,
+    REPUTATION_SOURCE_WEEKLY_QUEST,
+    REPUTATION_SOURCE_MONTHLY_QUEST,
+    REPUTATION_SOURCE_REPEATABLE_QUEST,
+    REPUTATION_SOURCE_SPELL
 };
 
 enum FactionTemplates
@@ -465,7 +476,7 @@ enum SpellAttr2 : uint32
     SPELL_ATTR2_ALWAYS_CAST_AS_UNIT                  = 0x00000200, // TITLE Unknown attribute 9@Attr2
     SPELL_ATTR2_SPECIAL_TAMING_FLAG                  = 0x00000400, // TITLE Unknown attribute 10@Attr2 DESCRIPTION Related to taming?
     SPELL_ATTR2_NO_TARGET_PER_SECOND_COST            = 0x00000800, // TITLE Health Funnel
-    SPELL_ATTR2_CHAIN_FROM_CASTER                    = 0x00001000, // TITLE Unknown attribute 12@Attr2 DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
+    SPELL_ATTR2_CHAIN_FROM_CASTER                    = 0x00001000, // TITLE Chain from caster DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
     SPELL_ATTR2_ENCHANT_OWN_ITEM_ONLY                = 0x00002000, // TITLE Enchant persists when entering arena
     SPELL_ATTR2_ALLOW_WHILE_INVISIBLE                = 0x00004000, // TITLE Unknown attribute 14@Attr2
     SPELL_ATTR2_DO_NOT_CONSUME_IF_GAINED_DURING_CAST = 0x00008000, // TITLE Unused attribute 15@Attr2 DESCRIPTION not set in 3.3.5a
@@ -2612,16 +2623,6 @@ enum LockType
     LOCKTYPE_OPEN_FROM_VEHICLE     = 21
 };
 
-enum TrainerType                                            // this is important type for npcs!
-{
-    TRAINER_TYPE_CLASS             = 0,
-    TRAINER_TYPE_MOUNTS            = 1,                     // on blizz it's 2
-    TRAINER_TYPE_TRADESKILLS       = 2,
-    TRAINER_TYPE_PETS              = 3
-};
-
-#define MAX_TRAINER_TYPE 4
-
 // CreatureType.dbc
 enum CreatureType
 {
@@ -3999,14 +4000,15 @@ enum ServerProcessTypes
 // Login Failure Reasons
 enum class LoginFailureReason : uint8
 {
-    Failed             = 0,
-    NoWorld            = 1,
-    DuplicateCharacter = 2,
-    NoInstances        = 3,
-    Disabled           = 4,
-    NoCharacter        = 5,
-    LockedForTransfer  = 6,
-    LockedByBilling    = 7
+    Failed             = 0, // Login failed
+    NoWorld            = 1, // World server down
+    DuplicateCharacter = 2, // A character with that name already exists
+    NoInstances        = 3, // No instance servers are available
+    Disabled           = 4, // Login for that race, class or character is currently disabled.
+    NoCharacter        = 5, // Character not found
+    LockedForTransfer  = 6, // You cannot log in until the character update process you recently initiated is complete.
+    LockedByBilling    = 7, // Character locked. Contact billing for more information
+    UsingRemote        = 8, // You cannot log in while using World of Warcraft Remote.
 };
 
 namespace Acore::Impl

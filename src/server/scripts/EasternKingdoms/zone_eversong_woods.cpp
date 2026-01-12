@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -60,7 +60,7 @@ struct npc_partygoer_pather : public ScriptedAI
             switch (eventId)
             {
             case EVENT_PATH:
-                me->GetMotionMaster()->MovePath(_path, false);
+                me->GetMotionMaster()->MoveWaypoint(_path, false);
                 break;
             case EVENT_RANDOM_ACTION_PATHER:
             {
@@ -139,7 +139,7 @@ struct npc_partygoer : public ScriptedAI
 
     void Reset() override
     {
-        _events.ScheduleEvent(EVENT_RANDOM_ACTION, urand(1000, 20000));
+        _events.ScheduleEvent(EVENT_RANDOM_ACTION, 1s, 20s);
     }
 
     void UpdateAI(uint32 diff) override

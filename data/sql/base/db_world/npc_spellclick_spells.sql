@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -57,7 +57,7 @@ INSERT INTO `npc_spellclick_spells` VALUES
 (26477,61832,1,0),
 (26503,47121,0,0),
 (26523,48296,1,0),
-(26809,47416,0,0),
+(26809,47416,2,1),
 (26813,47424,1,0),
 (27061,47920,1,0),
 (27131,48754,1,0),
@@ -82,7 +82,7 @@ INSERT INTO `npc_spellclick_spells` VALUES
 (27996,50343,1,0),
 (28018,46598,1,0),
 (28054,50556,1,0),
-(28061,50557,1,0),
+(28061,46598,1,0),
 (28094,60968,1,0),
 (28115,46598,1,0),
 (28161,51037,0,0),
@@ -99,6 +99,7 @@ INSERT INTO `npc_spellclick_spells` VALUES
 (28379,51658,0,0),
 (28389,51592,1,0),
 (28389,51593,3,0),
+(28399,46598,1,0),
 (28468,46598,1,0),
 (28605,52263,1,0),
 (28606,52263,1,0),
@@ -133,7 +134,7 @@ INSERT INTO `npc_spellclick_spells` VALUES
 (29708,46598,1,0),
 (29708,55028,1,0),
 (29709,55029,1,0),
-(29736,67830,1,0),
+(29736,46598,1,0),
 (29838,46598,1,0),
 (29856,55364,1,0),
 (29857,55460,1,0),
@@ -380,5 +381,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:11
-
+-- Dump completed on 2025-12-29 17:54:14

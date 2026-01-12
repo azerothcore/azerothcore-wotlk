@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -428,7 +428,7 @@ struct npc_costumed_orphan_matron : public ScriptedAI
             GetInitXYZ(x, y, z, o, path);
             if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
             {
-                cr->GetMotionMaster()->MovePath(path, true);
+                cr->GetMotionMaster()->MoveWaypoint(path, true);
                 cr->AI()->DoAction(path);
                 horseGUID = cr->GetGUID();
             }
@@ -697,7 +697,7 @@ struct npc_hallows_end_soh : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason /* why */) override
     {
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     uint32 GetData(uint32 /*type*/) const override
@@ -763,7 +763,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                     }
 
                     CastFires(false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 }
                 case 4:
@@ -807,7 +807,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         std::list<Player*> players;
         Acore::AnyPlayerInObjectRangeCheck checker(me, 60.f);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-        Cell::VisitWorldObjects(me, searcher, 60.f);
+        Cell::VisitObjects(me, searcher, 60.f);
         if (players.empty())
         {
             return;
@@ -848,7 +848,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     c->RemoveAllAuras();
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
         else
         {
@@ -868,7 +868,7 @@ struct npc_hallows_end_soh : public ScriptedAI
             me->RemoveAllAuras();
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            events.ScheduleEvent(4, 2000);
+            events.ScheduleEvent(4, 2s);
         }
     }
 
@@ -887,7 +887,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         std::list<Player*> players;
         Acore::AnyPlayerInObjectRangeCheck checker(me, radius);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-        Cell::VisitWorldObjects(me, searcher, radius);
+        Cell::VisitObjects(me, searcher, radius);
 
         for (Player* player : players)
         {
@@ -1029,7 +1029,7 @@ struct boss_headless_horseman : public ScriptedAI
         std::list<Creature*> unitList;
         me->GetCreaturesWithEntryInRange(unitList, 100.0f, NPC_PUMPKIN_FIEND);
         for (std::list<Creature*>::iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-            (*itr)->ToCreature()->DespawnOrUnsummon(500);
+            (*itr)->ToCreature()->DespawnOrUnsummon(500ms);
 
         Map::PlayerList const& players = me->GetMap()->GetPlayers();
         if (!players.IsEmpty() && players.begin()->GetSource() && players.begin()->GetSource()->GetGroup())
@@ -1085,9 +1085,9 @@ struct boss_headless_horseman : public ScriptedAI
     {
         if (type == WAYPOINT_MOTION_TYPE)
         {
-            if (point == 0)
+            if (point == 1)
                 me->CastSpell(me, SPELL_HEAD_VISUAL, true);
-            else if (point == 11)
+            else if (point == 12)
             {
                 me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
@@ -1191,7 +1191,7 @@ struct boss_headless_horseman : public ScriptedAI
                             break;
                         case 3:
                             me->SetDisableGravity(true);
-                            me->GetMotionMaster()->MovePath(236820, false);
+                            me->GetMotionMaster()->MoveWaypoint(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
                             player->Say(TALK_PLAYER_FELT_DEATH);
                             Talk(TALK_ENTRANCE);
@@ -1202,7 +1202,7 @@ struct boss_headless_horseman : public ScriptedAI
                             talkCount = 0;
                             return; // pop and return, skip repeat
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 }
             case EVENT_HORSEMAN_FOLLOW:
@@ -1218,7 +1218,7 @@ struct boss_headless_horseman : public ScriptedAI
             case EVENT_HORSEMAN_CLEAVE:
                 {
                     me->CastSpell(me->GetVictim(), SPELL_HORSEMAN_CLEAVE, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
                 }
             case EVENT_HORSEMAN_WHIRLWIND:
@@ -1226,11 +1226,11 @@ struct boss_headless_horseman : public ScriptedAI
                     if (me->HasAuraEffect(SPELL_HORSEMAN_WHIRLWIND, EFFECT_0))
                     {
                         me->RemoveAura(SPELL_HORSEMAN_WHIRLWIND);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         break;
                     }
                     me->CastSpell(me, SPELL_HORSEMAN_WHIRLWIND, true);
-                    events.RepeatEvent(6000);
+                    events.Repeat(6s);
                     break;
                 }
             case EVENT_HORSEMAN_CHECK_HEALTH:
@@ -1241,7 +1241,7 @@ struct boss_headless_horseman : public ScriptedAI
                         return;
                     }
 
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
                 }
             case EVENT_HORSEMAN_CONFLAGRATION:
@@ -1253,21 +1253,21 @@ struct boss_headless_horseman : public ScriptedAI
                         Talk(TALK_CONFLAGRATION);
                     }
 
-                    events.RepeatEvent(12500);
+                    events.Repeat(12500ms);
                     break;
                 }
             case EVENT_SUMMON_PUMPKIN:
                 {
                     if (talkCount < 4)
                     {
-                        events.RepeatEvent(1);
+                        events.Repeat(1ms);
                         talkCount++;
                         me->CastSpell(me, SPELL_SUMMON_PUMPKIN, false);
                     }
                     else
                     {
                         Talk(TALK_SPROUTING_PUMPKINS);
-                        events.RepeatEvent(15000);
+                        events.Repeat(15s);
                         talkCount = 0;
                     }
 

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -36,7 +36,7 @@ CREATE TABLE `version` (
 LOCK TABLES `version` WRITE;
 /*!40000 ALTER TABLE `version` DISABLE KEYS */;
 INSERT INTO `version` VALUES
-('AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)','2923a4aa43d0','ACDB 335.13-dev',13);
+('AzerothCore rev. 10d105243f47 2025-12-29 17:44:37 +0100 (Last-DB-SQUASH-OF-2025-WOO-HOO-WOOP-WOOP branch) (Win64, RelWithDebInfo, Static)','10d105243f47','ACDB 335.14-dev',14);
 /*!40000 ALTER TABLE `version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -48,5 +48,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:47
-
+-- Dump completed on 2025-12-29 17:54:48

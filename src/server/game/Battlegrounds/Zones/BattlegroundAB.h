@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -170,12 +170,11 @@ enum BG_AB_Misc
 
     BG_AB_WARNING_NEAR_VICTORY_SCORE    = 1400,
     BG_AB_MAX_TEAM_SCORE                = 1600,
-
-    BG_AB_FLAG_CAPTURING_TIME           = 60000,
-    BG_AB_BANNER_UPDATE_TIME            = 2000
 };
+constexpr Milliseconds BG_AB_FLAG_CAPTURING_TIME = 60s;
+constexpr Milliseconds BG_AB_BANNER_UPDATE_TIME = 2s;
 
-const uint32 BG_AB_TickIntervals[BG_AB_DYNAMIC_NODES_COUNT + 1] = {0, 12000, 9000, 6000, 3000, 1000};
+const Milliseconds BG_AB_TickIntervals[BG_AB_DYNAMIC_NODES_COUNT + 1] = {0ms, 12s, 9s, 6s, 3s, 1s};
 const uint32 BG_AB_TickPoints[BG_AB_DYNAMIC_NODES_COUNT + 1] = {0, 10, 10, 10, 10, 30};
 const uint32 BG_AB_GraveyardIds[BG_AB_ALL_NODES_COUNT] = {895, 894, 893, 897, 896, 898, 899};
 
@@ -299,6 +298,7 @@ private:
     EventMap _bgEvents;
     uint32 _honorTics;
     uint32 _reputationTics;
+    float _abReputationRate;
     uint8 _controlledPoints[PVP_TEAMS_COUNT] {};
     bool _teamScores500Disadvantage[PVP_TEAMS_COUNT] {};
     uint32 _configurableMaxTeamScore;

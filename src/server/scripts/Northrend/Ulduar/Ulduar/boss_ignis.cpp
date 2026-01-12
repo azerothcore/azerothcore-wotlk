@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,37 +26,33 @@
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
 
-#define SPELL_FLAME_JETS_10             62680
-#define SPELL_FLAME_JETS_25             63472
-#define S_FLAME_JETS                    RAID_MODE(SPELL_FLAME_JETS_10, SPELL_FLAME_JETS_25)
-#define SPELL_SCORCH_10                 62546
-#define SPELL_SCORCH_25                 63474
-#define S_SCORCH                        RAID_MODE(SPELL_SCORCH_10, SPELL_SCORCH_25)
-#define SPELL_ACTIVATE_CONSTRUCT        62488
-#define SPELL_STRENGTH_OF_THE_CREATOR   64473
-#define SPELL_SLAG_POT_10               62717
-#define SPELL_SLAG_POT_25               63477
-#define S_SLAG_POT                      RAID_MODE(SPELL_SLAG_POT_10, SPELL_SLAG_POT_25)
-#define SPELL_BERSERK                   64238
-#define SPELL_GRAB                      62707
-#define SPELL_GRAB_TRIGGERED            62708
-#define SPELL_GRAB_CONTROL_2            62711
+enum IgnisSpellData
+{
+    SPELL_FLAME_JETS               = 62680,
+    SPELL_SCORCH                   = 62546,
+    SPELL_ACTIVATE_CONSTRUCT       = 62488,
+    SPELL_STRENGTH_OF_THE_CREATOR  = 64473,
+    SPELL_SLAG_POT                 = 62717,
+    SPELL_BERSERK                  = 64238,
+    SPELL_GRAB                     = 62707,
+    SPELL_GRAB_TRIGGERED           = 62708,
+    SPELL_GRAB_CONTROL_2           = 62711,
 
-#define SPELL_SCORCHED_GROUND_10        62548
-#define SPELL_SCORCHED_GROUND_25        63476
-#define S_SCORCHED_GROUND               RAID_MODE(SPELL_SCORCHED_GROUND_10, SPELL_SCORCHED_GROUND_25)
-#define SPELL_HEAT_AREA                 62343
-#define SPELL_HEAT_BUFF                 65667
-#define SPELL_MOLTEN                    62373
-#define SPELL_BRITTLE_10                62382
-#define SPELL_BRITTLE_25                67114
-#define S_BRITTLE                       RAID_MODE(SPELL_BRITTLE_10, SPELL_BRITTLE_25)
-#define SPELL_SHATTER                   62383
+    SPELL_SCORCHED_GROUND          = 62548,
+    SPELL_HEAT_AREA                = 62343,
+    SPELL_HEAT_BUFF                = 65667,
+    SPELL_MOLTEN                   = 62373,
+    SPELL_BRITTLE                  = 62382,
+    SPELL_SHATTER                  = 62383,
+};
 
-#define BOSS_IGNIS                      33118
-#define NPC_IRON_CONSTRUCT              33121
-#define NPC_SCORCHED_GROUND             33123
-#define NPC_WATER_TRIGGER               22515
+enum IgnisNPCs
+{
+    BOSS_IGNIS                     = 33118,
+    NPC_IRON_CONSTRUCT             = 33121,
+    NPC_SCORCHED_GROUND            = 33123,
+    NPC_WATER_TRIGGER              = 22515,
+};
 
 enum Texts
 {
@@ -147,7 +143,7 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= RAID_MODE(3000U, 5000U) && me->GetAura(S_BRITTLE))
+            if (damage >= RAID_MODE(3000U, 5000U) && me->GetAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_BRITTLE, me)))
             {
                 me->CastSpell(me, SPELL_SHATTER, true);
                 Unit::Kill(attacker, me);
@@ -177,7 +173,7 @@ public:
                     if (me->FindNearestCreature(NPC_WATER_TRIGGER, 18.0f, true))
                     {
                         me->RemoveAura(a);
-                        me->CastSpell(me, S_BRITTLE, true);
+                        me->CastSpell(me, SPELL_BRITTLE, true);
                     }
             }
             else
@@ -247,7 +243,7 @@ public:
             bShattered = false;
             lastShatterMSTime = 0;
             events.Reset();
-            events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40000, 30000));
+            events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40s, 30s));
             events.ScheduleEvent(EVENT_SPELL_SCORCH, 10s);
             events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32s);
             events.ScheduleEvent(EVENT_GRAB, 25s);
@@ -312,7 +308,7 @@ public:
             if (caster && spell->Id == SPELL_GRAB_CONTROL_2)
             {
                 //caster->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                me->CastSpell(caster, S_SLAG_POT, true);
+                me->CastSpell(caster, SPELL_SLAG_POT, true);
             }
         }
 
@@ -347,14 +343,14 @@ public:
                         me->CastSpell(me, SPELL_BERSERK, true);
                         break;
                     }
-                    events.RepeatEvent(RAID_MODE(40000, 30000));
+                    events.Repeat(RAID_MODE(40s, 30s));
                     break;
                 case EVENT_SPELL_SCORCH:
                     Talk(SAY_SCORCH);
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->DisableRotate(true);
                     me->SendMovementFlagUpdate();
-                    me->CastSpell(me->GetVictim(), S_SCORCH, false);
+                    me->CastSpell(me->GetVictim(), SPELL_SCORCH, false);
                     events.Repeat(20s);
                     events.RescheduleEvent(EVENT_ENABLE_ROTATE, 3s);
                     break;
@@ -364,7 +360,7 @@ public:
                     break;
                 case EVENT_SPELL_FLAME_JETS:
                     Talk(EMOTE_JETS);
-                    me->CastSpell(me->GetVictim(), S_FLAME_JETS, false);
+                    me->CastSpell(me->GetVictim(), SPELL_FLAME_JETS, false);
                     events.Repeat(25s);
                     break;
                 case EVENT_GRAB:
@@ -431,7 +427,7 @@ class spell_ignis_scorch_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_SCORCHED_GROUND_10, SPELL_SCORCHED_GROUND_25 });
+        return ValidateSpellInfo({ SPELL_SCORCHED_GROUND });
     }
 
     void HandleEffectPeriodic(AuraEffect const* aurEff)
@@ -441,7 +437,7 @@ class spell_ignis_scorch_aura : public AuraScript
                 if (Creature* summon = caster->SummonCreature(NPC_SCORCHED_GROUND, caster->GetPositionX() + 20.0f * cos(caster->GetOrientation()), caster->GetPositionY() + 20.0f * std::sin(caster->GetOrientation()), 361.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
                 {
                     if (!summon->FindNearestCreature(NPC_WATER_TRIGGER, 25.0f, true)) // must be away from the water
-                        summon->CastSpell(summon, (aurEff->GetId() == SPELL_SCORCH_10 ? SPELL_SCORCHED_GROUND_10 : SPELL_SCORCHED_GROUND_25), true);
+                        summon->CastSpell(summon, SPELL_SCORCHED_GROUND, true);
                 }
     }
 
@@ -474,12 +470,10 @@ class spell_ignis_grab_initial : public SpellScript
 
 enum SlagPot
 {
-    SPELL_SLAG_POT_DAMAGE_1 = 65722,
-    SPELL_SLAG_POT_DAMAGE_2 = 65723,
+    SPELL_SLAG_POT_DAMAGE   = 65722,
     SPELL_SCORCH_DAMAGE_1   = 62549,
     SPELL_SCORCH_DAMAGE_2   = 63475,
-    SPELL_SLAG_IMBUED_1     = 62836,
-    SPELL_SLAG_IMBUED_2     = 63536
+    SPELL_SLAG_IMBUED       = 62836,
 };
 
 class spell_ignis_slag_pot_aura : public AuraScript
@@ -490,12 +484,10 @@ class spell_ignis_slag_pot_aura : public AuraScript
     {
         return ValidateSpellInfo(
             {
-                SPELL_SLAG_POT_DAMAGE_1,
-                SPELL_SLAG_POT_DAMAGE_2,
+                SPELL_SLAG_POT_DAMAGE,
                 SPELL_SCORCH_DAMAGE_1,
                 SPELL_SCORCH_DAMAGE_2,
-                SPELL_SLAG_IMBUED_1,
-                SPELL_SLAG_IMBUED_2
+                SPELL_SLAG_IMBUED
             });
     }
 
@@ -503,7 +495,7 @@ class spell_ignis_slag_pot_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
             if (Unit* target = GetTarget())
-                caster->CastSpell(target, (GetId() == SPELL_SLAG_POT_10 ? SPELL_SLAG_POT_DAMAGE_1 : SPELL_SLAG_POT_DAMAGE_2), true);
+                caster->CastSpell(target, SPELL_SLAG_POT_DAMAGE, true);
     }
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -522,7 +514,7 @@ class spell_ignis_slag_pot_aura : public AuraScript
             target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_1, false);
             target->ApplySpellImmune(GetId(), IMMUNITY_ID, SPELL_SCORCH_DAMAGE_2, false);
             if (target->IsAlive())
-                target->CastSpell(target, (GetId() == SPELL_SLAG_POT_10 ? SPELL_SLAG_IMBUED_1 : SPELL_SLAG_IMBUED_2), true);
+                target->CastSpell(target, SPELL_SLAG_IMBUED, true);
         }
     }
 
