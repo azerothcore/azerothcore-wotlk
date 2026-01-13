@@ -1,3 +1,4 @@
+-- DB update 2026_01_13_01 -> 2026_01_13_02
 --
 DELETE FROM `creature` WHERE `guid` IN (202969, 202970) AND `id1` IN (28667, 28668);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28659);
