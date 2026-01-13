@@ -1,3 +1,4 @@
+-- DB update 2026_01_12_01 -> 2026_01_13_00
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 1 AND `SourceEntry` = 20400 AND `ConditionTypeOrReference` = 12;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (1, 27830, 20400, 0, 0, 12, 0, 12, 0, 0, 0, 0, 0, '', 'Pumpkin Bag - Venture Co. Evacuee - Requires Hallow''s End'),
