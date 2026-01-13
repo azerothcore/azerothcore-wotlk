@@ -2489,7 +2489,7 @@ class spell_dk_necrosis : public AuraScript
     }
 };
 
-// -49182 - Blade Barrier
+// -49182 Blade Barrier
 class spell_dk_blade_barrier : public AuraScript
 {
     PrepareAuraScript(spell_dk_blade_barrier);
