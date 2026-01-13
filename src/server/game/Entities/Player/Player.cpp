@@ -7364,9 +7364,8 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (entry && (entry->attributeMask & ENCHANT_PROC_ATTR_EXCLUSIVE) != 0)
             {
                 Unit* checkTarget = spellInfo->IsPositive() ? this : target;
-                if (Aura* aura = checkTarget->GetAura(spellInfo->Id, GetGUID()))
+                if (checkTarget->HasAura(spellInfo->Id, GetGUID()))
                 {
-                    aura->RefreshDuration();
                     continue;
                 }
             }
