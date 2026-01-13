@@ -195,7 +195,7 @@ public:
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
             { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
             { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  },
-            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::No  }
+            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::Yes }
         };
 
         return commandTable;
@@ -3109,9 +3109,19 @@ public:
         return false;
     }
 
-    static bool HandlePacketLog(ChatHandler* handler, Optional<bool> enableArg)
+    static bool HandlePacketLog(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<bool> enableArg)
     {
-        WorldSession* session = handler->GetSession();
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target || !target->IsConnected())
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        WorldSession* session = playerTarget->GetSession();
 
         if (!session)
             return false;
@@ -3121,13 +3131,13 @@ public:
             if (*enableArg)
             {
                 session->SetPacketLogging(true);
-                handler->SendNotification(LANG_ON);
+                handler->PSendSysMessage("Packet logging enabled for {}.", playerTarget->GetName());
                 return true;
             }
             else
             {
                 session->SetPacketLogging(false);
-                handler->SendNotification(LANG_OFF);
+                handler->PSendSysMessage("Packet logging disabled for {}.", playerTarget->GetName());
                 return true;
             }
         }

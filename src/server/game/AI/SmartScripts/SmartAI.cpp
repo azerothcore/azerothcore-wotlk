@@ -951,6 +951,14 @@ void SmartAI::InitializeAI()
         if (!(event.action.cast.castFlags & SMARTCAST_MAIN_SPELL))
             continue;
 
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+        if (spellInfo && spellInfo->IsPositive())
+        {
+            LOG_WARN("scripts.ai", "SmartAI: Creature {} has SMARTCAST_MAIN_SPELL on positive spell {} - positive spells should not be used as main spell",
+                me->GetEntry(), event.action.cast.spell);
+            continue;
+        }
+
         SetMainSpell(event.action.cast.spell);
         break;
     }
@@ -964,6 +972,11 @@ void SmartAI::InitializeAI()
                 continue;
 
             if (!(event.action.cast.castFlags & SMARTCAST_COMBAT_MOVE))
+                continue;
+
+            // Don't use positive (healing/buff) spells to determine attack distance
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+            if (spellInfo && spellInfo->IsPositive())
                 continue;
 
             SetMainSpell(event.action.cast.spell);
