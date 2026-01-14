@@ -1,3 +1,4 @@
+-- DB update 2026_01_14_00 -> 2026_01_14_01
 --
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` IN (1041, 1042, 1465, 1467, 1468, 1469, 2741, 2743, 2749, 2784, 3202, 3203, 4110, 4111, 4117, 4128, 4129, 4134, 4135, 4136, 4138, 4151, 4156, 4160, 4164, 4165, 4169, 4170, 4171, 4184, 4186, 4208, 4211, 4241, 4242, 4244, 4263, 4351, 4356, 4748, 4842, 4843, 7455, 7459, 7512, 7809, 7815, 7820, 7833, 8308, 8460, 8522, 8760, 8863, 9084, 9131, 9132, 10363, 10437, 10568, 21222, 61025));
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
