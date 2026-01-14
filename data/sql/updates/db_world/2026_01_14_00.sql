@@ -1,3 +1,4 @@
+-- DB update 2026_01_13_03 -> 2026_01_14_00
 -- Gryphon
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27886;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27886);
