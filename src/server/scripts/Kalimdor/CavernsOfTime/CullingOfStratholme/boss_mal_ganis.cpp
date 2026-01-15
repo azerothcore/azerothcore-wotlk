@@ -112,13 +112,14 @@ public:
                 me->SetImmuneToAll(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_PASSIVE);
-                if (InstanceScript* pInstance = me->GetInstanceScript())
+                if (InstanceScript* instance = me->GetInstanceScript())
                 {
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_ARTHAS)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ARTHAS)))
                         cr->AI()->DoAction(ACTION_KILLED_MALGANIS);
 
                     // give credit to players
                     me->CastSpell(me, 58630, true);
+                    instance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
                 }
 
                 // quest completion
