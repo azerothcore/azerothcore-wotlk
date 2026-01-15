@@ -118,7 +118,7 @@ struct boss_anubrekhan : public BossAI
             SummonCryptGuards();
         if (!Is25ManRaid())
         {
-            me->m_Events.AddEventAtOffset([&]()
+            me->m_Events.AddEventAtOffset([this]()
             {
                 me->SummonCreature(NPC_CRYPT_GUARD, cryptguardPositions[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
             }, 17500ms);
