@@ -29,14 +29,14 @@ void ScriptMgr::OnNetworkStop()
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_STOP, script->OnNetworkStop());
 }
 
-void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> socket)
+void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> const& socket)
 {
     ASSERT(socket);
 
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_SOCKET_OPEN, script->OnSocketOpen(socket));
 }
 
-void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
+void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> const& socket)
 {
     ASSERT(socket);
 

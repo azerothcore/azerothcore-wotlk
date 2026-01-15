@@ -67,19 +67,19 @@ struct ClientPktHeader
 
 struct AuthSession;
 
-class AC_GAME_API WorldSocket : public Socket<WorldSocket>
+class AC_GAME_API WorldSocket final : public Socket<WorldSocket>
 {
     typedef Socket<WorldSocket> BaseSocket;
 
 public:
-    WorldSocket(tcp::socket&& socket);
+    WorldSocket(IoContextTcpSocket&& socket);
     ~WorldSocket();
 
     WorldSocket(WorldSocket const& right) = delete;
     WorldSocket& operator=(WorldSocket const& right) = delete;
 
     void Start() override;
-    bool Update() override;
+    bool Update() final;
 
     void SendPacket(WorldPacket const& packet);
 
@@ -90,7 +90,7 @@ public:
 
 protected:
     void OnClose() override;
-    void ReadHandler() override;
+    SocketReadCallbackResult ReadHandler() final;
     bool ReadHeaderHandler();
 
     enum class ReadDataHandlerResult
