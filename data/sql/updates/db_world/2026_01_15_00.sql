@@ -1,3 +1,4 @@
+-- DB update 2026_01_14_01 -> 2026_01_15_00
 
 -- Edit Spell Timers (Watcher Narjil, Gashra, Silthik)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (28729, 28730, 28731));
