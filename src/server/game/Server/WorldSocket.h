@@ -65,21 +65,21 @@ struct ClientPktHeader
 };
 #pragma pack(pop)
 
-struct AuthSession;
+struct ClientAuthSession;
 
-class AC_GAME_API WorldSocket : public Socket<WorldSocket>
+class AC_GAME_API WorldSocket final : public Socket<WorldSocket>
 {
     typedef Socket<WorldSocket> BaseSocket;
 
 public:
-    WorldSocket(tcp::socket&& socket);
+    WorldSocket(IoContextTcpSocket&& socket);
     ~WorldSocket();
 
     WorldSocket(WorldSocket const& right) = delete;
     WorldSocket& operator=(WorldSocket const& right) = delete;
 
     void Start() override;
-    bool Update() override;
+    bool Update() final;
 
     void SendPacket(WorldPacket const& packet);
 
@@ -90,7 +90,7 @@ public:
 
 protected:
     void OnClose() override;
-    void ReadHandler() override;
+    SocketReadCallbackResult ReadHandler() final;
     bool ReadHeaderHandler();
 
     enum class ReadDataHandlerResult
@@ -113,7 +113,7 @@ private:
     void SendPacketAndLogOpcode(WorldPacket const& packet);
     void HandleSendAuthSession();
     void HandleAuthSession(WorldPacket& recvPacket);
-    void HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result);
+    void HandleAuthSessionCallback(std::shared_ptr<ClientAuthSession> authSession, PreparedQueryResult result);
     void LoadSessionPermissionsCallback(PreparedQueryResult result);
     void SendAuthResponseError(uint8 code);
 
