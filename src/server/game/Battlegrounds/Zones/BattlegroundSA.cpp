@@ -581,6 +581,7 @@ void BattlegroundSA::TeleportToEntrancePosition(Player* player)
                 player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 2682.936f, -830.368f, 15.0f, 2.895f, 0);
             else
                 player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 2577.003f, 980.261f, 15.0f, 0.807f, 0);
+
             _nextShipIsEast = !_nextShipIsEast;
         }
         else
