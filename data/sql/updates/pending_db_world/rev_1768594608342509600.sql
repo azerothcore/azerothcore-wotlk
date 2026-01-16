@@ -1,4 +1,4 @@
---
+-- Add skinning loot table for creature 1933 (Sheep) to enable Ruined Leather Scraps, Wool Cloth, and Light Leather drops.
 UPDATE `creature_template` SET `skinloot` = 1933 WHERE (`entry` = 1933);
 
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 1933);
