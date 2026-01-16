@@ -65,7 +65,7 @@ struct ClientPktHeader
 };
 #pragma pack(pop)
 
-struct AuthSession;
+struct ClientAuthSession;
 
 class AC_GAME_API WorldSocket final : public Socket<WorldSocket>
 {
@@ -113,7 +113,7 @@ private:
     void SendPacketAndLogOpcode(WorldPacket const& packet);
     void HandleSendAuthSession();
     void HandleAuthSession(WorldPacket& recvPacket);
-    void HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result);
+    void HandleAuthSessionCallback(std::shared_ptr<ClientAuthSession> authSession, PreparedQueryResult result);
     void LoadSessionPermissionsCallback(PreparedQueryResult result);
     void SendAuthResponseError(uint8 code);
 

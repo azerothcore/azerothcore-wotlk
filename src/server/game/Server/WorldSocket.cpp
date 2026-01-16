@@ -329,7 +329,7 @@ bool WorldSocket::ReadHeaderHandler()
     return true;
 }
 
-struct AuthSession
+struct ClientAuthSession
 {
     uint32 BattlegroupID = 0;
     uint32 LoginServerType = 0;
@@ -528,7 +528,7 @@ void WorldSocket::SendPacket(WorldPacket const& packet)
 
 void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)
 {
-    std::shared_ptr<AuthSession> authSession = std::make_shared<AuthSession>();
+    std::shared_ptr<ClientAuthSession> authSession = std::make_shared<ClientAuthSession>();
 
     // Read the content of the packet
     recvPacket >> authSession->Build;
@@ -552,7 +552,7 @@ void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSocket::HandleAuthSessionCallback, this, authSession, std::placeholders::_1)));
 }
 
-void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result)
+void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<ClientAuthSession> authSession, PreparedQueryResult result)
 {
     // Stop if the account is not found
     if (!result)
