@@ -1,3 +1,4 @@
+-- DB update 2026_01_15_00 -> 2026_01_16_00
 -- Delete quest credit hack
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30954) AND (`source_type` = 0) AND (`id` IN (3));
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30956) AND (`source_type` = 0) AND (`id` IN (6));
