@@ -117,9 +117,23 @@ public:
                     return PrisonerGUID[data - DATA_PRISONER_1];
                 case DATA_EXECUTIONER:
                     return ExecutionerGUID;
+                case DATA_LAST_FLAME_ARROW:
+                    return _lastArrowGUID;
             }
 
             return ObjectGuid::Empty;
+        }
+
+        void SetGuidData(uint32 data, ObjectGuid value) override
+        {
+            switch (data)
+            {
+                case DATA_LAST_FLAME_ARROW:
+                    _lastArrowGUID = value;
+                    break;
+                default:
+                    break;
+            }
         }
 
         void Update(uint32 diff) override
@@ -164,6 +178,7 @@ public:
         }
 
     protected:
+        ObjectGuid _lastArrowGUID;
         ObjectGuid ExecutionerGUID;
         ObjectGuid PrisonerGUID[3];
         uint32 RescueTimer;
