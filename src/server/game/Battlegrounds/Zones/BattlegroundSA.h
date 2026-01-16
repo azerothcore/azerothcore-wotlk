@@ -620,5 +620,7 @@ private:
 
     // Achievement: Not Even a Scratch
     bool _notEvenAScratch[PVP_TEAMS_COUNT];
+    /// toggle for spawn at first ship or second ship
+    bool _spawnAtFirstShip;
 };
 #endif
