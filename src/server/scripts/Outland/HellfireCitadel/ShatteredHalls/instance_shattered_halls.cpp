@@ -178,7 +178,7 @@ public:
         }
 
     protected:
-        ObjectGuid _lastArrowGUID;
+        ObjectGuid _lastArrowGUID = ObjectGuid::Empty;
         ObjectGuid ExecutionerGUID;
         ObjectGuid PrisonerGUID[3];
         uint32 RescueTimer;
