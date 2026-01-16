@@ -3303,7 +3303,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (Creature* creature = target->ToCreature())
                 {
                     creature->SetGossipMenuId(e.action.setGossipMenu.gossipMenuId);
-                    LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_SET_GOSSIP_MENU: Creature {} set gossip menu to {}",
+                    LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_GOSSIP_MENU: Creature {} set gossip menu to {}",
                         creature->GetGUID().ToString(), e.action.setGossipMenu.gossipMenuId);
                 }
             }
