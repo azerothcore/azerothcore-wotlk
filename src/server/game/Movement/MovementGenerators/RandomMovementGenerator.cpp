@@ -227,6 +227,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     default:
         break;
     }
+    creature->SetWalk(walk);
 
     Movement::MoveSplineInit init(creature);
     init.MovebyPath(finalPath);
