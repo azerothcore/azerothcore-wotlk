@@ -124,6 +124,29 @@ void SmartAI::UpdateFollow(uint32 diff)
     else
         mFollowArrivedTimer -= diff;
 
+    if (mFollowGuid.IsPlayer())
+    {
+        if (mFollowCheckTimer < diff)
+        {
+            bool shouldDespawn = false;
+            if (Player* player = ObjectAccessor::FindPlayer(mFollowGuid))
+            {
+                float checkDist = me->GetInstanceScript() ? SMART_ESCORT_MAX_PLAYER_DIST * 2 : SMART_ESCORT_MAX_PLAYER_DIST;
+                if (!me->IsWithinDistInMap(player, checkDist))
+                    shouldDespawn = true;
+            }
+            else
+                shouldDespawn = true;
+
+            if (shouldDespawn)
+                me->DespawnOrUnsummon();
+
+            mFollowCheckTimer = 1000;
+        }
+        else
+            mFollowCheckTimer -= diff;
+    }
+}
 
 WaypointData const* SmartAI::GetNextWayPoint()
 {

@@ -222,6 +222,7 @@ private:
     bool mIsCharmed;
     uint32 mFollowCreditType;
     uint32 mFollowArrivedTimer;
+    uint32 mFollowCheckTimer;
     uint32 mFollowCredit;
     uint32 mFollowArrivedEntry;
     bool   mFollowArrivedAlive;
