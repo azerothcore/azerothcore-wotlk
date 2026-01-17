@@ -1645,7 +1645,7 @@ void Player::ProcessDelayedOperations()
     if (m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
     {
         Aura* aura = GetAura(26013);
-        if (!aura || aura->GetDuration() <= 900000)
+        if (!aura)
             CastSpell(this, 26013, true);
     }
 
