@@ -220,7 +220,7 @@ public:
                         Player::RemoveFromGroup(group, guid);
         }
         else if (target && target->GetMap()->IsBattleground())
-            target->ToPlayer()->LeaveBattleground();
+            target->LeaveBattleground();
 
         handler->PSendSysMessage("{} of {} Deserter has been added to player {}.", secsToTimeString(duration), isInstance ? "Instance" : "Battleground", handler->playerLink(*playerName));
         return true;
