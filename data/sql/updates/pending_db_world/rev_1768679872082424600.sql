@@ -103,8 +103,8 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (13256, 19113, 0, 0, 0, 1, 1, 1, 1, 'Alterac Valley Summon Boss - Yeti Hide Bracers');
 DELETE FROM `creature_loot_template` WHERE (`Entry` IN (13256, 13419)) AND (`Item` IN (13256));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(13256, 13256, 13256, 100, 0, 1, 0, 1, 4, 'Alterac Summon Boss Loot Table'),
-(13419, 13256, 13256, 100, 0, 1, 0, 1, 4, 'Alterac Summon Boss Loot Table');
+(13256, 13256, 13256, 100, 0, 1, 0, 4, 4, 'Alterac Summon Boss Loot Table'),
+(13419, 13256, 13256, 100, 0, 1, 0, 4, 4, 'Alterac Summon Boss Loot Table');
 
 -- AQ40 Trash Epic
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 15312) AND (`Item` IN (21890));
