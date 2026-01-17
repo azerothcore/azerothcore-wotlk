@@ -213,6 +213,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             init.SetWalk(false);
             break;
         case WAYPOINT_MOVE_TYPE_WALK:
+            creature->SetWalk(true);
             init.SetWalk(true);
             break;
         default:
