@@ -352,6 +352,24 @@ INSERT INTO `reference_loot_template` (`Entry`, `Chance`, `GroupId`, `Item`, `Co
 (1227274, 0, 1, 36217, 'Orca Spaulders'), -- 146, 71, 2,
 (1227274, 0, 1, 36463, 'Polished Orb'), -- 146, 71, 2,
 (1227274, 0, 1, 36449, 'Vrykul Shield'), -- 146, 71, 2,
+-- Did you know my first pass missed several items? All weapons within this range. Apparently they never dropped prior to this.
+(1227274, 0, 1, 36533, 'Adorned Broadsword'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36603, 'Archaic Longspear'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36575, 'Dragonflayer Hatchet'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36505, 'Frosted Steel Mallet'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36631, 'Horned Crossbow'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36687, 'Illuminated Scepter'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36547, 'Jester\'s Stick'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36519, 'Moonlit Katana'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36701, 'Pine Needle Staff'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36715, 'Runed Shuriken, 146'), -- 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36589, 'Segmenting Broadaxe'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36491, 'Serrated Maul'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36659, 'Shivery Wand'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36645, 'Tuskarr Boomstick'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36477, 'Twin-Edged Stiletto'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36673, 'Wise Dagger'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
+(1227274, 0, 1, 36617, 'Yielding Bow'), -- 146, 71, 2 -- Random Green: Missing from Loot Table 72+
 -- 73-75
 (1227375, 0, 1, 36226, 'Amberpine Bracers'), -- 150, 72, 2,
 (1227375, 0, 1, 36221, 'Amberpine Chain Vest'), -- 150, 72, 2,
