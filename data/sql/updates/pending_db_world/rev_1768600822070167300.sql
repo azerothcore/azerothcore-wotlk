@@ -4,7 +4,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24539, 0, 0, 0, 0, 0, 100, 0, 3000, 6000, 15000, 22000, 0, 0, 11, 15091, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '\'Silvermoon\' Harry - In Combat - Cast \'Blast Wave\''),
 (24539, 0, 1, 0, 0, 0, 100, 0, 2500, 4000, 4000, 5000, 0, 0, 11, 50183, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, '\'Silvermoon\' Harry - In Combat - Cast \'Scorch\''),
 (24539, 0, 2, 0, 62, 0, 100, 0, 9010, 0, 0, 0, 0, 0, 80, 2453900, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Silvermoon" Harry - On Gossip Option "Taruk sent me to collect" Selected - Run Script: Attack'),
-(24539, 0, 3, 4, 62, 0, 100, 0, 9011, 0, 0, 0, 0, 0, 56, 34115, 1, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '"Silvermoon" Harry - On Gossip Option 0 Selected - Add Item \'"Silvermoon" Harry\'s Debt\' 1 Time'),
+(24539, 0, 3, 4, 62, 0, 100, 0, 9011, 0, 0, 0, 0, 0, 56, 34115, 1, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '"Silvermoon" Harry - On Gossip Option "Pay up, Harry!" Selected - Add Item \'"Silvermoon" Harry\'s Debt\' 1 Time'),
 (24539, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '"Silvermoon" Harry - On Gossip Option 0 Selected - Close Gossip'),
 (24539, 0, 5, 0, 2, 0, 100, 0, 0, 50, 30000, 30000, 0, 0, 80, 2453901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Silvermoon" Harry - Between 0-50% Health - Run Script: Give Up Fight'),
 (24539, 0, 7, 0, 32, 0, 100, 0, 0, 1000000, 15000, 15000, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Silvermoon" Harry - On Damaged by Condition: Player in Quest - Set Invincibility'),
