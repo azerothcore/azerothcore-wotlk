@@ -432,6 +432,14 @@ void Player::Update(uint32 p_time)
     }
 }
 
+void Player::Heartbeat()
+{
+    Unit::Heartbeat();
+
+    // Group update
+    SendUpdateToOutOfRangeGroupMembers();
+}
+
 void Player::UpdateMirrorTimers()
 {
     // Desync flags for update on next HandleDrowning
