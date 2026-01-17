@@ -749,6 +749,31 @@ void BattlegroundIC::HandleContestedNodes(ICNodePoint* nodePoint)
     {
         DelObject(BG_IC_GO_SEAFORIUM_BOMBS_1);
         DelObject(BG_IC_GO_SEAFORIUM_BOMBS_2);
+
+        for (uint8 i = 0; i < MAX_DEMOLISHERS_SPAWNS_PER_FACTION; ++i)
+        {
+            uint8 type = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_DEMOLISHER_1_H : BG_IC_NPC_DEMOLISHER_1_A) + i;
+            if (BgCreatures[type] && GetBgMap()->GetCreature(BgCreatures[type]))
+            {
+                if (Creature* demolisher = GetBgMap()->GetCreature(BgCreatures[type]))
+                {
+                    if (Vehicle* veh = demolisher->GetVehicleKit())
+                        if (!veh->IsVehicleInUse())
+                            DelCreature(type);
+                }
+            }
+        }
+
+        uint8 siegeType = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_H : BG_IC_NPC_SIEGE_ENGINE_A);
+        if (BgCreatures[siegeType] && GetBgMap()->GetCreature(BgCreatures[siegeType]))
+        {
+            if (Creature* siege = GetBgMap()->GetCreature(BgCreatures[siegeType]))
+            {
+                if (Vehicle* veh = siege->GetVehicleKit())
+                    if (!veh->IsVehicleInUse())
+                        DelCreature(siegeType);
+            }
+        }
     }
 }
 
