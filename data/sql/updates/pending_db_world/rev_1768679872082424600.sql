@@ -8,7 +8,7 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 6583) AND (`Item` IN (4505
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (6583, 45052, 0, 100, 0, 1, 0, 1, 1, 'Gruff - Gruffscale Leggings');
 
--- Dustbringer: Super Rare joke fishing blue
+-- Dustbringer: Super rare fishing loot item (novelty blue-quality drop)
 DELETE FROM `gameobject_loot_template` WHERE `Entry` IN (25662,25663,25664,25665,25668,25669,25670,25671,25673,25674) AND `Item` = 44505;
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (25662, 44505, 0, 0.01, 0, 1, 0, 1, 1, 'Glacial Salmon School - Dustbringer'),
@@ -23,7 +23,7 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 (25674, 44505, 0, 0.01, 0, 1, 0, 1, 1, 'Glassfin Minnow School - Dustbringer');
 
 -- Runed Ring: Apparently these two items are rare Zul'Farrak zone BoEs, but their item level is higher than others of its type, so the only creatures that can drop them are actually the final bosses of the dungeon
--- Spellshock Leggings were already in, but placed in the main loot group, so I placed them in a separate group
+-- Ensure Spellshock Leggings and Runed Ring drop from the final Zul'Farrak bosses in a separate shared loot group
 DELETE FROM `creature_loot_template` WHERE (`Entry` IN (8127, 7267)) AND (`Item` IN (9484, 862));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (8127, 9484, 0, 0.25, 0, 1, 2, 1, 1, 'Antu\'Sul - Spellshock Leggings'),
@@ -65,7 +65,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (14697, 23091, 0, 0, 0, 1, 1, 1, 1, 'Bracers of Undead Cleansing'),
 (14697, 23090, 0, 0, 0, 1, 1, 1, 1, 'Bracers of Undead Slaying');
 
--- Things of Spoils (AQ stuff idk)
+-- Sack of Spoils and Chest of Spoils (AQ event reward containers)
 DELETE FROM `item_loot_template` WHERE (`Entry` = 20601) AND (`Item` IN (20696, 20698));
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (20601, 20696, 0, 5, 0, 1, 1, 1, 1, 'Sack of Spoils - Crystal Spiked Maul'),
