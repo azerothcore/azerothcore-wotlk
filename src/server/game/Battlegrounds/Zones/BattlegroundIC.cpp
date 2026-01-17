@@ -907,6 +907,16 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
                     }
 
                     uint8 siegeType = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_A : BG_IC_NPC_SIEGE_ENGINE_H);
+                    uint8 oppositeSiegeType = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_H : BG_IC_NPC_SIEGE_ENGINE_A);
+
+                    if (Creature* oppositeSiege = GetBgMap()->GetCreature(BgCreatures[oppositeSiegeType]))
+                    {
+                        if (oppositeSiege->IsAlive())
+                            if (Vehicle* siegeVehicle = oppositeSiege->GetVehicleKit())
+                                if (!siegeVehicle->IsVehicleInUse())
+                                    Unit::Kill(oppositeSiege, oppositeSiege);
+                    }
+
                     if (!GetBgMap()->GetCreature(BgCreatures[siegeType]))
                     {
                         AddCreature((nodePoint->faction == TEAM_ALLIANCE ? NPC_SIEGE_ENGINE_A : NPC_SIEGE_ENGINE_H), siegeType,
@@ -919,11 +929,6 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
                     {
                         siegeEngine->SetFaction(BG_IC_Factions[(nodePoint->faction == TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE)]);
                         siegeEngine->SetCorpseDelay(5 * MINUTE);
-
-                        if (siegeEngine->IsAlive())
-                            if (Vehicle* siegeVehicle = siegeEngine->GetVehicleKit())
-                                if (!siegeVehicle->IsVehicleInUse())
-                                    Unit::Kill(siegeEngine, siegeEngine);
 
                         respawnMap[siegeEngine->GetGUID()] = GameTime::GetGameTime().count() + VEHICLE_RESPAWN_TIME;
                     }
