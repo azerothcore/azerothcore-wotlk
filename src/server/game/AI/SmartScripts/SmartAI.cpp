@@ -109,6 +109,22 @@ void SmartAI::UpdateDespawn(const uint32 diff)
         mDespawnTime -= diff;
 }
 
+void SmartAI::UpdateFollow(uint32 diff)
+{
+    if (!mFollowGuid)
+        return;
+
+    if (mFollowArrivedTimer < diff)
+    {
+        if (me->FindNearestCreature(mFollowArrivedEntry, INTERACTION_DISTANCE, mFollowArrivedAlive))
+            StopFollow(true);
+        else
+            mFollowArrivedTimer = 1000;
+    }
+    else
+        mFollowArrivedTimer -= diff;
+
+
 WaypointData const* SmartAI::GetNextWayPoint()
 {
     if (!mWayPoints || mWayPoints->empty())
@@ -528,23 +544,7 @@ void SmartAI::UpdateAI(uint32 diff)
     GetScript()->OnUpdate(diff);
     UpdatePath(diff);
     UpdateDespawn(diff);
-
-    //TODO move to void
-    if (mFollowGuid)
-    {
-        if (mFollowArrivedTimer < diff)
-        {
-            if (me->FindNearestCreature(mFollowArrivedEntry, INTERACTION_DISTANCE, mFollowArrivedAlive))
-            {
-                StopFollow(true);
-                return;
-            }
-
-            mFollowArrivedTimer = 1000;
-        }
-        else
-            mFollowArrivedTimer -= diff;
-    }
+    UpdateFollow(diff);
 
     if (!IsAIControlled())
     {
