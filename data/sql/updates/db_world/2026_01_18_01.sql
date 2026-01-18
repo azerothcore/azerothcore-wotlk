@@ -1,3 +1,4 @@
+-- DB update 2026_01_18_00 -> 2026_01_18_01
 -- Add skinning loot table for creature 1933 (Sheep) to enable Ruined Leather Scraps, Wool Cloth, and Light Leather drops.
 UPDATE `creature_template` SET `skinloot` = 1933 WHERE (`entry` = 1933);
 
