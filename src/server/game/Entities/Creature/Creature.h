@@ -204,8 +204,8 @@ public:
 
     [[nodiscard]] CreatureTemplate const* GetCreatureTemplate() const { return m_creatureInfo; }
     [[nodiscard]] CreatureData const* GetCreatureData() const { return m_creatureData; }
-    [[nodiscard]] uint32 GetGossipMenuId() const { return m_gossipMenuId ? m_gossipMenuId : GetCreatureTemplate()->GossipMenuId; }
-    void SetGossipMenuId(uint32 gossipMenuId) { m_gossipMenuId = gossipMenuId; }
+    [[nodiscard]] uint32 GetGossipMenuId() const { return _gossipMenuId ? _gossipMenuId : GetCreatureTemplate()->GossipMenuId; }
+    void SetGossipMenuId(uint32 gossipMenuId) { _gossipMenuId = gossipMenuId; }
     void SetDetectionDistance(float dist){ m_detectionDistance = dist; }
     [[nodiscard]] CreatureAddon const* GetCreatureAddon() const;
 
@@ -480,7 +480,7 @@ protected:
 
     SpellSchoolMask m_meleeDamageSchoolMask;
     uint32 m_originalEntry;
-    uint32 m_gossipMenuId;
+    uint32 _gossipMenuId;
 
     bool m_moveInLineOfSightDisabled;
     bool m_moveInLineOfSightStrictlyDisabled;
