@@ -293,10 +293,13 @@ class spell_tsh_shoot_flame_arrow : public SpellScript
             {
                 if (!target)
                     return true;
+
                 if (!target->SelectNearestPlayer(15.0f))
                     return true;
+
                 if (target->FindNearestGameObject(GO_BLAZE, 6.0f))
                     return true;
+
                 // Don't stack arrows on the same target
                 if (InstanceScript* instance = caster->GetInstanceScript())
                     if (target->GetGUID() == instance->GetGuidData(DATA_LAST_FLAME_ARROW))
