@@ -1112,7 +1112,7 @@ class spell_gen_haunted : public SpellScript
         if (Unit* caster = GetCaster())
         {
             Position pos = caster->GetRandomNearPosition(5.0f);
-            if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
+            if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos))
             {
                 haunt->SetSpeed(MOVE_RUN, 0.5, true);
                 haunt->GetMotionMaster()->MoveFollow(caster, 1, M_PI);
