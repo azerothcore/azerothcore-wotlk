@@ -51,20 +51,6 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 9568) AND (`Item` IN (1316
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (9568, 13164, 0, 1, 0, 1, 0, 1, 1, 'Overlord Wyrmthalak - Heart of the Scale');
 
--- Scourge Invasion Items
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 16143) AND (`Item` IN (23085, 23088, 23087, 23089));
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(16143, 23085, 0, 0, 0, 1, 1, 1, 1, 'Shadow of Doom - Robe of Undead Cleansing'),
-(16143, 23088, 0, 0, 0, 1, 1, 1, 1, 'Shadow of Doom - Chestguard of Undead Slaying'),
-(16143, 23087, 0, 0, 0, 1, 1, 1, 1, 'Shadow of Doom - Breastplate of Undead Slaying'),
-(16143, 23089, 0, 0, 0, 1, 1, 1, 1, 'Shadow of Doom - Tunic of Undead Slaying');
-DELETE FROM `reference_loot_template` WHERE (`Entry` = 14697) AND (`Item` IN (23092, 23093, 23091, 23090));
-INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(14697, 23092, 0, 0, 0, 1, 1, 1, 1, 'Wristguards of Undead Slaying'),
-(14697, 23093, 0, 0, 0, 1, 1, 1, 1, 'Wristwraps of Undead Slaying'),
-(14697, 23091, 0, 0, 0, 1, 1, 1, 1, 'Bracers of Undead Cleansing'),
-(14697, 23090, 0, 0, 0, 1, 1, 1, 1, 'Bracers of Undead Slaying');
-
 -- Sack of Spoils and Chest of Spoils (AQ event reward containers)
 DELETE FROM `item_loot_template` WHERE (`Entry` = 20601) AND (`Item` IN (20696, 20698));
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
