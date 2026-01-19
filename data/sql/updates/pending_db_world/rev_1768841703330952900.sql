@@ -1,5 +1,5 @@
 --
-UPDATE `creature_loot_template` SET `Chance` = 100 WHERE  `Entry` = 24664 AND `Item` = 35008 AND `Reference` = 35008;
+UPDATE `creature_loot_template` SET `Chance` = 100 WHERE  `Entry` IN (24664, 24857) AND `Item` = 35008 AND `Reference` = 35008;
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 10) AND (`SourceGroup` = 35008) AND (`ConditionTypeOrReference` = 7) AND (`ConditionValue2` = 1);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
