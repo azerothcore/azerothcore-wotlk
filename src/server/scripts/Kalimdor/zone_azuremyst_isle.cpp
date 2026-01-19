@@ -563,11 +563,7 @@ public:
 ## spell_surveyor_candress_fireball
 ######*/
 
-enum SurveyorCandress
-{
-    NPC_SURVEYOR_CANDRESS   = 16522,
-    SPELL_FIREBALL          = 9487
-};
+constexpr uint32 NPC_SURVEYOR_CANDRESS = 16522;
 
 class spell_surveyor_candress_fireball : public SpellScript
 {
@@ -578,11 +574,10 @@ class spell_surveyor_candress_fireball : public SpellScript
         if (Unit* caster = GetCaster())
         {
             // Check if the caster is Surveyor Candress to avoid breaking other NPCs sharing this spell
+            // PTR Data: Damage is 6-8 (Current core scaling is too high at ~16-26)
             if (caster->GetEntry() == NPC_SURVEYOR_CANDRESS)
-            {
-                // PTR Data: Damage is 6-8 (Current core scaling is too high at ~16-26)
                 SetHitDamage(urand(6, 8));
-            }
+
         }
     }
 
