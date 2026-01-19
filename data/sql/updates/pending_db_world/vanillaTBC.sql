@@ -4588,14 +4588,14 @@ INSERT INTO `reference_loot_template` (`Entry`, `Chance`, `Reference`, `GroupId`
 -- Elite: 100%
 -- 61-65
 (1186165, 1.5, 0, 1, 5760, 'Eternium Lockbox'),
-(1186165, 0.6, 1180002, 2, 5760, 'Uncommon Patterns'),
-(1186165, 0.3, 1180003, 2, 5760, 'Rare Patterns'),
-(1186165, 0.1, 1180004, 2, 5760, 'Epic Patterns'),
+(1186165, 0.6, 1180002, 2, 1, 'Uncommon Patterns'),
+(1186165, 0.3, 1180003, 2, 2, 'Rare Patterns'),
+(1186165, 0.1, 1180004, 2, 3, 'Epic Patterns'),
 -- 66-67
 (1186673, 1.5, 0, 1, 31952, 'Khorium Lockbox'),
-(1186673, 0.6, 1180002, 2, 5760, 'Uncommon Patterns'),
-(1186673, 0.3, 1180003, 2, 5760, 'Rare Patterns'),
-(1186673, 0.1, 1180004, 2, 5760, 'Epic Patterns');
+(1186673, 0.6, 1180002, 2, 1, 'Uncommon Patterns'),
+(1186673, 0.3, 1180003, 2, 2, 'Rare Patterns'),
+(1186673, 0.1, 1180004, 2, 3, 'Epic Patterns');
 
 INSERT INTO `reference_loot_template` (`Entry`, `Chance`, `GroupId`, `Item`, `Comment`) VALUES
 -- Uncommon Patterns
