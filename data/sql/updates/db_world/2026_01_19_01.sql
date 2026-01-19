@@ -3,11 +3,6 @@
 -- Edit Spawn Time (Captured Rageclaw & Drakuru Shackles)
 UPDATE `creature` SET `spawntimesecs` = 30 WHERE (`id1` IN (29700, 29686));
 
--- Add creature template movement to Drakuru Shackles
-DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 29700);
-INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
-(29700, 0, 0, 1, 1, 0, 0, 0);
-
 -- Remove C++ script and set SAI for Drakuru Shackles & Captured Rageclaw
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE (`entry` IN (29700, 29686));
 
