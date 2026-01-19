@@ -227,7 +227,11 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     default:
         break;
     }
-    creature->SetWalk(walk);
+
+    if (walk)
+        creature->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
+    else
+        creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
 
     Movement::MoveSplineInit init(creature);
     init.MovebyPath(finalPath);
