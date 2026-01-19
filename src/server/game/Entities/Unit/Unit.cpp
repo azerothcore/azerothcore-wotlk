@@ -2171,11 +2171,11 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     float resistanceConstant = 0.0f;
 
     if (level > 60)
-        resistanceConstant = 150 + (level - 60) * (level - 67.5f);
+        resistanceConstant = 150.0f + (float(level) - 60.0f) * (float(level) - 67.5f);
     else if (level > 20)
-        resistanceConstant = 50 + (level - 20) * 2.5f;
+        resistanceConstant = 50.0f + float(level - 20) * 2.5f;
     else
-        resistanceConstant = 50;
+        resistanceConstant = 50.0f;
 
     return std::max(victimResistance / (victimResistance + resistanceConstant), 0.75f);
 }
