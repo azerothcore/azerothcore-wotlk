@@ -12364,6 +12364,10 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
         if (_spell_idx->second->ClassMask && (_spell_idx->second->ClassMask & classmask) == 0)
             continue;
 
+        // skip wrong class and race skill saved in SkillRaceClassInfo.dbc
+        if (!GetSkillRaceClassInfo(_spell_idx->second->SkillLine, getRace(), getClass()))
+            continue;
+
         return true;
     }
 
@@ -14365,7 +14369,7 @@ bool Player::CanSeeVendor(Creature const* creature) const
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
         return false;
 
-    uint32 const menuId = creature->GetCreatureTemplate()->GossipMenuId;
+    uint32 const menuId = creature->GetGossipMenuId();
     if (!AnyVendorOptionAvailable(menuId, creature))
         return false;
 
