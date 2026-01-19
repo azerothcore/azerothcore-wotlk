@@ -2177,7 +2177,7 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     else
         resistanceConstant = 50.0f;
 
-    return std::max(victimResistance / (victimResistance + resistanceConstant), 0.75f);
+    return std::min(victimResistance / (victimResistance + resistanceConstant), 0.75f);
 }
 
 void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
