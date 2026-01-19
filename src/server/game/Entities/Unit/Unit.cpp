@@ -2148,7 +2148,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
 
 float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim)
 {
-    float victimResistance = float(victim->GetResistance(schoolMask));
+    float victimResistance = static_cast<float>(victim->GetResistance(schoolMask));
     if (owner)
     {
         // Xinef: pets inherit 100% of masters penetration
@@ -2156,24 +2156,24 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
         Player const* player = owner->GetSpellModOwner();
         if (player && owner->GetEntry() != WORLD_TRIGGER)
         {
-            victimResistance += float(player->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
-            victimResistance -= float(player->GetSpellPenetrationItemMod());
+            victimResistance += static_cast<float>(player->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
+            victimResistance -= static_cast<float>(player->GetSpellPenetrationItemMod());
         }
         else
-            victimResistance += float(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
+            victimResistance += static_cast<float>(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
     }
 
     victimResistance = std::max(victimResistance, 0.0f);
     if (owner)
-        victimResistance += std::max((float(victim->GetLevel()) - float(owner->GetLevel())) * 5.0f, 0.0f);
+        victimResistance += std::max(static_cast<float>(victim->GetLevel() - owner->GetLevel()) * 5.0f, 0.0f);
 
-    uint32 level = victim->GetLevel();
+    float level = static_cast<float>(victim->GetLevel());
     float resistanceConstant = 0.0f;
 
-    if (level > 60)
-        resistanceConstant = 150.0f + (float(level) - 60.0f) * (float(level) - 67.5f);
-    else if (level > 20)
-        resistanceConstant = 50.0f + float(level - 20) * 2.5f;
+    if (level > 60.0f)
+        resistanceConstant = 150.0f + (level - 60.0f) * (level - 67.5f);
+    else if (level > 20.0f)
+        resistanceConstant = 50.0f + (level - 20.0f) * 2.5f;
     else
         resistanceConstant = 50.0f;
 
