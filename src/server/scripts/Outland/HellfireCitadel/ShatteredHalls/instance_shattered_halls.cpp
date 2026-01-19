@@ -118,7 +118,7 @@ public:
                 case DATA_EXECUTIONER:
                     return ExecutionerGUID;
                 case DATA_LAST_FLAME_ARROW:
-                    return _lastArrowGUID;
+                    return LastArrowGUID;
             }
 
             return ObjectGuid::Empty;
@@ -129,7 +129,7 @@ public:
             switch (data)
             {
                 case DATA_LAST_FLAME_ARROW:
-                    _lastArrowGUID = value;
+                    LastArrowGUID = value;
                     break;
                 default:
                     break;
