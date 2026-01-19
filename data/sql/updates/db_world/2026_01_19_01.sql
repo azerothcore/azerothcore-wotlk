@@ -1,3 +1,4 @@
+-- DB update 2026_01_19_00 -> 2026_01_19_01
 
 -- Edit Spawn Time (Captured Rageclaw & Drakuru Shackles)
 UPDATE `creature` SET `spawntimesecs` = 30 WHERE (`id1` IN (29700, 29686));
