@@ -266,6 +266,7 @@ namespace Movement
                 points[0] = controls[0] - G3D::Vector3{ std::cos(initialOrientation), std::sin(initialOrientation), 0.0f };
             else
                 points[0] = controls[0].lerp(controls[1], -1);
+
             points[high_index + 1] = controls[count - 1];
         }
 
