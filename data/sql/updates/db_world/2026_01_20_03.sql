@@ -1,3 +1,4 @@
+-- DB update 2026_01_20_02 -> 2026_01_20_03
 --
 DELETE FROM `linked_respawn` WHERE `linkedGuid` = 126663 AND `linkType` = 0;
 INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
