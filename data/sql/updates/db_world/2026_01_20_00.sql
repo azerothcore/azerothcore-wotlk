@@ -1,3 +1,4 @@
+-- DB update 2026_01_19_01 -> 2026_01_20_00
 -- Updates 3 vendors that spawn with arena season 5 to include missing items and correct costs.
 DELETE FROM `npc_vendor` WHERE (`entry` IN  (31863, 32407, 32405));
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
