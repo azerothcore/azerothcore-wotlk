@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
+#include "TaskScheduler.h"
 #include "nexus.h"
 #include "Player.h"
 #include "Group.h"
@@ -183,7 +184,15 @@ enum eFrayer
     SPELL_SEED_POD                      = 48082,
     SPELL_AURA_OF_REGENERATION          = 57056,
     SPELL_CRYSTAL_BLOOM                 = 48058,
-    SPELL_ENSNARE                       = 48053
+    SPELL_ENSNARE                       = 48053,
+
+    SAY_EMOTE                           = 0
+};
+
+enum FrayerGroups
+{
+    GROUP_COMBAT    = 1,
+    GROUP_SEED_POD  = 2
 };
 
 struct npc_crystalline_frayer : public ScriptedAI
@@ -192,17 +201,13 @@ struct npc_crystalline_frayer : public ScriptedAI
 
     bool _allowDeath;
     bool _inSeedPod;
-    uint32 _restoreTimer;
-    uint32 _abilityTimer1;
-    uint32 _abilityTimer2;
+    TaskScheduler _scheduler;
 
     void Reset() override
     {
-        _restoreTimer = 0;
-        _abilityTimer1 = 0;
-        _abilityTimer2 = 30000;
         _allowDeath = false;
         _inSeedPod = false;
+        _scheduler.CancelAll();
 
         me->RemoveAllAuras();
         me->SetObjectScale(1.0f);
@@ -218,6 +223,16 @@ struct npc_crystalline_frayer : public ScriptedAI
     {
         if (InstanceScript* instance = me->GetInstanceScript())
             _allowDeath = instance->GetBossState(DATA_ORMOROK_EVENT) == DONE;
+
+        _scheduler.Schedule(5s, GROUP_COMBAT, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_ENSNARE);
+            context.Repeat();
+        }).Schedule(0s, GROUP_COMBAT, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CRYSTAL_BLOOM);
+            context.Repeat(30s);
+        });
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -241,6 +256,7 @@ struct npc_crystalline_frayer : public ScriptedAI
     void EnterSeedPod()
     {
         _inSeedPod = true;
+        _scheduler.CancelGroup(GROUP_COMBAT);
 
         me->AttackStop();
         me->GetThreatMgr().ClearAllThreat();
@@ -254,19 +270,21 @@ struct npc_crystalline_frayer : public ScriptedAI
         me->SetRegeneratingHealth(false);
         me->SetObjectScale(0.6f);
 
-        me->CastSpell(me, SPELL_SEED_POD, true);
-        me->CastSpell(me, SPELL_SUMMON_SEED_POD, true);
-        me->CastSpell(me, SPELL_AURA_OF_REGENERATION, true);
+        DoCastSelf(SPELL_SEED_POD, true);
+        DoCastSelf(SPELL_SUMMON_SEED_POD, true);
+        DoCastSelf(SPELL_AURA_OF_REGENERATION, true);
 
-        _restoreTimer = 1;
+        _scheduler.Schedule(90s, GROUP_SEED_POD, [this](TaskContext /*context*/)
+        {
+            LeaveSeedPod();
+        });
     }
 
     void LeaveSeedPod()
     {
         _inSeedPod = false;
-        _restoreTimer = 0;
 
-        Talk(0);
+        Talk(SAY_EMOTE);
 
         me->RemoveAurasDueToSpell(SPELL_SEED_POD);
         me->RemoveAurasDueToSpell(SPELL_AURA_OF_REGENERATION);
@@ -283,31 +301,13 @@ struct npc_crystalline_frayer : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (_restoreTimer)
-        {
-            _restoreTimer += diff;
-            if (_restoreTimer >= 90 * IN_MILLISECONDS)
-                LeaveSeedPod();
+        _scheduler.Update(diff);
+
+        if (_inSeedPod)
             return;
-        }
 
         if (!UpdateVictim())
             return;
-
-        _abilityTimer1 += diff;
-        _abilityTimer2 += diff;
-
-        if (_abilityTimer1 >= 5000)
-        {
-            me->CastSpell(me->GetVictim(), SPELL_ENSNARE, false);
-            _abilityTimer1 = 0;
-        }
-
-        if (_abilityTimer2 >= 30000)
-        {
-            me->CastSpell(me->GetVictim(), SPELL_CRYSTAL_BLOOM, false);
-            _abilityTimer2 = 0;
-        }
     }
 };
 
