@@ -126,7 +126,7 @@ void SmartAI::UpdateFollow(uint32 diff)
 
     if (mFollowGuid.IsPlayer())
     {
-        if (mFollowCheckTimer < diff)
+        if (_followCheckTimer < diff)
         {
             bool shouldDespawn = false;
             if (Player* player = ObjectAccessor::FindPlayer(mFollowGuid))
@@ -141,10 +141,10 @@ void SmartAI::UpdateFollow(uint32 diff)
             if (shouldDespawn)
                 me->DespawnOrUnsummon();
 
-            mFollowCheckTimer = 1000;
+            _followCheckTimer = 1000;
         }
         else
-            mFollowCheckTimer -= diff;
+            _followCheckTimer -= diff;
     }
 }
 
