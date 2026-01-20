@@ -44,6 +44,8 @@ public:
     {
         instance_nexus_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
+        GuidVector _frayerGUIDs;
+
         void Initialize() override
         {
             SetHeaders(DataHeader);
@@ -80,6 +82,23 @@ public:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_COMMANDER_KOLURG);
                     break;
+                case NPC_CRYSTALLINE_FRAYER:
+                    _frayerGUIDs.push_back(creature->GetGUID());
+                    break;
+            }
+        }
+
+        void KillAllFrayers()
+        {
+            for (ObjectGuid const& guid : _frayerGUIDs)
+            {
+                if (Creature* frayer = instance->GetCreature(guid))
+                {
+                    frayer->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    frayer->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                    frayer->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+                    Unit::Kill(frayer, frayer);
+                }
             }
         }
 
@@ -141,7 +160,13 @@ public:
             if (!InstanceScript::SetBossState(id, state))
                 return false;
 
-            if (state != DONE || id > DATA_ORMOROK_EVENT)
+            if (state != DONE)
+                return true;
+
+            if (id == DATA_ORMOROK_EVENT)
+                KillAllFrayers();
+
+            if (id > DATA_ORMOROK_EVENT)
                 return true;
 
             BossInfo const* bossInfo = GetBossInfo(id + DATA_TELESTRA_ORB);
@@ -156,7 +181,7 @@ enum eFrayer
 {
     SPELL_SUMMON_SEED_POD               = 52796,
     SPELL_SEED_POD                      = 48082,
-    SPELL_AURA_OF_REGENERATION          = 52067,
+    SPELL_AURA_OF_REGENERATION          = 57056,
     SPELL_CRYSTAL_BLOOM                 = 48058,
     SPELL_ENSNARE                       = 48053
 };
@@ -166,27 +191,38 @@ struct npc_crystalline_frayer : public ScriptedAI
     npc_crystalline_frayer(Creature* creature) : ScriptedAI(creature) { }
 
     bool _allowDeath;
-    uint32 restoreTimer;
-    uint32 abilityTimer1;
-    uint32 abilityTimer2;
+    bool _inSeedPod;
+    uint32 _restoreTimer;
+    uint32 _abilityTimer1;
+    uint32 _abilityTimer2;
 
     void Reset() override
     {
-        restoreTimer = 0;
-        abilityTimer1 = 0;
-        abilityTimer2 = 30000;
-        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        _restoreTimer = 0;
+        _abilityTimer1 = 0;
+        _abilityTimer2 = 30000;
+        _allowDeath = false;
+        _inSeedPod = false;
+
+        me->RemoveAllAuras();
+        me->SetObjectScale(1.0f);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetRegeneratingHealth(true);
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->GetMotionMaster()->MoveRandom(10.0f);
     }
 
     void JustEngagedWith(Unit*) override
     {
-        _allowDeath = me->GetInstanceScript()->GetBossState(DATA_ORMOROK_EVENT) == DONE;
+        if (InstanceScript* instance = me->GetInstanceScript())
+            _allowDeath = instance->GetBossState(DATA_ORMOROK_EVENT) == DONE;
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (me->isRegeneratingHealth())
+        if (!_inSeedPod)
             ScriptedAI::EnterEvadeMode(why);
     }
 
@@ -196,56 +232,81 @@ struct npc_crystalline_frayer : public ScriptedAI
         {
             if (!_allowDeath)
             {
-                me->RemoveAllAuras();
-                me->GetThreatMgr().ClearAllThreat();
-                me->CombatStop(true);
                 damage = 0;
-
-                me->SetReactState(REACT_PASSIVE);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetRegeneratingHealth(false);
-                me->CastSpell(me, SPELL_SUMMON_SEED_POD, true);
-                me->CastSpell(me, SPELL_SEED_POD, true);
-                me->CastSpell(me, SPELL_AURA_OF_REGENERATION, false);
-                restoreTimer = 1;
+                EnterSeedPod();
             }
         }
     }
 
+    void EnterSeedPod()
+    {
+        _inSeedPod = true;
+
+        me->AttackStop();
+        me->GetThreatMgr().ClearAllThreat();
+        me->CombatStop(true);
+        me->RemoveAllAuras();
+
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetRegeneratingHealth(false);
+        me->SetObjectScale(0.6f);
+
+        me->CastSpell(me, SPELL_SEED_POD, true);
+        me->CastSpell(me, SPELL_SUMMON_SEED_POD, true);
+        me->CastSpell(me, SPELL_AURA_OF_REGENERATION, true);
+
+        _restoreTimer = 1;
+    }
+
+    void LeaveSeedPod()
+    {
+        _inSeedPod = false;
+        _restoreTimer = 0;
+
+        Talk(0);
+
+        me->RemoveAurasDueToSpell(SPELL_SEED_POD);
+        me->RemoveAurasDueToSpell(SPELL_AURA_OF_REGENERATION);
+
+        me->SetObjectScale(1.0f);
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        me->SetRegeneratingHealth(true);
+
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->GetMotionMaster()->MoveRandom(10.0f);
+    }
+
     void UpdateAI(uint32 diff) override
     {
-        if (restoreTimer)
+        if (_restoreTimer)
         {
-            restoreTimer += diff;
-            if (restoreTimer >= 90 * IN_MILLISECONDS)
-            {
-                Talk(0);
-                me->SetRegeneratingHealth(true);
-                restoreTimer = 0;
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            }
+            _restoreTimer += diff;
+            if (_restoreTimer >= 90 * IN_MILLISECONDS)
+                LeaveSeedPod();
             return;
         }
 
         if (!UpdateVictim())
             return;
 
-        abilityTimer1 += diff;
-        abilityTimer2 += diff;
+        _abilityTimer1 += diff;
+        _abilityTimer2 += diff;
 
-        if (abilityTimer1 >= 5000)
+        if (_abilityTimer1 >= 5000)
         {
             me->CastSpell(me->GetVictim(), SPELL_ENSNARE, false);
-            abilityTimer1 = 0;
+            _abilityTimer1 = 0;
         }
 
-        if (abilityTimer2 >= 30000)
+        if (_abilityTimer2 >= 30000)
         {
             me->CastSpell(me->GetVictim(), SPELL_CRYSTAL_BLOOM, false);
-            abilityTimer2 = 0;
+            _abilityTimer2 = 0;
         }
     }
 };
