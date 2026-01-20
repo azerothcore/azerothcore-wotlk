@@ -227,7 +227,7 @@ struct npc_crystalline_frayer : public ScriptedAI
         _scheduler.Schedule(5s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastVictim(SPELL_ENSNARE);
-            context.Repeat();
+            context.Repeat(5s);
         }).Schedule(0s, GROUP_COMBAT, [this](TaskContext context)
         {
             DoCastVictim(SPELL_CRYSTAL_BLOOM);
