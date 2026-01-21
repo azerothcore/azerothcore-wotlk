@@ -1,3 +1,4 @@
+-- DB update 2026_01_21_00 -> 2026_01_21_01
 -- Just missing from the mob, as it should have one pair of pants for each type (cloth, leather, etc)
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 18681) AND (`Item` IN (31246));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
