@@ -872,7 +872,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (54838,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,  45000, 0), -- Purified Spirit
 (54841,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     2, 0x0,  0,   0,   2500, 0), -- Thunder Capacitor
 (54925,   2, 10, 0x00000000, 0x00000200, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,      0, 0), -- Glyph of Seal of Command
-(55380,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0,0.7,   0,  40000, 0), -- Skyflare Swiftness
+(55380,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0,  0,   0,  40000, 0), -- Skyflare Swiftness (Thundering Skyflare Diamond)
 (55381,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,  15000, 0), -- Mana Restore
 (55640,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,  45000, 0), -- Lightweave Embroidery
 (55680,   0,  6, 0x00000200, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,      0, 0), -- Glyph of Prayer of Healing
