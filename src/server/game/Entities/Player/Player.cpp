@@ -3295,9 +3295,9 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
         return;
     }
 
-    uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
-    bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
-    bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true, temporary, learnFromSkill);
+    uint8 const specMask = GetLearnSpellSpecMask(spellId);
+
+    bool const added = addSpell(spellId, specMask, true, temporary, learnFromSkill);
     if (added)
     {
         sScriptMgr->OnPlayerLearnSpell(this, spellId);
@@ -3325,6 +3325,45 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
         if (itr2 != m_spells.end() && itr2->second->State != PLAYERSPELL_REMOVED && !itr2->second->IsInSpec(m_activeSpec))
             learnSpell(itr2->first, temporary);
     }
+}
+
+uint8 Player::GetLearnSpellSpecMask(uint32 const spellId) const
+{
+    uint32 const firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
+
+    bool const isTalentBasedSpell = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
+    if (!isTalentBasedSpell)
+        return SPEC_MASK_ALL;
+
+    uint8 specMask = GetActiveSpecMask();
+
+    if (m_spells.find(firstRankSpellId) != m_spells.end())
+    {
+        // If the first rank of a talent-based spell has already been learned in another spec,
+        // the following ranks should also be learned in that spec, even if it is not active.
+        specMask |= m_spells.at(firstRankSpellId)->specMask;
+    }
+
+    // When learning a spell that has other spells as a requirement, it should be learned in all specs that have the required spells.
+    // Example: Greater Blessing of Sanctuary has Blessing of Sanctuary as required spell.
+    SpellRequiredMapBounds const spellsRequiredForSpellBounds = sSpellMgr->GetSpellsRequiredForSpellBounds(spellId);
+    bool const spellHasRequiredSpells = (spellsRequiredForSpellBounds.first != spellsRequiredForSpellBounds.second);
+    if (spellHasRequiredSpells)
+    {
+        uint8 requiredSpellsSpecMask = SPEC_MASK_ALL;
+        for (SpellRequiredMap::const_iterator itr = spellsRequiredForSpellBounds.first; itr != spellsRequiredForSpellBounds.second; ++itr)
+        {
+            uint32 const requiredSpellId = itr->second;
+            bool const requiredSpellExistsAsPlayerSpell = (m_spells.find(requiredSpellId) != m_spells.end());
+
+            // The required spell should usually exist at least in the current spec, but maybe we are learning a spell via GM command
+            requiredSpellsSpecMask &= requiredSpellExistsAsPlayerSpell ? m_spells.at(requiredSpellId)->specMask : 0;
+
+        }
+        specMask |= requiredSpellsSpecMask;
+    }
+
+    return specMask;
 }
 
 void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTemporary)
