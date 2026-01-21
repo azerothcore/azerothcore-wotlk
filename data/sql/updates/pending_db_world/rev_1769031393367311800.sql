@@ -8,7 +8,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (20040, 0, 4, 5, 8, 0, 100, 512, 34946, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Devastator - On Spellhit \'Golem Repair\' - Store Targetlist'),
 (20040, 0, 5, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 80, 2004000, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Devastator - On Spellhit \'Golem Repair\' - Run Script'),
 (20040, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 35039, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Devastator - On Hostile Casting in Range - If Interrupt Successful, Remove Charge'),
-(20040, 0, 7, 0, 0, 2, 50, 0, 1000, 1000, 1000, 1000, 0, 0, 11, 35035, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Devastator - In Combat, Every 1200ms or So - Refresh Charge on Self (Phase 2)'),
+(20040, 0, 7, 0, 0, 2, 50, 0, 1000, 1000, 1000, 1000, 0, 0, 11, 35035, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Devastator - In Combat, Every 1000ms - Refresh Charge on Self (Phase 2)'),
 (20040, 0, 8, 0, 0, 2, 100, 0, 15000, 15000, 15000, 15000, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Devastator - In Combat - After 15s, Return to Initial Phase (Phase 2)'),
 (20040, 0, 9, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crystalcore Devastator - On Aggro - Set Initial Phase');
 
