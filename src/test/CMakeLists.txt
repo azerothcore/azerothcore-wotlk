@@ -31,6 +31,26 @@ target_link_libraries(
         game-interface
 )
 
+# Add module test sources if any modules registered tests
+get_property(MODULE_TEST_SOURCES GLOBAL PROPERTY ACORE_MODULE_TEST_SOURCES)
+get_property(MODULE_TEST_INCLUDES GLOBAL PROPERTY ACORE_MODULE_TEST_INCLUDES)
+
+if(MODULE_TEST_SOURCES)
+    target_sources(unit_tests PRIVATE ${MODULE_TEST_SOURCES})
+    message(STATUS "Added module tests to unit_tests target")
+endif()
+
+if(MODULE_TEST_INCLUDES)
+    list(REMOVE_DUPLICATES MODULE_TEST_INCLUDES)
+    target_include_directories(unit_tests PRIVATE ${MODULE_TEST_INCLUDES})
+    message(STATUS "Added module test includes to unit_tests target")
+endif()
+
+# Link modules library to tests so module code is available
+if(TARGET modules)
+    target_link_libraries(unit_tests modules)
+endif()
+
 add_test(
         NAME
         unit
