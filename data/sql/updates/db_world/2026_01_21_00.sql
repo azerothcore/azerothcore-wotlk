@@ -1,3 +1,4 @@
+-- DB update 2026_01_20_03 -> 2026_01_21_00
 --
 UPDATE `creature_loot_template` SET `Chance` = 100 WHERE  `Entry` IN (24664, 24857) AND `Item` = 35008 AND `Reference` = 35008;
 
