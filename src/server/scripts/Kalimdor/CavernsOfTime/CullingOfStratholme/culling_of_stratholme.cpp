@@ -1423,10 +1423,12 @@ public:
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action)
     {
-        // final menu id, show crates if hidden and add item if missing
-        if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
+        uint32 menuId = player->PlayerTalkClass->GetGossipMenu().GetMenuId();
+
+        // "Yes, please!" shortcut (menu 9586, option 1) or final lore menu (9595)
+        if ((menuId == 9586 && action == 1) || menuId == 9595)
         {
             if (InstanceScript* pInstance = creature->GetInstanceScript())
             {
@@ -1442,7 +1444,7 @@ public:
             }
         }
         // Skip Event
-        else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
+        else if (menuId == 11277)
         {
             if (InstanceScript* pInstance = creature->GetInstanceScript())
             {
@@ -1515,6 +1517,8 @@ public:
         npc_cos_stratholme_citizienAI(Creature* creature) : ScriptedAI(creature)
         {
             allowTimer = 0;
+            talkTimer = urand(5000, 10000);
+            emoteTimer = urand(1000, 3000);
             pInstance = me->GetInstanceScript();
             if (!pInstance || pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_FINISHED_CITY_INTRO)
                 allowTimer++;
@@ -1524,6 +1528,8 @@ public:
         uint32 changeTimer;
         InstanceScript* pInstance;
         uint32 allowTimer;
+        uint32 talkTimer;
+        uint32 emoteTimer;
 
         void Reset() override
         {
@@ -1583,6 +1589,30 @@ public:
         void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
+
+            // Agitated crowd near Patricia - active as soon as instance is loaded
+            float dist = me->GetDistance(2372.0f, 1199.0f, 135.0f);
+            if ((me->GetEntry() == NPC_CITY_MAN3 || me->GetEntry() == NPC_CITY_MAN4) && dist < 20.0f)
+            {
+                if (talkTimer <= diff)
+                {
+                    // GroupID 2 for Citizens (31126), GroupID 0 for Residents (31127)
+                    uint8 groupId = (me->GetEntry() == NPC_CITY_MAN3) ? 2 : 0;
+                    Talk(groupId);
+                    talkTimer = urand(8000, 15000);
+                }
+                else
+                    talkTimer -= diff;
+
+                if (emoteTimer <= diff)
+                {
+                    static uint32 const agitatedEmotes[] = { 1, 5, 6, 14, 15, 25, 273, 274, 396 };
+                    me->HandleEmoteCommand(agitatedEmotes[urand(0, 8)]);
+                    emoteTimer = urand(1500, 2500);
+                }
+                else
+                    emoteTimer -= diff;
+            }
 
             if (allowTimer)
             {
