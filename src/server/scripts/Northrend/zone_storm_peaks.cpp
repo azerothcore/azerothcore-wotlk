@@ -20,6 +20,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellMgr.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
@@ -1375,9 +1376,46 @@ class spell_eject_passenger_wild_wyrm : public SpellScript
     }
 };
 
+struct npc_oathbound_warder : public ScriptedAI
+{
+    npc_oathbound_warder(Creature* creature) : ScriptedAI(creature) { }
+
+    void AttackStart(Unit* /*who*/) override { }
+    void JustEngagedWith(Unit* /*who*/) override { }
+    void UpdateAI(uint32 /*diff*/) override { } // Need so AI doesn't stop casting when hit in combat
+
+    void InitializeAI() override
+    {
+        ScriptedAI::InitializeAI();
+        me->SetReactState(REACT_PASSIVE);
+
+        CharmInfo* charmInfo = me->GetCharmInfo();
+        if (!charmInfo)
+            return;
+
+        charmInfo->InitEmptyActionBar(false);
+
+        uint32 slot = 0;
+        for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+        {
+            uint32 spellId = me->m_spells[i];
+            if (!spellId)
+                continue;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (spellInfo && spellInfo->IsPassive())
+                me->CastSpell(me, spellInfo, true);
+
+            charmInfo->SetActionBar(6 + slot, spellId, ACT_PASSIVE);
+            ++slot;
+        }
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
+    RegisterCreatureAI(npc_oathbound_warder);
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     RegisterSpellScript(spell_q13007_iron_colossus);
