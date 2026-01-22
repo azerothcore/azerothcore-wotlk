@@ -753,7 +753,7 @@ public:
                 if (cr)
                 {
                     cr->AI()->AttackStart(me);
-                    cr->AddThreat(me, 0.0f);
+                    cr->AddThreat(me, 100.0f); // TODO: Creatures cast 51774 on spawn, which triggers 51775. Script Effect unimplemented
                     cr->SetInCombatWithZone();
                 }
             }
