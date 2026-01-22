@@ -258,6 +258,15 @@ public:
                 }, 12s);
             }
         }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            DoMeleeAttackIfReady();
+            scheduler.Update(diff);
+        }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
