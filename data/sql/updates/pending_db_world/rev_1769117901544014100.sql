@@ -89,7 +89,7 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 (39132, 32491, 0, 'Time-Lost Proto Drake / Vyragosa - Path 3'),
 (39133, 32491, 0, 'Time-Lost Proto Drake / Vyragosa - Path 4');
 
-DELETE FROM `creature_addon` WHERE `guid` IN (@GUID1, @GUID2, @GUID3, @GUID4);
+DELETE FROM `creature_addon` WHERE `guid` BETWEEN 39130 AND 39133;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (39130, 324911, 0, 0, 0, 0, 0, ''),
 (39131, 324912, 0, 0, 0, 0, 0, ''),
