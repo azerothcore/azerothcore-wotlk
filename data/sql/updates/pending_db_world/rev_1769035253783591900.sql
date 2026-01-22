@@ -20,7 +20,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `gameobject` WHERE `id` = 190555 AND `guid` BETWEEN 58160 AND 58168;
 DELETE FROM `creature` WHERE `id1` = 28369 AND `guid` BETWEEN 115685 AND 115691;
-UPDATE `creature` SET `spawntimesecs` = 120 WHERE `id` = 28352 AND `guid` BETWEEN 114082 AND 114091;
+UPDATE `creature` SET `spawntimesecs` = 120 WHERE `id1` = 28352 AND `guid` BETWEEN 114082 AND 114091;
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `speed_run` = 2 WHERE `entry` = 28369;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28369);
