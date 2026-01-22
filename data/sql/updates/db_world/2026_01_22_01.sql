@@ -1,3 +1,4 @@
+-- DB update 2026_01_22_00 -> 2026_01_22_01
 -- PrevQuestID from 12822 to 18221, A Flawless Plan requires Opening the Backdoor, not Know No Fear
 UPDATE `quest_template_addon` SET `PrevQuestID` = 12821 WHERE `ID` = 12823;
 
