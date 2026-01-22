@@ -5180,6 +5180,18 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
     });
 
+    // Prayer of Healing: make PoH ignore line of sight for the AoE heal effect, the line of sight check of the target is done in SpellScript
+    ApplySpellFix({ 596, 996, 10960, 10961, 25316, 25308, 48072 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Glyph of Prayer of Healing: make the Glyphed PoH heal over time ignore line of sight
+    ApplySpellFix({ 56161 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
