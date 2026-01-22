@@ -71,7 +71,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (324914, 17, 7143.3037, -697.4054, 969.9835  , NULL, 0, 2);
 
 DELETE FROM `creature` WHERE (`id1` = 32491) AND `guid` = 1975840;
-DELETE FROM `creature` WHERE `guid` = 5;
+DELETE FROM `creature` WHERE `id1` = 32491 AND `guid` BETWEEN 39130 AND 39133;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (39130, 32491, 571, 67, 511, 6748.211, -1664.3069, 919.3118, 0, 2700, 2, 58558, 1, NULL),
 (39131, 32491, 571, 67, 511, 6455.723, -562.87396, 814.643, 0, 2700, 2, 58558, 1, NULL),
