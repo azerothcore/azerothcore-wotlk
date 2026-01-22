@@ -82,7 +82,6 @@ DELETE FROM `pool_template` WHERE `entry` = 32491;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (32491, 1, 'Time-Lost Proto Drake / Vyragosa');
 
--- Pool creatures (4 spawn locations, one per path)
 DELETE FROM `pool_creature` WHERE `pool_entry` = 32491;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (39130, 32491, 0, 'Time-Lost Proto Drake / Vyragosa - Path 1'),
@@ -90,7 +89,6 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 (39132, 32491, 0, 'Time-Lost Proto Drake / Vyragosa - Path 3'),
 (39133, 32491, 0, 'Time-Lost Proto Drake / Vyragosa - Path 4');
 
--- Assign paths via creature_addon (one per spawn GUID)
 DELETE FROM `creature_addon` WHERE `guid` IN (@GUID1, @GUID2, @GUID3, @GUID4);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (39130, 324911, 0, 0, 0, 0, 0, ''),
