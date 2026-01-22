@@ -266,7 +266,7 @@ class spell_gluth_decimate : public SpellScript
     }
 };
 
-// 28375 - Decimate 
+// 28375 - Decimate
 class spell_gluth_decimate_damage : public SpellScript
 {
     PrepareSpellScript(spell_gluth_decimate_damage)
