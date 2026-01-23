@@ -671,7 +671,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (26119,   0, 10, 0x90100003, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,      0, 0), -- Stormcaller Spelldamage Bonus
 (26128,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     8, 0x0,  0,   0,      0, 0), -- Enigma Resist Bonus
 (26135,   0, 10, 0x00800000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x2,  0,   0,      0, 0), -- Battlegear of Eternal Justice
-(26480,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  3,   0,      0, 0), -- Badge of the Swarmguard
+(26480,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0, 10,   0,      0, 0), -- Badge of the Swarmguard (AC #16777)
 (26605,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     2, 0x2,  0,   0,      0, 0), -- Bloodcrown
 (27419,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0,  3,   0,      0, 0), -- Warrior's Resolve
 (27498,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0,  3,   0,      0, 0), -- Crusader's Wrath
@@ -1469,7 +1469,7 @@ UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=24353;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=25669;
 UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=16, `Chance`=0 WHERE `SpellId`=26135;
-UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=26480;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0, `ProcsPerMinute`=10 WHERE `SpellId`=26480; -- AC #16777
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=27656;
 UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=27774;
 UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=28716;
