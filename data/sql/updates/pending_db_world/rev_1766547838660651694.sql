@@ -1171,7 +1171,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (15332,   0, 0, 0x00000000, 0x00000000, 0x00000000,  327680, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
 -- Ancestral Fortitude (Shaman) - procFlags=131072, customChance=100
 (16372,   0, 0, 0x00000000, 0x00000000, 0x00000000,  131072, 0x0, 0x0, 0, 0x0, 0, 100,     0, 0),
--- Fiery Core - procFlags=20, ppmRate=20.0, Cooldown=50000
+-- Lawbringer - procFlags=20, ppmRate=20.0, Cooldown=50000 (AC #10402)
 (21747,   0, 0, 0x00000000, 0x00000000, 0x00000000,      20, 0x0, 0x0, 0, 0x0,20,   0, 50000, 0),
 -- Blessing of the Claw - Cooldown=240000 (4 min)
 (24256,   0, 0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0, 0, 0x0, 0,   0,240000, 0),
