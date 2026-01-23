@@ -2311,11 +2311,25 @@ float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& event
     // so talents modifying chances and judgements will have properly calculated proc chance
     if (Unit* caster = GetCaster())
     {
-        // calculate ppm chance if present and we're using weapon
+        // If PPM exists calculate chance from PPM
         if (eventInfo.GetDamageInfo() && procEntry.ProcsPerMinute != 0)
         {
-            uint32 WeaponSpeed = caster->GetAttackTime(eventInfo.GetDamageInfo()->GetAttackType());
-            chance = caster->GetPPMProcChance(WeaponSpeed, procEntry.ProcsPerMinute, GetSpellInfo());
+            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+            uint32 attackSpeed = 0;
+            if (!procSpell || procSpell->DmgClass == SPELL_DAMAGE_CLASS_MELEE || procSpell->IsRangedWeaponSpell())
+            {
+                attackSpeed = caster->GetAttackTime(eventInfo.GetDamageInfo()->GetAttackType());
+            }
+            else // spells use their cast time for PPM calculations
+            {
+                if (procSpell->CastTimeEntry)
+                    attackSpeed = procSpell->CastTimeEntry->CastTime;
+
+                // instants and fast spells use 1.5s cast speed
+                if (attackSpeed < 1500)
+                    attackSpeed = 1500;
+            }
+            chance = caster->GetPPMProcChance(attackSpeed, procEntry.ProcsPerMinute, GetSpellInfo());
         }
         // apply chance modifer aura, applies also to ppm chance (see improved judgement of light spell)
         if (Player* modOwner = caster->GetSpellModOwner())
