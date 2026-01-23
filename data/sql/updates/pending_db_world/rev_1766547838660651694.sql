@@ -789,7 +789,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (39443,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     2, 0x0,  0,   0,      0, 0), -- Aura of Wrath
 (39530,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x1,     0, 0x0,  0,   0,      0, 0), -- Focus
 (39958,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0,0.7,   0,  40000, 0), -- Skyfire Swiftness
-(40407,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x0,  0,   0,      0, 0), -- Illidan Tank Shield
+(40407,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x0,  6,   0,      0, 0), -- Illidan Tank Shield (AC Mangos legacy)
 (40444,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,    64, 0x0,  0,   0,      0, 0), -- Black Temple Tank Trinket
 (40458,   0,  4, 0x02000000, 0x00000601, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,      0, 0), -- Warrior Tier 6 Trinket
 (40475,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  3,   0,      0, 0), -- Black Temple Melee Trinket
