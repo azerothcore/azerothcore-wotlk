@@ -227,8 +227,6 @@ public:
             me->SetAnimTier(AnimTier::Fly);
             me->setActive(true);
             me->SetVisible(false);
-            me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            me->UpdateEntry(roll_chance_i(10) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false); // Seen 1 in 12 times as Time-Lost in sniffs
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetVisible(true);
