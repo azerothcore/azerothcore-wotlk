@@ -716,7 +716,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (33127,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0,  7,   0,   1000, 0), -- Seal of Command
 (33297,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   0,  45000, 0), -- Spell Haste Trinket
 (33299,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x1,     0, 0x0,  0,   0,      0, 0), -- Coilfang Slave Pens Lvl 70 Boss3a Caster Trinket
-(33510,   0,  0, 0x00000000, 0x00000000, 0x00000000,     340, 0x0, 0x2,     0, 0x0,  3,   0,      0, 0), -- Health Restore
+(33510,   0,  0, 0x00000000, 0x00000000, 0x00000000,     340, 0x0, 0x2,     0, 0x0,  0,  15,  25000, 0), -- Health Restore (AC #16551)
 (33648,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     2, 0x0,  0,   0,  45000, 0), -- Reflection of Torment
 (33719,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,  2048, 0x0,  0,   0,      0, 0), -- Perfect Spell Reflection
 (33746,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x1,  0,   0,  10000, 0), -- Essence Infused Mushroom
@@ -1491,7 +1491,7 @@ UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=
 UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=35000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32837;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32844;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=33297;
-UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=340, `Chance`=0 WHERE `SpellId`=33510;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=25000, `HitMask`=0, `ProcFlags`=340, `Chance`=15 WHERE `SpellId`=33510;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=50000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=33648;
 UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=45000, `HitMask`=0, `ProcFlags`=279552, `Chance`=0 WHERE `SpellId`=33953;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=34074;
