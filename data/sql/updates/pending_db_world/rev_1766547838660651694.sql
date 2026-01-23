@@ -96,7 +96,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (12536,   0,  3, 0x20C21AF7, 0x00029040, 0x00000000,       0, 0x0, 0x1,     0, 0x4,  0,   0,      0, 0), -- Clearcasting (Mage)
 (15286,  32,  6, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x0,  0,   0,      0, 0), -- Vampiric Embrace
 (16246,   0, 11, 0x981001C3, 0x00001400, 0x00000010,       0, 0x0, 0x1,     0, 0x4,  0,   0,      0, 0), -- Clearcasting (Shaman)
-(16864,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  0,   6,      0, 0), -- Omen of Clarity
+(16864,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0, 3.5,  0,      0, 0), -- Omen of Clarity
 (16870,   0,  7, 0x00E3BBFF, 0x079007D3, 0x00040400,       0, 0x0, 0x1,     0, 0x4,  0,   0,      0, 0), -- Clearcasting (Druid)
 (17619,   0, 13, 0x00000000, 0x00000000, 0x00000000,   32768, 0x7, 0x0,     0, 0x0,  0,   0,      0, 0), -- Alchemist's Stone
 (20185,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x0,     0, 0x0, 15,   0,      0, 0), -- Judgement of Light
