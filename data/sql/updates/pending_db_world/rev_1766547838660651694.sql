@@ -2,7 +2,7 @@
 -- Port from TrinityCore QAston proc system commits
 
 -- Add DisableEffectsMask column to spell_proc table if it doesn't exist
-SET @column_exists = (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'spell_proc' AND COLUMN_NAME = 'DisableEffectsMask');
+SET @column_exists = (SELECT `COUNT`(*) FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'spell_proc' AND `COLUMN_NAME` = 'DisableEffectsMask');
 SET @sql = IF(@column_exists = 0, 'ALTER TABLE `spell_proc` ADD COLUMN `DisableEffectsMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesMask`', 'SELECT 1');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
