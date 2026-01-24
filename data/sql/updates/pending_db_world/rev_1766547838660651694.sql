@@ -1885,11 +1885,6 @@ DELETE FROM `spell_script_names` WHERE `spell_id` = 57350;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (57350, 'spell_item_darkmoon_card_illusion');
 
--- Gift of the Harvester
-DELETE FROM `spell_script_names` WHERE `spell_id` = 52479;
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(52479, 'spell_item_gift_of_the_harvester');
-
 -- Mad Alchemist's Potion
 DELETE FROM `spell_script_names` WHERE `spell_id` = 28374;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
@@ -1899,16 +1894,6 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `spell_id` = 47770;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (47770, 'spell_item_decahedral_dwarven_dice');
-
--- Titanium Seal of Dalaran - Flip Coin
-DELETE FROM `spell_script_names` WHERE `spell_id` = 60458;
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(60458, 'spell_item_titanium_seal_of_dalaran_toss');
-
--- Titanium Seal of Dalaran - Toss Your Luck!
-DELETE FROM `spell_script_names` WHERE `spell_id` = 60476;
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(60476, 'spell_item_titanium_seal_of_dalaran_catch');
 
 -- Arena Drink - modifies drink mana regen behavior in arenas
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_gen_arena_drink';
@@ -1930,3 +1915,19 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (57073, 'spell_gen_arena_drink'),
 (61830, 'spell_gen_arena_drink'),
 (72623, 'spell_gen_arena_drink');
+
+-- Remove scripts with DBC mismatches (spell effects don't match AC's DBC)
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN (
+'spell_item_nitro_boosts',
+'spell_item_nitro_boosts_backfire',
+'spell_item_harm_prevention_belt',
+'spell_item_dire_brew',
+'spell_item_dimensional_ripper_everlook',
+'spell_item_red_rider_air_rifle',
+'spell_item_runic_healing_injector',
+'spell_item_taunt_flag_targeting',
+'spell_item_extract_gas',
+'spell_item_disco_ball_listening_to_music_periodic',
+'spell_item_disco_ball_listening_to_music_check',
+'spell_item_disco_ball_listening_to_music_parent'
+);
