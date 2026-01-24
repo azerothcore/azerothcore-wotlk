@@ -2006,8 +2006,13 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     }
 
     // passive auras don't stack with another rank of the spell cast by same caster
+    // Exception: weapon enchant procs from different items can stack (e.g., Flametongue Weapon MH/OH)
     if (IsPassive() && sameCaster && (m_spellInfo->IsDifferentRankOf(existingSpellInfo) || (m_spellInfo->Id == existingSpellInfo->Id && m_castItemGuid.IsEmpty())))
-        return false;
+    {
+        // Allow stacking if both auras are from different items and have ENCHANT_PROC attribute
+        if (!(m_spellInfo->HasAttribute(SPELL_ATTR0_CU_ENCHANT_PROC) && GetCastItemGUID() && existingAura->GetCastItemGUID() && GetCastItemGUID() != existingAura->GetCastItemGUID()))
+            return false;
+    }
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -2118,9 +2123,11 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         // don't allow passive area auras to stack
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
             return true;
+
         if (GetCastItemGUID() && existingAura->GetCastItemGUID())
             if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasAttribute(SPELL_ATTR0_CU_ENCHANT_PROC))
                 return true;
+
         // same spell with same caster should not stack
         return false;
     }
@@ -2236,8 +2243,7 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
         return 0;
 
     // AuraScript Hook
-    bool check = const_cast<Aura*>(this)->CallScriptCheckProcHandlers(aurApp, eventInfo);
-    if (!check)
+    if (!const_cast<Aura*>(this)->CallScriptCheckProcHandlers(aurApp, eventInfo))
         return 0;
 
     // At least one effect has to pass checks to proc aura
