@@ -69,6 +69,89 @@ class spell_gen_5000_gold : public SpellScript
     }
 };
 
+// 430, 431, 432, 1133, 1135, 1137, 10250, 22734, 27089, 34291, 43182, 43183, 46755, 49472, 57073, 61830, 72623 - Drink
+class spell_gen_arena_drink : public AuraScript
+{
+    PrepareAuraScript(spell_gen_arena_drink);
+
+    bool Load() override
+    {
+        return GetCaster() && GetCaster()->IsPlayer();
+    }
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Effects[EFFECT_0].ApplyAuraName != SPELL_AURA_MOD_POWER_REGEN)
+        {
+            LOG_ERROR("spells", "Aura {} structure has been changed - first aura is no longer SPELL_AURA_MOD_POWER_REGEN", spellInfo->Id);
+            return false;
+        }
+
+        return true;
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& /*amplitude*/)
+    {
+        AuraEffect* regen = GetAura()->GetEffect(EFFECT_0);
+        if (!regen)
+            return;
+
+        // default case - not in arena
+        if (!GetCaster()->ToPlayer()->InArena())
+            isPeriodic = false;
+    }
+
+    void CalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        AuraEffect* regen = GetAura()->GetEffect(EFFECT_0);
+        if (!regen)
+            return;
+
+        // default case - not in arena
+        if (!GetCaster()->ToPlayer()->InArena())
+            regen->ChangeAmount(amount);
+    }
+
+    void UpdatePeriodic(AuraEffect* aurEff)
+    {
+        AuraEffect* regen = GetAura()->GetEffect(EFFECT_0);
+        if (!regen)
+            return;
+
+        // This feature used only in arenas
+        // Here need increase mana regen per tick (6 second rule)
+        // on 0 tick -   0  (handled in 2 second)
+        // on 1 tick - 166% (handled in 4 second)
+        // on 2 tick - 133% (handled in 6 second)
+
+        // Apply bonus for 1 - 4 tick
+        switch (aurEff->GetTickNumber())
+        {
+            case 1:   // 0%
+                regen->ChangeAmount(0);
+                break;
+            case 2:   // 166%
+                regen->ChangeAmount(aurEff->GetAmount() * 5 / 3);
+                break;
+            case 3:   // 133%
+                regen->ChangeAmount(aurEff->GetAmount() * 4 / 3);
+                break;
+            default:  // 100% - normal regen
+                regen->ChangeAmount(aurEff->GetAmount());
+                // No need to update after 4th tick
+                aurEff->SetPeriodic(false);
+                break;
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_arena_drink::CalcPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_arena_drink::CalcAmount, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_arena_drink::UpdatePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 // 24401 - Test Pet Passive
 class spell_gen_model_visible : public AuraScript
 {
@@ -6001,6 +6084,7 @@ void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
     RegisterSpellScript(spell_gen_5000_gold);
+    RegisterSpellScript(spell_gen_arena_drink);
     RegisterSpellScript(spell_gen_model_visible);
     RegisterSpellScript(spell_the_flag_of_ownership);
     RegisterSpellScript(spell_gen_have_item_auras);

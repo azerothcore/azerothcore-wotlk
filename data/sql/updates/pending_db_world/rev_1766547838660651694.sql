@@ -1969,3 +1969,24 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `spell_id` = 50499;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (50499, 'spell_item_disco_ball_listening_to_music_parent');
+
+-- Arena Drink - modifies drink mana regen behavior in arenas
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_gen_arena_drink';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(430, 'spell_gen_arena_drink'),
+(431, 'spell_gen_arena_drink'),
+(432, 'spell_gen_arena_drink'),
+(1133, 'spell_gen_arena_drink'),
+(1135, 'spell_gen_arena_drink'),
+(1137, 'spell_gen_arena_drink'),
+(10250, 'spell_gen_arena_drink'),
+(22734, 'spell_gen_arena_drink'),
+(27089, 'spell_gen_arena_drink'),
+(34291, 'spell_gen_arena_drink'),
+(43182, 'spell_gen_arena_drink'),
+(43183, 'spell_gen_arena_drink'),
+(46755, 'spell_gen_arena_drink'),
+(49472, 'spell_gen_arena_drink'),
+(57073, 'spell_gen_arena_drink'),
+(61830, 'spell_gen_arena_drink'),
+(72623, 'spell_gen_arena_drink');

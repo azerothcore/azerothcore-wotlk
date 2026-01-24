@@ -4890,7 +4890,7 @@ class spell_item_mind_control_cap : public SpellScript
     {
         if (!GetCastItem())
             return false;
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -5099,7 +5099,7 @@ class spell_item_runic_healing_injector : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleHeal(SpellEffIndex /*effIndex*/)
@@ -5129,7 +5129,7 @@ class spell_item_taunt_flag_targeting : public SpellScript
     {
         targets.remove_if([](WorldObject* obj) -> bool
         {
-            return obj->GetTypeId() != TYPEID_PLAYER && obj->GetTypeId() != TYPEID_CORPSE;
+            return !obj->IsPlayer() && obj->GetTypeId() != TYPEID_CORPSE;
         });
 
         if (targets.empty())
@@ -5274,8 +5274,8 @@ class spell_item_extract_gas : public AuraScript
     {
         PreventDefaultAction();
 
-        if (GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER &&
-            GetTarget()->GetTypeId() == TYPEID_UNIT &&
+        if (GetCaster() && GetCaster()->IsPlayer() &&
+            GetTarget()->IsCreature() &&
             GetTarget()->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_GAS_CLOUD)
         {
             Player* player = GetCaster()->ToPlayer();
@@ -5414,7 +5414,7 @@ class spell_item_decahedral_dwarven_dice : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
