@@ -2006,11 +2006,11 @@ bool Aura::CanStackWith(Aura const* existingAura) const
     }
 
     // passive auras don't stack with another rank of the spell cast by same caster
-    // Exception: weapon enchant procs from different items can stack (e.g., Flametongue Weapon MH/OH)
+    // Exception: item-sourced auras from different items can stack (e.g., weapon imbues on MH/OH)
     if (IsPassive() && sameCaster && (m_spellInfo->IsDifferentRankOf(existingSpellInfo) || (m_spellInfo->Id == existingSpellInfo->Id && m_castItemGuid.IsEmpty())))
     {
-        // Allow stacking if both auras are from different items and have ENCHANT_PROC attribute
-        if (!(m_spellInfo->HasAttribute(SPELL_ATTR0_CU_ENCHANT_PROC) && GetCastItemGUID() && existingAura->GetCastItemGUID() && GetCastItemGUID() != existingAura->GetCastItemGUID()))
+        // Allow stacking if both auras are from different items
+        if (!(GetCastItemGUID() && existingAura->GetCastItemGUID() && GetCastItemGUID() != existingAura->GetCastItemGUID()))
             return false;
     }
 
@@ -2124,9 +2124,9 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
             return true;
 
-        if (GetCastItemGUID() && existingAura->GetCastItemGUID())
-            if (GetCastItemGUID() != existingAura->GetCastItemGUID() && m_spellInfo->HasAttribute(SPELL_ATTR0_CU_ENCHANT_PROC))
-                return true;
+        // Allow item-sourced auras from different items to stack
+        if (GetCastItemGUID() && existingAura->GetCastItemGUID() && GetCastItemGUID() != existingAura->GetCastItemGUID())
+            return true;
 
         // same spell with same caster should not stack
         return false;

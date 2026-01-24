@@ -4153,14 +4153,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
     });
 
-    // Flametongue Weapon (Passive) - all ranks
-    // Allow different ranks to stack when applied to different weapons (MH/OH)
-    // This enables the intended gameplay of using Rank 9 + Rank 10 for proc mechanics
-    ApplySpellFix({ 10400, 15567, 15568, 15569, 16311, 16312, 16313, 58784, 58791, 58792 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesCu |= SPELL_ATTR0_CU_ENCHANT_PROC;
-    });
-
     // Mana Tide Totem
     // Cleansing Totem Effect
     ApplySpellFix({ 39609, 52025 }, [](SpellInfo* spellInfo)
