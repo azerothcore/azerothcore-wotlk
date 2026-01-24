@@ -101,6 +101,8 @@ enum Spells
     SPELL_KINETIC_BOMB                  = 72080,
     SPELL_SHOCK_VORTEX                  = 72037,
     SPELL_EMPOWERED_SHOCK_VORTEX        = 72039,
+    SPELL_REMOVE_EMPOWERED_BLOOD        = 72131,
+    SPELL_CLEAR_ALL_STATUS_AILMENTS     = 70939,
 
     // Kinetic Bomb
     SPELL_UNSTABLE                      = 72059,
@@ -233,6 +235,7 @@ public:
             _isEmpowered = false;
             _evading = false;
             me->SetHealth(me->GetMaxHealth());
+            me->CastSpell(me, SPELL_REMOVE_EMPOWERED_BLOOD, true);
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -261,6 +264,7 @@ public:
                 me->SetLootRecipient(who);
             me->LowerPlayerDamageReq(me->GetMaxHealth());
             me->SetReactState(REACT_AGGRESSIVE);
+            DoCastSelf(SPELL_CLEAR_ALL_STATUS_AILMENTS, true);
             instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, me);
 
             if (Creature* taldaram = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PRINCE_TALDARAM_GUID)))
