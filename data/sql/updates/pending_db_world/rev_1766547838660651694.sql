@@ -1816,3 +1816,9 @@ DROP TABLE IF EXISTS `spell_proc_event`;
 DELETE FROM `spell_script_names` WHERE `spell_id` = 57345;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (57345, 'spell_item_darkmoon_card_greatness');
+
+-- Death's Choice / Death's Verdict - Register script to handle proc based on highest stat (Str vs Agi)
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (67702, 67771);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(67702, 'spell_item_death_choice'),
+(67771, 'spell_item_death_choice');

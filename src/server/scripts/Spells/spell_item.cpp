@@ -53,6 +53,16 @@ enum DarkmoonCardGreatness
     SPELL_DARKMOON_CARD_SPIRIT              = 60235
 };
 
+enum DeathChoice
+{
+    SPELL_DEATH_CHOICE_NORMAL_AURA          = 67702,
+    SPELL_DEATH_CHOICE_NORMAL_AGILITY       = 67703,
+    SPELL_DEATH_CHOICE_NORMAL_STRENGTH      = 67708,
+    SPELL_DEATH_CHOICE_HEROIC_AURA          = 67771,
+    SPELL_DEATH_CHOICE_HEROIC_AGILITY       = 67772,
+    SPELL_DEATH_CHOICE_HEROIC_STRENGTH      = 67773
+};
+
 enum AuraOfMadness
 {
     SPELL_SOCIOPATH         = 39511,
@@ -4557,6 +4567,54 @@ class spell_item_darkmoon_card_greatness : public AuraScript
     }
 };
 
+// 67702, 67771 - Death's Choice/Death's Verdict
+class spell_item_death_choice : public AuraScript
+{
+    PrepareAuraScript(spell_item_death_choice);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DEATH_CHOICE_NORMAL_STRENGTH,
+            SPELL_DEATH_CHOICE_NORMAL_AGILITY,
+            SPELL_DEATH_CHOICE_HEROIC_STRENGTH,
+            SPELL_DEATH_CHOICE_HEROIC_AGILITY
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+        float str = caster->GetStat(STAT_STRENGTH);
+        float agi = caster->GetStat(STAT_AGILITY);
+
+        switch (aurEff->GetId())
+        {
+            case SPELL_DEATH_CHOICE_NORMAL_AURA:
+                if (str > agi)
+                    caster->CastSpell(caster, SPELL_DEATH_CHOICE_NORMAL_STRENGTH, true, nullptr, aurEff);
+                else
+                    caster->CastSpell(caster, SPELL_DEATH_CHOICE_NORMAL_AGILITY, true, nullptr, aurEff);
+                break;
+            case SPELL_DEATH_CHOICE_HEROIC_AURA:
+                if (str > agi)
+                    caster->CastSpell(caster, SPELL_DEATH_CHOICE_HEROIC_STRENGTH, true, nullptr, aurEff);
+                else
+                    caster->CastSpell(caster, SPELL_DEATH_CHOICE_HEROIC_AGILITY, true, nullptr, aurEff);
+                break;
+            default:
+                break;
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_item_death_choice::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 39446 - Aura of Madness
 class spell_item_aura_of_madness : public AuraScript
 {
@@ -5627,6 +5685,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_brewfest_hops);
     RegisterSpellScript(spell_item_alchemists_stone);
     RegisterSpellScript(spell_item_darkmoon_card_greatness);
+    RegisterSpellScript(spell_item_death_choice);
     RegisterSpellScript(spell_item_aura_of_madness);
     RegisterSpellScript(spell_item_dementia);
     RegisterSpellScript(spell_item_deadly_precision);
