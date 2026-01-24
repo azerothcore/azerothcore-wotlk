@@ -2391,6 +2391,13 @@ public:
         // Output XX. LANG_PINFO_CHR_PLAYEDTIME
         handler->PSendSysMessage(LANG_PINFO_CHR_PLAYEDTIME, (secsToTimeString(totalPlayerTime, true)));
 
+        // Output XXI. LANG_PINFO_CHR_ONLINETIME (only for online players)
+        if (playerTarget)
+        {
+            uint32 onlineTime = uint32(GameTime::GetGameTime().count() - playerTarget->m_logintime);
+            handler->PSendSysMessage(LANG_PINFO_CHR_ONLINETIME, secsToTimeString(onlineTime, true));
+        }
+
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
         CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
