@@ -45,6 +45,14 @@ enum AlchemistStone
     SPELL_ALCHEMISTS_STONE_EXTRA_MANA       = 21400
 };
 
+enum DarkmoonCardGreatness
+{
+    SPELL_DARKMOON_CARD_STRENGTH            = 60229,
+    SPELL_DARKMOON_CARD_AGILITY             = 60233,
+    SPELL_DARKMOON_CARD_INTELLECT           = 60234,
+    SPELL_DARKMOON_CARD_SPIRIT              = 60235
+};
+
 enum AuraOfMadness
 {
     SPELL_SOCIOPATH         = 39511,
@@ -4489,6 +4497,66 @@ class spell_item_alchemists_stone : public AuraScript
     }
 };
 
+// 57345 - Darkmoon Card: Greatness
+class spell_item_darkmoon_card_greatness : public AuraScript
+{
+    PrepareAuraScript(spell_item_darkmoon_card_greatness);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DARKMOON_CARD_STRENGTH,
+            SPELL_DARKMOON_CARD_AGILITY,
+            SPELL_DARKMOON_CARD_INTELLECT,
+            SPELL_DARKMOON_CARD_SPIRIT
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+        float str = caster->GetStat(STAT_STRENGTH);
+        float agi = caster->GetStat(STAT_AGILITY);
+        float intl = caster->GetStat(STAT_INTELLECT);
+        float spi = caster->GetStat(STAT_SPIRIT);
+        float stat = 0.0f;
+
+        uint32 spellTrigger = SPELL_DARKMOON_CARD_STRENGTH;
+
+        if (str > stat)
+        {
+            spellTrigger = SPELL_DARKMOON_CARD_STRENGTH;
+            stat = str;
+        }
+
+        if (agi > stat)
+        {
+            spellTrigger = SPELL_DARKMOON_CARD_AGILITY;
+            stat = agi;
+        }
+
+        if (intl > stat)
+        {
+            spellTrigger = SPELL_DARKMOON_CARD_INTELLECT;
+            stat = intl;
+        }
+
+        if (spi > stat)
+        {
+            spellTrigger = SPELL_DARKMOON_CARD_SPIRIT;
+        }
+
+        caster->CastSpell(caster, spellTrigger, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_item_darkmoon_card_greatness::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 39446 - Aura of Madness
 class spell_item_aura_of_madness : public AuraScript
 {
@@ -5558,6 +5626,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_bloodsail_admiral_hat);
     RegisterSpellScript(spell_item_brewfest_hops);
     RegisterSpellScript(spell_item_alchemists_stone);
+    RegisterSpellScript(spell_item_darkmoon_card_greatness);
     RegisterSpellScript(spell_item_aura_of_madness);
     RegisterSpellScript(spell_item_dementia);
     RegisterSpellScript(spell_item_deadly_precision);

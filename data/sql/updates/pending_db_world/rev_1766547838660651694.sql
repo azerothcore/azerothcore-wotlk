@@ -1811,3 +1811,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (56218, 'spel
 
 -- Drop obsolete spell_proc_event table (replaced by spell_proc)
 DROP TABLE IF EXISTS `spell_proc_event`;
+
+-- Darkmoon Card: Greatness - Register script to handle proc based on highest stat
+DELETE FROM `spell_script_names` WHERE `spell_id` = 57345;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(57345, 'spell_item_darkmoon_card_greatness');
