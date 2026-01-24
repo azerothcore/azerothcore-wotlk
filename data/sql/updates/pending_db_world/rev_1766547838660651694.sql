@@ -1469,7 +1469,7 @@ UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=24353;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=25669;
 UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=16, `Chance`=0 WHERE `SpellId`=26135;
-UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0, `ProcsPerMinute`=10 WHERE `SpellId`=26480; -- AC #16777
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0, `ProcsPerMinute`=10 WHERE `SpellId`=26480; -- `AC` #16777
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=27656;
 UPDATE `spell_proc` SET `SpellTypeMask`=3, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=27774;
 UPDATE `spell_proc` SET `SpellTypeMask`=2, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=262144, `Chance`=0 WHERE `SpellId`=28716;
@@ -1486,7 +1486,7 @@ UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29635;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29636;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=29637;
-UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0, `ProcsPerMinute`=18 WHERE `SpellId`=30823; -- AC #17499
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0, `ProcsPerMinute`=18 WHERE `SpellId`=30823; -- `AC` #17499
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=3500, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32734;
 UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=35000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32837;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=32844;
