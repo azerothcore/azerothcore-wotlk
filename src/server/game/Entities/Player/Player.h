@@ -1101,6 +1101,8 @@ public:
 
     void Update(uint32 time) override;
 
+    void Heartbeat() override;
+
     PlayerFlags GetPlayerFlags() const { return PlayerFlags(GetUInt32Value(PLAYER_FLAGS)); }
     bool HasPlayerFlag(PlayerFlags flags) const { return HasFlag(PLAYER_FLAGS, flags) != 0; }
     void SetPlayerFlag(PlayerFlags flags) { SetFlag(PLAYER_FLAGS, flags); }
