@@ -88,49 +88,23 @@ enum ManaDrain
     SPELL_MANA_DRAIN_LEECH                  = 27526
 };
 
-enum NitroBoosts
-{
-    SPELL_NITRO_BOOSTS_SUCCESS              = 54861,
-    SPELL_NITRO_BOOSTS_BACKFIRE             = 54621,
-    SPELL_NITRO_BOOSTS_PARACHUTE            = 54649
-};
-
-enum HarmPreventionBelt
-{
-    SPELL_FORCEFIELD_COLLAPSE               = 36355
-};
-
 enum HourglassSand
 {
     SPELL_HOURGLASS_SAND_HEAL               = 30554,
     SPELL_HOURGLASS_SAND_DAMAGE             = 30553
 };
 
-enum DireBrew
-{
-    SPELL_DIRE_BREW_DARK_IRON_ATTACK        = 47340
-};
-
-enum TransporterSpells
+enum UltrasafeTransporter
 {
     SPELL_TRANSPORTER_MALFUNCTION_SMALL     = 36178,
     SPELL_TRANSPORTER_MALFUNCTION_BIG       = 36183,
     SPELL_TRANSPORTER_EVIL_TWIN             = 23445,
-    SPELL_TELEPORT_EVERLOOK                 = 23442,
-    SPELL_TELEPORT_GADGETZAN                = 23441,
-    SPELL_TELEPORT_TOSHLEY_STATION          = 35974,
-    SPELL_TELEPORT_AREA_52                  = 35973
+    SPELL_TELEPORT_TOSHLEY_STATION          = 35974
 };
 
 enum PowerCircle
 {
     SPELL_LIMITLESS_POWER                   = 45044
-};
-
-enum TauntFlag
-{
-    SPELL_TAUNT_FLAG                        = 51657,
-    EMOTE_PLANTS_FLAG                       = 28008
 };
 
 enum AuraOfMadness
@@ -4811,76 +4785,6 @@ class spell_item_mana_drain : public AuraScript
     }
 };
 
-// 54861 - Nitro Boosts
-class spell_item_nitro_boosts : public SpellScript
-{
-    PrepareSpellScript(spell_item_nitro_boosts);
-
-    bool Load() override
-    {
-        return GetCastItem() != nullptr;
-    }
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        return ValidateSpellInfo({ SPELL_NITRO_BOOSTS_SUCCESS, SPELL_NITRO_BOOSTS_BACKFIRE });
-    }
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        Unit* caster = GetCaster();
-        AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(caster->GetAreaId());
-        bool success = true;
-        if (areaEntry && areaEntry->IsFlyable() && !caster->GetMap()->IsDungeon())
-            success = roll_chance_i(95);
-        caster->CastSpell(caster, success ? SPELL_NITRO_BOOSTS_SUCCESS : SPELL_NITRO_BOOSTS_BACKFIRE, GetCastItem());
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_nitro_boosts::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-// 54621 - Nitro Boosts Backfire
-class spell_item_nitro_boosts_backfire : public AuraScript
-{
-    PrepareAuraScript(spell_item_nitro_boosts_backfire);
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        return ValidateSpellInfo({ SPELL_NITRO_BOOSTS_PARACHUTE });
-    }
-
-    void HandleApply(AuraEffect const* /*effect*/, AuraEffectHandleModes /*mode*/)
-    {
-        _lastZ = GetTarget()->GetPositionZ();
-    }
-
-    void HandlePeriodicDummy(AuraEffect const* /*effect*/)
-    {
-        PreventDefaultAction();
-        float curZ = GetTarget()->GetPositionZ();
-        if (curZ < _lastZ)
-        {
-            if (roll_chance_i(80))
-                GetTarget()->CastSpell(GetTarget(), SPELL_NITRO_BOOSTS_PARACHUTE, true);
-            GetAura()->Remove();
-        }
-        else
-            _lastZ = curZ;
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_item_nitro_boosts_backfire::HandleApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_nitro_boosts_backfire::HandlePeriodicDummy, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-    }
-
-private:
-    float _lastZ = 0.0f;
-};
-
 // 13180 - Gnomish Mind Control Cap
 class spell_item_mind_control_cap : public SpellScript
 {
@@ -4911,27 +4815,6 @@ class spell_item_mind_control_cap : public SpellScript
     }
 };
 
-// 13567 - Harm Prevention Belt
-class spell_item_harm_prevention_belt : public AuraScript
-{
-    PrepareAuraScript(spell_item_harm_prevention_belt);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_FORCEFIELD_COLLAPSE });
-    }
-
-    void HandleProc(ProcEventInfo& /*eventInfo*/)
-    {
-        GetTarget()->CastSpell(GetTarget(), SPELL_FORCEFIELD_COLLAPSE, true);
-    }
-
-    void Register() override
-    {
-        OnProc += AuraProcFn(spell_item_harm_prevention_belt::HandleProc);
-    }
-};
-
 // 30536 - Hourglass Sand
 class spell_item_hourglass_sand : public SpellScript
 {
@@ -4950,52 +4833,6 @@ class spell_item_hourglass_sand : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_hourglass_sand::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-// 51010 - Dire Brew
-class spell_item_dire_brew : public AuraScript
-{
-    PrepareAuraScript(spell_item_dire_brew);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_DIRE_BREW_DARK_IRON_ATTACK });
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_DIRE_BREW_DARK_IRON_ATTACK, true, nullptr, aurEff);
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_item_dire_brew::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
-
-// 23453 - Dimensional Ripper - Everlook
-class spell_item_dimensional_ripper_everlook : public SpellScript
-{
-    PrepareSpellScript(spell_item_dimensional_ripper_everlook);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_TRANSPORTER_MALFUNCTION_SMALL, SPELL_TRANSPORTER_MALFUNCTION_BIG, SPELL_TRANSPORTER_EVIL_TWIN, SPELL_TELEPORT_EVERLOOK });
-    }
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        Unit* caster = GetCaster();
-        caster->CastSpell(caster, SPELL_TELEPORT_EVERLOOK, true);
-        if (roll_chance_i(10))
-            caster->CastSpell(caster, RAND(SPELL_TRANSPORTER_MALFUNCTION_SMALL, SPELL_TRANSPORTER_MALFUNCTION_BIG, SPELL_TRANSPORTER_EVIL_TWIN), true);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_dimensional_ripper_everlook::HandleDummy, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };
 
@@ -5050,107 +4887,6 @@ class spell_item_power_circle : public AuraScript
     void Register() override
     {
         AfterEffectRemove += AuraEffectRemoveFn(spell_item_power_circle::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
-enum AirRifleSpells
-{
-    SPELL_AIR_RIFLE_HOLD_VISUAL = 65582,
-    SPELL_AIR_RIFLE_SHOOT       = 67532,
-    SPELL_AIR_RIFLE_SHOOT_SELF  = 65577
-};
-
-// 65576 - Red Rider Air Rifle
-class spell_item_red_rider_air_rifle : public SpellScript
-{
-    PrepareSpellScript(spell_item_red_rider_air_rifle);
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        return ValidateSpellInfo({ SPELL_AIR_RIFLE_HOLD_VISUAL, SPELL_AIR_RIFLE_SHOOT, SPELL_AIR_RIFLE_SHOOT_SELF });
-    }
-
-    void HandleScript(SpellEffIndex effIndex)
-    {
-        PreventHitDefaultEffect(effIndex);
-        Unit* caster = GetCaster();
-        if (Unit* target = GetHitUnit())
-        {
-            caster->CastSpell(caster, SPELL_AIR_RIFLE_HOLD_VISUAL, true);
-            if (Player* player = caster->ToPlayer())
-                player->GetGlobalCooldownMgr().CancelGlobalCooldown(GetSpellInfo());
-            if (urand(0, 4))
-                caster->CastSpell(target, SPELL_AIR_RIFLE_SHOOT, false);
-            else
-                caster->CastSpell(caster, SPELL_AIR_RIFLE_SHOOT_SELF, false);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_red_rider_air_rifle::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
-// 67019 - Runic Healing Injector
-class spell_item_runic_healing_injector : public SpellScript
-{
-    PrepareSpellScript(spell_item_runic_healing_injector);
-
-    bool Load() override
-    {
-        return GetCaster()->IsPlayer();
-    }
-
-    void HandleHeal(SpellEffIndex /*effIndex*/)
-    {
-        if (Player* caster = GetCaster()->ToPlayer())
-            if (caster->HasSkill(SKILL_ENGINEERING))
-                SetHitHeal(GetHitHeal() * 1.25f);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_runic_healing_injector::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
-    }
-};
-
-// 51653 - Taunt Flag Targeting
-class spell_item_taunt_flag_targeting : public SpellScript
-{
-    PrepareSpellScript(spell_item_taunt_flag_targeting);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_TAUNT_FLAG }) && sObjectMgr->GetBroadcastText(EMOTE_PLANTS_FLAG);
-    }
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        targets.remove_if([](WorldObject* obj) -> bool
-        {
-            return !obj->IsPlayer() && obj->GetTypeId() != TYPEID_CORPSE;
-        });
-
-        if (targets.empty())
-        {
-            FinishCast(SPELL_FAILED_NO_VALID_TARGETS);
-            return;
-        }
-
-        Acore::Containers::RandomResize(targets, 1);
-    }
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        GetCaster()->Unit::TextEmote(EMOTE_PLANTS_FLAG, GetHitUnit(), false);
-        GetCaster()->CastSpell(GetHitUnit(), SPELL_TAUNT_FLAG, true);
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_item_taunt_flag_targeting::FilterTargets, EFFECT_0, TARGET_CORPSE_SRC_AREA_ENEMY);
-        OnEffectHitTarget += SpellEffectFn(spell_item_taunt_flag_targeting::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -5262,35 +4998,6 @@ class spell_item_darkmoon_card_illusion : public AuraScript
     void Register() override
     {
         AfterEffectRemove += AuraEffectRemoveFn(spell_item_darkmoon_card_illusion::AfterRemove, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
-// 30101 - Extract Gas
-class spell_item_extract_gas : public AuraScript
-{
-    PrepareAuraScript(spell_item_extract_gas);
-
-    void PeriodicTick(AuraEffect const* /*aurEff*/)
-    {
-        PreventDefaultAction();
-
-        if (GetCaster() && GetCaster()->IsPlayer() &&
-            GetTarget()->IsCreature() &&
-            GetTarget()->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_GAS_CLOUD)
-        {
-            Player* player = GetCaster()->ToPlayer();
-            Creature* creature = GetTarget()->ToCreature();
-            if (!creature->GetCreatureTemplate()->SkinLootId)
-                return;
-
-            player->AutoStoreLoot(creature->GetCreatureTemplate()->SkinLootId, LootTemplates_Skinning, true);
-            creature->DespawnOrUnsummon();
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_extract_gas::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -5488,81 +5195,6 @@ class spell_item_titanium_seal_of_dalaran_catch : public SpellScript
     void Register() override
     {
         OnEffectHit += SpellEffectFn(spell_item_titanium_seal_of_dalaran_catch::TriggerEmote, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
-enum DiscoBall
-{
-    SPELL_LISTENING_TO_MUSIC_CHECK = 50492,
-    SPELL_LISTENING_TO_MUSIC       = 50493
-};
-
-// 50486 - Listening to Music (Periodic)
-class spell_item_disco_ball_listening_to_music_periodic : public AuraScript
-{
-    PrepareAuraScript(spell_item_disco_ball_listening_to_music_periodic);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_LISTENING_TO_MUSIC_CHECK });
-    }
-
-    void OnPeriodic(AuraEffect const* /*aurEff*/)
-    {
-        GetTarget()->CastSpell(GetTarget(), SPELL_LISTENING_TO_MUSIC_CHECK, true);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_disco_ball_listening_to_music_periodic::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-    }
-};
-
-// 50492 - Listening to Music CHECK
-class spell_item_disco_ball_listening_to_music_check : public SpellScript
-{
-    PrepareSpellScript(spell_item_disco_ball_listening_to_music_check);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_LISTENING_TO_MUSIC });
-    }
-
-    void HandleAfterCast()
-    {
-        std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-        auto count = std::count_if(targetsInfo->begin(), targetsInfo->end(), [](TargetInfo const& targetInfo)
-        {
-            return targetInfo.effectMask & (1 << EFFECT_0);
-        });
-        if (!count)
-            GetCaster()->RemoveAurasDueToSpell(SPELL_LISTENING_TO_MUSIC);
-    }
-
-    void Register() override
-    {
-        AfterCast += SpellCastFn(spell_item_disco_ball_listening_to_music_check::HandleAfterCast);
-    }
-};
-
-// 50499 - Listening to Music (Parent)
-class spell_item_disco_ball_listening_to_music_parent : public SpellScript
-{
-    PrepareSpellScript(spell_item_disco_ball_listening_to_music_parent);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_LISTENING_TO_MUSIC });
-    }
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_LISTENING_TO_MUSIC, true);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_disco_ball_listening_to_music_parent::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -6641,31 +6273,19 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_charm_witch_doctor);
     RegisterSpellScript(spell_item_lifegiving_gem);
     RegisterSpellScript(spell_item_mana_drain);
-    RegisterSpellScript(spell_item_nitro_boosts);
-    RegisterSpellScript(spell_item_nitro_boosts_backfire);
     RegisterSpellScript(spell_item_mind_control_cap);
-    RegisterSpellScript(spell_item_harm_prevention_belt);
     RegisterSpellScript(spell_item_hourglass_sand);
-    RegisterSpellScript(spell_item_dire_brew);
-    RegisterSpellScript(spell_item_dimensional_ripper_everlook);
     RegisterSpellScript(spell_item_ultrasafe_transporter);
     RegisterSpellScript(spell_item_power_circle);
-    RegisterSpellScript(spell_item_red_rider_air_rifle);
-    RegisterSpellScript(spell_item_runic_healing_injector);
-    RegisterSpellScript(spell_item_taunt_flag_targeting);
     RegisterSpellScript(spell_item_thrallmar_and_honor_hold_favor);
     RegisterSpellScript(spell_item_drums_of_forgotten_kings);
     RegisterSpellScript(spell_item_drums_of_the_wild);
     RegisterSpellScript(spell_item_darkmoon_card_illusion);
-    RegisterSpellScript(spell_item_extract_gas);
     RegisterSpellScript(spell_item_gift_of_the_harvester);
     RegisterSpellScript(spell_item_mad_alchemists_potion);
     RegisterSpellScript(spell_item_decahedral_dwarven_dice);
     RegisterSpellScript(spell_item_titanium_seal_of_dalaran_toss);
     RegisterSpellScript(spell_item_titanium_seal_of_dalaran_catch);
-    RegisterSpellScript(spell_item_disco_ball_listening_to_music_periodic);
-    RegisterSpellScript(spell_item_disco_ball_listening_to_music_check);
-    RegisterSpellScript(spell_item_disco_ball_listening_to_music_parent);
     RegisterSpellScript(spell_item_aura_of_madness);
     RegisterSpellScript(spell_item_dementia);
     RegisterSpellScript(spell_item_deadly_precision);
