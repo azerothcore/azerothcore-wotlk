@@ -1822,3 +1822,150 @@ DELETE FROM `spell_script_names` WHERE `spell_id` IN (67702, 67771);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (67702, 'spell_item_death_choice'),
 (67771, 'spell_item_death_choice');
+
+-- Soul Preserver - Register script to handle proc based on class
+DELETE FROM `spell_script_names` WHERE `spell_id` = 60510;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(60510, 'spell_item_soul_preserver');
+
+-- Amani Charm of the Witch Doctor - Register script to handle heal proc
+DELETE FROM `spell_script_names` WHERE `spell_id` = 43820;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(43820, 'spell_item_charm_witch_doctor');
+
+-- Lifegiving Gem - Gift of Life spell
+DELETE FROM `spell_script_names` WHERE `spell_id` = 23725;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(23725, 'spell_item_lifegiving_gem');
+
+-- Mana Drain - proc script for mana drain items
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (27522, 40336);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(27522, 'spell_item_mana_drain'),
+(40336, 'spell_item_mana_drain');
+
+-- Nitro Boosts
+DELETE FROM `spell_script_names` WHERE `spell_id` = 54861;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(54861, 'spell_item_nitro_boosts');
+
+-- Nitro Boosts Backfire
+DELETE FROM `spell_script_names` WHERE `spell_id` = 54621;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(54621, 'spell_item_nitro_boosts_backfire');
+
+-- Gnomish Mind Control Cap
+DELETE FROM `spell_script_names` WHERE `spell_id` = 13180;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(13180, 'spell_item_mind_control_cap');
+
+-- Harm Prevention Belt
+DELETE FROM `spell_script_names` WHERE `spell_id` = 13567;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(13567, 'spell_item_harm_prevention_belt');
+
+-- Hourglass Sand
+DELETE FROM `spell_script_names` WHERE `spell_id` = 30536;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(30536, 'spell_item_hourglass_sand');
+
+-- Dire Brew
+DELETE FROM `spell_script_names` WHERE `spell_id` = 51010;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(51010, 'spell_item_dire_brew');
+
+-- Dimensional Ripper - Everlook
+DELETE FROM `spell_script_names` WHERE `spell_id` = 23453;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(23453, 'spell_item_dimensional_ripper_everlook');
+
+-- Ultrasafe Transporter: Toshley's Station
+DELETE FROM `spell_script_names` WHERE `spell_id` = 36941;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(36941, 'spell_item_ultrasafe_transporter');
+
+-- Power Circle (Mage T5 Set Bonus)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 45043;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(45043, 'spell_item_power_circle');
+
+-- Red Rider Air Rifle
+DELETE FROM `spell_script_names` WHERE `spell_id` = 65576;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(65576, 'spell_item_red_rider_air_rifle');
+
+-- Runic Healing Injector
+DELETE FROM `spell_script_names` WHERE `spell_id` = 67019;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(67019, 'spell_item_runic_healing_injector');
+
+-- Taunt Flag Targeting
+DELETE FROM `spell_script_names` WHERE `spell_id` = 51653;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(51653, 'spell_item_taunt_flag_targeting');
+
+-- Thrallmar's Favor / Honor Hold's Favor
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (32096, 32098);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(32096, 'spell_item_thrallmar_and_honor_hold_favor'),
+(32098, 'spell_item_thrallmar_and_honor_hold_favor');
+
+-- Drums of Forgotten Kings
+DELETE FROM `spell_script_names` WHERE `spell_id` = 69378;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(69378, 'spell_item_drums_of_forgotten_kings');
+
+-- Drums of the Wild
+DELETE FROM `spell_script_names` WHERE `spell_id` = 69381;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(69381, 'spell_item_drums_of_the_wild');
+
+-- Darkmoon Card: Illusion
+DELETE FROM `spell_script_names` WHERE `spell_id` = 57350;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(57350, 'spell_item_darkmoon_card_illusion');
+
+-- Extract Gas
+DELETE FROM `spell_script_names` WHERE `spell_id` = 30101;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(30101, 'spell_item_extract_gas');
+
+-- Gift of the Harvester
+DELETE FROM `spell_script_names` WHERE `spell_id` = 52479;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(52479, 'spell_item_gift_of_the_harvester');
+
+-- Mad Alchemist's Potion
+DELETE FROM `spell_script_names` WHERE `spell_id` = 28374;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(28374, 'spell_item_mad_alchemists_potion');
+
+-- Decahedral Dwarven Dice
+DELETE FROM `spell_script_names` WHERE `spell_id` = 47770;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(47770, 'spell_item_decahedral_dwarven_dice');
+
+-- Titanium Seal of Dalaran - Flip Coin
+DELETE FROM `spell_script_names` WHERE `spell_id` = 60458;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(60458, 'spell_item_titanium_seal_of_dalaran_toss');
+
+-- Titanium Seal of Dalaran - Toss Your Luck!
+DELETE FROM `spell_script_names` WHERE `spell_id` = 60476;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(60476, 'spell_item_titanium_seal_of_dalaran_catch');
+
+-- Disco Ball - Listening to Music (Periodic)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 50486;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(50486, 'spell_item_disco_ball_listening_to_music_periodic');
+
+-- Disco Ball - Listening to Music CHECK
+DELETE FROM `spell_script_names` WHERE `spell_id` = 50492;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(50492, 'spell_item_disco_ball_listening_to_music_check');
+
+-- Disco Ball - Listening to Music (Parent)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 50499;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(50499, 'spell_item_disco_ball_listening_to_music_parent');
