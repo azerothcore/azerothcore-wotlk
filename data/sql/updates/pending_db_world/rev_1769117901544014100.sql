@@ -109,13 +109,13 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 (@GUID, 32492, 10, 'Time-Lost Proto Drake - Path 1'),
 (@GUID+4, 32492, 0, 'Vyragosa - Path 1'),
 
-(@GUID+1, 32493, 10, 'Time-Lost Proto Drake - Path 3'),
-(@GUID+5, 32493, 0, 'Vyragosa - Path 4'),
+(@GUID+1, 32493, 10, 'Time-Lost Proto Drake - Path 2'),
+(@GUID+5, 32493, 0, 'Vyragosa - Path 2'),
 
 (@GUID+2, 32494, 10, 'Time-Lost Proto Drake - Path 3'),
-(@GUID+6, 32494, 0, 'Vyragosa - Path 4'),
+(@GUID+6, 32494, 0, 'Vyragosa - Path 3'),
 
-(@GUID+3, 32495, 10, 'Time-Lost Proto Drake - Path 3'),
+(@GUID+3, 32495, 10, 'Time-Lost Proto Drake - Path 4'),
 (@GUID+7, 32495, 0, 'Vyragosa - Path 4');
 
 DELETE FROM `creature_addon` WHERE `guid` BETWEEN @GUID+0 AND @GUID+7;
