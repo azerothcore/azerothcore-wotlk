@@ -756,18 +756,15 @@ class spell_hun_sniper_training : public AuraScript
         PreventDefaultAction();
         if (aurEff->GetAmount() <= 0)
         {
-            if (!GetCaster() || !GetTarget())
-            {
-                return;
-            }
-
             Unit* target = GetTarget();
-
             uint32 spellId = SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_HUNTER_SNIPER_TRAINING_R1;
-            if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId))
+            target->CastSpell(target, spellId, true, nullptr, aurEff);
+
+            if (Player* playerTarget = GetUnitOwner()->ToPlayer())
             {
-                Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(GetSpellInfo()) ? GetCaster() : target;
-                triggerCaster->CastSpell(target, triggeredSpellInfo, true, 0, aurEff);
+                int32 baseAmount = aurEff->GetBaseAmount();
+                int32 amount = playerTarget->CalculateSpellDamage(playerTarget, GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount);
+                GetEffect(EFFECT_0)->SetAmount(amount);
             }
         }
     }
@@ -777,7 +774,7 @@ class spell_hun_sniper_training : public AuraScript
         if (Player* playerTarget = GetUnitOwner()->ToPlayer())
         {
             int32 baseAmount = aurEff->GetBaseAmount();
-            int32 amount = playerTarget->isMoving() || aurEff->GetAmount() <= 0 ?
+            int32 amount = playerTarget->isMoving() ?
                             playerTarget->CalculateSpellDamage(playerTarget, GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount) :
                             aurEff->GetAmount() - 1;
             aurEff->SetAmount(amount);
@@ -1169,11 +1166,6 @@ private:
     WorldObject* _target = nullptr;
 };
 
-enum LocknLoadSpells
-{
-    SPELL_FROST_TRAP_SLOW = 67035
-};
-
 // -56342 - Lock and Load
 class spell_hun_lock_and_load : public AuraScript
 {
@@ -1181,103 +1173,58 @@ class spell_hun_lock_and_load : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER, SPELL_FROST_TRAP_SLOW });
+        return ValidateSpellInfo(
+        {
+            SPELL_LOCK_AND_LOAD_TRIGGER,
+            SPELL_LOCK_AND_LOAD_MARKER
+        });
     }
 
-    bool CheckTrapProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || !eventInfo.GetActor())
-        {
+        if (eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER))
             return false;
-        }
-
-        // Black Arrow and Fire traps may trigger on periodic tick only.
-        if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-            && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE))
-        {
-            return true;
-        }
-
-        return IsTargetValid(spellInfo, eventInfo.GetProcTarget()) && !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
-    }
-
-    bool IsTargetValid(SpellInfo const* spellInfo, Unit* target)
-    {
-        if (!spellInfo || !target)
-        {
-            return false;
-        }
-
-        // Don't check it for fire traps and black arrow, they proc on periodic only and not spell hit.
-        // So it's wrong to check for immunity, it was already checked when the spell was applied.
-        if ((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-        {
-            return false;
-        }
-
-        // HitMask for Frost Trap can't be checked correctly as it is.
-        // That's because the talent is triggered by the spell that fires the trap (63487)...
-        // ...and not the actual spell that applies the slow effect (67035).
-        // So the IMMUNE result is never sent by the spell that triggers this.
-        if (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
-        {
-            if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
-            {
-                return !target->IsImmunedToSpell(triggerSpell);
-            }
-        }
-
         return true;
     }
 
-    template <uint32 mask>
-    void HandleProcs(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    bool CheckTrapProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_TRAP_ACTIVATION))
+            return false;
+
+        // Do not proc on traps for immolation/explosive trap
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
+            return false;
+
+        return roll_chance_i(aurEff->GetAmount());
+    }
+
+    bool CheckPeriodicProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_PERIODIC))
+            return false;
+
+        return roll_chance_i(aurEff->GetAmount());
+    }
+
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-
-        if (!(eventInfo.GetTypeMask() & mask) || !spellInfo)
-        {
-            return;
-        }
-
-        // Also check if the proc from the fire traps and black arrow actually comes from the periodic ticks here.
-        // Normally this wouldn't be required, but we are circumventing the current proc system limitations.
-        if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-            && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
-            && !(mask & PROC_FLAG_DONE_PERIODIC))
-        {
-            return;
-        }
-
-        if (!roll_chance_i(aurEff->GetAmount()))
-        {
-            return;
-        }
-
         Unit* caster = eventInfo.GetActor();
         caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_TRIGGER, true);
-    }
-
-    void ApplyMarker(ProcEventInfo& eventInfo)
-    {
-        if (IsTargetValid(eventInfo.GetSpellInfo(), eventInfo.GetProcTarget()))
-        {
-            Unit* caster = eventInfo.GetActor();
-            caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
-        }
+        caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_hun_lock_and_load::CheckTrapProc);
+        DoCheckProc += AuraCheckProcFn(spell_hun_lock_and_load::CheckProc);
 
-        OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load::HandleProcs<PROC_FLAG_DONE_TRAP_ACTIVATION>, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load::HandleProcs<PROC_FLAG_DONE_PERIODIC>, EFFECT_1, SPELL_AURA_DUMMY);
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_hun_lock_and_load::CheckTrapProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_hun_lock_and_load::CheckPeriodicProc, EFFECT_1, SPELL_AURA_DUMMY);
 
-        AfterProc += AuraProcFn(spell_hun_lock_and_load::ApplyMarker);
+        OnProc += AuraProcFn(spell_hun_lock_and_load::HandleProc);
     }
 };
 
