@@ -1642,12 +1642,9 @@ void Player::ProcessDelayedOperations()
     if (m_DelayedOperations & DELAYED_SAVE_PLAYER)
         SaveToDB(false, false);
 
-    if (m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
-    {
-        Aura* aura = GetAura(26013);
-        if (!aura || aura->GetDuration() <= 900000)
+    if ((m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
+        && !GetAura(26013))
             CastSpell(this, 26013, true);
-    }
 
     if (m_DelayedOperations & DELAYED_BG_MOUNT_RESTORE)
     {
@@ -5993,6 +5990,19 @@ void Player::RewardReputation(Unit* victim)
     }
 }
 
+FactionTemplateEntry const* GetAnyFactionTemplateForFaction(uint32 factionId)
+{
+    for (uint32 i = 0; i < sFactionTemplateStore.GetNumRows(); ++i)
+    {
+        if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(i))
+        {
+            if (factionTemplate->faction == factionId)
+                return factionTemplate;
+        }
+    }
+    return nullptr;
+}
+
 // Calculate how many reputation points player gain with the quest
 void Player::RewardReputation(Quest const* quest)
 {
@@ -6046,10 +6056,24 @@ void Player::RewardReputation(Quest const* quest)
             sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_QUEST);
         }
 
-        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
+        FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]);
+        if (!factionEntry)
+            continue;
+
+        FactionTemplateEntry const* templateEntry = GetAnyFactionTemplateForFaction(factionEntry->ID);
+        if (templateEntry)
         {
-            GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
+            bool hostile = (GetTeamId() == TEAM_ALLIANCE) ? templateEntry->IsHostileToAlliancePlayers()
+                                                          : templateEntry->IsHostileToHordePlayers();
+
+            if (hostile)
+            {
+                LOG_DEBUG("sql.sql", "RewardReputation: {} is hostile with player ({}), skipping!", templateEntry->ID, GetGUID().ToString());
+                continue;
+            }
         }
+
+        GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
     }
 }
 
@@ -12337,6 +12361,10 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
         if (_spell_idx->second->ClassMask && (_spell_idx->second->ClassMask & classmask) == 0)
             continue;
 
+        // skip wrong class and race skill saved in SkillRaceClassInfo.dbc
+        if (!GetSkillRaceClassInfo(_spell_idx->second->SkillLine, getRace(), getClass()))
+            continue;
+
         return true;
     }
 
@@ -14338,7 +14366,7 @@ bool Player::CanSeeVendor(Creature const* creature) const
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
         return false;
 
-    uint32 const menuId = creature->GetCreatureTemplate()->GossipMenuId;
+    uint32 const menuId = creature->GetGossipMenuId();
     if (!AnyVendorOptionAvailable(menuId, creature))
         return false;
 

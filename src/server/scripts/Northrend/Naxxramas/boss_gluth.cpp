@@ -255,7 +255,8 @@ class spell_gluth_decimate : public SpellScript
                 Unit::DealDamage(GetCaster(), cTarget, damage);
                 return;
             }
-            GetCaster()->CastCustomSpell(SPELL_DECIMATE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, unitTarget);
+
+            GetCaster()->CastSpell(unitTarget, SPELL_DECIMATE_DAMAGE);
         }
     }
 
@@ -265,8 +266,38 @@ class spell_gluth_decimate : public SpellScript
     }
 };
 
+// 28375 - Decimate
+class spell_gluth_decimate_damage : public SpellScript
+{
+    PrepareSpellScript(spell_gluth_decimate_damage)
+
+    void RecalculateDamage()
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        int32 targetHealth = int32(target->GetHealth());
+        int32 fivePctHealth = int32(target->CountPctFromMaxHealth(5));
+
+        // Damage needed to leave the target at exactly 5%
+        int32 damage = targetHealth - fivePctHealth;
+
+        if (damage <= 0)
+            damage = 0;
+
+        SetHitDamage(damage);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_gluth_decimate_damage::RecalculateDamage);
+    }
+};
+
 void AddSC_boss_gluth()
 {
     new boss_gluth();
     RegisterSpellScript(spell_gluth_decimate);
+    RegisterSpellScript(spell_gluth_decimate_damage);
 }
