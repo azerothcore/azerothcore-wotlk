@@ -1,8 +1,12 @@
 -- QAston Proc System - Base spell_proc entries
 -- Port from TrinityCore QAston proc system commits
 
--- Add DisableEffectsMask column to spell_proc table
-ALTER TABLE `spell_proc` ADD COLUMN IF NOT EXISTS `DisableEffectsMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesMask`;
+-- Add DisableEffectsMask column to spell_proc table if it doesn't exist
+SET @column_exists = (SELECT 1 FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA` = DATABASE() AND `TABLE_NAME` = 'spell_proc' AND `COLUMN_NAME` = 'DisableEffectsMask' LIMIT 1);
+SET @sql = IF(@column_exists IS NULL, 'ALTER TABLE `spell_proc` ADD COLUMN `DisableEffectsMask` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `AttributesMask`', 'SELECT 1');
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 -- Charge drop on spell cast
 DELETE FROM `spell_proc` WHERE `SpellId` IN (17941, 18820, 22008, 28200, 31834, 32216, 34477, 34936, 44401, 48108, 51124, 54741, 57761, 64823);
