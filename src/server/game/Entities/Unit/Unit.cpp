@@ -4595,8 +4595,10 @@ Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8
             castItemGUID = castItem->GetGUID();
 
         // find current aura from spell and change it's stackamount, or refresh it's duration
-        // Use castItemGUID for item-sourced auras so same spell from different items won't refresh each other
-        if (Aura* foundAura = GetOwnedAura(newAura->Id, newAura->HasAttribute(SPELL_ATTR0_CU_SINGLE_AURA_STACK) ? ObjectGuid::Empty : casterGUID, castItemGUID, 0))
+        // Use castItemGUID only for passive auras (weapon imbues) so they won't refresh each other
+        // Non-passive item procs (e.g., Unholy Strength) should find existing aura regardless of source item
+        ObjectGuid itemGuidForLookup = (newAura->IsPassive() && castItemGUID) ? castItemGUID : ObjectGuid::Empty;
+        if (Aura* foundAura = GetOwnedAura(newAura->Id, newAura->HasAttribute(SPELL_ATTR0_CU_SINGLE_AURA_STACK) ? ObjectGuid::Empty : casterGUID, itemGuidForLookup, 0))
         {
             // effect masks do not match
             // extremely rare case

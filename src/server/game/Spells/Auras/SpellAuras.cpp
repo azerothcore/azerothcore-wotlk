@@ -2124,8 +2124,9 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         if (m_spellInfo->IsMultiSlotAura() && !IsArea())
             return true;
 
-        // Allow item-sourced auras from different items to stack
-        if (GetCastItemGUID() && existingAura->GetCastItemGUID() && GetCastItemGUID() != existingAura->GetCastItemGUID())
+        // Allow passive item-sourced auras from different items to stack (e.g., weapon imbues on MH/OH)
+        // Non-passive item procs (e.g., Unholy Strength) should refresh, not stack
+        if (IsPassive() && GetCastItemGUID() && existingAura->GetCastItemGUID() && GetCastItemGUID() != existingAura->GetCastItemGUID())
             return true;
 
         // same spell with same caster should not stack
