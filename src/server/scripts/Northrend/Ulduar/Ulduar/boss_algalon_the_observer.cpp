@@ -390,13 +390,20 @@ public:
             _phaseTwo = false;
             _heraldOfTheTitans = true;
 
-            if (m_pInstance->GetData(TYPE_ALGALON) == FAIL)
-            {
-                _firstPull = false;
-            }
-
             if (m_pInstance)
+            {
+                uint32 algalonTimer = m_pInstance->GetData(DATA_ALGALON_TIMER);
+                if (algalonTimer > 0 && algalonTimer <= 60)
+                {
+                    _firstPull = false;
+                }
+                else if (m_pInstance->GetData(TYPE_ALGALON) == FAIL)
+                {
+                    _firstPull = false;
+                }
+
                 m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
+            }
         }
 
         void KilledUnit(Unit* victim) override

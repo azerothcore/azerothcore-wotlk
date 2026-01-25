@@ -1078,6 +1078,9 @@ public:
 
                 case DATA_CALL_TRAM:
                     return m_mimironTramUsed;
+
+                case DATA_ALGALON_TIMER:
+                    return m_algalonTimer;
             }
 
             return 0;
