@@ -38,11 +38,10 @@ VALUES  (21838,3,0,'Who calls me to this world? The stars are not yet aligned...
 UPDATE `creature_text` SET `Text` = 'Kwa! You cannot kill me, I am immortal!' WHERE `CreatureID` = 21838 AND `GroupID` = 1;
 UPDATE `creature_text` SET `BroadcastTextId` = 24020 WHERE `CreatureID` = 21838 AND `GroupID` = 1;
 
-UPDATE `creature_text` SET `BroadcastTextId` = 21439 WHERE `CreatureID` = 23377 AND `GroupID` = 0;
-UPDATE `creature_text` SET `BroadcastTextId` = 24021 WHERE `CreatureID` = 23377 AND `GroupID` = 1;
-
-DELETE FROM `creature_text` WHERE `CreatureID` = 23377 AND `GroupID` = 3;
+DELETE FROM `creature_text` WHERE `CreatureID` = 23377;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(23377,1,0,'Quickly! Use the flames and support ground troops. Its ancient magic should cleanse Terokk''s shield.',14,0,100.0,0,0,0,24021,0,'Skyguard Ace'),
+(23377,2,0,'Enemy sighted! Fall into formation and prepare for bombing maneuvers!',14,0,100.0,0,0,0,21439,0,'Skyguard Ace'),
 (23377,3,0,'They did it!  Enemy down!  Return to base!',14,0,100.0,0,0,0,21437,0,'Skyguard Ace');
 
 UPDATE `creature_template` SET `unit_flags` = 2 WHERE `entry` = 23377;
