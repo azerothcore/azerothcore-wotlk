@@ -99,6 +99,7 @@ enum DeathKnightSpells
     SPELL_DK_DEATH_STRIKE_OFF_HAND_R1            = 66188,
     SPELL_DK_RUNE_STRIKE_OFF_HAND_R1             = 66217,
     SPELL_DK_BLOOD_STRIKE_OFF_HAND_R1            = 66215,
+    SPELL_DK_KILLING_MACHINE                     = 51124,
 };
 
 enum DeathKnightSpellIcons
@@ -2615,6 +2616,26 @@ class spell_dk_rime : public AuraScript
     }
 };
 
+// 51124 - Killing Machine
+class spell_dk_killing_machine : public AuraScript
+{
+    PrepareAuraScript(spell_dk_killing_machine);
+
+    void HandleEffectCalcSpellMod(AuraEffect const* /*aurEff*/, SpellModifier*& spellMod)
+    {
+        if (spellMod)
+        {
+            // Icy Touch (mask0=2), Frost Strike (mask1=4), Howling Blast (mask1=2)
+            spellMod->mask = flag96(2, 6, 0);
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcSpellMod += AuraEffectCalcSpellModFn(spell_dk_killing_machine::HandleEffectCalcSpellMod, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER);
+    }
+};
+
 // -49018 - Sudden Doom
 class spell_dk_sudden_doom : public AuraScript
 {
@@ -2900,6 +2921,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_blade_barrier);
     RegisterSpellScript(spell_dk_death_rune);
     RegisterSpellScript(spell_dk_rime);
+    RegisterSpellScript(spell_dk_killing_machine);
     RegisterSpellScript(spell_dk_sudden_doom);
     RegisterSpellScript(spell_dk_threat_of_thassarian);
     RegisterSpellScript(spell_dk_glyph_of_death_grip);

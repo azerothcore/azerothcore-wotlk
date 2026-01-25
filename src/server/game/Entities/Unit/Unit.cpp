@@ -6720,10 +6720,12 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
     {
         // Calculate spellTypeMask based on phase and actual damage/heal info
         uint32 spellTypeMask = 0;
-        if (procPhase == PROC_SPELL_PHASE_CAST)
+        if (procPhase == PROC_SPELL_PHASE_CAST || procPhase == PROC_SPELL_PHASE_FINISH)
         {
             // At CAST phase, no damage/heal has occurred yet - use MASK_ALL to allow
             // procs that check for damage/heal type based on spell info (like Backlash)
+            // At FINISH phase, damageInfo may be null but spell did do damage - use MASK_ALL
+            // to match TrinityCore behavior (see TC Spell.cpp PROC_SPELL_PHASE_FINISH call)
             spellTypeMask = PROC_SPELL_TYPE_MASK_ALL;
         }
         else if (healInfo && healInfo->GetHeal())
