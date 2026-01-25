@@ -1168,45 +1168,6 @@ class spell_pal_seal_of_righteousness : public AuraScript
     }
 };
 
-// 42463 - Seal of Vengeance
-// 53739 - Seal of Corruption
-class spell_pal_seal_of_vengeance : public SpellScript
-{
-    PrepareSpellScript(spell_pal_seal_of_vengeance);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT, SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT });
-    }
-
-    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-    {
-        Unit* target = GetExplTargetUnit();
-        uint32 spellId = GetSpell()->GetSpellInfo()->Id;
-        uint32 auraId = (spellId == SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT)
-            ? SPELL_PALADIN_HOLY_VENGEANCE
-            : SPELL_PALADIN_BLOOD_CORRUPTION;
-        int32 damage = GetHitDamage();
-        uint8 stacks = 0;
-
-        if (target)
-        {
-            Aura* aura = target->GetAura(auraId, GetCaster()->GetGUID());
-            if (aura)
-                stacks = aura->GetStackAmount();
-
-            damage = ((damage * stacks) / 5);
-
-            SetHitDamage(damage);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_pal_seal_of_vengeance::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
-    }
-};
-
 // -31876 - Judgements of the Wise
 class spell_pal_judgements_of_the_wise : public AuraScript
 {
@@ -1948,14 +1909,17 @@ class spell_pal_seal_of_vengeance_aura : public AuraScript
         if (!sealDot)
             return;
 
-        uint8 const stacks = sealDot->GetBase()->GetStackAmount();
-        uint8 const maxStacks = sealDot->GetSpellInfo()->StackAmount;
-
-        if (stacks < maxStacks && !(eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS))
-            return;
+        uint8 stacks = sealDot->GetBase()->GetStackAmount();
+        uint8 maxStacks = sealDot->GetSpellInfo()->StackAmount;
 
         uint32 damageSpell = _isVengeance ? SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT : SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT;
-        caster->CastSpell(target, damageSpell, true, nullptr, aurEff);
+
+        // Scale weapon damage % by stacks (6.6% per stack, up to 33% at 5 stacks)
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(damageSpell);
+        int32 amount = spellInfo->Effects[EFFECT_0].CalcValue();
+        amount = (amount * stacks) / maxStacks;
+
+        caster->CastCustomSpell(damageSpell, SPELLVALUE_BASE_POINT0, amount, target, true, nullptr, aurEff);
     }
 
     void Register() override
