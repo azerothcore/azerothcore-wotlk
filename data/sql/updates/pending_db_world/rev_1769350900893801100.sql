@@ -190,7 +190,7 @@ INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 (-91, 12386),
 (-91, 22181),
 (-91, 22188),
--- Corrupted Mottled Board
+-- Corrupted Mottled Boar
 (-91, 22451);
 
 -- Update creature 'Brewfest Building (Orgrimmar)' with sniffed values
@@ -221,7 +221,7 @@ INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 
 -- update auras
 DELETE FROM `creature_addon` WHERE (`guid` IN (12768, 12769, 12770, 12771, 12772, 12773, 12774, 12775, 12776));
-INSERT INTO creature_addon (guid, path_id, mount, bytes1, bytes2, emote, visibilityDistanceType, auras) VALUES
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (12768, 0, 0, 0, 0, 233, 0, '43992'),
 (12769, 0, 0, 0, 0, 233, 0, '43992'),
 (12770, 0, 0, 0, 0, 233, 0, '43992'),
@@ -233,6 +233,6 @@ INSERT INTO creature_addon (guid, path_id, mount, bytes1, bytes2, emote, visibil
 (12776, 0, 0, 0, 0, 233, 0, '43992');
 
 -- update equipment
-DELETE FROM creature_equip_template WHERE CreatureID = 23504;
-INSERT INTO creature_equip_template (CreatureID, ID, ItemID1, ItemID2, ItemID3, VerifiedBuild) VALUES
+DELETE FROM `creature_equip_template` WHERE `CreatureID` = 23504;
+INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
 (23504, 1, 2361, 0, 0, NULL);
