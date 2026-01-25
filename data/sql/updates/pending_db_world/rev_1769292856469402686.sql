@@ -19,3 +19,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `spell_id` = 53651;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (53651, 'spell_pal_light_s_beacon');
+
+-- Light's Grace (31834) - Remove erroneous spell_proc entry that caused buff to consume itself immediately
+-- The buff should passively reduce Holy Light cast time while active, not have proc behavior
+DELETE FROM `spell_proc` WHERE `SpellId` = 31834;
