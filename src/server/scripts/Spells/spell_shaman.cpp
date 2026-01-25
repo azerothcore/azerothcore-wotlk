@@ -38,6 +38,7 @@ enum ShamanSpells
     SPELL_SHAMAN_CLEANSING_TOTEM_EFFECT         = 52025,
     SPELL_SHAMAN_EARTH_SHIELD_HEAL              = 379,
     SPELL_SHAMAN_ELEMENTAL_MASTERY              = 16166,
+    SPELL_SHAMAN_ELEMENTAL_FOCUS                = 16164,
     SPELL_SHAMAN_ELECTRIFIED                    = 64930,
     SPELL_SHAMAN_EXHAUSTION                     = 57723,
     SPELL_SHAMAN_FIRE_NOVA_R1                   = 1535,
@@ -951,6 +952,30 @@ class spell_sha_item_mana_surge : public AuraScript
     {
         DoCheckProc += AuraCheckProcFn(spell_sha_item_mana_surge::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_sha_item_mana_surge::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 16164 - Elemental Focus
+// Prevents weapon imbue attacks (Frostbrand, Flametongue) from proccing Clearcasting
+class spell_sha_elemental_focus : public AuraScript
+{
+    PrepareAuraScript(spell_sha_elemental_focus);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
+        {
+            // Frostbrand Attack (mask0 = 0x1000000), Flametongue Attack (mask0 = 0x200000)
+            if (procSpell->SpellFamilyName == SPELLFAMILY_SHAMAN &&
+                (procSpell->SpellFamilyFlags[0] & 0x1200000))
+                return false;
+        }
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_sha_elemental_focus::CheckProc);
     }
 };
 
@@ -2037,6 +2062,7 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_item_lightning_shield);
     RegisterSpellScript(spell_sha_item_lightning_shield_trigger);
     RegisterSpellScript(spell_sha_item_mana_surge);
+    RegisterSpellScript(spell_sha_elemental_focus);
     RegisterSpellScript(spell_sha_item_t10_elemental_2p_bonus);
     RegisterSpellScript(spell_sha_lava_lash);
     RegisterSpellScript(spell_sha_mana_spring_totem);

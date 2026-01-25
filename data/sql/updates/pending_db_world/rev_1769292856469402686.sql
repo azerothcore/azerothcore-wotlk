@@ -9,3 +9,8 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_dk_killing_machine';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (51124, 'spell_dk_killing_machine');
+
+-- Elemental Focus - register spell script to prevent weapon imbue attacks from proccing Clearcasting
+DELETE FROM `spell_script_names` WHERE `spell_id` = 16164 AND `ScriptName` = 'spell_sha_elemental_focus';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(16164, 'spell_sha_elemental_focus');
