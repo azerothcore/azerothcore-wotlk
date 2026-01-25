@@ -14,3 +14,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `spell_id` = 16164 AND `ScriptName` = 'spell_sha_elemental_focus';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (16164, 'spell_sha_elemental_focus');
+
+-- Light's Beacon (53651) - Beacon of Light heal transfer script
+DELETE FROM `spell_script_names` WHERE `spell_id` = 53651;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(53651, 'spell_pal_light_s_beacon');

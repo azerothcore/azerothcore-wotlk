@@ -120,8 +120,10 @@ enum PaladinProcSpells
     SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA       = 20268,
     SPELL_PALADIN_SPIRITUAL_ATTUNEMENT_MANA      = 31786,
     SPELL_PALADIN_BEACON_OF_LIGHT_AURA           = 53563,
+    SPELL_PALADIN_LIGHTS_BEACON                  = 53651,
     SPELL_PALADIN_BEACON_OF_LIGHT_FLASH          = 53652,
     SPELL_PALADIN_BEACON_OF_LIGHT_HOLY           = 53654,
+    SPELL_PALADIN_HOLY_LIGHT_R1                  = 635,
     SPELL_PALADIN_GLYPH_OF_HOLY_LIGHT_HEAL       = 54968,
     SPELL_PALADIN_SACRED_SHIELD                  = 53601,
     SPELL_PALADIN_T9_HOLY_4P_BONUS               = 67191,
@@ -1976,6 +1978,61 @@ class spell_pal_illumination : public AuraScript
     }
 };
 
+// 53651 - Light's Beacon - Beacon of Light
+class spell_pal_light_s_beacon : public AuraScript
+{
+    PrepareAuraScript(spell_pal_light_s_beacon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_PALADIN_BEACON_OF_LIGHT_AURA,
+            SPELL_PALADIN_BEACON_OF_LIGHT_FLASH,
+            SPELL_PALADIN_BEACON_OF_LIGHT_HOLY,
+            SPELL_PALADIN_HOLY_LIGHT_R1
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // Don't proc if the heal target is the beacon target (no double heal)
+        if (GetTarget()->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
+            return false;
+        return true;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal())
+            return;
+
+        // Holy Light heals for 100%, Flash of Light heals for 50%
+        uint32 healSpellId = procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT_R1)) ?
+            SPELL_PALADIN_BEACON_OF_LIGHT_FLASH : SPELL_PALADIN_BEACON_OF_LIGHT_HOLY;
+        int32 heal = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount());
+
+        Unit* beaconTarget = GetCaster();
+        if (!beaconTarget || !beaconTarget->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
+            return;
+
+        eventInfo.GetActor()->CastCustomSpell(healSpellId, SPELLVALUE_BASE_POINT0, heal, beaconTarget, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_pal_light_s_beacon::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pal_light_s_beacon::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_pal_seal_of_command, spell_pal_seal_of_command_aura);
@@ -2025,4 +2082,5 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_judgements_of_the_just);
     RegisterSpellScript(spell_pal_sacred_shield_dummy);
     RegisterSpellScript(spell_pal_illumination);
+    RegisterSpellScript(spell_pal_light_s_beacon);
 }
