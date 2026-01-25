@@ -31,6 +31,7 @@
 
 enum MageSpells
 {
+    SPELL_MAGE_ARCANE_MISSILES_R1                = 5143,
     SPELL_MAGE_BLAZING_SPEED                     = 31643,
     SPELL_MAGE_MAGIC_ABSORPTION_MANA             = 29442,
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
@@ -44,6 +45,7 @@ enum MageSpells
     SPELL_MAGE_INCANTERS_ABSORBTION_TRIGGERED    = 44413,
     SPELL_MAGE_IGNITE                            = 12654,
     SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE       = 29077,
+    SPELL_MAGE_PERMAFROST_AURA                   = 68391,
     SPELL_MAGE_SQUIRREL_FORM                     = 32813,
     SPELL_MAGE_GIRAFFE_FORM                      = 32816,
     SPELL_MAGE_SERPENT_FORM                      = 32817,
@@ -74,7 +76,8 @@ enum MageSpellIcons
 {
     MAGE_ICON_MAGIC_ABSORPTION                   = 459,
     MAGE_ICON_CLEARCASTING                       = 212,
-    MAGE_ICON_PRESENCE_OF_MIND                   = 139
+    MAGE_ICON_PRESENCE_OF_MIND                   = 139,
+    MAGE_ICON_LIVING_BOMB                        = 3000
 };
 
 class spell_mage_arcane_blast : public SpellScript
@@ -1396,9 +1399,152 @@ class spell_mage_blazing_speed : public AuraScript
     }
 };
 
+// -5143 - Arcane Missiles
+class spell_mage_arcane_missiles : public AuraScript
+{
+    PrepareAuraScript(spell_mage_arcane_missiles);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_T10_2P_BONUS, SPELL_MAGE_T10_2P_BONUS_EFFECT });
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (target->HasAura(SPELL_MAGE_T10_2P_BONUS) && _canProcT10)
+            target->CastSpell(target, SPELL_MAGE_T10_2P_BONUS_EFFECT, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_mage_arcane_missiles::OnRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+
+public:
+    void AllowT10Proc() { _canProcT10 = true; }
+
+private:
+    bool _canProcT10 = false;
+};
+
+// -31661 - Dragon's Breath
+class spell_mage_dragon_breath : public AuraScript
+{
+    PrepareAuraScript(spell_mage_dragon_breath);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // Don't proc with Living Bomb explosion
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (spellInfo && spellInfo->SpellIconID == MAGE_ICON_LIVING_BOMB && spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
+            return false;
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_dragon_breath::CheckProc);
+    }
+};
+
+// -44614 - Frostfire Bolt
+class spell_mage_frostfire_bolt : public AuraScript
+{
+    PrepareAuraScript(spell_mage_frostfire_bolt);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_PERMAFROST_AURA });
+    }
+
+    void ApplyPermafrost(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), SPELL_MAGE_PERMAFROST_AURA, true, nullptr, aurEff);
+    }
+
+    void RemovePermafrost(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_PERMAFROST_AURA);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_mage_frostfire_bolt::ApplyPermafrost, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_mage_frostfire_bolt::RemovePermafrost, EFFECT_0, SPELL_AURA_MOD_DECREASE_SPEED, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 45438 - Ice Block
+class spell_mage_ice_block : public SpellScript
+{
+    PrepareSpellScript(spell_mage_ice_block);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return spellInfo->ExcludeCasterAuraSpell && ValidateSpellInfo({ static_cast<uint32>(spellInfo->ExcludeCasterAuraSpell) });
+    }
+
+    void TriggerHypothermia()
+    {
+        GetCaster()->CastSpell(GetCaster(), GetSpellInfo()->ExcludeCasterAuraSpell, true);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_mage_ice_block::TriggerHypothermia);
+    }
+};
+
+// 44401 - Missile Barrage (proc buff)
+class spell_mage_missile_barrage_proc : public AuraScript
+{
+    PrepareAuraScript(spell_mage_missile_barrage_proc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_T10_2P_BONUS, SPELL_MAGE_T8_4P_BONUS, SPELL_MAGE_ARCANE_MISSILES_R1 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* caster = eventInfo.GetActor();
+
+        // T8 4P bonus: chance to not consume the proc
+        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
+            if (roll_chance_i(aurEff->GetAmount()))
+                return false;
+
+        return true;
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetTarget();
+        // T10 2P bonus: signal Arcane Missiles to proc the bonus when it ends
+        if (caster->HasAura(SPELL_MAGE_T10_2P_BONUS))
+        {
+            if (Aura* aura = caster->GetAuraOfRankedSpell(SPELL_MAGE_ARCANE_MISSILES_R1))
+            {
+                if (spell_mage_arcane_missiles* script = dynamic_cast<spell_mage_arcane_missiles*>(aura->GetScriptByName("spell_mage_arcane_missiles")))
+                    script->AllowT10Proc();
+            }
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_missile_barrage_proc::CheckProc);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_mage_missile_barrage_proc::OnRemove, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_arcane_blast);
+    RegisterSpellScript(spell_mage_arcane_missiles);
     RegisterSpellScript(spell_mage_arcane_potency);
     RegisterSpellScript(spell_mage_blazing_speed);
     RegisterSpellScript(spell_mage_burning_determination);
@@ -1411,20 +1557,24 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_combustion);
     RegisterSpellScript(spell_mage_glyph_of_eternal_water);
     RegisterSpellScript(spell_mage_combustion_proc);
+    RegisterSpellScript(spell_mage_dragon_breath);
     RegisterSpellScript(spell_mage_empowered_fire);
     RegisterSpellScript(spell_mage_gen_extra_effects);
+    RegisterSpellScript(spell_mage_frostfire_bolt);
     RegisterSpellScript(spell_mage_glyph_of_ice_block);
     RegisterSpellScript(spell_mage_glyph_of_icy_veins);
     RegisterSpellScript(spell_mage_glyph_of_polymorph);
     RegisterSpellScript(spell_mage_hot_streak);
+    RegisterSpellScript(spell_mage_ice_barrier);
+    RegisterSpellScript(spell_mage_ice_block);
     RegisterSpellScript(spell_mage_imp_blizzard);
     RegisterSpellScript(spell_mage_imp_mana_gems);
     RegisterSpellScript(spell_mage_missile_barrage);
+    RegisterSpellScript(spell_mage_missile_barrage_proc);
     RegisterSpellScript(spell_mage_blast_wave);
     RegisterSpellScript(spell_mage_cold_snap);
     RegisterSpellScript(spell_mage_fire_frost_ward);
     RegisterSpellScript(spell_mage_focus_magic);
-    RegisterSpellScript(spell_mage_ice_barrier);
     RegisterSpellScript(spell_mage_ignite);
     RegisterSpellScript(spell_mage_living_bomb);
     RegisterSpellScript(spell_mage_mana_shield);

@@ -23,3 +23,12 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 -- Light's Grace (31834) - Remove erroneous spell_proc entry that caused buff to consume itself immediately
 -- The buff should passively reduce Holy Light cast time while active, not have proc behavior
 DELETE FROM `spell_proc` WHERE `SpellId` = 31834;
+
+-- Mage spell scripts from TrinityCore proc system port
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (-5143, -31661, -44614, 45438, 44401);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(-5143, 'spell_mage_arcane_missiles'),
+(-31661, 'spell_mage_dragon_breath'),
+(-44614, 'spell_mage_frostfire_bolt'),
+(45438, 'spell_mage_ice_block'),
+(44401, 'spell_mage_missile_barrage_proc');
