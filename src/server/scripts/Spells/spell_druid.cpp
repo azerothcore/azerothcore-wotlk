@@ -89,12 +89,6 @@ enum DruidSpells
     SPELL_DRUID_RIP_DURATION_LACERATE_DMG   = 60141,
     SPELL_DRUID_REJUVENATION_T10_PROC       = 70691,
     SPELL_DRUID_LANGUISH                    = 71023,
-    // Forms Trinket
-    SPELL_DRUID_FORMS_TRINKET_BEAR          = 37340,
-    SPELL_DRUID_FORMS_TRINKET_CAT           = 37341,
-    SPELL_DRUID_FORMS_TRINKET_MOONKIN       = 37343,
-    SPELL_DRUID_FORMS_TRINKET_NONE          = 37344,
-    SPELL_DRUID_FORMS_TRINKET_TREE          = 37342,
     // T9 Feral Relic
     SPELL_DRUID_T9_FERAL_RELIC_BEAR         = 67354,
     SPELL_DRUID_T9_FERAL_RELIC_CAT          = 67355,
@@ -1891,80 +1885,6 @@ class spell_dru_maim_interrupt : public AuraScript
     }
 };
 
-// 37336 - Druid Forms Trinket
-class spell_dru_forms_trinket : public AuraScript
-{
-    PrepareAuraScript(spell_dru_forms_trinket);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({
-            SPELL_DRUID_FORMS_TRINKET_BEAR,
-            SPELL_DRUID_FORMS_TRINKET_CAT,
-            SPELL_DRUID_FORMS_TRINKET_MOONKIN,
-            SPELL_DRUID_FORMS_TRINKET_NONE,
-            SPELL_DRUID_FORMS_TRINKET_TREE
-        });
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        Unit* target = eventInfo.GetActor();
-
-        switch (target->GetShapeshiftForm())
-        {
-            case FORM_BEAR:
-            case FORM_DIREBEAR:
-            case FORM_CAT:
-            case FORM_MOONKIN:
-            case FORM_NONE:
-            case FORM_TREE:
-                return true;
-            default:
-                break;
-        }
-
-        return false;
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        Unit* target = eventInfo.GetActor();
-        uint32 triggerspell = 0;
-
-        switch (target->GetShapeshiftForm())
-        {
-            case FORM_BEAR:
-            case FORM_DIREBEAR:
-                triggerspell = SPELL_DRUID_FORMS_TRINKET_BEAR;
-                break;
-            case FORM_CAT:
-                triggerspell = SPELL_DRUID_FORMS_TRINKET_CAT;
-                break;
-            case FORM_MOONKIN:
-                triggerspell = SPELL_DRUID_FORMS_TRINKET_MOONKIN;
-                break;
-            case FORM_NONE:
-                triggerspell = SPELL_DRUID_FORMS_TRINKET_NONE;
-                break;
-            case FORM_TREE:
-                triggerspell = SPELL_DRUID_FORMS_TRINKET_TREE;
-                break;
-            default:
-                return;
-        }
-
-        target->CastSpell(target, triggerspell, true, nullptr, aurEff);
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_dru_forms_trinket::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_dru_forms_trinket::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-};
-
 // 67353 - T9 Feral Relic (Idol of Mutilation)
 class spell_dru_t9_feral_relic : public AuraScript
 {
@@ -2205,7 +2125,6 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_glyph_of_starfire_dummy);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus_dummy);
     RegisterSpellScript(spell_dru_maim_interrupt);
-    RegisterSpellScript(spell_dru_forms_trinket);
     RegisterSpellScript(spell_dru_t9_feral_relic);
     RegisterSpellScript(spell_dru_frenzied_regeneration);
     RegisterSpellScript(spell_dru_insect_swarm);

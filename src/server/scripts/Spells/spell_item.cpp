@@ -71,6 +71,15 @@ enum SoulPreserver
     SPELL_SOUL_PRESERVER_SHAMAN             = 60515
 };
 
+enum LivingRootOfTheWildheart
+{
+    SPELL_LIVING_ROOT_BEAR                  = 37340,
+    SPELL_LIVING_ROOT_CAT                   = 37341,
+    SPELL_LIVING_ROOT_TREE                  = 37342,
+    SPELL_LIVING_ROOT_MOONKIN               = 37343,
+    SPELL_LIVING_ROOT_NONE                  = 37344
+};
+
 enum CharmWitchDoctor
 {
     SPELL_CHARM_WITCH_DOCTOR_PROC           = 43821
@@ -6048,6 +6057,80 @@ class spell_item_shiny_shard_of_the_scale : public AuraScript
     }
 };
 
+// 37336 - Living Root of the Wildheart
+class spell_item_living_root_of_the_wildheart : public AuraScript
+{
+    PrepareAuraScript(spell_item_living_root_of_the_wildheart);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_LIVING_ROOT_BEAR,
+            SPELL_LIVING_ROOT_CAT,
+            SPELL_LIVING_ROOT_MOONKIN,
+            SPELL_LIVING_ROOT_NONE,
+            SPELL_LIVING_ROOT_TREE
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActor();
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+            case FORM_CAT:
+            case FORM_MOONKIN:
+            case FORM_NONE:
+            case FORM_TREE:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* target = eventInfo.GetActor();
+        uint32 triggerspell = 0;
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                triggerspell = SPELL_LIVING_ROOT_BEAR;
+                break;
+            case FORM_CAT:
+                triggerspell = SPELL_LIVING_ROOT_CAT;
+                break;
+            case FORM_MOONKIN:
+                triggerspell = SPELL_LIVING_ROOT_MOONKIN;
+                break;
+            case FORM_NONE:
+                triggerspell = SPELL_LIVING_ROOT_NONE;
+                break;
+            case FORM_TREE:
+                triggerspell = SPELL_LIVING_ROOT_TREE;
+                break;
+            default:
+                return;
+        }
+
+        target->CastSpell(target, triggerspell, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_living_root_of_the_wildheart::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_item_living_root_of_the_wildheart::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -6229,4 +6312,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_petrified_twilight_scale_heroic);
     RegisterSpellScript(spell_item_purified_shard_of_the_scale);
     RegisterSpellScript(spell_item_shiny_shard_of_the_scale);
+    RegisterSpellScript(spell_item_living_root_of_the_wildheart);
 }

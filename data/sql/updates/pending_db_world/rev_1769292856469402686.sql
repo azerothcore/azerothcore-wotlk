@@ -84,22 +84,24 @@ DELETE FROM `spell_proc` WHERE `SpellId` = 37336;
 INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `DisableEffectsMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
 (37336, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0);
 
+-- Living Root of the Wildheart (37336) - Item trinket script
+DELETE FROM `spell_script_names` WHERE `spell_id` = 37336;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(37336, 'spell_item_living_root_of_the_wildheart');
+
 -- Druid scripts ported from TrinityCore
 -- Frenzied Regeneration (22842) - Converts rage to health
--- Forms Trinket (37336) - Procs different buffs based on shapeshift form
 -- Nourish (50464) - Glyph of Nourish support
 -- Insect Swarm (-5570) - T8 Balance Relic support
 -- T9 Feral Relic (67353) - Idol of Mutilation form-specific procs
 DELETE FROM `spell_script_names` WHERE `ScriptName` IN (
     'spell_dru_frenzied_regeneration',
-    'spell_dru_forms_trinket',
     'spell_dru_nourish',
     'spell_dru_insect_swarm',
     'spell_dru_t9_feral_relic'
 );
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (22842, 'spell_dru_frenzied_regeneration'),
-(37336, 'spell_dru_forms_trinket'),
 (50464, 'spell_dru_nourish'),
 (-5570, 'spell_dru_insect_swarm'),
 (67353, 'spell_dru_t9_feral_relic');
