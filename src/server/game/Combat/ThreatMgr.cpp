@@ -468,6 +468,10 @@ bool ThreatContainer::IsPreferredTarget(Creature* attacker, Unit* target) const
     if (target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID()))
         return false;
 
+    // If I am rooted and target is out of melee range, and I am not a caster with enough mana
+    if (attacker->HasUnitState(UNIT_STATE_ROOT) && attacker->IsCombatMovementAllowed() && !attacker->IsWithinMeleeRange(target))
+        return false;
+
     return true;
 }
 

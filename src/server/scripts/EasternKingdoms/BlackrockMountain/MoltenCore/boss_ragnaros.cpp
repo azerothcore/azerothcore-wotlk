@@ -252,11 +252,6 @@ public:
             }
         }
 
-        bool CanAIAttack(Unit const* victim) const override
-        {
-            return me->IsWithinMeleeRange(victim);
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!extraEvents.Empty())
