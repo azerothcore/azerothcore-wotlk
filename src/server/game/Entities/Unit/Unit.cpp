@@ -8670,15 +8670,6 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     {
         case SPELLFAMILY_DRUID:
         {
-            // Insect Swarm vs Item - Druid T8 Balance Relic
-            if (spellProto->SpellFamilyFlags[0] & 0x00200000)
-            {
-                if (AuraEffect const* relicAurEff = GetAuraEffect(64950, EFFECT_0))
-                {
-                    DoneAdvertisedBenefit += relicAurEff->GetAmount();
-                }
-            }
-
             // Nourish vs Idol of the Flourishing Life
             if (spellProto->SpellFamilyFlags[1] & 0x02000000)
             {
@@ -9556,26 +9547,22 @@ uint32 Unit::SpellHealingBonusTaken(Unit* caster, SpellInfo const* spellProto, u
     // Taken fixed damage bonus auras
     int32 TakenAdvertisedBenefit = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_HEALING, spellProto->GetSchoolMask());
 
-    // Nourish cast, glyph of nourish
+    // Nourish cast - 20% bonus if target has Rejuvenation, Regrowth, Lifebloom, or Wild Growth from caster
+    // Glyph of Nourish is handled by spell_dru_nourish script
     if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[1] & 0x2000000 && caster)
     {
-        bool any = false;
-        bool hasglyph = caster->GetAuraEffectDummy(62971);
         AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
         for (AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
         {
-            if (((*i)->GetCasterGUID() == caster->GetGUID()))
+            if ((*i)->GetCasterGUID() == caster->GetGUID())
             {
                 SpellInfo const* spell = (*i)->GetSpellInfo();
                 // Rejuvenation, Regrowth, Lifebloom, or Wild Growth
-                if (!any && spell->SpellFamilyFlags.HasFlag(0x50, 0x4000010, 0))
+                if (spell->SpellFamilyFlags.HasFlag(0x50, 0x4000010, 0))
                 {
                     TakenTotalMod *= 1.2f;
-                    any = true;
+                    break;
                 }
-
-                if (hasglyph)
-                    TakenTotalMod += 0.06f;
             }
         }
     }

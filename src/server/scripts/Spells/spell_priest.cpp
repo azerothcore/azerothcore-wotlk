@@ -449,6 +449,27 @@ class spell_pri_lightwell_renew : public AuraScript
         }
     }
 
+    void InitializeAmount(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        // Attacks done to you equal to 30% of your total health will cancel the effect
+        _remainingAmount = GetTarget()->CountPctFromMaxHealth(30);
+    }
+
+    void CheckDropCharge(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo)
+            return;
+
+        uint32 damage = damageInfo->GetDamage();
+        if (_remainingAmount <= damage)
+            return;
+
+        _remainingAmount -= damage;
+        // prevent drop charge
+        PreventDefaultAction();
+    }
+
     void HandleUpdateSpellclick(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
@@ -466,10 +487,15 @@ class spell_pri_lightwell_renew : public AuraScript
 
     void Register() override
     {
+        DoPrepareProc += AuraProcFn(spell_pri_lightwell_renew::CheckDropCharge);
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pri_lightwell_renew::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_pri_lightwell_renew::InitializeAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         AfterEffectApply += AuraEffectApplyFn(spell_pri_lightwell_renew::HandleUpdateSpellclick, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_pri_lightwell_renew::HandleUpdateSpellclick, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
     }
+
+private:
+    uint32 _remainingAmount = 0;
 };
 
 // 8129 - Mana Burn
@@ -1361,6 +1387,22 @@ class spell_pri_t10_heal_2p_bonus : public AuraScript
     }
 };
 
+// -47580 - Pain and Suffering (dummy aura)
+class spell_pri_pain_and_suffering_dummy : public AuraScript
+{
+    PrepareAuraScript(spell_pri_pain_and_suffering_dummy);
+
+    bool CheckDummy(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_pri_pain_and_suffering_dummy::CheckDummy, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
 // -27811 - Blessed Recovery
 class spell_pri_blessed_recovery : public AuraScript
 {
@@ -1412,6 +1454,7 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_mana_burn);
     RegisterSpellScript(spell_pri_mana_leech);
     RegisterSpellScript(spell_pri_mind_sear);
+    RegisterSpellScript(spell_pri_pain_and_suffering_dummy);
     RegisterSpellScript(spell_pri_pain_and_suffering_proc);
     RegisterSpellScript(spell_pri_penance);
     RegisterSpellAndAuraScriptPair(spell_pri_power_word_shield, spell_pri_power_word_shield_aura);

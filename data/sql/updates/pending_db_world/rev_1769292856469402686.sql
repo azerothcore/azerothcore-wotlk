@@ -77,3 +77,36 @@ DELETE FROM `spell_script_names` WHERE `spell_id` IN (59665, 21977);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (59665, 'spell_warr_vigilance_redirect_threat'),
 (21977, 'spell_warr_warriors_wrath');
+
+-- Druid Forms Trinket (37336) - SpellPhaseMask required for proc system
+-- ProcFlags=0 uses DBC flags (0x15414), Chance=0 uses DBC chance (3%)
+DELETE FROM `spell_proc` WHERE `SpellId` = 37336;
+INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `DisableEffectsMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
+(37336, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0);
+
+-- Druid scripts ported from TrinityCore
+-- Frenzied Regeneration (22842) - Converts rage to health
+-- Forms Trinket (37336) - Procs different buffs based on shapeshift form
+-- Nourish (50464) - Glyph of Nourish support
+-- Insect Swarm (-5570) - T8 Balance Relic support
+-- T9 Feral Relic (67353) - Idol of Mutilation form-specific procs
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN (
+    'spell_dru_frenzied_regeneration',
+    'spell_dru_forms_trinket',
+    'spell_dru_nourish',
+    'spell_dru_insect_swarm',
+    'spell_dru_t9_feral_relic'
+);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(22842, 'spell_dru_frenzied_regeneration'),
+(37336, 'spell_dru_forms_trinket'),
+(50464, 'spell_dru_nourish'),
+(-5570, 'spell_dru_insect_swarm'),
+(67353, 'spell_dru_t9_feral_relic');
+
+-- Priest scripts ported from TrinityCore
+-- Pain and Suffering (-47580) - Prevents EFFECT_1 DUMMY from proccing
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_pri_pain_and_suffering_dummy';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(47580, 'spell_pri_pain_and_suffering_dummy'),
+(47581, 'spell_pri_pain_and_suffering_dummy');
