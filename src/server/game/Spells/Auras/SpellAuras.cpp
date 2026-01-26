@@ -1887,24 +1887,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         case SPELLFAMILY_PALADIN:
             switch (GetId())
             {
-                case 19746:
-                case 31821:
-                    // Aura Mastery Triggered Spell Handler
-                    // If apply Concentration Aura -> trigger -> apply Aura Mastery Immunity
-                    // If remove Concentration Aura -> trigger -> remove Aura Mastery Immunity
-                    // If remove Aura Mastery -> trigger -> remove Aura Mastery Immunity
-                    // Do effects only on aura owner
-                    if (GetCasterGUID() != target->GetGUID())
-                        break;
-                    if (apply)
-                    {
-                        if ((GetSpellInfo()->Id == 31821 && target->HasAura(19746, GetCasterGUID())) || (GetSpellInfo()->Id == 19746 && target->HasAura(31821)))
-                            target->CastSpell(target, 64364, true);
-                    }
-                    else
-                        target->RemoveAurasDueToSpell(64364, GetCasterGUID());
-                    break;
-                case 31842:
+                case 31842: // Divine Illumination
+                    // Item - Paladin T10 Holy 2P Bonus
                     if (caster && caster->HasAura(70755))
                     {
                         if (apply)
@@ -1913,23 +1897,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             target->RemoveAurasDueToSpell(71166);
                     }
                     break;
-            }
-
-            // Sanctified Retribution, Improved Devotion Aura, Swift Retribution, Improved Concentration Aura
-            if (caster == target && GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_AURA)
-            {
-                if (apply)
-                {
-                    target->CastSpell(target, 63510, true);
-                    target->CastSpell(target, 63514, true);
-                    target->CastSpell(target, 63531, true);
-                }
-                else
-                {
-                    target->RemoveAura(63510);
-                    target->RemoveAura(63514);
-                    target->RemoveAura(63531);
-                }
             }
             break;
     }

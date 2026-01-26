@@ -421,6 +421,80 @@ private:
     }
 };
 
+// 31821 - Aura Mastery
+class spell_pal_aura_mastery : public AuraScript
+{
+    PrepareAuraScript(spell_pal_aura_mastery);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_AURA_MASTERY_IMMUNE });
+    }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->CastSpell(GetTarget(), SPELL_PALADIN_AURA_MASTERY_IMMUNE, true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveOwnedAura(SPELL_PALADIN_AURA_MASTERY_IMMUNE, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_pal_aura_mastery::HandleEffectApply, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_pal_aura_mastery::HandleEffectRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 64364 - Aura Mastery Immune
+class spell_pal_aura_mastery_immune : public AuraScript
+{
+    PrepareAuraScript(spell_pal_aura_mastery_immune);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_CONCENTRACTION_AURA });
+    }
+
+    bool CheckAreaTarget(Unit* target)
+    {
+        return target->HasAura(SPELL_PALADIN_CONCENTRACTION_AURA, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_pal_aura_mastery_immune::CheckAreaTarget);
+    }
+};
+
+// 53563 - Beacon of Light
+class spell_pal_beacon_of_light : public AuraScript
+{
+    PrepareAuraScript(spell_pal_beacon_of_light);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+
+        // area aura owner casts the spell
+        Unit* owner = GetAura()->GetUnitOwner();
+        uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
+        owner->CastSpell(GetTarget(), triggerSpell, true, nullptr, aurEff, owner->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pal_beacon_of_light::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 // 31884 - Avenging Wrath
 class spell_pal_avenging_wrath : public AuraScript
 {
@@ -428,17 +502,27 @@ class spell_pal_avenging_wrath : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_PALADIN_SANCTIFIED_WRATH, SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1 });
+        return ValidateSpellInfo(
+        {
+            SPELL_PALADIN_SANCTIFIED_WRATH,
+            SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1,
+            SPELL_PALADIN_AVENGING_WRATH_MARKER,
+            SPELL_PALADIN_IMMUNE_SHIELD_MARKER
+        });
     }
 
-    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        if (AuraEffect const* aurEff = target->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1, EFFECT_2))
+        if (AuraEffect const* sanctifiedWrathAurEff = target->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1, EFFECT_2))
         {
-            int32 basepoints = aurEff->GetAmount();
-            target->CastCustomSpell(target, SPELL_PALADIN_SANCTIFIED_WRATH, &basepoints, &basepoints, nullptr, true, nullptr, aurEff);
+            int32 basepoints = sanctifiedWrathAurEff->GetAmount();
+            target->CastCustomSpell(target, SPELL_PALADIN_SANCTIFIED_WRATH, &basepoints, &basepoints, nullptr, true, nullptr, sanctifiedWrathAurEff);
         }
+
+        target->CastSpell(target, SPELL_PALADIN_AVENGING_WRATH_MARKER, true, nullptr, aurEff);
+        // Blizz seems to just apply aura without bothering to cast
+        target->AddAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER, target);
     }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -448,7 +532,7 @@ class spell_pal_avenging_wrath : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_pal_avenging_wrath::HandleApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_pal_avenging_wrath::HandleApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_pal_avenging_wrath::HandleRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -1978,6 +2062,104 @@ class spell_pal_illumination : public AuraScript
     }
 };
 
+// 498, 642, 1022 - Divine Protection, Divine Shield, Hand of Protection
+class spell_pal_immunities : public SpellScript
+{
+    PrepareSpellScript(spell_pal_immunities);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_PALADIN_FORBEARANCE,
+            SPELL_PALADIN_AVENGING_WRATH_MARKER,
+            SPELL_PALADIN_IMMUNE_SHIELD_MARKER
+        });
+    }
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+
+        // for HoP
+        Unit* target = GetExplTargetUnit();
+        if (!target)
+            target = caster;
+
+        // "Cannot be used within $61987d. of using Avenging Wrath."
+        if (target->HasAura(SPELL_PALADIN_FORBEARANCE) || target->HasAura(SPELL_PALADIN_AVENGING_WRATH_MARKER))
+            return SPELL_FAILED_TARGET_AURASTATE;
+
+        return SPELL_CAST_OK;
+    }
+
+    void TriggerDebuffs()
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            // Blizz seems to just apply aura without bothering to cast
+            GetCaster()->AddAura(SPELL_PALADIN_FORBEARANCE, target);
+            GetCaster()->AddAura(SPELL_PALADIN_AVENGING_WRATH_MARKER, target);
+            GetCaster()->AddAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER, target);
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_pal_immunities::CheckCast);
+        AfterHit += SpellHitFn(spell_pal_immunities::TriggerDebuffs);
+    }
+};
+
+// -20254 - Improved Concentration Aura
+// -20138 - Improved Devotion Aura
+//  31869 - Sanctified Retribution
+// -53379 - Swift Retribution
+class spell_pal_improved_aura : public AuraScript
+{
+    PrepareAuraScript(spell_pal_improved_aura);
+
+public:
+    spell_pal_improved_aura(uint32 spellId) : AuraScript(), _spellId(spellId) { }
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            _spellId,
+            SPELL_PALADIN_SANCTIFIED_RETRIBUTION_R1,
+            SPELL_PALADIN_SWIFT_RETRIBUTION_R1
+        });
+    }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        target->RemoveOwnedAura(_spellId, GetCasterGUID()); // need to remove to reapply spellmods
+        target->CastSpell(target, _spellId, true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        uint32 spellId = GetSpellInfo()->GetFirstRankSpell()->Id;
+
+        if ((spellId == SPELL_PALADIN_SANCTIFIED_RETRIBUTION_R1 && GetTarget()->GetAuraOfRankedSpell(SPELL_PALADIN_SWIFT_RETRIBUTION_R1))
+            || (spellId == SPELL_PALADIN_SWIFT_RETRIBUTION_R1 && GetTarget()->GetAuraOfRankedSpell(SPELL_PALADIN_SANCTIFIED_RETRIBUTION_R1)))
+            return;
+
+        GetTarget()->RemoveOwnedAura(_spellId, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_pal_improved_aura::HandleEffectApply, EFFECT_FIRST_FOUND, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_pal_improved_aura::HandleEffectRemove, EFFECT_FIRST_FOUND, SPELL_AURA_ADD_FLAT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    uint32 _spellId;
+};
+
 // 53651 - Light's Beacon - Beacon of Light
 class spell_pal_light_s_beacon : public AuraScript
 {
@@ -2041,6 +2223,9 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_seal_of_light);
     RegisterSpellScript(spell_pal_sacred_shield_base);
     RegisterSpellScript(spell_pal_ardent_defender);
+    RegisterSpellScript(spell_pal_aura_mastery);
+    RegisterSpellScript(spell_pal_aura_mastery_immune);
+    RegisterSpellScript(spell_pal_beacon_of_light);
     RegisterSpellScript(spell_pal_avenging_wrath);
     RegisterSpellScript(spell_pal_blessing_of_faith);
     RegisterSpellScript(spell_pal_blessing_of_sanctuary);
@@ -2082,5 +2267,10 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_judgements_of_the_just);
     RegisterSpellScript(spell_pal_sacred_shield_dummy);
     RegisterSpellScript(spell_pal_illumination);
+    RegisterSpellScript(spell_pal_immunities);
+    RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_improved_concentraction_aura", SPELL_PALADIN_IMPROVED_CONCENTRACTION_AURA);
+    RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_improved_devotion_aura", SPELL_PALADIN_IMPROVED_DEVOTION_AURA);
+    RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_sanctified_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
+    RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_swift_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
     RegisterSpellScript(spell_pal_light_s_beacon);
 }

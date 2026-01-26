@@ -32,3 +32,37 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (-44614, 'spell_mage_frostfire_bolt'),
 (45438, 'spell_mage_ice_block'),
 (44401, 'spell_mage_missile_barrage_proc');
+
+-- Paladin scripts refactored from hardcoded SpellAuras.cpp and Spell.cpp to proper scripts
+-- Aura Mastery (31821) - Applies/removes Aura Mastery Immune aura
+DELETE FROM `spell_script_names` WHERE `spell_id` = 31821;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(31821, 'spell_pal_aura_mastery');
+
+-- Aura Mastery Immune (64364) - Area target check to filter immunity to only Concentration Aura targets
+DELETE FROM `spell_script_names` WHERE `spell_id` = 64364;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(64364, 'spell_pal_aura_mastery_immune');
+
+-- Beacon of Light (53563) - Periodic tick handler to ensure correct caster GUID propagation
+DELETE FROM `spell_script_names` WHERE `spell_id` = 53563 AND `ScriptName` = 'spell_pal_beacon_of_light';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(53563, 'spell_pal_beacon_of_light');
+
+-- Divine Protection (498), Divine Shield (642), Hand of Protection (-1022)
+-- Applies Forbearance, Avenging Wrath marker, and Immune Shield marker
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_pal_immunities';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(498, 'spell_pal_immunities'),
+(642, 'spell_pal_immunities'),
+(-1022, 'spell_pal_immunities');
+
+-- Improved Concentration Aura (-20254), Improved Devotion Aura (-20138)
+-- Sanctified Retribution (31869), Swift Retribution (-53379)
+-- Handles applying/removing the improved aura buff effects
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_pal_improved_concentraction_aura', 'spell_pal_improved_devotion_aura', 'spell_pal_sanctified_retribution', 'spell_pal_swift_retribution');
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(-20254, 'spell_pal_improved_concentraction_aura'),
+(-20138, 'spell_pal_improved_devotion_aura'),
+(31869, 'spell_pal_sanctified_retribution'),
+(-53379, 'spell_pal_swift_retribution');
