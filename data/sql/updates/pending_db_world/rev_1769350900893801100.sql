@@ -164,7 +164,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 (91, 3838);
 
 -- despawn mobs in the area
-DELETE FROM `game_event_creature` WHERE (`eventEntry` = -91) AND (`guid` IN (12372, 24976, 22473, 6507 , 6509 , 6510, 6511 , 12369, 12379, 21020, 21022, 21024, 21026, 21034, 21036, 7369 , 7370 , 12386, 22181, 22188, 22451));
+DELETE FROM `game_event_creature` WHERE (`eventEntry` = -91) AND (`guid` IN (12372, 24976, 22473, 6507, 6509, 6510, 6511, 12369, 12379, 21020, 21022, 21024, 21026, 21034, 21036, 7369, 7370, 12386, 22181, 22188, 22451));
 INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 -- Adder
 (-91, 12372),
