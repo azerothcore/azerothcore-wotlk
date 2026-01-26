@@ -49,6 +49,11 @@ DELETE FROM `spell_script_names` WHERE `spell_id` = 53563 AND `ScriptName` = 'sp
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (53563, 'spell_pal_beacon_of_light');
 
+-- Sacred Shield (58597) - Absorb amount calculation with ICC buff support
+DELETE FROM `spell_script_names` WHERE `spell_id` = 58597 AND `ScriptName` = 'spell_pal_sacred_shield';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(58597, 'spell_pal_sacred_shield');
+
 -- Divine Protection (498), Divine Shield (642), Hand of Protection (-1022)
 -- Applies Forbearance, Avenging Wrath marker, and Immune Shield marker
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_pal_immunities';

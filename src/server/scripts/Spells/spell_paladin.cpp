@@ -108,6 +108,12 @@ enum PaladinSpellIcons
     PALADIN_ICON_SHEATH_OF_LIGHT                 = 3030
 };
 
+enum MiscSpellIcons
+{
+    SPELL_ICON_ID_STRENGTH_OF_WRYNN              = 1704,
+    SPELL_ICON_ID_HELLSCREAM_WARSONG             = 937
+};
+
 // Proc system triggered spell IDs
 enum PaladinProcSpells
 {
@@ -240,6 +246,45 @@ class spell_pal_seal_of_light : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_light::CheckProc);
+    }
+};
+
+// 58597 - Sacred Shield (absorb)
+class spell_pal_sacred_shield : public AuraScript
+{
+    PrepareAuraScript(spell_pal_sacred_shield);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            // +75.00% from sp bonus
+            float bonus = CalculatePct(caster->SpellBaseHealingBonusDone(GetSpellInfo()->GetSchoolMask()), 75.0f);
+
+            // Divine Guardian is only applied at the spell healing bonus because it was already applied to the base value in CalculateSpellDamage
+            bonus = caster->ApplyEffectModifiers(GetSpellInfo(), aurEff->GetEffIndex(), bonus);
+            bonus *= caster->CalculateLevelPenalty(GetSpellInfo());
+
+            amount += int32(bonus);
+
+            // Arena - Dampening
+            if (AuraEffect const* auraEffArenaDampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
+                AddPct(amount, auraEffArenaDampening->GetAmount());
+            // Battleground - Dampening
+            else if (AuraEffect const* auraEffBattlegroundDampening = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
+                AddPct(amount, auraEffBattlegroundDampening->GetAmount());
+
+            // ICC buff
+            if (AuraEffect const* auraStrengthOfWrynn = caster->GetAuraEffect(SPELL_AURA_MOD_HEALING_DONE_PERCENT, SPELLFAMILY_GENERIC, SPELL_ICON_ID_STRENGTH_OF_WRYNN, EFFECT_2))
+                AddPct(amount, auraStrengthOfWrynn->GetAmount());
+            else if (AuraEffect const* auraHellscreamsWarsong = caster->GetAuraEffect(SPELL_AURA_MOD_HEALING_DONE_PERCENT, SPELLFAMILY_GENERIC, SPELL_ICON_ID_HELLSCREAM_WARSONG, EFFECT_2))
+                AddPct(amount, auraHellscreamsWarsong->GetAmount());
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_sacred_shield::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
     }
 };
 
@@ -2221,6 +2266,7 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_divine_intervention);
     RegisterSpellScript(spell_pal_divine_purpose);
     RegisterSpellScript(spell_pal_seal_of_light);
+    RegisterSpellScript(spell_pal_sacred_shield);
     RegisterSpellScript(spell_pal_sacred_shield_base);
     RegisterSpellScript(spell_pal_ardent_defender);
     RegisterSpellScript(spell_pal_aura_mastery);
