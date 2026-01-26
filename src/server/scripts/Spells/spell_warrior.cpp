@@ -71,6 +71,7 @@ enum WarriorSpells
     SPELL_WARRIOR_T10_MELEE_4P_EXTRA_CHARGE         = 70849,
     SPELL_WARRIOR_SLAM_GCD_REDUCED                  = 71072,
     SPELL_WARRIOR_EXECUTE_GCD_REDUCED               = 71069,
+    SPELL_WARRIOR_WARRIORS_WRATH                    = 21887,
 };
 
 enum WarriorSpellIcons
@@ -736,17 +737,6 @@ class spell_warr_vigilance : public AuraScript
             target->CastSpell(caster, SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT, true);
     }
 
-    void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        //! WORKAROUND
-        //! this glyph is a proc
-        if (Unit* caster = GetCaster())
-        {
-            if (AuraEffect const* glyph = caster->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_VIGILANCE, EFFECT_0))
-                GetTarget()->ModifyRedirectThreat(glyph->GetAmount());
-        }
-    }
-
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
@@ -776,7 +766,6 @@ class spell_warr_vigilance : public AuraScript
     void Register() override
     {
         OnEffectApply += AuraEffectApplyFn(spell_warr_vigilance::HandleApply, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        AfterEffectApply += AuraEffectApplyFn(spell_warr_vigilance::HandleAfterApply, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         OnEffectRemove += AuraEffectRemoveFn(spell_warr_vigilance::HandleRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         DoCheckProc += AuraCheckProcFn(spell_warr_vigilance::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_warr_vigilance::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
@@ -784,6 +773,29 @@ class spell_warr_vigilance : public AuraScript
 
 private:
     Unit* _procTarget;
+};
+
+// 59665 - Vigilance (Redirect Threat)
+class spell_warr_vigilance_redirect_threat : public SpellScript
+{
+    PrepareSpellScript(spell_warr_vigilance_redirect_threat);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_GLYPH_OF_VIGILANCE });
+    }
+
+    void HandleGlyph(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* warrior = GetHitUnit())
+            if (AuraEffect const* glyph = warrior->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_VIGILANCE, EFFECT_0))
+                SetEffectValue(GetEffectValue() + glyph->GetAmount());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_warr_vigilance_redirect_threat::HandleGlyph, EFFECT_0, SPELL_EFFECT_REDIRECT_THREAT);
+    }
 };
 
 // 50725 - Vigilance
@@ -836,35 +848,27 @@ class spell_warr_glyph_of_sunder_armor : public AuraScript
     }
 };
 
-// Spell 28845 - Cheat Death
-
-enum CheatDeath
-{
-    SPELL_CHEAT_DEATH_TRIGGER  = 28846
-};
-
+// 28845 - Cheat Death
 class spell_warr_t3_prot_8p_bonus : public AuraScript
 {
     PrepareAuraScript(spell_warr_t3_prot_8p_bonus);
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->GetHealthPct() <= 20.0f;
-    }
+        if (eventInfo.GetActionTarget()->HealthBelowPct(20))
+            return true;
 
-    void HandleEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        if (Unit* target = eventInfo.GetActionTarget())
-        {
-            target->CastSpell(target, SPELL_CHEAT_DEATH_TRIGGER, true);
-        }
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (damageInfo && damageInfo->GetDamage())
+            if (GetTarget()->HealthBelowPctDamaged(20, damageInfo->GetDamage()))
+                return true;
+
+        return false;
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_warr_t3_prot_8p_bonus::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_warr_t3_prot_8p_bonus::HandleEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1198,6 +1202,27 @@ class spell_warr_item_t10_prot_4p_bonus : public AuraScript
     }
 };
 
+// 21977 - Warrior's Wrath (T3 8P Bonus)
+class spell_warr_warriors_wrath : public SpellScript
+{
+    PrepareSpellScript(spell_warr_warriors_wrath);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_WARRIORS_WRATH });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_WARRIOR_WARRIORS_WRATH, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_warr_warriors_wrath::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     RegisterSpellScript(spell_warr_mocking_blow);
@@ -1222,7 +1247,9 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_slam);
     RegisterSpellScript(spell_warr_sweeping_strikes);
     RegisterSpellScript(spell_warr_vigilance);
+    RegisterSpellScript(spell_warr_vigilance_redirect_threat);
     RegisterSpellScript(spell_warr_vigilance_trigger);
+    RegisterSpellScript(spell_warr_warriors_wrath);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
     RegisterSpellScript(spell_warr_heroic_strike);
     RegisterSpellScript(spell_war_sudden_death_aura);
