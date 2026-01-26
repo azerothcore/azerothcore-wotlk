@@ -1,3 +1,4 @@
+-- DB update 2026_01_26_00 -> 2026_01_26_01
 --
 -- Remove Weather-Beaten Journal from Dark Runed Chest ref
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 35037) AND (`Item` IN (34109));
