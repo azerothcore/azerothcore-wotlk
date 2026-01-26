@@ -2156,16 +2156,6 @@ void Aura::ResetProcCooldown()
     m_procCooldown = std::chrono::steady_clock::now();
 }
 
-void Aura::PrepareProcChargeDrop(SpellProcEntry const* procEntry, ProcEventInfo& eventInfo)
-{
-    // take one charge, aura expiration will be handled in Aura::TriggerProcOnEvent (if needed)
-    if (!(procEntry->AttributesMask & PROC_ATTR_USE_STACKS_FOR_CHARGES) && IsUsingCharges() && (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->HasAttribute(SPELL_ATTR6_DO_NOT_CONSUME_RESOURCES)))
-    {
-        --m_procCharges;
-        SetNeedClientUpdateForTargets();
-    }
-}
-
 void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now)
 {
     bool prepare = CallScriptPrepareProcHandlers(aurApp, eventInfo);

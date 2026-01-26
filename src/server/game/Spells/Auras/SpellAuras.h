@@ -197,7 +197,6 @@ public:
     void AddProcCooldown(TimePoint cooldownEnd);
     void AddProcCooldown(SpellProcEntry const* procEntry, TimePoint now);
     void ResetProcCooldown();
-    void PrepareProcChargeDrop(SpellProcEntry const* procEntry, ProcEventInfo& eventInfo);
     bool IsUsingCharges() const { return m_isUsingCharges; }
     void SetUsingCharges(bool val) { m_isUsingCharges = val; }
     void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now);

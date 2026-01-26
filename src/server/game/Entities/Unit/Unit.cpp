@@ -13011,15 +13011,6 @@ void Unit::GetProcAurasTriggeredOnEvent(AuraApplicationProcContainer& aurasTrigg
         }
         else
         {
-            if (aurApp->GetBase()->GetSpellInfo()->HasAttribute(SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE))
-            {
-                if (SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(aurApp->GetBase()->GetId()))
-                {
-                    aurApp->GetBase()->PrepareProcChargeDrop(procEntry, eventInfo);
-                    aurasTriggeringProc.emplace_back(0, aurApp);
-                }
-            }
-
             if (aurApp->GetBase()->GetSpellInfo()->HasAttribute(SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE))
                 if (SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(aurApp->GetBase()->GetId()))
                     aurApp->GetBase()->AddProcCooldown(procEntry, now);
