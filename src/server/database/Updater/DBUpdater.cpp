@@ -168,7 +168,7 @@ BaseLocation DBUpdater<T>::GetBaseLocationType()
 }
 
 template<class T>
-bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
+bool DBUpdater<T>::Create(DatabaseUpdatePool& pool)
 {
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 
@@ -218,7 +218,7 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 }
 
 template<class T>
-bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList /*= {}*/)
+bool DBUpdater<T>::Update(DatabaseUpdatePool& pool, std::string_view modulesList /*= {}*/)
 {
     if (!DBUpdaterUtil::CheckExecutable())
         return false;
@@ -293,7 +293,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
 }
 
 template<class T>
-bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories)
+bool DBUpdater<T>::Update(DatabaseUpdatePool& pool, std::vector<std::string> const* setDirectories)
 {
     if (!DBUpdaterUtil::CheckExecutable())
     {
@@ -354,7 +354,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
 }
 
 template<class T>
-bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
+bool DBUpdater<T>::Populate(DatabaseUpdatePool& pool)
 {
     {
         QueryResult const result = Retrieve(pool, "SHOW TABLES");
@@ -427,26 +427,26 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 }
 
 template<class T>
-QueryResult DBUpdater<T>::Retrieve(DatabaseWorkerPool<T>& pool, std::string const& query)
+QueryResult DBUpdater<T>::Retrieve(DatabaseUpdatePool& pool, std::string const& query)
 {
     return pool.Query(query.c_str());
 }
 
 template<class T>
-void DBUpdater<T>::Apply(DatabaseWorkerPool<T>& pool, std::string const& query)
+void DBUpdater<T>::Apply(DatabaseUpdatePool& pool, std::string const& query)
 {
     pool.DirectExecute(query.c_str());
 }
 
 template<class T>
-void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path)
+void DBUpdater<T>::ApplyFile(DatabaseUpdatePool& pool, Path const& path)
 {
     DBUpdater<T>::ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
                             pool.GetConnectionInfo()->port_or_socket, pool.GetConnectionInfo()->database, pool.GetConnectionInfo()->ssl, path);
 }
 
 template<class T>
-void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
+void DBUpdater<T>::ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string const& user,
                              std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path)
 {
     std::string configTempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
