@@ -71,3 +71,9 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (-20138, 'spell_pal_improved_devotion_aura'),
 (31869, 'spell_pal_sanctified_retribution'),
 (-53379, 'spell_pal_swift_retribution');
+
+-- Warrior scripts - Vigilance redirect threat and Warrior's Wrath (T2 5P)
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (59665, 21977);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(59665, 'spell_warr_vigilance_redirect_threat'),
+(21977, 'spell_warr_warriors_wrath');
