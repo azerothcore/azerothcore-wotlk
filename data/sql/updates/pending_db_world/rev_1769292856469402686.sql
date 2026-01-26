@@ -94,12 +94,7 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 -- Nourish (50464) - Glyph of Nourish support
 -- Insect Swarm (-5570) - T8 Balance Relic support
 -- T9 Feral Relic (67353) - Idol of Mutilation form-specific procs
-DELETE FROM `spell_script_names` WHERE `ScriptName` IN (
-    'spell_dru_frenzied_regeneration',
-    'spell_dru_nourish',
-    'spell_dru_insect_swarm',
-    'spell_dru_t9_feral_relic'
-);
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_dru_frenzied_regeneration', 'spell_dru_nourish', 'spell_dru_insect_swarm', 'spell_dru_t9_feral_relic');
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (22842, 'spell_dru_frenzied_regeneration'),
 (50464, 'spell_dru_nourish'),
