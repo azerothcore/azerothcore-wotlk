@@ -1,3 +1,4 @@
+-- DB update 2026_01_24_01 -> 2026_01_26_00
 --
 DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (7815, 7820, 8760, 10363) AND `OptionID` = 1;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`,
