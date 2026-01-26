@@ -219,15 +219,17 @@ INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 (91, 12775),
 (91, 12776);
 
+-- TODO: guids 12771 and 12773 should have waypoints and SAI
+
 -- update auras
 DELETE FROM `creature_addon` WHERE (`guid` IN (12768, 12769, 12770, 12771, 12772, 12773, 12774, 12775, 12776));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (12768, 0, 0, 0, 0, 233, 0, '43992'),
 (12769, 0, 0, 0, 0, 233, 0, '43992'),
 (12770, 0, 0, 0, 0, 233, 0, '43992'),
-(12771, 0, 0, 0, 0,   0, 0, '43992'),
+(12771, 0, 0, 0, 0, 432, 0, '43992'),
 (12772, 0, 0, 0, 0, 233, 0, '43992'),
-(12773, 0, 0, 0, 0,   0, 0, '43992'),
+(12773, 0, 0, 0, 0, 432, 0, '43992'),
 (12774, 0, 0, 0, 0, 233, 0, '43992'),
 (12775, 0, 0, 0, 0, 233, 0, '43992'),
 (12776, 0, 0, 0, 0, 233, 0, '43992');
