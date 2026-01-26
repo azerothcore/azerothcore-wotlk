@@ -39,6 +39,7 @@ enum ShamanSpells
     SPELL_SHAMAN_EARTH_SHIELD_HEAL              = 379,
     SPELL_SHAMAN_ELEMENTAL_MASTERY              = 16166,
     SPELL_SHAMAN_ELEMENTAL_FOCUS                = 16164,
+    SPELL_SHAMAN_ELEMENTAL_OATH                 = 51466,
     SPELL_SHAMAN_ELECTRIFIED                    = 64930,
     SPELL_SHAMAN_EXHAUSTION                     = 57723,
     SPELL_SHAMAN_FIRE_NOVA_R1                   = 1535,
@@ -46,6 +47,7 @@ enum ShamanSpells
     SPELL_SHAMAN_GLYPH_OF_EARTH_SHIELD          = 63279,
     SPELL_SHAMAN_GLYPH_OF_HEALING_STREAM_TOTEM  = 55456,
     SPELL_SHAMAN_GLYPH_OF_MANA_TIDE             = 55441,
+    SPELL_SHAMAN_GLYPH_OF_STONECLAW_TOTEM       = 63298,
     SPELL_SHAMAN_GLYPH_OF_THUNDERSTORM          = 62132,
     SPELL_SHAMAN_ITEM_LIGHTNING_SHIELD          = 23552,
     SPELL_SHAMAN_ITEM_LIGHTNING_SHIELD_DAMAGE   = 27635,
@@ -54,7 +56,10 @@ enum ShamanSpells
     SPELL_SHAMAN_LAVA_FLOWS_TRIGGERED_R1        = 64694,
     SPELL_SHAMAN_MANA_SPRING_TOTEM_ENERGIZE     = 52032,
     SPELL_SHAMAN_MANA_TIDE_TOTEM                = 39609,
+    SPELL_SHAMAN_NATURE_GUARDIAN                = 31616,
+    SPELL_SHAMAN_NATURE_GUARDIAN_THREAT         = 39301,
     SPELL_SHAMAN_SATED                          = 57724,
+    SPELL_SHAMAN_STONECLAW_TOTEM                = 55277,
     SPELL_SHAMAN_STORM_EARTH_AND_FIRE           = 51483,
     SPELL_SHAMAN_TOTEM_EARTHBIND_EARTHGRAB      = 64695,
     SPELL_SHAMAN_TOTEM_EARTHBIND_TOTEM          = 6474,
@@ -548,6 +553,30 @@ class spell_sha_cleansing_totem_pulse : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_sha_cleansing_totem_pulse::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 16246 - Clearcasting
+class spell_sha_clearcasting : public AuraScript
+{
+    PrepareAuraScript(spell_sha_clearcasting);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHAMAN_ELEMENTAL_OATH });
+    }
+
+    // Elemental Oath bonus
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        Unit const* owner = GetUnitOwner();
+        if (Aura const* aura = owner->GetAuraOfRankedSpell(SPELL_SHAMAN_ELEMENTAL_OATH, owner->GetGUID()))
+            amount = aura->GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sha_clearcasting::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
     }
 };
 
@@ -1059,6 +1088,28 @@ class spell_sha_mana_spring_totem : public SpellScript
     }
 };
 
+// 16191 - Mana Tide
+class spell_sha_mana_tide : public AuraScript
+{
+    PrepareAuraScript(spell_sha_mana_tide);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_mana_tide::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 // 39610 - Mana Tide Totem
 class spell_sha_mana_tide_totem : public SpellScript
 {
@@ -1094,6 +1145,52 @@ class spell_sha_mana_tide_totem : public SpellScript
     }
 };
 
+// -30881 - Nature's Guardian
+class spell_sha_nature_guardian : public AuraScript
+{
+    PrepareAuraScript(spell_sha_nature_guardian);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_SHAMAN_NATURE_GUARDIAN,
+                SPELL_SHAMAN_NATURE_GUARDIAN_THREAT
+            });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return false;
+
+        int32 healthpct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        if (Unit* target = eventInfo.GetActionTarget())
+            if (target->HealthBelowPctDamaged(healthpct, damageInfo->GetDamage()))
+                return true;
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* target = eventInfo.GetActionTarget();
+        int32 bp = CalculatePct(target->GetMaxHealth(), aurEff->GetAmount());
+        target->CastCustomSpell(SPELL_SHAMAN_NATURE_GUARDIAN, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
+        if (Unit* attacker = eventInfo.GetActor())
+            target->CastSpell(attacker, SPELL_SHAMAN_NATURE_GUARDIAN_THREAT, true);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_sha_nature_guardian::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_sha_nature_guardian::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 // 6495 - Sentry Totem
 class spell_sha_sentry_totem : public AuraScript
 {
@@ -1114,6 +1211,42 @@ class spell_sha_sentry_totem : public AuraScript
     void Register() override
     {
         AfterEffectRemove += AuraEffectRemoveFn(spell_sha_sentry_totem::AfterRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 55278, 55328, 55329, 55330, 55332, 55333, 55335, 58589, 58590, 58591 - Stoneclaw Totem
+class spell_sha_stoneclaw_totem : public SpellScript
+{
+    PrepareSpellScript(spell_sha_stoneclaw_totem);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHAMAN_STONECLAW_TOTEM, SPELL_SHAMAN_GLYPH_OF_STONECLAW_TOTEM });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+
+        // Cast Absorb on totems
+        for (uint8 slot = SUMMON_SLOT_TOTEM_FIRE; slot < MAX_TOTEM_SLOT; ++slot)
+        {
+            if (!target->m_SummonSlot[slot])
+                continue;
+
+            Creature* totem = target->GetMap()->GetCreature(target->m_SummonSlot[slot]);
+            if (totem && totem->IsTotem())
+                GetCaster()->CastCustomSpell(SPELL_SHAMAN_STONECLAW_TOTEM, SPELLVALUE_BASE_POINT0, GetEffectValue(), totem, true);
+        }
+
+        // Glyph of Stoneclaw Totem
+        if (AuraEffect* aur = target->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_STONECLAW_TOTEM, 0))
+            GetCaster()->CastCustomSpell(SPELL_SHAMAN_STONECLAW_TOTEM, SPELLVALUE_BASE_POINT0, GetEffectValue() * aur->GetAmount(), target, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sha_stoneclaw_totem::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1410,6 +1543,24 @@ class spell_sha_astral_shift_aura : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_sha_astral_shift_aura::CheckProc);
+    }
+};
+
+// 52179 - Astral Shift
+class spell_sha_astral_shift_visual_dummy : public AuraScript
+{
+    PrepareAuraScript(spell_sha_astral_shift_visual_dummy);
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        // Periodic needed to remove visual on stun/fear/silence lost
+        if (!(GetTarget()->GetUnitFlags() & (UNIT_FLAG_STUNNED | UNIT_FLAG_FLEEING | UNIT_FLAG_SILENCED)))
+            Remove();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_astral_shift_visual_dummy::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1784,34 +1935,32 @@ class spell_sha_static_shock : public AuraScript
     }
 };
 
-// 71824 - Item - Shaman T10 Elemental 4P Bonus
+// 70817 - Item - Shaman T10 Elemental 4P Bonus
 class spell_sha_t10_elemental_4p_bonus : public AuraScript
 {
     PrepareAuraScript(spell_sha_t10_elemental_4p_bonus);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_SHAMAN_LAVA_BURST_BONUS_DAMAGE });
-    }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !damageInfo->GetDamage())
-            return;
-
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_SHAMAN_LAVA_BURST_BONUS_DAMAGE);
-        if (!spellInfo)
-            return;
-
-        int32 amount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
-        amount /= spellInfo->GetMaxTicks();
-
         Unit* caster = eventInfo.GetActor();
         Unit* target = eventInfo.GetActionTarget();
-        target->CastDelayedSpellWithPeriodicAmount(caster, SPELL_SHAMAN_LAVA_BURST_BONUS_DAMAGE, SPELL_AURA_PERIODIC_DAMAGE, amount);
+
+        // try to find spell Flame Shock on the target
+        AuraEffect* flameShock = target->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_SHAMAN, 0x10000000, 0x00000000, 0x00000000, caster->GetGUID());
+        if (!flameShock)
+            return;
+
+        Aura* flameShockAura = flameShock->GetBase();
+
+        int32 maxDuration = flameShockAura->GetMaxDuration();
+        int32 newDuration = flameShockAura->GetDuration() + aurEff->GetAmount() * IN_MILLISECONDS;
+
+        flameShockAura->SetDuration(newDuration);
+        // is it blizzlike to change max duration for FS?
+        if (newDuration > maxDuration)
+            flameShockAura->SetMaxDuration(newDuration);
     }
 
     void Register() override
@@ -1873,6 +2022,26 @@ class spell_sha_t3_6p_bonus : public AuraScript
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_sha_t3_6p_bonus::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 28820 - Lightning Shield (The Earthshatterer 8P Bonus)
+class spell_sha_t3_8p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_sha_t3_8p_bonus);
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+
+        // Need remove self if Lightning Shield not active
+        if (!GetTarget()->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_SHAMAN, 0x400, 0, 0))
+            Remove();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sha_t3_8p_bonus::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -2066,8 +2235,11 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_item_t10_elemental_2p_bonus);
     RegisterSpellScript(spell_sha_lava_lash);
     RegisterSpellScript(spell_sha_mana_spring_totem);
+    RegisterSpellScript(spell_sha_mana_tide);
     RegisterSpellScript(spell_sha_mana_tide_totem);
+    RegisterSpellScript(spell_sha_nature_guardian);
     RegisterSpellScript(spell_sha_sentry_totem);
+    RegisterSpellScript(spell_sha_stoneclaw_totem);
     RegisterSpellScript(spell_sha_thunderstorm);
     RegisterSpellScript(spell_sha_flurry_proc);
     RegisterSpellScript(spell_sha_t8_electrified);
@@ -2077,6 +2249,8 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_lightning_overload);
     RegisterSpellScript(spell_sha_ancestral_awakening);
     RegisterSpellScript(spell_sha_astral_shift_aura);
+    RegisterSpellScript(spell_sha_astral_shift_visual_dummy);
+    RegisterSpellScript(spell_sha_clearcasting);
     RegisterSpellScript(spell_sha_flametongue_weapon);
     RegisterSpellScript(spell_sha_glyph_of_earth_shield);
     RegisterSpellScript(spell_sha_glyph_of_totem_of_wrath);
@@ -2088,6 +2262,7 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_static_shock);
     RegisterSpellScript(spell_sha_t10_elemental_4p_bonus);
     RegisterSpellScript(spell_sha_t3_6p_bonus);
+    RegisterSpellScript(spell_sha_t3_8p_bonus);
     RegisterSpellScript(spell_sha_t8_elemental_4p_bonus);
     RegisterSpellScript(spell_sha_t9_elemental_4p_bonus);
     RegisterSpellScript(spell_sha_tidal_force_dummy);
