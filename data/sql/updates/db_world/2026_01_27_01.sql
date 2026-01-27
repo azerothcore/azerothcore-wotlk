@@ -1,3 +1,4 @@
+-- DB update 2026_01_27_00 -> 2026_01_27_01
 -- Updates the trainer option from "Train me." to "I seek training in Fishing."
 UPDATE `gossip_menu_option` SET `OptionText` = 'I seek training in Fishing.', `OptionBroadcastTextID` = 34245 WHERE `MenuID` = 10437 AND `OptionID` = 0;
 
