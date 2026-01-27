@@ -2978,7 +2978,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (Creature* c = target->ToCreature())
                     {
                         CAST_AI(SmartAI, c->AI())->SetCanRespawn(false);
-                        if (!e.action.scriptSpawn.dontDespawn)
+                        if (e.action.scriptSpawn.dontDespawn == 0)
                             c->DespawnOrUnsummon();
                     }
                 }
