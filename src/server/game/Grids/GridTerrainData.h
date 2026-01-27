@@ -245,11 +245,37 @@ public:
     ~GridTerrainData() { };
     TerrainMapDataReadResult Load(std::string const& mapFileName);
 
+    enum class GroundFootprintShape : uint8
+    {
+        Circle = 0,   // cylinder-plane
+        Square = 1    // upside-down pyramid
+    };
+
+    static inline const char* ToString(GroundFootprintShape s)
+    {
+        switch (s)
+        {
+            case GroundFootprintShape::Circle: return "circle";
+            case GroundFootprintShape::Square: return "square";
+        }
+        return "unknown";
+    }
+
+    // Accurate height with footprint & yaw. squareBlend in [0..1]. slopeClamp in [0..10] (0 disables).
+    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw,
+                            float squareBlend, float slopeClamp, uint32 gradientMode, float normalEps) const;
+    // Convenience wrappers (kept for compatibility).
+    float GetHeightAccurate(float x, float y, float radius) const;
+    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const;
+    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw /*rads*/) const;
+    inline std::string to_string(GridTerrainData::GroundFootprintShape s) { return GridTerrainData::ToString(s); }
     uint16 getArea(float x, float y) const;
     inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
     float getMinHeight(float x, float y) const;
     float getLiquidLevel(float x, float y) const;
     LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType) const;
+private:
+    bool SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const;
 };
 
 #endif
