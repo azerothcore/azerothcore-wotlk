@@ -36,3 +36,23 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (31321, 0, 1, 0, 0, 0, 100, 0, 3200, 7500, 9750, 13250, 0, 0, 11, 46202, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Runesmith - In Combat - Cast \'Pierce Armor\'');
 
 UPDATE `gameobject` SET `phaseMask` = `phaseMask`|4 WHERE `id` = 193004 AND `guid` IN (99724, 99725, 99726, 99727);
+
+DELETE FROM `creature_text` WHERE (`CreatureID` = 30922);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(30922, 0, 0, 'No one throws rocks at me!', 12, 0, 100, 0, 0, 0, 32217, 0, 'Matchmaker (13147)'),
+(30922, 0, 1, 'You wouldn\'t like me when I\'m angry...', 12, 0, 100, 0, 0, 0, 32218, 0, 'Matchmaker (13147)'),
+(30922, 0, 2, 'Finally! An excuse to squash you!', 12, 0, 100, 0, 0, 0, 32220, 0, 'Matchmaker (13147)'),
+(30922, 0, 3, 'You die for good this time, skeleton!', 12, 0, 100, 0, 0, 0, 32221, 0, 'Matchmaker (13147)'),
+(30922, 0, 4, 'Last straw...', 12, 0, 100, 0, 0, 0, 32222, 0, 'Matchmaker (13147)'),
+(30922, 0, 5, 'I was waiting for a reason to tear you bone from bone!', 12, 0, 100, 0, 0, 0, 32223, 0, 'Matchmaker (13147)'),
+(30922, 0, 6, 'That\'s the last mistake you\'ll make, skeleton.', 12, 0, 100, 0, 0, 0, 32224, 0, 'Matchmaker (13147)');
+
+DELETE FROM `creature_text` WHERE (`CreatureID` = 30922);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(31320, 0, 0, 'No one throws rocks at me!', 12, 0, 100, 0, 0, 0, 32217, 0, 'Matchmaker (13147)'),
+(31320, 0, 1, 'You wouldn\'t like me when I\'m angry...', 12, 0, 100, 0, 0, 0, 32218, 0, 'Matchmaker (13147)'),
+(31320, 0, 2, 'Finally! An excuse to squash you!', 12, 0, 100, 0, 0, 0, 32220, 0, 'Matchmaker (13147)'),
+(31320, 0, 3, 'You die for good this time, skeleton!', 12, 0, 100, 0, 0, 0, 32221, 0, 'Matchmaker (13147)'),
+(31320, 0, 4, 'Last straw...', 12, 0, 100, 0, 0, 0, 32222, 0, 'Matchmaker (13147)'),
+(31320, 0, 5, 'I was waiting for a reason to tear you bone from bone!', 12, 0, 100, 0, 0, 0, 32223, 0, 'Matchmaker (13147)'),
+(31320, 0, 6, 'That\'s the last mistake you\'ll make, skeleton.', 12, 0, 100, 0, 0, 0, 32224, 0, 'Matchmaker (13147)');
