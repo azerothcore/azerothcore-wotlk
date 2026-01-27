@@ -47,7 +47,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (30922, 0, 5, 'I was waiting for a reason to tear you bone from bone!', 12, 0, 100, 0, 0, 0, 32223, 0, 'Matchmaker (13147)'),
 (30922, 0, 6, 'That\'s the last mistake you\'ll make, skeleton.', 12, 0, 100, 0, 0, 0, 32224, 0, 'Matchmaker (13147)');
 
-DELETE FROM `creature_text` WHERE (`CreatureID` = 30922);
+DELETE FROM `creature_text` WHERE (`CreatureID` = 31320);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (31320, 0, 0, 'No one throws rocks at me!', 12, 0, 100, 0, 0, 0, 32217, 0, 'Matchmaker (13147)'),
 (31320, 0, 1, 'You wouldn\'t like me when I\'m angry...', 12, 0, 100, 0, 0, 0, 32218, 0, 'Matchmaker (13147)'),
