@@ -5191,8 +5191,10 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     ApplySpellFix({
-        57374, // Shadow Bolt (Lady Blaumeux)
-        57376, // Holy Bolt (Sir Zeliek)
+        57374, // Shadow Bolt (Lady Blaumeux 10m)
+        57464, // Shadow Bolt (Lady Blaumeux 25m)
+        57376, // Holy Bolt (Sir Zeliek 10m)
+        57465, // Holy Bolt (Sir Zeliek 25m)
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
