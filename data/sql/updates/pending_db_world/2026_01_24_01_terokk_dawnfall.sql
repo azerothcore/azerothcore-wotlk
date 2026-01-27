@@ -30,10 +30,9 @@ UPDATE `smart_scripts` SET `action_param1` = 2, `action_param2` = 2, `comment` =
 UPDATE `smart_scripts` SET `target_param1` = 23377 WHERE `entryorguid` = 21838 AND `id` IN (4, 7, 13, 14);
 UPDATE `smart_scripts` SET `action_param1` = 1, `action_param2` = 1 WHERE `entryorguid` = 21838 AND `id` = 7;
 
-
 DELETE FROM `creature_text` WHERE `CreatureID` = 21838 AND `GroupID` = 3;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) 
-VALUES  (21838,3,0,'Who calls me to this world? The stars are not yet aligned... my powers fail me! You will pay for this!',14,0,100.0,0,0,0,21639,0,'Terokk');
+VALUES (21838,3,0,'Who calls me to this world? The stars are not yet aligned... my powers fail me! You will pay for this!',14,0,100.0,0,0,0,21639,0,'Terokk');
 
 UPDATE `creature_text` SET `Text` = 'Kwa! You cannot kill me, I am immortal!' WHERE `CreatureID` = 21838 AND `GroupID` = 1;
 UPDATE `creature_text` SET `BroadcastTextId` = 24020 WHERE `CreatureID` = 21838 AND `GroupID` = 1;
@@ -52,4 +51,3 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (23377, 2, -3794.88, 3497.48, 325.551, NULL, 0, 'Skyguard Ace'),
 (23377, 3, -3808.63, 3515.7, 325.551, NULL, 0, 'Skyguard Ace'),
 (23377, 4, -3783.6, 3524.59, 325.551, NULL, 0, 'Skyguard Ace');
-
