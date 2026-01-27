@@ -128,6 +128,7 @@ public:
             spawnTimer = 0;
             currentTarget.Clear();
             blockList.clear();
+            me->SetAnimTier(AnimTier::Fly);
         }
 
         void EnterCombatSelfFunction()
@@ -291,7 +292,7 @@ public:
                     me->AttackStop();
                     float x, y, z, o;
                     me->GetHomePosition(x, y, z, o);
-                    me->GetMotionMaster()->MovePoint(POINT_CENTER, x, y, z);
+                    me->GetMotionMaster()->MovePoint(POINT_CENTER, x, y, z, FORCED_MOVEMENT_NONE, 0.f, o);
                     return;
                 case EVENT_FLIGHT_LIFTOFF:
                     Talk(EMOTE_AIR_PHASE);
