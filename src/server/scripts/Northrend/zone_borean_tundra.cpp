@@ -1749,6 +1749,7 @@ public:
                     case EVENT_THASSARIAN_SCRIPT_29:
                         Cleanup();
                         me->DespawnOrUnsummon(30s, 120s);
+                        me->setActive(false);
                         break;
                     default:
                         break;
@@ -1767,6 +1768,7 @@ public:
         {
             Cleanup();
             me->DespawnOrUnsummon(1s, 120s);
+            me->setActive(false);
         }
 
         void Cleanup()
@@ -1792,6 +1794,11 @@ public:
             }
         }
 
+        void JustSummoned(Creature* summon) override
+        {
+            summon->setActive(true);
+        }
+
         void sGossipHello(Player* /*player*/) override
         {
             if (!me->HasAura(SPELL_BLOOD_PRESENCE))
@@ -1804,6 +1811,7 @@ public:
         {
             if (action == 0)
             {
+                me->setActive(true);
                 _playerGUID = player->GetGUID();
                 CloseGossipMenuFor(player);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
