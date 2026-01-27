@@ -5190,6 +5190,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValueB = 64;
     });
 
+    ApplySpellFix({
+        57374, // Shadow Bolt (Lady Blaumeux)
+        57376, // Holy Bolt (Sir Zeliek)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
