@@ -1,3 +1,4 @@
+-- DB update 2026_01_27_01 -> 2026_01_27_02
 --
 UPDATE `creature_template` SET `lootid` = 30921 WHERE (`entry` = 31321);
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 31321);
