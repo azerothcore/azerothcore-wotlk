@@ -703,20 +703,14 @@ public:
                         Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
                         if (!PlayerList.IsEmpty())
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                if (Player* pPlayer = i->GetSource())
+                                if (Player* player = i->GetSource())
                                 {
-                                    sScriptMgr->AnticheatSetUnderACKmount(pPlayer);
+                                    sScriptMgr->AnticheatSetUnderACKmount(player);
 
-                                    if (!pPlayer->IsAlive() || pPlayer->IsGameMaster())
+                                    if (!player->IsAlive() || player->IsGameMaster())
                                         continue;
 
-                                    if (Creature* c = me->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
-                                    {
-                                        c->SetFaction(pPlayer->GetFaction());
-                                        //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
-                                        c->m_Events.AddEventAtOffset(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), 500ms);
-                                        AttackStart(c);
-                                    }
+                                    player->CastSpell(player, SPELL_SUMMOM_RED_DRAGON_BUDDY, true);
                                 }
 
                         events.RescheduleEvent(EVENT_SAY_PHASE_3_INTRO, 3s, 1);
