@@ -1236,15 +1236,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask[1] |= 0x20; // prayer of mending
     });
 
-    // Power Infusion
-    ApplySpellFix({ 10060 }, [](SpellInfo* spellInfo)
-    {
-        // hack to fix stacking with arcane power
-        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
-        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ALLY);
-    });
-
     // Lifebloom final bloom
     ApplySpellFix({ 33778 }, [](SpellInfo* spellInfo)
     {
@@ -3693,13 +3684,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 26740 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_CHARM;
-    });
-
-    // Persistent Shield
-    ApplySpellFix({ 26467 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 26470;
     });
 
     // Deadly Swiftness
