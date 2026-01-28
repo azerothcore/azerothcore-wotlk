@@ -1754,7 +1754,6 @@ public:
                     case EVENT_THASSARIAN_SCRIPT_29:
                         Cleanup();
                         me->DespawnOrUnsummon(30s, 120s);
-                        me->setActive(false);
                         break;
                     default:
                         break;
@@ -1773,7 +1772,6 @@ public:
         {
             Cleanup();
             me->DespawnOrUnsummon(1s, 120s);
-            me->setActive(false);
         }
 
         void Cleanup()
