@@ -237,4 +237,4 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 -- update equipment
 DELETE FROM `creature_equip_template` WHERE `CreatureID` = 23504;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
-(23504, 1, 2361, 0, 0, NULL);
+(23504, 1, 5292, 0, 0, 50664);
