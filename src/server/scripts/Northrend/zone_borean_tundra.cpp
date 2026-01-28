@@ -1472,6 +1472,11 @@ public:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_1, 2s);
             }
+            else if (type == POINT_MOTION_TYPE && param == 0)
+            {
+                if (Creature* talbot = ObjectAccessor::GetCreature(*me, _talbotGUID))
+                    me->SetFacingToObject(talbot);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1702,7 +1707,7 @@ public:
                         if (Creature* leryssa = ObjectAccessor::GetCreature(*me, _leryssaGUID))
                         {
                             leryssa->SetWalk(false);
-                            leryssa->GetMotionMaster()->MovePoint(0, 3726.751f, 3568.1633f, 477.44086f, FORCED_MOVEMENT_RUN);
+                            leryssa->GetMotionMaster()->MovePoint(1, 3726.751f, 3568.1633f, 477.44086f, FORCED_MOVEMENT_RUN);
                         }
                         _events.ScheduleEvent(EVENT_THASSARIAN_SCRIPT_23, 2s);
                         break;
@@ -1792,11 +1797,6 @@ public:
             {
                 arthas->RemoveFromWorld();
             }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summon->setActive(true);
         }
 
         void sGossipHello(Player* /*player*/) override
