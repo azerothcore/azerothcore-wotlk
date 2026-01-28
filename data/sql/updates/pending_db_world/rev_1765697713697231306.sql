@@ -1,7 +1,7 @@
 --
 SET @ENTRY := 24705;
 
-UPDATE `creature_template` SET `flags_extra` = 128 WHERE `entry` = @ENTRY;
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 128 WHERE `entry` = @ENTRY;
 
 DELETE FROM `creature_template_model` WHERE `CreatureID` = @ENTRY;
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
