@@ -126,4 +126,24 @@ private:
     bool _inheritSpeed;
 };
 
+template<class T>
+class HauntMovementGenerator : public MovementGeneratorMedium<T, HauntMovementGenerator<T>>, public TargetedMovementGeneratorBase
+{
+public:
+    HauntMovementGenerator(Unit* target) : TargetedMovementGeneratorBase(target), i_path(nullptr) {}
+    ~HauntMovementGenerator() {}
+
+    MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
+
+    bool DoUpdate(T*, uint32);
+    void DoInitialize(T*);
+    void DoFinalize(T*);
+    void DoReset(T*);
+    void MovementInform(T*);
+
+    Unit* GetTarget() const { return i_target.getTarget(); }
+
+private:
+    std::unique_ptr<PathGenerator> i_path;
+};
 #endif

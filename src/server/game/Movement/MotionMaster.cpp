@@ -1020,3 +1020,11 @@ bool MotionMaster::GetDestination(float& x, float& y, float& z)
     z = dest.z;
     return true;
 }
+
+void MotionMaster::MoveHaunt(Unit* target)
+{
+    if (!target)
+        return;
+
+    Mutate(new HauntMovementGenerator<Creature>(target), MOTION_SLOT_CONTROLLED);
+}

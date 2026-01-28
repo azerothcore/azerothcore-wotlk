@@ -262,6 +262,7 @@ public:
     void MoveDistract(uint32 time);
     void MoveWaypoint(uint32 path_id, bool repeatable, PathSource pathSource = PathSource::WAYPOINT_MGR);
     void MoveRotate(uint32 time, RotateDirection direction);
+    void MoveHaunt(Unit* target);
 
     [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
     [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
