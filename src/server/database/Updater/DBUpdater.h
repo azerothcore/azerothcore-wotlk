@@ -23,9 +23,7 @@
 #include "QueryResult.h"
 #include <filesystem>
 #include <string>
-
-template <class T>
-class DatabaseWorkerPool;
+#include "DatabaseUpdatePool.h"
 
 namespace boost
 {
@@ -75,19 +73,19 @@ public:
     static std::string GetBaseFilesDirectory();
     static bool IsEnabled(uint32 const updateMask);
     static BaseLocation GetBaseLocationType();
-    static bool Create(DatabaseWorkerPool<T>& pool);
-    static bool Update(DatabaseWorkerPool<T>& pool, std::string_view modulesList = {});
-    static bool Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> const* setDirectories);
-    static bool Populate(DatabaseWorkerPool<T>& pool);
+    static bool Create(DatabaseUpdatePool& pool);
+    static bool Update(DatabaseUpdatePool& pool, std::string_view modulesList = {});
+    static bool Update(DatabaseUpdatePool& pool, std::vector<std::string> const* setDirectories);
+    static bool Populate(DatabaseUpdatePool& pool);
 
     // module
     static std::string GetDBModuleName();
 
 private:
-    static QueryResult Retrieve(DatabaseWorkerPool<T>& pool, std::string const& query);
-    static void Apply(DatabaseWorkerPool<T>& pool, std::string const& query);
-    static void ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path);
-    static void ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
+    static QueryResult Retrieve(DatabaseUpdatePool& pool, std::string const& query);
+    static void Apply(DatabaseUpdatePool& pool, std::string const& query);
+    static void ApplyFile(DatabaseUpdatePool& pool, Path const& path);
+    static void ApplyFile(DatabaseUpdatePool& pool, std::string const& host, std::string const& user,
                           std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path);
 };
 
