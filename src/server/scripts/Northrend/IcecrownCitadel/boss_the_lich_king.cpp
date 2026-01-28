@@ -2702,19 +2702,9 @@ class spell_the_lich_king_valkyr_target_search : public SpellScript
                     if (s->GetSpellInfo()->Id == SPELL_DEFILE && s->m_targets.GetUnitTarget())
                         targets.remove(s->m_targets.GetUnitTarget());
 
-        // Exclude Shaman totems from the target pool.
-        // Totems are Creature-type units and can appear as valid friendly units,
-        // but they must never be considered pickup targets for Val'kyr.
-        targets.remove_if([](WorldObject* obj) {
-            if (Creature* c = obj->ToCreature())
-                return (c->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM);
-            return false;
-        });
-
-        // Enforce player-only targets as a final safety filter.
         // This ensures no pets, guardians, or other non-player units slip through.
         targets.remove_if([](WorldObject* obj) {
-            return obj->GetTypeId() != TYPEID_PLAYER;
+            return obj->IsPlayer();
         });
 
         if (targets.empty())
