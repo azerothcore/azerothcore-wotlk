@@ -156,7 +156,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
 
 -- Update creature 'Brewfest Building (Ironforge)' with sniffed values
 -- new spawns
-DELETE FROM `creature` WHERE (`id1` IN (23504)) AND (`guid` IN (12820, 12821, 12822, 12823, 12824, 12825, 12826, 12827, 12828));
+DELETE FROM `creature` WHERE (`id1` IN (23504)) AND (`guid` IN (12820, 12821, 12822, 12823, 12824, 12825, 12826, 12827, 12828, 12829));
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (12820, 23504, 0, 1, 1, 1, -5130.50634765625, -619.58343505859375, 397.336334228515625, 1.448623299598693847, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 -- TODO: guids 12821 and 12822 should have waypoints and SAI
@@ -167,9 +167,10 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 (12825, 23504, 0, 1, 1, 1, -5197.08056640625, -487.789215087890625, 388.21221923828125, 0.226892799139022827, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12826, 23504, 0, 1, 1, 1, -5206.8115234375, -550.51776123046875, 397.272247314453125, 2.146754980087280273, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12827, 23504, 0, 1, 1, 1, -5211.03173828125, -503.261444091796875, 388.160888671875, 3.351032257080078125, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
-(12828, 23504, 0, 1, 1, 1, -5221.11572265625, -478.54193115234375, 386.972564697265625, 4.076367378234863281, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL);
+(12828, 23504, 0, 1, 1, 1, -5221.11572265625, -478.54193115234375, 386.972564697265625, 4.076367378234863281, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
+(12829, 23504, 0, 1, 1, 1, -5210.88525390625, -465.2335205078125, 387.572174072265625, 0.912006199359893798, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL);
 
-DELETE FROM `game_event_creature` WHERE (`eventEntry` = 70) AND (`guid` IN (12820, 12821, 12822, 12823, 12824, 12825, 12826, 12827, 12828));
+DELETE FROM `game_event_creature` WHERE (`eventEntry` = 70) AND (`guid` IN (12820, 12821, 12822, 12823, 12824, 12825, 12826, 12827, 12828, 12829));
 INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 (70, 12820),
 (70, 12821),
@@ -179,10 +180,11 @@ INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 (70, 12825),
 (70, 12826),
 (70, 12827),
-(70, 12828);
+(70, 12828),
+(70, 12829);
 
 -- update auras
-DELETE FROM `creature_addon` WHERE (`guid` IN (12820, 12821, 12822, 12823, 12824, 12825, 12826, 12827, 12828));
+DELETE FROM `creature_addon` WHERE (`guid` IN (12820, 12821, 12822, 12823, 12824, 12825, 12826, 12827, 12828, 12829));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (12820, 0, 0, 0, 0, 233, 0, '44372'),
 (12821, 0, 0, 0, 0, 432, 0, '44372'),
@@ -192,7 +194,8 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (12825, 0, 0, 0, 0, 233, 0, '44372'),
 (12826, 0, 0, 0, 0, 233, 0, '44372'),
 (12827, 0, 0, 0, 0, 233, 0, '44372'),
-(12828, 0, 0, 0, 0, 233, 0, '44372');
+(12828, 0, 0, 0, 0, 233, 0, '44372'),
+(12829, 0, 0, 0, 0, 233, 0, '44372');
 
 -- update equipment
 DELETE FROM `creature_equip_template` WHERE `CreatureID` = 23504;
