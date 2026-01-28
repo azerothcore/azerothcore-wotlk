@@ -1,4 +1,6 @@
---
+-- update game event
+UPDATE `game_event` SET `description` = "Brewfest Building (Ironforge)" WHERE `eventEntry` = 70;
+
 -- Update gameobject 'Brewfest Building (Ironforge)' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (186737, 186717, 180052, 186217, 180026)) AND (`guid` IN (66860, 66861, 66862, 66863, 66864, 66865, 66866, 66867, 66868, 66869, 66870, 66871));
