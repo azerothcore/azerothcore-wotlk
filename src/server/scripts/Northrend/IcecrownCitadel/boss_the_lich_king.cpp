@@ -940,7 +940,7 @@ public:
                     events.ScheduleEvent(EVENT_QUAKE, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 6s, EVENT_GROUP_ABILITIES);
                     break;
                 case POINT_CENTER_2:
                     me->SetFacingTo(0.0f);
@@ -952,7 +952,7 @@ public:
                     events.ScheduleEvent(EVENT_QUAKE_2, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 6s, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
@@ -1821,6 +1821,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
+            if (!target->IsPlayer()) return false;
             return IsValidPlatformTarget(target) && !target->GetVehicle();
         }
     };
@@ -2308,6 +2309,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
+            if (!target->IsPlayer()) return false;
             return IsValidPlatformTarget(target) && !target->GetVehicle();
         }
 
@@ -2699,6 +2701,21 @@ class spell_the_lich_king_valkyr_target_search : public SpellScript
                 if (Spell* s = lichKing->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                     if (s->GetSpellInfo()->Id == SPELL_DEFILE && s->m_targets.GetUnitTarget())
                         targets.remove(s->m_targets.GetUnitTarget());
+
+        // Exclude Shaman totems from the target pool.
+        // Totems are Creature-type units and can appear as valid friendly units,
+        // but they must never be considered pickup targets for Val'kyr.
+        targets.remove_if([](WorldObject* obj) {
+            if (Creature* c = obj->ToCreature())
+                return (c->GetCreatureTemplate()->type == CREATURE_TYPE_TOTEM);
+            return false;
+        });
+
+        // Enforce player-only targets as a final safety filter.
+        // This ensures no pets, guardians, or other non-player units slip through.
+        targets.remove_if([](WorldObject* obj) {
+            return obj->GetTypeId() != TYPEID_PLAYER;
+        });
 
         if (targets.empty())
             return;
@@ -3369,6 +3386,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
+            if (!target->IsPlayer()) return false;
             return IsValidPlatformTarget(target) && !target->GetVehicle();
         }
     };
