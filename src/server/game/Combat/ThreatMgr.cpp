@@ -468,6 +468,9 @@ bool ThreatContainer::IsPreferredTarget(Creature* attacker, Unit* target) const
     if (target->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, attacker->GetGUID()))
         return false;
 
+    if (attacker->HasUnitState(UNIT_STATE_ROOT) && attacker->IsCombatMovementAllowed() && !attacker->IsWithinMeleeRange(target))
+        return false;
+
     return true;
 }
 

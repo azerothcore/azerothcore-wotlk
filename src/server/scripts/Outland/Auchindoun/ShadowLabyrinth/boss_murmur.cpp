@@ -85,11 +85,6 @@ struct boss_murmur : public BossAI
         }, 3600ms, 10900ms, GROUP_OOC_CAST);
     }
 
-    bool CanAIAttack(Unit const* victim) const override
-    {
-        return me->IsWithinMeleeRange(victim);
-    }
-
     void EnterEvadeMode(EvadeReason why) override
     {
         if (me->GetThreatMgr().GetThreatList().empty())
