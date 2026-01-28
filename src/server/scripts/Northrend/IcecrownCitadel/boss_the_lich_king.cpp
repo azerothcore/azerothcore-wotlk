@@ -2704,7 +2704,7 @@ class spell_the_lich_king_valkyr_target_search : public SpellScript
 
         // This ensures no pets, guardians, or other non-player units slip through.
         targets.remove_if([](WorldObject* obj) {
-            return obj->IsPlayer();
+            return !obj->IsPlayer();
         });
 
         if (targets.empty())
