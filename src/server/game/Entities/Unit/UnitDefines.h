@@ -169,7 +169,7 @@ enum UnitState
 {
     UNIT_STATE_DIED                     = 0x00000001,       // player has fake death aura
     UNIT_STATE_MELEE_ATTACKING          = 0x00000002,       // player is melee attacking someone
-    //UNIT_STATE_MELEE_ATTACK_BY        = 0x00000004,       // player is melee attack by someone
+    UNIT_STATE_CHARMED                  = 0x00000004,       // having any kind of charm aura on self
     UNIT_STATE_STUNNED                  = 0x00000008,
     UNIT_STATE_ROAMING                  = 0x00000010,
     UNIT_STATE_CHASE                    = 0x00000020,
@@ -201,7 +201,7 @@ enum UnitState
     UNIT_STATE_NO_COMBAT_MOVEMENT       = 0x40000000,       // should not be changed outside the core and should be placed at the end
     UNIT_STATE_LOGOUT_TIMER             = 0x80000000,       // Unit is logging out
 
-    UNIT_STATE_ALL_STATE_SUPPORTED = UNIT_STATE_DIED | UNIT_STATE_MELEE_ATTACKING | UNIT_STATE_STUNNED | UNIT_STATE_ROAMING | UNIT_STATE_CHASE
+    UNIT_STATE_ALL_STATE_SUPPORTED = UNIT_STATE_DIED | UNIT_STATE_MELEE_ATTACKING | UNIT_STATE_CHARMED | UNIT_STATE_STUNNED | UNIT_STATE_ROAMING | UNIT_STATE_CHASE
     | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT | UNIT_STATE_FOLLOW | UNIT_STATE_ROOT | UNIT_STATE_CONFUSED
     | UNIT_STATE_DISTRACTED | UNIT_STATE_ISOLATED | UNIT_STATE_ATTACK_PLAYER | UNIT_STATE_CASTING
     | UNIT_STATE_POSSESSED | UNIT_STATE_CHARGING | UNIT_STATE_JUMPING | UNIT_STATE_MOVE | UNIT_STATE_ROTATING
