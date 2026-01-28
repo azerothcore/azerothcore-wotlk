@@ -72,7 +72,7 @@ public:
                     if (!player->IsAlive())
                         return;
 
-                    player->CastSpell(player, SPELL_SUMMOM_RED_DRAGON_BUDDY, true);
+                    player->CastSpell(player, SPELL_SUMMON_RED_DRAGON_BUDDY, true);
                 }
             }
         }

@@ -710,7 +710,7 @@ public:
                                     if (!player->IsAlive() || player->IsGameMaster())
                                         continue;
 
-                                    player->CastSpell(player, SPELL_SUMMOM_RED_DRAGON_BUDDY, true);
+                                    player->CastSpell(player, SPELL_SUMMON_RED_DRAGON_BUDDY, true);
                                 }
 
                         events.RescheduleEvent(EVENT_SAY_PHASE_3_INTRO, 3s, 1);
