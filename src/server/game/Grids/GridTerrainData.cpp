@@ -700,8 +700,8 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     return GetHeightAccurate(x, y, radius, shape, yaw, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f, 0u, 1.0e-6f);
 }
 
-float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw,
-                                         float squareBlend, float slopeClamp, uint32 gradientMode, float normalEps) const
+float GridTerrainData::GetHeightAccurate(
+    float x, float y, float radius, GroundFootprintShape shape, float yaw, float squareBlend, float slopeClamp, uint32 gradientMode, float normalEps) const
 {
     if (!_loadedHeightData)
         return INVALID_HEIGHT;
@@ -733,49 +733,49 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     // h3 -> (0,S)
     // h4 -> (S,S)
     // h5 -> (S/2, S/2)
-    const float S  = CELL_SIZE();
-    const float S2 = S * 0.5f;
+    float const S = CELL_SIZE();
+    float const S2 = S * 0.5f;
 
     G3D::Vector3 P(fx * S, fy * S, 0.0f);
 
     G3D::Vector3 A(S2, S2, h5);
 
-    const float eps = 1e-6f;
-    const float blend = std::max(0.0f, std::min(1.0f, squareBlend));
+    float const eps = 1e-6f;
+    float const blend = std::max(0.0f, std::min(1.0f, squareBlend));
 
-    const bool right = (P.x >= A.x);
-    const bool top   = (P.y >= A.y);
+    bool const right = (P.x >= A.x);
+    bool const top = (P.y >= A.y);
     G3D::Vector3 B, C;
     if (right && !top)
     {
-        B = G3D::Vector3(S,   0.0f, h2);
+        B = G3D::Vector3(S, 0.0f, h2);
         C = G3D::Vector3(0.0f, 0.0f, h1);
     } // BR
     else if (right && top)
     {
-        B = G3D::Vector3(S,   S,    h4);
-        C = G3D::Vector3(S,   0.0f, h2);
+        B = G3D::Vector3(S, S, h4);
+        C = G3D::Vector3(S, 0.0f, h2);
     } // TR
     else if (!right && top)
     {
-        B = G3D::Vector3(0.0f, S,    h3);
-        C = G3D::Vector3(S,   S,    h4);
+        B = G3D::Vector3(0.0f, S, h3);
+        C = G3D::Vector3(S, S, h4);
     } // TL
     else /* !right && !top */
     {
         B = G3D::Vector3(0.0f, 0.0f, h1);
-        C = G3D::Vector3(0.0f, S,    h3);
+        C = G3D::Vector3(0.0f, S, h3);
     } // BL
 
-    const G3D::Vector3 U = B - A;
-    const G3D::Vector3 V = C - A;
-    const G3D::Vector3 n = U.cross(V);
-    const float nzAbs = std::abs(n.z);
+    G3D::Vector3 const U = B - A;
+    G3D::Vector3 const V = C - A;
+    G3D::Vector3 const n = U.cross(V);
+    float const nzAbs = std::abs(n.z);
     if (nzAbs < std::max(eps, normalEps))
         return getHeight(x, y);
 
-    const float zPlane = A.z - (n.x * (P.x - A.x) + n.y * (P.y - A.y)) / n.z;
-    const float inv2S = 1.0f / (2.0f * S);
+    float const zPlane = A.z - (n.x * (P.x - A.x) + n.y * (P.y - A.y)) / n.z;
+    float const inv2S = 1.0f / (2.0f * S);
     float gx, gy;
 
     if (gradientMode == 0u)
@@ -794,16 +794,16 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     // Optional clamp
     if (slopeClamp > 0.0f)
     {
-        const float g2 = gx*gx + gy*gy;
-        const float c2 = slopeClamp * slopeClamp;
+        float const g2 = gx * gx + gy * gy;
+        float const c2 = slopeClamp * slopeClamp;
         if (g2 > c2)
         {
-            const float s = slopeClamp / std::sqrt(g2);
+            float const s = slopeClamp / std::sqrt(g2);
             gx *= s; gy *= s;
         }
     }
 
-    const float slopeL2 = std::sqrt(std::max(0.0f, gx*gx + gy*gy));
+    float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
 
     // Fast‑path radius 0
     if (radius <= 0.0f)
@@ -815,10 +815,10 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
         float slopeL1 = 0.0f;
         if (!(gx == 0.0f && gy == 0.0f))
         {
-            const float c = std::cos(yaw);
-            const float s = std::sin(yaw);
-            const float rx =  gx * c + gy * s;
-            const float ry = -gx * s + gy * c;
+            float const c = std::cos(yaw);
+            float const s = std::sin(yaw);
+            float const rx = gx * c + gy * s;
+            float const ry = -gx * s + gy * c;
             slopeL1 = std::abs(rx) + std::abs(ry);
         }
         totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);

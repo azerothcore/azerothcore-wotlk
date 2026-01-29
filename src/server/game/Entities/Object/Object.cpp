@@ -3039,6 +3039,7 @@ float WorldObject::GetGroundProbeRadius() const
 {
     if (Unit const* u = ToUnit())
         return std::max(0.25f, u->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS));
+
     return 0.3f;
 }
 
