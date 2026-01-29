@@ -5189,6 +5189,13 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, U
                         }
                         // FIXME: using aura->GetMaxDuration() maybe not blizzlike but it fixes stealing of spells like Innervate
                         newAura->SetLoadedState(aura->GetMaxDuration(), int32(dur), stealCharge ? 1 : aura->GetCharges(), 1, recalculateMask, &damage[0]);
+
+                        // Reset periodic timers so stolen HoTs tick properly
+                        // For stolen auras we need fresh tick counters since no ticks have occurred yet
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (AuraEffect* aurEff = newAura->GetEffect(i))
+                                aurEff->ResetPeriodic(true);
+
                         newAura->ApplyForTargets();
                     }
             }
