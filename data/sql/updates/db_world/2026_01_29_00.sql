@@ -1,3 +1,4 @@
+-- DB update 2026_01_28_00 -> 2026_01_29_00
 --
 -- Add BreadcrumbForQuestId column to quest_template_addon
 --
