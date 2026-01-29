@@ -88,6 +88,12 @@ enum WarlockSpells
     SPELL_WARLOCK_SHADOWFLAME_PROC                  = 37378,
     SPELL_WARLOCK_FLAMESHADOW_PROC                  = 37379,
     SPELL_REPLENISHMENT                             = 57669,
+    SPELL_WARLOCK_NETHER_PROTECTION_HOLY            = 54370,
+    SPELL_WARLOCK_NETHER_PROTECTION_FIRE            = 54371,
+    SPELL_WARLOCK_NETHER_PROTECTION_FROST           = 54372,
+    SPELL_WARLOCK_NETHER_PROTECTION_ARCANE          = 54373,
+    SPELL_WARLOCK_NETHER_PROTECTION_SHADOW          = 54374,
+    SPELL_WARLOCK_NETHER_PROTECTION_NATURE          = 54375,
 };
 
 enum WarlockSpellIcons
@@ -1469,8 +1475,72 @@ class spell_warl_demonic_pact_aura : public AuraScript
     }
 };
 
-// 18094, 18095 - Nightfall
+// -980 - Curse of Agony
+class spell_warl_curse_of_agony : public AuraScript
+{
+    PrepareAuraScript(spell_warl_curse_of_agony);
+
+    void ApplyEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        _tick_amount = aurEff->GetAmount();
+    }
+
+    void HandleEffectPeriodicUpdate(AuraEffect* aurEff)
+    {
+        switch (aurEff->GetTickNumber())
+        {
+            // 1..4 ticks, 1/2 from normal tick damage
+            case 1:
+                aurEff->SetAmount(_tick_amount / 2);
+                break;
+            // 5..8 ticks have normal tick damage
+            case 5:
+                aurEff->SetAmount(_tick_amount);
+                break;
+            // 9..12 ticks, 3/2 from normal tick damage
+            case 9:
+                aurEff->SetAmount((_tick_amount + 1) * 3 / 2); // +1 prevent 0.5 damage possible lost at 1..4 ticks
+                break;
+            // 13 and 14 ticks (glyphed only), twice normal tick damage
+            case 13:
+                aurEff->SetAmount(_tick_amount * 2);
+                break;
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_warl_curse_of_agony::ApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_warl_curse_of_agony::HandleEffectPeriodicUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+private:
+    uint32 _tick_amount = 0;
+};
+
 // 56218 - Glyph of Corruption
+class spell_warl_glyph_of_corruption_nightfall : public AuraScript
+{
+    PrepareAuraScript(spell_warl_glyph_of_corruption_nightfall);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_SHADOW_TRANCE });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        caster->CastSpell(caster, SPELL_WARLOCK_SHADOW_TRANCE, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_glyph_of_corruption_nightfall::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 18094, 18095 - Nightfall
 class spell_warl_nightfall : public AuraScript
 {
     PrepareAuraScript(spell_warl_nightfall);
@@ -1800,8 +1870,88 @@ class spell_warl_t4_2p_bonus_shadow : public AuraScript
     }
 };
 
+// -30299 - Nether Protection
+class spell_warl_nether_protection : public AuraScript
+{
+    PrepareAuraScript(spell_warl_nether_protection);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_WARLOCK_NETHER_PROTECTION_HOLY,
+            SPELL_WARLOCK_NETHER_PROTECTION_FIRE,
+            SPELL_WARLOCK_NETHER_PROTECTION_NATURE,
+            SPELL_WARLOCK_NETHER_PROTECTION_FROST,
+            SPELL_WARLOCK_NETHER_PROTECTION_SHADOW,
+            SPELL_WARLOCK_NETHER_PROTECTION_ARCANE
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
+        {
+            switch (GetFirstSchoolInMask(damageInfo->GetSchoolMask()))
+            {
+                case SPELL_SCHOOL_HOLY:
+                case SPELL_SCHOOL_FIRE:
+                case SPELL_SCHOOL_NATURE:
+                case SPELL_SCHOOL_FROST:
+                case SPELL_SCHOOL_SHADOW:
+                case SPELL_SCHOOL_ARCANE:
+                    return true;
+                default:
+                    break;
+            }
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 triggerspell = 0;
+
+        switch (GetFirstSchoolInMask(eventInfo.GetDamageInfo()->GetSchoolMask()))
+        {
+            case SPELL_SCHOOL_HOLY:
+                triggerspell = SPELL_WARLOCK_NETHER_PROTECTION_HOLY;
+                break;
+            case SPELL_SCHOOL_FIRE:
+                triggerspell = SPELL_WARLOCK_NETHER_PROTECTION_FIRE;
+                break;
+            case SPELL_SCHOOL_NATURE:
+                triggerspell = SPELL_WARLOCK_NETHER_PROTECTION_NATURE;
+                break;
+            case SPELL_SCHOOL_FROST:
+                triggerspell = SPELL_WARLOCK_NETHER_PROTECTION_FROST;
+                break;
+            case SPELL_SCHOOL_SHADOW:
+                triggerspell = SPELL_WARLOCK_NETHER_PROTECTION_SHADOW;
+                break;
+            case SPELL_SCHOOL_ARCANE:
+                triggerspell = SPELL_WARLOCK_NETHER_PROTECTION_ARCANE;
+                break;
+            default:
+                return;
+        }
+
+        if (Unit* target = eventInfo.GetActionTarget())
+            target->CastSpell(target, triggerspell, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warl_nether_protection::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warl_nether_protection::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
+    RegisterSpellScript(spell_warl_nether_protection);
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
     RegisterSpellScript(spell_warl_shadowflame);
     RegisterSpellScript(spell_warl_seduction);
@@ -1835,8 +1985,9 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_voidwalker_pet_passive);
     RegisterSpellScript(spell_warl_demonic_pact_aura);
+    RegisterSpellScript(spell_warl_curse_of_agony);
+    RegisterSpellScript(spell_warl_glyph_of_corruption_nightfall);
     RegisterSpellScript(spell_warl_nightfall);
-    RegisterSpellScriptWithArgs(spell_warl_nightfall, "spell_warl_glyph_of_corruption_nightfall");
     RegisterSpellScript(spell_warl_decimation);
     RegisterSpellScript(spell_warl_demonic_pact);
     RegisterSpellScript(spell_warl_glyph_of_life_tap);
