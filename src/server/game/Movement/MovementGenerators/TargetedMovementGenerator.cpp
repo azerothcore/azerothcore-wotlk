@@ -110,7 +110,7 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
 
     // For pets, treat incomplete paths as failures to avoid clipping through geometry
     // Players have more erratic movement, skip check
-    if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer()) && !(i_target.getTarget()->IsPlayer() || i_target.getTarget()->IsCreatedByPlayer()))
+    if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer()) && !i_target.getTarget()->IsCharmedOwnedByPlayerOrPlayer())
         if (pathType & PATHFIND_INCOMPLETE)
             pathFailed = true;
 
