@@ -46,6 +46,7 @@
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
+#include "Transport.h"
 #include "WeatherMgr.h"
 #include "WorldSessionMgr.h"
 
@@ -877,13 +878,39 @@ public:
                 _player->CleanupAfterTaxiFlight();
             }
             else // save only in non-flight case
-            {
                 _player->SaveRecallPosition();
-            }
 
-            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            if (Transport* transport = targetPlayer->GetTransport())
             {
-                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+                if (Transport* oldTransport = _player->GetTransport())
+                    oldTransport->RemovePassenger(_player, true);
+
+                float x;
+                float y;
+                float z;
+                float o;
+                targetPlayer->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+
+                _player->SetTransport(transport);
+                _player->m_movementInfo.transport.guid = transport->GetGUID();
+                _player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+                _player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
+                float worldX = x;
+                float worldY = y;
+                float worldZ = z;
+                float worldO = o;
+                transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
+
+                transport->AddPassenger(_player, false);
+
+                if (_player->TeleportTo(transport->GetMapId(), worldX, worldY, worldZ + 0.25f, worldO, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+            }
+            else
+            {
+                if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
             }
         }
         else
