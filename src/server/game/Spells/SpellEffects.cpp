@@ -5451,6 +5451,16 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
                 // Duration of the fishing bobber can't be higher than the Fishing channeling duration
                 duration = std::min(duration, duration - lastSec*IN_MILLISECONDS + FISHING_BOBBER_READY_TIME*IN_MILLISECONDS);
 
+                // Ensure duration is at least FISHING_BOBBER_READY_TIME to prevent negative/immediate splash
+                // The splash happens at (duration - FISHING_BOBBER_READY_TIME), so if duration < READY_TIME,
+                // splash would happen at a negative time or immediately, giving player no time to react
+                if (duration < FISHING_BOBBER_READY_TIME * IN_MILLISECONDS)
+                {
+                    LOG_WARN("spells.effect", "Fishing bobber duration calculated as {}ms (too short for {}s click window). Base spell duration: {}ms, lastSec: {}. Setting to minimum {}ms to prevent immediate expiration.",
+                              duration, FISHING_BOBBER_READY_TIME, m_spellInfo->GetDuration(), lastSec, FISHING_BOBBER_READY_TIME * IN_MILLISECONDS);
+                    duration = FISHING_BOBBER_READY_TIME * IN_MILLISECONDS;
+                }
+
                 break;
             }
         case GAMEOBJECT_TYPE_SUMMONING_RITUAL:

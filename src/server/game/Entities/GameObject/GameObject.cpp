@@ -504,7 +504,7 @@ void GameObject::Update(uint32 diff)
                     case GAMEOBJECT_TYPE_FISHINGNODE:
                         {
                             // fishing code (bobber ready)
-                            if (GameTime::GetGameTime().count() > m_respawnTime - FISHING_BOBBER_READY_TIME)
+                            if (GameTime::GetGameTime().count() >= m_respawnTime - FISHING_BOBBER_READY_TIME)
                             {
                                 // splash bobber (bobber ready now)
                                 Unit* caster = GetOwner();
@@ -523,6 +523,19 @@ void GameObject::Update(uint32 diff)
                                 }
 
                                 m_lootState = GO_READY;                 // can be successfully open with some chance
+
+                                // Always reset respawn time when bobber splashes to ensure consistent click window
+                                // This prevents issues from ms->seconds conversion precision loss and variable duration calculations
+                                // Add +1 second buffer to account for server tick timing
+                                time_t now = GameTime::GetGameTime().count();
+                                time_t oldRespawnTime = m_respawnTime;
+                                m_respawnTime = now + FISHING_BOBBER_READY_TIME + 1;
+
+                                if (oldRespawnTime <= now + FISHING_BOBBER_READY_TIME)
+                                {
+                                    LOG_WARN("entities.gameobject", "Fishing bobber respawn time {} was too close to current time {} (only {}s remaining). Reset to {} seconds from now.",
+                                             oldRespawnTime, now, (oldRespawnTime > now ? oldRespawnTime - now : 0), FISHING_BOBBER_READY_TIME + 1);
+                                }
                             }
                             return;
                         }
