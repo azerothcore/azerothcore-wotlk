@@ -919,7 +919,6 @@ struct npc_vortex_ride : public VehicleAI
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; }
 };
 
-
 struct npc_power_spark : public NullCreatureAI
 {
     npc_power_spark(Creature* pCreature) : NullCreatureAI(pCreature)
