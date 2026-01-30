@@ -46,7 +46,6 @@ enum NPCs
     NPC_HOVER_DISK              = 30248,
     NPC_ARCANE_OVERLOAD         = 30282,
     NPC_SURGE_OF_POWER          = 30334,
-    NPC_WYRMREST_SKYTALON       = 30161,
     NPC_STATIC_FIELD            = 30592,
     NPC_ALEXSTRASZA             = 32295,
 };
@@ -75,6 +74,8 @@ enum eSpells
     SPELL_HASTE                         = 57060,
 
     SPELL_ALEXSTRASZA_GIFT              = 61028,
+    SPELL_SUMMON_RED_DRAGON_BUDDY       = 56070,
+    SPELL_RIDE_RED_DRAGON               = 56072
 };
 
 enum eAchiev
