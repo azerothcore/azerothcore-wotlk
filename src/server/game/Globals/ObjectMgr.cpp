@@ -4738,10 +4738,10 @@ void ObjectMgr::LoadQuests()
     }
 
     // Load `quest_template_addon`
-    //                                   0   1         2                 3              4            5            6               7                     8
-    result = WorldDatabase.Query("SELECT ID, MaxLevel, AllowableClasses, SourceSpellID, PrevQuestID, NextQuestID, ExclusiveGroup, RewardMailTemplateID, RewardMailDelay, "
-                                 //9               10                   11                     12                     13                   14                   15                 16                     17
-                                 "RequiredSkillID, RequiredSkillPoints, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, ProvidedItemCount, RewardMailSenderEntry, SpecialFlags FROM quest_template_addon LEFT JOIN quest_mail_sender ON Id=QuestId");
+    //                                   0   1         2                 3              4            5            6               7                      8
+    result = WorldDatabase.Query("SELECT ID, MaxLevel, AllowableClasses, SourceSpellID, PrevQuestID, NextQuestID, ExclusiveGroup, BreadcrumbForQuestId, RewardMailTemplateID, "
+                                 //9                10               11                   12                     13                     14                   15                   16                 17                     18
+                                 "RewardMailDelay, RequiredSkillID, RequiredSkillPoints, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, ProvidedItemCount, RewardMailSenderEntry, SpecialFlags FROM quest_template_addon LEFT JOIN quest_mail_sender ON Id=QuestId");
 
     if (!result)
     {
@@ -5318,10 +5318,52 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->ExclusiveGroup)
             mExclusiveQuestGroups.insert(std::pair<int32, uint32>(qinfo->ExclusiveGroup, qinfo->GetQuestId()));
+
+        if (uint32 breadcrumbForQuestId = qinfo->GetBreadcrumbForQuestId())
+        {
+            if (_questTemplates.find(breadcrumbForQuestId) == _questTemplates.end())
+                LOG_ERROR("sql.sql", "Quest {} has BreadcrumbForQuestId {}, but no such quest exists", qinfo->GetQuestId(), breadcrumbForQuestId);
+            else
+                _breadcrumbsForQuest[breadcrumbForQuestId].push_back(qinfo->GetQuestId());
+
+            if (qinfo->GetNextQuestId())
+                LOG_ERROR("sql.sql", "Quest {} is a breadcrumb quest but also has NextQuestID {} set", qinfo->GetQuestId(), qinfo->GetNextQuestId());
+            if (qinfo->GetExclusiveGroup())
+                LOG_ERROR("sql.sql", "Quest {} is a breadcrumb quest but also has ExclusiveGroup {} set", qinfo->GetQuestId(), qinfo->GetExclusiveGroup());
+        }
+
         if (qinfo->TimeAllowed)
             qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAGS_TIMED);
         if (qinfo->RequiredPlayerKills)
             qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL);
+    }
+
+    for (auto const& [questId, quest] : _questTemplates)
+    {
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, questId, nullptr))
+            continue;
+
+        uint32 breadcrumbForQuestId = quest->GetBreadcrumbForQuestId();
+        if (!breadcrumbForQuestId)
+            continue;
+
+        std::set<uint32> visitedQuests;
+        visitedQuests.insert(questId);
+
+        while (breadcrumbForQuestId)
+        {
+            if (!visitedQuests.insert(breadcrumbForQuestId).second)
+            {
+                LOG_ERROR("sql.sql", "Breadcrumb quests {} and {} form a loop", questId, breadcrumbForQuestId);
+                break;
+            }
+
+            Quest const* targetQuest = GetQuestTemplate(breadcrumbForQuestId);
+            if (!targetQuest)
+                break;
+
+            breadcrumbForQuestId = targetQuest->GetBreadcrumbForQuestId();
+        }
     }
 
     // check QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT for spell with SPELL_EFFECT_QUEST_COMPLETE
