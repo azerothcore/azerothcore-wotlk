@@ -1553,11 +1553,6 @@ class spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger : public SpellScript
 {
     PrepareSpellScript(spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger);
 
-    bool Load() override
-    {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
-    }
-
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
