@@ -1531,7 +1531,7 @@ class spell_wyrmrest_skytalon_summon_red_dragon_buddy : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void SetDest(SpellDestination& dest)
