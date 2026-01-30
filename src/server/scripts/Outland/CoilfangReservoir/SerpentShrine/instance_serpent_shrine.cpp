@@ -210,7 +210,7 @@ public:
 
     private:
         ObjectGuid _shieldGeneratorGUID[4];
-        int _aliveKeepersCount;
+        uint32 _aliveKeepersCount;
         int _frenzyCount;
     };
 
