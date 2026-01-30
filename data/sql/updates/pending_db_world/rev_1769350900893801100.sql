@@ -200,10 +200,9 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 (12768, 23504, 1, 1, 1, 1, 1176.0369873046875, -4255.9814453125, 22.21631431579589843, 5.270894527435302734, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12769, 23504, 1, 1, 1, 1, 1179.4427490234375, -4284.61474609375, 21.28194046020507812, 1.029744267463684082, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12770, 23504, 1, 1, 1, 1, 1180.81787109375, -4376.79443359375, 26.24557113647460937, 2.832220315933227539, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
--- TODO: guids 12771 and 12773 should have waypoints and SAI
-(12771, 23504, 1, 1, 1, 0, 1181.4923095703125, -4355.63916015625, 21.42108535766601562, 4.023062705993652343, 120, 0, 0, 0, 0, 0, "TODO: needs waypoints and SAI", 50664, 1, NULL),
+(12771, 23504, 1, 1, 1, 0, 1181.4923095703125, -4355.63916015625, 21.42108535766601562, 4.023062705993652343, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12772, 23504, 1, 1, 1, 1, 1182.0416259765625, -4332.8818359375, 21.37387275695800781, 5.759586334228515625, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
-(12773, 23504, 1, 1, 1, 0, 1183.577880859375, -4304.1298828125, 21.31663703918457031, 4.184878826141357421, 120, 0, 0, 0, 0, 0, "TODO: needs waypoints and SAI", 50664, 1, NULL),
+(12773, 23504, 1, 1, 1, 0, 1183.577880859375, -4304.1298828125, 21.31663703918457031, 4.184878826141357421, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12774, 23504, 1, 1, 1, 1, 1209.23681640625, -4261.87890625, 21.27497291564941406, 0.92502450942993164, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12775, 23504, 1, 1, 1, 1, 1234.40283203125, -4307.765625, 21.25117683410644531, 6.143558979034423828, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL),
 (12776, 23504, 1, 1, 1, 1, 1259.862548828125, -4377.77001953125, 28.61495018005371093, 1.047197580337524414, 120, 0, 0, 0, 0, 0, "", 50664, 1, NULL);
@@ -223,12 +222,12 @@ INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 -- update auras
 DELETE FROM `creature_addon` WHERE (`guid` IN (12768, 12769, 12772, 12774, 12775, 12776));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(12768, 0, 0, 0, 0, 233, 0, '43992'),
-(12769, 0, 0, 0, 0, 233, 0, '43992'),
-(12772, 0, 0, 0, 0, 233, 0, '43992'),
-(12774, 0, 0, 0, 0, 233, 0, '43992'),
-(12775, 0, 0, 0, 0, 233, 0, '43992'),
-(12776, 0, 0, 0, 0, 233, 0, '43992');
+(12768, 0, 0, 0, 0, 234, 0, '43992'),
+(12769, 0, 0, 0, 0, 234, 0, '43992'),
+(12772, 0, 0, 0, 0, 234, 0, '43992'),
+(12774, 0, 0, 0, 0, 234, 0, '43992'),
+(12775, 0, 0, 0, 0, 234, 0, '43992'),
+(12776, 0, 0, 0, 0, 234, 0, '43992');
 
 -- update equipment
 DELETE FROM `creature_equip_template` WHERE `CreatureID` = 23504;
@@ -306,7 +305,9 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -12770);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-12770, 0, 1000, 0, 108, 0, 100, 0, 1, 0, 0, 0, 0, 0, 17, 234, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 1 Reached - Set Emote State 234'),
-(-12770, 0, 1001, 0, 108, 0, 100, 0, 2, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 2 Reached - Reset EmoteState'),
-(-12770, 0, 1002, 0, 108, 0, 100, 0, 3, 0, 0, 0, 0, 0, 17, 234, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 3 Reached - Set Emote State 234'),
-(-12770, 0, 1003, 0, 108, 0, 100, 0, 4, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 4 Reached - Reset EmoteState');
+(-12770, 0, 1000, 1001, 108, 0, 100, 0, 1, 0, 0, 0, 0, 0, 17, 234, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 1 of Path Any Reached - Set Emote State 234'),
+(-12770, 0, 1001, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 20, 180007, 10, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 1 of Path Any Reached - Set Orientation Closest Creature \'Excavation Stake\''),
+(-12770, 0, 1002, 0, 108, 0, 100, 0, 2, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 2 of Path Any Reached - Set Emote State 0'),
+(-12770, 0, 1003, 1004, 108, 0, 100, 0, 3, 0, 0, 0, 0, 0, 17, 234, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 3 of Path Any Reached - Set Emote State 234'),
+(-12770, 0, 1004, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 20, 180007, 10, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 3 of Path Any Reached - Set Orientation Closest Creature \'Excavation Stake\''),
+(-12770, 0, 1005, 0, 108, 0, 100, 0, 4, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 4 of Path Any Reached - Set Emote State 0');
