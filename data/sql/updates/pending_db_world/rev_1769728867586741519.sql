@@ -24,3 +24,8 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 DELETE FROM `spell_script_names` WHERE `spell_id` = 70656;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (70656, 'spell_dk_advantage_t10_4p');
+
+-- Register Glyph of Barkskin spell script (Druid)
+DELETE FROM `spell_script_names` WHERE `spell_id` = 63057;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(63057, 'spell_dru_glyph_of_barkskin');

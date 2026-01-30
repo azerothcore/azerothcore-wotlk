@@ -327,21 +327,41 @@ class spell_dru_barkskin : public AuraScript
 {
     PrepareAuraScript(spell_dru_barkskin);
 
-    void AfterApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (GetUnitOwner()->HasAura(SPELL_DRUID_GLYPH_OF_BARKSKIN, GetUnitOwner()->GetGUID()))
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, true);
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER });
     }
 
-    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, GetUnitOwner()->GetGUID());
+        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER);
     }
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_dru_barkskin::AfterApply, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_dru_barkskin::AfterRemove, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_dru_barkskin::OnRemove, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 63057 - Glyph of Barkskin
+class spell_dru_glyph_of_barkskin : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_barkskin);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_barkskin::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -2082,6 +2102,7 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_omen_of_clarity);
     RegisterSpellScript(spell_dru_brambles_treant);
     RegisterSpellScript(spell_dru_barkskin);
+    RegisterSpellScript(spell_dru_glyph_of_barkskin);
     RegisterSpellScript(spell_dru_treant_scaling);
     RegisterSpellScript(spell_dru_berserk);
     RegisterSpellAndAuraScriptPair(spell_dru_dash, spell_dru_dash_aura);
