@@ -221,14 +221,11 @@ INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
 (91, 12776);
 
 -- update auras
-DELETE FROM `creature_addon` WHERE (`guid` IN (12768, 12769, 12770, 12771, 12772, 12773, 12774, 12775, 12776));
+DELETE FROM `creature_addon` WHERE (`guid` IN (12768, 12769, 12772, 12774, 12775, 12776));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (12768, 0, 0, 0, 0, 233, 0, '43992'),
 (12769, 0, 0, 0, 0, 233, 0, '43992'),
-(12770, 0, 0, 0, 0, 233, 0, '43992'),
-(12771, 0, 0, 0, 0, 432, 0, '43992'),
 (12772, 0, 0, 0, 0, 233, 0, '43992'),
-(12773, 0, 0, 0, 0, 432, 0, '43992'),
 (12774, 0, 0, 0, 0, 233, 0, '43992'),
 (12775, 0, 0, 0, 0, 233, 0, '43992'),
 (12776, 0, 0, 0, 0, 233, 0, '43992');
@@ -237,3 +234,79 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 DELETE FROM `creature_equip_template` WHERE `CreatureID` = 23504;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
 (23504, 1, 5292, 0, 0, 50664);
+
+-- CREATURE_FLAG_EXTRA_DONT_OVERRIDE_SAI_ENTRY
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `flags_extra` = `flags_extra`|134217728 WHERE (`entry` = 23504);
+
+-- Pathing for  Entry: 23504
+SET @NPC := 12771;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+UPDATE `creature_addon` SET `path_id` = @PATH WHERE `guid` = @NPC;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1 ,1220.4547,-4334.2886,21.31665,NULL,0,0,0,100,0),
+(@PATH,2 ,1227.7362,-4310.514,21.316643,NULL,0,0,0,100,0),
+(@PATH,3 ,1233.6675,-4298.053,21.441637,NULL,15000,0,0,100,0),
+(@PATH,4 ,1233.6675,-4298.053,21.441637,NULL,0,0,0,100,0),
+(@PATH,5 ,1224.0404,-4319.1245,21.316643,NULL,0,0,0,100,0),
+(@PATH,6 ,1203.6339,-4335.0293,21.31665,NULL,0,0,0,100,0),
+(@PATH,7 ,1191.6898,-4343.2666,21.421085,NULL,0,0,0,100,0),
+(@PATH,8 ,1181.4923,-4355.639,21.421085,NULL,10000,0,0,100,0),
+(@PATH,9 ,1181.4923,-4355.639,21.421085,NULL,0,0,0,100,0),
+(@PATH,10,1204.1326,-4348.952,21.31665,NULL,0,0,0,100,0),
+(@PATH,11,1204.1326,-4348.952,21.31665,1.762782573699951171,20000,0,0,100,0),
+(@PATH,12,1204.1326,-4348.952,21.31665,1.762782573699951171,0,0,0,100,0);
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -12771);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-12771, 0, 1000, 0, 108, 0, 100, 0, 3, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 3 Reached - Set Emote State 133'),
+(-12771, 0, 1001, 0, 108, 0, 100, 0, 4, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 4 Reached - Reset EmoteState'),
+(-12771, 0, 1002, 0, 108, 0, 100, 0, 8, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 8 Reached - Set Emote State 133'),
+(-12771, 0, 1003, 0, 108, 0, 100, 0, 9, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 9 Reached - Reset EmoteState'),
+(-12771, 0, 1004, 0, 108, 0, 100, 0, 11, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 11 Reached - Set Emote State 133'),
+(-12771, 0, 1005, 0, 108, 0, 100, 0, 12, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 12 Reached - Reset EmoteState');
+
+SET @NPC := 12773;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+UPDATE `creature_addon` SET `path_id` = @PATH WHERE `guid` = @NPC;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1 ,1183.3735,-4283.522,21.270655,NULL,0,0,0,100,0),
+(@PATH,2 ,1191.225,-4284.0986,21.270655,NULL,0,0,0,100,0),
+(@PATH,3 ,1199.2571,-4277.2163,21.270655,NULL,15000,0,0,100,0),
+(@PATH,4 ,1199.2571,-4277.2163,21.270655,NULL,0,0,0,100,0),
+(@PATH,5 ,1183.5779,-4304.13,21.316637,NULL,20000,0,0,100,0),
+(@PATH,6 ,1183.5779,-4304.13,21.316637,NULL,0,0,0,100,0),
+(@PATH,7 ,1184.7842,-4284.5176,21.270655,NULL,0,0,0,100,0),
+(@PATH,8 ,1179.4281,-4278.2236,21.270655,NULL,0,0,0,100,0),
+(@PATH,9 ,1180.4791,-4275.776,21.270655,NULL,15000,0,0,100,0),
+(@PATH,10,1180.4791,-4275.776,21.270655,NULL,0,0,0,100,0);
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -12773);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-12773, 0, 1000, 0, 108, 0, 100, 0, 3, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 3 Reached - Set Emote State 133'),
+(-12773, 0, 1001, 0, 108, 0, 100, 0, 4, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 4 Reached - Reset EmoteState'),
+(-12773, 0, 1002, 0, 108, 0, 100, 0, 5, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 5 Reached - Set Emote State 133'),
+(-12773, 0, 1003, 0, 108, 0, 100, 0, 6, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 6 Reached - Reset EmoteState'),
+(-12773, 0, 1004, 0, 108, 0, 100, 0, 9, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 9 Reached - Set Emote State 133'),
+(-12773, 0, 1005, 0, 108, 0, 100, 0, 10, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 10 Reached - Reset EmoteState');
+
+SET @NPC := 12770;
+SET @PATH := @NPC * 10;
+UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
+UPDATE `creature_addon` SET `path_id` = @PATH WHERE `guid` = @NPC;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,1193.0723,-4380.715,24.006937,NULL,30000,0,0,100,0),
+(@PATH,2,1193.0723,-4380.715,24.006937,NULL,0,0,0,100,0),
+(@PATH,3,1180.8179,-4376.7944,26.245571,NULL,30000,0,0,100,0),
+(@PATH,4,1180.8179,-4376.7944,26.245571,NULL,0,0,0,100,0);
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -12770);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-12770, 0, 1000, 0, 108, 0, 100, 0, 1, 0, 0, 0, 0, 0, 17, 234, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 1 Reached - Set Emote State 234'),
+(-12770, 0, 1001, 0, 108, 0, 100, 0, 2, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 2 Reached - Reset EmoteState'),
+(-12770, 0, 1002, 0, 108, 0, 100, 0, 3, 0, 0, 0, 0, 0, 17, 234, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 3 Reached - Set Emote State 234'),
+(-12770, 0, 1003, 0, 108, 0, 100, 0, 4, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 4 Reached - Reset EmoteState');
