@@ -143,15 +143,10 @@ public:
                     creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     break;
                 case NPC_COILFANG_FRENZY:
-                    if (!creature->IsInWater())
+                    if (!creature->IsInWater() || _frenzyCount >= MAX_FRENZY_COUNT)
                         creature->DespawnOrUnsummon();
-
-                    // Spam Prevention
-                    if (_frenzyCount < MAX_FRENZY_COUNT)
-                        ++_frenzyCount;
                     else
-                        creature->DespawnOrUnsummon();
-
+                        ++_frenzyCount;
                     break;
                 default:
                     break;
@@ -320,7 +315,6 @@ class spell_serpentshrine_cavern_coilfang_water : public AuraScript
         }
 
         GetUnitOwner()->RemoveAurasDueToSpell(SPELL_SCALDING_WATER);
-        return;
     }
 
     void Register() override
