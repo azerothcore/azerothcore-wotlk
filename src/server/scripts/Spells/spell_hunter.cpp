@@ -78,7 +78,8 @@ enum HunterSpells
     SPELL_HUNTER_KILL_COMMAND_HUNTER                = 34026,
     SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1         = 56654,
     SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2         = 58882,
-    SPELL_HUNTER_PIERCING_SHOTS                     = 63468
+    SPELL_HUNTER_PIERCING_SHOTS                     = 63468,
+    SPELL_HUNTER_T9_4P_GREATNESS                    = 68130
 };
 
 enum HunterSpellIcons
@@ -1599,6 +1600,36 @@ class spell_hun_piercing_shots : public AuraScript
     }
 };
 
+// 67151 - Item - Hunter T9 4P Bonus (Steady Shot)
+class spell_hun_t9_4p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_hun_t9_4p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_T9_4P_GREATNESS });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* actor = eventInfo.GetActor();
+        return actor && actor->IsPlayer() && actor->ToPlayer()->GetPet();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        caster->CastSpell(caster->ToPlayer()->GetPet(), SPELL_HUNTER_T9_4P_GREATNESS, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_t9_4p_bonus::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hun_t9_4p_bonus::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1639,4 +1670,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_kill_command_pet);
     RegisterSpellScript(spell_hun_piercing_shots);
     RegisterSpellScript(spell_hun_rapid_recuperation_trigger);
+    RegisterSpellScript(spell_hun_t9_4p_bonus);
 }
