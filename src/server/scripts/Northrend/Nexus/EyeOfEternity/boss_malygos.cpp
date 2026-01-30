@@ -1536,8 +1536,8 @@ class spell_wyrmrest_skytalon_summon_red_dragon_buddy : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        // Adjust effect summon position to lower Z
         dest.Relocate(GetCaster()->GetPosition());
+        // Adjust effect summon position to lower Z
         Position const offset = { 0.0f, 0.0f, -80.0f, 0.0f };
         dest.RelocateOffset(offset);
     }
