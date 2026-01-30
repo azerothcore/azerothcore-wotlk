@@ -105,20 +105,11 @@ const Position Phase2NorthPos = {837.22f, 1301.676f, 296.10f, M_PI};
 
 const uint32 MalygosIntroIntervals[] = {18000, 19000, 21000, 18000, 15000};
 
-class EoEDrakeEnterVehicleEvent : public BasicEvent
-{
-public:
-    EoEDrakeEnterVehicleEvent(Creature& owner, ObjectGuid playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override;
-private:
-    Creature& _owner;
-    ObjectGuid _playerGUID;
-};
-
 template <class AI, class T>
 inline AI* GetEyeOfEternityAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, EyeOfEternityScriptName);
 }
+#define RegisterEoECreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetEyeOfEternityAI)
 
 #endif
