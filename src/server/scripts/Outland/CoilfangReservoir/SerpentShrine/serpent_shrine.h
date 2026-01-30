@@ -95,7 +95,7 @@ enum SSSpells
     SPELL_SERVERSIDE_FRENZY_WATER_PERIODIC  = 37280
 };
 
-enum NpcCount
+enum SSNPCCount
 {
     MIN_KEEPER_COUNT = 0,
     MAX_KEEPER_COUNT = 24,
