@@ -82,6 +82,13 @@ enum DeathKnightSpells
     SPELL_DK_THRASH                             = 47480,
     SPELL_GHOUL_FRENZY                          = 62218,
     // Proc system spells
+    SPELL_DK_ACCLIMATION_HOLY                    = 50490,
+    SPELL_DK_ACCLIMATION_FIRE                    = 50362,
+    SPELL_DK_ACCLIMATION_FROST                   = 50485,
+    SPELL_DK_ACCLIMATION_ARCANE                  = 50486,
+    SPELL_DK_ACCLIMATION_SHADOW                  = 50489,
+    SPELL_DK_ACCLIMATION_NATURE                  = 50488,
+    SPELL_DK_ADVANTAGE_T10_4P_MELEE              = 70657,
     SPELL_DK_BUTCHERY_RUNIC_POWER                = 50163,
     SPELL_DK_MARK_OF_BLOOD_HEAL                  = 61607,
     SPELL_DK_UNHOLY_BLIGHT_DOT                   = 50536,
@@ -907,6 +914,119 @@ class spell_dk_pet_scaling : public AuraScript
         OnEffectApply += AuraEffectApplyFn(spell_dk_pet_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
         DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_dk_pet_scaling::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_pet_scaling::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+    }
+};
+
+// -49200 - Acclimation
+class spell_dk_acclimation : public AuraScript
+{
+    PrepareAuraScript(spell_dk_acclimation);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_DK_ACCLIMATION_HOLY,
+            SPELL_DK_ACCLIMATION_FIRE,
+            SPELL_DK_ACCLIMATION_NATURE,
+            SPELL_DK_ACCLIMATION_FROST,
+            SPELL_DK_ACCLIMATION_SHADOW,
+            SPELL_DK_ACCLIMATION_ARCANE
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (DamageInfo* damageInfo = eventInfo.GetDamageInfo())
+        {
+            switch (GetFirstSchoolInMask(damageInfo->GetSchoolMask()))
+            {
+                case SPELL_SCHOOL_HOLY:
+                case SPELL_SCHOOL_FIRE:
+                case SPELL_SCHOOL_NATURE:
+                case SPELL_SCHOOL_FROST:
+                case SPELL_SCHOOL_SHADOW:
+                case SPELL_SCHOOL_ARCANE:
+                    return true;
+                default:
+                    break;
+            }
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 triggerspell = 0;
+
+        switch (GetFirstSchoolInMask(eventInfo.GetDamageInfo()->GetSchoolMask()))
+        {
+            case SPELL_SCHOOL_HOLY:
+                triggerspell = SPELL_DK_ACCLIMATION_HOLY;
+                break;
+            case SPELL_SCHOOL_FIRE:
+                triggerspell = SPELL_DK_ACCLIMATION_FIRE;
+                break;
+            case SPELL_SCHOOL_NATURE:
+                triggerspell = SPELL_DK_ACCLIMATION_NATURE;
+                break;
+            case SPELL_SCHOOL_FROST:
+                triggerspell = SPELL_DK_ACCLIMATION_FROST;
+                break;
+            case SPELL_SCHOOL_SHADOW:
+                triggerspell = SPELL_DK_ACCLIMATION_SHADOW;
+                break;
+            case SPELL_SCHOOL_ARCANE:
+                triggerspell = SPELL_DK_ACCLIMATION_ARCANE;
+                break;
+            default:
+                return;
+        }
+
+        if (Unit* target = eventInfo.GetActionTarget())
+            target->CastSpell(target, triggerspell, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dk_acclimation::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dk_acclimation::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 70656 - Advantage T10 4P (DK)
+class spell_dk_advantage_t10_4p : public AuraScript
+{
+    PrepareAuraScript(spell_dk_advantage_t10_4p);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DK_ADVANTAGE_T10_4P_MELEE });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (Unit* caster = eventInfo.GetActor())
+        {
+            Player* player = caster->ToPlayer();
+            if (!player || player->getClass() != CLASS_DEATH_KNIGHT)
+                return false;
+
+            for (uint8 i = 0; i < MAX_RUNES; ++i)
+                if (player->GetRuneCooldown(i) == 0)
+                    return false;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dk_advantage_t10_4p::CheckProc);
     }
 };
 
@@ -2885,6 +3005,8 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_dancing_rune_weapon_visual);
     RegisterSpellScript(spell_dk_scent_of_blood_trigger);
     RegisterSpellScript(spell_dk_pet_scaling);
+    RegisterSpellScript(spell_dk_acclimation);
+    RegisterSpellScript(spell_dk_advantage_t10_4p);
     RegisterSpellScript(spell_dk_anti_magic_shell_raid);
     RegisterSpellScript(spell_dk_anti_magic_shell_self);
     RegisterSpellScript(spell_dk_anti_magic_zone);
