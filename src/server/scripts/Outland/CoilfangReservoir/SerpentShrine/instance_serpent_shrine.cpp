@@ -77,11 +77,7 @@ public:
 
     struct instance_serpentshrine_cavern_InstanceMapScript : public InstanceScript
     {
-        instance_serpentshrine_cavern_InstanceMapScript(Map* map) : InstanceScript(map)
-        {
-            _aliveKeepersCount = 0;
-            _frenzyCount = 0;
-        }
+        instance_serpentshrine_cavern_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
         void Initialize() override
         {
