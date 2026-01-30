@@ -1427,6 +1427,19 @@ public:
     {
         npc_eoe_wyrmrest_skytalonAI(Creature* pCreature) : VehicleAI(pCreature) { }
 
+        void IsSummonedBy(WorldObject* summoner) override
+        {
+            me->SetDisableGravity(true);
+            if (summoner && summoner->IsPlayer())
+            {
+                ObjectGuid summonerGUID = summoner->GetGUID();
+                me->m_Events.AddEventAtOffset([summonerGUID, this] {
+                    if (Player* rider = ObjectAccessor::GetPlayer(*me, summonerGUID))
+                        DoCast(rider, SPELL_RIDE_RED_DRAGON, true);
+                }, 2s);
+            }
+        }
+
         void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply) override
         {
             if (apply)
@@ -1511,6 +1524,51 @@ class spell_eoe_ph3_surge_of_power : public SpellScript
     }
 };
 
+// 56070 - Summon Red Dragon Buddy
+class spell_wyrmrest_skytalon_summon_red_dragon_buddy : public SpellScript
+{
+    PrepareSpellScript(spell_wyrmrest_skytalon_summon_red_dragon_buddy);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void SetDest(SpellDestination& dest)
+    {
+        // Adjust effect summon position to lower Z
+        Position const offset = { 0.0f, 0.0f, -80.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_wyrmrest_skytalon_summon_red_dragon_buddy::SetDest, EFFECT_0, TARGET_DEST_CASTER_RADIUS);
+    }
+};
+
+// 56072 - Ride Red Dragon Buddy
+class spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger : public SpellScript
+{
+    PrepareSpellScript(spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger);
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), GetEffectValue(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_malygos()
 {
     new boss_malygos();
@@ -1522,6 +1580,8 @@ void AddSC_boss_malygos()
     new npc_scion_of_eternity();
     new npc_hover_disk();
     new npc_eoe_wyrmrest_skytalon();
+    RegisterSpellScript(spell_wyrmrest_skytalon_summon_red_dragon_buddy);
+    RegisterSpellScript(spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger);
 
     RegisterSpellScript(spell_eoe_ph3_surge_of_power);
 }

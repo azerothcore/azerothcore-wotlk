@@ -74,7 +74,8 @@ enum eSpells
     SPELL_HASTE                         = 57060,
 
     SPELL_ALEXSTRASZA_GIFT              = 61028,
-    SPELL_SUMMON_RED_DRAGON_BUDDY       = 56070
+    SPELL_SUMMON_RED_DRAGON_BUDDY       = 56070,
+    SPELL_RIDE_RED_DRAGON               = 56072
 };
 
 enum eAchiev
