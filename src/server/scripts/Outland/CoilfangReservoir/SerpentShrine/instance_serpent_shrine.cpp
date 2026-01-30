@@ -202,7 +202,7 @@ public:
     private:
         ObjectGuid _shieldGeneratorGUID[4];
         uint32 _aliveKeepersCount;
-        int _frenzyCount;
+        uint32 _frenzyCount;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
