@@ -294,3 +294,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-12822, 0, 1003, 0, 108, 0, 100, 0, 7, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 7 Reached - Reset EmoteState'),
 (-12822, 0, 1004, 0, 108, 0, 100, 0, 8, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 8 Reached - Set Emote State 234'),
 (-12822, 0, 1005, 0, 108, 0, 100, 0, 9, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 9 Reached - Reset EmoteState');
+
+-- creature texts
+DELETE FROM `creature_text` WHERE (`CreatureID` = 23504) AND (`GroupID` = 0) AND (`ID` IN (0, 1, 2));
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(23504, 0, 0, 'Brewfest is almost here!', 12, 0, 100.0, 0, 0, 0, 21966, 0, 'Brewfest Setup Crew'),
+(23504, 0, 1, 'Can\'t you see I\'ve got work to do here?', 12, 0, 100.0, 0, 0, 0, 21967, 0, 'Brewfest Setup Crew'),
+(23504, 0, 2, 'Won\'t be long now until the Brewfest starts!  Come back later and check to see if we\'re done.', 12, 0, 100.0, 0, 0, 0, 21968, 0, 'Brewfest Setup Crew');
