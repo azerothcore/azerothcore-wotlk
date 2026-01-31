@@ -214,9 +214,6 @@ DELETE FROM `creature_equip_template` WHERE `CreatureID` = 23504;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
 (23504, 1, 5292, 0, 0, 50664);
 
--- CREATURE_FLAG_EXTRA_DONT_OVERRIDE_SAI_ENTRY
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `flags_extra` = `flags_extra`|134217728 WHERE (`entry` = 23504);
-
 SET @NPC := 12828;
 SET @PATH := @NPC * 10;
 UPDATE `creature` SET `wander_distance`=0,`MovementType`=2 WHERE `guid`=@NPC;
@@ -295,8 +292,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-12822, 0, 1005, 0, 108, 0, 100, 0, 9, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On Point 9 of Path Any Reached - Set Emote State 0');
 
 -- creature texts
-DELETE FROM `creature_text` WHERE (`CreatureID` = 23504) AND (`GroupID` = 0) AND (`ID` IN (0, 1, 2));
+DELETE FROM `creature_text` WHERE (`CreatureID` = 23504) AND (`GroupID` = 0) AND (`ID` IN (0, 1, 2, 3, 4));
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (23504, 0, 0, 'Brewfest is almost here!', 12, 0, 100.0, 0, 0, 0, 21966, 0, 'Brewfest Setup Crew'),
 (23504, 0, 1, 'Can\'t you see I\'ve got work to do here?', 12, 0, 100.0, 0, 0, 0, 21967, 0, 'Brewfest Setup Crew'),
-(23504, 0, 2, 'Won\'t be long now until the Brewfest starts!  Come back later and check to see if we\'re done.', 12, 0, 100.0, 0, 0, 0, 21968, 0, 'Brewfest Setup Crew');
+(23504, 0, 2, 'Won\'t be long now until the Brewfest starts!  Come back later and check to see if we\'re done.', 12, 0, 100.0, 0, 0, 0, 21968, 0, 'Brewfest Setup Crew'),
+(23504, 0, 3, 'I can\'t wait until we\'re done setting up.  Then I can kick back and enjoy the festivities.', 12, 0, 100.0, 0, 0, 0, 21969, 0, 'Brewfest Setup Crew'),
+(23504, 0, 4, 'Brewfest is a non-stop party.  Setting up for it, though, is non-stop work!', 12, 0, 100.0, 0, 0, 0, 21970, 0, 'Brewfest Setup Crew');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23504;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23504);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(23504, 0, 0, 0, 101, 0, 100, 0, 1, 14, 0, 6000, 36000, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewfest Setup Crew - On 1 or More Players in Range - Say Line 0');
