@@ -208,6 +208,21 @@ bool WorldSession::IsGMAccount() const
     return GetSecurity() >= SEC_GAMEMASTER;
 }
 
+bool WorldSession::IsTrialAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_TRIAL);
+}
+
+bool WorldSession::IsInternetGameRoomAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_IGR);
+}
+
+bool WorldSession::IsRecurringBillingAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_RECURRING_BILLING);
+}
+
 std::string const& WorldSession::GetPlayerName() const
 {
     return _player ? _player->GetName() : DefaultPlayerName;
