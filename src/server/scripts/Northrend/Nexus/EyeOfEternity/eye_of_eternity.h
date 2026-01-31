@@ -24,6 +24,8 @@
 #define DataHeader "EOE"
 #define EyeOfEternityScriptName "instance_eye_of_eternity"
 
+uint32 const EncounterCount = 1;
+
 enum Objects
 {
     GO_NEXUS_PLATFORM           = 193070,
@@ -52,8 +54,8 @@ enum NPCs
 
 enum Data
 {
+    DATA_MALYGOS                = 0,
     DATA_IRIS_ACTIVATED,
-    DATA_ENCOUNTER_STATUS,
     DATA_SET_IRIS_INACTIVE,
     DATA_HIDE_IRIS_AND_PORTAL,
     DATA_MALYGOS_GUID,
@@ -85,6 +87,11 @@ enum eAchiev
     ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_10    = 7174,
     ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_25    = 7175,
     ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT = 20387,
+};
+
+enum EoEMisc : uint32
+{
+    EVENT_IRIS_ACTIVATED                    = 20158
 };
 
 /*** POSITIONS/WAYPOINTS BELOW ***/
