@@ -191,7 +191,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        if line.startswith("--"):
+        if line.strip().startswith("--"):
             continue
         if "INSERT" in line and "DELETE" not in previous_line:
             print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
