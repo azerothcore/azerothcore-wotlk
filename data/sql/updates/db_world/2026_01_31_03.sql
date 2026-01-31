@@ -1,3 +1,4 @@
+-- DB update 2026_01_31_02 -> 2026_01_31_03
 -- add game event
 DELETE FROM `game_event` WHERE `eventEntry` = 91;
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
