@@ -1,2 +1,2 @@
 --
-UPDATE `creature_template` SET `faction` = 634 WHERE (`entry` = 23772);
+UPDATE `creature_template` SET `faction` = 634 WHERE (`entry` IN (23772, 29479));
