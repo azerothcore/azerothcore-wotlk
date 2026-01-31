@@ -24,6 +24,8 @@
 #define DataHeader "EOE"
 #define EyeOfEternityScriptName "instance_eye_of_eternity"
 
+uint32 const EncounterCount = 1;
+
 enum Objects
 {
     GO_NEXUS_PLATFORM           = 193070,
@@ -52,8 +54,8 @@ enum NPCs
 
 enum Data
 {
+    DATA_MALYGOS                = 0,
     DATA_IRIS_ACTIVATED,
-    DATA_ENCOUNTER_STATUS,
     DATA_SET_IRIS_INACTIVE,
     DATA_HIDE_IRIS_AND_PORTAL,
     DATA_MALYGOS_GUID,
