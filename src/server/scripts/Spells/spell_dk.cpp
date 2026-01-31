@@ -991,7 +991,7 @@ class spell_dk_anti_magic_zone : public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
+        SpellInfo const* talentSpell = sSpellMgr.AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
 
         Unit* owner = GetCaster()->GetOwner();
         if (!owner)
@@ -1185,7 +1185,7 @@ class spell_dk_corpse_explosion : public SpellScript
             {
                 unitTarget->ToCreature()->m_CreatureSpellCooldowns.clear();
                 if (CharmInfo* charmInfo = unitTarget->GetCharmInfo())
-                    charmInfo->GetGlobalCooldownMgr().CancelGlobalCooldown(sSpellMgr->GetSpellInfo(SPELL_DK_GHOUL_EXPLODE));
+                    charmInfo->GetGlobalCooldownMgr().CancelGlobalCooldown(sSpellMgr.GetSpellInfo(SPELL_DK_GHOUL_EXPLODE));
 
                 unitTarget->StopMoving();
                 unitTarget->CastSpell(unitTarget, SPELL_DK_GHOUL_EXPLODE, false);
@@ -1376,7 +1376,7 @@ class spell_dk_death_grip : public SpellScript
             else
             {
                 caster->CastSpell(target, 49560, true);
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(1766); // Rogue kick
                 if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
                     target->InterruptNonMeleeSpells(true);
             }
@@ -1394,7 +1394,7 @@ class spell_dk_death_grip : public SpellScript
             {
                 if (target != GetCaster())
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(1766); // Rogue kick
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(1766); // Rogue kick
                     if (!target->IsImmunedToSpellEffect(spellInfo, EFFECT_0))
                         target->InterruptNonMeleeSpells(false, 0, false);
                 }
@@ -1943,7 +1943,7 @@ class spell_dk_raise_dead : public SpellScript
     SpellCastResult CheckReagents()
     {
         /// @workaround: there is no access to castresult of other spells, check it manually
-        SpellInfo const* reagentSpell = sSpellMgr->GetSpellInfo(SPELL_DK_RAISE_DEAD_USE_REAGENT);
+        SpellInfo const* reagentSpell = sSpellMgr.GetSpellInfo(SPELL_DK_RAISE_DEAD_USE_REAGENT);
         Player* player = GetCaster()->ToPlayer();
         if (!player->CanNoReagentCast(reagentSpell))
         {
@@ -2007,7 +2007,7 @@ class spell_dk_raise_dead : public SpellScript
 
     void HandleRaiseDead(SpellEffIndex /*effIndex*/)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(GetGhoulSpellId());
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(GetGhoulSpellId());
         SpellCastTargets targets;
         targets.SetDst(*GetHitUnit());
 
@@ -2198,7 +2198,7 @@ class spell_dk_will_of_the_necropolis : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        SpellInfo const* firstRankSpellInfo = sSpellMgr->GetSpellInfo(SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1);
+        SpellInfo const* firstRankSpellInfo = sSpellMgr.GetSpellInfo(SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1);
         if (!firstRankSpellInfo)
             return false;
 
@@ -2207,7 +2207,7 @@ class spell_dk_will_of_the_necropolis : public AuraScript
             return false;
 
         uint8 rank = spellInfo->GetRank();
-        if (!sSpellMgr->GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank, true))
+        if (!sSpellMgr.GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank, true))
             return false;
 
         return true;
@@ -2231,7 +2231,7 @@ class spell_dk_will_of_the_necropolis : public AuraScript
     {
         // min pct of hp is stored in effect 0 of talent spell
         uint8 rank = GetSpellInfo()->GetRank();
-        SpellInfo const* talentProto = sSpellMgr->AssertSpellInfo(sSpellMgr->GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank));
+        SpellInfo const* talentProto = sSpellMgr.AssertSpellInfo(sSpellMgr.GetSpellWithRank(SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1, rank));
 
         int32 remainingHp = int32(GetTarget()->GetHealth() - dmgInfo.GetDamage());
         int32 minHp = int32(GetTarget()->CountPctFromMaxHealth(talentProto->Effects[EFFECT_0].CalcValue(GetCaster())));

@@ -680,7 +680,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (e.action.cast.castFlags & SMARTCAST_INTERRUPT_PREVIOUS)
                         me->InterruptNonMeleeSpells(false);
 
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.cast.spell);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(e.action.cast.spell);
                     float distanceToTarget = me->GetDistance(target->ToUnit());
                     float spellMaxRange = me->GetSpellMaxRangeForTarget(target->ToUnit(), spellInfo);
                     float spellMinRange = me->GetSpellMinRangeForTarget(target->ToUnit(), spellInfo);
@@ -2725,7 +2725,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (!(e.action.castCustom.flags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.castCustom.spell))
                     {
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.castCustom.spell);
+                        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(e.action.castCustom.spell);
                         CustomSpellValues values;
                         if (e.action.castCustom.bp1)
                             values.AddSpellMod(SPELLVALUE_BASE_POINT0, e.action.castCustom.bp1);

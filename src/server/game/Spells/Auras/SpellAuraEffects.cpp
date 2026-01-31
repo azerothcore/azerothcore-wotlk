@@ -1217,7 +1217,7 @@ void AuraEffect::CleanupTriggeredSpells(Unit* target)
     if (!tSpellId)
         return;
 
-    SpellInfo const* tProto = sSpellMgr->GetSpellInfo(tSpellId);
+    SpellInfo const* tProto = sSpellMgr.GetSpellInfo(tSpellId);
     if (!tProto)
         return;
 
@@ -1340,7 +1340,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                 if (itr->first == spellId || itr->first == spellId2)
                     continue;
 
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itr->first);
                 if (!spellInfo || !spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)))
                     continue;
 
@@ -1359,7 +1359,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                     continue;
 
                 // Xinef: skip talents with effect learn spell
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itr->first);
                 if (!spellInfo || !spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)) || spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
                     continue;
 
@@ -1374,7 +1374,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
                 {
                     if (GlyphPropertiesEntry const* glyph = sGlyphPropertiesStore.LookupEntry(glyphId))
                     {
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(glyph->SpellId);
+                        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(glyph->SpellId);
                         if (!spellInfo || !spellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_PASSIVE | SPELL_ATTR0_DO_NOT_DISPLAY)))
                             continue;
                         if (spellInfo->Stances & (1 << (GetMiscValue() - 1)))
@@ -1386,7 +1386,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             // Leader of the Pack
             if (player->HasTalent(17007, player->GetActiveSpec()))
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(24932);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(24932);
                 if (spellInfo && spellInfo->Stances & (1 << (GetMiscValue() - 1)))
                     target->CastSpell(target, 24932, true, nullptr, this, target->GetGUID());
             }
@@ -2028,7 +2028,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         {
             bool allow = true;
             if (target->getTransForm() && !(target->GetMapId() == MAP_THE_ESCAPE_FROM_DURNHOLDE))
-                if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm()))
+                if (SpellInfo const* transformSpellInfo = sSpellMgr.GetSpellInfo(target->getTransForm()))
                     if (transformSpellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !transformSpellInfo->IsPositive())
                         allow = false;
 
@@ -2089,7 +2089,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                             if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(target->ToPlayer()->GetActiveSpec()))
                                 continue;
 
-                            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itr->first);
                             if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139)
                                 Rage_val += target->CalculateSpellDamage(target, spellInfo, 0) * 10;
                         }
@@ -2101,7 +2101,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                             if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(target->ToPlayer()->GetActiveSpec()))
                                 continue;
 
-                            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+                            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itr->first);
                             if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && spellInfo->SpellIconID == 139)
                                 Rage_val += target->CalculateSpellDamage(target, spellInfo, 0) * 10;
                         }
@@ -2740,7 +2740,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
         }
 
         // update active transform spell only when transform or shapeshift not set or not overwriting negative by positive case
-        SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm());
+        SpellInfo const* transformSpellInfo = sSpellMgr.GetSpellInfo(target->getTransForm());
         if (!transformSpellInfo || GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !GetSpellInfo()->IsPositive() || transformSpellInfo->IsPositive())
             target->setTransForm(GetId());
 
@@ -5421,7 +5421,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
     if (mode & AURA_EFFECT_HANDLE_REAL)
     {
         // pet auras
-        if (PetAura const* petSpell = sSpellMgr->GetPetAura(GetId(), m_effIndex))
+        if (PetAura const* petSpell = sSpellMgr.GetPetAura(GetId(), m_effIndex))
         {
             if (apply)
                 target->AddPetAura(petSpell);
@@ -5684,7 +5684,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             uint32 spellId = 24659;
                             if (apply && caster)
                             {
-                                SpellInfo const* spell = sSpellMgr->AssertSpellInfo(spellId);
+                                SpellInfo const* spell = sSpellMgr.AssertSpellInfo(spellId);
 
                                 for (uint32 i = 0; i < spell->StackAmount; ++i)
                                     caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
@@ -5699,7 +5699,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             uint32 spellId = 24662;
                             if (apply && caster)
                             {
-                                SpellInfo const* spell = sSpellMgr->AssertSpellInfo(spellId);
+                                SpellInfo const* spell = sSpellMgr.AssertSpellInfo(spellId);
                                 for (uint32 i = 0; i < spell->StackAmount; ++i)
                                     caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
                                 break;
@@ -6057,8 +6057,8 @@ void AuraEffect::HandleAuraLinked(AuraApplication const* aurApp, uint8 mode, boo
 {
     Unit* target = aurApp->GetTarget();
 
-    uint32 triggeredSpellId = sSpellMgr->GetSpellIdForDifficulty(m_spellInfo->Effects[m_effIndex].TriggerSpell, target);
-    SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggeredSpellId);
+    uint32 triggeredSpellId = sSpellMgr.GetSpellIdForDifficulty(m_spellInfo->Effects[m_effIndex].TriggerSpell, target);
+    SpellInfo const* triggeredSpellInfo = sSpellMgr.GetSpellInfo(triggeredSpellId);
     if (!triggeredSpellInfo)
         return;
 
@@ -6292,7 +6292,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
     // generic casting code with custom spells and target/caster customs
     uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
 
-    SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId);
+    SpellInfo const* triggeredSpellInfo = sSpellMgr.GetSpellInfo(triggerSpellId);
     SpellInfo const* auraSpellInfo = GetSpellInfo();
     uint32 auraId = auraSpellInfo->Id;
 
@@ -6530,7 +6530,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
     }
 
     // Reget trigger spell proto
-    triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId);
+    triggeredSpellInfo = sSpellMgr.GetSpellInfo(triggerSpellId);
 
     if (triggeredSpellInfo)
     {
@@ -6558,7 +6558,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
 void AuraEffect::HandlePeriodicTriggerSpellWithValueAuraTick(Unit* target, Unit* caster) const
 {
     uint32 triggerSpellId = GetSpellInfo()->Effects[m_effIndex].TriggerSpell;
-    if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
+    if (SpellInfo const* triggeredSpellInfo = sSpellMgr.GetSpellInfo(triggerSpellId))
     {
         if (Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? caster : target)
         {
@@ -7236,7 +7236,7 @@ void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEve
     Unit* triggerTarget = eventInfo.GetProcTarget();
 
     uint32 triggerSpellId = GetSpellInfo()->Effects[GetEffIndex()].TriggerSpell;
-    if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
+    if (SpellInfo const* triggeredSpellInfo = sSpellMgr.GetSpellInfo(triggerSpellId))
     {
         LOG_DEBUG("spells.aura", "AuraEffect::HandleProcTriggerSpellAuraProc: Triggering spell {} from aura {} proc", triggeredSpellInfo->Id, GetId());
         triggerCaster->CastSpell(triggerTarget, triggeredSpellInfo, true, nullptr, this);
@@ -7253,7 +7253,7 @@ void AuraEffect::HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp
     Unit* triggerTarget = eventInfo.GetProcTarget();
 
     uint32 triggerSpellId = GetSpellInfo()->Effects[m_effIndex].TriggerSpell;
-    if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(triggerSpellId))
+    if (SpellInfo const* triggeredSpellInfo = sSpellMgr.GetSpellInfo(triggerSpellId))
     {
         // used only with EXTRA_LOGS
         (void)triggeredSpellInfo;

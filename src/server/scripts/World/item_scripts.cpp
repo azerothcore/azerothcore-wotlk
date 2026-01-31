@@ -54,7 +54,7 @@ public:
                     disabled = true;
                 break;
             case 34475:
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
+                if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_ARCANE_CHARGES))
                     Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
                 break;
         }
@@ -153,7 +153,7 @@ public:
         {
             player->SendEquipError(EQUIP_ERR_NONE, item, nullptr);
 
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_PETROV_BOMB))
+            if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_PETROV_BOMB))
                 Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_HERE);
 
             return true;

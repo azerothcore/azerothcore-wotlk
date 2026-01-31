@@ -291,7 +291,7 @@ struct boss_taldaram : public BossAI
     {
         BossAI::DamageTaken(attacker, damage, damageType, school);
 
-        if (me->FindCurrentSpellBySpellId(sSpellMgr->GetSpellIdForDifficulty(SPELL_EMBRACE_OF_THE_VAMPYR, me)))
+        if (me->FindCurrentSpellBySpellId(sSpellMgr.GetSpellIdForDifficulty(SPELL_EMBRACE_OF_THE_VAMPYR, me)))
         {
             vanishDamage += damage;
             if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))

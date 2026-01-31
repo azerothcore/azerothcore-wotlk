@@ -174,7 +174,7 @@ public:
             else if (phase == 2)
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
-                me->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_FORGE_BLADE, me));
+                me->RemoveAurasDueToSpell(sSpellMgr.GetSpellIdForDifficulty(SPELL_FORGE_BLADE, me));
                 if (me->CastSpell(me, SPELL_FORGE_MACE, false) == SPELL_CAST_OK)
                 {
                     events.RescheduleEvent(EVENT_SPELL_DEEP_FREEZE, 10s);
@@ -194,7 +194,7 @@ public:
 
         void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
-            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_SARONITE_TRIGGERED, me))
+            if (spell->Id == sSpellMgr.GetSpellIdForDifficulty(SPELL_SARONITE_TRIGGERED, me))
             {
                 if (bCanSayBoulderHit)
                 {

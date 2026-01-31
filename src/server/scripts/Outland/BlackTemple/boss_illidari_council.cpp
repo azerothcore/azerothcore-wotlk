@@ -746,7 +746,7 @@ class spell_illidari_council_judgement : public SpellScript
         for (auto i = auras.begin(); i != auras.end(); ++i)
         {
             if ((*i)->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL && (*i)->GetEffIndex() == EFFECT_2)
-                if (sSpellMgr->GetSpellInfo((*i)->GetAmount()))
+                if (sSpellMgr.GetSpellInfo((*i)->GetAmount()))
                 {
                     GetCaster()->CastSpell(GetHitUnit(), (*i)->GetAmount(), true);
                     GetCaster()->RemoveAurasDueToSpell((*i)->GetSpellInfo()->Id);

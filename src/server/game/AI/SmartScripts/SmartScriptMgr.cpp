@@ -1091,7 +1091,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_SPELLHIT_TARGET:
                 if (e.event.spellHit.spell)
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.event.spellHit.spell);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(e.event.spellHit.spell);
                     if (!spellInfo)
                     {
                         LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.spellHit.spell);
@@ -1163,7 +1163,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 
                 return IsSAIBoolValid(e, e.event.kill.playerOnly);
             case SMART_EVENT_VICTIM_CASTING:
-                if (e.event.targetCasting.spellId > 0 && !sSpellMgr->GetSpellInfo(e.event.targetCasting.spellId))
+                if (e.event.targetCasting.spellId > 0 && !sSpellMgr.GetSpellInfo(e.event.targetCasting.spellId))
                 {
                     LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.spellHit.spell);
                     return false;

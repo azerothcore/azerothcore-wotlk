@@ -409,25 +409,25 @@ void World::SetInitialWorldSettings()
     AIRegistry::Initialize();
 
     LOG_INFO("server.loading", "Loading SpellInfo Store...");
-    sSpellMgr->LoadSpellInfoStore();
+    sSpellMgr.LoadSpellInfoStore();
 
     LOG_INFO("server.loading", "Loading Spell Cooldown Overrides...");
-    sSpellMgr->LoadSpellCooldownOverrides();
+    sSpellMgr.LoadSpellCooldownOverrides();
 
     LOG_INFO("server.loading", "Loading SpellInfo Data Corrections...");
-    sSpellMgr->LoadSpellInfoCorrections();
+    sSpellMgr.LoadSpellInfoCorrections();
 
     LOG_INFO("server.loading", "Loading Spell Rank Data...");
-    sSpellMgr->LoadSpellRanks();
+    sSpellMgr.LoadSpellRanks();
 
     LOG_INFO("server.loading", "Loading Spell Specific And Aura State...");
-    sSpellMgr->LoadSpellSpecificAndAuraState();
+    sSpellMgr.LoadSpellSpecificAndAuraState();
 
     LOG_INFO("server.loading", "Loading SkillLineAbilityMultiMap Data...");
-    sSpellMgr->LoadSkillLineAbilityMap();
+    sSpellMgr.LoadSkillLineAbilityMap();
 
     LOG_INFO("server.loading", "Loading SpellInfo Custom Attributes...");
-    sSpellMgr->LoadSpellInfoCustomAttributes();
+    sSpellMgr.LoadSpellInfoCustomAttributes();
 
     LOG_INFO("server.loading", "Loading Player Totem models...");
     sObjectMgr->LoadPlayerTotemModels();
@@ -487,37 +487,37 @@ void World::SetInitialWorldSettings()
     sTransportMgr->LoadTransportTemplates();
 
     LOG_INFO("server.loading", "Loading Spell Required Data...");
-    sSpellMgr->LoadSpellRequired();
+    sSpellMgr.LoadSpellRequired();
 
     LOG_INFO("server.loading", "Loading Spell Group Types...");
-    sSpellMgr->LoadSpellGroups();
+    sSpellMgr.LoadSpellGroups();
 
     LOG_INFO("server.loading", "Loading Spell Learn Skills...");
-    sSpellMgr->LoadSpellLearnSkills();                           // must be after LoadSpellRanks
+    sSpellMgr.LoadSpellLearnSkills();                           // must be after LoadSpellRanks
 
     LOG_INFO("server.loading", "Loading Spell Proc Event Conditions...");
-    sSpellMgr->LoadSpellProcEvents();
+    sSpellMgr.LoadSpellProcEvents();
 
     LOG_INFO("server.loading", "Loading Spell Proc Conditions and Data...");
-    sSpellMgr->LoadSpellProcs();
+    sSpellMgr.LoadSpellProcs();
 
     LOG_INFO("server.loading", "Loading Spell Bonus Data...");
-    sSpellMgr->LoadSpellBonuses();
+    sSpellMgr.LoadSpellBonuses();
 
     LOG_INFO("server.loading", "Loading Aggro Spells Definitions...");
-    sSpellMgr->LoadSpellThreats();
+    sSpellMgr.LoadSpellThreats();
 
     LOG_INFO("server.loading", "Loading Mixology Bonuses...");
-    sSpellMgr->LoadSpellMixology();
+    sSpellMgr.LoadSpellMixology();
 
     LOG_INFO("server.loading", "Loading Spell Group Stack Rules...");
-    sSpellMgr->LoadSpellGroupStackRules();
+    sSpellMgr.LoadSpellGroupStackRules();
 
     LOG_INFO("server.loading", "Loading NPC Texts...");
     sObjectMgr->LoadGossipText();
 
     LOG_INFO("server.loading", "Loading Enchant Spells Proc Datas...");
-    sSpellMgr->LoadSpellEnchantProcData();
+    sSpellMgr.LoadSpellEnchantProcData();
 
     LOG_INFO("server.loading", "Loading Item Random Enchantments Table...");
     LoadRandomEnchantmentsTable();
@@ -571,10 +571,10 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
 
     LOG_INFO("server.loading", "Loading Pet Levelup Spells...");
-    sSpellMgr->LoadPetLevelupSpellMap();
+    sSpellMgr.LoadPetLevelupSpellMap();
 
     LOG_INFO("server.loading", "Loading Pet default Spells additional to Levelup Spells...");
-    sSpellMgr->LoadPetDefaultSpells();
+    sSpellMgr.LoadPetDefaultSpells();
 
     LOG_INFO("server.loading", "Loading Creature Addon Data...");
     sObjectMgr->LoadCreatureAddons();                            // must be after LoadCreatureTemplates() and LoadCreatures()
@@ -640,7 +640,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadVehicleSeatAddon();                         // must be after loading DBC
 
     LOG_INFO("server.loading", "Loading SpellArea Data...");                // must be after quest load
-    sSpellMgr->LoadSpellAreas();
+    sSpellMgr.LoadSpellAreas();
 
     LOG_INFO("server.loading", "Loading Area Trigger Definitions");
     sObjectMgr->LoadAreaTriggers();
@@ -673,16 +673,16 @@ void World::SetInitialWorldSettings()
     sGraveyard->LoadGraveyardZones();
 
     LOG_INFO("server.loading", "Loading Spell Pet Auras...");
-    sSpellMgr->LoadSpellPetAuras();
+    sSpellMgr.LoadSpellPetAuras();
 
     LOG_INFO("server.loading", "Loading Spell Target Coordinates...");
-    sSpellMgr->LoadSpellTargetPositions();
+    sSpellMgr.LoadSpellTargetPositions();
 
     LOG_INFO("server.loading", "Loading Enchant Custom Attributes...");
-    sSpellMgr->LoadEnchantCustomAttr();
+    sSpellMgr.LoadEnchantCustomAttr();
 
     LOG_INFO("server.loading", "Loading linked Spells...");
-    sSpellMgr->LoadSpellLinked();
+    sSpellMgr.LoadSpellLinked();
 
     LOG_INFO("server.loading", "Loading Player Create Data...");
     sObjectMgr->LoadPlayerInfo();

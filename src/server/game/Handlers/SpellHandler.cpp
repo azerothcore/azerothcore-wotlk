@@ -85,7 +85,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
 
     if (!spellInfo)
     {
@@ -168,7 +168,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     {
         for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
         {
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(proto->Spells[i].SpellId))
+            if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(proto->Spells[i].SpellId))
             {
                 if (!spellInfo->CanBeUsedInCombat())
                 {
@@ -396,7 +396,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
 
     if (!spellInfo)
     {
@@ -505,7 +505,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     sScriptMgr->ValidateSpellAtCastSpell(_player, oldSpellId, spellId, castCount, castFlags);
 
     if (oldSpellId != spellId)
-        spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        spellInfo = sSpellMgr.GetSpellInfo(spellId);
 
     // Client is resending autoshot cast opcode when other spell is casted during shoot rotation
     // Skip it to prevent "interrupt" message
@@ -566,7 +566,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     uint32 spellId;
     recvPacket >> spellId;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 
@@ -605,7 +605,7 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
     recvPacket >> guid;
     recvPacket >> spellId;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
     {
         LOG_ERROR("network.opcode", "WORLD: unknown PET spell id {}", spellId);
@@ -658,7 +658,7 @@ void WorldSession::HandleCancelChanneling(WorldPacket& recvData)
         return;
     }
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellID);
     if (!spellInfo)
     {
         return;
@@ -704,7 +704,7 @@ void WorldSession::HandleSelfResOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SELF_RES");                  // empty opcode
 
-    if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL)))
+    if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL)))
     {
         if (_player->HasPreventResurectionAura() && !spell->HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
         {

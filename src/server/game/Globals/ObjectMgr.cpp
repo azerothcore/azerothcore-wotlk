@@ -886,7 +886,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 
             if (Optional<uint32> spellId = Acore::StringTo<uint32>(aura))
             {
-                spellInfo = sSpellMgr->GetSpellInfo(*spellId);
+                spellInfo = sSpellMgr.GetSpellInfo(*spellId);
             }
 
             if (!spellInfo)
@@ -1179,7 +1179,7 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     for (uint8 j = 0; j < MAX_CREATURE_SPELLS; ++j)
     {
-        if (cInfo->spells[j] && !sSpellMgr->GetSpellInfo(cInfo->spells[j]))
+        if (cInfo->spells[j] && !sSpellMgr.GetSpellInfo(cInfo->spells[j]))
         {
             LOG_ERROR("sql.sql", "Creature (Entry: {}) has non-existing Spell{} ({}), set to 0.", cInfo->Entry, j + 1, cInfo->spells[j]);
             const_cast<CreatureTemplate*>(cInfo)->spells[j] = 0;
@@ -1299,7 +1299,7 @@ void ObjectMgr::LoadCreatureAddons()
 
             if (Optional<uint32> spellId = Acore::StringTo<uint32>(aura))
             {
-                spellInfo = sSpellMgr->GetSpellInfo(*spellId);
+                spellInfo = sSpellMgr.GetSpellInfo(*spellId);
             }
 
             if (!spellInfo)
@@ -3115,7 +3115,7 @@ void ObjectMgr::LoadItemTemplates()
             }
         }
 
-        if (itemTemplate.RequiredSpell && !sSpellMgr->GetSpellInfo(itemTemplate.RequiredSpell))
+        if (itemTemplate.RequiredSpell && !sSpellMgr.GetSpellInfo(itemTemplate.RequiredSpell))
         {
             LOG_ERROR("sql.sql", "Item (Entry: {}) has a wrong (non-existing) spell in RequiredSpell ({})", entry, itemTemplate.RequiredSpell);
             itemTemplate.RequiredSpell = 0;
@@ -3220,7 +3220,7 @@ void ObjectMgr::LoadItemTemplates()
             }
             else if (itemTemplate.Spells[1].SpellId != -1)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itemTemplate.Spells[1].SpellId);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itemTemplate.Spells[1].SpellId);
                 if (!spellInfo && !sDisableMgr->IsDisabledFor(DISABLE_TYPE_SPELL, itemTemplate.Spells[1].SpellId, nullptr))
                 {
                     LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong (not existing) spell in spellid_{} ({})", entry, 1 + 1, itemTemplate.Spells[1].SpellId);
@@ -3268,7 +3268,7 @@ void ObjectMgr::LoadItemTemplates()
 
                 if (itemTemplate.Spells[j].SpellId && itemTemplate.Spells[j].SpellId != -1)
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itemTemplate.Spells[j].SpellId);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itemTemplate.Spells[j].SpellId);
                     if (!spellInfo && !sDisableMgr->IsDisabledFor(DISABLE_TYPE_SPELL, itemTemplate.Spells[j].SpellId, nullptr))
                     {
                         LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong (not existing) spell in spellid_{} ({})", entry, j + 1, itemTemplate.Spells[j].SpellId);
@@ -5003,7 +5003,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->SourceSpellid)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(qinfo->SourceSpellid);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(qinfo->SourceSpellid);
             if (!spellInfo)
             {
                 LOG_ERROR("sql.sql", "Quest {} has `SourceSpellid` = {} but spell {} doesn't exist, quest can't be done.",
@@ -5206,7 +5206,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->RewardDisplaySpell)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(qinfo->RewardDisplaySpell);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(qinfo->RewardDisplaySpell);
 
             if (!spellInfo)
             {
@@ -5232,7 +5232,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->RewardSpell > 0)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(qinfo->RewardSpell);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(qinfo->RewardSpell);
 
             if (!spellInfo)
             {
@@ -5367,9 +5367,9 @@ void ObjectMgr::LoadQuests()
     }
 
     // check QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT for spell with SPELL_EFFECT_QUEST_COMPLETE
-    for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i)
+    for (uint32 i = 0; i < sSpellMgr.GetSpellInfoStoreSize(); ++i)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(i);
         if (!spellInfo)
             continue;
 
@@ -5673,7 +5673,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
 
             case SCRIPT_COMMAND_REMOVE_AURA:
                 {
-                    if (!sSpellMgr->GetSpellInfo(tmp.RemoveAura.SpellID))
+                    if (!sSpellMgr.GetSpellInfo(tmp.RemoveAura.SpellID))
                     {
                         LOG_ERROR("sql.sql", "Table `{}` using non-existent spell (id: {}) in SCRIPT_COMMAND_REMOVE_AURA for script id {}",
                                          tableName, tmp.RemoveAura.SpellID, tmp.id);
@@ -5690,7 +5690,7 @@ void ObjectMgr::LoadScripts(ScriptsType type)
 
             case SCRIPT_COMMAND_CAST_SPELL:
                 {
-                    if (!sSpellMgr->GetSpellInfo(tmp.CastSpell.SpellID))
+                    if (!sSpellMgr.GetSpellInfo(tmp.CastSpell.SpellID))
                     {
                         LOG_ERROR("sql.sql", "Table `{}` using non-existent spell (id: {}) in SCRIPT_COMMAND_CAST_SPELL for script id {}",
                                          tableName, tmp.CastSpell.SpellID, tmp.id);
@@ -5759,7 +5759,7 @@ void ObjectMgr::LoadSpellScripts()
     for (ScriptMapMap::const_iterator itr = sSpellScripts.begin(); itr != sSpellScripts.end(); ++itr)
     {
         uint32 spellId = uint32(itr->first) & 0x00FFFFFF;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
 
         if (!spellInfo)
         {
@@ -5791,8 +5791,8 @@ void ObjectMgr::LoadEventScripts()
             evt_scripts.insert(eventId);
 
     // Load all possible script entries from spells
-    for (uint32 i = 1; i < sSpellMgr->GetSpellInfoStoreSize(); ++i)
-        if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(i))
+    for (uint32 i = 1; i < sSpellMgr.GetSpellInfoStoreSize(); ++i)
+        if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(i))
             for (uint8 j = 0; j < MAX_SPELL_EFFECTS; ++j)
                 if (spell->Effects[j].Effect == SPELL_EFFECT_SEND_EVENT)
                     if (spell->Effects[j].MiscValue)
@@ -5881,7 +5881,7 @@ void ObjectMgr::LoadSpellScriptNames()
             spellId = -spellId;
         }
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
         if (!spellInfo)
         {
             LOG_ERROR("sql.sql", "Scriptname: `{}` spell (spell_id:{}) does not exist in `Spell.dbc`.", scriptName, fields[0].Get<int32>());
@@ -5890,7 +5890,7 @@ void ObjectMgr::LoadSpellScriptNames()
 
         if (allRanks)
         {
-            if (sSpellMgr->GetFirstSpellInChain(spellId) != uint32(spellId))
+            if (sSpellMgr.GetFirstSpellInChain(spellId) != uint32(spellId))
             {
                 LOG_ERROR("sql.sql", "Scriptname: `{}` spell (spell_id:{}) is not first rank of spell.", scriptName, fields[0].Get<int32>());
                 continue;
@@ -5925,7 +5925,7 @@ void ObjectMgr::ValidateSpellScripts()
 
     for (SpellScriptsContainer::iterator itr = _spellScriptsStore.begin(); itr != _spellScriptsStore.end();)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itr->first);
         std::vector<std::pair<SpellScriptLoader*, SpellScriptsContainer::iterator> > SpellScriptLoaders;
         sScriptMgr->CreateSpellScriptLoaders(itr->first, SpellScriptLoaders);
         itr = _spellScriptsStore.upper_bound(itr->first);
@@ -5972,7 +5972,7 @@ void ObjectMgr::InitializeSpellInfoPrecomputedData()
 {
     uint32 limit = sSpellStore.GetNumRows();
     for(uint32 i = 0; i <= limit; ++i)
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i))
+        if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(i))
         {
             const_cast<SpellInfo*>(spellInfo)->SetStackableWithRanks(spellInfo->ComputeIsStackableWithRanks());
             const_cast<SpellInfo*>(spellInfo)->SetCritCapable(spellInfo->ComputeIsCritCapable());
@@ -6176,7 +6176,7 @@ void ObjectMgr::LoadInstanceEncounters()
                 }
             case ENCOUNTER_CREDIT_CAST_SPELL:
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(creditEntry);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(creditEntry);
                     if (!spellInfo)
                     {
                         LOG_ERROR("sql.sql", "Table `instance_encounters` has an invalid spell (entry {}) linked to the encounter {} ({}), skipped!", creditEntry, entry, dungeonEncounter->encounterName[0]);
@@ -7354,7 +7354,7 @@ inline void CheckGOLinkedTrapId(GameObjectTemplate const* goInfo, uint32 dataN, 
 
 inline void CheckGOSpellId(GameObjectTemplate const* goInfo, uint32 dataN, uint32 N)
 {
-    if (sSpellMgr->GetSpellInfo(dataN))
+    if (sSpellMgr.GetSpellInfo(dataN))
         return;
 
     LOG_ERROR("sql.sql", "Gameobject (Entry: {} GoType: {}) have data{}={} but Spell (Entry {}) not exist.",
@@ -8224,7 +8224,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
         }
 
         uint32 spellid = fields[1].Get<uint32>();
-        SpellInfo const* spellinfo = sSpellMgr->GetSpellInfo(spellid);
+        SpellInfo const* spellinfo = sSpellMgr.GetSpellInfo(spellid);
         if (!spellinfo)
         {
             LOG_ERROR("sql.sql", "Table npc_spellclick_spells references unknown spellid {}. Skipping entry.", spellid);
@@ -9347,7 +9347,7 @@ void ObjectMgr::LoadTrainers()
             spell.ReqAbility[2] = fields[7].Get<uint32>();
             spell.ReqLevel = fields[8].Get<uint8>();
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell.SpellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell.SpellId);
             if (!spellInfo)
             {
                 LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: {}) for TrainerId {}, ignoring", spell.SpellId, trainerId);
@@ -9371,7 +9371,7 @@ void ObjectMgr::LoadTrainers()
             for (std::size_t i = 0; i < spell.ReqAbility.size(); ++i)
             {
                 uint32 requiredSpell = spell.ReqAbility[i];
-                if (requiredSpell && !sSpellMgr->GetSpellInfo(requiredSpell))
+                if (requiredSpell && !sSpellMgr.GetSpellInfo(requiredSpell))
                 {
                     LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (ReqAbility {} : {}) for TrainerId {} and SpellId {}, ignoring",
                         i + 1, requiredSpell, trainerId, spell.SpellId);
@@ -10295,9 +10295,9 @@ void ObjectMgr::LoadFactionChangeSpells()
         uint32 alliance = fields[0].Get<uint32>();
         uint32 horde = fields[1].Get<uint32>();
 
-        if (!sSpellMgr->GetSpellInfo(alliance))
+        if (!sSpellMgr.GetSpellInfo(alliance))
             LOG_ERROR("sql.sql", "Spell {} (alliance_id) referenced in `player_factionchange_spells` does not exist, pair skipped!", alliance);
-        else if (!sSpellMgr->GetSpellInfo(horde))
+        else if (!sSpellMgr.GetSpellInfo(horde))
             LOG_ERROR("sql.sql", "Spell {} (horde_id) referenced in `player_factionchange_spells` does not exist, pair skipped!", horde);
         else
             FactionChangeSpells[alliance] = horde;

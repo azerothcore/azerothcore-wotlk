@@ -868,7 +868,7 @@ public:
     static bool HandleReloadSpellAreaCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading SpellArea Data...");
-        sSpellMgr->LoadSpellAreas();
+        sSpellMgr.LoadSpellAreas();
         handler->SendGlobalGMSysMessage("DB table `spell_area` (spell dependences from area/quest/auras state) reloaded.");
         return true;
     }
@@ -876,7 +876,7 @@ public:
     static bool HandleReloadSpellRequiredCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Required Data... ");
-        sSpellMgr->LoadSpellRequired();
+        sSpellMgr.LoadSpellRequired();
         handler->SendGlobalGMSysMessage("DB table `spell_required` reloaded.");
         return true;
     }
@@ -884,7 +884,7 @@ public:
     static bool HandleReloadSpellGroupsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Groups...");
-        sSpellMgr->LoadSpellGroups();
+        sSpellMgr.LoadSpellGroups();
         handler->SendGlobalGMSysMessage("DB table `spell_group` (spell groups) reloaded.");
         return true;
     }
@@ -892,7 +892,7 @@ public:
     static bool HandleReloadSpellLinkedSpellCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Linked Spells...");
-        sSpellMgr->LoadSpellLinked();
+        sSpellMgr.LoadSpellLinked();
         handler->SendGlobalGMSysMessage("DB table `spell_linked_spell` reloaded.");
         return true;
     }
@@ -900,7 +900,7 @@ public:
     static bool HandleReloadSpellProcEventCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Proc Event conditions...");
-        sSpellMgr->LoadSpellProcEvents();
+        sSpellMgr.LoadSpellProcEvents();
         handler->SendGlobalGMSysMessage("DB table `spell_proc_event` (spell proc trigger requirements) reloaded.");
         return true;
     }
@@ -908,7 +908,7 @@ public:
     static bool HandleReloadSpellProcsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Proc conditions and data...");
-        sSpellMgr->LoadSpellProcs();
+        sSpellMgr.LoadSpellProcs();
         handler->SendGlobalGMSysMessage("DB table `spell_proc` (spell proc conditions and data) reloaded.");
         return true;
     }
@@ -916,7 +916,7 @@ public:
     static bool HandleReloadSpellBonusesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Bonus Data...");
-        sSpellMgr->LoadSpellBonuses();
+        sSpellMgr.LoadSpellBonuses();
         handler->SendGlobalGMSysMessage("DB table `spell_bonus_data` (spell damage/healing coefficients) reloaded.");
         return true;
     }
@@ -924,7 +924,7 @@ public:
     static bool HandleReloadSpellTargetPositionCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell target coordinates...");
-        sSpellMgr->LoadSpellTargetPositions();
+        sSpellMgr.LoadSpellTargetPositions();
         handler->SendGlobalGMSysMessage("DB table `spell_target_position` (destination coordinates for spell targets) reloaded.");
         return true;
     }
@@ -932,7 +932,7 @@ public:
     static bool HandleReloadSpellThreatsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Aggro Spells Definitions...");
-        sSpellMgr->LoadSpellThreats();
+        sSpellMgr.LoadSpellThreats();
         handler->SendGlobalGMSysMessage("DB table `spell_threat` (spell aggro definitions) reloaded.");
         return true;
     }
@@ -940,7 +940,7 @@ public:
     static bool HandleReloadSpellGroupStackRulesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Group Stack Rules...");
-        sSpellMgr->LoadSpellGroupStackRules();
+        sSpellMgr.LoadSpellGroupStackRules();
         handler->SendGlobalGMSysMessage("DB table `spell_group_stack_rules` (spell stacking definitions) reloaded.");
         return true;
     }
@@ -948,7 +948,7 @@ public:
     static bool HandleReloadSpellPetAurasCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell pet auras...");
-        sSpellMgr->LoadSpellPetAuras();
+        sSpellMgr.LoadSpellPetAuras();
         handler->SendGlobalGMSysMessage("DB table `spell_pet_auras` reloaded.");
         return true;
     }

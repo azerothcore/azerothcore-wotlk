@@ -467,7 +467,7 @@ class spell_mage_cold_snap : public SpellScript
         PlayerSpellMap const& spellMap = caster->GetSpellMap();
         for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
         {
-            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
+            SpellInfo const* spellInfo = sSpellMgr.AssertSpellInfo(itr->first);
             if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST) && spellInfo->Id != SPELL_MAGE_COLD_SNAP && spellInfo->GetRecoveryTime() > 0)
             {
                 SpellCooldowns::iterator citr = caster->GetSpellCooldownMap().find(spellInfo->Id);
@@ -702,7 +702,7 @@ class spell_mage_ignite : public AuraScript
     {
         PreventDefaultAction();
 
-        SpellInfo const* igniteDot = sSpellMgr->AssertSpellInfo(SPELL_MAGE_IGNITE);
+        SpellInfo const* igniteDot = sSpellMgr.AssertSpellInfo(SPELL_MAGE_IGNITE);
         int32 pct = 8 * GetSpellInfo()->GetRank();
 
         int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), pct) / igniteDot->GetMaxTicks());
@@ -726,7 +726,7 @@ class spell_mage_living_bomb : public AuraScript
 
     bool Validate(SpellInfo const* spell) override
     {
-        if (!sSpellMgr->GetSpellInfo(uint32(spell->Effects[EFFECT_1].CalcValue())))
+        if (!sSpellMgr.GetSpellInfo(uint32(spell->Effects[EFFECT_1].CalcValue())))
             return false;
         return true;
     }
@@ -873,7 +873,7 @@ class spell_mage_polymorph_cast_visual : public SpellScript
     {
         // check if spell ids exist in dbc
         for (uint32 i = 0; i < 6; ++i)
-            if (!sSpellMgr->GetSpellInfo(PolymorhForms[i]))
+            if (!sSpellMgr.GetSpellInfo(PolymorhForms[i]))
                 return false;
         return true;
     }
@@ -933,7 +933,7 @@ class spell_mage_summon_water_elemental : public SpellScript
             if (pet->GetCharmInfo() && caster->ToPlayer())
             {
                 pet->m_CreatureSpellCooldowns.clear();
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(31707);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(31707);
                 pet->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, true);
                 pet->GetCharmInfo()->SetSpellAutocast(spellInfo, true);
                 caster->ToPlayer()->CharmSpellInitialize();

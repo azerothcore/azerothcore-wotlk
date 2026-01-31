@@ -97,7 +97,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
     void MySelectNextTarget()
     {
         Unit* owner = me->GetOwner();
-        if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_GARGOYLE_STRIKE)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
+        if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr.GetSpellInfo(SPELL_GARGOYLE_STRIKE)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
         {
             Unit* selection = owner->ToPlayer()->GetSelectedUnit();
             if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))

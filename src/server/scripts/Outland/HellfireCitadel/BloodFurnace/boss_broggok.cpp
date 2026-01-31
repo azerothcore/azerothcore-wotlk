@@ -117,7 +117,7 @@ class spell_broggok_poison_cloud : public AuraScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        if (!sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell))
+        if (!sSpellMgr.GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell))
             return false;
 
         return true;

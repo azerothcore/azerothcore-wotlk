@@ -240,7 +240,7 @@ struct LinkValidator<LinkTags::enchant>
         if (LinkValidator<LinkTags::spell>::IsTextValid(info, text))
             return true;
 
-        SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(info->Id);
+        SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(info->Id);
         if (bounds.first == bounds.second)
             return false;
 
@@ -276,7 +276,7 @@ struct LinkValidator<LinkTags::glyph>
 {
     static bool IsTextValid(GlyphLinkData const& data, std::string_view text)
     {
-        if (SpellInfo const* info = sSpellMgr->GetSpellInfo(data.Glyph->SpellId))
+        if (SpellInfo const* info = sSpellMgr.GetSpellInfo(data.Glyph->SpellId))
             return LinkValidator<LinkTags::spell>::IsTextValid(info, text);
 
         return false;
@@ -295,7 +295,7 @@ struct LinkValidator<LinkTags::talent>
     {
         SpellInfo const* info = data.Spell;
         if (!info)
-            info = sSpellMgr->GetSpellInfo(data.Talent->RankID[0]);
+            info = sSpellMgr.GetSpellInfo(data.Talent->RankID[0]);
 
         if (!info)
             return false;

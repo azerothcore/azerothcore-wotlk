@@ -212,7 +212,7 @@ class spell_pal_sacred_shield_base : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
             amount = spellInfo->Effects[EFFECT_0].CalcValue();
 
             // +75.00% from sp bonus
@@ -795,7 +795,7 @@ class spell_pal_holy_shock : public SpellScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        SpellInfo const* firstRankSpellInfo = sSpellMgr->GetSpellInfo(SPELL_PALADIN_HOLY_SHOCK_R1);
+        SpellInfo const* firstRankSpellInfo = sSpellMgr.GetSpellInfo(SPELL_PALADIN_HOLY_SHOCK_R1);
         if (!firstRankSpellInfo)
             return false;
 
@@ -804,7 +804,7 @@ class spell_pal_holy_shock : public SpellScript
             return false;
 
         uint8 rank = spellInfo->GetRank();
-        if (!sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE, rank, true) || !sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_HEALING, rank, true))
+        if (!sSpellMgr.GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE, rank, true) || !sSpellMgr.GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_HEALING, rank, true))
             return false;
 
         return true;
@@ -817,9 +817,9 @@ class spell_pal_holy_shock : public SpellScript
         {
             uint8 rank = GetSpellInfo()->GetRank();
             if (caster->IsFriendlyTo(unitTarget))
-                caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_HEALING, rank), true);
+                caster->CastSpell(unitTarget, sSpellMgr.GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_HEALING, rank), true);
             else
-                caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE, rank), true);
+                caster->CastSpell(unitTarget, sSpellMgr.GetSpellWithRank(SPELL_PALADIN_HOLY_SHOCK_R1_DAMAGE, rank), true);
         }
     }
 
@@ -873,7 +873,7 @@ public:
         for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
         {
             if ((*i)->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL && (*i)->GetEffIndex() == EFFECT_2)
-                if (sSpellMgr->GetSpellInfo((*i)->GetAmount()))
+                if (sSpellMgr.GetSpellInfo((*i)->GetAmount()))
                 {
                     spellId2 = (*i)->GetAmount();
                     break;
@@ -930,7 +930,7 @@ class spell_pal_judgement_of_command : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* unitTarget = GetHitUnit())
-            if (SpellInfo const* spell_proto = sSpellMgr->GetSpellInfo(GetEffectValue()))
+            if (SpellInfo const* spell_proto = sSpellMgr.GetSpellInfo(GetEffectValue()))
                 GetCaster()->CastSpell(unitTarget, spell_proto, true, nullptr);
     }
 

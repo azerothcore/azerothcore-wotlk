@@ -1369,7 +1369,7 @@ void GameObject::TriggeringLinkedGameObject(uint32 trapEntry, Unit* target)
     if (!trapInfo || trapInfo->type != GAMEOBJECT_TYPE_TRAP)
         return;
 
-    SpellInfo const* trapSpell = sSpellMgr->GetSpellInfo(trapInfo->trap.spellId);
+    SpellInfo const* trapSpell = sSpellMgr.GetSpellInfo(trapInfo->trap.spellId);
     if (!trapSpell)                                          // checked at load already
         return;
 
@@ -2049,7 +2049,7 @@ void GameObject::Use(Unit* user)
     if (!spellId)
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
     {
         if (!user->IsPlayer() || !sOutdoorPvPMgr->HandleCustomSpell(user->ToPlayer(), spellId, this))
@@ -2076,7 +2076,7 @@ void GameObject::Use(Unit* user)
 
 void GameObject::CastSpell(Unit* target, uint32 spellId)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 
@@ -2275,7 +2275,7 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     if (!m_goValue.Building.MaxHealth)
         return;
 
-    sScriptMgr->OnGameObjectModifyHealth(this, attackerOrHealer, change, sSpellMgr->GetSpellInfo(spellId));
+    sScriptMgr->OnGameObjectModifyHealth(this, attackerOrHealer, change, sSpellMgr.GetSpellInfo(spellId));
 
     // if the health isn't being changed, return
     if (!change)
@@ -3025,7 +3025,7 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
 
         if (lock->Type[i] == LOCK_KEY_SPELL)
         {
-            if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(lock->Index[i]))
+            if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(lock->Index[i]))
             {
                 return spell;
             }
@@ -3038,7 +3038,7 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
 
         for (auto&& playerSpell : player->GetSpellMap())
         {
-            if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(playerSpell.first))
+            if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(playerSpell.first))
             {
                 for (auto&& effect : spell->Effects)
                 {

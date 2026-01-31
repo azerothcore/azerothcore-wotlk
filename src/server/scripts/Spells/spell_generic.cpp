@@ -1480,7 +1480,7 @@ class spell_gen_netherbloom : public SpellScript
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         for (uint8 i = 0; i < 5; ++i)
-            if (!sSpellMgr->GetSpellInfo(SPELL_NETHERBLOOM_POLLEN_1 + i))
+            if (!sSpellMgr.GetSpellInfo(SPELL_NETHERBLOOM_POLLEN_1 + i))
                 return false;
         return true;
     }
@@ -3089,7 +3089,7 @@ class spell_gen_mounted_charge : public SpellScript
 
     void Register() override
     {
-        SpellInfo const* spell = sSpellMgr->AssertSpellInfo(m_scriptSpellId);
+        SpellInfo const* spell = sSpellMgr.AssertSpellInfo(m_scriptSpellId);
 
         if (spell->HasEffect(SPELL_EFFECT_SCRIPT_EFFECT))
             OnEffectHitTarget += SpellEffectFn(spell_gen_mounted_charge::HandleScriptEffect, EFFECT_FIRST_FOUND, SPELL_EFFECT_SCRIPT_EFFECT);
@@ -3152,7 +3152,7 @@ class spell_gen_defend : public AuraScript
 
     void Register() override
     {
-        SpellInfo const* spell = sSpellMgr->AssertSpellInfo(m_scriptSpellId);
+        SpellInfo const* spell = sSpellMgr.AssertSpellInfo(m_scriptSpellId);
 
         // Defend spells cast by NPCs (add visuals)
         if (spell->Effects[EFFECT_0].ApplyAuraName == SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN)
@@ -3766,7 +3766,7 @@ class spell_gen_paralytic_poison : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return (sSpellMgr->GetSpellInfo(SPELL_PARALYSIS));
+        return (sSpellMgr.GetSpellInfo(SPELL_PARALYSIS));
     }
 
     void HandleStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -3828,7 +3828,7 @@ class spell_gen_blade_warding : public AuraScript
         PreventDefaultAction();
 
         Unit* caster = eventInfo.GetActionTarget();
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_GEN_BLADE_WARDING_TRIGGERED);
         if (!caster)
         {
             return;
@@ -4017,17 +4017,17 @@ public:
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (_mount0 && !sSpellMgr->GetSpellInfo(_mount0))
+        if (_mount0 && !sSpellMgr.GetSpellInfo(_mount0))
             return false;
-        if (_mount60 && !sSpellMgr->GetSpellInfo(_mount60))
+        if (_mount60 && !sSpellMgr.GetSpellInfo(_mount60))
             return false;
-        if (_mount100 && !sSpellMgr->GetSpellInfo(_mount100))
+        if (_mount100 && !sSpellMgr.GetSpellInfo(_mount100))
             return false;
-        if (_mount150 && !sSpellMgr->GetSpellInfo(_mount150))
+        if (_mount150 && !sSpellMgr.GetSpellInfo(_mount150))
             return false;
-        if (_mount280 && !sSpellMgr->GetSpellInfo(_mount280))
+        if (_mount280 && !sSpellMgr.GetSpellInfo(_mount280))
             return false;
-        if (_mount310 && !sSpellMgr->GetSpellInfo(_mount310))
+        if (_mount310 && !sSpellMgr.GetSpellInfo(_mount310))
             return false;
         return true;
     }
@@ -4803,7 +4803,7 @@ class spell_freezing_circle : public SpellScript
         else
             spellId = SPELL_FREEZING_CIRCLE;
 
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+        if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId))
             SetHitDamage(spellInfo->Effects[EFFECT_0].CalcValue());
     }
 

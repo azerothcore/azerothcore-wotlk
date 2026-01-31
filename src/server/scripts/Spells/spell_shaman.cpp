@@ -77,7 +77,7 @@ class spell_sha_totem_of_wrath : public SpellScript
     {
         if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(63280, EFFECT_0))
             if (Creature* totem = GetCaster()->GetMap()->GetCreature(GetCaster()->m_SummonSlot[1]))   // Fire totem summon slot
-                if (SpellInfo const* totemSpell = sSpellMgr->GetSpellInfo(totem->m_spells[0]))
+                if (SpellInfo const* totemSpell = sSpellMgr.GetSpellInfo(totem->m_spells[0]))
                 {
                     int32 bp0 = CalculatePct(totemSpell->Effects[EFFECT_0].CalcValue(), aurEff->GetAmount());
                     int32 bp1 = CalculatePct(totemSpell->Effects[EFFECT_1].CalcValue(), aurEff->GetAmount());
@@ -124,7 +124,7 @@ class spell_sha_t10_restoration_4p_bonus : public AuraScript
         PreventDefaultAction();
 
         uint32 triggered_spell_id = 70809;
-        SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
+        SpellInfo const* triggeredSpell = sSpellMgr.GetSpellInfo(triggered_spell_id);
 
         HealInfo* healInfo = eventInfo.GetHealInfo();
 
@@ -697,12 +697,12 @@ class spell_sha_fire_nova : public SpellScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        SpellInfo const* firstRankSpellInfo = sSpellMgr->GetSpellInfo(SPELL_SHAMAN_FIRE_NOVA_R1);
+        SpellInfo const* firstRankSpellInfo = sSpellMgr.GetSpellInfo(SPELL_SHAMAN_FIRE_NOVA_R1);
         if (!firstRankSpellInfo || !spellInfo->IsRankOf(firstRankSpellInfo))
             return false;
 
         uint8 rank = spellInfo->GetRank();
-        if (!sSpellMgr->GetSpellWithRank(SPELL_SHAMAN_FIRE_NOVA_TRIGGERED_R1, rank, true))
+        if (!sSpellMgr.GetSpellWithRank(SPELL_SHAMAN_FIRE_NOVA_TRIGGERED_R1, rank, true))
             return false;
         return true;
     }
@@ -731,7 +731,7 @@ class spell_sha_fire_nova : public SpellScript
         {
             uint8 rank = GetSpellInfo()->GetRank();
             if (totem->IsTotem())
-                caster->CastSpell(totem, sSpellMgr->GetSpellWithRank(SPELL_SHAMAN_FIRE_NOVA_TRIGGERED_R1, rank), true);
+                caster->CastSpell(totem, sSpellMgr.GetSpellWithRank(SPELL_SHAMAN_FIRE_NOVA_TRIGGERED_R1, rank), true);
         }
     }
 
@@ -758,12 +758,12 @@ class spell_sha_flame_shock : public AuraScript
             // Lava Flows
             if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_SHAMAN, SHAMAN_ICON_ID_SHAMAN_LAVA_FLOW, EFFECT_0))
             {
-                if (SpellInfo const* firstRankSpellInfo = sSpellMgr->GetSpellInfo(SPELL_SHAMAN_LAVA_FLOWS_R1))
+                if (SpellInfo const* firstRankSpellInfo = sSpellMgr.GetSpellInfo(SPELL_SHAMAN_LAVA_FLOWS_R1))
                     if (!aurEff->GetSpellInfo()->IsRankOf(firstRankSpellInfo))
                         return;
 
                 uint8 rank = aurEff->GetSpellInfo()->GetRank();
-                caster->CastSpell(caster, sSpellMgr->GetSpellWithRank(SPELL_SHAMAN_LAVA_FLOWS_TRIGGERED_R1, rank), true);
+                caster->CastSpell(caster, sSpellMgr.GetSpellWithRank(SPELL_SHAMAN_LAVA_FLOWS_TRIGGERED_R1, rank), true);
             }
     }
 
@@ -1131,7 +1131,7 @@ class spell_sha_t8_electrified : public AuraScript
             }
         }
 
-        SpellInfo const* electrifiedDot = sSpellMgr->AssertSpellInfo(SPELL_SHAMAN_ELECTRIFIED);
+        SpellInfo const* electrifiedDot = sSpellMgr.AssertSpellInfo(SPELL_SHAMAN_ELECTRIFIED);
         int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / electrifiedDot->GetMaxTicks());
 
         eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_SHAMAN_ELECTRIFIED, SPELL_AURA_PERIODIC_DAMAGE, amount);

@@ -1852,7 +1852,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
                 if (IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC))
                 {
                     uint32 cooldownSpell = IsClass(CLASS_ROGUE, CLASS_CONTEXT_WEAPON_SWAP) ? 6123 : 6119;
-                    uint32 startRecoveryTime = sSpellMgr->GetSpellInfo(cooldownSpell)->StartRecoveryTime;
+                    uint32 startRecoveryTime = sSpellMgr.GetSpellInfo(cooldownSpell)->StartRecoveryTime;
                     if (m_weaponChangeTimer != 0 && m_weaponChangeTimer != startRecoveryTime)
                         return EQUIP_ERR_CANT_DO_RIGHT_NOW;         // maybe exist better err
                 }
@@ -2757,7 +2757,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
             if (pProto && IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
                 uint32 cooldownSpell = IsClass(CLASS_ROGUE, CLASS_CONTEXT_WEAPON_SWAP) ? 6123 : 6119;
-                SpellInfo const* spellProto = sSpellMgr->GetSpellInfo(cooldownSpell);
+                SpellInfo const* spellProto = sSpellMgr.GetSpellInfo(cooldownSpell);
 
                 if (!spellProto)
                     LOG_ERROR("entities.player", "Weapon switch cooldown spell {} couldn't be found in Spell.dbc", cooldownSpell);
@@ -4235,7 +4235,7 @@ void Player::RemoveArenaEnchantments(EnchantmentSlot slot)
             if (itr->item && itr->item->GetEnchantmentId(slot))
             {
                 // Poisons and DK runes are enchants which are allowed on arenas
-                if (sSpellMgr->IsArenaAllowedEnchancment(itr->item->GetEnchantmentId(slot)))
+                if (sSpellMgr.IsArenaAllowedEnchancment(itr->item->GetEnchantmentId(slot)))
                 {
                     ++next;
                     continue;
@@ -4259,7 +4259,7 @@ void Player::RemoveArenaEnchantments(EnchantmentSlot slot)
     for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             if (uint32 enchId = pItem->GetEnchantmentId(slot))
-                if (!sSpellMgr->IsArenaAllowedEnchancment(enchId))
+                if (!sSpellMgr.IsArenaAllowedEnchancment(enchId))
                     pItem->ClearEnchantment(slot);
 
     // in inventory bags
@@ -4268,7 +4268,7 @@ void Player::RemoveArenaEnchantments(EnchantmentSlot slot)
             for (uint32 j = 0; j < pBag->GetBagSize(); j++)
                 if (Item* pItem = pBag->GetItemByPos(j))
                     if (uint32 enchId = pItem->GetEnchantmentId(slot))
-                        if (!sSpellMgr->IsArenaAllowedEnchancment(enchId))
+                        if (!sSpellMgr.IsArenaAllowedEnchancment(enchId))
                             pItem->ClearEnchantment(slot);
 }
 
@@ -5727,7 +5727,7 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 remaintime = fields[13].Get<int32>();
             uint8 remaincharges = fields[14].Get<uint8>();
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellid);
             if (!spellInfo)
             {
                 LOG_ERROR("entities.player", "Unknown aura (spellid {}), ignore.", spellid);
@@ -5787,7 +5787,7 @@ void Player::_LoadGlyphAuras()
             {
                 if (GlyphSlotEntry const* glyphSlotEntry = sGlyphSlotStore.LookupEntry(GetGlyphSlot(i)))
                 {
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(glyphEntry->SpellId);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(glyphEntry->SpellId);
                     if (glyphEntry->TypeFlags == glyphSlotEntry->TypeFlags)
                     {
                         if (!spellInfo->Stances)

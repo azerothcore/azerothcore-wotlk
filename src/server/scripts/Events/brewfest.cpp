@@ -1423,7 +1423,7 @@ class spell_brewfest_relay_race_force_cast : public SpellScript
     {
         if (Unit* target = GetExplTargetUnit())
         {
-            if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
+            if (SpellInfo const* triggeredSpellInfo = sSpellMgr.GetSpellInfo(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
             {
                 if (Player* player = target->ToPlayer())
                 {

@@ -76,7 +76,7 @@ bool UnitAI::DoSpellAttackIfReady(uint32 spell)
     if (me->HasUnitState(UNIT_STATE_CASTING) || !me->isAttackReady())
         return true;
 
-    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
+    if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell))
     {
         if (me->IsWithinCombatRange(me->GetVictim(), spellInfo->GetMaxRange(false)))
         {
@@ -94,7 +94,7 @@ void UnitAI::DoSpellAttackToRandomTargetIfReady(uint32 spell, uint32 threatTable
     if (me->HasUnitState(UNIT_STATE_CASTING) || !me->isAttackReady())
         return;
 
-    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell))
+    if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell))
     {
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly))
         {
@@ -119,7 +119,7 @@ void UnitAI::SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTa
 
 float UnitAI::DoGetSpellMaxRange(uint32 spellId, bool positive)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     return spellInfo ? spellInfo->GetMaxRange(positive) : 0;
 }
 
@@ -189,7 +189,7 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
             break;
         case AITARGET_ENEMY:
             {
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId))
                 {
                     DefaultTargetSelector targetSelector(me, spellInfo->GetMaxRange(false), false, true, 0);
                     target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* target) {
@@ -222,7 +222,7 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
             break;
         case AITARGET_DEBUFF:
             {
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
+                if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId))
                 {
                     float range = spellInfo->GetMaxRange(false);
 
@@ -327,14 +327,14 @@ SpellCastResult UnitAI::DoCastMaxThreat(uint32 spellId, uint32 threatTablePositi
 
 void UnitAI::FillAISpellInfo()
 {
-    AISpellInfo = new AISpellInfoType[sSpellMgr->GetSpellInfoStoreSize()];
+    AISpellInfo = new AISpellInfoType[sSpellMgr.GetSpellInfoStoreSize()];
 
     AISpellInfoType* AIInfo = AISpellInfo;
     SpellInfo const* spellInfo;
 
-    for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i, ++AIInfo)
+    for (uint32 i = 0; i < sSpellMgr.GetSpellInfoStoreSize(); ++i, ++AIInfo)
     {
-        spellInfo = sSpellMgr->GetSpellInfo(i);
+        spellInfo = sSpellMgr.GetSpellInfo(i);
         if (!spellInfo)
             continue;
 
@@ -417,7 +417,7 @@ void SimpleCharmedAI::UpdateAI(uint32 /*diff*/)
 }
 
 SpellTargetSelector::SpellTargetSelector(Unit* caster, uint32 spellId) :
-    _caster(caster), _spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(sSpellMgr->GetSpellInfo(spellId), caster))
+    _caster(caster), _spellInfo(sSpellMgr.GetSpellForDifficultyFromSpell(sSpellMgr.GetSpellInfo(spellId), caster))
 {
     ASSERT(_spellInfo);
 }

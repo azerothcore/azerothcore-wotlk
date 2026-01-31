@@ -26,7 +26,7 @@ namespace Trainer
 {
     bool Spell::IsCastable() const
     {
-        return sSpellMgr->AssertSpellInfo(SpellId)->HasEffect(SPELL_EFFECT_LEARN_SPELL);
+        return sSpellMgr.AssertSpellInfo(SpellId)->HasEffect(SPELL_EFFECT_LEARN_SPELL);
     }
 
     Trainer::Trainer(uint32 trainerId, Type type, uint32 requirement, std::string greeting, std::vector<Spell> spells) : _trainerId(trainerId), _type(type), _requirement(requirement), _spells(std::move(spells))
@@ -48,7 +48,7 @@ namespace Trainer
             if (!player->IsSpellFitByClassAndRace(trainerSpell.SpellId))
                 continue;
 
-            SpellInfo const* trainerSpellInfo = sSpellMgr->AssertSpellInfo(trainerSpell.SpellId);
+            SpellInfo const* trainerSpellInfo = sSpellMgr.AssertSpellInfo(trainerSpell.SpellId);
 
             bool primaryProfessionFirstRank = false;
             for (SpellEffectInfo const& spellEffectInfo : trainerSpellInfo->GetEffects())
@@ -56,7 +56,7 @@ namespace Trainer
                 if (!spellEffectInfo.IsEffect(SPELL_EFFECT_LEARN_SPELL))
                     continue;
 
-                SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(spellEffectInfo.TriggerSpell);
+                SpellInfo const* learnedSpellInfo = sSpellMgr.GetSpellInfo(spellEffectInfo.TriggerSpell);
                 if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank())
                     primaryProfessionFirstRank = true;
             }
@@ -136,14 +136,14 @@ namespace Trainer
         if (state != SpellState::Available)
             return false;
 
-        SpellInfo const* trainerSpellInfo = sSpellMgr->AssertSpellInfo(trainerSpell->SpellId);
+        SpellInfo const* trainerSpellInfo = sSpellMgr.AssertSpellInfo(trainerSpell->SpellId);
 
         for (SpellEffectInfo const& spellEffectInfo : trainerSpellInfo->GetEffects())
         {
             if (!spellEffectInfo.IsEffect(SPELL_EFFECT_LEARN_SPELL))
                 continue;
 
-            SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(spellEffectInfo.TriggerSpell);
+            SpellInfo const* learnedSpellInfo = sSpellMgr.GetSpellInfo(spellEffectInfo.TriggerSpell);
             if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && !player->GetFreePrimaryProfessionPoints())
                 return false;
         }
@@ -175,7 +175,7 @@ namespace Trainer
         // check ranks
         bool hasLearnSpellEffect = false;
         bool knowsAllLearnedSpells = true;
-        for (SpellEffectInfo const& spellEffectInfo : sSpellMgr->AssertSpellInfo(trainerSpell->SpellId)->GetEffects())
+        for (SpellEffectInfo const& spellEffectInfo : sSpellMgr.AssertSpellInfo(trainerSpell->SpellId)->GetEffects())
         {
             if (!spellEffectInfo.IsEffect(SPELL_EFFECT_LEARN_SPELL))
                 continue;
@@ -184,14 +184,14 @@ namespace Trainer
             if (!player->HasSpell(spellEffectInfo.TriggerSpell))
                 knowsAllLearnedSpells = false;
 
-            if (uint32 previousRankSpellId = sSpellMgr->GetPrevSpellInChain(spellEffectInfo.TriggerSpell))
+            if (uint32 previousRankSpellId = sSpellMgr.GetPrevSpellInChain(spellEffectInfo.TriggerSpell))
                 if (!player->HasSpell(previousRankSpellId))
                     return SpellState::Unavailable;
         }
 
         if (!hasLearnSpellEffect)
         {
-            if (uint32 previousRankSpellId = sSpellMgr->GetPrevSpellInChain(trainerSpell->SpellId))
+            if (uint32 previousRankSpellId = sSpellMgr.GetPrevSpellInChain(trainerSpell->SpellId))
                 if (!player->HasSpell(previousRankSpellId))
                     return SpellState::Unavailable;
         }
@@ -199,7 +199,7 @@ namespace Trainer
             return SpellState::Known;
 
         // check additional spell requirement
-        for (auto const& requirePair : sSpellMgr->GetSpellsRequiredForSpellBounds(trainerSpell->SpellId))
+        for (auto const& requirePair : sSpellMgr.GetSpellsRequiredForSpellBounds(trainerSpell->SpellId))
             if (!player->HasSpell(requirePair.second))
                 return SpellState::Unavailable;
 

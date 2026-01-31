@@ -483,7 +483,7 @@ class spell_warr_bloodthirst_heal : public SpellScript
 
     void HandleHeal(SpellEffIndex /*effIndex*/)
     {
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARRIOR_BLOODTHIRST_DAMAGE))
+        if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_WARRIOR_BLOODTHIRST_DAMAGE))
             SetEffectValue(GetCaster()->CountPctFromMaxHealth(spellInfo->Effects[EFFECT_1].CalcValue(GetCaster())));
     }
 

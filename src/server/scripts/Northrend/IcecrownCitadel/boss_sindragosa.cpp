@@ -491,7 +491,7 @@ public:
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             if (target->IsPlayer())
-                if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(70127, me))
+                if (uint32 spellId = sSpellMgr.GetSpellIdForDifficulty(70127, me))
                     if (spellId == spell->Id)
                         if (Aura const* mysticBuffet = target->GetAura(spell->Id))
                             _mysticBuffetStack = std::max<uint8>(_mysticBuffetStack, mysticBuffet->GetStackAmount());

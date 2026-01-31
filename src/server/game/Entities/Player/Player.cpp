@@ -2805,7 +2805,7 @@ void Player::SendInitialSpells()
         if (!itr->second.needSendToClient)
             continue;
 
-        SpellInfo const* sEntry = sSpellMgr->GetSpellInfo(itr->first);
+        SpellInfo const* sEntry = sSpellMgr.GetSpellInfo(itr->first);
         if (!sEntry)
             continue;
 
@@ -2883,7 +2883,7 @@ void Player::AddNewMailDeliverTime(time_t deliver_time)
 
 bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!SpellMgr::CheckSpellValid(spellInfo, spellId, true))
         return false;
 
@@ -2977,11 +2977,11 @@ void Player::_removeTalentAurasAndSpells(uint32 spellId)
 {
     RemoveOwnedAura(spellId);
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         // pussywizard: remove pet auras
-        if (PetAura const* petSpell = sSpellMgr->GetPetAura(spellId, i))
+        if (PetAura const* petSpell = sSpellMgr.GetPetAura(spellId, i))
             RemovePetAura(petSpell);
 
         // pussywizard: remove all triggered auras
@@ -3001,11 +3001,11 @@ void Player::_removeTalentAurasAndSpells(uint32 spellId)
 void Player::_addTalentAurasAndSpells(uint32 spellId)
 {
     // pussywizard: spells learnt from talents are added as TEMPORARY, so not saved to db (only the talent itself is saved)
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
     {
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL && !sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL && !sSpellMgr.IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
                 _addSpell(spellInfo->Effects[i].TriggerSpell, SPEC_MASK_ALL, true);
     }
     else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
@@ -3040,13 +3040,13 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
     if (!updateActive)
         return true;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId); // must exist, checked in _addSpell
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId); // must exist, checked in _addSpell
 
     // pussywizard: now update active state for all ranks of this spell! and send packet to swap on action bar
     // pussywizard: assumption - it's in all specs, can't be a talent
     if (!spellInfo->IsStackableWithRanks() && spellInfo->IsRanked())
     {
-        SpellInfo const* nextSpellInfo = sSpellMgr->GetSpellInfo(sSpellMgr->GetFirstSpellInChain(spellInfo->Id));
+        SpellInfo const* nextSpellInfo = sSpellMgr.GetSpellInfo(sSpellMgr.GetFirstSpellInChain(spellInfo->Id));
         while (nextSpellInfo)
         {
             PlayerSpellMap::iterator itr = m_spells.find(nextSpellInfo->Id);
@@ -3084,7 +3084,7 @@ bool Player::CheckSkillLearnedBySpell(uint32 spellId)
     if (!sWorld->getBoolConfig(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS))
         return true;
 
-    SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    SkillLineAbilityMapBounds skill_bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellId);
     uint32 errorSkill = 0;
     for (SkillLineAbilityMap::const_iterator sla = skill_bounds.first; sla != skill_bounds.second; ++sla)
     {
@@ -3112,7 +3112,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
 {
     // pussywizard: this can be called to OVERWRITE currently existing spell params! usually to set active = false for lower ranks of a spell
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!SpellMgr::CheckSpellValid(spellInfo, spellId, false))
         return false;
 
@@ -3140,7 +3140,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
                     return false;
                     //ABORT();
                 }
-                else if (SpellInfo const* learnSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
+                else if (SpellInfo const* learnSpell = sSpellMgr.GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
                     _addSpell(learnSpell->Id, SPEC_MASK_ALL, true);
             }
 
@@ -3226,8 +3226,8 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     }
 
     uint16 maxskill = GetMaxSkillValueForLevel();
-    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(spellId);
-    SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr.GetSpellLearnSkill(spellId);
+    SkillLineAbilityMapBounds skill_bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellId);
     // xinef: set appropriate skill value
     if (spellLearnSkill)
     {
@@ -3295,8 +3295,8 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
         return;
     }
 
-    uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
-    bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
+    uint32 firstRankSpellId = sSpellMgr.GetFirstSpellInChain(spellId);
+    bool thisSpec = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr.IsAdditionalTalentSpell(firstRankSpellId);
     bool added = addSpell(spellId, thisSpec ? GetActiveSpecMask() : SPEC_MASK_ALL, true, temporary, learnFromSkill);
     if (added)
     {
@@ -3308,7 +3308,7 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
     }
 
     // pussywizard: rank stuff at the end!
-    if (uint32 nextSpell = sSpellMgr->GetNextSpellInChain(spellId))
+    if (uint32 nextSpell = sSpellMgr.GetNextSpellInChain(spellId))
     {
         // pussywizard: lookup next rank in m_spells (the only talents on m_spella are for example pyroblast, that have all ranks restored upon learning rank 1)
         // pussywizard: next ranks must not be in current spec (otherwise no need to learn already learnt)
@@ -3318,7 +3318,7 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
     }
 
     // xinef: if we learn new spell, check all spells requiring this spell, if we have such a spell, and it is not in current spec - learn it
-    SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr->GetSpellsRequiringSpellBounds(spellId);
+    SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr.GetSpellsRequiringSpellBounds(spellId);
     for (SpellsRequiringSpellMap::const_iterator itr = spellsRequiringSpell.first; itr != spellsRequiringSpell.second; ++itr)
     {
         PlayerSpellMap::iterator itr2 = m_spells.find(itr->second);
@@ -3343,15 +3343,15 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
 
     // pussywizard: remove non-talent higher ranks (recursive)
     // pussywizard: do this at the beginning, not in the middle of removing!
-    if (uint32 nextSpell = sSpellMgr->GetNextSpellInChain(spell_id))
+    if (uint32 nextSpell = sSpellMgr.GetNextSpellInChain(spell_id))
         if (!GetTalentSpellPos(nextSpell))
             removeSpell(nextSpell, removeSpecMask, onlyTemporary);
 
     // xinef: if current spell has talentcost, remove spells requiring this spell
-    uint32 firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spell_id);
+    uint32 firstRankSpellId = sSpellMgr.GetFirstSpellInChain(spell_id);
     if (GetTalentSpellCost(firstRankSpellId))
     {
-        SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr->GetSpellsRequiringSpellBounds(firstRankSpellId);
+        SpellsRequiringSpellMapBounds spellsRequiringSpell = sSpellMgr.GetSpellsRequiringSpellBounds(firstRankSpellId);
         for (auto spellsItr = spellsRequiringSpell.first; spellsItr != spellsRequiringSpell.second; ++spellsItr)
         {
             removeSpell(spellsItr->second, removeSpecMask, onlyTemporary);
@@ -3366,7 +3366,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     itr->second->specMask = (((uint8)itr->second->specMask) & ~removeSpecMask); // pussywizard: update specMask in map
 
     // pussywizard: some more conditions needed for spells like pyroblast (shouldn't be fully removed when not available in any spec, should stay in db with specMask = 0)
-    if (GetTalentSpellCost(firstRankSpellId) == 0 && !sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId) && itr->second->specMask == 0)
+    if (GetTalentSpellCost(firstRankSpellId) == 0 && !sSpellMgr.IsAdditionalTalentSpell(firstRankSpellId) && itr->second->specMask == 0)
     {
         if (itr->second->State == PLAYERSPELL_NEW || itr->second->State == PLAYERSPELL_TEMPORARY)
         {
@@ -3384,11 +3384,11 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     // pussywizard: remove owned aura obtained from currently removed spell
     RemoveOwnedAura(spell_id);
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell_id);
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         // pussywizard: remove pet auras
-        if (PetAura const* petSpell = sSpellMgr->GetPetAura(spell_id, i))
+        if (PetAura const* petSpell = sSpellMgr.GetPetAura(spell_id, i))
             RemovePetAura(petSpell);
 
         // pussywizard: remove all triggered auras
@@ -3411,20 +3411,20 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
                 Has310Flyer(true, spell_id);
 
     // pussywizard: remove dependent skill
-    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr->GetSpellLearnSkill(spell_id);
+    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr.GetSpellLearnSkill(spell_id);
     if (spellLearnSkill)
     {
-        uint32 prev_spell = sSpellMgr->GetPrevSpellInChain(spell_id);
+        uint32 prev_spell = sSpellMgr.GetPrevSpellInChain(spell_id);
 
         if (!prev_spell) // pussywizard: first rank, remove skill
             SetSkill(spellLearnSkill->skill, 0, 0, 0);
         else // pussywizard: search previous ranks
         {
-            SpellLearnSkillNode const* prevSkill = sSpellMgr->GetSpellLearnSkill(prev_spell);
+            SpellLearnSkillNode const* prevSkill = sSpellMgr.GetSpellLearnSkill(prev_spell);
             while (!prevSkill && prev_spell)
             {
-                prev_spell = sSpellMgr->GetPrevSpellInChain(prev_spell);
-                prevSkill = sSpellMgr->GetSpellLearnSkill(sSpellMgr->GetFirstSpellInChain(prev_spell));
+                prev_spell = sSpellMgr.GetPrevSpellInChain(prev_spell);
+                prevSkill = sSpellMgr.GetSpellLearnSkill(sSpellMgr.GetFirstSpellInChain(prev_spell));
             }
 
             if (!prevSkill) // pussywizard: not found prev skill setting, remove skill
@@ -3446,7 +3446,7 @@ void Player::removeSpell(uint32 spell_id, uint8 removeSpecMask, bool onlyTempora
     }
     else
     {
-        SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spell_id);
+        SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spell_id);
         // most likely will never be used, haven't heard of cases where players unlearn a mount
         if (Has310Flyer(false) && spellInfo)
         {
@@ -3497,13 +3497,13 @@ bool Player::Has310Flyer(bool checkAllSpells, uint32 excludeSpellId)
             if (itr->first == excludeSpellId)
                 continue;
 
-            SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(itr->first);
+            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(itr->first);
             for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
             {
                 if (_spell_idx->second->SkillLine != SKILL_MOUNTS)
                     break;  // We can break because mount spells belong only to one skillline (at least 310 flyers do)
 
-                spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
+                spellInfo = sSpellMgr.AssertSpellInfo(itr->first);
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                     if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED &&
                             spellInfo->Effects[i].CalcValue() == 310)
@@ -3543,7 +3543,7 @@ void Player::RemoveArenaSpellCooldowns(bool removeActivePetCooldowns)
     {
         next = itr;
         ++next;
-        SpellInfo const* spellInfo = sSpellMgr->CheckSpellInfo(itr->first);
+        SpellInfo const* spellInfo = sSpellMgr.CheckSpellInfo(itr->first);
         if (!spellInfo)
         {
             continue;
@@ -3601,7 +3601,7 @@ void Player::_LoadSpellCooldowns(PreparedQueryResult result)
             uint32 db_time  = fields[3].Get<uint32>();
             bool needSend   = fields[4].Get<bool>();
 
-            if (!sSpellMgr->GetSpellInfo(spell_id))
+            if (!sSpellMgr.GetSpellInfo(spell_id))
             {
                 LOG_ERROR("entities.player", "Player {} has unknown spell {} in `character_spell_cooldown`, skipping.", GetGUID().ToString(), spell_id);
                 continue;
@@ -3746,7 +3746,7 @@ bool Player::resetTalents(bool noResetCost)
 
         // xinef: check if talent learns spell to spell book
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID);
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itr->first);
 
         bool removed = false;
         if (talentInfo->addToSpellBook)
@@ -3762,7 +3762,7 @@ bool Player::resetTalents(bool noResetCost)
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-                if (sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
+                if (sSpellMgr.IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
                     removeSpell(spellInfo->Effects[i].TriggerSpell, GetActiveSpecMask(), false);
 
         // xinef: remove talent modifies m_talents, move itr to map begin
@@ -5366,7 +5366,7 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 
             // remove all spells that related to this skill
             for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(id))
-                removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->Spell), SPEC_MASK_ALL, false);
+                removeSpell(sSpellMgr.GetFirstSpellInChain(pAbility->Spell), SPEC_MASK_ALL, false);
         }
     }
     else if (newVal)                                        //add
@@ -5586,7 +5586,7 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type)
     switch (type)
     {
         case ACTION_BUTTON_SPELL:
-            if (!sSpellMgr->GetSpellInfo(action))
+            if (!sSpellMgr.GetSpellInfo(action))
             {
                 LOG_ERROR("entities.player", "Spell action {} not added into button {} for player {}: spell not exist", action, button, GetName());
                 return false;
@@ -7096,7 +7096,7 @@ void Player::ApplyItemDependentAuras(Item* item, bool apply)
             if (playerSpell->State == PLAYERSPELL_REMOVED)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
             if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
                 continue;
 
@@ -7113,7 +7113,7 @@ void Player::ApplyItemDependentAuras(Item* item, bool apply)
             if (!(playerTalent->IsInSpec(GetActiveSpec())))
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
             if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
                 continue;
 
@@ -7180,7 +7180,7 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         }
 
         // check if it is valid spell
-        SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(spellData.SpellId);
+        SpellInfo const* spellproto = sSpellMgr.GetSpellInfo(spellData.SpellId);
         if (!spellproto)
             continue;
 
@@ -7294,7 +7294,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_CHANCE_ON_HIT)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellData.SpellId);
             if (!spellInfo)
             {
                 LOG_ERROR("entities.player", "WORLD: unknown Item spellid {}", spellData.SpellId);
@@ -7331,7 +7331,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (pEnchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                 continue;
 
-            SpellEnchantProcEntry const* entry = sSpellMgr->GetSpellEnchantProcEvent(enchant_id);
+            SpellEnchantProcEntry const* entry = sSpellMgr.GetSpellEnchantProcEvent(enchant_id);
 
             if (entry && entry->procEx)
             {
@@ -7350,7 +7350,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (entry && (entry->attributeMask & ENCHANT_PROC_ATTR_WHITE_HIT) && (procVictim & SPELL_PROC_FLAG_MASK))
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pEnchant->spellid[s]);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(pEnchant->spellid[s]);
             if (!spellInfo)
             {
                 LOG_ERROR("entities.player", "Player::CastItemCombatSpell({}, name: {}, enchant: {}): unknown spell {} is casted, ignoring...",
@@ -7417,7 +7417,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         uint32 learn_spell_id = proto->Spells[0].SpellId;
         uint32 learning_spell_id = proto->Spells[1].SpellId;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(learn_spell_id);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(learn_spell_id);
         if (!spellInfo)
         {
             LOG_ERROR("entities.player", "Player::CastItemUseSpell: Item (Entry: {}) in have wrong spell id {}, ignoring ", proto->ItemId, learn_spell_id);
@@ -7450,7 +7450,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
         if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellData.SpellId);
         if (!spellInfo)
         {
             LOG_ERROR("entities.player", "Player::CastItemUseSpell: Item (Entry: {}) in have wrong spell id {}, ignoring", proto->ItemId, spellData.SpellId);
@@ -7497,7 +7497,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
             if (pEnchant->type[s] != ITEM_ENCHANTMENT_TYPE_USE_SPELL)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pEnchant->spellid[s]);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(pEnchant->spellid[s]);
             if (!spellInfo)
             {
                 LOG_ERROR("entities.player", "Player::CastItemUseSpell Enchant {}, cast unknown spell {}", pEnchant->ID, pEnchant->spellid[s]);
@@ -9110,7 +9110,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
     {
         //returning of reagents only for players, so best done here
         uint32 spellId = pet ? pet->GetUInt32Value(UNIT_CREATED_BY_SPELL) : m_oldpetspell;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
 
         if (spellInfo)
         {
@@ -9616,7 +9616,7 @@ void Player::VehicleSpellInitialize()
     for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
     {
         uint32 spellId = vehicle->m_spells[i];
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
         if (!spellInfo)
         {
             data << uint16(0) << uint8(0) << uint8(i + 8);
@@ -9759,7 +9759,7 @@ bool Player::IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod
 template <class T>
 void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* spell, bool temporaryPet)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 
@@ -9992,7 +9992,7 @@ void Player::RemoveSpellMods(Spell* spell)
 
             // don't handle spells with proc_event entry defined
             // this is a temporary workaround, because all spellmods should be handled like that
-            if (sSpellMgr->GetSpellProcEvent(mod->spellId))
+            if (sSpellMgr.GetSpellProcEvent(mod->spellId))
             {
                 continue;
             }
@@ -10512,7 +10512,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
         if (itr->second->State == PLAYERSPELL_REMOVED)
             continue;
         uint32 unSpellId = itr->first;
-        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(unSpellId);
+        SpellInfo const* spellInfo = sSpellMgr.AssertSpellInfo(unSpellId);
 
         // Not send cooldown for this spells
         if (spellInfo->IsCooldownStartedOnEvent())
@@ -10990,7 +10990,7 @@ void Player::AddSpellAndCategoryCooldowns(SpellInfo const* spellInfo, uint32 ite
                 }
 
                 // Only within the same spellfamily
-                SpellInfo const* categorySpellInfo = sSpellMgr->GetSpellInfo(i_scset->second);
+                SpellInfo const* categorySpellInfo = sSpellMgr.GetSpellInfo(i_scset->second);
                 if (!categorySpellInfo || categorySpellInfo->SpellFamilyName != spellInfo->SpellFamilyName)
                 {
                     continue;
@@ -11791,7 +11791,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
             continue;
 
         // xinef: dont apply equip cooldown if spell on item has insignificant cooldown
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellData.SpellId);
         if (spellData.SpellCooldown <= 3000 && spellData.SpellCategoryCooldown <= 3000 && (!spellInfo || (spellInfo->RecoveryTime <= 3000 && spellInfo->CategoryRecoveryTime <= 3000)))
             continue;
 
@@ -11948,7 +11948,7 @@ void Player::learnQuestRewardedSpells(Quest const* quest)
     if (!spellId)
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 
@@ -11958,7 +11958,7 @@ void Player::learnQuestRewardedSpells(Quest const* quest)
         if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL && spellInfo->Effects[i].TriggerSpell && !HasSpell(spellInfo->Effects[i].TriggerSpell))
         {
             // pusywizard: don't re-add profession specialties!
-            if (SpellInfo const* triggeredInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
+            if (SpellInfo const* triggeredInfo = sSpellMgr.GetSpellInfo(spellInfo->Effects[i].TriggerSpell))
                 if (triggeredInfo->Effects[0].Effect == SPELL_EFFECT_TRADE_SKILL)
                     break; // pussywizard: break and not cast the spell (found is false)
 
@@ -11995,7 +11995,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
     uint32 classMask = getClassMask();
     for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pAbility->Spell);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(pAbility->Spell);
         if (!spellInfo)
         {
             continue;
@@ -12030,7 +12030,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
             if (pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pAbility->SupercededBySpell)
             {
                 bool skipCurrent = false;
-                auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
+                auto bounds = sSpellMgr.GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
                 for (auto itr = bounds.first; itr != bounds.second; ++itr)
                 {
                     if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skill_value >= itr->second->MinSkillLineRank)
@@ -12347,7 +12347,7 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
     uint32 racemask  = getRaceMask();
     uint32 classmask = getClassMask();
 
-    SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spell_id);
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spell_id);
     if (bounds.first == bounds.second)
         return true;
 
@@ -13666,7 +13666,7 @@ void Player::learnSpellHighRank(uint32 spellid)
 {
     learnSpell(spellid);
 
-    if (uint32 next = sSpellMgr->GetNextSpellInChain(spellid))
+    if (uint32 next = sSpellMgr.GetNextSpellInChain(spellid))
         learnSpellHighRank(next);
 }
 
@@ -14045,7 +14045,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
     if (spellId == 0)
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
         return;
 
@@ -14064,7 +14064,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
 
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (spellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL)
-            if (sSpellMgr->IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
+            if (sSpellMgr.IsAdditionalTalentSpell(spellInfo->Effects[i].TriggerSpell))
                 learnSpell(spellInfo->Effects[i].TriggerSpell);
 
     addTalent(spellId, GetActiveSpecMask(), currentTalentRank);
@@ -15506,7 +15506,7 @@ void Player::PrepareCharmAISpells()
         if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->Active || !itr->second->IsInSpec(GetActiveSpec()))
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itr->first);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(itr->first);
         if (!spellInfo)
             continue;
 
@@ -15531,7 +15531,7 @@ void Player::PrepareCharmAISpells()
 
                 if ((int32)damage_type[offset] < dmg)
                 {
-                    if (!m_charmAISpells[SPELL_INSTANT_DAMAGE + offset] || !spellInfo->IsHighRankOf(sSpellMgr->GetSpellInfo(m_charmAISpells[SPELL_INSTANT_DAMAGE + offset])) || urand(0, 1))
+                    if (!m_charmAISpells[SPELL_INSTANT_DAMAGE + offset] || !spellInfo->IsHighRankOf(sSpellMgr.GetSpellInfo(m_charmAISpells[SPELL_INSTANT_DAMAGE + offset])) || urand(0, 1))
                         if (damage_type[1 + offset] < damage_type[offset])
                         {
                             m_charmAISpells[SPELL_INSTANT_DAMAGE2 + offset] = m_charmAISpells[SPELL_INSTANT_DAMAGE + offset];
@@ -15543,7 +15543,7 @@ void Player::PrepareCharmAISpells()
                 }
                 else if ((int32)damage_type[1 + offset] < dmg)
                 {
-                    if (m_charmAISpells[SPELL_INSTANT_DAMAGE + offset] && sSpellMgr->GetSpellInfo(m_charmAISpells[SPELL_INSTANT_DAMAGE + offset])->IsHighRankOf(spellInfo) && urand(0, 1))
+                    if (m_charmAISpells[SPELL_INSTANT_DAMAGE + offset] && sSpellMgr.GetSpellInfo(m_charmAISpells[SPELL_INSTANT_DAMAGE + offset])->IsHighRankOf(spellInfo) && urand(0, 1))
                         continue;
 
                     m_charmAISpells[SPELL_INSTANT_DAMAGE2 + offset] = spellInfo->Id;

@@ -99,7 +99,7 @@ struct boss_talon_king_ikiss : public BossAI
             context.Repeat(7s, 12s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_POLYMORPH);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_POLYMORPH);
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* target) -> bool
                 {
                     return target && !target->IsImmunedToSpell(spellInfo) && target != me->GetThreatMgr().GetCurrentVictim();
@@ -148,7 +148,7 @@ class spell_talon_king_ikiss_blink : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return sSpellMgr->GetSpellInfo(SPELL_BLINK);
+        return sSpellMgr.GetSpellInfo(SPELL_BLINK);
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)

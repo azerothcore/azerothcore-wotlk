@@ -350,7 +350,7 @@ bool ItemTemplate::HasSpellPowerStat() const
             continue;
         }
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellData.SpellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellData.SpellId);
         if (!spellInfo)
         {
             continue;
@@ -472,7 +472,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recvData)
         {
             // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
             // use `item_template` or if not set then only use spell cooldowns
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(pProto->Spells[s].SpellId);
+            SpellInfo const* spell = sSpellMgr.GetSpellInfo(pProto->Spells[s].SpellId);
             if (spell)
             {
                 bool db_data = pProto->Spells[s].SpellCooldown >= 0 || pProto->Spells[s].SpellCategoryCooldown >= 0;

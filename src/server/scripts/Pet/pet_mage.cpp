@@ -131,7 +131,7 @@ struct npc_pet_mage_mirror_image : CasterAI
                 SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(visAura->GetId());
                 if (bounds.first != bounds.second)
                     continue;
-                std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(visAura->GetId() + SPELL_LINK_AURA);
+                std::vector<int32> const* spellTriggered = sSpellMgr.GetSpellLinked(visAura->GetId() + SPELL_LINK_AURA);
                 if (!spellTriggered || !spellTriggered->empty())
                     continue;
                 if (Aura* newAura = me->AddAura(visAura->GetId(), me))

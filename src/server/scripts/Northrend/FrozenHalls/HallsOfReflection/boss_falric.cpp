@@ -144,7 +144,7 @@ public:
             if ((uiHopelessnessCount == 0 && HealthBelowPct(67)) || (uiHopelessnessCount == 1 && HealthBelowPct(34)) || (uiHopelessnessCount == 2 && HealthBelowPct(11)))
             {
                 if (uiHopelessnessCount)
-                    me->RemoveOwnedAura(sSpellMgr->GetSpellIdForDifficulty(hopelessnessId[uiHopelessnessCount - 1], me));
+                    me->RemoveOwnedAura(sSpellMgr.GetSpellIdForDifficulty(hopelessnessId[uiHopelessnessCount - 1], me));
 
                 me->CastSpell((Unit*)nullptr, hopelessnessId[uiHopelessnessCount], true);
                 ++uiHopelessnessCount;

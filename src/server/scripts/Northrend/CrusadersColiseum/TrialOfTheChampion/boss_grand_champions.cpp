@@ -463,7 +463,7 @@ public:
             {
                 for (std::vector<uint32>::const_iterator itr = cainfo->auras.begin(); itr != cainfo->auras.end(); ++itr)
                 {
-                    SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(*itr);
+                    SpellInfo const* AdditionalSpellInfo = sSpellMgr.GetSpellInfo(*itr);
                     if (!AdditionalSpellInfo)
                         continue;
 

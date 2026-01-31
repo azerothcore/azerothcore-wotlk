@@ -124,7 +124,7 @@ class spell_hun_wyvern_sting : public AuraScript
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
-            caster->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_HUNTER_WYVERN_STING_DOT, GetSpellInfo()->GetRank()), true);
+            caster->CastSpell(GetTarget(), sSpellMgr.GetSpellWithRank(SPELL_HUNTER_WYVERN_STING_DOT, GetSpellInfo()->GetRank()), true);
     }
 
     void Register() override
@@ -670,7 +670,7 @@ class spell_hun_readiness : public SpellScript
 
         for (auto const& [spellId, cooldown] : cooldowns)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
             if (spellInfo
             && spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER
             && spellInfo->Id != SPELL_HUNTER_READINESS
@@ -746,7 +746,7 @@ class spell_hun_sniper_training : public AuraScript
             Unit* target = GetTarget();
 
             uint32 spellId = SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_HUNTER_SNIPER_TRAINING_R1;
-            if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId))
+            if (SpellInfo const* triggeredSpellInfo = sSpellMgr.GetSpellInfo(spellId))
             {
                 Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(GetSpellInfo()) ? GetCaster() : target;
                 triggerCaster->CastSpell(target, triggeredSpellInfo, true, 0, aurEff);
@@ -1204,7 +1204,7 @@ class spell_hun_lock_and_load : public AuraScript
         // So the IMMUNE result is never sent by the spell that triggers this.
         if (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
         {
-            if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
+            if (SpellInfo const* triggerSpell = sSpellMgr.GetSpellInfo(SPELL_FROST_TRAP_SLOW))
             {
                 return !target->IsImmunedToSpell(triggerSpell);
             }

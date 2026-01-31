@@ -44,7 +44,7 @@ bool IsPrimaryProfessionSkill(uint32 skill)
 
 bool IsPartOfSkillLine(uint32 skillId, uint32 spellId)
 {
-    SkillLineAbilityMapBounds skillBounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    SkillLineAbilityMapBounds skillBounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellId);
     for (SkillLineAbilityMap::const_iterator itr = skillBounds.first; itr != skillBounds.second; ++itr)
         if (itr->second->SkillLine == skillId)
             return true;
@@ -357,12 +357,6 @@ SpellMgr::~SpellMgr()
     UnloadSpellInfoStore();
 }
 
-SpellMgr* SpellMgr::instance()
-{
-    static SpellMgr instance;
-    return &instance;
-}
-
 /// Some checks for spells, to prevent adding deprecated/broken spells for trainers, spell book, etc
 bool SpellMgr::ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg)
 {
@@ -407,7 +401,7 @@ bool SpellMgr::ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg)
                 }
             case SPELL_EFFECT_LEARN_SPELL:
                 {
-                    SpellInfo const* spellInfo2 = sSpellMgr->GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
+                    SpellInfo const* spellInfo2 = sSpellMgr.GetSpellInfo(spellInfo->Effects[i].TriggerSpell);
                     if (!ComputeIsSpellValid(spellInfo2, msg))
                     {
                         if (msg)
@@ -2546,7 +2540,7 @@ static bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaul
         return false;
 
     // remove duplicates with levelupSpells if any
-    if (PetLevelupSpellSet const* levelupSpells = cInfo->family ? sSpellMgr->GetPetLevelupSpellList(cInfo->family) : nullptr)
+    if (PetLevelupSpellSet const* levelupSpells = cInfo->family ? sSpellMgr.GetPetLevelupSpellList(cInfo->family) : nullptr)
     {
         for (uint8 j = 0; j < MAX_CREATURE_SPELL_DATA_SLOT; ++j)
         {

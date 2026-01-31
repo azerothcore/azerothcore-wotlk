@@ -2178,7 +2178,7 @@ private:
 
     bool IsSpellValid(SmartScriptHolder const& e, uint32 entry)
     {
-        if (!sSpellMgr->GetSpellInfo(entry))
+        if (!sSpellMgr.GetSpellInfo(entry))
         {
             LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Spell entry {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), entry);
             return false;

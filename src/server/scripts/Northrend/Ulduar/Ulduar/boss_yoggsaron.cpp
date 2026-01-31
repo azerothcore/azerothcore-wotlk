@@ -1674,7 +1674,7 @@ public:
             {
                 if (me->GetDistance(itr->GetSource()) > 10 || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     continue;
-                if (itr->GetSource()->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me)) || itr->GetSource()->HasAura(SPELL_INSANE1))
+                if (itr->GetSource()->HasAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_SQUEEZE, me)) || itr->GetSource()->HasAura(SPELL_INSANE1))
                     continue;
 
                 if (count <= num || !target)
@@ -1716,7 +1716,7 @@ public:
         void JustDied(Unit*) override
         {
             if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
-                player->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me));
+                player->RemoveAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_SQUEEZE, me));
         }
     };
 };

@@ -568,7 +568,7 @@ SpellValue::SpellValue(SpellInfo const* proto)
 }
 
 Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, ObjectGuid originalCasterGUID, bool skipCheck) :
-    m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)),
+    m_spellInfo(sSpellMgr.GetSpellForDifficultyFromSpell(info, caster)),
     m_caster((info->HasAttribute(SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER) && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
     , m_spellValue(new SpellValue(m_spellInfo)), _spellEvent(nullptr)
 {
@@ -1350,7 +1350,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 dest = SpellDestination(playerCaster->m_homebindX, playerCaster->m_homebindY, playerCaster->m_homebindZ, playerCaster->GetOrientation(), playerCaster->m_homebindMapId);
             break;
         case TARGET_DEST_DB:
-            if (SpellTargetPosition const* st = sSpellMgr->GetSpellTargetPosition(m_spellInfo->Id, effIndex))
+            if (SpellTargetPosition const* st = sSpellMgr.GetSpellTargetPosition(m_spellInfo->Id, effIndex))
             {
                 /// @todo fix this check
                 if (m_spellInfo->HasEffect(SPELL_EFFECT_TELEPORT_UNITS) || m_spellInfo->HasEffect(SPELL_EFFECT_BIND))
@@ -1896,7 +1896,7 @@ void Spell::SelectImplicitTrajTargets(SpellEffIndex effIndex, SpellImplicitTarge
     // We should check if triggered spell has greater range (which is true in many cases, and initial spell has too short max range)
     // limit max range to 300 yards, sometimes triggered spells can have 50000yds
     float bestDist = m_spellInfo->GetMaxRange(false);
-    if (SpellInfo const* triggerSpellInfo = sSpellMgr->GetSpellInfo(m_spellInfo->Effects[effIndex].TriggerSpell))
+    if (SpellInfo const* triggerSpellInfo = sSpellMgr.GetSpellInfo(m_spellInfo->Effects[effIndex].TriggerSpell))
         bestDist = std::min(std::max(bestDist, triggerSpellInfo->GetMaxRange(false)), std::min(dist2d, 300.0f));
 
     // GameObjects don't cast traj
@@ -3211,7 +3211,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
         // Fearie Fire (Feral) - damage
         if (m_preCastSpell == 60089)
             m_caster->CastSpell(unit, m_preCastSpell, true);
-        else if (sSpellMgr->GetSpellInfo(m_preCastSpell))
+        else if (sSpellMgr.GetSpellInfo(m_preCastSpell))
             // Blizz seems to just apply aura without bothering to cast
             m_caster->AddAura(m_preCastSpell, unit);
     }
@@ -3251,7 +3251,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
 
     // trigger linked auras remove/apply
     /// @todo: remove/cleanup this, as this table is not documented and people are doing stupid things with it
-    if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT))
+    if (std::vector<int32> const* spellTriggered = sSpellMgr.GetSpellLinked(m_spellInfo->Id + SPELL_LINK_HIT))
     {
         for (std::vector<int32>::const_iterator i = spellTriggered->begin(); i != spellTriggered->end(); ++i)
             if (*i < 0)
@@ -4013,7 +4013,7 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, false);
 
-    if (std::vector<int32> const* spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
+    if (std::vector<int32> const* spell_triggered = sSpellMgr.GetSpellLinked(m_spellInfo->Id))
     {
         for (int32 id : *spell_triggered)
         {
@@ -4484,7 +4484,7 @@ void Spell::finish(bool ok)
     {
         // Unsummon statue
         uint32 spell = m_caster->GetUInt32Value(UNIT_CREATED_BY_SPELL);
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell);
         if (spellInfo && spellInfo->SpellIconID == 2056)
         {
             LOG_DEBUG("spells.aura", "Statue {} is unsummoned in spell {} finish", m_caster->GetGUID().ToString(), m_spellInfo->Id);
@@ -5537,7 +5537,7 @@ void Spell::HandleThreatSpells()
         return;
 
     float threat = 0.0f;
-    if (SpellThreatEntry const* threatEntry = sSpellMgr->GetSpellThreatEntry(m_spellInfo->Id))
+    if (SpellThreatEntry const* threatEntry = sSpellMgr.GetSpellThreatEntry(m_spellInfo->Id))
     {
         if (threatEntry->apPctMod != 0.0f)
             threat += threatEntry->apPctMod * m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
@@ -5727,9 +5727,9 @@ SpellCastResult Spell::CheckCast(bool strict)
             return SPELL_FAILED_CASTER_AURASTATE;
 
         // Note: spell 62473 requres CasterAuraSpell = triggering spell
-        if (m_spellInfo->CasterAuraSpell && !m_caster->HasAura(sSpellMgr->GetSpellIdForDifficulty(m_spellInfo->CasterAuraSpell, m_caster)))
+        if (m_spellInfo->CasterAuraSpell && !m_caster->HasAura(sSpellMgr.GetSpellIdForDifficulty(m_spellInfo->CasterAuraSpell, m_caster)))
             return SPELL_FAILED_CASTER_AURASTATE;
-        if (m_spellInfo->ExcludeCasterAuraSpell && m_caster->HasAura(sSpellMgr->GetSpellIdForDifficulty(m_spellInfo->ExcludeCasterAuraSpell, m_caster)))
+        if (m_spellInfo->ExcludeCasterAuraSpell && m_caster->HasAura(sSpellMgr.GetSpellIdForDifficulty(m_spellInfo->ExcludeCasterAuraSpell, m_caster)))
             return SPELL_FAILED_CASTER_AURASTATE;
 
         if (reqCombat && m_caster->IsInCombat() && !m_spellInfo->CanBeUsedInCombat())
@@ -6087,7 +6087,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!pet)
                         return SPELL_FAILED_NO_PET;
 
-                    SpellInfo const* learn_spellproto = sSpellMgr->GetSpellInfo(m_spellInfo->Effects[i].TriggerSpell);
+                    SpellInfo const* learn_spellproto = sSpellMgr.GetSpellInfo(m_spellInfo->Effects[i].TriggerSpell);
 
                     if (!learn_spellproto)
                         return SPELL_FAILED_NOT_KNOWN;
@@ -6109,7 +6109,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!pet || pet->GetOwner() != m_caster)
                             return SPELL_FAILED_BAD_TARGETS;
 
-                        SpellInfo const* learn_spellproto = sSpellMgr->GetSpellInfo(m_spellInfo->Effects[i].TriggerSpell);
+                        SpellInfo const* learn_spellproto = sSpellMgr.GetSpellInfo(m_spellInfo->Effects[i].TriggerSpell);
 
                         if (!learn_spellproto)
                             return SPELL_FAILED_NOT_KNOWN;
@@ -6650,7 +6650,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                     // xinef: dont allow to cast mounts in specific transforms
                     if (m_caster->getTransForm())
-                        if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(m_caster->getTransForm()))
+                        if (SpellInfo const* transformSpellInfo = sSpellMgr.GetSpellInfo(m_caster->getTransForm()))
                             if (transformSpellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) &&
                                     !transformSpellInfo->HasAttribute(SpellAttr0(SPELL_ATTR0_ALLOW_WHILE_MOUNTED | SPELL_ATTR0_AURA_IS_DEBUFF)))
                                 return SPELL_FAILED_NOT_SHAPESHIFT;
@@ -6990,7 +6990,7 @@ bool Spell::CanAutoCast(Unit* target)
             if (GetSpellInfo()->Id == (*auraIt)->GetSpellInfo()->Id)
                 return false;
 
-            switch (sSpellMgr->CheckSpellGroupStackRules(GetSpellInfo(), (*auraIt)->GetSpellInfo()))
+            switch (sSpellMgr.CheckSpellGroupStackRules(GetSpellInfo(), (*auraIt)->GetSpellInfo()))
             {
                 case SPELL_GROUP_STACK_RULE_EXCLUSIVE:
                     return false;
@@ -8756,10 +8756,10 @@ void Spell::PrepareTriggersExecutedOnHit()
     /// @todo: move this to scripts
     if (m_spellInfo->SpellFamilyName)
     {
-        SpellInfo const* excludeCasterSpellInfo = sSpellMgr->GetSpellInfo(m_spellInfo->ExcludeCasterAuraSpell);
+        SpellInfo const* excludeCasterSpellInfo = sSpellMgr.GetSpellInfo(m_spellInfo->ExcludeCasterAuraSpell);
         if (excludeCasterSpellInfo && !excludeCasterSpellInfo->IsPositive())
             m_preCastSpell = m_spellInfo->ExcludeCasterAuraSpell;
-        SpellInfo const* excludeTargetSpellInfo = sSpellMgr->GetSpellInfo(m_spellInfo->ExcludeTargetAuraSpell);
+        SpellInfo const* excludeTargetSpellInfo = sSpellMgr.GetSpellInfo(m_spellInfo->ExcludeTargetAuraSpell);
         if (excludeTargetSpellInfo && !excludeTargetSpellInfo->IsPositive())
             m_preCastSpell = m_spellInfo->ExcludeTargetAuraSpell;
     }
@@ -8805,7 +8805,7 @@ void Spell::PrepareTriggersExecutedOnHit()
             continue;
         SpellInfo const* auraSpellInfo = (*i)->GetSpellInfo();
         uint32 auraSpellIdx = (*i)->GetEffIndex();
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(auraSpellInfo->Effects[auraSpellIdx].TriggerSpell))
+        if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(auraSpellInfo->Effects[auraSpellIdx].TriggerSpell))
         {
             // calculate the chance using spell base amount, because aura amount is not updated on combo-points change
             // this possibly needs fixing
@@ -8907,7 +8907,7 @@ void Spell::OnSpellLaunch()
     if (!m_caster || !m_caster->IsInWorld())
         return;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(24390);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(24390);
 
     // Make sure the player is sending a valid GO target and lock ID. SPELL_EFFECT_OPEN_LOCK
     // can succeed with a lockId of 0

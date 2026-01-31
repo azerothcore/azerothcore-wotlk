@@ -247,7 +247,7 @@ class spell_rog_deadly_poison : public SpellScript
                     if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
                         continue;
 
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(enchant->spellid[s]);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(enchant->spellid[s]);
                     if (!spellInfo)
                     {
                         LOG_ERROR("misc", "Player::CastItemCombatSpell Enchant {}, player (Name: {}, {}) cast unknown spell {}",
@@ -456,7 +456,7 @@ class spell_rog_preparation : public SpellScript
         PlayerSpellMap const& spellMap = caster->GetSpellMap();
         for (PlayerSpellMap::const_iterator itr = spellMap.begin(); itr != spellMap.end(); ++itr)
         {
-            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(itr->first);
+            SpellInfo const* spellInfo = sSpellMgr.AssertSpellInfo(itr->first);
             if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
             {
                 if (spellInfo->SpellFamilyFlags[1] & SPELLFAMILYFLAG1_ROGUE_COLDB_SHADOWSTEP ||      // Cold Blood, Shadowstep

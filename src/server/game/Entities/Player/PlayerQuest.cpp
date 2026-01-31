@@ -829,7 +829,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // cast spells after mark quest complete (some spells have quest completed state requirements in spell_area data)
     if (quest->GetRewSpellCast() > 0)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpellCast());
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(quest->GetRewSpellCast());
         if (questGiver->IsUnit() && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM) && !spellInfo->IsSelfCast())
         {
             if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
@@ -840,7 +840,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     }
     else if (quest->GetRewSpell() > 0)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpell());
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(quest->GetRewSpell());
         if (questGiver->IsUnit() && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM) && !spellInfo->IsSelfCast())
         {
             if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
@@ -1561,7 +1561,7 @@ void Player::SendQuestUpdate(uint32 questId)
     // xinef: fixup
     uint32 oldSpellId = 0;
 
-    SpellAreaForQuestMapBounds saBounds = sSpellMgr->GetSpellAreaForQuestMapBounds(questId);
+    SpellAreaForQuestMapBounds saBounds = sSpellMgr.GetSpellAreaForQuestMapBounds(questId);
     if (saBounds.first != saBounds.second)
     {
         GetZoneAndAreaId(zone, area);
@@ -1580,7 +1580,7 @@ void Player::SendQuestUpdate(uint32 questId)
         }
     }
 
-    saBounds = sSpellMgr->GetSpellAreaForQuestEndMapBounds(questId);
+    saBounds = sSpellMgr.GetSpellAreaForQuestEndMapBounds(questId);
 
     // xinef: fixup
     uint32 skipSpellId = 0;

@@ -1101,7 +1101,7 @@ void ConditionMgr::LoadConditions(bool isReload)
 
         LOG_INFO("server.loading", "Reloading `gossip_menu_option` Table for Conditions!");
         sObjectMgr->LoadGossipMenuItems();
-        sSpellMgr->UnloadSpellInfoImplicitTargetConditionLists();
+        sSpellMgr.UnloadSpellInfoImplicitTargetConditionLists();
     }
 
     QueryResult result = WorldDatabase.Query("SELECT SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget, "
@@ -1406,7 +1406,7 @@ bool ConditionMgr::addToGossipMenuItems(Condition* cond)
 bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
 {
     uint32            conditionEffMask = cond->SourceGroup;
-    SpellInfo*        spellInfo        = const_cast<SpellInfo*>(sSpellMgr->AssertSpellInfo(cond->SourceEntry));
+    SpellInfo*        spellInfo        = const_cast<SpellInfo*>(sSpellMgr.AssertSpellInfo(cond->SourceEntry));
     std::list<uint32> sharedMasks;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -1712,7 +1712,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
     }
     case CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET:
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(cond->SourceEntry);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(cond->SourceEntry);
         if (!spellInfo)
         {
             LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table, does not exist in `spell.dbc`, ignoring.", cond->SourceEntry);
@@ -1792,7 +1792,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
     case CONDITION_SOURCE_TYPE_SPELL:
     case CONDITION_SOURCE_TYPE_SPELL_PROC:
     {
-        SpellInfo const* spellProto = sSpellMgr->GetSpellInfo(cond->SourceEntry);
+        SpellInfo const* spellProto = sSpellMgr.GetSpellInfo(cond->SourceEntry);
         if (!spellProto)
         {
             LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table, does not exist in `spell.dbc`, ignoring.", cond->SourceEntry);
@@ -1818,7 +1818,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             return false;
         }
 
-        if (!sSpellMgr->GetSpellInfo(cond->SourceEntry))
+        if (!sSpellMgr.GetSpellInfo(cond->SourceEntry))
         {
             LOG_ERROR("sql.sql", "SourceEntry {} in `condition` table, does not exist in `spell.dbc`, ignoring.", cond->SourceEntry);
             return false;
@@ -1895,7 +1895,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     {
     case CONDITION_AURA:
     {
-        if (!sSpellMgr->GetSpellInfo(cond->ConditionValue1))
+        if (!sSpellMgr.GetSpellInfo(cond->ConditionValue1))
         {
             LOG_ERROR("sql.sql", "Aura condition has non existing spell (Id: {}), skipped", cond->ConditionValue1);
             return false;
@@ -2125,7 +2125,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
     }
     case CONDITION_SPELL:
     {
-        if (!sSpellMgr->GetSpellInfo(cond->ConditionValue1))
+        if (!sSpellMgr.GetSpellInfo(cond->ConditionValue1))
         {
             LOG_ERROR("sql.sql", "Spell condition has non existing spell (Id: {}), skipped", cond->ConditionValue1);
             return false;

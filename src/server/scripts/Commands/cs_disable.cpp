@@ -71,7 +71,7 @@ public:
         {
             case DISABLE_TYPE_SPELL:
                 {
-                    if (!sSpellMgr->GetSpellInfo(entry))
+                    if (!sSpellMgr.GetSpellInfo(entry))
                     {
                         handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
                         return false;

@@ -304,7 +304,7 @@ class spell_warl_generic_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
             if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
                 amount += spellInfo->Effects[EFFECT_0].CalcValue(); // 130
             }
         }
@@ -427,7 +427,7 @@ class spell_warl_infernal_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
             if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
                 amount += spellInfo->Effects[EFFECT_0].CalcValue(); // 130
             }
         }
@@ -558,7 +558,7 @@ class spell_warl_demonic_empowerment : public SpellScript
                         break;
                     case CREATURE_FAMILY_VOIDWALKER:
                         {
-                            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER);
+                            SpellInfo const* spellInfo = sSpellMgr.AssertSpellInfo(SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER);
                             int32 hp = int32(targetCreature->CountPctFromMaxHealth(GetCaster()->CalculateSpellDamage(targetCreature, spellInfo, 0)));
                             targetCreature->CastCustomSpell(targetCreature, SPELL_WARLOCK_DEMONIC_EMPOWERMENT_VOIDWALKER, &hp, nullptr, nullptr, true);
                             //unitTarget->CastSpell(unitTarget, 54441, true);
@@ -755,7 +755,7 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
             return;
 
         GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
-        GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
+        GetCaster()->CastSpell(GetTarget(), sSpellMgr.GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -996,7 +996,7 @@ class spell_warl_demonic_circle_summon : public AuraScript
             // WARLOCK_DEMONIC_CIRCLE_ALLOW_CAST; allowing him to cast the WARLOCK_DEMONIC_CIRCLE_TELEPORT.
             // If not in range remove the WARLOCK_DEMONIC_CIRCLE_ALLOW_CAST.
 
-            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_WARLOCK_DEMONIC_CIRCLE_TELEPORT);
+            SpellInfo const* spellInfo = sSpellMgr.AssertSpellInfo(SPELL_WARLOCK_DEMONIC_CIRCLE_TELEPORT);
 
             if (GetTarget()->IsWithinDist(circle, spellInfo->GetMaxRange(true)))
             {

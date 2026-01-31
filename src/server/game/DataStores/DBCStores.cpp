@@ -483,7 +483,7 @@ void LoadDBCStores(const std::string& dataPath)
 
         for (uint8 x = 0; x < MAX_DIFFICULTY; ++x)
             if (newEntry.SpellID[x])
-                sSpellMgr->SetSpellDifficultyId(uint32(newEntry.SpellID[x]), spellDiff->ID);
+                sSpellMgr.SetSpellDifficultyId(uint32(newEntry.SpellID[x]), spellDiff->ID);
     }
 
     // create talent spells set

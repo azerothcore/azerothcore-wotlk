@@ -788,7 +788,7 @@ public:
         if (!player || !spell_id || !end_time)
             return false;
 
-        if (!sSpellMgr->GetSpellInfo(spell_id))
+        if (!sSpellMgr.GetSpellInfo(spell_id))
             return false;
 
         if (!item_id)

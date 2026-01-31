@@ -1153,10 +1153,10 @@ public:
 
         void SummonNPC(GameObject* go, Player* player, uint32 npc, uint32 spellId)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
             if (!spellInfo)
                 return;
-            SpellInfo const* spellInfoTrigger = sSpellMgr->GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell);
+            SpellInfo const* spellInfoTrigger = sSpellMgr.GetSpellInfo(spellInfo->Effects[EFFECT_0].TriggerSpell);
             if (!spellInfoTrigger)
                 return;
             Spell*          spell  = new Spell(player, spellInfoTrigger, TRIGGERED_NONE);

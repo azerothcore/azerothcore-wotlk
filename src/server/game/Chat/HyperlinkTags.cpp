@@ -98,7 +98,7 @@ bool Acore::Hyperlinks::LinkTags::enchant::StoreTo(SpellInfo const*& val, std::s
     if (!(t.TryConsumeTo(spellId) && t.IsEmpty()))
         return false;
 
-    return (val = sSpellMgr->GetSpellInfo(spellId)) && val->HasAttribute(SPELL_ATTR0_IS_TRADESKILL);
+    return (val = sSpellMgr.GetSpellInfo(spellId)) && val->HasAttribute(SPELL_ATTR0_IS_TRADESKILL);
 }
 
 bool Acore::Hyperlinks::LinkTags::glyph::StoreTo(GlyphLinkData& val, std::string_view text)
@@ -206,7 +206,7 @@ bool Acore::Hyperlinks::LinkTags::spell::StoreTo(SpellInfo const*& val, std::str
     if (!(t.TryConsumeTo(spellId) && t.IsEmpty()))
         return false;
 
-    return (val = sSpellMgr->GetSpellInfo(spellId));
+    return (val = sSpellMgr.GetSpellInfo(spellId));
 }
 
 bool Acore::Hyperlinks::LinkTags::talent::StoreTo(TalentLinkData& val, std::string_view text)
@@ -233,7 +233,7 @@ bool Acore::Hyperlinks::LinkTags::talent::StoreTo(TalentLinkData& val, std::stri
         if (!spellId)
             return false;
 
-        val.Spell = sSpellMgr->GetSpellInfo(spellId);
+        val.Spell = sSpellMgr.GetSpellInfo(spellId);
 
         if (!val.Spell)
             return false;
@@ -254,7 +254,7 @@ bool Acore::Hyperlinks::LinkTags::trade::StoreTo(TradeskillLinkData& val, std::s
     if (!t.TryConsumeTo(spellId))
         return false;
 
-    val.Spell = sSpellMgr->GetSpellInfo(spellId);
+    val.Spell = sSpellMgr.GetSpellInfo(spellId);
 
     return (val.Spell && val.Spell->Effects[0].Effect == SPELL_EFFECT_TRADE_SKILL && t.TryConsumeTo(val.CurValue) &&
         t.TryConsumeTo(val.MaxValue) && t.TryConsumeTo(val.Owner) && t.TryConsumeTo(val.KnownRecipes) && t.IsEmpty());
