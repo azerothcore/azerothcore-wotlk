@@ -1,3 +1,4 @@
+-- DB update 2026_01_31_01 -> 2026_01_31_02
 -- update game event
 UPDATE `game_event` SET `description` = "Brewfest Building (Ironforge)" WHERE `eventEntry` = 70;
 
