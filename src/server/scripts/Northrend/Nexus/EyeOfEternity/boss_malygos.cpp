@@ -720,6 +720,7 @@ struct boss_malygos : public BossAI
 
     void JustDied(Unit*  /*killer*/) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
         instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_MALYGOS, 1);
     }
