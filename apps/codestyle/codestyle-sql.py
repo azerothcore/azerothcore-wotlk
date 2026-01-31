@@ -323,7 +323,7 @@ def backtick_check(file: io, file_path: str) -> None:
 
     for line_number, line in enumerate(file, start=1):
         # Ignore comments
-        if line.startswith('--'):
+        if line.strip().startswith('--'):
             continue
 
         # Sanitize single- and doublequotes to prevent false positives
