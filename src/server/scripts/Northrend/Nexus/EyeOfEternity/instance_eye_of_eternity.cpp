@@ -26,11 +26,6 @@ class instance_eye_of_eternity : public InstanceMapScript
 public:
     instance_eye_of_eternity() : InstanceMapScript("instance_eye_of_eternity", MAP_THE_EYE_OF_ETERNITY) { }
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
-    {
-        return new instance_eye_of_eternity_InstanceMapScript(pMap);
-    }
-
     struct instance_eye_of_eternity_InstanceMapScript : public InstanceScript
     {
         instance_eye_of_eternity_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); }
@@ -53,19 +48,14 @@ public:
             if (GetBossState(DATA_MALYGOS) == DONE)
             {
                 // destroy platform, hide iris (actually ensure, done at loading, but doesn't always work
-                ProcessEvent(nullptr, 20158);
+                ProcessEvent(nullptr, EVENT_IRIS_ACTIVATED);
                 if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
                     if (go->GetPhaseMask() != 2)
                         go->SetPhaseMask(2, true);
 
                 // no floor, so put players on drakes
-                if (player)
-                {
-                    if (!player->IsAlive())
-                        return;
-
+                if (player && player->IsAlive())
                     player->CastSpell(player, SPELL_SUMMON_RED_DRAGON_BUDDY, true);
-                }
             }
         }
 
@@ -207,6 +197,11 @@ public:
             return false;
         }
     };
+
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    {
+        return new instance_eye_of_eternity_InstanceMapScript(map);
+    }
 };
 
 void AddSC_instance_eye_of_eternity()
