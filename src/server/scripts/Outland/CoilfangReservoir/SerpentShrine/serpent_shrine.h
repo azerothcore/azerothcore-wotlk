@@ -98,7 +98,7 @@ enum SSSpells
 enum SSNPCCount
 {
     MIN_KEEPER_COUNT = 0,
-    MAX_KEEPER_COUNT = 24,
+    MAX_KEEPER_COUNT = 54,
 
     MAX_FRENZY_COUNT = 50
 };

@@ -130,11 +130,6 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_COILFANG_SHATTERER:
-                case NPC_COILFANG_PRIESTESS:
-                    if (creature->GetPositionX() > 190.0f)
-                        --_aliveKeepersCount;
-                    break;
                 case NPC_CYCLONE_KARATHRESS:
                     creature->GetMotionMaster()->MoveRandom(50.0f);
                     break;
@@ -298,7 +293,7 @@ class spell_serpentshrine_cavern_coilfang_water : public AuraScript
         InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
         if (!instance || GetUnitOwner()->GetMapId() != MAP_COILFANG_SERPENTSHRINE_CAVERN)
         {
-            Remove();
+            GetAura()->SetDuration(1);
             return;
         }
 
@@ -311,6 +306,11 @@ class spell_serpentshrine_cavern_coilfang_water : public AuraScript
             if (instance->GetData(DATA_ALIVE_KEEPERS) <= 0 && !GetUnitOwner()->HasAura(SPELL_SCALDING_WATER))
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SCALDING_WATER, true);
 
+            return;
+        }
+        else if (instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE)
+        {
+            GetAura()->SetDuration(1);
             return;
         }
 
