@@ -156,7 +156,7 @@ public:
                             if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f, TEMPSUMMON_TIMED_DESPAWN, 604800000))
                                 break;
                         break;
-                    case FAIL:
+                    default:
                         break;
                 }
             }
