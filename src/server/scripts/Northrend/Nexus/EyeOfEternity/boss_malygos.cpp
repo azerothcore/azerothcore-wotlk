@@ -188,16 +188,9 @@ enum MalygosLightOverrides
     LIGHT_OBSCURE_ARCANE_RUNES       = 1825,
 };
 
-struct boss_malygos : public ScriptedAI
+struct boss_malygos : public BossAI
 {
-    boss_malygos(Creature* c) : ScriptedAI(c), summons(me)
-    {
-        pInstance = me->GetInstanceScript();
-    }
-
-    InstanceScript* pInstance;
-    EventMap events;
-    SummonList summons;
+    boss_malygos(Creature* creature) : BossAI(creature, DATA_MALYGOS) { }
 
     uint32 timer1, timer2;
     uint8 IntroCounter;
@@ -211,9 +204,7 @@ struct boss_malygos : public ScriptedAI
 
     void Reset() override
     {
-        events.Reset();
-        events.SetPhase(PHASE_NONE);
-        summons.DespawnAll();
+        _Reset();
 
         timer1 = MalygosIntroIntervals[4];
         timer2 = INTRO_MOVEMENT_INTERVAL;
@@ -226,11 +217,7 @@ struct boss_malygos : public ScriptedAI
 
         me->SetAnimTier(AnimTier::Fly);
 
-        if (pInstance)
-        {
-            pInstance->SetData(DATA_ENCOUNTER_STATUS, NOT_STARTED);
-            pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
-        }
+        instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -305,14 +292,10 @@ struct boss_malygos : public ScriptedAI
 
     void JustEngagedWith(Unit*  /*who*/) override
     {
+        _JustEngagedWith();
         events.Reset();
-        DoZoneInCombat();
-
         Talk(SAY_PHASE_1);
-
         events.RescheduleEvent(EVENT_INTRO_MOVE_CENTER, 0ms, 1);
-        if (pInstance)
-            pInstance->SetData(DATA_ENCOUNTER_STATUS, IN_PROGRESS);
     }
 
     void AttackStart(Unit* victim) override
@@ -372,8 +355,7 @@ struct boss_malygos : public ScriptedAI
             break;
         case EVENT_INTRO_MOVE_CENTER:
         {
-            if (pInstance)
-                pInstance->SetData(DATA_SET_IRIS_INACTIVE, 0);
+            instance->SetData(DATA_SET_IRIS_INACTIVE, 0);
             summons.DespawnAll();
             me->InterruptNonMeleeSpells(true);
             me->RemoveAllAuras();
@@ -392,11 +374,8 @@ struct boss_malygos : public ScriptedAI
         }
         case EVENT_START_FIGHT:
         {
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_HIDE_IRIS_AND_PORTAL, 0);
-                pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
-            }
+            instance->SetData(DATA_HIDE_IRIS_AND_PORTAL, 0);
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
             if (Unit* target = me->SelectNearestTarget(250.0f))
             {
@@ -689,19 +668,16 @@ struct boss_malygos : public ScriptedAI
 
             me->GetThreatMgr().ClearAllThreat(); // players on vehicle are unattackable -> leads to EnterEvadeMode() because target is not acceptable!
 
-            // mount players:
-            Map::PlayerList const& PlayerList = me->GetMap()->GetPlayers();
-            if (!PlayerList.IsEmpty())
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (Player* player = i->GetSource())
-                    {
-                        sScriptMgr->AnticheatSetUnderACKmount(player);
+            me->GetMap()->DoForAllPlayers([&](Player* player)
+            {
+                if (player->IsAlive() && !player->IsGameMaster())
+                {
+                    sScriptMgr->AnticheatSetUnderACKmount(player);
+                    player->CastSpell(player, SPELL_SUMMON_RED_DRAGON_BUDDY, true);
+                }
+            });
 
-                        if (!player->IsAlive() || player->IsGameMaster())
-                            continue;
-
-                        player->CastSpell(player, SPELL_SUMMON_RED_DRAGON_BUDDY, true);
-                    }
+            DoZoneInCombat();
 
             events.RescheduleEvent(EVENT_SAY_PHASE_3_INTRO, 3s, 1);
         }
@@ -744,12 +720,9 @@ struct boss_malygos : public ScriptedAI
 
     void JustDied(Unit*  /*killer*/) override
     {
+        _JustDied();
         Talk(SAY_DEATH);
-        if (pInstance)
-        {
-            pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_MALYGOS, 1);
-            pInstance->SetData(DATA_ENCOUNTER_STATUS, DONE);
-        }
+        instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_MALYGOS, 1);
     }
 
     void KilledUnit(Unit* victim) override
