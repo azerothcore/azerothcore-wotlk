@@ -633,7 +633,7 @@ INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFami
 (15277,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x0,  0,   0,      0, 0), -- Seal of Reckoning
 (15346,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x1, 0x2,     0, 0x0,  0,   0,      0, 0), -- Seal of Reckoning
 (15600,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x2,     0, 0x0,  1,   0,      0, 0), -- Hand of Justice
-(16164,  28,  0, 0x00000000, 0x00000000, 0x00000000,   65536, 0x0, 0x2,     2, 0x0,  0,   0,      0, 0), -- Elemental Focus
+(16164,  28,  0, 0x00000000, 0x00000000, 0x00000000,   65536, 0x0, 0x1,     2, 0x0,  0,   0,      0, 0), -- Elemental Focus (CAST phase for travel-time spells)
 (16550,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     2, 0x0,  0,   0,      0, 0), -- Bonespike
 (16620,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,     0, 0x0,  0,   0,  30000, 0), -- Proc Self Invulnerability
 (16624,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x0, 0x0,    64, 0x0,  0,   0,      0, 0), -- Thorium Shield Spike
@@ -1450,7 +1450,7 @@ UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=
 UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=5000, `HitMask`=2, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=15088;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=2, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=15286;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=128, `Cooldown`=2000, `HitMask`=0, `ProcFlags`=0, `Chance`=2 WHERE `SpellId`=15600;
-UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=2, `AttributesMask`=0, `Cooldown`=500, `HitMask`=2, `ProcFlags`=65536, `Chance`=0 WHERE `SpellId`=16164;
+UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=1, `AttributesMask`=0, `Cooldown`=500, `HitMask`=2, `ProcFlags`=65536, `Chance`=0 WHERE `SpellId`=16164;
 UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=12, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=16246;
 UPDATE `spell_proc` SET `SpellTypeMask`=1, `SpellPhaseMask`=0, `AttributesMask`=0, `Cooldown`=30000, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=16620;
 UPDATE `spell_proc` SET `SpellTypeMask`=0, `SpellPhaseMask`=1, `AttributesMask`=12, `Cooldown`=0, `HitMask`=0, `ProcFlags`=0, `Chance`=0 WHERE `SpellId`=16870;
