@@ -328,6 +328,8 @@ def backtick_check(file: io, file_path: str) -> None:
 
         # Sanitize single- and doublequotes to prevent false positives
         sanitized_line = quote_pattern.sub('', line)
+        # Strip inline comments (safe to do after removing quoted strings)
+        sanitized_line = re.sub(r'--.*$', '', sanitized_line)
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
