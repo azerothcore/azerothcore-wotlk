@@ -442,6 +442,73 @@ TEST_F(SpellProcTest, CanSpellTriggerProcOnEvent_SpellPhaseMaskNoMatch)
     EXPECT_FALSE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
 }
 
+TEST_F(SpellProcTest, CanSpellTriggerProcOnEvent_CastPhaseWithExplicitHitMaskCrit)
+{
+    // Nature's Grace scenario: CAST phase + explicit HitMask for crit
+    // Crit is pre-calculated for travel-time spells
+    auto* spellInfo = CreateSpellInfo(1);
+    DamageInfo damageInfo(nullptr, nullptr, 100, spellInfo, SPELL_SCHOOL_MASK_NATURE, SPELL_DIRECT_DAMAGE);
+
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_CAST)
+        .WithHitMask(PROC_HIT_CRITICAL)
+        .Build();
+
+    auto eventInfo = ProcEventInfoBuilder()
+        .WithTypeMask(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_CAST)
+        .WithHitMask(PROC_HIT_CRITICAL)
+        .WithDamageInfo(&damageInfo)
+        .Build();
+
+    EXPECT_TRUE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
+}
+
+TEST_F(SpellProcTest, CanSpellTriggerProcOnEvent_CastPhaseWithExplicitHitMaskNoCrit)
+{
+    // CAST phase + explicit HitMask requires crit, but spell didn't crit
+    auto* spellInfo = CreateSpellInfo(1);
+    DamageInfo damageInfo(nullptr, nullptr, 100, spellInfo, SPELL_SCHOOL_MASK_NATURE, SPELL_DIRECT_DAMAGE);
+
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_CAST)
+        .WithHitMask(PROC_HIT_CRITICAL)
+        .Build();
+
+    auto eventInfo = ProcEventInfoBuilder()
+        .WithTypeMask(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_CAST)
+        .WithHitMask(PROC_HIT_NORMAL) // No crit
+        .WithDamageInfo(&damageInfo)
+        .Build();
+
+    EXPECT_FALSE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
+}
+
+TEST_F(SpellProcTest, CanSpellTriggerProcOnEvent_CastPhaseWithDefaultHitMask)
+{
+    // CAST phase + HitMask=0 should skip HitMask check (old behavior)
+    auto* spellInfo = CreateSpellInfo(1);
+    DamageInfo damageInfo(nullptr, nullptr, 100, spellInfo, SPELL_SCHOOL_MASK_NATURE, SPELL_DIRECT_DAMAGE);
+
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_CAST)
+        .WithHitMask(0) // Default - no explicit HitMask
+        .Build();
+
+    auto eventInfo = ProcEventInfoBuilder()
+        .WithTypeMask(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_CAST)
+        .WithHitMask(PROC_HIT_NORMAL) // Doesn't matter - HitMask check skipped
+        .WithDamageInfo(&damageInfo)
+        .Build();
+
+    EXPECT_TRUE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
+}
+
 // =============================================================================
 // Combined Condition Tests
 // =============================================================================

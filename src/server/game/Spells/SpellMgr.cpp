@@ -847,8 +847,11 @@ bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcE
             return false;
     }
 
-    // check hit mask (on taken hit or on done hit, but not on spell cast phase)
-    if ((eventInfo.GetTypeMask() & TAKEN_HIT_PROC_FLAG_MASK) || ((eventInfo.GetTypeMask() & DONE_HIT_PROC_FLAG_MASK) && !(eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST)))
+    // check hit mask (on taken hit or on done hit)
+    // For CAST phase with DONE flags, only check if HitMask is explicitly set (crit is pre-calculated for travel time spells)
+    if ((eventInfo.GetTypeMask() & TAKEN_HIT_PROC_FLAG_MASK) ||
+        ((eventInfo.GetTypeMask() & DONE_HIT_PROC_FLAG_MASK) &&
+         (!(eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST) || procEntry.HitMask)))
     {
         uint32 hitMask = procEntry.HitMask;
         // get default values if hit mask not set
@@ -1942,7 +1945,8 @@ void SpellMgr::LoadSpellProcs()
                 LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has `SpellPhaseMask` value defined, but it won't be used for defined `ProcFlags` value", spellId);
             if (procEntry.HitMask & ~PROC_HIT_MASK_ALL)
                 LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has wrong `HitMask` set: {}", spellId, procEntry.HitMask);
-            if (procEntry.HitMask && !(procEntry.ProcFlags & TAKEN_HIT_PROC_FLAG_MASK || (procEntry.ProcFlags & DONE_HIT_PROC_FLAG_MASK && (!procEntry.SpellPhaseMask || procEntry.SpellPhaseMask & (PROC_SPELL_PHASE_HIT | PROC_SPELL_PHASE_FINISH)))))
+            // HitMask is valid for: TAKEN procs, or DONE procs at any phase (CAST phase has pre-calculated crit for travel-time spells)
+            if (procEntry.HitMask && !(procEntry.ProcFlags & TAKEN_HIT_PROC_FLAG_MASK || procEntry.ProcFlags & DONE_HIT_PROC_FLAG_MASK))
                 LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has `HitMask` value defined, but it won't be used for defined `ProcFlags` and `SpellPhaseMask` values", spellId);
             for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                 if ((procEntry.DisableEffectsMask & (1u << i)) && !spellInfo->Effects[i].IsAura())
