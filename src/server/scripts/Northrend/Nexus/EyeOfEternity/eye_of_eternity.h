@@ -89,7 +89,7 @@ enum eAchiev
     ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT = 20387,
 };
 
-enum EoEMisc : uint8
+enum EoEMisc : uint32
 {
     EVENT_IRIS_ACTIVATED                    = 20158
 };
