@@ -89,6 +89,11 @@ enum eAchiev
     ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT = 20387,
 };
 
+enum EoEMisc : uint8
+{
+    EVENT_IRIS_ACTIVATED                    = 20158
+};
+
 /*** POSITIONS/WAYPOINTS BELOW ***/
 
 #define INTRO_MOVEMENT_INTERVAL 25000

@@ -184,17 +184,13 @@ public:
 
         void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override
         {
-            switch (eventId)
-            {
-                case 20158:
-                    if (GameObject* go = instance->GetGameObject(GO_PlatformGUID))
-                        if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
-                        {
-                            go->ModifyHealth(-6500000, c); // We have HP 6 million in the database... So we have to do at least that
-                            go->EnableCollision(false);
-                        }
-                    break;
-            }
+            if (eventId == EVENT_IRIS_ACTIVATED)
+                if (GameObject* go = instance->GetGameObject(GO_PlatformGUID))
+                    if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
+                    {
+                        go->ModifyHealth(-6500000, c); // We have HP 6 million in the database... So we have to do at least that
+                        go->EnableCollision(false);
+                    }
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
