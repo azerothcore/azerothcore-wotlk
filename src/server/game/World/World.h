@@ -76,7 +76,7 @@ enum BillingPlanFlags
     SESSION_UNUSED          = 0x01,
     SESSION_RECURRING_BILL  = 0x02,
     SESSION_FREE_TRIAL      = 0x04,
-    SESSION_IGR             = 0x08,
+    SESSION_IGR             = 0x08, // Internet Game Room
     SESSION_USAGE           = 0x10,
     SESSION_TIME_MIXTURE    = 0x20,
     SESSION_RESTRICTED      = 0x40,
