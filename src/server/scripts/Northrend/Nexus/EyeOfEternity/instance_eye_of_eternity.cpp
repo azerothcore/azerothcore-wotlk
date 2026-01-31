@@ -155,6 +155,7 @@ public:
                         if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
                             if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f, TEMPSUMMON_TIMED_DESPAWN, 604800000))
                                 break;
+                        break;
                     case FAIL:
                         break;
                 }
