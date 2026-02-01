@@ -21,6 +21,7 @@
 #include "ObjectGuid.h"
 #include "Packet.h"
 #include "Weather.h"
+#include "WorldSession.h"
 
 enum WeatherState : uint32;
 
