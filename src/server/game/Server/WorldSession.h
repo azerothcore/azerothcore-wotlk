@@ -471,6 +471,7 @@ public:
     void SetPreviousPlayedTime(time_t playedTime) { _previousPlayTime = playedTime; }
     void CheckPlayedTimeLimit(time_t now);
     void SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemaining);
+    bool IsAffectedByCAIS();
 
     /// Is the user engaged in a log out process?
     bool isLogingOut() const { return _logoutTime || m_playerLogout; }

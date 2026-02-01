@@ -351,7 +351,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     uint32 processedPackets = 0;
     time_t currentTime = GameTime::GetGameTime().count();
 
-    if (GetPlayer() && GetPlayer()->IsInWorld())
+    if (GetPlayer() && GetPlayer()->IsInWorld() && IsAffectedByCAIS())
         CheckPlayedTimeLimit(currentTime);
 
     _lastUpdateTime = currentTime;
@@ -655,6 +655,14 @@ void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemainin
     playTimeWarning.Flag = flag;
     playTimeWarning.PlayTimeRemaining = playTimeRemaining;
     GetPlayer()->SendDirectMessage(playTimeWarning.Write());
+}
+
+bool WorldSession::IsAffectedByCAIS()
+{
+    // China realm system for restricting play times
+    // Don't know of any account flag or similar denoting whether an account/session is affected by CAIS (possibly just a realm-wide flag)
+    // But just in case we find something down the road, this function just acts as a switch for accounts to use the system.
+    return false;
 }
 
 /// %Log the player out

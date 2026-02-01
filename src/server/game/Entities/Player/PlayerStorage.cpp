@@ -5025,10 +5025,13 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     time_t const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime().count());
 
-    if (accountPlayedTime >= PLAY_TIME_LIMIT_FULL)
-        SetPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
-    else if (accountPlayedTime >= PLAY_TIME_LIMIT_PARTIAL)
-        SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+    if (GetSession()->IsAffectedByCAIS())
+    {
+        if (accountPlayedTime >= PLAY_TIME_LIMIT_FULL)
+            SetPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+        else if (accountPlayedTime >= PLAY_TIME_LIMIT_PARTIAL)
+            SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+    }
 
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[53].Get<uint32>());
 
