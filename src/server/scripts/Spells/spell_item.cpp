@@ -63,6 +63,18 @@ enum DeathChoice
     SPELL_DEATH_CHOICE_HEROIC_STRENGTH      = 67773
 };
 
+enum TrinketStackSpells
+{
+    SPELL_LIGHTNING_CAPACITOR_STACK             = 37658,
+    SPELL_LIGHTNING_CAPACITOR_TRIGGER           = 37661,
+    SPELL_THUNDER_CAPACITOR_STACK               = 54842,
+    SPELL_THUNDER_CAPACITOR_TRIGGER             = 54843,
+    SPELL_TOC25_CASTER_TRINKET_NORMAL_STACK     = 67713,
+    SPELL_TOC25_CASTER_TRINKET_NORMAL_TRIGGER   = 67714,
+    SPELL_TOC25_CASTER_TRINKET_HEROIC_STACK     = 67759,
+    SPELL_TOC25_CASTER_TRINKET_HEROIC_TRIGGER   = 67760
+};
+
 enum SoulPreserver
 {
     SPELL_SOUL_PRESERVER_DRUID              = 60512,
@@ -4668,6 +4680,55 @@ class spell_item_death_choice : public AuraScript
     }
 };
 
+// 37657 - The Lightning Capacitor
+// 54841 - Thunder Capacitor
+// 67712 - Item - Coliseum 25 Normal Caster Trinket
+// 67758 - Item - Coliseum 25 Heroic Caster Trinket
+template <uint32 StackSpell, uint32 TriggerSpell>
+class spell_item_trinket_stack : public AuraScript
+{
+    PrepareAuraScript(spell_item_trinket_stack);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ StackSpell, TriggerSpell });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+
+        caster->CastSpell(caster, StackSpell, aurEff);
+
+        Aura* dummy = caster->GetAura(StackSpell);
+
+        if (!dummy || dummy->GetStackAmount() < aurEff->GetAmount())
+            return;
+
+        caster->RemoveAurasDueToSpell(StackSpell);
+        if (Unit* target = eventInfo.GetActionTarget())
+            caster->CastSpell(target, TriggerSpell, aurEff);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(StackSpell);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_item_trinket_stack::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_item_trinket_stack::OnRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+using spell_item_lightning_capacitor = spell_item_trinket_stack<SPELL_LIGHTNING_CAPACITOR_STACK, SPELL_LIGHTNING_CAPACITOR_TRIGGER>;
+using spell_item_thunder_capacitor = spell_item_trinket_stack<SPELL_THUNDER_CAPACITOR_STACK, SPELL_THUNDER_CAPACITOR_TRIGGER>;
+using spell_item_toc25_caster_trinket_normal = spell_item_trinket_stack<SPELL_TOC25_CASTER_TRINKET_NORMAL_STACK, SPELL_TOC25_CASTER_TRINKET_NORMAL_TRIGGER>;
+using spell_item_toc25_caster_trinket_heroic = spell_item_trinket_stack<SPELL_TOC25_CASTER_TRINKET_HEROIC_STACK, SPELL_TOC25_CASTER_TRINKET_HEROIC_TRIGGER>;
+
 // 60510 - Soul Preserver
 class spell_item_soul_preserver : public AuraScript
 {
@@ -6264,6 +6325,10 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_alchemists_stone);
     RegisterSpellScript(spell_item_darkmoon_card_greatness);
     RegisterSpellScript(spell_item_death_choice);
+    RegisterSpellScriptWithArgs(spell_item_lightning_capacitor, "spell_item_lightning_capacitor");
+    RegisterSpellScriptWithArgs(spell_item_thunder_capacitor, "spell_item_thunder_capacitor");
+    RegisterSpellScriptWithArgs(spell_item_toc25_caster_trinket_normal, "spell_item_toc25_caster_trinket_normal");
+    RegisterSpellScriptWithArgs(spell_item_toc25_caster_trinket_heroic, "spell_item_toc25_caster_trinket_heroic");
     RegisterSpellScript(spell_item_soul_preserver);
     RegisterSpellScript(spell_item_charm_witch_doctor);
     RegisterSpellScript(spell_item_lifegiving_gem);
