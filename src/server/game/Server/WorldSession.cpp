@@ -625,22 +625,22 @@ void WorldSession::CheckPlayedTimeLimit(time_t now)
         (currentPlayed >= PLAY_TIME_LIMIT_FULL))
     {
         SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
-        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
-        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+        GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
     }
     else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_FULL) &&
         (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_FULL))
     {
         SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
-        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
-        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+        GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
     }
     else if ((previousPlayed < PLAY_TIME_LIMIT_PARTIAL) &&
         (currentPlayed >= PLAY_TIME_LIMIT_PARTIAL))
     {
         SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
-        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
-        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+        GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
     }
     else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_PARTIAL) &&
         (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_PARTIAL))
