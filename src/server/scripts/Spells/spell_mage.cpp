@@ -1032,7 +1032,12 @@ class spell_mage_empowered_fire : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_MAGE_EMPOWERED_FIRE_PROC, true, nullptr, aurEff);
+
+        Unit* target = GetTarget();
+        // Calculate mana restored: 2% of base mana (percent value comes from spell 67545 effect 0)
+        uint32 percent = sSpellMgr->GetSpellInfo(SPELL_MAGE_EMPOWERED_FIRE_PROC)->Effects[EFFECT_0].CalcValue();
+        int32 mana = int32(CalculatePct(target->GetCreateMana(), percent));
+        target->CastCustomSpell(SPELL_MAGE_EMPOWERED_FIRE_PROC, SPELLVALUE_BASE_POINT0, mana, target, true, nullptr, aurEff);
     }
 
     void Register() override
