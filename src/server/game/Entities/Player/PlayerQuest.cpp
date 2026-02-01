@@ -420,6 +420,7 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
     {
         if (msg)
             GetSession()->SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+
         return false;
     }
 
