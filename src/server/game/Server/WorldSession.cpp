@@ -628,8 +628,8 @@ void WorldSession::CheckPlayedTimeLimit(time_t now)
         GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
         GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
     }
-    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROCHING_FULL) &&
-        (currentPlayed >= PLAY_TIME_LIMIT_APPROCHING_FULL))
+    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_FULL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_FULL))
     {
         SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
         GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
