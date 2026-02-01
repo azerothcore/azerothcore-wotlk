@@ -24,19 +24,7 @@ void WorldSession::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + (shortForm ? 0 : (4 + 1)));
     packet << uint8(code);
     packet << uint32(0); // BillingTimeRemaining
-
-    uint8 billingPlanFlags = SESSION_NONE;
-
-    if (IsRecurringBillingAccount())
-        billingPlanFlags |= SESSION_RECURRING_BILL;
-
-    if (IsTrialAccount())
-        billingPlanFlags |= SESSION_FREE_TRIAL;
-
-    if (IsInternetGameRoomAccount())
-        billingPlanFlags |= SESSION_IGR;
-
-    packet << uint8(billingPlanFlags);
+    packet << GetBillingPlanFlags();
     packet << uint32(0); // BillingTimeRested
     uint8 exp = Expansion(); // 0 - normal, 1 - TBC, 2 - WoTLK, must be set in database manually for each account
 
