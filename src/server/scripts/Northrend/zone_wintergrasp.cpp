@@ -27,9 +27,11 @@
 #include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "PlayerScript.h"
 #include "PoolMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
@@ -1163,6 +1165,65 @@ public:
     }
 };
 
+// Wintergrasp tower positions for dismount check
+struct WGTowerPosition
+{
+    float x;
+    float y;
+    float z;
+    float radius;
+};
+
+// Tower positions: Shadowsight, Winter's Edge, Flamewatch, and 4 Keep towers
+static const WGTowerPosition WGTowers[] =
+{
+    // Attacking towers
+    { 4557.17f, 3623.94f, 395.883f, 25.0f },  // Shadowsight Tower
+    { 4398.17f, 2822.5f,  405.627f, 25.0f },  // Winter's Edge Tower
+    { 4459.1f,  1944.33f, 434.991f, 25.0f },  // Flamewatch Tower
+    // Keep towers
+    { 5281.15f, 3044.59f, 407.843f, 20.0f },  // Fortress Tower NW
+    { 5163.76f, 2932.23f, 409.19f,  20.0f },  // Fortress Tower SW
+    { 5166.4f,  2748.37f, 409.188f, 20.0f },  // Fortress Tower SE
+    { 5281.19f, 2632.48f, 409.099f, 20.0f },  // Fortress Tower NE
+};
+
+class playerscript_wg_tower_dismount : public PlayerScript
+{
+public:
+    playerscript_wg_tower_dismount() : PlayerScript("playerscript_wg_tower_dismount") { }
+
+    void OnPlayerUpdate(Player* player, uint32 /*p_time*/) override
+    {
+        // Only check in Wintergrasp zone (4197)
+        if (player->GetZoneId() != 4197)
+            return;
+
+        if (!player->IsMounted())
+            return;
+
+        float playerX = player->GetPositionX();
+        float playerY = player->GetPositionY();
+        float playerZ = player->GetPositionZ();
+
+        for (const auto& tower : WGTowers)
+        {
+            float dx = playerX - tower.x;
+            float dy = playerY - tower.y;
+            float dz = playerZ - tower.z;
+            float distSq = dx * dx + dy * dy;
+
+            // Check if player is within tower radius (horizontal) and reasonable height
+            if (distSq <= tower.radius * tower.radius && std::abs(dz) <= 50.0f)
+            {
+                player->RemoveAurasByType(SPELL_AURA_MOUNTED);
+                player->Dismount();
+                break;
+            }
+        }
+    }
+};
+
 void AddSC_wintergrasp()
 {
     // NPCs
@@ -1188,4 +1249,7 @@ void AddSC_wintergrasp()
     new achievement_wg_didnt_stand_a_chance();
     new achievement_wg_vehicular_gnomeslaughter();
     new achievement_wg_within_our_grasp();
+
+    // Player scripts
+    new playerscript_wg_tower_dismount();
 }
