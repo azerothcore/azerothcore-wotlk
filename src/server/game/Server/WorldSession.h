@@ -282,6 +282,8 @@ enum PlayTimeFlag : uint32
 {
     PTF_APPROACHING_PARTIAL_PLAY_TIME = 0x1000,
     PTF_APPROACHING_NO_PLAY_TIME      = 0x2000,
+    PTF_UNK_1                         = 0x20000000,
+    PTF_UNK_2                         = 0x40000000,
     PTF_UNHEALTHY_TIME                = 0x80000000,
 };
 
