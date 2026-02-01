@@ -2422,6 +2422,30 @@ class spell_gen_lifeblood : public AuraScript
     }
 };
 
+// -53120 - Toughness (Mining)
+// Spell IDs: 53120 (Rank 1), 53121 (Rank 2), 53122 (Rank 3), 53123 (Rank 4), 53124 (Rank 5), 53040 (Rank 6)
+class spell_gen_toughness : public AuraScript
+{
+    PrepareAuraScript(spell_gen_toughness);
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
+    {
+        // Force recalculation on load to fix incorrect stamina after relogin
+        canBeRecalculated = true;
+
+        // Get the base amount from spell info to ensure correct value
+        if (SpellInfo const* spellInfo = GetSpellInfo())
+        {
+            amount = spellInfo->Effects[EFFECT_0].BasePoints + 1;
+        }
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_gen_toughness::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_STAT);
+    }
+};
+
 /* 4073 - Mechanical Dragonling
    12749 - Mithril Mechanical Dragonling
    13166 - Battle Chicken
@@ -5773,6 +5797,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_seaforium_blast);
     RegisterSpellScript(spell_gen_turkey_marker);
     RegisterSpellScript(spell_gen_lifeblood);
+    RegisterSpellScript(spell_gen_toughness);
     RegisterSpellScript(spell_gen_allow_cast_from_item_only);
     RegisterSpellAndAuraScriptPair(spell_gen_vehicle_scaling, spell_gen_vehicle_scaling_aura);
     RegisterSpellScript(spell_gen_oracle_wolvar_reputation);
