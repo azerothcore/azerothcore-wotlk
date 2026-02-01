@@ -3116,11 +3116,15 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                 case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
                 case SPELL_EFFECT_ENCHANT_HELD_ITEM:
                     {
-                        // only enchanting profession enchantments procs can stack
+                        // Only Enchanting profession enchant procs can stack when dual-wielding
+                        // DK runes (e.g., Unholy Strength) should refresh, not stack
                         if (IsPartOfSkillLine(SKILL_ENCHANTING, i))
                         {
                             uint32 enchantId = spellInfo->Effects[j].MiscValue;
                             SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchantId);
+                            if (!enchant)
+                                break;
+
                             for (uint8 s = 0; s < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++s)
                             {
                                 if (enchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
