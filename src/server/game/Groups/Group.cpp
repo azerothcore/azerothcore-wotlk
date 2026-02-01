@@ -2017,8 +2017,8 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         if (!member->GetBGAccessByLevel(bgTemplate->GetBgTypeID()))
             return ERR_BATTLEGROUND_JOIN_TIMED_OUT;
 
-		if (member->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME)) // Assumed to only apply to full restriction rather than partial
-			return ERR_GROUP_JOIN_BATTLEGROUND_FAIL; // ERR_ARENA_EXPIRED_CAIS does not seem to be a result, so using this error instead
+        if (member->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME)) // Assumed to only apply to full restriction rather than partial
+            return ERR_GROUP_JOIN_BATTLEGROUND_FAIL; // ERR_ARENA_EXPIRED_CAIS does not seem to be a result, so using this error instead
     }
 
     // for arenas: check party size is proper
