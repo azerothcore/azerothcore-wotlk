@@ -137,8 +137,13 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
 
         if (!pSession->Update(diff, updater))
         {
+            AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
+
             if (!RemoveQueuedPlayer(pSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
+            {
                 _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
+                history.logoutTime = GameTime::GetGameTime().count();
+            }
             _sessions.erase(itr);
             delete pSession;
         }
@@ -295,6 +300,9 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
         if (!RemoveQueuedPlayer(oldSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
             _disconnects[session->GetAccountId()] = GameTime::GetGameTime().count();
 
+        // don't allow resetting consecutive play time on double login to same account
+        session->SetPreviousPlayedTime(old->second->GetConsecutivePlayTime(GameTime::GetGameTime().count()));
+
         // pussywizard:
         if (oldSession->HandleSocketClosed())
         {
@@ -312,6 +320,17 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
         else
         {
             delete oldSession;
+        }
+    }
+    else
+    {
+        auto itr = _accountsPlayHistory.find(session->GetAccountId());
+        if (itr != _accountsPlayHistory.end())
+        {
+            if ((GameTime::GetGameTime().count() - itr->second.logoutTime) < PLAY_TIME_LIMIT_FULL)
+                session->SetPreviousPlayedTime(itr->second.playedTime);
+            else
+                itr->second.playedTime = 0;
         }
     }
 

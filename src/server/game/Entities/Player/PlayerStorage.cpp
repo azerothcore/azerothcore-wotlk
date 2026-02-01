@@ -5022,6 +5022,14 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetByteValue(PLAYER_BYTES_3, 0, fields[5].Get<uint8>());
     SetByteValue(PLAYER_BYTES_3, 1, fields[54].Get<uint8>());
     ReplaceAllPlayerFlags((PlayerFlags)fields[16].Get<uint32>());
+
+    time_t const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime().count());
+
+    if (accountPlayedTime >= PLAY_TIME_LIMIT_FULL)
+        SetPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+    else if (accountPlayedTime >= PLAY_TIME_LIMIT_PARTIAL)
+        SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[53].Get<uint32>());
 
     SetUInt64Value(PLAYER_FIELD_KNOWN_CURRENCIES, fields[52].Get<uint64>());

@@ -270,6 +270,21 @@ enum CharterTypes
     ARENA_TEAM_CHARTER_5v5_TYPE                   = 5
 };
 
+enum PlayTimeLimit : uint32
+{
+    PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_PARTIAL             = 3 * HOUR,
+    PLAY_TIME_LIMIT_APPROCHING_FULL     = 4 * HOUR + 30 * MINUTE,
+    PLAY_TIME_LIMIT_FULL                = 5 * HOUR,
+};
+
+enum PlayTimeFlag : uint32
+{
+    PTF_APPROACHING_PARTIAL_PLAY_TIME = 0x1000,
+    PTF_APPROACHING_NO_PLAY_TIME      = 0x2000,
+    PTF_UNHEALTHY_TIME                = 0x80000000,
+};
+
 //class to deal with packet processing
 //allows to determine if next packet is safe to be processed
 class PacketFilter
@@ -448,6 +463,14 @@ public:
 
     /// Session in auth.queue currently
     void SetInQueue(bool state) { m_inQueue = state; }
+
+    // Playtime limit
+    time_t GetCreateTime() const { return _createTime; }
+    time_t GetConsecutivePlayTime(time_t now) const { return (now - _createTime) + _previousPlayTime; }
+    time_t GetPreviousPlayedTime() { return _previousPlayTime; }
+    void SetPreviousPlayedTime(time_t playedTime) { _previousPlayTime = playedTime; }
+    void CheckPlayedTimeLimit(time_t now);
+    void SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemaining);
 
     /// Is the user engaged in a log out process?
     bool isLogingOut() const { return _logoutTime || m_playerLogout; }
@@ -1221,6 +1244,9 @@ private:
     // Warden
     std::unique_ptr<Warden> _warden;                    // Remains nullptr if Warden system is not enabled by config
 
+    time_t _lastUpdateTime;                             // last time session was updated by world
+    time_t _createTime;                                 // when session was created
+    time_t _previousPlayTime;                           // play time from previous session less than 5 hours ago
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue
     bool m_playerLoading;                               // code processed in LoginPlayer

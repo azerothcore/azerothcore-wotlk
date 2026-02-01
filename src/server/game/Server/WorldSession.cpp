@@ -34,6 +34,7 @@
 #include "Log.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "MiscPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -119,6 +120,9 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _accountFlags(accountFlags),
     m_expansion(expansion),
     m_total_time(TotalTime),
+    _lastUpdateTime(0),
+    _createTime(GameTime::GetGameTime().count()),
+    _previousPlayTime(0),
     _logoutTime(0),
     m_inQueue(false),
     m_playerLoading(false),
@@ -346,6 +350,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     std::vector<WorldPacket*> requeuePackets;
     uint32 processedPackets = 0;
     time_t currentTime = GameTime::GetGameTime().count();
+
+    if (GetPlayer() && GetPlayer()->IsInWorld())
+        CheckPlayedTimeLimit(currentTime);
+
+    _lastUpdateTime = currentTime;
 
     constexpr uint32 MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE = 150;
 
@@ -605,6 +614,47 @@ void WorldSession::HandleTeleportTimeout(bool updateInSessions)
                 }
         }
     }
+}
+
+void WorldSession::CheckPlayedTimeLimit(time_t now)
+{
+    time_t const previousPlayed = GetConsecutivePlayTime(_lastUpdateTime);
+    time_t const currentPlayed = GetConsecutivePlayTime(now);
+
+    if ((previousPlayed < PLAY_TIME_LIMIT_FULL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_FULL))
+    {
+        SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+    }
+    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROCHING_FULL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_APPROCHING_FULL))
+    {
+        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+    }
+    else if ((previousPlayed < PLAY_TIME_LIMIT_PARTIAL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_PARTIAL))
+    {
+        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+        GetPlayer()->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        GetPlayer()->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+    }
+    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_PARTIAL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_PARTIAL))
+    {
+        SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32(PLAY_TIME_LIMIT_PARTIAL - currentPlayed));
+    }
+}
+
+void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemaining)
+{
+    WorldPackets::Misc::PlayTimeWarning playTimeWarning;
+    playTimeWarning.Flag = flag;
+    playTimeWarning.PlayTimeRemaining = playTimeRemaining;
+    GetPlayer()->SendDirectMessage(playTimeWarning.Write());
 }
 
 /// %Log the player out

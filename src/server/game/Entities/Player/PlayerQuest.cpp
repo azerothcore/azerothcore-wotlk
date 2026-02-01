@@ -416,6 +416,13 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
     if (quest->GetRewOrReqMoney() < 0 && !HasEnoughMoney(-quest->GetRewOrReqMoney()))
         return false;
 
+    if (HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        if (msg)
+            GetSession()->SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+        return false;
+    }
+
     return true;
 }
 

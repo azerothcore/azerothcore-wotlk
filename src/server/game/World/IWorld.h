@@ -49,6 +49,12 @@ private:
     CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
+struct AccountPlayHistory
+{
+    time_t logoutTime;
+    time_t playedTime; // reset after 5 hours offline time
+};
+
 // ServerMessages.dbc
 enum ServerMessageType
 {

@@ -507,6 +507,12 @@ void WorldSession::HandleLootRoll(WorldPacket& recvData)
     if (!group)
         return;
 
+    if (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+        rollType = ROLL_PASS;
+    }
+
     group->CountRollVote(GetPlayer()->GetGUID(), guid, rollType);
 
     switch (rollType)
