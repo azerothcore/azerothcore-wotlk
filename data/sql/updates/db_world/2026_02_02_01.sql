@@ -1,3 +1,4 @@
+-- DB update 2026_02_02_00 -> 2026_02_02_01
 -- Update gameobject 'Broken Cart' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (186807)) AND (`guid` IN (171));
