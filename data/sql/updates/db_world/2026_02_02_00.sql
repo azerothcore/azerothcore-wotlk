@@ -1,3 +1,4 @@
+-- DB update 2026_02_01_02 -> 2026_02_02_00
 -- Karazhan: Chances increase as you go up the tower from ~0.4% to ~1%
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 1532000);
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
