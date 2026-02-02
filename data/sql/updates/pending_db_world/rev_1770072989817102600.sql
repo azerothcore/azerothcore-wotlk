@@ -8,12 +8,6 @@ DELETE FROM `creature_text` WHERE (`CreatureID` = 19734);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (19734, 0, 0, '%s throws a mushroom spore at $n.', 16, 0, 100, 0, 0, 0, 18913, 0, 'Fungal Giant Unstable Shroom');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 20479);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(20479, 0, 0, 1, 0, 0, 100, 1, 2000, 4000, 0, 0, 0, 0, 11, 35252, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Unstable Shroom - In Combat - Cast \'Unstable Cloud\' (No Repeat)'),
-(20479, 0, 1, 0, 61, 0, 100, 1, 0, 0, 0, 0, 0, 0, 11, 35362, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unstable Shroom - In Combat - Cast \'Unstable Mushroom Visual\' (No Repeat)'),
-(20479, 0, 2, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Unstable Shroom - On Just Summoned - Set Reactstate Passive');
-
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 20479);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (20479, 0, 0, 0, 1, 0, 0, 0);
