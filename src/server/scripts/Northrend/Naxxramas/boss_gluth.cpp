@@ -256,7 +256,7 @@ class spell_gluth_decimate : public SpellScript
                 return;
             }
 
-            GetCaster()->CastSpell(unitTarget, SPELL_DECIMATE_DAMAGE, true);
+            GetCaster()->CastSpell(unitTarget, SPELL_DECIMATE_DAMAGE);
         }
     }
 
