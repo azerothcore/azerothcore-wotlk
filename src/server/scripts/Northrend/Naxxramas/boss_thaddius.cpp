@@ -129,6 +129,15 @@ public:
         uint32 resetTimer{};
         bool ballLightningEnabled;
 
+        bool IsAnyPlayerInMeleeRange() const
+        {
+            for (auto const& ref : me->GetThreatMgr().GetThreatList())
+                if (Unit* target = ref->getTarget())
+                    if (target->IsPlayer() && me->IsWithinMeleeRange(target))
+                        return true;
+            return false;
+        }
+
         void DoAction(int32 param) override
         {
             if (param == ACTION_SUMMON_DIED)
@@ -327,17 +336,11 @@ public:
                     break;
             }
 
-            if (me->IsWithinMeleeRange(me->GetVictim()))
-            {
+            if (IsAnyPlayerInMeleeRange())
                 DoMeleeAttackIfReady();
-            }
-            else if (ballLightningEnabled)
-            {
+            else if (ballLightningEnabled && !IsAnyPlayerInMeleeRange())
                 if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
-                {
                     me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
-                }
-            }
         }
     };
 };
