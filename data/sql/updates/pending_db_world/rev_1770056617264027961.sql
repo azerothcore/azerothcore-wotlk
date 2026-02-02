@@ -10,4 +10,4 @@ UPDATE `creature_template` SET `gossip_menu_id` = 10351 WHERE (`entry` = 33682);
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 8760;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (8760, 0, 3, 'Train me.', 3266, 5, 16, 0, 0, 0, 0, '', 0, 0),
-(8760, 1, 1, 'Let me browse your goods.', 8097, 3, 128, 0, 0, 0, 0, '', 0, 0),
+(8760, 1, 1, 'Let me browse your goods.', 8097, 3, 128, 0, 0, 0, 0, '', 0, 0);
