@@ -68,11 +68,11 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 (5151, 0, 44605, 0, 0, 0, 0),
 (5151, 0, 44614, 0, 0, 0, 0),
 (5151, 0, 44615, 0, 0, 0, 0),
--- 'Velanni Alchemy Supplies & Reagents'
+-- 'Velanni <Alchemy Supplies & Reagents>'
 (16612, 0, 44605, 0, 0, 0, 0),
 (16612, 0, 44614, 0, 0, 0, 0),
 (16612, 0, 44615, 0, 0, 0, 0),
--- Musal <Alchemy Supplies & Reagents>
+-- 'Musal <Alchemy Supplies & Reagents>'
 (16706, 0, 44605, 0, 0, 0, 0),
 (16706, 0, 44614, 0, 0, 0, 0),
 (16706, 0, 44615, 0, 0, 0, 0),
