@@ -1,3 +1,4 @@
+-- DB update 2026_02_02_01 -> 2026_02_03_00
 -- Add parent rotation columns to gameobject_addon table for transport rotation support
 ALTER TABLE `gameobject_addon`
   ADD COLUMN `parent_rotation0` FLOAT NOT NULL DEFAULT 0 AFTER `guid`,

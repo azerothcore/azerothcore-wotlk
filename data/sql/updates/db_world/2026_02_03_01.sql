@@ -1,3 +1,4 @@
+-- DB update 2026_02_03_00 -> 2026_02_03_01
 -- DB/Gameobject: Update "Dangerous!" sign with sniffed values
 -- Closes https://github.com/azerothcore/azerothcore-wotlk/issues/16834
 DELETE FROM `gameobject` WHERE `guid` = 17154 AND `id` = 2008;
