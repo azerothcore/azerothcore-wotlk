@@ -5194,7 +5194,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 33802, 38609 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes &= ~SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
