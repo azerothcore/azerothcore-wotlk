@@ -9,13 +9,12 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 -- Charge drop on spell cast
-DELETE FROM `spell_proc` WHERE `SpellId` IN (17941, 18820, 22008, 28200, 31834, 32216, 34477, 34936, 44401, 48108, 51124, 54741, 57761, 64823);
+DELETE FROM `spell_proc` WHERE `SpellId` IN (17941, 18820, 22008, 28200, 32216, 34477, 34936, 44401, 48108, 51124, 54741, 57761, 64823);
 INSERT INTO `spell_proc` (`SpellId`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `ProcFlags`, `SpellTypeMask`, `SpellPhaseMask`, `HitMask`, `AttributesMask`, `ProcsPerMinute`, `Chance`, `Cooldown`, `Charges`) VALUES
 (17941,   0,  5, 0x00000001, 0x00000000, 0x00000000,   65536, 0x1, 0x1,     0, 0x0,  0,   0,      0, 1), -- Shadow Trance
 (18820,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x7, 0x1,     0, 0x0,  0,   0,      0, 1), -- Insight
 (22008,   0,  3, 0x61400035, 0x00000000, 0x00000000,   69632, 0x5, 0x1,     0, 0x0,  0,   0,      0, 1), -- Netherwind Focus
 (28200,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x3, 0x1,     0, 0x0,  0,   0,      0, 6), -- Ascendance
-(31834,   0, 10, 0x80000000, 0x00000000, 0x00000000,   16384, 0x2, 0x1,     0, 0x0,  0,   0,      0, 1), -- Light's Grace
 (32216,   0,  4, 0x00000000, 0x00000100, 0x00000000,      16, 0x1, 0x4,     0, 0x0,  0,   0,      0, 1), -- Victorious (drop charge on Victory rush cast)
 (34477,   0,  0, 0x00000000, 0x00000000, 0x00000000,       0, 0x5, 0x2,     0, 0x0,  0,   0,      0, 1), -- Misdirection
 (34936,   0,  5, 0x00000001, 0x00000040, 0x00000000,   65536, 0x1, 0x1,     0, 0x8,  0,   0,      0, 1), -- Backlash
