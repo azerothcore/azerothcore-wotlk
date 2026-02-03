@@ -256,7 +256,7 @@ class spell_gluth_decimate : public SpellScript
                 return;
             }
 
-            GetCaster()->CastSpell(unitTarget, SPELL_DECIMATE_DAMAGE);
+            GetCaster()->CastSpell(unitTarget, SPELL_DECIMATE_DAMAGE, true);
         }
     }
 
@@ -271,7 +271,7 @@ class spell_gluth_decimate_damage : public SpellScript
 {
     PrepareSpellScript(spell_gluth_decimate_damage)
 
-    void RecalculateDamage()
+    void HandleDamage(SpellEffIndex /*effIndex*/)
     {
         Unit* target = GetHitUnit();
         if (!target)
@@ -291,7 +291,7 @@ class spell_gluth_decimate_damage : public SpellScript
 
     void Register() override
     {
-        OnHit += SpellHitFn(spell_gluth_decimate_damage::RecalculateDamage);
+        OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate_damage::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
