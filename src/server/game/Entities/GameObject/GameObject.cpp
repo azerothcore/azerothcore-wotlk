@@ -38,6 +38,11 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 
+bool QuaternionData::IsUnit() const
+{
+    return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
+}
+
 GameObject::GameObject() : WorldObject(), MovableMapObject(),
     m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
@@ -293,35 +298,14 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         return false;
     }
 
-    GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(GetSpawnId());
+    SetLocalRotation(rotation);
 
-    // hackfix for the hackfix down below
-    switch (goinfo->entry)
-    {
-        // excluded ids from the hackfix below
-        // used switch since there should be more
-        case 181233: // maexxna portal effect
-        case 181575: // maexxna portal
-        case 20992: // theramore black shield
-        case 21042: // theramore guard badge
-            SetLocalRotation(rotation);
-            break;
-        default:
-            // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data)
-            // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-            if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
-            {
-                SetLocalRotation(rotation);
-            }
-            else
-            {
-                SetLocalRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
-            }
-            break;
-    }
+    GameObjectAddon const* gameObjectAddon = sObjectMgr->GetGameObjectAddon(GetSpawnId());
+    QuaternionData parentRotation;
+    if (gameObjectAddon)
+        parentRotation = gameObjectAddon->ParentRotation;
 
-    // pussywizard: no PathRotation for normal gameobjects
-    SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
+    SetTransportPathRotation(parentRotation.x, parentRotation.y, parentRotation.z, parentRotation.w);
 
     SetObjectScale(goinfo->size);
 
@@ -403,12 +387,12 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
             break;
     }
 
-    if (addon)
+    if (gameObjectAddon)
     {
-        if (addon->InvisibilityValue)
+        if (gameObjectAddon->InvisibilityValue)
         {
-            m_invisibility.AddFlag(addon->invisibilityType);
-            m_invisibility.AddValue(addon->invisibilityType, addon->InvisibilityValue);
+            m_invisibility.AddFlag(gameObjectAddon->invisibilityType);
+            m_invisibility.AddValue(gameObjectAddon->invisibilityType, gameObjectAddon->InvisibilityValue);
         }
     }
 
