@@ -1397,7 +1397,7 @@ void ObjectMgr::LoadGameObjectAddons()
             gameObjectAddon.InvisibilityValue = 1;
         }
 
-        if (!gameObjectAddon.ParentRotation.isUnit())
+        if (!gameObjectAddon.ParentRotation.IsUnit())
         {
             LOG_ERROR("sql.sql", "GameObject (GUID: {}) has invalid parent rotation in `gameobject_addon`, set to default", guid);
             gameObjectAddon.ParentRotation = QuaternionData();

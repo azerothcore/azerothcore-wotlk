@@ -38,7 +38,7 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 
-bool QuaternionData::isUnit() const
+bool QuaternionData::IsUnit() const
 {
     return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
 }

@@ -688,7 +688,7 @@ struct AC_GAME_API QuaternionData
     QuaternionData() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) { }
     QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) { }
 
-    [[nodiscard]] bool isUnit() const;
+    [[nodiscard]] bool IsUnit() const;
 };
 
 // `gameobject_addon` table
