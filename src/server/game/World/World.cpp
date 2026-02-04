@@ -1740,6 +1740,16 @@ void World::ResetEventSeasonalQuests(uint16 event_id)
             itr->second->GetPlayer()->ResetSeasonalQuestStatus(event_id);
 }
 
+void World::ReloadRBAC()
+{
+    // Passive reload, we mark the data as invalidated and next time a permission is checked it will be reloaded
+    LOG_INFO("rbac", "World::ReloadRBAC()");
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
+        if (WorldSession* session = itr->second)
+            session->InvalidateRBACData();
+}
+
 void World::ResetRandomBG()
 {
     LOG_DEBUG("server.worldserver", "Random BG status reset for all characters.");

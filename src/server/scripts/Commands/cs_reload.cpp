@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
@@ -139,6 +140,7 @@ public:
             { "quest_greeting",                HandleReloadQuestGreetingCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "quest_poi",                     HandleReloadQuestPOICommand,                   SEC_ADMINISTRATOR, Console::Yes },
             { "quest_template",                HandleReloadQuestTemplateCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "rbac",                          HandleReloadRBACCommand,                       SEC_ADMINISTRATOR, Console::Yes },
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     SEC_ADMINISTRATOR, Console::Yes },
             { "reserved_name",                 HandleReloadReservedNameCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "profanity_name",                HandleReloadProfanityNameCommand,              SEC_ADMINISTRATOR, Console::Yes },
@@ -573,6 +575,15 @@ public:
         LOG_INFO("server.loading", "Reloading GameObjects for quests...");
         sObjectMgr->LoadGameObjectForQuests();
         handler->SendGlobalGMSysMessage("Data GameObjects for quests reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadRBACCommand(ChatHandler* handler)
+    {
+        LOG_INFO("rbac", "Reloading RBAC tables...");
+        sAccountMgr->LoadRBAC();
+        sWorld->ReloadRBAC();
+        handler->SendGlobalGMSysMessage("RBAC data reloaded.");
         return true;
     }
 
