@@ -5190,12 +5190,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValueB = 64;
     });
 
-    // Flame Wave
-    ApplySpellFix({ 33802, 38609 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Attributes &= ~SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL;
-    });
-
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
