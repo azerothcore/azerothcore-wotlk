@@ -279,7 +279,7 @@ public:
         // if email is not specified, use empty string
         std::string emailStr = email ? email : "";
 
-        AccountOpResult result = AccountMgr::CreateAccount(std::string(accountName), std::string(password), emailStr);
+        AccountOpResult result = sAccountMgr->CreateAccount(std::string(accountName), std::string(password), emailStr);
         switch (result)
         {
             case AOR_OK:
