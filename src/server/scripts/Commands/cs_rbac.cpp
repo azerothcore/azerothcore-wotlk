@@ -52,16 +52,16 @@ public:
     {
         static ChatCommandTable rbacAccountCommandTable =
         {
-            { "list",   HandleRBACPermListCommand,   SEC_ADMINISTRATOR, Console::Yes },
-            { "grant",  HandleRBACPermGrantCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "deny",   HandleRBACPermDenyCommand,   SEC_ADMINISTRATOR, Console::Yes },
-            { "revoke", HandleRBACPermRevokeCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "list",   HandleRBACPermListCommand,   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_LIST,   Console::Yes },
+            { "grant",  HandleRBACPermGrantCommand,  rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_GRANT,  Console::Yes },
+            { "deny",   HandleRBACPermDenyCommand,   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_DENY,   Console::Yes },
+            { "revoke", HandleRBACPermRevokeCommand, rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_REVOKE, Console::Yes },
         };
 
         static ChatCommandTable rbacCommandTable =
         {
             { "account", rbacAccountCommandTable },
-            { "list",    HandleRBACListPermissionsCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "list",    HandleRBACListPermissionsCommand, rbac::RBAC_PERM_COMMAND_RBAC_LIST, Console::Yes },
         };
 
         static ChatCommandTable commandTable =

@@ -449,8 +449,10 @@ void AccountMgr::LoadRBAC()
     }
 
     LOG_DEBUG("rbac", "AccountMgr::LoadRBAC: Loading default permissions");
-    result = LoginDatabase.Query("SELECT secId, permissionId FROM rbac_default_permissions ORDER BY secId ASC");
-    if (!result)
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RBAC_DEFAULT_PERMISSIONS);
+    stmt->SetData(0, int32(realm.Id.Realm));
+    PreparedQueryResult defaultPermResult = LoginDatabase.Query(stmt);
+    if (!defaultPermResult)
     {
         LOG_INFO("server.loading", ">> Loaded 0 RBAC default permissions. DB table `rbac_default_permissions` is empty.");
         LOG_INFO("server.loading", " ");
@@ -461,9 +463,9 @@ void AccountMgr::LoadRBAC()
     rbac::RBACPermissionContainer* permissions = nullptr;
     do
     {
-        Field* field = result->Fetch();
+        Field* field = defaultPermResult->Fetch();
         uint8 newId = field[0].Get<uint8>();
-        if (secId != newId)
+        if (secId != newId || permissions == nullptr)
         {
             secId = newId;
             permissions = &_defaultPermissions[secId];
@@ -472,7 +474,7 @@ void AccountMgr::LoadRBAC()
         permissions->insert(field[1].Get<uint32>());
         ++count3;
     }
-    while (result->NextRow());
+    while (defaultPermResult->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} RBAC default permissions in {} ms", count3, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
