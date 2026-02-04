@@ -1,3 +1,4 @@
+-- DB update 2026_02_04_02 -> 2026_02_04_03
 DELETE FROM `creature_template_model` WHERE `CreatureID` IN (17168, 17169, 17170, 17171, 17172, 17173, 17174, 17175, 17176, 25739);
 INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
 (17168, 0, 15435, 1, 1, 51831),
