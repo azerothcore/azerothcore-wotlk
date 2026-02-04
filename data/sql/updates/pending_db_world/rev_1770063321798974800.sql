@@ -1,5 +1,5 @@
 --
-UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 1 WHERE (`entry` = 19381);
+-- UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 1 WHERE (`entry` = 19381);
 UPDATE `creature_template` SET `faction` = 1692 WHERE (`entry` = 22228);
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|128 WHERE (`entry` IN (19381, 22228));
 
