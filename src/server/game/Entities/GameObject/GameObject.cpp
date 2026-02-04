@@ -1038,7 +1038,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
     data.orientation = GetOrientation();
-    data.rotation = m_worldRotation;
+    data.rotation = WorldRotation;
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
@@ -1064,10 +1064,10 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     stmt->SetData(index++, GetPositionY());
     stmt->SetData(index++, GetPositionZ());
     stmt->SetData(index++, GetOrientation());
-    stmt->SetData(index++, m_worldRotation.x);
-    stmt->SetData(index++, m_worldRotation.y);
-    stmt->SetData(index++, m_worldRotation.z);
-    stmt->SetData(index++, m_worldRotation.w);
+    stmt->SetData(index++, WorldRotation.x);
+    stmt->SetData(index++, WorldRotation.y);
+    stmt->SetData(index++, WorldRotation.z);
+    stmt->SetData(index++, WorldRotation.w);
     stmt->SetData(index++, int32(m_respawnDelayTime));
     stmt->SetData(index++, GetGoAnimProgress());
     stmt->SetData(index++, uint8(GetGoState()));
@@ -2199,10 +2199,10 @@ void GameObject::UpdatePackedRotation()
     static const int32 PACK_X = PACK_YZ << 1;
     static const int32 PACK_YZ_MASK = (PACK_YZ << 1) - 1;
     static const int32 PACK_X_MASK = (PACK_X << 1) - 1;
-    int8 w_sign = (m_worldRotation.w >= 0.f ? 1 : -1);
-    int64 x = int32(m_worldRotation.x * PACK_X)  * w_sign & PACK_X_MASK;
-    int64 y = int32(m_worldRotation.y * PACK_YZ) * w_sign & PACK_YZ_MASK;
-    int64 z = int32(m_worldRotation.z * PACK_YZ) * w_sign & PACK_YZ_MASK;
+    int8 w_sign = (WorldRotation.w >= 0.f ? 1 : -1);
+    int64 x = int32(WorldRotation.x * PACK_X)  * w_sign & PACK_X_MASK;
+    int64 y = int32(WorldRotation.y * PACK_YZ) * w_sign & PACK_YZ_MASK;
+    int64 z = int32(WorldRotation.z * PACK_YZ) * w_sign & PACK_YZ_MASK;
     m_packedRotation = z | (y << 21) | (x << 42);
 }
 
@@ -2210,7 +2210,7 @@ void GameObject::SetWorldRotation(G3D::Quat const& rot)
 {
     G3D::Quat rotation = rot;
     rotation.unitize();
-    m_worldRotation = rotation;
+    WorldRotation = rotation;
     UpdatePackedRotation();
 }
 
