@@ -513,6 +513,18 @@ void AccountMgr::AddPermissionForTest(uint32 permissionId, std::string const& na
     _permissions[permissionId] = new rbac::RBACPermission(permissionId, name);
 }
 
+void AccountMgr::AddLinkedPermissionForTest(uint32 permissionId, uint32 linkedPermissionId)
+{
+    auto it = _permissions.find(permissionId);
+    if (it != _permissions.end())
+        it->second->AddLinkedPermission(linkedPermissionId);
+}
+
+void AccountMgr::AddDefaultPermissionForTest(uint8 secLevel, uint32 permissionId)
+{
+    _defaultPermissions[secLevel].insert(permissionId);
+}
+
 void AccountMgr::ClearPermissionsForTest()
 {
     ClearRBAC();

@@ -399,13 +399,348 @@ TEST_F(RBACSecurityLevelTest, Constructor_PreservesSecurityLevel)
     EXPECT_EQ(rbacLevel3.GetSecurityLevel(), 3);
 }
 
-TEST_F(RBACSecurityLevelTest, SetSecurityLevel_UpdatesLevel)
+TEST_F(RBACSecurityLevelTest, SetSecurityLevelForTest_UpdatesLevel)
 {
     rbac::RBACData rbac(1, "TestAccount", 1, 0);
     EXPECT_EQ(rbac.GetSecurityLevel(), 0);
 
-    rbac.SetSecurityLevel(3);
+    // Use test-friendly setter that doesn't call LoadFromDB
+    rbac.SetSecurityLevelForTest(3);
     EXPECT_EQ(rbac.GetSecurityLevel(), 3);
+}
+
+/**
+ * @class RBACPermissionExpansionTest
+ * @brief Tests for permission expansion through linked permissions.
+ *
+ * Tests verify that when a role/permission with linked permissions is granted,
+ * all linked permissions become effective via ExpandPermissions().
+ */
+class RBACPermissionExpansionTest : public ::testing::Test
+{
+protected:
+    // Permission structure for testing:
+    // ROLE_GM (100) -> links to PERM_KICK (10), PERM_BAN (11)
+    // ROLE_ADMIN (101) -> links to ROLE_GM (100), PERM_SHUTDOWN (12)
+    // This creates a hierarchy: ADMIN -> GM -> individual permissions
+
+    static constexpr uint32 PERM_KICK = 10;
+    static constexpr uint32 PERM_BAN = 11;
+    static constexpr uint32 PERM_SHUTDOWN = 12;
+    static constexpr uint32 PERM_TELEPORT = 13;
+    static constexpr uint32 ROLE_GM = 100;
+    static constexpr uint32 ROLE_ADMIN = 101;
+
+    void SetUp() override
+    {
+        // Register individual permissions
+        sAccountMgr->AddPermissionForTest(PERM_KICK, "Kick Permission");
+        sAccountMgr->AddPermissionForTest(PERM_BAN, "Ban Permission");
+        sAccountMgr->AddPermissionForTest(PERM_SHUTDOWN, "Shutdown Permission");
+        sAccountMgr->AddPermissionForTest(PERM_TELEPORT, "Teleport Permission");
+
+        // Register role permissions
+        sAccountMgr->AddPermissionForTest(ROLE_GM, "GameMaster Role");
+        sAccountMgr->AddPermissionForTest(ROLE_ADMIN, "Administrator Role");
+
+        // Set up permission hierarchy:
+        // GM role includes kick and ban
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, PERM_KICK);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, PERM_BAN);
+
+        // Admin role includes GM role and shutdown
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, ROLE_GM);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, PERM_SHUTDOWN);
+
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACPermissionExpansionTest, GrantRole_ExpandsLinkedPermissions)
+{
+    // Grant GM role
+    rbacData->GrantPermission(ROLE_GM);
+    rbacData->RecalculatePermissions();
+
+    // Should have access to GM role and linked permissions (kick, ban)
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_BAN));
+
+    // Should NOT have access to unlinked permissions
+    EXPECT_FALSE(rbacData->HasPermission(PERM_SHUTDOWN));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_TELEPORT));
+}
+
+TEST_F(RBACPermissionExpansionTest, GrantRole_RecursiveExpansion)
+{
+    // Grant Admin role (which links to GM role, which links to kick/ban)
+    rbacData->GrantPermission(ROLE_ADMIN);
+    rbacData->RecalculatePermissions();
+
+    // Should have access to Admin role
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_ADMIN));
+
+    // Should have access to directly linked permissions (GM role, shutdown)
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_SHUTDOWN));
+
+    // Should have access to recursively linked permissions (from GM role)
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_BAN));
+
+    // Should NOT have access to unlinked permissions
+    EXPECT_FALSE(rbacData->HasPermission(PERM_TELEPORT));
+}
+
+TEST_F(RBACPermissionExpansionTest, DenyRole_PreventsLinkedPermissions)
+{
+    // Grant teleport individually
+    rbacData->GrantPermission(PERM_TELEPORT);
+
+    // Grant admin role (gives kick, ban, shutdown via expansion)
+    rbacData->GrantPermission(ROLE_ADMIN);
+    rbacData->RecalculatePermissions();
+
+    // Verify all permissions are granted
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_ADMIN));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_TELEPORT));
+
+    // Now revoke admin and deny the GM role
+    rbacData->RevokePermission(ROLE_ADMIN);
+    rbacData->DenyPermission(ROLE_GM);
+    rbacData->RecalculatePermissions();
+
+    // GM role and its linked permissions should be denied
+    EXPECT_FALSE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_BAN));
+
+    // Teleport was granted directly, not through GM, so should still work
+    EXPECT_TRUE(rbacData->HasPermission(PERM_TELEPORT));
+}
+
+TEST_F(RBACPermissionExpansionTest, DenyRole_OverridesIndividualGrant)
+{
+    // Grant kick permission individually
+    rbacData->GrantPermission(PERM_KICK);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+
+    // Deny the GM role (which links to kick)
+    rbacData->DenyPermission(ROLE_GM);
+    rbacData->RecalculatePermissions();
+
+    // Denying a role expands to deny all linked permissions
+    // Even though kick was granted individually, denying GM role
+    // expands to deny kick as well (RBAC deny expansion)
+    EXPECT_FALSE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_FALSE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_BAN));
+}
+
+/**
+ * @class RBACDefaultPermissionsTest
+ * @brief Tests for default permissions based on security level.
+ *
+ * Tests verify that default permissions from rbac_default_permissions
+ * are properly applied based on account security level.
+ */
+class RBACDefaultPermissionsTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_PLAYER_1 = 20;
+    static constexpr uint32 PERM_PLAYER_2 = 21;
+    static constexpr uint32 PERM_MOD_1 = 30;
+    static constexpr uint32 PERM_GM_1 = 40;
+    static constexpr uint32 PERM_ADMIN_1 = 50;
+
+    static constexpr uint8 SEC_PLAYER = 0;
+    static constexpr uint8 SEC_MODERATOR = 1;
+    static constexpr uint8 SEC_GAMEMASTER = 2;
+    static constexpr uint8 SEC_ADMINISTRATOR = 3;
+
+    void SetUp() override
+    {
+        // Register test permissions
+        sAccountMgr->AddPermissionForTest(PERM_PLAYER_1, "Player Permission 1");
+        sAccountMgr->AddPermissionForTest(PERM_PLAYER_2, "Player Permission 2");
+        sAccountMgr->AddPermissionForTest(PERM_MOD_1, "Moderator Permission 1");
+        sAccountMgr->AddPermissionForTest(PERM_GM_1, "GameMaster Permission 1");
+        sAccountMgr->AddPermissionForTest(PERM_ADMIN_1, "Administrator Permission 1");
+
+        // Set up default permissions for security levels
+        sAccountMgr->AddDefaultPermissionForTest(SEC_PLAYER, PERM_PLAYER_1);
+        sAccountMgr->AddDefaultPermissionForTest(SEC_PLAYER, PERM_PLAYER_2);
+
+        sAccountMgr->AddDefaultPermissionForTest(SEC_MODERATOR, PERM_MOD_1);
+
+        sAccountMgr->AddDefaultPermissionForTest(SEC_GAMEMASTER, PERM_GM_1);
+
+        sAccountMgr->AddDefaultPermissionForTest(SEC_ADMINISTRATOR, PERM_ADMIN_1);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACDefaultPermissionsTest, GetDefaultPermissions_ReturnsCorrectSet)
+{
+    rbac::RBACPermissionContainer const& playerPerms = sAccountMgr->GetRBACDefaultPermissions(SEC_PLAYER);
+    EXPECT_EQ(playerPerms.size(), 2u);
+    EXPECT_TRUE(playerPerms.count(PERM_PLAYER_1) > 0);
+    EXPECT_TRUE(playerPerms.count(PERM_PLAYER_2) > 0);
+
+    rbac::RBACPermissionContainer const& modPerms = sAccountMgr->GetRBACDefaultPermissions(SEC_MODERATOR);
+    EXPECT_EQ(modPerms.size(), 1u);
+    EXPECT_TRUE(modPerms.count(PERM_MOD_1) > 0);
+
+    rbac::RBACPermissionContainer const& gmPerms = sAccountMgr->GetRBACDefaultPermissions(SEC_GAMEMASTER);
+    EXPECT_EQ(gmPerms.size(), 1u);
+    EXPECT_TRUE(gmPerms.count(PERM_GM_1) > 0);
+
+    rbac::RBACPermissionContainer const& adminPerms = sAccountMgr->GetRBACDefaultPermissions(SEC_ADMINISTRATOR);
+    EXPECT_EQ(adminPerms.size(), 1u);
+    EXPECT_TRUE(adminPerms.count(PERM_ADMIN_1) > 0);
+}
+
+TEST_F(RBACDefaultPermissionsTest, GetDefaultPermissions_EmptySecLevel_ReturnsEmpty)
+{
+    // Security level 255 has no default permissions set
+    rbac::RBACPermissionContainer const& emptyPerms = sAccountMgr->GetRBACDefaultPermissions(255);
+    EXPECT_TRUE(emptyPerms.empty());
+}
+
+TEST_F(RBACDefaultPermissionsTest, SecurityLevel_DeterminesDefaultPermissions)
+{
+    // Create RBACData for a player account (sec level 0)
+    rbac::RBACData playerData(1, "PlayerAccount", TEST_REALM_ID, SEC_PLAYER);
+
+    // Manually grant the default permissions (simulating LoadFromDBCallback)
+    rbac::RBACPermissionContainer const& playerDefaults = sAccountMgr->GetRBACDefaultPermissions(SEC_PLAYER);
+    for (uint32 perm : playerDefaults)
+        playerData.GrantPermission(perm);
+
+    playerData.RecalculatePermissions();
+
+    // Player should have player permissions
+    EXPECT_TRUE(playerData.HasPermission(PERM_PLAYER_1));
+    EXPECT_TRUE(playerData.HasPermission(PERM_PLAYER_2));
+
+    // Player should NOT have higher level permissions
+    EXPECT_FALSE(playerData.HasPermission(PERM_MOD_1));
+    EXPECT_FALSE(playerData.HasPermission(PERM_GM_1));
+    EXPECT_FALSE(playerData.HasPermission(PERM_ADMIN_1));
+}
+
+TEST_F(RBACDefaultPermissionsTest, HigherSecLevel_GetsOnlyOwnDefaults)
+{
+    // Create RBACData for an admin account (sec level 3)
+    rbac::RBACData adminData(4, "AdminAccount", TEST_REALM_ID, SEC_ADMINISTRATOR);
+
+    // Manually grant the default permissions for admin level
+    rbac::RBACPermissionContainer const& adminDefaults = sAccountMgr->GetRBACDefaultPermissions(SEC_ADMINISTRATOR);
+    for (uint32 perm : adminDefaults)
+        adminData.GrantPermission(perm);
+
+    adminData.RecalculatePermissions();
+
+    // Admin gets their own default permissions
+    EXPECT_TRUE(adminData.HasPermission(PERM_ADMIN_1));
+
+    // Note: In a real setup, admin would typically have a role that links to
+    // lower permissions. Here we're just testing that default permissions
+    // are applied per security level, not inherited.
+    // Without explicit roles linking them, admin doesn't automatically get
+    // player/mod/gm permissions.
+    EXPECT_FALSE(adminData.HasPermission(PERM_PLAYER_1));
+    EXPECT_FALSE(adminData.HasPermission(PERM_MOD_1));
+    EXPECT_FALSE(adminData.HasPermission(PERM_GM_1));
+}
+
+/**
+ * @class RBACDeniedExpansionTest
+ * @brief Tests for denied permission expansion.
+ *
+ * Tests verify that denied permissions are properly expanded
+ * and remove access to linked permissions.
+ */
+class RBACDeniedExpansionTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_KICK = 10;
+    static constexpr uint32 PERM_BAN = 11;
+    static constexpr uint32 ROLE_GM = 100;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_KICK, "Kick Permission");
+        sAccountMgr->AddPermissionForTest(PERM_BAN, "Ban Permission");
+        sAccountMgr->AddPermissionForTest(ROLE_GM, "GameMaster Role");
+
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, PERM_KICK);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, PERM_BAN);
+
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACDeniedExpansionTest, DenyRole_ExpandsDeniedLinkedPermissions)
+{
+    // First grant individual permissions that would be linked from GM
+    rbacData->GrantPermission(PERM_KICK);
+    rbacData->GrantPermission(PERM_BAN);
+    rbacData->RecalculatePermissions();
+
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_BAN));
+
+    // Now deny the GM role
+    rbacData->DenyPermission(ROLE_GM);
+    rbacData->RecalculatePermissions();
+
+    // The GM role and its linked permissions should be denied
+    // Even though kick/ban were granted individually, denying the role
+    // that links them should expand to deny those permissions
+    EXPECT_FALSE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_BAN));
+}
+
+TEST_F(RBACDeniedExpansionTest, GrantAndDenySameRole_DenyWins)
+{
+    // Grant the GM role
+    rbacData->GrantPermission(ROLE_GM);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+
+    // Revoke and then deny
+    rbacData->RevokePermission(ROLE_GM);
+    rbacData->DenyPermission(ROLE_GM);
+    rbacData->RecalculatePermissions();
+
+    // Deny should win - no access
+    EXPECT_FALSE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_BAN));
 }
 
 }  // namespace

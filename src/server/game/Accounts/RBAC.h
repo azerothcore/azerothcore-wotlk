@@ -774,6 +774,9 @@ public:
     /// For unit testing - forces permission recalculation without database
     void RecalculatePermissions() { CalculateNewPermissions(); }
 
+    /// For unit testing - sets security level without database reload
+    void SetSecurityLevelForTest(uint8 id) { _secLevel = id; }
+
 private:
     /// Saves a permission to DB, Granted or Denied
     void SavePermission(uint32 role, bool granted, int32 realm);

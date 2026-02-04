@@ -80,6 +80,8 @@ public:
 
     // For unit testing - allows adding permissions without database
     void AddPermissionForTest(uint32 permissionId, std::string const& name);
+    void AddLinkedPermissionForTest(uint32 permissionId, uint32 linkedPermissionId);
+    void AddDefaultPermissionForTest(uint8 secLevel, uint32 permissionId);
     void ClearPermissionsForTest();
 
 private:
