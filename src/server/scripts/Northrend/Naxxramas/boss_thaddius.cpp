@@ -246,17 +246,15 @@ public:
                 reviveTimer += diff;
                 if (reviveTimer >= 12000)
                 {
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    summons.DoForAllSummons([this](WorldObject* summon)
                     {
-                        if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
+                        if (summon->GetEntry() == NPC_TESLA_COIL)
                         {
-                            if (cr->GetEntry() == NPC_TESLA_COIL)
-                            {
-                                cr->AI()->Talk(EMOTE_TESLA_OVERLOAD);
-                                cr->CastSpell(me, SPELL_SHOCK_VISUAL, true);
-                            }
+                            summon->ToCreature()->AI()->Talk(EMOTE_TESLA_OVERLOAD);
+                            summon->ToCreature()->CastSpell(me, SPELL_SHOCK_VISUAL, true);
                         }
-                    }
+                    });
+
                     reviveTimer = 0;
                     events.ScheduleEvent(EVENT_THADDIUS_INIT, 750ms);
                 }
