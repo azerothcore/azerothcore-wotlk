@@ -322,7 +322,15 @@ public:
                     events.Repeat(15s);
                     break;
                 case EVENT_THADDIUS_POLARITY_SHIFT:
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        events.Repeat(1s);
+                        ballLightningEnabled = false;
+                        return;
+                    }
+
                     DoCastAOE(SPELL_POLARITY_SHIFT);
+                    events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 3s);
                     events.Repeat(30s);
                     break;
                 case EVENT_ALLOW_BALL_LIGHTNING:
