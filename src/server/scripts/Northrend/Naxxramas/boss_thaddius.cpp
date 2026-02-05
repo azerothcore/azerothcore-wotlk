@@ -92,9 +92,8 @@ enum Events
     EVENT_THADDIUS_INIT                 = 5,
     EVENT_THADDIUS_ENTER_COMBAT         = 6,
     EVENT_THADDIUS_CHAIN_LIGHTNING      = 7,
-    EVENT_THADDIUS_BERSERK              = 8,
-    EVENT_THADDIUS_POLARITY_SHIFT       = 9,
-    EVENT_ALLOW_BALL_LIGHTNING          = 10
+    EVENT_THADDIUS_POLARITY_SHIFT       = 8,
+    EVENT_ALLOW_BALL_LIGHTNING          = 9
 };
 
 enum Misc
@@ -268,8 +267,6 @@ public:
                 return;
 
             events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
 
             if (summonTimer) // Revive
             {
@@ -316,19 +313,16 @@ public:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     events.ScheduleEvent(EVENT_THADDIUS_CHAIN_LIGHTNING, 14s);
-                    events.ScheduleEvent(EVENT_THADDIUS_BERSERK, 6min);
                     events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 20s);
                     events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 5s);
+                    ScheduleEnrageTimer(SPELL_BERSERK, 6min);
                     return;
-                case EVENT_THADDIUS_BERSERK:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
                 case EVENT_THADDIUS_CHAIN_LIGHTNING:
-                    me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
+                    DoCastVictim(SPELL_CHAIN_LIGHTNING);
                     events.Repeat(15s);
                     break;
                 case EVENT_THADDIUS_POLARITY_SHIFT:
-                    me->CastSpell(me, SPELL_POLARITY_SHIFT, false);
+                    DoCastAOE(SPELL_POLARITY_SHIFT);
                     events.Repeat(30s);
                     break;
                 case EVENT_ALLOW_BALL_LIGHTNING:
