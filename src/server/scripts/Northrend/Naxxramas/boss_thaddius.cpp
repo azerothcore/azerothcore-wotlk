@@ -237,7 +237,7 @@ public:
                 if (resetTimer > 1000)
                 {
                     resetTimer = 0;
-                    me->CastSpell(me, SPELL_THADDIUS_SPAWN_STUN, true);
+                    DoCastSelf(SPELL_THADDIUS_SPAWN_STUN, true);
                 }
                 return;
             }
@@ -284,25 +284,19 @@ public:
                 {
                     me->RemoveAllAuras();
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    summons.DoForAllSummons([](WorldObject* summon)
                     {
-                        if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
-                        {
-                            if (cr->GetEntry() == NPC_TESLA_COIL)
-                            {
-                                Unit::Kill(cr, cr);
-                            }
-                        }
-                    }
+                        if (summon->GetEntry() == NPC_TESLA_COIL)
+                            summon->ToCreature()->KillSelf();
+                    });
+
                     if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_LEFT, 100.0f))
-                    {
                         go->SetGoState(GO_STATE_READY);
-                    }
+
                     if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_RIGHT, 100.0f))
-                    {
                         go->SetGoState(GO_STATE_READY);
-                    }
-                    me->CastSpell(me, SPELL_THADDIUS_VISUAL_LIGHTNING, true);
+
+                    DoCastSelf(SPELL_THADDIUS_VISUAL_LIGHTNING, true);
                     events.ScheduleEvent(EVENT_THADDIUS_ENTER_COMBAT, 1s);
                     break;
                 }
