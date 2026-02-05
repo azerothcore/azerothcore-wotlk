@@ -156,8 +156,6 @@ void WorldSession::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyB
     // next slot
     ++slot;
 
-    LOG_INFO("network", "PLAYER: Buy bank bag slot, slot number = {}", slot);
-
     BankBagSlotPricesEntry const* slotEntry = sBankBagSlotPricesStore.LookupEntry(slot);
 
     if (!slotEntry)
