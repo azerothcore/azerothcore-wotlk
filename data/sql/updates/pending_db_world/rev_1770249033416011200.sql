@@ -1,0 +1,4 @@
+--
+DELETE FROM `spell_target_position` WHERE `ID` = 33244;
+INSERT INTO `spell_target_position` (`ID`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES
+(33244, 550, 432.74, -373.645, 18.0138, 1.39626, 50791);
