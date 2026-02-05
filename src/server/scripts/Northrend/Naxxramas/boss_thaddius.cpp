@@ -332,7 +332,7 @@ public:
 
             if (IsAnyPlayerInMeleeRange())
                 DoMeleeAttackIfReady();
-            else if (ballLightningEnabled && !IsAnyPlayerInMeleeRange())
+            else if (ballLightningEnabled && !IsAnyPlayerInMeleeRange() && !me->HasUnitState(UNIT_STATE_CASTING))
                 if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
                     me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
         }
