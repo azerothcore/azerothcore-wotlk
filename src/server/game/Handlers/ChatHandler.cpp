@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "CellImpl.h"
+#include "RBAC.h"
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "ChatPackets.h"
@@ -112,7 +113,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 
     // pussywizard: chatting on most chat types requires 2 hours played to prevent spam/abuse
-    if (AccountMgr::IsPlayerAccount(GetSecurity()))
+    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHAT_CHANNEL_REQ))
     {
         switch (type)
         {
@@ -382,8 +383,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
-                bool senderIsPlayer = AccountMgr::IsPlayerAccount(GetSecurity());
-                bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->GetSession()->GetSecurity() : SEC_PLAYER);
+                bool senderIsPlayer = !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT);
+                bool receiverIsPlayer = receiver ? !receiver->GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) : true;
 
                 if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && receiver != sender && receiver && !receiver->IsGameMaster())
                 {
@@ -554,7 +555,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
         case CHAT_MSG_CHANNEL:
             {
-                if (AccountMgr::IsPlayerAccount(GetSecurity()))
+                if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHAT_CHANNEL_REQ))
                 {
                     if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                     {

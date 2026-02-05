@@ -23,6 +23,7 @@
 #include "Language.h"
 #include "MapMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -35,12 +36,12 @@ public:
     {
         static ChatCommandTable instanceCommandTable =
         {
-            { "listbinds",    HandleInstanceListBindsCommand,    SEC_MODERATOR,     Console::No },
-            { "unbind",       HandleInstanceUnbindCommand,       SEC_GAMEMASTER,    Console::No },
-            { "stats",        HandleInstanceStatsCommand,        SEC_MODERATOR,     Console::Yes },
-            { "savedata",     HandleInstanceSaveDataCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "setbossstate", HandleInstanceSetBossStateCommand, SEC_GAMEMASTER,    Console::Yes },
-            { "getbossstate", HandleInstanceGetBossStateCommand, SEC_MODERATOR,     Console::Yes },
+            { "listbinds",    HandleInstanceListBindsCommand,    rbac::RBAC_PERM_COMMAND_INSTANCE_LISTBINDS,     Console::No },
+            { "unbind",       HandleInstanceUnbindCommand,       rbac::RBAC_PERM_COMMAND_INSTANCE_UNBIND,        Console::No },
+            { "stats",        HandleInstanceStatsCommand,        rbac::RBAC_PERM_COMMAND_INSTANCE_STATS,         Console::Yes },
+            { "savedata",     HandleInstanceSaveDataCommand,     rbac::RBAC_PERM_COMMAND_INSTANCE_SAVEDATA,      Console::No },
+            { "setbossstate", HandleInstanceSetBossStateCommand, rbac::RBAC_PERM_COMMAND_INSTANCE_SET_BOSS_STATE, Console::Yes },
+            { "getbossstate", HandleInstanceGetBossStateCommand, rbac::RBAC_PERM_COMMAND_INSTANCE_GET_BOSS_STATE, Console::Yes },
         };
 
         static ChatCommandTable commandTable =

@@ -18,6 +18,7 @@
 #include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -30,11 +31,11 @@ public:
     {
         static ChatCommandTable battlefieldcommandTable =
         {
-            { "start",  HandleBattlefieldStart,  SEC_ADMINISTRATOR, Console::No },
-            { "stop",   HandleBattlefieldEnd,    SEC_ADMINISTRATOR, Console::No },
-            { "switch", HandleBattlefieldSwitch, SEC_ADMINISTRATOR, Console::No },
-            { "timer",  HandleBattlefieldTimer,  SEC_ADMINISTRATOR, Console::No },
-            { "enable", HandleBattlefieldEnable, SEC_ADMINISTRATOR, Console::No }
+            { "start",  HandleBattlefieldStart,  rbac::RBAC_PERM_COMMAND_BF_START,  Console::No },
+            { "stop",   HandleBattlefieldEnd,    rbac::RBAC_PERM_COMMAND_BF_STOP,   Console::No },
+            { "switch", HandleBattlefieldSwitch, rbac::RBAC_PERM_COMMAND_BF_SWITCH, Console::No },
+            { "timer",  HandleBattlefieldTimer,  rbac::RBAC_PERM_COMMAND_BF_TIMER,  Console::No },
+            { "enable", HandleBattlefieldEnable, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::No }
         };
         static ChatCommandTable commandTable =
         {

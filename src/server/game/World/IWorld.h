@@ -110,6 +110,7 @@ public:
     virtual void   ResetEventSeasonalQuests(uint16 event_id) = 0;
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
+    virtual void ReloadRBAC() = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H

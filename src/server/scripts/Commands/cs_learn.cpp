@@ -21,6 +21,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerCommand.h"
+#include "RBAC.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -35,32 +36,32 @@ public:
     {
         static ChatCommandTable learnAllMyCommandTable =
         {
-            { "class",      HandleLearnAllMyClassCommand,      SEC_GAMEMASTER, Console::No },
-            { "pettalents", HandleLearnAllMyPetTalentsCommand, SEC_GAMEMASTER, Console::No },
-            { "spells",     HandleLearnAllMySpellsCommand,     SEC_GAMEMASTER, Console::No },
-            { "talents",    HandleLearnAllMyTalentsCommand,    SEC_GAMEMASTER, Console::No }
+            { "class",      HandleLearnAllMyClassCommand,      rbac::RBAC_PERM_COMMAND_LEARN_ALL_MY_CLASS, Console::No },
+            { "pettalents", HandleLearnAllMyPetTalentsCommand, rbac::RBAC_PERM_COMMAND_LEARN_MY_PETTALENTS, Console::No },
+            { "spells",     HandleLearnAllMySpellsCommand,     rbac::RBAC_PERM_COMMAND_LEARN_ALL_MY_SPELLS, Console::No },
+            { "talents",    HandleLearnAllMyTalentsCommand,    rbac::RBAC_PERM_COMMAND_LEARN_ALL_TALENTS, Console::No }
         };
 
         static ChatCommandTable learnAllCommandTable =
         {
             { "my",        learnAllMyCommandTable },
-            { "gm",        HandleLearnAllGMCommand,            SEC_GAMEMASTER, Console::No },
-            { "crafts",    HandleLearnAllCraftsCommand,        SEC_GAMEMASTER, Console::No },
-            { "default",   HandleLearnAllDefaultCommand,       SEC_GAMEMASTER, Console::No },
-            { "lang",      HandleLearnAllLangCommand,          SEC_GAMEMASTER, Console::No },
-            { "recipes",   HandleLearnAllRecipesCommand,       SEC_GAMEMASTER, Console::No },
+            { "gm",        HandleLearnAllGMCommand,            rbac::RBAC_PERM_COMMAND_LEARN_ALL_GM, Console::No },
+            { "crafts",    HandleLearnAllCraftsCommand,        rbac::RBAC_PERM_COMMAND_LEARN_ALL_CRAFTS, Console::No },
+            { "default",   HandleLearnAllDefaultCommand,       rbac::RBAC_PERM_COMMAND_LEARN_ALL_DEFAULT, Console::No },
+            { "lang",      HandleLearnAllLangCommand,          rbac::RBAC_PERM_COMMAND_LEARN_ALL_LANG, Console::No },
+            { "recipes",   HandleLearnAllRecipesCommand,       rbac::RBAC_PERM_COMMAND_LEARN_ALL_RECIPES, Console::No },
         };
 
         static ChatCommandTable learnCommandTable =
         {
             { "all",  learnAllCommandTable },
-            { "",     HandleLearnCommand,                      SEC_GAMEMASTER, Console::No }
+            { "",     HandleLearnCommand,                      rbac::RBAC_PERM_COMMAND_LEARN, Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
             { "learn",   learnCommandTable },
-            { "unlearn", HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
+            { "unlearn", HandleUnLearnCommand,             rbac::RBAC_PERM_COMMAND_UNLEARN, Console::No }
         };
         return commandTable;
     }

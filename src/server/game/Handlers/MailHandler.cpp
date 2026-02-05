@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "RBAC.h"
 #include "CharacterCache.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
@@ -213,7 +214,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     uint32 rc_account = receive ? receive->GetSession()->GetAccountId() : sCharacterCache->GetCharacterAccountIdByGuid(receiverGuid);
 
-    if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && AccountMgr::IsPlayerAccount(GetSecurity()))
+    if (/*!accountBound*/ GetAccountId() != rc_account && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL) && player->GetTeamId() != rc_teamId && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_MAIL))
     {
         player->SendMailResult(0, MAIL_SEND, MAIL_ERR_NOT_YOUR_TEAM);
         return;

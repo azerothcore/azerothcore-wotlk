@@ -23,6 +23,7 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
@@ -36,10 +37,10 @@ public:
     {
         static ChatCommandTable sendCommandTable =
         {
-            { "items",   HandleSendItemsCommand,   SEC_GAMEMASTER,    Console::Yes },
-            { "mail",    HandleSendMailCommand,    SEC_GAMEMASTER,    Console::Yes },
-            { "message", HandleSendMessageCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "money",   HandleSendMoneyCommand,   SEC_GAMEMASTER,    Console::Yes }
+            { "items",   HandleSendItemsCommand,   rbac::RBAC_PERM_COMMAND_SEND_ITEMS,   Console::Yes },
+            { "mail",    HandleSendMailCommand,    rbac::RBAC_PERM_COMMAND_SEND_MAIL,    Console::Yes },
+            { "message", HandleSendMessageCommand, rbac::RBAC_PERM_COMMAND_SEND_MESSAGE, Console::Yes },
+            { "money",   HandleSendMoneyCommand,   rbac::RBAC_PERM_COMMAND_SEND_MONEY,   Console::Yes }
         };
 
         static ChatCommandTable commandTable =

@@ -22,6 +22,7 @@
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellMgr.h"
 
 using namespace Acore::ChatCommands;
@@ -35,21 +36,21 @@ public:
     {
         static ChatCommandTable removeDisableCommandTable =
         {
-            { "spell",        HandleRemoveDisableSpellCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "quest",        HandleRemoveDisableQuestCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "map",          HandleRemoveDisableMapCommand,          SEC_ADMINISTRATOR, Console::Yes },
-            { "battleground", HandleRemoveDisableBattlegroundCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "outdoorpvp",   HandleRemoveDisableOutdoorPvPCommand,   SEC_ADMINISTRATOR, Console::Yes },
-            { "vmap",         HandleRemoveDisableVmapCommand,         SEC_ADMINISTRATOR, Console::Yes }
+            { "spell",        HandleRemoveDisableSpellCommand,        rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_SPELL,        Console::Yes },
+            { "quest",        HandleRemoveDisableQuestCommand,        rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_QUEST,        Console::Yes },
+            { "map",          HandleRemoveDisableMapCommand,          rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_MAP,          Console::Yes },
+            { "battleground", HandleRemoveDisableBattlegroundCommand, rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_BATTLEGROUND, Console::Yes },
+            { "outdoorpvp",   HandleRemoveDisableOutdoorPvPCommand,   rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_OUTDOORPVP,   Console::Yes },
+            { "vmap",         HandleRemoveDisableVmapCommand,         rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_VMAP,         Console::Yes }
         };
         static ChatCommandTable addDisableCommandTable =
         {
-            { "spell",        HandleAddDisableSpellCommand,           SEC_ADMINISTRATOR, Console::Yes },
-            { "quest",        HandleAddDisableQuestCommand,           SEC_ADMINISTRATOR, Console::Yes },
-            { "map",          HandleAddDisableMapCommand,             SEC_ADMINISTRATOR, Console::Yes },
-            { "battleground", HandleAddDisableBattlegroundCommand,    SEC_ADMINISTRATOR, Console::Yes },
-            { "outdoorpvp",   HandleAddDisableOutdoorPvPCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "vmap",         HandleAddDisableVmapCommand,            SEC_ADMINISTRATOR, Console::Yes }
+            { "spell",        HandleAddDisableSpellCommand,           rbac::RBAC_PERM_COMMAND_DISABLE_ADD_SPELL,           Console::Yes },
+            { "quest",        HandleAddDisableQuestCommand,           rbac::RBAC_PERM_COMMAND_DISABLE_ADD_QUEST,           Console::Yes },
+            { "map",          HandleAddDisableMapCommand,             rbac::RBAC_PERM_COMMAND_DISABLE_ADD_MAP,             Console::Yes },
+            { "battleground", HandleAddDisableBattlegroundCommand,    rbac::RBAC_PERM_COMMAND_DISABLE_ADD_BATTLEGROUND,    Console::Yes },
+            { "outdoorpvp",   HandleAddDisableOutdoorPvPCommand,      rbac::RBAC_PERM_COMMAND_DISABLE_ADD_OUTDOORPVP,      Console::Yes },
+            { "vmap",         HandleAddDisableVmapCommand,            rbac::RBAC_PERM_COMMAND_DISABLE_ADD_VMAP,            Console::Yes }
         };
         static ChatCommandTable disableCommandTable =
         {

@@ -54,6 +54,13 @@ bool ChatHandler::IsAvailable(uint32 securityLevel) const
     return IsConsole() ? true : m_session->GetSecurity() >= AccountTypes(securityLevel);
 }
 
+bool ChatHandler::HasPermission(uint32 permissionId) const
+{
+    if (IsConsole())
+        return true;
+    return m_session && m_session->HasPermission(permissionId);
+}
+
 bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 {
     WorldSession* target_session = nullptr;

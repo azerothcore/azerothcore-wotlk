@@ -33,6 +33,7 @@
 #include "Map.h"
 #include "PathGenerator.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "TargetedMovementGenerator.h"
 
 using namespace Acore::ChatCommands;
@@ -46,11 +47,11 @@ public:
     {
         static ChatCommandTable mmapCommandTable =
         {
-            { "loadedtiles", HandleMmapLoadedTilesCommand, SEC_ADMINISTRATOR, Console::No },
-            { "loc",         HandleMmapLocCommand,         SEC_ADMINISTRATOR, Console::No },
-            { "path",        HandleMmapPathCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "stats",       HandleMmapStatsCommand,       SEC_ADMINISTRATOR, Console::No },
-            { "testarea",    HandleMmapTestArea,           SEC_ADMINISTRATOR, Console::No }
+            { "loadedtiles", HandleMmapLoadedTilesCommand, rbac::RBAC_PERM_COMMAND_MMAP_LOADEDTILES, Console::No },
+            { "loc",         HandleMmapLocCommand,         rbac::RBAC_PERM_COMMAND_MMAP_LOC,         Console::No },
+            { "path",        HandleMmapPathCommand,        rbac::RBAC_PERM_COMMAND_MMAP_PATH,        Console::No },
+            { "stats",       HandleMmapStatsCommand,       rbac::RBAC_PERM_COMMAND_MMAP_STATS,       Console::No },
+            { "testarea",    HandleMmapTestArea,           rbac::RBAC_PERM_COMMAND_MMAP_TESTAREA,    Console::No }
         };
 
         static ChatCommandTable commandTable =

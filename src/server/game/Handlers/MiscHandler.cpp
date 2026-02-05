@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "BattlefieldMgr.h"
+#include "RBAC.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CharacterPackets.h"
@@ -422,7 +423,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     if (ObjectGuid lguid = GetPlayer()->GetLootGUID())
         DoLootRelease(lguid);
 
-    bool instantLogout = ((GetSecurity() >= 0 && uint32(GetSecurity()) >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
+    bool instantLogout = (HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT)
                           || (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat())) || GetPlayer()->IsInFlight();
 
     bool preventAfkSanctuaryLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 1
@@ -1073,7 +1074,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
 
     LOG_DEBUG("network", "CMSG_WORLD_TELEPORT: Player = {}, Time = {}, map = {}, x = {}, y = {}, z = {}, o = {}", GetPlayer()->GetName(), time, mapid, PositionX, PositionY, PositionZ, Orientation);
 
-    if (AccountMgr::IsAdminAccount(GetSecurity()))
+    if (HasPermission(rbac::RBAC_PERM_OPCODE_WORLD_TELEPORT))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
         ChatHandler(this).SendNotification(LANG_PERMISSION_DENIED);
@@ -1085,7 +1086,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     std::string charname;
     recv_data >> charname;
 
-    if (!AccountMgr::IsAdminAccount(GetSecurity()))
+    if (!HasPermission(rbac::RBAC_PERM_OPCODE_WHOIS))
     {
         ChatHandler(this).SendNotification(LANG_PERMISSION_DENIED);
         return;

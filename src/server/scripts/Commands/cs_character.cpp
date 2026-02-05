@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerDump.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "Timer.h"
 #include "World.h"
@@ -41,16 +42,17 @@ public:
     {
         static ChatCommandTable pdumpCommandTable =
         {
-            { "load",           HandlePDumpLoadCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "write",          HandlePDumpWriteCommand, SEC_ADMINISTRATOR, Console::Yes }
+            { "copy",           HandlePDumpCopyCommand,  rbac::RBAC_PERM_COMMAND_PDUMP_COPY,  Console::Yes },
+            { "load",           HandlePDumpLoadCommand,  rbac::RBAC_PERM_COMMAND_PDUMP_LOAD,  Console::Yes },
+            { "write",          HandlePDumpWriteCommand, rbac::RBAC_PERM_COMMAND_PDUMP_WRITE, Console::Yes }
         };
 
         static ChatCommandTable characterDeletedCommandTable =
         {
-            { "delete",         HandleCharacterDeletedDeleteCommand,   SEC_CONSOLE,       Console::Yes },
-            { "list",           HandleCharacterDeletedListCommand,     SEC_ADMINISTRATOR, Console::Yes },
-            { "restore",        HandleCharacterDeletedRestoreCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "purge",          HandleCharacterDeletedPurgeCommand,    SEC_CONSOLE,       Console::Yes }
+            { "delete",         HandleCharacterDeletedDeleteCommand,   rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_DELETE,  Console::Yes },
+            { "list",           HandleCharacterDeletedListCommand,     rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_LIST,    Console::Yes },
+            { "restore",        HandleCharacterDeletedRestoreCommand,  rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_RESTORE, Console::Yes },
+            { "purge",          HandleCharacterDeletedPurgeCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_OLD,     Console::Yes }
         };
 
         static ChatCommandTable characterCheckCommandTable =
@@ -62,23 +64,23 @@ public:
 
         static ChatCommandTable characterCommandTable =
         {
-            { "customize",      HandleCharacterCustomizeCommand,        SEC_GAMEMASTER, Console::Yes },
-            { "changefaction",  HandleCharacterChangeFactionCommand,    SEC_GAMEMASTER, Console::Yes },
-            { "changerace",     HandleCharacterChangeRaceCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "changeaccount",  HandleCharacterChangeAccountCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "customize",      HandleCharacterCustomizeCommand,        rbac::RBAC_PERM_COMMAND_CHARACTER_CUSTOMIZE,      Console::Yes },
+            { "changefaction",  HandleCharacterChangeFactionCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_CHANGEFACTION,  Console::Yes },
+            { "changerace",     HandleCharacterChangeRaceCommand,       rbac::RBAC_PERM_COMMAND_CHARACTER_CHANGERACE,     Console::Yes },
+            { "changeaccount",  HandleCharacterChangeAccountCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_CHANGEACCOUNT,  Console::Yes },
             { "check",          characterCheckCommandTable },
-            { "erase",          HandleCharacterEraseCommand,            SEC_CONSOLE,    Console::Yes },
+            { "erase",          HandleCharacterEraseCommand,            rbac::RBAC_PERM_COMMAND_CHARACTER_ERASE,          Console::Yes },
             { "deleted",        characterDeletedCommandTable },
-            { "level",          HandleCharacterLevelCommand,            SEC_GAMEMASTER, Console::Yes },
-            { "rename",         HandleCharacterRenameCommand,           SEC_GAMEMASTER, Console::Yes },
-            { "reputation",     HandleCharacterReputationCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "titles",         HandleCharacterTitlesCommand,           SEC_GAMEMASTER, Console::Yes }
+            { "level",          HandleCharacterLevelCommand,            rbac::RBAC_PERM_COMMAND_CHARACTER_LEVEL,          Console::Yes },
+            { "rename",         HandleCharacterRenameCommand,           rbac::RBAC_PERM_COMMAND_CHARACTER_RENAME,         Console::Yes },
+            { "reputation",     HandleCharacterReputationCommand,       rbac::RBAC_PERM_COMMAND_CHARACTER_REPUTATION,     Console::Yes },
+            { "titles",         HandleCharacterTitlesCommand,           rbac::RBAC_PERM_COMMAND_CHARACTER_TITLES,         Console::Yes }
         };
 
         static ChatCommandTable commandTable =
         {
             { "character",      characterCommandTable },
-            { "levelup",        HandleLevelUpCommand, SEC_GAMEMASTER, Console::No },
+            { "levelup",        HandleLevelUpCommand, rbac::RBAC_PERM_COMMAND_LEVELUP, Console::No },
             { "pdump",          pdumpCommandTable }
         };
 

@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -31,13 +32,13 @@ public:
     {
         static ChatCommandTable guildCommandTable =
         {
-            { "create",     HandleGuildCreateCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "delete",     HandleGuildDeleteCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "invite",     HandleGuildInviteCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "uninvite",   HandleGuildUninviteCommand, SEC_GAMEMASTER, Console::Yes },
-            { "rank",       HandleGuildRankCommand,     SEC_GAMEMASTER, Console::Yes },
-            { "rename",     HandleGuildRenameCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "info",       HandleGuildInfoCommand,     SEC_GAMEMASTER, Console::Yes }
+            { "create",     HandleGuildCreateCommand,   rbac::RBAC_PERM_COMMAND_GUILD_CREATE,   Console::Yes },
+            { "delete",     HandleGuildDeleteCommand,   rbac::RBAC_PERM_COMMAND_GUILD_DELETE,   Console::Yes },
+            { "invite",     HandleGuildInviteCommand,   rbac::RBAC_PERM_COMMAND_GUILD_INVITE,   Console::Yes },
+            { "uninvite",   HandleGuildUninviteCommand, rbac::RBAC_PERM_COMMAND_GUILD_UNINVITE, Console::Yes },
+            { "rank",       HandleGuildRankCommand,     rbac::RBAC_PERM_COMMAND_GUILD_RANK,     Console::Yes },
+            { "rename",     HandleGuildRenameCommand,   rbac::RBAC_PERM_COMMAND_GUILD_RENAME,   Console::Yes },
+            { "info",       HandleGuildInfoCommand,     rbac::RBAC_PERM_COMMAND_GUILD_INFO,     Console::Yes }
         };
         static ChatCommandTable commandTable =
         {

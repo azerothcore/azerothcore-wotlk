@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 
 constexpr std::array<std::string_view, MAX_ITEM_QUALITY> itemQualityToString =
 {
@@ -43,7 +44,7 @@ public:
     {
         static ChatCommandTable commandTable =
         {
-            { "bags clear",  HandleBagsClearCommand, SEC_GAMEMASTER, Console::No },
+            { "bags clear",  HandleBagsClearCommand, rbac::RBAC_PERM_COMMAND_ADDITEM, Console::No },
         };
 
         return commandTable;

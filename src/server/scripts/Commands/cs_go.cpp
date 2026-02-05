@@ -22,6 +22,7 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "TicketMgr.h"
 
 #include "boost/algorithm/string.hpp"
@@ -38,19 +39,19 @@ public:
     {
         static ChatCommandTable goCommandTable =
         {
-            { "creature",      HandleGoCreatureSpawnIdCommand,   SEC_MODERATOR,  Console::No },
-            { "creature id",   HandleGoCreatureCIdCommand,       SEC_MODERATOR,  Console::No },
-            { "creature name", HandleGoCreatureNameCommand,      SEC_MODERATOR,  Console::No },
-            { "gameobject",    HandleGoGameObjectSpawnIdCommand, SEC_MODERATOR,  Console::No },
-            { "gameobject id", HandleGoGameObjectGOIdCommand,    SEC_MODERATOR,  Console::No },
-            { "graveyard",     HandleGoGraveyardCommand,         SEC_MODERATOR,  Console::No },
-            { "grid",          HandleGoGridCommand,              SEC_MODERATOR,  Console::No },
-            { "taxinode",      HandleGoTaxinodeCommand,          SEC_MODERATOR,  Console::No },
-            { "trigger",       HandleGoTriggerCommand,           SEC_MODERATOR,  Console::No },
-            { "zonexy",        HandleGoZoneXYCommand,            SEC_MODERATOR,  Console::No },
-            { "xyz",           HandleGoXYZCommand,               SEC_MODERATOR,  Console::No },
-            { "ticket",        HandleGoTicketCommand,            SEC_GAMEMASTER, Console::No },
-            { "quest",         HandleGoQuestCommand,             SEC_MODERATOR,  Console::No },
+            { "creature",      HandleGoCreatureSpawnIdCommand,   rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "creature id",   HandleGoCreatureCIdCommand,       rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "creature name", HandleGoCreatureNameCommand,      rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "gameobject",    HandleGoGameObjectSpawnIdCommand, rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "gameobject id", HandleGoGameObjectGOIdCommand,    rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "graveyard",     HandleGoGraveyardCommand,         rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "grid",          HandleGoGridCommand,              rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "taxinode",      HandleGoTaxinodeCommand,          rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "trigger",       HandleGoTriggerCommand,           rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "zonexy",        HandleGoZoneXYCommand,            rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "xyz",           HandleGoXYZCommand,               rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "ticket",        HandleGoTicketCommand,            rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "quest",         HandleGoQuestCommand,             rbac::RBAC_PERM_COMMAND_GO, Console::No },
         };
 
         static ChatCommandTable commandTable =

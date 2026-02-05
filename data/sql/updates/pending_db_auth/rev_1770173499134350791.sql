@@ -457,7 +457,17 @@ INSERT INTO `rbac_permissions` VALUES
 (738,'Command: tele add'),
 (739,'Command: tele del'),
 (740,'Command: tele name'),
-(741,'Command: tele group');
+(741,'Command: tele group'),
+-- Gear commands
+(897,'Command: gear repair'),
+(898,'Command: gear stats'),
+-- Spectator commands
+(899,'Command: spect'),
+(900,'Command: spect version'),
+(901,'Command: spect reset'),
+(902,'Command: spect spectate'),
+(903,'Command: spect watch'),
+(904,'Command: spect leave');
 
 -- Link roles to permissions
 -- Administrator role gets Gamemaster role + admin commands
@@ -587,6 +597,7 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (197, 739), -- tele del
 (197, 740), -- tele name
 (197, 741), -- tele group
+(197, 897), -- gear repair
 -- Moderator commands role
 (198, 240), -- ban account
 (198, 241), -- ban character
@@ -629,7 +640,14 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (199, 505), -- gps
 (199, 507), -- help
 (199, 525), -- save
-(199, 725); -- server info
+(199, 725), -- server info
+(199, 898), -- gear stats
+(199, 899), -- spect
+(199, 900), -- spect version
+(199, 901), -- spect reset
+(199, 902), -- spect spectate
+(199, 903), -- spect watch
+(199, 904); -- spect leave
 
 -- Default permissions by security level
 -- SEC_PLAYER = 0 gets Player role (195)
