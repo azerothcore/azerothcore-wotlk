@@ -715,7 +715,16 @@ INSERT INTO `rbac_permissions` VALUES
 (901,'Command: spect reset'),
 (902,'Command: spect spectate'),
 (903,'Command: spect watch'),
-(904,'Command: spect leave');
+(904,'Command: spect leave'),
+-- Arena season commands (905-908)
+(905,'Command: arena season state'),
+(906,'Command: arena season reward'),
+(907,'Command: arena season deleteteams'),
+(908,'Command: arena season start'),
+-- Character check commands (909-911)
+(909,'Command: character check bank'),
+(910,'Command: character check bag'),
+(911,'Command: character check profession');
 
 -- ============================================================================
 -- Link roles to permissions
@@ -845,6 +854,8 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (196, 786), (196, 787), (196, 788), (196, 789), (196, 790), (196, 791), (196, 792), (196, 793),
 -- List spawnpoints
 (196, 866),
+-- Arena season commands
+(196, 905), (196, 906), (196, 907), (196, 908),
 -- AC-specific admin commands
 (196, 886), (196, 887), (196, 888), (196, 891), (196, 894), (196, 896),
 -- ---------------------------------------------------------------------------
@@ -859,6 +870,7 @@ INSERT INTO `rbac_linked_permissions` VALUES
 -- Character
 (197, 274), (197, 275), (197, 276), (197, 279), (197, 280),
 (197, 283), (197, 284), (197, 285), (197, 286), (197, 287),
+(197, 909), (197, 910), (197, 911),
 -- Cheat
 (197, 292), (197, 293), (197, 294), (197, 295), (197, 296), (197, 297), (197, 298), (197, 299),
 -- Debug

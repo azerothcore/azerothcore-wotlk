@@ -659,6 +659,16 @@ public:
     {
         AccountTypes gmLevel = handler->GetSession()->GetSecurity();
         handler->PSendSysMessage(LANG_ACCOUNT_LEVEL, uint32(gmLevel));
+
+        if (handler->GetSession()->HasPermission(rbac::RBAC_PERM_MAY_CHECK_OWN_EMAIL))
+        {
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_EMAIL_BY_ID);
+            stmt->SetData(0, handler->GetSession()->GetAccountId());
+            PreparedQueryResult result = LoginDatabase.Query(stmt);
+            if (result)
+                handler->PSendSysMessage(LANG_COMMAND_EMAIL_OUTPUT, (*result)[0].Get<std::string>());
+        }
+
         return true;
     }
 

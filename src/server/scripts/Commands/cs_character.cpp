@@ -57,9 +57,9 @@ public:
 
         static ChatCommandTable characterCheckCommandTable =
         {
-            { "bank",          HandleCharacterCheckBankCommand,          SEC_GAMEMASTER, Console::Yes },
-            { "bag",           HandleCharacterCheckBagCommand,           SEC_GAMEMASTER, Console::Yes },
-            { "profession",    HandleCharacterCheckProfessionCommand,    SEC_GAMEMASTER, Console::Yes }
+            { "bank",          HandleCharacterCheckBankCommand,          rbac::RBAC_PERM_COMMAND_CHARACTER_CHECK_BANK,       Console::Yes },
+            { "bag",           HandleCharacterCheckBagCommand,           rbac::RBAC_PERM_COMMAND_CHARACTER_CHECK_BAG,        Console::Yes },
+            { "profession",    HandleCharacterCheckProfessionCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_CHECK_PROFESSION, Console::Yes }
         };
 
         static ChatCommandTable characterCommandTable =

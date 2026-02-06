@@ -665,6 +665,13 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_SPECT_SPECTATE                         = 902,
     RBAC_PERM_COMMAND_SPECT_WATCH                            = 903,
     RBAC_PERM_COMMAND_SPECT_LEAVE                            = 904,
+    RBAC_PERM_COMMAND_ARENA_SEASON                           = 905,
+    RBAC_PERM_COMMAND_ARENA_SEASON_REWARD                    = 906,
+    RBAC_PERM_COMMAND_ARENA_SEASON_DELETETEAMS               = 907,
+    RBAC_PERM_COMMAND_ARENA_SEASON_START                     = 908,
+    RBAC_PERM_COMMAND_CHARACTER_CHECK_BANK                   = 909,
+    RBAC_PERM_COMMAND_CHARACTER_CHECK_BAG                    = 910,
+    RBAC_PERM_COMMAND_CHARACTER_CHECK_PROFESSION             = 911,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

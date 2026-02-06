@@ -34,14 +34,14 @@ public:
     {
         static ChatCommandTable arenaSeasonSetCommandTable =
         {
-            { "state",          HandleArenaSeasonSetStateCommand, SEC_ADMINISTRATOR, Console::Yes }
+            { "state",          HandleArenaSeasonSetStateCommand, rbac::RBAC_PERM_COMMAND_ARENA_SEASON, Console::Yes }
         };
 
         static ChatCommandTable arenaSeasonCommandTable =
         {
-            { "reward",         HandleArenaSeasonRewardCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "deleteteams",    HandleArenaSeasonDeleteTeamsCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "start",          HandleArenaSeasonStartCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "reward",         HandleArenaSeasonRewardCommand,      rbac::RBAC_PERM_COMMAND_ARENA_SEASON_REWARD,      Console::Yes },
+            { "deleteteams",    HandleArenaSeasonDeleteTeamsCommand, rbac::RBAC_PERM_COMMAND_ARENA_SEASON_DELETETEAMS,  Console::Yes },
+            { "start",          HandleArenaSeasonStartCommand,       rbac::RBAC_PERM_COMMAND_ARENA_SEASON_START,        Console::Yes },
             { "set",            arenaSeasonSetCommandTable }
         };
 
