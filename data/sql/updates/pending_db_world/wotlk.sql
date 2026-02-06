@@ -2913,7 +2913,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (30952, 1, 1200180, 0, 0, 1, 5, 1, 1, 'Hungering Plaguehound - World Loot Level 80'),
 (30957, 1, 1200180, 0, 0, 1, 5, 1, 1, 'Death Knight Initiate - World Loot Level 80'),
 (30958, 1, 1200180, 0, 0, 1, 5, 1, 1, 'Death Knight Initiate - World Loot Level 80'),
-(30960, 1, 1200180, 0, 0, 1, 5, 1, 1, 'Risen Soldier - World Loot Level 80'),
+-- (30960, 1, 1200180, 0, 0, 1, 5, 1, 1, 'Risen Soldier - World Loot Level 80'),
 (30988, 1, 1200080, 0, 0, 1, 5, 1, 1, 'Scourgebeak Fleshripper - World Loot Level 80'),
 (31037, 1, 1200177, 0, 0, 1, 5, 1, 1, 'Forgotten Depths High Priest - World Loot Level 77'),
 (31037, 2, 1200178, 0, 0, 1, 5, 1, 1, 'Forgotten Depths High Priest - World Loot Level 78'),
@@ -4505,3 +4505,5 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `C
 (31675, 33470, 1270002, 25, 'Proto-Drake Handler (1) - Frostweave Cloth Elite'),
 (32191, 33470, 1270002, 25, 'Azure Stalker - Frostweave Cloth Elite'),
 (32192, 33470, 1270002, 25, 'Azure Stalker (1) - Frostweave Cloth Elite');
+
+UPDATE `creature_template` SET `lootid` = 0 WHERE `entry` = 30960;
