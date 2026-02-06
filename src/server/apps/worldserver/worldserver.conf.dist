@@ -2502,6 +2502,20 @@ Arena.LegacyArenaPoints = 0
 Rate.ArenaPoints = 1
 
 #
+#    Rate.ArenaPoints2v2
+#        Description: Arena points gain rate for 2v2 bracket.
+#        Default:     0.76
+
+Rate.ArenaPoints2v2 = 0.76
+
+#
+#    Rate.ArenaPoints3v3
+#        Description: Arena points gain rate for 3v3 bracket.
+#        Default:     0.88
+
+Rate.ArenaPoints3v3 = 0.88
+
+#
 #    PvPToken.Enable
 #        Description: Character will receive a token after defeating another character that yields
 #                     honor.
