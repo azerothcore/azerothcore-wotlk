@@ -118,11 +118,9 @@ public:
 
     struct boss_thaddiusAI : public BossAI
     {
-        explicit boss_thaddiusAI(Creature* c) : BossAI(c, BOSS_THADDIUS), summons(me), ballLightningEnabled(false)
+        explicit boss_thaddiusAI(Creature* c) : BossAI(c, BOSS_THADDIUS), ballLightningEnabled(false)
         {}
 
-        EventMap events;
-        SummonList summons;
         uint32 summonTimer{};
         uint32 reviveTimer{};
         uint32 resetTimer{};
