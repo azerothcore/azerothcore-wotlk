@@ -461,8 +461,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
 static Position const PredictPosition(Unit* target)
 {
     Position pos = target->GetPosition();
-
-     // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
+    // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
     float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
     float orientation = target->GetOrientation();
 
@@ -489,6 +488,20 @@ static Position const PredictPosition(Unit* target)
     }
 
     return pos;
+}
+
+static bool IsValidPredictedPosition(Unit* target, Position const& predicted)
+{
+    Position current = target->GetPosition();
+
+    if (current.GetExactDist2d(&predicted) > 15.0f)
+        return false;
+
+    // Check line of sight from current to predicted to avoid clipping through geometry
+    if (!target->IsWithinLOS(predicted.GetPositionX(), predicted.GetPositionY(), predicted.GetPositionZ()))
+        return false;
+
+    return true;
 }
 
 template<class T>
@@ -571,7 +584,10 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
-    if (PositionOkay(target, owner->IsGuardian() && target->IsPlayer(), targetIsMoving, time_diff))
+    bool isPlayerPet = owner->IsGuardian() && target->IsPlayer();
+    bool isFollowingPlayer = target->IsPlayer();
+
+    if (PositionOkay(target, isPlayerPet, targetIsMoving, time_diff))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -599,14 +615,23 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             if (_lastPredictedPosition && _lastPredictedPosition->GetExactDistSq(&predictedPosition) < 0.25f)
                 return true;
 
-            _lastPredictedPosition = predictedPosition;
-            targetPosition = predictedPosition;
-            i_recheckPredictedDistance = true;
+            if (IsValidPredictedPosition(target, predictedPosition))
+            {
+                _lastPredictedPosition = predictedPosition;
+                targetPosition = predictedPosition;
+                i_recheckPredictedDistance = true;
+            }
+            else
+            {
+                _lastPredictedPosition.reset();
+                i_recheckPredictedDistance = false;
+            }
         }
         else
         {
             i_recheckPredictedDistance = false;
             i_recheckPredictedDistanceTimer.Reset(0);
+            _lastPredictedPosition.reset();
         }
 
         if (!i_path)
@@ -628,6 +653,22 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             if (!owner->IsStopped())
                 owner->StopMoving();
 
+            // Teleport if stuck and too far away
+            if (cOwner && isFollowingPlayer)
+            {
+                float distance = owner->GetDistance(target);
+                if (distance > 20.f)
+                {
+                    float teleX;
+                    float teleY;
+                    float teleZ;
+
+                    target->GetClosePoint(teleX, teleY, teleZ, owner->GetCombatReach());
+                    owner->NearTeleportTo(teleX, teleY, teleZ, target->GetOrientation());
+                    _lastTargetPosition.reset();
+                    _lastPredictedPosition.reset();
+                }
+            }
             return true;
         }
 
