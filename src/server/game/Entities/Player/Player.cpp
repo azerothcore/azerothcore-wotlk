@@ -2190,6 +2190,11 @@ bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) cons
     return true;
 }
 
+bool Player::CanBeGameMaster() const
+{
+    return GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_GM);
+}
+
 void Player::SetGameMaster(bool on)
 {
     if (on)

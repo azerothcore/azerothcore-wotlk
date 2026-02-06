@@ -2941,6 +2941,15 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     if (!item_owner)
         return;
 
+    Player* p_caster = m_caster->ToPlayer();
+    if (item_owner != p_caster && p_caster->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(p_caster->GetSession()->GetAccountId(), "GM {} (Account: {}) enchanting(prismatic): {} (SpellID: {} EncID: {}) on {}'s item: {} (Entry: {})",
+            p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+            m_spellInfo->SpellName[0], m_spellInfo->Id, enchant_id,
+            item_owner->GetName(), itemTarget->GetTemplate()->Name1, itemTarget->GetEntry());
+    }
+
     // remove old enchanting before applying new if equipped
     item_owner->ApplyEnchantment(itemTarget, PRISMATIC_ENCHANTMENT_SLOT, false);
 

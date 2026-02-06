@@ -366,7 +366,7 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
         if (Player const* playerSender = sender->ToPlayer())
         {
             chatTag = playerSender->GetChatTag();
-            gmMessage = playerSender->IsGameMaster();
+            gmMessage = playerSender->GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_GM_CHAT);
         }
     }
 

@@ -994,7 +994,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_INSPECT_TALENT, guid_size + 4 + talent_points);
     data << player->GetPackGUID();
 
-    if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || _player->IsGameMaster())
+    if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || _player->CanBeGameMaster())
     {
         player->BuildPlayerTalentsInfoData(&data);
     }
