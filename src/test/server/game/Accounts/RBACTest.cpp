@@ -743,4 +743,912 @@ TEST_F(RBACDeniedExpansionTest, GrantAndDenySameRole_DenyWins)
     EXPECT_FALSE(rbacData->HasPermission(PERM_BAN));
 }
 
+// ---------------------------------------------------------------------------
+// Suite 1: RBACPermissionRemoveLinkedTest
+// ---------------------------------------------------------------------------
+class RBACPermissionRemoveLinkedTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        permission = std::make_unique<rbac::RBACPermission>(TEST_PERM_1, "Test Permission");
+        permission->AddLinkedPermission(TEST_PERM_2);
+        permission->AddLinkedPermission(TEST_PERM_3);
+    }
+
+    std::unique_ptr<rbac::RBACPermission> permission;
+};
+
+TEST_F(RBACPermissionRemoveLinkedTest, RemoveLinkedPermission_RemovesFromSet)
+{
+    EXPECT_EQ(permission->GetLinkedPermissions().size(), 2u);
+    permission->RemoveLinkedPermission(TEST_PERM_2);
+    EXPECT_EQ(permission->GetLinkedPermissions().size(), 1u);
+    EXPECT_EQ(permission->GetLinkedPermissions().count(TEST_PERM_2), 0u);
+    EXPECT_EQ(permission->GetLinkedPermissions().count(TEST_PERM_3), 1u);
+}
+
+TEST_F(RBACPermissionRemoveLinkedTest, RemoveNonExistent_IsNoOp)
+{
+    permission->RemoveLinkedPermission(TEST_PERM_INVALID);
+    EXPECT_EQ(permission->GetLinkedPermissions().size(), 2u);
+}
+
+TEST_F(RBACPermissionRemoveLinkedTest, RemoveAll_LeavesEmpty)
+{
+    permission->RemoveLinkedPermission(TEST_PERM_2);
+    permission->RemoveLinkedPermission(TEST_PERM_3);
+    EXPECT_TRUE(permission->GetLinkedPermissions().empty());
+}
+
+// ---------------------------------------------------------------------------
+// Suite 2: RBACGetPermissionsTest (computed global perms)
+// ---------------------------------------------------------------------------
+class RBACGetPermissionsTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_A = 10;
+    static constexpr uint32 PERM_B = 11;
+    static constexpr uint32 PERM_C = 12;
+    static constexpr uint32 ROLE_R = 100;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_A, "Permission A");
+        sAccountMgr->AddPermissionForTest(PERM_B, "Permission B");
+        sAccountMgr->AddPermissionForTest(PERM_C, "Permission C");
+        sAccountMgr->AddPermissionForTest(ROLE_R, "Role R");
+
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_R, PERM_A);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_R, PERM_B);
+
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACGetPermissionsTest, Empty_WhenNothingGranted)
+{
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->GetPermissions().empty());
+}
+
+TEST_F(RBACGetPermissionsTest, MatchesHasPermission)
+{
+    rbacData->GrantPermission(PERM_A);
+    rbacData->GrantPermission(PERM_C);
+    rbacData->RecalculatePermissions();
+
+    auto const& perms = rbacData->GetPermissions();
+    for (uint32 p : perms)
+        EXPECT_TRUE(rbacData->HasPermission(p));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_B));
+}
+
+TEST_F(RBACGetPermissionsTest, ExcludesDeniedPermissions)
+{
+    rbacData->GrantPermission(PERM_A);
+    rbacData->GrantPermission(PERM_C);
+    rbacData->DenyPermission(PERM_B);
+    rbacData->RecalculatePermissions();
+
+    auto const& perms = rbacData->GetPermissions();
+    EXPECT_TRUE(perms.count(PERM_A) > 0);
+    EXPECT_TRUE(perms.count(PERM_C) > 0);
+    EXPECT_EQ(perms.count(PERM_B), 0u);
+}
+
+TEST_F(RBACGetPermissionsTest, IncludesExpandedLinkedPermissions)
+{
+    rbacData->GrantPermission(ROLE_R);
+    rbacData->RecalculatePermissions();
+
+    auto const& perms = rbacData->GetPermissions();
+    EXPECT_TRUE(perms.count(ROLE_R) > 0);
+    EXPECT_TRUE(perms.count(PERM_A) > 0);
+    EXPECT_TRUE(perms.count(PERM_B) > 0);
+    EXPECT_EQ(perms.count(PERM_C), 0u);
+}
+
+TEST_F(RBACGetPermissionsTest, ReflectsStateAfterRecalculate)
+{
+    rbacData->GrantPermission(PERM_A);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->GetPermissions().count(PERM_A) > 0);
+
+    rbacData->RevokePermission(PERM_A);
+    rbacData->RecalculatePermissions();
+    EXPECT_EQ(rbacData->GetPermissions().count(PERM_A), 0u);
+}
+
+// ---------------------------------------------------------------------------
+// Suite 3: RBACRevokeEdgeCasesTest
+// ---------------------------------------------------------------------------
+class RBACRevokeEdgeCasesTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Permission 1");
+        sAccountMgr->AddPermissionForTest(TEST_PERM_2, "Permission 2");
+        sAccountMgr->AddPermissionForTest(TEST_PERM_3, "Permission 3");
+
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACRevokeEdgeCasesTest, RevokeUnregistered_ReturnsCantRevoke)
+{
+    rbac::RBACCommandResult result = rbacData->RevokePermission(TEST_PERM_INVALID);
+    EXPECT_EQ(result, rbac::RBAC_CANT_REVOKE_NOT_IN_LIST);
+}
+
+TEST_F(RBACRevokeEdgeCasesTest, RevokeFromEmpty_ReturnsError)
+{
+    rbac::RBACCommandResult result = rbacData->RevokePermission(TEST_PERM_1);
+    EXPECT_EQ(result, rbac::RBAC_CANT_REVOKE_NOT_IN_LIST);
+}
+
+TEST_F(RBACRevokeEdgeCasesTest, RevokeGranted_ThenDeny)
+{
+    rbacData->GrantPermission(TEST_PERM_1);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(TEST_PERM_1));
+
+    rbacData->RevokePermission(TEST_PERM_1);
+    rbac::RBACCommandResult result = rbacData->DenyPermission(TEST_PERM_1);
+    EXPECT_EQ(result, rbac::RBAC_OK);
+    rbacData->RecalculatePermissions();
+    EXPECT_FALSE(rbacData->HasPermission(TEST_PERM_1));
+    EXPECT_TRUE(rbacData->GetDeniedPermissions().count(TEST_PERM_1) > 0);
+}
+
+TEST_F(RBACRevokeEdgeCasesTest, RevokeDenied_ThenGrant)
+{
+    rbacData->DenyPermission(TEST_PERM_1);
+    rbacData->RecalculatePermissions();
+    EXPECT_FALSE(rbacData->HasPermission(TEST_PERM_1));
+
+    rbacData->RevokePermission(TEST_PERM_1);
+    rbac::RBACCommandResult result = rbacData->GrantPermission(TEST_PERM_1);
+    EXPECT_EQ(result, rbac::RBAC_OK);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(TEST_PERM_1));
+}
+
+TEST_F(RBACRevokeEdgeCasesTest, RevokeDoesNotAffectOtherPermissions)
+{
+    rbacData->GrantPermission(TEST_PERM_1);
+    rbacData->GrantPermission(TEST_PERM_2);
+    rbacData->DenyPermission(TEST_PERM_3);
+
+    rbacData->RevokePermission(TEST_PERM_1);
+
+    EXPECT_TRUE(rbacData->GetGrantedPermissions().count(TEST_PERM_2) > 0);
+    EXPECT_TRUE(rbacData->GetDeniedPermissions().count(TEST_PERM_3) > 0);
+    EXPECT_EQ(rbacData->GetGrantedPermissions().count(TEST_PERM_1), 0u);
+}
+
+// ---------------------------------------------------------------------------
+// Suite 4: RBACComplexHierarchyTest
+// ---------------------------------------------------------------------------
+class RBACComplexHierarchyTest : public ::testing::Test
+{
+protected:
+    // 3-level: Admin(100)->GM(101)->Mod(102)->individual perms
+    static constexpr uint32 PERM_A = 10;
+    static constexpr uint32 PERM_B = 11;
+    static constexpr uint32 PERM_C = 12;
+    static constexpr uint32 PERM_D = 13;
+    static constexpr uint32 PERM_E = 14;
+    static constexpr uint32 PERM_F = 15;
+    static constexpr uint32 PERM_G = 16;
+    static constexpr uint32 PERM_H = 17;
+    static constexpr uint32 PERM_I = 18;
+    static constexpr uint32 PERM_J = 19;
+    static constexpr uint32 PERM_K = 20;
+    static constexpr uint32 PERM_L = 21;
+    static constexpr uint32 ROLE_MOD = 102;
+    static constexpr uint32 ROLE_GM = 101;
+    static constexpr uint32 ROLE_ADMIN = 100;
+    // Diamond: ROLE_X(103) and ROLE_Y(104) both link to PERM_SHARED(22)
+    static constexpr uint32 PERM_SHARED = 22;
+    static constexpr uint32 PERM_X_ONLY = 23;
+    static constexpr uint32 PERM_Y_ONLY = 24;
+    static constexpr uint32 ROLE_X = 103;
+    static constexpr uint32 ROLE_Y = 104;
+    // Wide role
+    static constexpr uint32 ROLE_WIDE = 105;
+
+    void SetUp() override
+    {
+        // Register individual perms
+        sAccountMgr->AddPermissionForTest(PERM_A, "A");
+        sAccountMgr->AddPermissionForTest(PERM_B, "B");
+        sAccountMgr->AddPermissionForTest(PERM_C, "C");
+        sAccountMgr->AddPermissionForTest(PERM_D, "D");
+        sAccountMgr->AddPermissionForTest(PERM_E, "E");
+        sAccountMgr->AddPermissionForTest(PERM_F, "F");
+        sAccountMgr->AddPermissionForTest(PERM_G, "G");
+        sAccountMgr->AddPermissionForTest(PERM_H, "H");
+        sAccountMgr->AddPermissionForTest(PERM_I, "I");
+        sAccountMgr->AddPermissionForTest(PERM_J, "J");
+        sAccountMgr->AddPermissionForTest(PERM_K, "K");
+        sAccountMgr->AddPermissionForTest(PERM_L, "L");
+        sAccountMgr->AddPermissionForTest(PERM_SHARED, "Shared");
+        sAccountMgr->AddPermissionForTest(PERM_X_ONLY, "X Only");
+        sAccountMgr->AddPermissionForTest(PERM_Y_ONLY, "Y Only");
+
+        // Register roles
+        sAccountMgr->AddPermissionForTest(ROLE_MOD, "Mod");
+        sAccountMgr->AddPermissionForTest(ROLE_GM, "GM");
+        sAccountMgr->AddPermissionForTest(ROLE_ADMIN, "Admin");
+        sAccountMgr->AddPermissionForTest(ROLE_X, "X");
+        sAccountMgr->AddPermissionForTest(ROLE_Y, "Y");
+        sAccountMgr->AddPermissionForTest(ROLE_WIDE, "Wide");
+
+        // 3-level hierarchy
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, PERM_A);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, PERM_B);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, ROLE_MOD);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, PERM_C);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, ROLE_GM);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, PERM_D);
+
+        // Diamond inheritance
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_X, PERM_SHARED);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_X, PERM_X_ONLY);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_Y, PERM_SHARED);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_Y, PERM_Y_ONLY);
+
+        // Wide role (10+ linked perms)
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_A);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_B);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_C);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_D);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_E);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_F);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_G);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_H);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_I);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_J);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_K);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WIDE, PERM_L);
+
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACComplexHierarchyTest, ThreeLevelDeep)
+{
+    rbacData->GrantPermission(ROLE_ADMIN);
+    rbacData->RecalculatePermissions();
+
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_ADMIN));
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_GM));
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_MOD));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_A));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_B));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_C));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_D));
+}
+
+TEST_F(RBACComplexHierarchyTest, DiamondInheritance)
+{
+    rbacData->GrantPermission(ROLE_X);
+    rbacData->GrantPermission(ROLE_Y);
+    rbacData->RecalculatePermissions();
+
+    EXPECT_TRUE(rbacData->HasPermission(PERM_SHARED));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_X_ONLY));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_Y_ONLY));
+}
+
+TEST_F(RBACComplexHierarchyTest, WideRole)
+{
+    rbacData->GrantPermission(ROLE_WIDE);
+    rbacData->RecalculatePermissions();
+
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_WIDE));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_A));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_L));
+    EXPECT_EQ(rbacData->GetPermissions().size(), 13u); // ROLE_WIDE + 12 perms
+}
+
+TEST_F(RBACComplexHierarchyTest, TwoOverlappingRoles_NoDuplicateInGetPermissions)
+{
+    // Both ROLE_X and ROLE_Y link to PERM_SHARED
+    rbacData->GrantPermission(ROLE_X);
+    rbacData->GrantPermission(ROLE_Y);
+    rbacData->RecalculatePermissions();
+
+    auto const& perms = rbacData->GetPermissions();
+    // ROLE_X, ROLE_Y, PERM_SHARED, PERM_X_ONLY, PERM_Y_ONLY = 5
+    EXPECT_EQ(perms.size(), 5u);
+    EXPECT_EQ(perms.count(PERM_SHARED), 1u);
+}
+
+TEST_F(RBACComplexHierarchyTest, RevokeOneOverlappingRole_KeepsSharedFromOther)
+{
+    rbacData->GrantPermission(ROLE_X);
+    rbacData->GrantPermission(ROLE_Y);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(PERM_SHARED));
+
+    rbacData->RevokePermission(ROLE_X);
+    rbacData->RecalculatePermissions();
+
+    // PERM_SHARED still accessible through ROLE_Y
+    EXPECT_TRUE(rbacData->HasPermission(PERM_SHARED));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_Y_ONLY));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_X_ONLY));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 5: RBACDenySpecificFromRoleTest
+// ---------------------------------------------------------------------------
+class RBACDenySpecificFromRoleTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_KICK = 10;
+    static constexpr uint32 PERM_BAN = 11;
+    static constexpr uint32 PERM_MUTE = 12;
+    static constexpr uint32 PERM_SHUTDOWN = 13;
+    static constexpr uint32 ROLE_MOD = 100;
+    static constexpr uint32 ROLE_ADMIN = 101;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_KICK, "Kick");
+        sAccountMgr->AddPermissionForTest(PERM_BAN, "Ban");
+        sAccountMgr->AddPermissionForTest(PERM_MUTE, "Mute");
+        sAccountMgr->AddPermissionForTest(PERM_SHUTDOWN, "Shutdown");
+        sAccountMgr->AddPermissionForTest(ROLE_MOD, "Moderator");
+        sAccountMgr->AddPermissionForTest(ROLE_ADMIN, "Admin");
+
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, PERM_KICK);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, PERM_BAN);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, PERM_MUTE);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, PERM_SHUTDOWN);
+
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACDenySpecificFromRoleTest, DenyOneChild_SiblingsStillGranted)
+{
+    rbacData->GrantPermission(ROLE_MOD);
+    rbacData->DenyPermission(PERM_BAN);
+    rbacData->RecalculatePermissions();
+
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_MOD));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_MUTE));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_BAN));
+}
+
+TEST_F(RBACDenySpecificFromRoleTest, DenyPermNotInRole_RolePermsUnaffected)
+{
+    rbacData->GrantPermission(ROLE_MOD);
+    rbacData->DenyPermission(PERM_SHUTDOWN);
+    rbacData->RecalculatePermissions();
+
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_MOD));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_BAN));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_MUTE));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_SHUTDOWN));
+}
+
+TEST_F(RBACDenySpecificFromRoleTest, GrantTwoRoles_DenyOneRole)
+{
+    rbacData->GrantPermission(ROLE_MOD);
+    rbacData->GrantPermission(ROLE_ADMIN);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(PERM_SHUTDOWN));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+
+    // Revoke and deny ROLE_ADMIN
+    rbacData->RevokePermission(ROLE_ADMIN);
+    rbacData->DenyPermission(ROLE_ADMIN);
+    rbacData->RecalculatePermissions();
+
+    // ROLE_ADMIN and its unique perm (SHUTDOWN) denied
+    EXPECT_FALSE(rbacData->HasPermission(ROLE_ADMIN));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_SHUTDOWN));
+
+    // ROLE_MOD perms remain
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_MOD));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_KICK));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_BAN));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_MUTE));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 6: RBACDefaultPermissionsWithRolesTest
+// ---------------------------------------------------------------------------
+class RBACDefaultPermissionsWithRolesTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_A = 10;
+    static constexpr uint32 PERM_B = 11;
+    static constexpr uint32 PERM_C = 12;
+    static constexpr uint32 PERM_MOD_1 = 13;
+    static constexpr uint32 ROLE_PLAYER = 100;
+
+    static constexpr uint8 SEC_PLAYER = 0;
+    static constexpr uint8 SEC_MODERATOR = 1;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_A, "A");
+        sAccountMgr->AddPermissionForTest(PERM_B, "B");
+        sAccountMgr->AddPermissionForTest(PERM_C, "C");
+        sAccountMgr->AddPermissionForTest(PERM_MOD_1, "Mod 1");
+        sAccountMgr->AddPermissionForTest(ROLE_PLAYER, "Player Role");
+
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_A);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_B);
+
+        // Default: Player gets ROLE_PLAYER, Moderator gets PERM_MOD_1
+        sAccountMgr->AddDefaultPermissionForTest(SEC_PLAYER, ROLE_PLAYER);
+        sAccountMgr->AddDefaultPermissionForTest(SEC_MODERATOR, PERM_MOD_1);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACDefaultPermissionsWithRolesTest, DefaultRoleExpandsLinked)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+
+    // Simulate LoadFromDBCallback: grant defaults then recalculate
+    rbac::RBACPermissionContainer const& defaults = sAccountMgr->GetRBACDefaultPermissions(SEC_PLAYER);
+    for (uint32 perm : defaults)
+        data.GrantPermission(perm);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_TRUE(data.HasPermission(PERM_B));
+}
+
+TEST_F(RBACDefaultPermissionsWithRolesTest, DefaultRole_DenyLinkedChild)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+
+    rbac::RBACPermissionContainer const& defaults = sAccountMgr->GetRBACDefaultPermissions(SEC_PLAYER);
+    for (uint32 perm : defaults)
+        data.GrantPermission(perm);
+
+    data.DenyPermission(PERM_B);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_FALSE(data.HasPermission(PERM_B));
+}
+
+TEST_F(RBACDefaultPermissionsWithRolesTest, SecLevels_NoCrossContamination)
+{
+    rbac::RBACData playerData(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+    rbac::RBACData modData(2, "Mod", TEST_REALM_ID, SEC_MODERATOR);
+
+    // Grant defaults for each
+    for (uint32 p : sAccountMgr->GetRBACDefaultPermissions(SEC_PLAYER))
+        playerData.GrantPermission(p);
+    playerData.RecalculatePermissions();
+
+    for (uint32 p : sAccountMgr->GetRBACDefaultPermissions(SEC_MODERATOR))
+        modData.GrantPermission(p);
+    modData.RecalculatePermissions();
+
+    // Player has player perms, not mod perms
+    EXPECT_TRUE(playerData.HasPermission(PERM_A));
+    EXPECT_FALSE(playerData.HasPermission(PERM_MOD_1));
+
+    // Mod has mod perms, not player perms (unless explicitly granted)
+    EXPECT_TRUE(modData.HasPermission(PERM_MOD_1));
+    EXPECT_FALSE(modData.HasPermission(PERM_A));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 7: RBACPermissionEnumConsistencyTest
+// ---------------------------------------------------------------------------
+class RBACPermissionEnumConsistencyTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(500, "Perm 500");
+        sAccountMgr->AddPermissionForTest(700, "Perm 700");
+        sAccountMgr->AddPermissionForTest(900, "Perm 900");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACPermissionEnumConsistencyTest, MaxGreaterThanHighestDefined)
+{
+    EXPECT_GT(static_cast<uint32>(rbac::RBAC_PERM_MAX), 911u);
+}
+
+TEST_F(RBACPermissionEnumConsistencyTest, RoleIdsWithinRange)
+{
+    EXPECT_LT(static_cast<uint32>(rbac::RBAC_ROLE_ADMINISTRATOR), static_cast<uint32>(rbac::RBAC_PERM_MAX));
+    EXPECT_LT(static_cast<uint32>(rbac::RBAC_ROLE_GAMEMASTER), static_cast<uint32>(rbac::RBAC_PERM_MAX));
+    EXPECT_LT(static_cast<uint32>(rbac::RBAC_ROLE_MODERATOR), static_cast<uint32>(rbac::RBAC_PERM_MAX));
+    EXPECT_LT(static_cast<uint32>(rbac::RBAC_ROLE_PLAYER), static_cast<uint32>(rbac::RBAC_PERM_MAX));
+}
+
+TEST_F(RBACPermissionEnumConsistencyTest, NonContiguousIds_Work)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+
+    data.GrantPermission(500);
+    data.GrantPermission(900);
+    data.DenyPermission(700);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(500));
+    EXPECT_TRUE(data.HasPermission(900));
+    EXPECT_FALSE(data.HasPermission(700));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 8: RBACEmptyAndBoundaryTest
+// ---------------------------------------------------------------------------
+class RBACEmptyAndBoundaryTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Permission 1");
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACEmptyAndBoundaryTest, FreshData_AllEmpty)
+{
+    EXPECT_TRUE(rbacData->GetGrantedPermissions().empty());
+    EXPECT_TRUE(rbacData->GetDeniedPermissions().empty());
+    EXPECT_TRUE(rbacData->GetPermissions().empty());
+}
+
+TEST_F(RBACEmptyAndBoundaryTest, HasPermission_Zero_ReturnsFalse)
+{
+    EXPECT_FALSE(rbacData->HasPermission(0));
+}
+
+TEST_F(RBACEmptyAndBoundaryTest, HasPermission_Max_ReturnsFalse)
+{
+    EXPECT_FALSE(rbacData->HasPermission(rbac::RBAC_PERM_MAX));
+}
+
+TEST_F(RBACEmptyAndBoundaryTest, GrantDenyRevokeSequence)
+{
+    rbac::RBACCommandResult r1 = rbacData->GrantPermission(TEST_PERM_1);
+    EXPECT_EQ(r1, rbac::RBAC_OK);
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(TEST_PERM_1));
+
+    rbac::RBACCommandResult r2 = rbacData->RevokePermission(TEST_PERM_1);
+    EXPECT_EQ(r2, rbac::RBAC_OK);
+
+    rbac::RBACCommandResult r3 = rbacData->DenyPermission(TEST_PERM_1);
+    EXPECT_EQ(r3, rbac::RBAC_OK);
+    rbacData->RecalculatePermissions();
+    EXPECT_FALSE(rbacData->HasPermission(TEST_PERM_1));
+
+    rbac::RBACCommandResult r4 = rbacData->RevokePermission(TEST_PERM_1);
+    EXPECT_EQ(r4, rbac::RBAC_OK);
+    rbacData->RecalculatePermissions();
+    EXPECT_FALSE(rbacData->HasPermission(TEST_PERM_1));
+}
+
+TEST_F(RBACEmptyAndBoundaryTest, MultipleRecalculates_Idempotent)
+{
+    rbacData->GrantPermission(TEST_PERM_1);
+    rbacData->RecalculatePermissions();
+    auto perms1 = rbacData->GetPermissions();
+
+    rbacData->RecalculatePermissions();
+    auto perms2 = rbacData->GetPermissions();
+
+    rbacData->RecalculatePermissions();
+    auto perms3 = rbacData->GetPermissions();
+
+    EXPECT_EQ(perms1, perms2);
+    EXPECT_EQ(perms2, perms3);
+}
+
+TEST_F(RBACEmptyAndBoundaryTest, RecalculateOnEmpty_Safe)
+{
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->GetPermissions().empty());
+
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->GetPermissions().empty());
+}
+
+// ---------------------------------------------------------------------------
+// Suite 9: RBACCircularLinkProtectionTest
+// ---------------------------------------------------------------------------
+class RBACCircularLinkProtectionTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_A = 10;
+    static constexpr uint32 PERM_B = 11;
+    static constexpr uint32 PERM_C = 12;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_A, "A");
+        sAccountMgr->AddPermissionForTest(PERM_B, "B");
+        sAccountMgr->AddPermissionForTest(PERM_C, "C");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACCircularLinkProtectionTest, MutualLink_BothGranted)
+{
+    sAccountMgr->AddLinkedPermissionForTest(PERM_A, PERM_B);
+    sAccountMgr->AddLinkedPermissionForTest(PERM_B, PERM_A);
+
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+    data.GrantPermission(PERM_A);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_TRUE(data.HasPermission(PERM_B));
+}
+
+TEST_F(RBACCircularLinkProtectionTest, SelfReferencing_Terminates)
+{
+    sAccountMgr->AddLinkedPermissionForTest(PERM_A, PERM_A);
+
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+    data.GrantPermission(PERM_A);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_EQ(data.GetPermissions().size(), 1u);
+}
+
+TEST_F(RBACCircularLinkProtectionTest, CircularChainOf3_AllGranted)
+{
+    sAccountMgr->AddLinkedPermissionForTest(PERM_A, PERM_B);
+    sAccountMgr->AddLinkedPermissionForTest(PERM_B, PERM_C);
+    sAccountMgr->AddLinkedPermissionForTest(PERM_C, PERM_A);
+
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+    data.GrantPermission(PERM_A);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_TRUE(data.HasPermission(PERM_B));
+    EXPECT_TRUE(data.HasPermission(PERM_C));
+    EXPECT_EQ(data.GetPermissions().size(), 3u);
+}
+
+// ---------------------------------------------------------------------------
+// Suite 10: RBACFullRoleHierarchyTest (mirrors actual 192-199 structure)
+// ---------------------------------------------------------------------------
+class RBACFullRoleHierarchyTest : public ::testing::Test
+{
+protected:
+    // Roles
+    static constexpr uint32 ROLE_PLAYER = 199;
+    static constexpr uint32 ROLE_MOD = 198;
+    static constexpr uint32 ROLE_GM = 197;
+    static constexpr uint32 ROLE_ADMIN = 196;
+
+    // Individual perms
+    static constexpr uint32 PERM_PLAYER_1 = 10;
+    static constexpr uint32 PERM_PLAYER_2 = 11;
+    static constexpr uint32 PERM_MOD_1 = 20;
+    static constexpr uint32 PERM_MOD_2 = 21;
+    static constexpr uint32 PERM_GM_1 = 30;
+    static constexpr uint32 PERM_GM_2 = 31;
+    static constexpr uint32 PERM_ADMIN_1 = 40;
+    static constexpr uint32 PERM_ADMIN_2 = 41;
+
+    void SetUp() override
+    {
+        // Register individual perms
+        sAccountMgr->AddPermissionForTest(PERM_PLAYER_1, "Player 1");
+        sAccountMgr->AddPermissionForTest(PERM_PLAYER_2, "Player 2");
+        sAccountMgr->AddPermissionForTest(PERM_MOD_1, "Mod 1");
+        sAccountMgr->AddPermissionForTest(PERM_MOD_2, "Mod 2");
+        sAccountMgr->AddPermissionForTest(PERM_GM_1, "GM 1");
+        sAccountMgr->AddPermissionForTest(PERM_GM_2, "GM 2");
+        sAccountMgr->AddPermissionForTest(PERM_ADMIN_1, "Admin 1");
+        sAccountMgr->AddPermissionForTest(PERM_ADMIN_2, "Admin 2");
+
+        // Register roles
+        sAccountMgr->AddPermissionForTest(ROLE_PLAYER, "Player Role");
+        sAccountMgr->AddPermissionForTest(ROLE_MOD, "Moderator Role");
+        sAccountMgr->AddPermissionForTest(ROLE_GM, "GameMaster Role");
+        sAccountMgr->AddPermissionForTest(ROLE_ADMIN, "Administrator Role");
+
+        // Player(199) -> basic perms
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_PLAYER_1);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_PLAYER_2);
+
+        // Mod(198) -> Player + mod perms
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, ROLE_PLAYER);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, PERM_MOD_1);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_MOD, PERM_MOD_2);
+
+        // GM(197) -> Mod + gm perms
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, ROLE_MOD);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, PERM_GM_1);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_GM, PERM_GM_2);
+
+        // Admin(196) -> GM + admin perms
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, ROLE_GM);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, PERM_ADMIN_1);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_ADMIN, PERM_ADMIN_2);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACFullRoleHierarchyTest, GrantPlayerRole_OnlyPlayerPerms)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, 0);
+    data.GrantPermission(ROLE_PLAYER);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_PLAYER_1));
+    EXPECT_TRUE(data.HasPermission(PERM_PLAYER_2));
+
+    EXPECT_FALSE(data.HasPermission(PERM_MOD_1));
+    EXPECT_FALSE(data.HasPermission(PERM_GM_1));
+    EXPECT_FALSE(data.HasPermission(PERM_ADMIN_1));
+    // 3 total: ROLE_PLAYER + 2 player perms
+    EXPECT_EQ(data.GetPermissions().size(), 3u);
+}
+
+TEST_F(RBACFullRoleHierarchyTest, GrantGMRole_FullChain)
+{
+    rbac::RBACData data(1, "GM", TEST_REALM_ID, 0);
+    data.GrantPermission(ROLE_GM);
+    data.RecalculatePermissions();
+
+    // GM + Mod + Player perms
+    EXPECT_TRUE(data.HasPermission(ROLE_GM));
+    EXPECT_TRUE(data.HasPermission(ROLE_MOD));
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_PLAYER_1));
+    EXPECT_TRUE(data.HasPermission(PERM_PLAYER_2));
+    EXPECT_TRUE(data.HasPermission(PERM_MOD_1));
+    EXPECT_TRUE(data.HasPermission(PERM_MOD_2));
+    EXPECT_TRUE(data.HasPermission(PERM_GM_1));
+    EXPECT_TRUE(data.HasPermission(PERM_GM_2));
+
+    EXPECT_FALSE(data.HasPermission(PERM_ADMIN_1));
+    EXPECT_FALSE(data.HasPermission(PERM_ADMIN_2));
+    // 9 total: 3 roles + 6 perms
+    EXPECT_EQ(data.GetPermissions().size(), 9u);
+}
+
+TEST_F(RBACFullRoleHierarchyTest, GrantAdminRole_AllPerms)
+{
+    rbac::RBACData data(1, "Admin", TEST_REALM_ID, 0);
+    data.GrantPermission(ROLE_ADMIN);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(ROLE_ADMIN));
+    EXPECT_TRUE(data.HasPermission(ROLE_GM));
+    EXPECT_TRUE(data.HasPermission(ROLE_MOD));
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_PLAYER_1));
+    EXPECT_TRUE(data.HasPermission(PERM_PLAYER_2));
+    EXPECT_TRUE(data.HasPermission(PERM_MOD_1));
+    EXPECT_TRUE(data.HasPermission(PERM_MOD_2));
+    EXPECT_TRUE(data.HasPermission(PERM_GM_1));
+    EXPECT_TRUE(data.HasPermission(PERM_GM_2));
+    EXPECT_TRUE(data.HasPermission(PERM_ADMIN_1));
+    EXPECT_TRUE(data.HasPermission(PERM_ADMIN_2));
+    // 12 total: 4 roles + 8 perms
+    EXPECT_EQ(data.GetPermissions().size(), 12u);
+}
+
+TEST_F(RBACFullRoleHierarchyTest, GrantAdmin_DenyModRole_ModAndPlayerDenied)
+{
+    rbac::RBACData data(1, "Admin", TEST_REALM_ID, 0);
+    data.GrantPermission(ROLE_ADMIN);
+    data.DenyPermission(ROLE_MOD);
+    data.RecalculatePermissions();
+
+    // Admin + GM perms remain
+    EXPECT_TRUE(data.HasPermission(ROLE_ADMIN));
+    EXPECT_TRUE(data.HasPermission(ROLE_GM));
+    EXPECT_TRUE(data.HasPermission(PERM_GM_1));
+    EXPECT_TRUE(data.HasPermission(PERM_GM_2));
+    EXPECT_TRUE(data.HasPermission(PERM_ADMIN_1));
+    EXPECT_TRUE(data.HasPermission(PERM_ADMIN_2));
+
+    // Mod role and its full chain denied (Mod + Player perms)
+    EXPECT_FALSE(data.HasPermission(ROLE_MOD));
+    EXPECT_FALSE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_FALSE(data.HasPermission(PERM_MOD_1));
+    EXPECT_FALSE(data.HasPermission(PERM_MOD_2));
+    EXPECT_FALSE(data.HasPermission(PERM_PLAYER_1));
+    EXPECT_FALSE(data.HasPermission(PERM_PLAYER_2));
+}
+
+TEST_F(RBACFullRoleHierarchyTest, GrantAdmin_DenyOneCommandPerm)
+{
+    rbac::RBACData data(1, "Admin", TEST_REALM_ID, 0);
+    data.GrantPermission(ROLE_ADMIN);
+    data.DenyPermission(PERM_GM_1);
+    data.RecalculatePermissions();
+
+    // Only PERM_GM_1 is denied
+    EXPECT_FALSE(data.HasPermission(PERM_GM_1));
+
+    // Everything else still works
+    EXPECT_TRUE(data.HasPermission(ROLE_ADMIN));
+    EXPECT_TRUE(data.HasPermission(ROLE_GM));
+    EXPECT_TRUE(data.HasPermission(ROLE_MOD));
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_GM_2));
+    EXPECT_TRUE(data.HasPermission(PERM_ADMIN_1));
+    EXPECT_TRUE(data.HasPermission(PERM_ADMIN_2));
+    EXPECT_TRUE(data.HasPermission(PERM_MOD_1));
+    EXPECT_TRUE(data.HasPermission(PERM_PLAYER_1));
+    // 11 total: 12 - 1 denied
+    EXPECT_EQ(data.GetPermissions().size(), 11u);
+}
+
 }  // namespace
