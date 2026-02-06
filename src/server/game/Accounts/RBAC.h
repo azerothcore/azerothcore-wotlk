@@ -191,6 +191,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_CHEAT_TAXI                             = 298,
     RBAC_PERM_COMMAND_CHEAT_WATERWALK                        = 299,
     RBAC_PERM_COMMAND_DEBUG                                  = 300,
+    // 301-342 previously used, do not reuse
     RBAC_PERM_COMMAND_DESERTER_BG_ADD                        = 343,
     RBAC_PERM_COMMAND_DESERTER_BG_REMOVE                     = 344,
     RBAC_PERM_COMMAND_DESERTER_INSTANCE_ADD                  = 346,

@@ -287,6 +287,25 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     player->SendMailResult(0, MAIL_SEND, MAIL_OK);
 
+    if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        if (items_count > 0)
+        {
+            for (uint8 i = 0; i < items_count; ++i)
+            {
+                Item* item = items[i];
+                LOG_GM(GetAccountId(), "GM {} (Account: {}) sent mail to {} (Account: {}) with item: {} (Entry: {} Count: {})",
+                    player->GetName(), GetAccountId(), receiver, rc_account,
+                    item->GetTemplate()->Name1, item->GetEntry(), item->GetCount());
+            }
+        }
+        if (money > 0)
+        {
+            LOG_GM(GetAccountId(), "GM {} (Account: {}) sent mail to {} (Account: {}) with money: {}",
+                player->GetName(), GetAccountId(), receiver, rc_account, money);
+        }
+    }
+
     player->ModifyMoney(-int32(reqmoney));
     player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL, cost);
 
@@ -578,6 +597,12 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if neccessary
         player->MoveItemToInventory(dest, it, true);
 
+        if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+        {
+            LOG_GM(GetAccountId(), "GM {} (Account: {}) took mail item: {} (Entry: {} Count: {}) from mailbox",
+                player->GetName(), GetAccountId(), it->GetTemplate()->Name1, it->GetEntry(), count);
+        }
+
         player->SaveInventoryAndGoldToDB(trans);
         player->_SaveMail(trans);
         CharacterDatabase.CommitTransaction(trans);
@@ -611,6 +636,12 @@ void WorldSession::HandleMailTakeMoney(WorldPacket& recvData)
     {
         player->SendMailResult(mailId, MAIL_MONEY_TAKEN, MAIL_ERR_EQUIP_ERROR, EQUIP_ERR_TOO_MUCH_GOLD);
         return;
+    }
+
+    if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(GetAccountId(), "GM {} (Account: {}) took mail money: {} from mailbox",
+            player->GetName(), GetAccountId(), m->money);
     }
 
     m->money = 0;

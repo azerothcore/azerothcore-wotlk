@@ -361,8 +361,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     uint8 res = ObjectMgr::CheckPlayerName(createInfo->Name, true);
     if (res != CHAR_NAME_SUCCESS)
     {
-        SendCharCreate(ResponseCodes(res));
-        return;
+        if (res != CHAR_NAME_RESERVED || !HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
+        {
+            SendCharCreate(ResponseCodes(res));
+            return;
+        }
     }
 
     // speedup check for heroic class disabled case

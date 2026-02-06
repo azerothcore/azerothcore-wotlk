@@ -23,6 +23,7 @@
 #include "Map.h"
 #include "MotionMaster.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -204,8 +205,13 @@ public:
             return 0;
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
+            if (player && player->GetSession() && player->GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_INSTANCE_REQUIRED_BOSSES))
+            {
+                return true;
+            }
+
             switch (bossId)
             {
                 case DATA_BROODLORD_LASHLAYER:
