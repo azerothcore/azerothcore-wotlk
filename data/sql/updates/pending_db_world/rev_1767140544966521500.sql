@@ -334,7 +334,7 @@ DELETE FROM `reference_loot_template` WHERE (`Entry` = 34047) AND (`Item` IN (29
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (34047, 29753, 0, 0, 0, 1, 1, 1, 1, 'Chestguard of the Fallen Defender'),
 (34047, 29754, 0, 0, 0, 1, 1, 1, 1, 'Chestguard of the Fallen Champion'),
-(34047, 29755, 0, 0, 0, 1, 1, 1, 1, ' Chestguard of the Fallen Hero');
+(34047, 29755, 0, 0, 0, 1, 1, 1, 1, 'Chestguard of the Fallen Hero');
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 17257) AND (`Item` IN (34039, 90039, 34047));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
