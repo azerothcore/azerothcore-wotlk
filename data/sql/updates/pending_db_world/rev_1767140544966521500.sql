@@ -432,7 +432,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (19622, 34104, 34104, 100, 0, 1, 0, 3, 3, 'Kael\'thas Sunstrider - (ReferenceTable)');
 
 -- Skyriss
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 20912) AND (`Item` IN (25004, 25004, 43000));
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 20912) AND (`Item` IN (25004, 43000));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (20912, 25004, 25004, 100, 0, 1, 0, 1, 1, 'Harbinger Skyriss - (ReferenceTable)'),
 (20912, 43000, 43000, 10, 0, 1, 0, 1, 1, 'Harbinger Skyriss - (ReferenceTable)');
