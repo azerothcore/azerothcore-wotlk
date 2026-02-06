@@ -1,3 +1,4 @@
+-- DB update 2026_02_04_03 -> 2026_02_06_00
 --
 UPDATE `creature_template` SET `gossip_menu_id` = 8760 WHERE (`entry` = 18752);
 UPDATE `creature_template` SET `gossip_menu_id` = 8760 WHERE (`entry` = 18753);
