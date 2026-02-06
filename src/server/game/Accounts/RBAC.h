@@ -100,6 +100,8 @@ enum RBACPermissions
     RBAC_PERM_EMAIL_CONFIRM_FOR_PASS_CHANGE                  = 49,
     RBAC_PERM_MAY_CHECK_OWN_EMAIL                            = 50,
     RBAC_PERM_ALLOW_TWO_SIDE_TRADE                           = 51,
+    RBAC_PERM_NO_BATTLEGROUND_DESERTER_DEBUFF                = 52,
+    RBAC_PERM_CAN_AFK_ON_BATTLEGROUND                        = 53,
 
     // Roles (Permissions with delegated permissions) use 199 and descending
     RBAC_ROLE_ADMINISTRATOR                                  = 196,

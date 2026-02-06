@@ -366,14 +366,25 @@ void AccountMgr::UpdateAccountAccess(rbac::RBACData* rbac, uint32 accountId, uin
 
     LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
-    stmt->SetData(0, accountId);
-    stmt->SetData(1, realmId);
-    trans->Append(stmt);
+    // Delete old security level from DB
+    if (realmId == -1)
+    {
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS);
+        stmt->SetData(0, accountId);
+        trans->Append(stmt);
+    }
+    else
+    {
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_ACCOUNT_ACCESS_BY_REALM);
+        stmt->SetData(0, accountId);
+        stmt->SetData(1, realmId);
+        trans->Append(stmt);
+    }
 
+    // Add new security level
     if (securityLevel)
     {
-        stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_ACCESS);
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_ACCESS);
         stmt->SetData(0, accountId);
         stmt->SetData(1, securityLevel);
         stmt->SetData(2, realmId);
