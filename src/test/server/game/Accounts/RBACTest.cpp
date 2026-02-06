@@ -1651,4 +1651,408 @@ TEST_F(RBACFullRoleHierarchyTest, GrantAdmin_DenyOneCommandPerm)
     EXPECT_EQ(data.GetPermissions().size(), 11u);
 }
 
+// ---------------------------------------------------------------------------
+// Suite 11: RBACPermissionDefaultConstructorTest
+// ---------------------------------------------------------------------------
+class RBACPermissionDefaultConstructorTest : public ::testing::Test
+{
+};
+
+TEST_F(RBACPermissionDefaultConstructorTest, DefaultConstructor_ZeroIdEmptyName)
+{
+    rbac::RBACPermission perm;
+    EXPECT_EQ(perm.GetId(), 0u);
+    EXPECT_EQ(perm.GetName(), "");
+    EXPECT_TRUE(perm.GetLinkedPermissions().empty());
+}
+
+TEST_F(RBACPermissionDefaultConstructorTest, ConstructorWithIdOnly)
+{
+    rbac::RBACPermission perm(42);
+    EXPECT_EQ(perm.GetId(), 42u);
+    EXPECT_EQ(perm.GetName(), "");
+    EXPECT_TRUE(perm.GetLinkedPermissions().empty());
+}
+
+// ---------------------------------------------------------------------------
+// Suite 12: RBACAccountMgrPermissionLookupTest
+// ---------------------------------------------------------------------------
+class RBACAccountMgrPermissionLookupTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Permission One");
+        sAccountMgr->AddPermissionForTest(TEST_PERM_2, "Permission Two");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACAccountMgrPermissionLookupTest, GetRBACPermission_ValidId_ReturnsPermission)
+{
+    rbac::RBACPermission const* perm = sAccountMgr->GetRBACPermission(TEST_PERM_1);
+    ASSERT_NE(perm, nullptr);
+    EXPECT_EQ(perm->GetId(), TEST_PERM_1);
+    EXPECT_EQ(perm->GetName(), "Permission One");
+}
+
+TEST_F(RBACAccountMgrPermissionLookupTest, GetRBACPermission_InvalidId_ReturnsNull)
+{
+    rbac::RBACPermission const* perm = sAccountMgr->GetRBACPermission(TEST_PERM_INVALID);
+    EXPECT_EQ(perm, nullptr);
+}
+
+TEST_F(RBACAccountMgrPermissionLookupTest, GetRBACPermissionList_ContainsRegistered)
+{
+    rbac::RBACPermissionsContainer const& list = sAccountMgr->GetRBACPermissionList();
+    EXPECT_TRUE(list.find(TEST_PERM_1) != list.end());
+    EXPECT_TRUE(list.find(TEST_PERM_2) != list.end());
+    EXPECT_TRUE(list.find(TEST_PERM_INVALID) == list.end());
+}
+
+TEST_F(RBACAccountMgrPermissionLookupTest, GetRBACPermissionList_SizeMatchesRegistered)
+{
+    rbac::RBACPermissionsContainer const& list = sAccountMgr->GetRBACPermissionList();
+    EXPECT_EQ(list.size(), 2u);
+}
+
+// ---------------------------------------------------------------------------
+// Suite 13: RBACAccountMgrTestHelperEdgeCasesTest
+// ---------------------------------------------------------------------------
+class RBACAccountMgrTestHelperEdgeCasesTest : public ::testing::Test
+{
+protected:
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACAccountMgrTestHelperEdgeCasesTest, AddPermissionForTest_DuplicateIsNoOp)
+{
+    sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Original Name");
+    sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Different Name");
+
+    rbac::RBACPermission const* perm = sAccountMgr->GetRBACPermission(TEST_PERM_1);
+    ASSERT_NE(perm, nullptr);
+    EXPECT_EQ(perm->GetName(), "Original Name");
+}
+
+TEST_F(RBACAccountMgrTestHelperEdgeCasesTest, AddLinkedPermission_UnregisteredParent_NoOp)
+{
+    // Link to non-existent parent: should silently do nothing
+    sAccountMgr->AddLinkedPermissionForTest(TEST_PERM_INVALID, TEST_PERM_1);
+    EXPECT_EQ(sAccountMgr->GetRBACPermission(TEST_PERM_INVALID), nullptr);
+}
+
+TEST_F(RBACAccountMgrTestHelperEdgeCasesTest, ClearPermissions_RemovesEverything)
+{
+    sAccountMgr->AddPermissionForTest(TEST_PERM_1, "One");
+    sAccountMgr->AddPermissionForTest(TEST_PERM_2, "Two");
+    sAccountMgr->AddDefaultPermissionForTest(0, TEST_PERM_1);
+
+    sAccountMgr->ClearPermissionsForTest();
+
+    EXPECT_EQ(sAccountMgr->GetRBACPermission(TEST_PERM_1), nullptr);
+    EXPECT_EQ(sAccountMgr->GetRBACPermission(TEST_PERM_2), nullptr);
+    EXPECT_TRUE(sAccountMgr->GetRBACPermissionList().empty());
+    EXPECT_TRUE(sAccountMgr->GetRBACDefaultPermissions(0).empty());
+}
+
+// ---------------------------------------------------------------------------
+// Suite 14: RBACExpandPermissionsDanglingLinkTest
+// ---------------------------------------------------------------------------
+class RBACExpandPermissionsDanglingLinkTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_VALID = 10;
+    static constexpr uint32 PERM_DANGLING = 9999;
+    static constexpr uint32 ROLE_WITH_DANGLING = 100;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_VALID, "Valid");
+        sAccountMgr->AddPermissionForTest(ROLE_WITH_DANGLING, "Role With Dangling");
+
+        // Role links to valid perm AND an unregistered perm ID
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WITH_DANGLING, PERM_VALID);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_WITH_DANGLING, PERM_DANGLING);
+
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACExpandPermissionsDanglingLinkTest, DanglingLink_SkippedGracefully)
+{
+    rbacData->GrantPermission(ROLE_WITH_DANGLING);
+    rbacData->RecalculatePermissions();
+
+    // Valid perm expanded, dangling silently skipped
+    EXPECT_TRUE(rbacData->HasPermission(ROLE_WITH_DANGLING));
+    EXPECT_TRUE(rbacData->HasPermission(PERM_VALID));
+    EXPECT_FALSE(rbacData->HasPermission(PERM_DANGLING));
+    // Only 2: the role + the valid perm (dangling not included)
+    EXPECT_EQ(rbacData->GetPermissions().size(), 2u);
+}
+
+TEST_F(RBACExpandPermissionsDanglingLinkTest, DenyDanglingLink_SkippedGracefully)
+{
+    rbacData->GrantPermission(PERM_VALID);
+    // PERM_DANGLING can't be denied since it's not registered
+    rbac::RBACCommandResult result = rbacData->DenyPermission(PERM_DANGLING);
+    EXPECT_EQ(result, rbac::RBAC_ID_DOES_NOT_EXISTS);
+
+    rbacData->RecalculatePermissions();
+    EXPECT_TRUE(rbacData->HasPermission(PERM_VALID));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 15: RBACLoadFromDBCallbackSimulationTest
+// ---------------------------------------------------------------------------
+class RBACLoadFromDBCallbackSimulationTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_A = 10;
+    static constexpr uint32 PERM_B = 11;
+    static constexpr uint32 ROLE_PLAYER = 100;
+
+    static constexpr uint8 SEC_PLAYER = 0;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_A, "A");
+        sAccountMgr->AddPermissionForTest(PERM_B, "B");
+        sAccountMgr->AddPermissionForTest(ROLE_PLAYER, "Player Role");
+
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_A);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_B);
+
+        sAccountMgr->AddDefaultPermissionForTest(SEC_PLAYER, ROLE_PLAYER);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACLoadFromDBCallbackSimulationTest, NullResult_AppliesDefaultsAndRecalculates)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+
+    // Simulate LoadFromDBCallback with no DB rows (nullptr result)
+    data.LoadFromDBCallback(nullptr);
+
+    // Default permission (ROLE_PLAYER) should be granted and expanded
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_TRUE(data.HasPermission(PERM_B));
+    EXPECT_EQ(data.GetPermissions().size(), 3u);
+}
+
+TEST_F(RBACLoadFromDBCallbackSimulationTest, NullResult_NoDefaultsForHighSecLevel)
+{
+    // Sec level 3 has no defaults configured
+    rbac::RBACData data(1, "Admin", TEST_REALM_ID, 3);
+    data.LoadFromDBCallback(nullptr);
+
+    EXPECT_TRUE(data.GetPermissions().empty());
+}
+
+// ---------------------------------------------------------------------------
+// Suite 16: RBACDoubleRevokeTest
+// ---------------------------------------------------------------------------
+class RBACDoubleRevokeTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Permission 1");
+        rbacData = std::make_unique<rbac::RBACData>(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+
+    std::unique_ptr<rbac::RBACData> rbacData;
+};
+
+TEST_F(RBACDoubleRevokeTest, RevokeGrantedTwice_SecondFails)
+{
+    rbacData->GrantPermission(TEST_PERM_1);
+    EXPECT_EQ(rbacData->RevokePermission(TEST_PERM_1), rbac::RBAC_OK);
+    EXPECT_EQ(rbacData->RevokePermission(TEST_PERM_1), rbac::RBAC_CANT_REVOKE_NOT_IN_LIST);
+}
+
+TEST_F(RBACDoubleRevokeTest, RevokeDeniedTwice_SecondFails)
+{
+    rbacData->DenyPermission(TEST_PERM_1);
+    EXPECT_EQ(rbacData->RevokePermission(TEST_PERM_1), rbac::RBAC_OK);
+    EXPECT_EQ(rbacData->RevokePermission(TEST_PERM_1), rbac::RBAC_CANT_REVOKE_NOT_IN_LIST);
+}
+
+// ---------------------------------------------------------------------------
+// Suite 17: RBACMultipleInstancesIndependenceTest
+// ---------------------------------------------------------------------------
+class RBACMultipleInstancesIndependenceTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Permission 1");
+        sAccountMgr->AddPermissionForTest(TEST_PERM_2, "Permission 2");
+        sAccountMgr->AddPermissionForTest(TEST_PERM_3, "Permission 3");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACMultipleInstancesIndependenceTest, TwoInstances_NoCrossContamination)
+{
+    rbac::RBACData data1(1, "Account1", TEST_REALM_ID, 0);
+    rbac::RBACData data2(2, "Account2", TEST_REALM_ID, 0);
+
+    data1.GrantPermission(TEST_PERM_1);
+    data2.GrantPermission(TEST_PERM_2);
+
+    data1.RecalculatePermissions();
+    data2.RecalculatePermissions();
+
+    EXPECT_TRUE(data1.HasPermission(TEST_PERM_1));
+    EXPECT_FALSE(data1.HasPermission(TEST_PERM_2));
+
+    EXPECT_FALSE(data2.HasPermission(TEST_PERM_1));
+    EXPECT_TRUE(data2.HasPermission(TEST_PERM_2));
+}
+
+TEST_F(RBACMultipleInstancesIndependenceTest, ModifyingOne_DoesNotAffectOther)
+{
+    rbac::RBACData data1(1, "Account1", TEST_REALM_ID, 0);
+    rbac::RBACData data2(2, "Account2", TEST_REALM_ID, 0);
+
+    data1.GrantPermission(TEST_PERM_1);
+    data1.GrantPermission(TEST_PERM_2);
+    data2.GrantPermission(TEST_PERM_1);
+
+    data1.RecalculatePermissions();
+    data2.RecalculatePermissions();
+
+    // Revoke from data1, data2 unaffected
+    data1.RevokePermission(TEST_PERM_1);
+    data1.RecalculatePermissions();
+
+    EXPECT_FALSE(data1.HasPermission(TEST_PERM_1));
+    EXPECT_TRUE(data2.HasPermission(TEST_PERM_1));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 18: RBACSetSecurityLevelForTestBehaviorTest
+// ---------------------------------------------------------------------------
+class RBACSetSecurityLevelForTestBehaviorTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Permission 1");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACSetSecurityLevelForTestBehaviorTest, DoesNotRecalculate)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+    data.GrantPermission(TEST_PERM_1);
+    data.RecalculatePermissions();
+    EXPECT_TRUE(data.HasPermission(TEST_PERM_1));
+
+    // Changing sec level via test helper should NOT clear/recalculate perms
+    data.SetSecurityLevelForTest(3);
+    EXPECT_EQ(data.GetSecurityLevel(), 3);
+    EXPECT_TRUE(data.HasPermission(TEST_PERM_1));
+}
+
+TEST_F(RBACSetSecurityLevelForTestBehaviorTest, UpdatesLevelOnly)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+    EXPECT_EQ(data.GetSecurityLevel(), 0);
+
+    data.SetSecurityLevelForTest(1);
+    EXPECT_EQ(data.GetSecurityLevel(), 1);
+
+    data.SetSecurityLevelForTest(255);
+    EXPECT_EQ(data.GetSecurityLevel(), 255);
+}
+
+// ---------------------------------------------------------------------------
+// Suite 19: RBACDataAccessorsTest
+// ---------------------------------------------------------------------------
+class RBACDataAccessorsTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(TEST_PERM_1, "Permission 1");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACDataAccessorsTest, GetName_ReturnsAccountName)
+{
+    rbac::RBACData data(42, "MyAccount", TEST_REALM_ID, 0);
+    EXPECT_EQ(data.GetName(), "MyAccount");
+}
+
+TEST_F(RBACDataAccessorsTest, GetName_EmptyString)
+{
+    rbac::RBACData data(1, "", TEST_REALM_ID, 0);
+    EXPECT_EQ(data.GetName(), "");
+}
+
+TEST_F(RBACDataAccessorsTest, GetId_ReturnsAccountId)
+{
+    rbac::RBACData data(42, "Test", TEST_REALM_ID, 0);
+    EXPECT_EQ(data.GetId(), 42u);
+}
+
+TEST_F(RBACDataAccessorsTest, GrantedDeniedGlobal_AllConsistent)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+
+    data.GrantPermission(TEST_PERM_1);
+    EXPECT_EQ(data.GetGrantedPermissions().size(), 1u);
+    EXPECT_TRUE(data.GetDeniedPermissions().empty());
+
+    // Before recalculate, global perms are still empty
+    EXPECT_TRUE(data.GetPermissions().empty());
+
+    data.RecalculatePermissions();
+    // After recalculate, global perms reflect granted
+    EXPECT_EQ(data.GetPermissions().size(), 1u);
+    EXPECT_TRUE(data.HasPermission(TEST_PERM_1));
+}
+
 }  // namespace
