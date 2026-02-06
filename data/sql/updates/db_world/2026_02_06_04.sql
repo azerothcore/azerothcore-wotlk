@@ -1,3 +1,4 @@
+-- DB update 2026_02_06_03 -> 2026_02_06_04
 --
 UPDATE `smart_scripts` SET `event_chance`=25 WHERE `entryorguid`=16867 AND `source_type`=0 AND `id`=1 AND `link`=0; -- Defias Pathstalker - In Combat - Cast 'Shield Bash' (No Repeat)
 UPDATE `smart_scripts` SET `event_chance`=25 WHERE `entryorguid`=1036 AND `source_type`=0 AND `id`=3 AND `link`=0; -- Kul Tiras Marine - In Combat - Cast 'Shield Bash' (No Repeat)

@@ -1,3 +1,4 @@
+-- DB update 2026_02_06_05 -> 2026_02_06_06
 --
 DELETE FROM `spell_target_position` WHERE `ID` = 33244 AND `EffectIndex` = 0;
 INSERT INTO `spell_target_position` (`ID`, `EffectIndex`, `MapID`, `PositionX`, `PositionY`, `PositionZ`, `Orientation`, `VerifiedBuild`) VALUES

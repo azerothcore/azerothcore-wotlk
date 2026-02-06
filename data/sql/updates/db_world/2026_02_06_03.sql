@@ -1,3 +1,4 @@
+-- DB update 2026_02_06_02 -> 2026_02_06_03
 -- Vyragosa
 UPDATE `creature_template` SET `speed_run` = 1.142857, `unit_flags` = `unit_flags`|64|32768 WHERE (`entry` = 32630);
 UPDATE `creature_model_info` SET `CombatReach` = 15 WHERE `DisplayID` = 28110;
