@@ -1340,7 +1340,7 @@ bool LootTemplate::LootGroup::HasQuestDrop(LootTemplateMap const& store) const
                 continue; // Error message [should be] already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            if (Referenced->second->HasQuestDrop(store, 0))
             {
                 return true;
             }
@@ -1362,7 +1362,7 @@ bool LootTemplate::LootGroup::HasQuestDrop(LootTemplateMap const& store) const
                 continue; // Error message [should be] already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            if (Referenced->second->HasQuestDrop(store, 0))
             {
                 return true;
             }
@@ -1390,7 +1390,7 @@ bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player, LootTe
                 continue;                                   // Error message already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            if (Referenced->second->HasQuestDropForPlayer(store, player, 0))
             {
                 return true;
             }
@@ -1412,7 +1412,7 @@ bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player, LootTe
                 continue;                                   // Error message already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            if (Referenced->second->HasQuestDropForPlayer(store, player, 0))
             {
                 return true;
             }
