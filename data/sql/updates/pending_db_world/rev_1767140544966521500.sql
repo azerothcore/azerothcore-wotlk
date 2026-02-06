@@ -396,7 +396,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (19044, 34097, 34097, 100, 0, 1, 0, 3, 3, 'Gruul the Dragonkiller - Tokens');
 
 -- Pathaleon (2 Gear Drops)
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 19220) AND (`Item` IN (21907, 23572, 35005, 35005, 43000));
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 19220) AND (`Item` IN (21907, 23572, 35005, 43000));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (19220, 21907, 0, 10, 0, 1, 0, 1, 1, 'Pathaleon the Calculator - Pattern: Arcanoweave Robe'),
 (19220, 23572, 0, 5, 0, 1, 0, 1, 1, 'Pathaleon the Calculator - Primal Nether'),
