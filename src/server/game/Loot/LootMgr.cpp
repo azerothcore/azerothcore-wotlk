@@ -1340,7 +1340,7 @@ bool LootTemplate::LootGroup::HasQuestDrop(LootTemplateMap const& store) const
                 continue; // Error message [should be] already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDrop(store, 0))
+            if (Referenced->second->HasQuestDrop(store))
             {
                 return true;
             }
@@ -1362,7 +1362,7 @@ bool LootTemplate::LootGroup::HasQuestDrop(LootTemplateMap const& store) const
                 continue; // Error message [should be] already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDrop(store, 0))
+            if (Referenced->second->HasQuestDrop(store))
             {
                 return true;
             }
@@ -1390,7 +1390,7 @@ bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player, LootTe
                 continue;                                   // Error message already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDropForPlayer(store, player, 0))
+            if (Referenced->second->HasQuestDropForPlayer(store, player))
             {
                 return true;
             }
@@ -1412,7 +1412,7 @@ bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player, LootTe
                 continue;                                   // Error message already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDropForPlayer(store, player, 0))
+            if (Referenced->second->HasQuestDropForPlayer(store, player))
             {
                 return true;
             }
@@ -1766,19 +1766,8 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
 }
 
 // True if template includes at least 1 quest drop entry
-bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) const
+bool LootTemplate::HasQuestDrop(LootTemplateMap const& store) const
 {
-    if (groupId)                                            // Group reference
-    {
-        if (groupId > Groups.size())
-            return false;                                   // Error message [should be] already printed at loading stage
-
-        if (!Groups[groupId - 1])
-            return false;
-
-        return Groups[groupId - 1]->HasQuestDrop(store);
-    }
-
     for (LootStoreItemList::const_iterator i = Entries.begin(); i != Entries.end(); ++i)
     {
         LootStoreItem* item = *i;
@@ -1788,7 +1777,7 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
             if (Referenced == store.end())
                 continue;                                   // Error message [should be] already printed at loading stage
 
-            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            if (Referenced->second->HasQuestDrop(store))
                 return true;
         }
         else if (item->needs_quest)
@@ -1811,19 +1800,8 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
 }
 
 // True if template includes at least 1 quest drop for an active quest of the player
-bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 groupId) const
+bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player) const
 {
-    if (groupId)                                            // Group reference
-    {
-        if (groupId > Groups.size())
-            return false;                                   // Error message already printed at loading stage
-
-        if (!Groups[groupId - 1])
-            return false;
-
-        return Groups[groupId - 1]->HasQuestDropForPlayer(player, store);
-    }
-
     // Checking non-grouped entries
     for (LootStoreItemList::const_iterator i = Entries.begin(); i != Entries.end(); ++i)
     {
@@ -1833,7 +1811,7 @@ bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player co
             LootTemplateMap::const_iterator Referenced = store.find(std::abs(item->reference));
             if (Referenced == store.end())
                 continue;                                   // Error message already printed at loading stage
-            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            if (Referenced->second->HasQuestDropForPlayer(store, player))
                 return true;
         }
         else if (player->HasQuestForItem(item->itemid))
