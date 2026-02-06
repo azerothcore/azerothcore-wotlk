@@ -39,9 +39,9 @@ bool WorldSession::CanOpenMailBox(ObjectGuid guid)
 {
     if (guid == _player->GetGUID())
     {
-        if (_player->GetSession()->GetSecurity() < SEC_MODERATOR)
+        if (!HasPermission(rbac::RBAC_PERM_COMMAND_MAILBOX))
         {
-            LOG_ERROR("network.opcode", "{} attempt open mailbox in cheating way.", _player->GetName());
+            LOG_WARN("cheat", "{} attempted to open mailbox by using a cheat.", _player->GetName());
             return false;
         }
     }

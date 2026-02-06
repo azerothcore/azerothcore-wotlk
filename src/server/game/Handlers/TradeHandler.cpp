@@ -648,7 +648,9 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_TRADE) && pOther->GetTeamId() != _player->GetTeamId())
+    if (pOther->GetTeamId() != _player->GetTeamId() &&
+        !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_TRADE) &&
+        !GetPlayer()->GetSession()->HasPermission(rbac::RBAC_PERM_ALLOW_TWO_SIDE_TRADE))
     {
         SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
         return;

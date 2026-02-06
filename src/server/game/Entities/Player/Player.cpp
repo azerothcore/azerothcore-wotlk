@@ -2548,10 +2548,15 @@ void Player::InitTalentForLevel()
 {
     uint32 talentPointsForLevel = CalculateTalentsPoints();
 
-    // xinef: more talent points that we have are used, reset
+    // if used more than have then reset
     if (m_usedTalentCount > talentPointsForLevel)
-        resetTalents(true);
-    // xinef: else, recalculate free talent points count
+    {
+        if (!GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_MORE_TALENTS_THAN_ALLOWED))
+            resetTalents(true);
+        else
+            SetFreeTalentPoints(0);
+    }
+    // else update amount of free points
     else
         SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
 
@@ -9425,7 +9430,7 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     SendDirectMessage(&data);
 
     // Special handling for messages, do not use visibility map for stealthed units
-    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE), nullptr, true);
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), !GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT), nullptr, true);
     Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 }
 

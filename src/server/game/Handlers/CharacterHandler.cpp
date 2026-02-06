@@ -1364,8 +1364,11 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
     uint8 res = ObjectMgr::CheckPlayerName(renameInfo->Name, true);
     if (res != CHAR_NAME_SUCCESS)
     {
-        SendCharRename(ResponseCodes(res), renameInfo.get());
-        return;
+        if (res != CHAR_NAME_RESERVED || !HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
+        {
+            SendCharRename(ResponseCodes(res), renameInfo.get());
+            return;
+        }
     }
 
     // Ensure that the character belongs to the current account, that rename at login is enabled
@@ -1704,8 +1707,11 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
     ResponseCodes res = static_cast<ResponseCodes>(ObjectMgr::CheckPlayerName(customizeInfo->Name, true));
     if (res != CHAR_NAME_SUCCESS)
     {
-        SendCharCustomize(res, customizeInfo.get());
-        return;
+        if (res != CHAR_NAME_RESERVED || !HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
+        {
+            SendCharCustomize(res, customizeInfo.get());
+            return;
+        }
     }
 
     // character with this name already exist
@@ -2103,8 +2109,11 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     ResponseCodes res = static_cast<ResponseCodes>(ObjectMgr::CheckPlayerName(factionChangeInfo->Name, true));
     if (res != CHAR_NAME_SUCCESS)
     {
-        SendCharFactionChange(res, factionChangeInfo.get());
-        return;
+        if (res != CHAR_NAME_RESERVED || !HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME))
+        {
+            SendCharFactionChange(res, factionChangeInfo.get());
+            return;
+        }
     }
 
     // character with this name already exist
@@ -2320,7 +2329,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                         guild->DeleteMember(factionChangeInfo->Guid, false, false, true);
             }
 
-            if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND))
+            if (!HasPermission(rbac::RBAC_PERM_TWO_SIDE_ADD_FRIEND))
             {
                 // Delete Friend List
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SOCIAL_BY_GUID);

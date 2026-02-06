@@ -707,15 +707,20 @@ void Channel::List(Player const* player)
     std::size_t pos = data.wpos();
     data << uint32(0);                                  // size of list, placeholder
 
+    uint32 gmLevelInWhoList = sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
+
     uint32 count  = 0;
     if (!(_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK))
         for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-            if (!i->second.plrPtr->GetSession()->HasPermission(rbac::RBAC_PERM_SILENTLY_JOIN_CHANNEL))
-            {
-                data << i->first;
-                data << uint8(i->second.flags); // flags seems to be changed...
-                ++count;
-            }
+            if (Player* member = i->second.plrPtr)
+                if ((player->GetSession()->HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) ||
+                     member->GetSession()->GetSecurity() <= AccountTypes(gmLevelInWhoList)) &&
+                    member->IsVisibleGloballyFor(player))
+                {
+                    data << i->first;
+                    data << uint8(i->second.flags); // flags seems to be changed...
+                    ++count;
+                }
 
     data.put<uint32>(pos, count);
 
