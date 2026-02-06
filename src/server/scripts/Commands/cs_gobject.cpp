@@ -332,7 +332,7 @@ public:
 
         Map* map = object->GetMap();
         object->Relocate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), *oz);
-        object->SetLocalRotationAngles(*oz, oy.value_or(0.0f), ox.value_or(0.0f));
+        object->SetWorldRotationAngles(*oz, oy.value_or(0.0f), ox.value_or(0.0f));
         object->SaveToDB();
 
         // Generate a completely new spawn with new guid
