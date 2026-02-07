@@ -2510,8 +2510,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             if (pathSource != PathSource::WAYPOINT_MGR && pathSource != PathSource::SMART_WAYPOINT_MGR)
             {
-                LOG_ERROR("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_START_CLOSEST_WAYPOINT: Invalid PathSource {} for entryOrGuid {} source_type {} event_id {} action_type {}",
-                    static_cast<uint32>(pathSource), e.entryOrGuid, e.source_type, e.event_id, e.action_type);
+                LOG_ERROR("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_START_CLOSEST_WAYPOINT: Invalid PathSource {} for entryOrGuid {} source_type {} event_id {} link {}",
+                static_cast<uint32>(pathSource), e.entryOrGuid, e.source_type, e.event_id, e.link);
                 break;
             }
 
