@@ -308,7 +308,15 @@ public:
                     ScheduleEnrageTimer(SPELL_BERSERK, 6min);
                     return;
                 case EVENT_THADDIUS_CHAIN_LIGHTNING:
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        events.Repeat(1s);
+                        ballLightningEnabled = false;
+                        return;
+                    }
+
                     DoCastVictim(SPELL_CHAIN_LIGHTNING);
+                    events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 1s);
                     events.Repeat(15s);
                     break;
                 case EVENT_THADDIUS_POLARITY_SHIFT:
