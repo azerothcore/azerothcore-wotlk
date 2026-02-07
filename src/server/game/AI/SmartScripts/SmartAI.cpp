@@ -109,7 +109,7 @@ void SmartAI::UpdateDespawn(const uint32 diff)
         mDespawnTime -= diff;
 }
 
-void SmartAI::UpdateFollow(uint32 diff)
+void SmartAI::UpdateFollow(const uint32 diff)
 {
     if (!mFollowGuid)
         return;

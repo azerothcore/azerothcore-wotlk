@@ -254,7 +254,7 @@ private:
     uint32 mDespawnTime;
     uint32 mDespawnState;
     void UpdateDespawn(const uint32 diff);
-    void UpdateFollow(uint32 diff);
+    void UpdateFollow(const uint32 diff);
     uint32 mEscortInvokerCheckTimer;
     bool mJustReset;
 
