@@ -671,9 +671,9 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
 
     // Type penalties for teams < 5v5
     if (Type == ARENA_TEAM_2v2)
-        points *= 0.76f;
+        points *= sWorld->getRate(RATE_ARENA_POINTS_2V2);
     else if (Type == ARENA_TEAM_3v3)
-        points *= 0.88f;
+        points *= sWorld->getRate(RATE_ARENA_POINTS_3V3);
 
     sScriptMgr->OnGetArenaPoints(this, points);
 
