@@ -140,12 +140,16 @@ struct brann_bronzebeard : public ScriptedAI
             // Past Sjonnir's Door
             me->NearTeleportTo(brannDoorDone);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
+            me->SetImmuneToAll(true);
         }
         else if (instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
         {
             // In front of Sjonnir's Door
             me->NearTeleportTo(brannTribunalEventDonePoint);
             me->SetGossipMenuId(SJONNIR_DOOR);
+            DoCastSelf(SPELL_STEALTH);
+            me->SetImmuneToAll(true);
         }
         else if (instance->GetBossState(BRANN_BRONZEBEARD) == DONE)
         {
