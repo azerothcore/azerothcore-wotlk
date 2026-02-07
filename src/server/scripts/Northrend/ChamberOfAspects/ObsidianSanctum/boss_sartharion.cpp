@@ -1104,7 +1104,7 @@ struct boss_sartharion_shadron : public boss_sartharion_dragonAI
         events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
     }
 
-    void SummonedCreatureDies(Creature* /*summon*/, Unit* /*summon*/) override
+    void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
     {
         if (isCalledBySartharion)
         {
