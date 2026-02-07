@@ -239,7 +239,7 @@ bool ChatHandler::_ParseCommands(std::string_view text)
         return true;
 
     // Pretend commands don't exist for regular players
-    if (m_session && !m_session->HasPermission(rbac::RBAC_PERM_COMMANDS_NOTIFY_COMMAND_NOT_FOUND_ERROR) && !sWorld->getBoolConfig(CONFIG_ALLOW_PLAYER_COMMANDS))
+    if (m_session && !m_session->HasPermission(rbac::RBAC_PERM_COMMANDS_NOTIFY_COMMAND_NOT_FOUND_ERROR))
         return false;
 
     // Send error message for GMs

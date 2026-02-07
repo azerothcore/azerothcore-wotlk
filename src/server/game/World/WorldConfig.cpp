@@ -159,7 +159,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_TICKET_LEVEL_REQ, "LevelReq.Ticket", 1);
     SetConfigValue<uint32>(CONFIG_AUCTION_LEVEL_REQ, "LevelReq.Auction", 1);
     SetConfigValue<uint32>(CONFIG_MAIL_LEVEL_REQ, "LevelReq.Mail", 1);
-    SetConfigValue<bool>(CONFIG_ALLOW_PLAYER_COMMANDS, "AllowPlayerCommands", 1);
     SetConfigValue<bool>(CONFIG_PRESERVE_CUSTOM_CHANNELS, "PreserveCustomChannels", false);
     SetConfigValue<uint32>(CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION, "PreserveCustomChannelDuration", 14);
     SetConfigValue<uint32>(CONFIG_INTERVAL_SAVE, "PlayerSaveInterval", 900000);
