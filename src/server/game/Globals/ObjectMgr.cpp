@@ -2422,6 +2422,9 @@ void ObjectMgr::LoadCreatures()
     LOG_INFO("server.loading", " ");
 }
 
+// Loads a single creature spawn from DB into the cache.
+// Creature::LoadCreatureFromDB() reads from cache (GetCreatureData()), not from DB directly,
+// so this must be called first for spawns not loaded at startup.
 CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnId)
 {
     CreatureData const* data = GetCreatureData(spawnId);
@@ -2439,6 +2442,8 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
 
     Field* fields = result->Fetch();
     uint32 id1 = fields[1].Get<uint32>();
+    uint32 id2 = fields[2].Get<uint32>();
+    uint32 id3 = fields[3].Get<uint32>();
 
     CreatureTemplate const* cInfo = GetCreatureTemplate(id1);
     if (!cInfo)
@@ -2447,10 +2452,28 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
         return nullptr;
     }
 
+    if (id2 && !GetCreatureTemplate(id2))
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with non-existing creature entry {} in id2 field, skipped.", spawnId, id2);
+        return nullptr;
+    }
+
+    if (id3 && !GetCreatureTemplate(id3))
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with non-existing creature entry {} in id3 field, skipped.", spawnId, id3);
+        return nullptr;
+    }
+
+    if (!id2 && id3)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with creature entry {} in id3 field but no entry in id2 field, skipped.", spawnId, id3);
+        return nullptr;
+    }
+
     CreatureData& creatureData    = _creatureDataStore[spawnId];
     creatureData.id1              = id1;
-    creatureData.id2              = fields[2].Get<uint32>();
-    creatureData.id3              = fields[3].Get<uint32>();
+    creatureData.id2              = id2;
+    creatureData.id3              = id3;
     creatureData.mapid            = fields[4].Get<uint16>();
     creatureData.equipmentId      = fields[5].Get<int8>();
     creatureData.posX             = fields[6].Get<float>();
@@ -2472,6 +2495,87 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
 
     if (!creatureData.ScriptId)
         creatureData.ScriptId = cInfo->ScriptID;
+
+    MapEntry const* mapEntry = sMapStore.LookupEntry(creatureData.mapid);
+    if (!mapEntry)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) that spawned at non-existing map (Id: {}), skipped.", spawnId, creatureData.mapid);
+        _creatureDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (mapEntry->IsRaid() && creatureData.spawntimesecs >= 7 * DAY && creatureData.spawntimesecs < 14 * DAY)
+        creatureData.spawntimesecs = 14 * DAY;
+
+    bool ok = true;
+    for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
+    {
+        if (_difficultyEntries[diff].find(id1) != _difficultyEntries[diff].end() ||
+            _difficultyEntries[diff].find(id2) != _difficultyEntries[diff].end() ||
+            _difficultyEntries[diff].find(id3) != _difficultyEntries[diff].end())
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) that is listed as difficulty {} template (Entries: {}, {}, {}) in `creature_template`, skipped.",
+                spawnId, diff + 1, id1, id2, id3);
+            ok = false;
+        }
+    }
+
+    if (!ok)
+    {
+        _creatureDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (creatureData.equipmentId != 0)
+    {
+        if (!GetEquipmentInfo(id1, creatureData.equipmentId) ||
+            (id2 && !GetEquipmentInfo(id2, creatureData.equipmentId)) ||
+            (id3 && !GetEquipmentInfo(id3, creatureData.equipmentId)))
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (Entries: {}, {}, {}) with equipment_id {} not found in table `creature_equip_template`, set to no equipment.",
+                id1, id2, id3, creatureData.equipmentId);
+            creatureData.equipmentId = 0;
+        }
+    }
+
+    if (creatureData.movementType >= MAX_DB_MOTION_TYPE)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with wrong movement generator type ({}), set to IDLE.",
+            spawnId, id1, id2, id3, creatureData.movementType);
+        creatureData.movementType = IDLE_MOTION_TYPE;
+    }
+
+    if (creatureData.wander_distance < 0.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `wander_distance`< 0, set to 0.",
+            spawnId, id1, id2, id3);
+        creatureData.wander_distance = 0.0f;
+    }
+    else if (creatureData.movementType == RANDOM_MOTION_TYPE)
+    {
+        if (creatureData.wander_distance == 0.0f)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
+                spawnId, id1, id2, id3);
+            creatureData.movementType = IDLE_MOTION_TYPE;
+        }
+    }
+    else if (creatureData.movementType == IDLE_MOTION_TYPE)
+    {
+        if (creatureData.wander_distance != 0.0f)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.",
+                spawnId, id1, id2, id3);
+            creatureData.wander_distance = 0.0f;
+        }
+    }
+
+    if (creatureData.phaseMask == 0)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `phaseMask`=0 (not visible for anyone), set to 1.",
+            spawnId, id1, id2, id3);
+        creatureData.phaseMask = 1;
+    }
 
     return &creatureData;
 }
@@ -2818,6 +2922,9 @@ void ObjectMgr::LoadGameobjects()
     LOG_INFO("server.loading", " ");
 }
 
+// Loads a single gameobject spawn from DB into the cache.
+// GameObject::LoadGameObjectFromDB() reads from cache (GetGameObjectData()), not from DB directly,
+// so this must be called first for spawns not loaded at startup.
 GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType spawnId)
 {
     GameObjectData const* data = GetGameObjectData(spawnId);
@@ -2842,6 +2949,13 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
         return nullptr;
     }
 
+    if (gInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry {} GoType: {}) with an invalid displayId ({}), not loaded.",
+            spawnId, entry, gInfo->type, gInfo->displayId);
+        return nullptr;
+    }
+
     GameObjectData& goData  = _gameObjectDataStore[spawnId];
     goData.id               = entry;
     goData.mapid            = fields[2].Get<uint16>();
@@ -2855,14 +2969,77 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
     goData.rotation.w       = fields[10].Get<float>();
     goData.spawntimesecs    = fields[11].Get<int32>();
     goData.animprogress     = fields[12].Get<uint8>();
-    goData.go_state         = GOState(fields[13].Get<uint8>());
-    goData.spawnMask        = fields[14].Get<uint8>();
-    goData.phaseMask        = fields[15].Get<uint32>();
     goData.artKit           = 0;
     goData.ScriptId         = GetScriptId(fields[16].Get<std::string>());
 
     if (!goData.ScriptId)
         goData.ScriptId = gInfo->ScriptId;
+
+    MapEntry const* mapEntry = sMapStore.LookupEntry(goData.mapid);
+    if (!mapEntry)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) spawned on a non-existing map (Id: {}), skipped.", spawnId, entry, goData.mapid);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.spawntimesecs == 0 && gInfo->IsDespawnAtAction())
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `spawntimesecs` (0) value, but the gameobject is marked as despawnable at action.", spawnId, entry);
+    }
+
+    uint32 go_state = fields[13].Get<uint8>();
+    if (go_state >= MAX_GO_STATE)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid `state` ({}) value, skipped.", spawnId, entry, go_state);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+    goData.go_state = GOState(go_state);
+
+    goData.spawnMask        = fields[14].Get<uint8>();
+    goData.phaseMask        = fields[15].Get<uint32>();
+
+    if (goData.rotation.x < -1.0f || goData.rotation.x > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationX ({}) value, skipped.", spawnId, entry, goData.rotation.x);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.rotation.y < -1.0f || goData.rotation.y > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationY ({}) value, skipped.", spawnId, entry, goData.rotation.y);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.rotation.z < -1.0f || goData.rotation.z > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationZ ({}) value, skipped.", spawnId, entry, goData.rotation.z);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.rotation.w < -1.0f || goData.rotation.w > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationW ({}) value, skipped.", spawnId, entry, goData.rotation.w);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (!MapMgr::IsValidMapCoord(goData.mapid, goData.posX, goData.posY, goData.posZ, goData.orientation))
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid coordinates, skipped.", spawnId, entry);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.phaseMask == 0)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, entry);
+        goData.phaseMask = 1;
+    }
 
     return &goData;
 }

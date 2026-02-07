@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "PoolMgr.h"
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
 #include <string>
@@ -267,6 +268,12 @@ public:
         if (!spawnId)
             return false;
 
+        if (sObjectMgr->GetCreatureData(spawnId))
+        {
+            handler->SendErrorMessage("Creature spawn {} is already loaded.", uint32(spawnId));
+            return false;
+        }
+
         CreatureData const* data = sObjectMgr->LoadCreatureDataFromDB(spawnId);
         if (!data)
         {
@@ -274,10 +281,23 @@ public:
             return false;
         }
 
+        if (sPoolMgr->IsPartOfAPool<Creature>(spawnId))
+        {
+            handler->SendErrorMessage("Creature spawn {} is part of a pool and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        QueryResult eventResult = WorldDatabase.Query("SELECT guid FROM game_event_creature WHERE guid = {}", uint32(spawnId));
+        if (eventResult)
+        {
+            handler->SendErrorMessage("Creature spawn {} is managed by the game event system and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
         Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
         if (!map)
         {
-            handler->SendErrorMessage("Creature spawn {} is on an instance map (ID: {}).", uint32(spawnId), data->mapid);
+            handler->SendErrorMessage("Creature spawn {} is on a non-continent map (ID: {}). Only continent maps are supported.", uint32(spawnId), data->mapid);
             return false;
         }
 

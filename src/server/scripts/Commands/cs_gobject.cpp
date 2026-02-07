@@ -150,6 +150,12 @@ public:
         if (!spawnId)
             return false;
 
+        if (sObjectMgr->GetGameObjectData(spawnId))
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is already loaded.", uint32(spawnId));
+            return false;
+        }
+
         GameObjectData const* data = sObjectMgr->LoadGameObjectDataFromDB(spawnId);
         if (!data)
         {
@@ -157,10 +163,23 @@ public:
             return false;
         }
 
+        if (sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is part of a pool and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        QueryResult eventResult = WorldDatabase.Query("SELECT guid FROM game_event_gameobject WHERE guid = {}", uint32(spawnId));
+        if (eventResult)
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is managed by the game event system and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
         Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
         if (!map)
         {
-            handler->SendErrorMessage("Gameobject spawn {} is on an instance map (ID: {}).", uint32(spawnId), data->mapid);
+            handler->SendErrorMessage("Gameobject spawn {} is on a non-continent map (ID: {}). Only continent maps are supported.", uint32(spawnId), data->mapid);
             return false;
         }
 
