@@ -462,7 +462,7 @@ struct boss_sartharion : public BossAI
 
         extraEvents.Update(diff);
 
-        // Special events which needs to be fired immidiately
+        // Special events which needs to be fired immediately
         while (uint32 const eventId = extraEvents.ExecuteEvent())
         {
             switch (eventId)
@@ -533,7 +533,7 @@ struct boss_sartharion : public BossAI
             }
         }
 
-        // Handle Sartharion combat abbilities
+        // Handle Sartharion combat abilities
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -571,7 +571,7 @@ struct boss_sartharion : public BossAI
                     }
 
                     summons.RemoveNotExisting();
-                    uint8 rand = urand(0, MAX_CYCLONE_COUNT - 1); // 5 - numer of cyclones
+                    uint8 rand = urand(0, MAX_CYCLONE_COUNT - 1); // 5 - number of cyclones
                     uint8 iter = 0;
                     if (!summons.empty())
                     {
@@ -1293,7 +1293,7 @@ struct boss_sartharion_shadron : public boss_sartharion_dragonAI
 
                 if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                 {
-                    /// @todo: inpect JustSummoned
+                    /// @todo: inspect JustSummoned
                     summons.Summon(acolyte);
                     acolyte->SetPhaseMask(16, true);
                 }
