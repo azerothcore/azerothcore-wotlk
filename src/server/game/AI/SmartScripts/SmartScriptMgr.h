@@ -1282,7 +1282,7 @@ struct SmartAction
             uint32 pathId2;
             uint32 repeat;
             uint32 forcedMovement;
-            uint32 pathSource;
+            PathSource pathSource;
         } startClosestWaypoint;
 
         struct
