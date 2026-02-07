@@ -89,7 +89,6 @@ public:
             LoadSummonData(summonData);
 
             _aliveKeepersCount = 0;
-            _frenzyCount = 0;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -130,6 +129,11 @@ public:
         {
             switch (creature->GetEntry())
             {
+                case NPC_COILFANG_SHATTERER:
+                case NPC_COILFANG_PRIESTESS:
+                    if (creature->GetPositionX() > 190.0f)
+                        --_aliveKeepersCount;
+                    break;
                 case NPC_CYCLONE_KARATHRESS:
                     creature->GetMotionMaster()->MoveRandom(50.0f);
                     break;
@@ -137,25 +141,10 @@ public:
                     creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                     break;
-                case NPC_COILFANG_FRENZY:
-                    if (!creature->IsInWater() || _frenzyCount >= MAX_FRENZY_COUNT)
-                        creature->DespawnOrUnsummon();
-                    else
-                        ++_frenzyCount;
-                    break;
                 default:
                     break;
             }
             InstanceScript::OnCreatureCreate(creature);
-        }
-
-        void OnCreatureRemove(Creature* creature) override
-        {
-            if (creature->GetEntry() == NPC_COILFANG_FRENZY)
-                if (_frenzyCount > 0)
-                    --_frenzyCount;
-
-            InstanceScript::OnCreatureRemove(creature);
         }
 
         void SetData(uint32 type, uint32  /*data*/) override
@@ -196,8 +185,7 @@ public:
 
     private:
         ObjectGuid _shieldGeneratorGUID[4];
-        uint32 _aliveKeepersCount;
-        uint32 _frenzyCount;
+        int32 _aliveKeepersCount;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -281,46 +269,53 @@ class spell_serpentshrine_cavern_coilfang_water : public AuraScript
 {
     PrepareAuraScript(spell_serpentshrine_cavern_coilfang_water);
 
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+            if (instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE)
+                if (instance->GetData(DATA_ALIVE_KEEPERS) == 0)
+                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SCALDING_WATER, true);
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         GetUnitOwner()->RemoveAurasDueToSpell(SPELL_SCALDING_WATER);
     }
 
-    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+    {
+        InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
+        if (!instance || instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE)
+            return;
+
+        isPeriodic = true;
+        amplitude = 8 * IN_MILLISECONDS;
+    }
+
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
         PreventDefaultAction();
-
         InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
         if (!instance || GetUnitOwner()->GetMapId() != MAP_COILFANG_SERPENTSHRINE_CAVERN)
         {
-            GetAura()->SetDuration(1);
+            SetDuration(0);
             return;
         }
 
-        if (instance->GetBossState(DATA_THE_LURKER_BELOW) != DONE && GetUnitOwner()->IsInWater())
-        {
-            if (instance->GetData(DATA_ALIVE_KEEPERS) > 0)
-                for (uint8 i = 0; i < urand(2, 3); ++i)
-                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SERVERSIDE_SUMMON_FRENZY, true);
-
-            if (instance->GetData(DATA_ALIVE_KEEPERS) <= 0 && !GetUnitOwner()->HasAura(SPELL_SCALDING_WATER))
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SCALDING_WATER, true);
-
+        if (instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE || instance->GetData(DATA_ALIVE_KEEPERS) == 0 || GetUnitOwner()->GetPositionZ() > -20.5f || !GetUnitOwner()->IsInWater())
             return;
-        }
-        else if (instance->GetBossState(DATA_THE_LURKER_BELOW) == DONE)
-        {
-            GetAura()->SetDuration(1);
-            return;
-        }
 
-        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_SCALDING_WATER);
+        for (uint8 i = 0; i < 3; ++i)
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FRENZY_WATER, true);
     }
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_coilfang_water::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_serpentshrine_cavern_coilfang_water::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectApply += AuraEffectApplyFn(spell_serpentshrine_cavern_coilfang_water::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_serpentshrine_cavern_coilfang_water::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_serpentshrine_cavern_coilfang_water::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_serpentshrine_cavern_coilfang_water::HandlePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
