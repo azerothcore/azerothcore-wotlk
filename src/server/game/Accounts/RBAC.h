@@ -698,6 +698,9 @@ private:
     RBACPermissionContainer _perms;                    ///> Set of permissions
 };
 
+/// Returns a comma-separated string of permission IDs for debugging
+std::string GetDebugPermissionString(RBACPermissionContainer const& perms);
+
 /**
  * @name RBACData
  * @brief Contains all needed information about the account

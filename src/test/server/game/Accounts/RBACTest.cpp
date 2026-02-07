@@ -2055,4 +2055,381 @@ TEST_F(RBACDataAccessorsTest, GrantedDeniedGlobal_AllConsistent)
     EXPECT_TRUE(data.HasPermission(TEST_PERM_1));
 }
 
+// ---------------------------------------------------------------------------
+// Suite 20: RBACGetDebugPermissionStringTest
+// Tests the rbac::GetDebugPermissionString utility function.
+// ---------------------------------------------------------------------------
+class RBACGetDebugPermissionStringTest : public ::testing::Test
+{
+};
+
+TEST_F(RBACGetDebugPermissionStringTest, EmptySet_ReturnsEmptyString)
+{
+    rbac::RBACPermissionContainer perms;
+    EXPECT_EQ(rbac::GetDebugPermissionString(perms), "");
+}
+
+TEST_F(RBACGetDebugPermissionStringTest, SingleElement_ReturnsIdAsString)
+{
+    rbac::RBACPermissionContainer perms;
+    perms.insert(42);
+    std::string result = rbac::GetDebugPermissionString(perms);
+    EXPECT_EQ(result, "42");
+}
+
+TEST_F(RBACGetDebugPermissionStringTest, MultipleElements_CommaSeparated)
+{
+    rbac::RBACPermissionContainer perms;
+    perms.insert(1);
+    perms.insert(5);
+    perms.insert(10);
+    std::string result = rbac::GetDebugPermissionString(perms);
+    // std::set is ordered, so output should be: "1, 5, 10"
+    EXPECT_EQ(result, "1, 5, 10");
+}
+
+TEST_F(RBACGetDebugPermissionStringTest, LargeSet_AllPresent)
+{
+    rbac::RBACPermissionContainer perms;
+    for (uint32 i = 100; i <= 105; ++i)
+        perms.insert(i);
+
+    std::string result = rbac::GetDebugPermissionString(perms);
+    EXPECT_EQ(result, "100, 101, 102, 103, 104, 105");
+}
+
+// ---------------------------------------------------------------------------
+// Suite 21: RBACLoadFromDBCallbackStatefulTest
+// Tests LoadFromDBCallback behavior when data already has state.
+// LoadFromDBCallback does NOT call ClearData - only LoadFromDB does.
+// ---------------------------------------------------------------------------
+class RBACLoadFromDBCallbackStatefulTest : public ::testing::Test
+{
+protected:
+    static constexpr uint32 PERM_A = 10;
+    static constexpr uint32 PERM_B = 11;
+    static constexpr uint32 PERM_C = 12;
+    static constexpr uint32 ROLE_PLAYER = 100;
+
+    static constexpr uint8 SEC_PLAYER = 0;
+
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(PERM_A, "A");
+        sAccountMgr->AddPermissionForTest(PERM_B, "B");
+        sAccountMgr->AddPermissionForTest(PERM_C, "C");
+        sAccountMgr->AddPermissionForTest(ROLE_PLAYER, "Player Role");
+
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_A);
+        sAccountMgr->AddLinkedPermissionForTest(ROLE_PLAYER, PERM_B);
+
+        sAccountMgr->AddDefaultPermissionForTest(SEC_PLAYER, ROLE_PLAYER);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACLoadFromDBCallbackStatefulTest, PreExistingGrants_NotClearedByCallback)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+
+    // Grant PERM_C before calling LoadFromDBCallback
+    data.GrantPermission(PERM_C);
+
+    // LoadFromDBCallback does NOT clear data, so PERM_C should remain
+    data.LoadFromDBCallback(nullptr);
+
+    EXPECT_TRUE(data.HasPermission(PERM_C));
+    // Defaults also applied
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_TRUE(data.HasPermission(PERM_B));
+}
+
+TEST_F(RBACLoadFromDBCallbackStatefulTest, PreExistingDeny_BlocksDefaultGrant)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+
+    // Deny the default role before callback
+    data.DenyPermission(ROLE_PLAYER);
+
+    // LoadFromDBCallback tries to GrantPermission(ROLE_PLAYER) as default,
+    // but it's in the denied list so the grant is rejected (RBAC_IN_DENIED_LIST)
+    data.LoadFromDBCallback(nullptr);
+
+    // ROLE_PLAYER should NOT be in the granted permissions
+    EXPECT_EQ(data.GetGrantedPermissions().count(ROLE_PLAYER), 0u);
+    // It should still be denied
+    EXPECT_TRUE(data.GetDeniedPermissions().count(ROLE_PLAYER) > 0);
+    // After expansion, ROLE_PLAYER and its linked perms should be denied
+    EXPECT_FALSE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_FALSE(data.HasPermission(PERM_A));
+    EXPECT_FALSE(data.HasPermission(PERM_B));
+}
+
+TEST_F(RBACLoadFromDBCallbackStatefulTest, DuplicateDefaultGrant_SilentlyHandled)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+
+    // Pre-grant the default role
+    data.GrantPermission(ROLE_PLAYER);
+
+    // LoadFromDBCallback tries to grant ROLE_PLAYER again - should be
+    // silently handled (RBAC_CANT_ADD_ALREADY_ADDED)
+    data.LoadFromDBCallback(nullptr);
+
+    // Should still have the permission correctly
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_TRUE(data.HasPermission(PERM_B));
+    // Only one entry in granted list
+    EXPECT_EQ(data.GetGrantedPermissions().count(ROLE_PLAYER), 1u);
+}
+
+TEST_F(RBACLoadFromDBCallbackStatefulTest, CalledTwice_DefaultsIdempotent)
+{
+    rbac::RBACData data(1, "Player", TEST_REALM_ID, SEC_PLAYER);
+
+    data.LoadFromDBCallback(nullptr);
+    auto perms1 = data.GetPermissions();
+
+    // Calling again: defaults already granted, so the grant is silently
+    // rejected (RBAC_CANT_ADD_ALREADY_ADDED), then CalculateNewPermissions
+    // is called again producing the same result.
+    data.LoadFromDBCallback(nullptr);
+    auto perms2 = data.GetPermissions();
+
+    EXPECT_EQ(perms1, perms2);
+    EXPECT_TRUE(data.HasPermission(ROLE_PLAYER));
+    EXPECT_TRUE(data.HasPermission(PERM_A));
+    EXPECT_TRUE(data.HasPermission(PERM_B));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 22: RBACConstructorVariationsTest
+// Tests constructor edge cases for realmId and account ID.
+// ---------------------------------------------------------------------------
+class RBACConstructorVariationsTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        sAccountMgr->AddPermissionForTest(1, "Perm 1");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACConstructorVariationsTest, AccountIdZero)
+{
+    rbac::RBACData data(0, "ZeroAccount", 1, 0);
+    EXPECT_EQ(data.GetId(), 0u);
+    EXPECT_EQ(data.GetName(), "ZeroAccount");
+
+    // Should still function normally
+    EXPECT_EQ(data.GrantPermission(1), rbac::RBAC_OK);
+    data.RecalculatePermissions();
+    EXPECT_TRUE(data.HasPermission(1));
+}
+
+TEST_F(RBACConstructorVariationsTest, RealmIdZero)
+{
+    rbac::RBACData data(1, "Test", 0, 0);
+    EXPECT_EQ(data.GetId(), 1u);
+
+    // Operations should still work with realmId=0
+    EXPECT_EQ(data.GrantPermission(1), rbac::RBAC_OK);
+    data.RecalculatePermissions();
+    EXPECT_TRUE(data.HasPermission(1));
+}
+
+TEST_F(RBACConstructorVariationsTest, RealmIdNegativeOne_AllRealms)
+{
+    rbac::RBACData data(1, "Test", -1, 0);
+    EXPECT_EQ(data.GetId(), 1u);
+
+    // Operations should still work with realmId=-1
+    EXPECT_EQ(data.GrantPermission(1), rbac::RBAC_OK);
+    data.RecalculatePermissions();
+    EXPECT_TRUE(data.HasPermission(1));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 23: RBACCommandResultEnumValuesTest
+// Verifies all enum values are distinct and have expected integer values.
+// ---------------------------------------------------------------------------
+class RBACCommandResultEnumValuesTest : public ::testing::Test
+{
+};
+
+TEST_F(RBACCommandResultEnumValuesTest, ExplicitValues)
+{
+    EXPECT_EQ(static_cast<int>(rbac::RBAC_OK), 0);
+    EXPECT_EQ(static_cast<int>(rbac::RBAC_CANT_ADD_ALREADY_ADDED), 1);
+    EXPECT_EQ(static_cast<int>(rbac::RBAC_CANT_REVOKE_NOT_IN_LIST), 2);
+    EXPECT_EQ(static_cast<int>(rbac::RBAC_IN_GRANTED_LIST), 3);
+    EXPECT_EQ(static_cast<int>(rbac::RBAC_IN_DENIED_LIST), 4);
+    EXPECT_EQ(static_cast<int>(rbac::RBAC_ID_DOES_NOT_EXISTS), 5);
+}
+
+TEST_F(RBACCommandResultEnumValuesTest, AllSixValuesDistinct)
+{
+    std::set<int> values;
+    values.insert(static_cast<int>(rbac::RBAC_OK));
+    values.insert(static_cast<int>(rbac::RBAC_CANT_ADD_ALREADY_ADDED));
+    values.insert(static_cast<int>(rbac::RBAC_CANT_REVOKE_NOT_IN_LIST));
+    values.insert(static_cast<int>(rbac::RBAC_IN_GRANTED_LIST));
+    values.insert(static_cast<int>(rbac::RBAC_IN_DENIED_LIST));
+    values.insert(static_cast<int>(rbac::RBAC_ID_DOES_NOT_EXISTS));
+    EXPECT_EQ(values.size(), 6u);
+}
+
+// ---------------------------------------------------------------------------
+// Suite 24: RBACStressTest
+// Tests with many permissions and complex operations.
+// ---------------------------------------------------------------------------
+class RBACStressTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        // Register 50 permissions
+        for (uint32 i = 1; i <= 50; ++i)
+            sAccountMgr->AddPermissionForTest(i, "Perm " + std::to_string(i));
+
+        // Register a role that links to all 50
+        sAccountMgr->AddPermissionForTest(200, "Mega Role");
+        for (uint32 i = 1; i <= 50; ++i)
+            sAccountMgr->AddLinkedPermissionForTest(200, i);
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(RBACStressTest, FiftyPermissions_GrantAndRecalculate)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+
+    for (uint32 i = 1; i <= 50; ++i)
+        EXPECT_EQ(data.GrantPermission(i), rbac::RBAC_OK);
+
+    data.RecalculatePermissions();
+
+    for (uint32 i = 1; i <= 50; ++i)
+        EXPECT_TRUE(data.HasPermission(i));
+
+    EXPECT_EQ(data.GetPermissions().size(), 50u);
+}
+
+TEST_F(RBACStressTest, MegaRole_Expands50Permissions)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+
+    data.GrantPermission(200);
+    data.RecalculatePermissions();
+
+    // Role + 50 linked = 51 total
+    EXPECT_EQ(data.GetPermissions().size(), 51u);
+    EXPECT_TRUE(data.HasPermission(200));
+    EXPECT_TRUE(data.HasPermission(1));
+    EXPECT_TRUE(data.HasPermission(50));
+}
+
+TEST_F(RBACStressTest, MegaRole_DenyHalf_25Remain)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+
+    data.GrantPermission(200);
+    // Deny permissions 1-25
+    for (uint32 i = 1; i <= 25; ++i)
+        data.DenyPermission(i);
+
+    data.RecalculatePermissions();
+
+    // Role + 25 remaining = 26
+    EXPECT_EQ(data.GetPermissions().size(), 26u);
+
+    for (uint32 i = 1; i <= 25; ++i)
+        EXPECT_FALSE(data.HasPermission(i));
+    for (uint32 i = 26; i <= 50; ++i)
+        EXPECT_TRUE(data.HasPermission(i));
+}
+
+TEST_F(RBACStressTest, InterleavedGrantDenyRevoke)
+{
+    rbac::RBACData data(1, "Test", TEST_REALM_ID, 0);
+
+    // Grant 1-10
+    for (uint32 i = 1; i <= 10; ++i)
+        data.GrantPermission(i);
+
+    // Deny 5-15 (5-10 will fail with RBAC_IN_GRANTED_LIST)
+    for (uint32 i = 5; i <= 15; ++i)
+    {
+        rbac::RBACCommandResult result = data.DenyPermission(i);
+        if (i <= 10)
+            EXPECT_EQ(result, rbac::RBAC_IN_GRANTED_LIST);
+        else
+            EXPECT_EQ(result, rbac::RBAC_OK);
+    }
+
+    // Revoke 3-7 (removes from granted)
+    for (uint32 i = 3; i <= 7; ++i)
+        EXPECT_EQ(data.RevokePermission(i), rbac::RBAC_OK);
+
+    data.RecalculatePermissions();
+
+    // Granted: 1,2,8,9,10
+    // Denied: 11,12,13,14,15
+    // Revoked (neither): 3,4,5,6,7
+    EXPECT_TRUE(data.HasPermission(1));
+    EXPECT_TRUE(data.HasPermission(2));
+    EXPECT_FALSE(data.HasPermission(3));
+    EXPECT_FALSE(data.HasPermission(5));
+    EXPECT_TRUE(data.HasPermission(8));
+    EXPECT_TRUE(data.HasPermission(10));
+    EXPECT_FALSE(data.HasPermission(11));
+    EXPECT_FALSE(data.HasPermission(15));
+}
+
+// ---------------------------------------------------------------------------
+// Suite 25: RBACPermissionEnumKeyValuesTest
+// Verifies specific well-known enum values match expected constants.
+// ---------------------------------------------------------------------------
+class RBACPermissionEnumKeyValuesTest : public ::testing::Test
+{
+};
+
+TEST_F(RBACPermissionEnumKeyValuesTest, CorePermissionValues)
+{
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_INSTANT_LOGOUT), 1u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_SKIP_QUEUE), 2u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_JOIN_NORMAL_BG), 3u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_JOIN_RANDOM_BG), 4u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_JOIN_ARENAS), 5u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER), 6u);
+}
+
+TEST_F(RBACPermissionEnumKeyValuesTest, RoleValues)
+{
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_ROLE_ADMINISTRATOR), 196u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_ROLE_GAMEMASTER), 197u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_ROLE_MODERATOR), 198u);
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_ROLE_PLAYER), 199u);
+}
+
+TEST_F(RBACPermissionEnumKeyValuesTest, CommandPermissionStartsAt200)
+{
+    EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_COMMAND_RBAC), 200u);
+}
+
 }  // namespace
