@@ -1,3 +1,4 @@
+-- DB update 2026_02_06_09 -> 2026_02_07_00
 
 -- Move waypoints to waypoint_data
 DELETE FROM `waypoints` WHERE `entry` IN (2889700, 2889701, 2889702, 2889703, 2889704, 2889705, 2889706);
