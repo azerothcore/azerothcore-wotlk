@@ -269,8 +269,55 @@ public:
         CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
         if (!data)
         {
-            handler->PSendSysMessage("Creature spawn data not found for spawn ID %u.", uint32(spawnId));
-            return false;
+            QueryResult result = WorldDatabase.Query("SELECT creature.guid, id1, id2, id3, map, equipment_id, "
+                "position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
+                "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, "
+                "creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.ScriptName "
+                "FROM creature WHERE creature.guid = {}", uint32(spawnId));
+
+            if (!result)
+            {
+                handler->PSendSysMessage("Creature spawn %u not found in the database.", uint32(spawnId));
+                return false;
+            }
+
+            Field* fields = result->Fetch();
+            uint32 id1 = fields[1].Get<uint32>();
+
+            CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(id1);
+            if (!cInfo)
+            {
+                handler->PSendSysMessage("Creature spawn %u has non-existing creature entry %u.", uint32(spawnId), id1);
+                return false;
+            }
+
+            CreatureData& creatureData = sObjectMgr->NewOrExistCreatureData(spawnId);
+            creatureData.id1             = id1;
+            creatureData.id2             = fields[2].Get<uint32>();
+            creatureData.id3             = fields[3].Get<uint32>();
+            creatureData.mapid           = fields[4].Get<uint16>();
+            creatureData.equipmentId     = fields[5].Get<int8>();
+            creatureData.posX            = fields[6].Get<float>();
+            creatureData.posY            = fields[7].Get<float>();
+            creatureData.posZ            = fields[8].Get<float>();
+            creatureData.orientation     = fields[9].Get<float>();
+            creatureData.spawntimesecs   = fields[10].Get<uint32>();
+            creatureData.wander_distance = fields[11].Get<float>();
+            creatureData.currentwaypoint = fields[12].Get<uint32>();
+            creatureData.curhealth       = fields[13].Get<uint32>();
+            creatureData.curmana         = fields[14].Get<uint32>();
+            creatureData.movementType    = fields[15].Get<uint8>();
+            creatureData.spawnMask       = fields[16].Get<uint8>();
+            creatureData.phaseMask       = fields[17].Get<uint32>();
+            creatureData.npcflag         = fields[18].Get<uint32>();
+            creatureData.unit_flags      = fields[19].Get<uint32>();
+            creatureData.dynamicflags    = fields[20].Get<uint32>();
+            creatureData.ScriptId        = sObjectMgr->GetScriptId(fields[21].Get<std::string>());
+
+            if (!creatureData.ScriptId)
+                creatureData.ScriptId = cInfo->ScriptID;
+
+            data = sObjectMgr->GetCreatureData(spawnId);
         }
 
         Player* player = handler->GetSession()->GetPlayer();

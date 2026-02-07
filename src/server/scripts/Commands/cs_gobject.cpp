@@ -153,8 +153,50 @@ public:
         GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
         if (!data)
         {
-            handler->PSendSysMessage("Gameobject spawn data not found for spawn ID %u.", uint32(spawnId));
-            return false;
+            QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
+                "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, "
+                "ScriptName "
+                "FROM gameobject WHERE gameobject.guid = {}", uint32(spawnId));
+
+            if (!result)
+            {
+                handler->PSendSysMessage("Gameobject spawn %u not found in the database.", uint32(spawnId));
+                return false;
+            }
+
+            Field* fields = result->Fetch();
+            uint32 entry = fields[1].Get<uint32>();
+
+            GameObjectTemplate const* gInfo = sObjectMgr->GetGameObjectTemplate(entry);
+            if (!gInfo)
+            {
+                handler->PSendSysMessage("Gameobject spawn %u has non-existing gameobject entry %u.", uint32(spawnId), entry);
+                return false;
+            }
+
+            GameObjectData& goData = sObjectMgr->NewGOData(spawnId);
+            goData.id             = entry;
+            goData.mapid          = fields[2].Get<uint16>();
+            goData.posX           = fields[3].Get<float>();
+            goData.posY           = fields[4].Get<float>();
+            goData.posZ           = fields[5].Get<float>();
+            goData.orientation    = fields[6].Get<float>();
+            goData.rotation.x    = fields[7].Get<float>();
+            goData.rotation.y    = fields[8].Get<float>();
+            goData.rotation.z    = fields[9].Get<float>();
+            goData.rotation.w    = fields[10].Get<float>();
+            goData.spawntimesecs = fields[11].Get<int32>();
+            goData.animprogress  = fields[12].Get<uint8>();
+            goData.go_state      = GOState(fields[13].Get<uint8>());
+            goData.spawnMask     = fields[14].Get<uint8>();
+            goData.phaseMask     = fields[15].Get<uint32>();
+            goData.artKit        = 0;
+            goData.ScriptId      = sObjectMgr->GetScriptId(fields[16].Get<std::string>());
+
+            if (!goData.ScriptId)
+                goData.ScriptId = gInfo->ScriptId;
+
+            data = sObjectMgr->GetGameObjectData(spawnId);
         }
 
         Player* player = handler->GetSession()->GetPlayer();
