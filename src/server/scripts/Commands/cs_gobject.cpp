@@ -150,24 +150,24 @@ public:
         if (!spawnId)
             return false;
 
-        GameObjectData const* data = sObjectMgr->LoadGameObjectFromDatabase(spawnId);
+        GameObjectData const* data = sObjectMgr->LoadGameObjectDataFromDB(spawnId);
         if (!data)
         {
-            handler->PSendSysMessage("Gameobject spawn %u not found in the database.", uint32(spawnId));
+            handler->PSendSysMessage("Gameobject spawn {} not found in the database.", uint32(spawnId));
             return false;
         }
 
         Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
         if (!map)
         {
-            handler->PSendSysMessage("Gameobject spawn %u is on a non-instanceable map %u that is not loaded.", uint32(spawnId), data->mapid);
+            handler->PSendSysMessage("Gameobject spawn {} is on a non-instanceable map {} that is not loaded.", uint32(spawnId), data->mapid);
             return false;
         }
 
         GameObjectTemplate const* objectInfo = sObjectMgr->GetGameObjectTemplate(data->id);
         if (!objectInfo)
         {
-            handler->PSendSysMessage("Gameobject template not found for entry %u.", data->id);
+            handler->PSendSysMessage("Gameobject template not found for entry {}.", data->id);
             return false;
         }
 
@@ -175,12 +175,12 @@ public:
         if (!object->LoadGameObjectFromDB(spawnId, map, true))
         {
             delete object;
-            handler->PSendSysMessage("Failed to load gameobject spawn %u.", uint32(spawnId));
+            handler->PSendSysMessage("Failed to load gameobject spawn {}.", uint32(spawnId));
             return false;
         }
 
         sObjectMgr->AddGameobjectToGrid(spawnId, data);
-        handler->PSendSysMessage("Gameobject spawn %u loaded successfully.", uint32(spawnId));
+        handler->PSendSysMessage("Gameobject spawn {} loaded successfully.", uint32(spawnId));
         return true;
     }
 

@@ -1226,7 +1226,7 @@ public:
     [[nodiscard]] CreatureSparringContainer const& GetSparringData() const { return _creatureSparringStore; }
 
     CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
-    CreatureData const* LoadCreatureFromDatabase(ObjectGuid::LowType spawnId);
+    CreatureData const* LoadCreatureDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteCreatureData(ObjectGuid::LowType spawnId);
     [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
     {
@@ -1312,7 +1312,7 @@ public:
     [[nodiscard]] QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
-    GameObjectData const* LoadGameObjectFromDatabase(ObjectGuid::LowType spawnId);
+    GameObjectData const* LoadGameObjectDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteGOData(ObjectGuid::LowType guid);
 
     [[nodiscard]] ModuleString const* GetModuleString(std::string module, uint32 id) const

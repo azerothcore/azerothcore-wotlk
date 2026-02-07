@@ -267,17 +267,17 @@ public:
         if (!spawnId)
             return false;
 
-        CreatureData const* data = sObjectMgr->LoadCreatureFromDatabase(spawnId);
+        CreatureData const* data = sObjectMgr->LoadCreatureDataFromDB(spawnId);
         if (!data)
         {
-            handler->PSendSysMessage("Creature spawn %u not found in the database.", uint32(spawnId));
+            handler->PSendSysMessage("Creature spawn {} not found in the database.", uint32(spawnId));
             return false;
         }
 
         Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
         if (!map)
         {
-            handler->PSendSysMessage("Creature spawn %u is on a non-instanceable map %u that is not loaded.", uint32(spawnId), data->mapid);
+            handler->PSendSysMessage("Creature spawn {} is on a non-instanceable map {} that is not loaded.", uint32(spawnId), data->mapid);
             return false;
         }
 
@@ -285,12 +285,12 @@ public:
         if (!creature->LoadCreatureFromDB(spawnId, map, true, true))
         {
             delete creature;
-            handler->PSendSysMessage("Failed to load creature spawn %u.", uint32(spawnId));
+            handler->PSendSysMessage("Failed to load creature spawn {}.", uint32(spawnId));
             return false;
         }
 
         sObjectMgr->AddCreatureToGrid(spawnId, data);
-        handler->PSendSysMessage("Creature spawn %u loaded successfully.", uint32(spawnId));
+        handler->PSendSysMessage("Creature spawn {} loaded successfully.", uint32(spawnId));
         return true;
     }
 

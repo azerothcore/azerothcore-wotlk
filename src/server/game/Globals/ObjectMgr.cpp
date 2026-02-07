@@ -2422,7 +2422,7 @@ void ObjectMgr::LoadCreatures()
     LOG_INFO("server.loading", " ");
 }
 
-CreatureData const* ObjectMgr::LoadCreatureFromDatabase(ObjectGuid::LowType spawnId)
+CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnId)
 {
     CreatureData const* data = GetCreatureData(spawnId);
     if (data)
@@ -2818,7 +2818,7 @@ void ObjectMgr::LoadGameobjects()
     LOG_INFO("server.loading", " ");
 }
 
-GameObjectData const* ObjectMgr::LoadGameObjectFromDatabase(ObjectGuid::LowType spawnId)
+GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType spawnId)
 {
     GameObjectData const* data = GetGameObjectData(spawnId);
     if (data)
