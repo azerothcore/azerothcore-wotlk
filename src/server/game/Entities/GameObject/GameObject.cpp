@@ -1087,7 +1087,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
 
 bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
 {
-    GameObjectData const* data = sObjectMgr->LoadGameObjectFromDatabase(spawnId);
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
 
     if (!data)
     {

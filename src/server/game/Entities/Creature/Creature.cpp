@@ -1682,7 +1682,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         }
     }
 
-    CreatureData const* data = sObjectMgr->LoadCreatureFromDatabase(spawnId);
+    CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
     if (!data)
     {
         LOG_ERROR("sql.sql", "Creature (SpawnId: {}) not found in table `creature`, can't load. ", spawnId);
