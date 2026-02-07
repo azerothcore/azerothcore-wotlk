@@ -56,7 +56,7 @@ public:
 
         static ChatCommandTable commandTable =
         {
-            { "mmap", mmapCommandTable }
+            { "mmap", mmapCommandTable, rbac::RBAC_PERM_COMMAND_MMAP }
         };
         return commandTable;
     }

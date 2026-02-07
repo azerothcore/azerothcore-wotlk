@@ -41,16 +41,18 @@ public:
             { "map",          HandleRemoveDisableMapCommand,          rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_MAP,          Console::Yes },
             { "battleground", HandleRemoveDisableBattlegroundCommand, rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_BATTLEGROUND, Console::Yes },
             { "outdoorpvp",   HandleRemoveDisableOutdoorPvPCommand,   rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_OUTDOORPVP,   Console::Yes },
-            { "vmap",         HandleRemoveDisableVmapCommand,         rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_VMAP,         Console::Yes }
+            { "vmap",                 HandleRemoveDisableVmapCommand,                 rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_VMAP,                 Console::Yes },
+            { "achievement_criteria", HandleRemoveDisableAchievementCriteriaCommand, rbac::RBAC_PERM_COMMAND_DISABLE_REMOVE_ACHIEVEMENT_CRITERIA, Console::Yes }
         };
         static ChatCommandTable addDisableCommandTable =
         {
-            { "spell",        HandleAddDisableSpellCommand,           rbac::RBAC_PERM_COMMAND_DISABLE_ADD_SPELL,           Console::Yes },
-            { "quest",        HandleAddDisableQuestCommand,           rbac::RBAC_PERM_COMMAND_DISABLE_ADD_QUEST,           Console::Yes },
-            { "map",          HandleAddDisableMapCommand,             rbac::RBAC_PERM_COMMAND_DISABLE_ADD_MAP,             Console::Yes },
-            { "battleground", HandleAddDisableBattlegroundCommand,    rbac::RBAC_PERM_COMMAND_DISABLE_ADD_BATTLEGROUND,    Console::Yes },
-            { "outdoorpvp",   HandleAddDisableOutdoorPvPCommand,      rbac::RBAC_PERM_COMMAND_DISABLE_ADD_OUTDOORPVP,      Console::Yes },
-            { "vmap",         HandleAddDisableVmapCommand,            rbac::RBAC_PERM_COMMAND_DISABLE_ADD_VMAP,            Console::Yes }
+            { "spell",                HandleAddDisableSpellCommand,                  rbac::RBAC_PERM_COMMAND_DISABLE_ADD_SPELL,                  Console::Yes },
+            { "quest",                HandleAddDisableQuestCommand,                  rbac::RBAC_PERM_COMMAND_DISABLE_ADD_QUEST,                  Console::Yes },
+            { "map",                  HandleAddDisableMapCommand,                    rbac::RBAC_PERM_COMMAND_DISABLE_ADD_MAP,                    Console::Yes },
+            { "battleground",         HandleAddDisableBattlegroundCommand,           rbac::RBAC_PERM_COMMAND_DISABLE_ADD_BATTLEGROUND,           Console::Yes },
+            { "outdoorpvp",           HandleAddDisableOutdoorPvPCommand,             rbac::RBAC_PERM_COMMAND_DISABLE_ADD_OUTDOORPVP,             Console::Yes },
+            { "vmap",                 HandleAddDisableVmapCommand,                   rbac::RBAC_PERM_COMMAND_DISABLE_ADD_VMAP,                   Console::Yes },
+            { "achievement_criteria", HandleAddDisableAchievementCriteriaCommand,    rbac::RBAC_PERM_COMMAND_DISABLE_ADD_ACHIEVEMENT_CRITERIA,   Console::Yes }
         };
         static ChatCommandTable disableCommandTable =
         {

@@ -39,12 +39,13 @@ public:
         {
             { "create",  HandlePetCreateCommand,  rbac::RBAC_PERM_COMMAND_PET_CREATE,  Console::No },
             { "learn",   HandlePetLearnCommand,   rbac::RBAC_PERM_COMMAND_PET_LEARN,   Console::No },
-            { "unlearn", HandlePetUnlearnCommand, rbac::RBAC_PERM_COMMAND_PET_UNLEARN, Console::No }
+            { "unlearn", HandlePetUnlearnCommand, rbac::RBAC_PERM_COMMAND_PET_UNLEARN, Console::No },
+            { "level",   HandlePetLevelCommand,   rbac::RBAC_PERM_COMMAND_PET_LEVEL,   Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "pet", petCommandTable }
+            { "pet", petCommandTable, rbac::RBAC_PERM_COMMAND_PET }
         };
 
         return commandTable;
@@ -156,6 +157,32 @@ public:
             handler->PSendSysMessage("Pet doesn't have that spell");
         }
 
+        return true;
+    }
+
+    static bool HandlePetLevelCommand(ChatHandler* handler, Optional<uint8> level)
+    {
+        Pet* pet = handler->GetSession()->GetPlayer()->GetPet();
+        if (!pet)
+        {
+            handler->SendErrorMessage("You have no pet.");
+            return false;
+        }
+
+        if (!level)
+        {
+            handler->PSendSysMessage("Pet level: %u", pet->GetLevel());
+            return true;
+        }
+
+        if (*level < 1 || *level > STRONG_MAX_LEVEL)
+        {
+            handler->SendErrorMessage(LANG_BAD_VALUE);
+            return false;
+        }
+
+        pet->GivePetLevel(*level);
+        handler->PSendSysMessage("Pet level set to %u.", *level);
         return true;
     }
 };

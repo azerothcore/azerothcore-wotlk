@@ -62,7 +62,7 @@ public:
         };
         static ChatCommandTable commandTable =
         {
-            { "ticket", ticketCommandTable }
+            { "ticket", ticketCommandTable, rbac::RBAC_PERM_COMMAND_TICKET }
         };
         return commandTable;
     }

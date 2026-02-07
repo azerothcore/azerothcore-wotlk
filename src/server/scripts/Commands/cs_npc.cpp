@@ -191,12 +191,13 @@ public:
             { "whisper",        HandleNpcWhisperCommand,           rbac::RBAC_PERM_COMMAND_NPC_WHISPER,       Console::No },
             { "yell",           HandleNpcYellCommand,              rbac::RBAC_PERM_COMMAND_NPC_YELL,          Console::No },
             { "tame",           HandleNpcTameCommand,              rbac::RBAC_PERM_COMMAND_NPC_TAME,          Console::No },
+            { "showloot",       HandleNpcShowLootCommand,          rbac::RBAC_PERM_COMMAND_NPC_SHOWLOOT,     Console::No },
             { "do",             HandleNpcDoActionCommand,          rbac::RBAC_PERM_COMMAND_NPC_EVADE,         Console::No },
             { "add",            npcAddCommandTable },
             { "delete",         npcDeleteCommandTable },
             { "follow",         npcFollowCommandTable },
-            { "load",           HandleNpcLoadCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "set",            npcSetCommandTable }
+            { "load",           HandleNpcLoadCommand,              rbac::RBAC_PERM_COMMAND_NPC_ADD, Console::Yes },
+            { "set",            npcSetCommandTable, rbac::RBAC_PERM_COMMAND_NPC_SET }
         };
         static ChatCommandTable commandTable =
         {
@@ -1349,6 +1350,58 @@ public:
         }
 
         handler->PSendSysMessage("LinkGUID '{}' added to creature with DBTableGUID: '{}'", linkguid, creature->GetSpawnId());
+        return true;
+    }
+
+    static bool HandleNpcShowLootCommand(ChatHandler* handler)
+    {
+        Creature* creature = handler->getSelectedCreature();
+        if (!creature)
+        {
+            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            return false;
+        }
+
+        CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
+        uint32 lootId = cInfo->lootid;
+
+        if (!lootId)
+        {
+            handler->SendErrorMessage("Creature %u has no loot template.", creature->GetEntry());
+            return false;
+        }
+
+        handler->PSendSysMessage("Loot template for creature %u (lootid: %u):", creature->GetEntry(), lootId);
+        handler->PSendSysMessage("--------------------------------------------");
+
+        QueryResult result = WorldDatabase.Query("SELECT item, ChanceOrQuestChance, groupid, mincountOrRef, maxcount FROM creature_loot_template WHERE entry = {}", lootId);
+        if (!result)
+        {
+            handler->PSendSysMessage("No loot entries found.");
+            return true;
+        }
+
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 item       = fields[0].Get<uint32>();
+            float chance       = fields[1].Get<float>();
+            uint8 group        = fields[2].Get<uint8>();
+            int32 minCount     = fields[3].Get<int32>();
+            uint32 maxCount    = fields[4].Get<uint32>();
+
+            if (minCount < 0)
+            {
+                handler->PSendSysMessage("  [Reference %d] Chance: %.2f%% Group: %u MaxCount: %u", -minCount, chance, group, maxCount);
+            }
+            else
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
+                std::string name = proto ? proto->Name1 : "Unknown";
+                handler->PSendSysMessage("  [%u] %s - Chance: %.2f%% Group: %u Count: %d-%u", item, name.c_str(), chance, group, minCount, maxCount);
+            }
+        } while (result->NextRow());
+
         return true;
     }
 };

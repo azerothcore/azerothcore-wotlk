@@ -45,7 +45,7 @@ public:
 
         static ChatCommandTable commandTable =
         {
-            { "send", sendCommandTable }
+            { "send", sendCommandTable, rbac::RBAC_PERM_COMMAND_SEND }
         };
 
         return commandTable;

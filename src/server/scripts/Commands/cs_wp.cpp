@@ -46,7 +46,7 @@ public:
         };
         static ChatCommandTable commandTable =
         {
-            { "wp", wpCommandTable }
+            { "wp", wpCommandTable, rbac::RBAC_PERM_COMMAND_WP }
         };
         return commandTable;
     }

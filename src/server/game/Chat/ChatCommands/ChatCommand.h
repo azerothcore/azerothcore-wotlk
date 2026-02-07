@@ -245,9 +245,24 @@ namespace Acore::ChatCommands
         ChatCommandBuilder(char const* name, std::vector<ChatCommandBuilder> const& subCommands)
             : _name{ ASSERT_NOTNULL(name) }, _data{ std::in_place_type<SubCommandEntry>, subCommands } { }
 
+        ChatCommandBuilder(char const* name, std::vector<ChatCommandBuilder> const& subCommands,
+            uint32 securityLevel, Acore::ChatCommands::Console allowConsole = Console::No)
+            : _name{ ASSERT_NOTNULL(name) }, _data{ SubCommandWithPermEntry{
+              subCommands, { securityLevel, allowConsole } } } { }
+
     private:
+        struct SubCommandWithPermEntry
+        {
+            SubCommandWithPermEntry(std::vector<ChatCommandBuilder> const& sub,
+                Acore::Impl::ChatCommands::CommandPermissions perm)
+                : _subCommands(sub), _permissions(perm) { }
+
+            std::reference_wrapper<std::vector<ChatCommandBuilder> const> _subCommands;
+            Acore::Impl::ChatCommands::CommandPermissions _permissions;
+        };
+
         std::string_view _name;
-        std::variant<InvokerEntry, SubCommandEntry> _data;
+        std::variant<InvokerEntry, SubCommandEntry, SubCommandWithPermEntry> _data;
     };
 
     AC_GAME_API void LoadCommandMap();

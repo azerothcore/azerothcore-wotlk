@@ -61,14 +61,16 @@ public:
 
         static ChatCommandTable serverRestartCommandTable =
         {
-            { "cancel",       HandleServerShutDownCancelCommand, rbac::RBAC_PERM_COMMAND_SERVER_RESTART_CANCEL, Console::Yes },
-            { "",             HandleServerRestartCommand,        rbac::RBAC_PERM_COMMAND_SERVER_RESTART,        Console::Yes }
+            { "cancel",       HandleServerShutDownCancelCommand,   rbac::RBAC_PERM_COMMAND_SERVER_RESTART_CANCEL, Console::Yes },
+            { "force",        HandleServerForceRestartCommand,     rbac::RBAC_PERM_COMMAND_SERVER_RESTART_FORCE,  Console::Yes },
+            { "",             HandleServerRestartCommand,          rbac::RBAC_PERM_COMMAND_SERVER_RESTART,        Console::Yes }
         };
 
         static ChatCommandTable serverShutdownCommandTable =
         {
-            { "cancel",       HandleServerShutDownCancelCommand, rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN_CANCEL, Console::Yes },
-            { "",             HandleServerShutDownCommand,       rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN,        Console::Yes }
+            { "cancel",       HandleServerShutDownCancelCommand,   rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN_CANCEL, Console::Yes },
+            { "force",        HandleServerForceShutdownCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN_FORCE,  Console::Yes },
+            { "",             HandleServerShutDownCommand,         rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN,        Console::Yes }
         };
 
         static ChatCommandTable serverSetCommandTable =
@@ -76,6 +78,7 @@ public:
             { "loglevel",     HandleServerSetLogLevelCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SET_LOGLEVEL, Console::Yes },
             { "motd",         HandleServerSetMotdCommand,        rbac::RBAC_PERM_COMMAND_SERVER_SET_MOTD,     Console::Yes },
             { "closed",       HandleServerSetClosedCommand,      rbac::RBAC_PERM_COMMAND_SERVER_SET_CLOSED,   Console::Yes },
+            { "difftime",     HandleServerSetDiffTimeCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SET_DIFFTIME, Console::Yes },
         };
 
         static ChatCommandTable serverCommandTable =
@@ -86,15 +89,16 @@ public:
             { "idlerestart",  serverIdleRestartCommandTable },
             { "idleshutdown", serverIdleShutdownCommandTable },
             { "info",         HandleServerInfoCommand,           rbac::RBAC_PERM_COMMAND_SERVER_INFO,     Console::Yes },
+            { "plimit",       HandleServerPLimitCommand,         rbac::RBAC_PERM_COMMAND_SERVER_PLIMIT,   Console::Yes },
             { "motd",         HandleServerMotdCommand,           rbac::RBAC_PERM_COMMAND_SERVER_MOTD,     Console::Yes },
             { "restart",      serverRestartCommandTable },
             { "shutdown",     serverShutdownCommandTable },
-            { "set",          serverSetCommandTable }
+            { "set",          serverSetCommandTable, rbac::RBAC_PERM_COMMAND_SERVER_SET }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "server", serverCommandTable }
+            { "server", serverCommandTable, rbac::RBAC_PERM_COMMAND_SERVER }
         };
 
         return commandTable;
@@ -604,6 +608,51 @@ public:
     static bool HandleServerSetLogLevelCommand(ChatHandler* /*handler*/, bool isLogger, std::string const& name, int32 level)
     {
         sLog->SetLogLevel(name, level, isLogger);
+        return true;
+    }
+
+    static bool HandleServerPLimitCommand(ChatHandler* handler, Optional<uint32> limit)
+    {
+        if (limit)
+        {
+            sWorldSessionMgr->SetPlayerAmountLimit(*limit);
+            handler->PSendSysMessage("Player limit set to %u.", *limit);
+        }
+        else
+        {
+            handler->PSendSysMessage("Player limit: %u (Online: %u, Max: %u, Queue: %u)",
+                sWorldSessionMgr->GetPlayerAmountLimit(),
+                sWorldSessionMgr->GetPlayerCount(),
+                sWorldSessionMgr->GetMaxPlayerCount(),
+                sWorldSessionMgr->GetQueuedSessionCount());
+        }
+        return true;
+    }
+
+    static bool HandleServerSetDiffTimeCommand(ChatHandler* handler, uint32 newTime)
+    {
+        sWorldUpdateTime.SetRecordUpdateTimeInterval(Milliseconds(newTime));
+        handler->PSendSysMessage("Record update time interval set to %u ms.", newTime);
+        return true;
+    }
+
+    static bool HandleServerForceShutdownCommand(ChatHandler* /*handler*/, Optional<std::string> reason)
+    {
+        std::string strReason;
+        if (reason)
+            strReason = *reason;
+
+        sWorld->ShutdownServ(0, SHUTDOWN_MASK_FORCE, SHUTDOWN_EXIT_CODE, strReason);
+        return true;
+    }
+
+    static bool HandleServerForceRestartCommand(ChatHandler* /*handler*/, Optional<std::string> reason)
+    {
+        std::string strReason;
+        if (reason)
+            strReason = *reason;
+
+        sWorld->ShutdownServ(0, SHUTDOWN_MASK_FORCE | SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, strReason);
         return true;
     }
 };

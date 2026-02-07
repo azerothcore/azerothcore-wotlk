@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
+#include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "CharacterCache.h"
@@ -197,7 +198,14 @@ public:
             { "string",            HandleStringCommand,            rbac::RBAC_PERM_COMMAND_STRING,            Console::No  },
             { "opendoor",          HandleOpenDoorCommand,          rbac::RBAC_PERM_COMMAND_OPENDOOR,          Console::No  },
             { "bm",                HandleBMCommand,                rbac::RBAC_PERM_COMMAND_BEASTMASTER,       Console::No  },
-            { "packetlog",         HandlePacketLog,                rbac::RBAC_PERM_COMMAND_PACKETLOG,         Console::Yes }
+            { "packetlog",         HandlePacketLog,                rbac::RBAC_PERM_COMMAND_PACKETLOG,         Console::Yes },
+            { "bank",              HandleBankCommand,              rbac::RBAC_PERM_COMMAND_BANK,              Console::No  },
+            { "repairitems",       HandleRepairitemsCommand,       rbac::RBAC_PERM_COMMAND_REPAIRITEMS,       Console::No  },
+            { "bg start",          HandleBGStartCommand,           rbac::RBAC_PERM_COMMAND_BG_START,          Console::No  },
+            { "bg stop",           HandleBGStopCommand,            rbac::RBAC_PERM_COMMAND_BG_STOP,           Console::No  },
+            { "neargraveyard",     HandleNearGraveyardCommand,     rbac::RBAC_PERM_COMMAND_NEARGRAVEYARD,     Console::No  },
+            { "listfreeze",        HandleListFreezeCommand,        rbac::RBAC_PERM_COMMAND_LISTFREEZE,        Console::No  },
+            { "pvpstats",          HandlePvPstatsCommand,          rbac::RBAC_PERM_COMMAND_PVPSTATS,          Console::Yes }
         };
 
         return commandTable;
@@ -3173,6 +3181,124 @@ public:
 
         handler->SendErrorMessage(LANG_USE_BOL);
         return false;
+    }
+
+    static bool HandleBankCommand(ChatHandler* handler)
+    {
+        handler->GetSession()->SendShowBank(handler->GetSession()->GetPlayer()->GetGUID());
+        return true;
+    }
+
+    static bool HandleRepairitemsCommand(ChatHandler* handler)
+    {
+        Player* target = handler->getSelectedPlayerOrSelf();
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            return false;
+        }
+
+        target->DurabilityRepairAll(false, 0, false);
+        handler->PSendSysMessage(LANG_YOU_REPAIR_ITEMS, handler->GetNameLink(target));
+        if (handler->needReportToTarget(target))
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink());
+        return true;
+    }
+
+    static bool HandleBGStartCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        Battleground* bg = player->GetBattleground();
+        if (!bg)
+        {
+            handler->SendErrorMessage("You are not in a battleground.");
+            return false;
+        }
+
+        bg->SetStartDelayTime(0);
+        handler->PSendSysMessage("Battleground start forced.");
+        return true;
+    }
+
+    static bool HandleBGStopCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        Battleground* bg = player->GetBattleground();
+        if (!bg)
+        {
+            handler->SendErrorMessage("You are not in a battleground.");
+            return false;
+        }
+
+        bg->EndBattleground(PVP_TEAM_NEUTRAL);
+        handler->PSendSysMessage("Battleground ended.");
+        return true;
+    }
+
+    static bool HandleNearGraveyardCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("linked")> /*linked*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(player, player->GetTeamId());
+
+        if (graveyard)
+        {
+            float dist = player->GetDistance2d(graveyard->x, graveyard->y);
+            handler->PSendSysMessage("Nearest graveyard: %u (X: %f Y: %f Z: %f, Dist: %f)",
+                graveyard->ID, graveyard->x, graveyard->y, graveyard->z, dist);
+        }
+        else
+            handler->PSendSysMessage("No nearby graveyard found.");
+
+        return true;
+    }
+
+    static bool HandleListFreezeCommand(ChatHandler* handler)
+    {
+        // Find all online players who have the freeze aura (spell 9454)
+        std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+        HashMapHolder<Player>::MapType const& playerMap = ObjectAccessor::GetPlayers();
+        bool found = false;
+        for (auto const& [guid, player] : playerMap)
+        {
+            if (player->HasAura(9454))
+            {
+                handler->PSendSysMessage("%s is frozen.", player->GetName().c_str());
+                found = true;
+            }
+        }
+
+        if (!found)
+            handler->SendSysMessage("No frozen players found.");
+
+        return true;
+    }
+
+    static bool HandlePvPstatsCommand(ChatHandler* handler)
+    {
+        if (!sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
+        {
+            handler->SendErrorMessage("PvP statistics are disabled.");
+            return false;
+        }
+
+        QueryResult result = CharacterDatabase.Query("SELECT slot, id, SUBSTRING_INDEX(SUBSTRING_INDEX(characters.name, ' ', 1), ' ', -1) AS name, score0, score1 FROM pvpstats_battlegrounds JOIN characters ON characters.guid = pvpstats_battlegrounds.winner_faction ORDER BY id DESC LIMIT 5");
+        if (!result)
+        {
+            handler->SendSysMessage("No PvP stats found.");
+            return true;
+        }
+
+        handler->SendSysMessage("Recent battleground statistics:");
+        do
+        {
+            Field* fields = result->Fetch();
+            handler->PSendSysMessage("BG Type: %u | ID: %u | Winner: %s | Score: %u-%u",
+                fields[0].Get<uint8>(), fields[1].Get<uint32>(), fields[2].Get<std::string>().c_str(),
+                fields[3].Get<uint32>(), fields[4].Get<uint32>());
+        } while (result->NextRow());
+
+        return true;
     }
 
 };

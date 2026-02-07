@@ -40,6 +40,12 @@ void Acore::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuil
         if (help)
             _help.emplace<AcoreStrings>(help);
     }
+    else if (std::holds_alternative<ChatCommandBuilder::SubCommandWithPermEntry>(builder._data))
+    {
+        auto const& entry = std::get<ChatCommandBuilder::SubCommandWithPermEntry>(builder._data);
+        _permission = entry._permissions;
+        LoadCommandsIntoMap(this, _subCommands, entry._subCommands);
+    }
     else
         LoadCommandsIntoMap(this, _subCommands, std::get<ChatCommandBuilder::SubCommandEntry>(builder._data));
 }
@@ -525,6 +531,13 @@ bool Acore::Impl::ChatCommands::ChatCommandNode::IsInvokerVisible(ChatHandler co
 
 bool Acore::Impl::ChatCommands::ChatCommandNode::HasVisibleSubCommands(ChatHandler const& who) const
 {
+    // If parent has an RBAC permission, check it before showing subcommands
+    if (!_invoker && _permission.RequiredLevel >= rbac::RBAC_PERM_COMMAND_RBAC)
+    {
+        if (!who.IsConsole() && !who.HasPermission(_permission.RequiredLevel))
+            return false;
+    }
+
     for (auto it = _subCommands.begin(); it != _subCommands.end(); ++it)
         if (it->second.IsVisible(who))
             return true;

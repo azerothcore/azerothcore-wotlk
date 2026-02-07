@@ -42,7 +42,7 @@ public:
         };
         static ChatCommandTable commandTable =
         {
-            { "guild", guildCommandTable }
+            { "guild", guildCommandTable, rbac::RBAC_PERM_COMMAND_GUILD }
         };
         return commandTable;
     }

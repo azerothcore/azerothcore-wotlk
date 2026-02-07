@@ -65,6 +65,7 @@ public:
             { "standstate",     HandleModifyStandStateCommand,    rbac::RBAC_PERM_COMMAND_MODIFY_STANDSTATE,      Console::No },
             { "phase",          HandleModifyPhaseCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_PHASE,           Console::No },
             { "gender",         HandleModifyGenderCommand,        rbac::RBAC_PERM_COMMAND_MODIFY_GENDER,          Console::No },
+            { "xp",             HandleModifyXPCommand,            rbac::RBAC_PERM_COMMAND_MODIFY_XP,              Console::No },
             { "speed",          modifyspeedCommandTable }
         };
 
@@ -78,7 +79,7 @@ public:
         static ChatCommandTable commandTable =
         {
             { "morph",          morphCommandTable },
-            { "modify",         modifyCommandTable }
+            { "modify",         modifyCommandTable, rbac::RBAC_PERM_COMMAND_MODIFY }
         };
 
         return commandTable;
@@ -975,6 +976,37 @@ public:
         {
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_GENDER_CHANGED, gender_full, handler->GetNameLink());
         }
+
+        return true;
+    }
+
+    static bool HandleModifyXPCommand(ChatHandler* handler, uint32 xp)
+    {
+        Player* target = handler->getSelectedPlayerOrSelf();
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            return false;
+        }
+
+        if (xp < 1)
+        {
+            handler->SendErrorMessage(LANG_BAD_VALUE);
+            return false;
+        }
+
+        // If player is at max level, skip
+        if (target->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        {
+            handler->SendErrorMessage("Player is at max level.");
+            return false;
+        }
+
+        target->GiveXP(xp, nullptr);
+        handler->PSendSysMessage("%u XP given to %s.", xp, handler->GetNameLink(target));
+
+        if (handler->needReportToTarget(target))
+            ChatHandler(target->GetSession()).PSendSysMessage("You received %u XP from %s.", xp, handler->GetNameLink());
 
         return true;
     }

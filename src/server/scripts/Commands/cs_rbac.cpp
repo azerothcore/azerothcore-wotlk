@@ -60,7 +60,7 @@ public:
 
         static ChatCommandTable rbacCommandTable =
         {
-            { "account", rbacAccountCommandTable },
+            { "account", rbacAccountCommandTable, rbac::RBAC_PERM_COMMAND_RBAC_ACC },
             { "list",    HandleRBACListPermissionsCommand, rbac::RBAC_PERM_COMMAND_RBAC_LIST, Console::Yes },
         };
 

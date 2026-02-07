@@ -17,6 +17,7 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "Group.h"
 #include "GroupMgr.h"
 #include "Language.h"
 #include "Player.h"
@@ -31,6 +32,13 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable groupSetCommandTable =
+        {
+            { "assistant", HandleGroupSetAssistantCommand, rbac::RBAC_PERM_COMMAND_GROUP_ASSISTANT, Console::No },
+            { "maintank",  HandleGroupSetMainTankCommand,  rbac::RBAC_PERM_COMMAND_GROUP_MAINTANK,  Console::No },
+            { "mainassist", HandleGroupSetMainAssistCommand, rbac::RBAC_PERM_COMMAND_GROUP_MAINASSIST, Console::No }
+        };
+
         static ChatCommandTable groupCommandTable =
         {
             { "list",    HandleGroupListCommand,    rbac::RBAC_PERM_COMMAND_GROUP_LIST,    Console::Yes },
@@ -38,12 +46,13 @@ public:
             { "remove",  HandleGroupRemoveCommand,  rbac::RBAC_PERM_COMMAND_GROUP_REMOVE,  Console::No },
             { "disband", HandleGroupDisbandCommand, rbac::RBAC_PERM_COMMAND_GROUP_DISBAND, Console::No },
             { "revive",  HandleGroupReviveCommand,  rbac::RBAC_PERM_COMMAND_GROUP_REVIVE,  Console::No },
-            { "leader",  HandleGroupLeaderCommand,  rbac::RBAC_PERM_COMMAND_GROUP_LEADER,  Console::No }
+            { "leader",  HandleGroupLeaderCommand,  rbac::RBAC_PERM_COMMAND_GROUP_LEADER,  Console::No },
+            { "set",     groupSetCommandTable, rbac::RBAC_PERM_COMMAND_GROUP_SET }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "group",  groupCommandTable }
+            { "group",  groupCommandTable, rbac::RBAC_PERM_COMMAND_GROUP }
         };
 
         return commandTable;
@@ -291,6 +300,47 @@ public:
         }
 
         return true;
+    }
+
+    static bool HandleGroupSetFlagCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, bool apply, GroupMemberFlags flag, char const* flagName)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+            return false;
+
+        Player* player = nullptr;
+        Group* group = nullptr;
+        ObjectGuid guid;
+
+        if (!handler->GetPlayerGroupAndGUIDByName(target->GetName().c_str(), player, group, guid))
+            return false;
+
+        if (!group || !group->isRaidGroup())
+        {
+            handler->SendErrorMessage("Target must be in a raid group.");
+            return false;
+        }
+
+        group->SetGroupMemberFlag(guid, apply, flag);
+        handler->PSendSysMessage("%s flag %s for %s.", apply ? "Set" : "Removed", flagName, target->GetName().c_str());
+        return true;
+    }
+
+    static bool HandleGroupSetAssistantCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, bool apply)
+    {
+        return HandleGroupSetFlagCommand(handler, target, apply, MEMBER_FLAG_ASSISTANT, "Assistant");
+    }
+
+    static bool HandleGroupSetMainTankCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, bool apply)
+    {
+        return HandleGroupSetFlagCommand(handler, target, apply, MEMBER_FLAG_MAINTANK, "MainTank");
+    }
+
+    static bool HandleGroupSetMainAssistCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, bool apply)
+    {
+        return HandleGroupSetFlagCommand(handler, target, apply, MEMBER_FLAG_MAINASSIST, "MainAssist");
     }
 };
 

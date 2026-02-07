@@ -50,6 +50,7 @@ public:
             { "item",     HandleListItemCommand,        rbac::RBAC_PERM_COMMAND_LIST_ITEM,     Console::Yes },
             { "object",   HandleListObjectCommand,      rbac::RBAC_PERM_COMMAND_LIST_OBJECT,   Console::Yes },
             { "auras",    listAurasCommandTable },
+            { "mail",     HandleListMailCommand,         rbac::RBAC_PERM_COMMAND_LIST_MAIL,     Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -515,6 +516,36 @@ public:
             std::string name = spellInfo->SpellName[locale];
             return Utf8FitTo(name, namePart);
         }
+
+        return true;
+    }
+
+    static bool HandleListMailCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        QueryResult result = CharacterDatabase.Query("SELECT id, messageType, sender, subject, expire_time FROM mail WHERE receiver = {} ORDER BY id DESC LIMIT 50", target->GetGUID().GetCounter());
+        if (!result)
+        {
+            handler->PSendSysMessage("No mail found for %s.", target->GetName());
+            return true;
+        }
+
+        handler->PSendSysMessage("Mail for %s:", target->GetName());
+        do
+        {
+            Field* fields = result->Fetch();
+            handler->PSendSysMessage("  ID: %u | Type: %u | Sender: %u | Subject: %s",
+                fields[0].Get<uint32>(), fields[1].Get<uint8>(), fields[2].Get<uint32>(),
+                fields[3].Get<std::string>().c_str());
+        } while (result->NextRow());
 
         return true;
     }

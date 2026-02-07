@@ -96,6 +96,7 @@ public:
             { "creature_onkill_reputation",     HandleReloadOnKillReputationCommand,           rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_ONKILL_REPUTATION, Console::Yes },
             { "creature_queststarter",         HandleReloadCreatureQuestStarterCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_QUESTSTARTER, Console::Yes },
             { "creature_template",             HandleReloadCreatureTemplateCommand,           rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_TEMPLATE, Console::Yes },
+            { "creature_summon_groups",        HandleReloadCreatureSummonGroupsCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_CREATURE_SUMMON_GROUPS, Console::Yes },
             { "disables",                      HandleReloadDisablesCommand,                   rbac::RBAC_PERM_COMMAND_RELOAD_DISABLES, Console::Yes },
             { "disenchant_loot_template",      HandleReloadLootTemplatesDisenchantCommand,    rbac::RBAC_PERM_COMMAND_RELOAD_DISENCHANT_LOOT_TEMPLATE, Console::Yes },
             { "event_scripts",                 HandleReloadEventScriptsCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_EVENT_SCRIPTS, Console::Yes },
@@ -173,6 +174,7 @@ public:
             { "waypoint_data",                 HandleReloadWpCommand,                         rbac::RBAC_PERM_COMMAND_RELOAD_WAYPOINT_DATA, Console::Yes },
             { "vehicle_accessory",             HandleReloadVehicleAccessoryCommand,           rbac::RBAC_PERM_COMMAND_RELOAD_VEHICLE_ACCESSORY, Console::Yes },
             { "vehicle_template_accessory",    HandleReloadVehicleTemplateAccessoryCommand,   rbac::RBAC_PERM_COMMAND_RELOAD_VEHICLE_TEMPLATE_ACCESSORY, Console::Yes },
+            { "quest_greeting_locale",         HandleReloadQuestGreetingLocaleCommand,        rbac::RBAC_PERM_COMMAND_RELOAD_QUEST_GREETING_LOCALE, Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -562,6 +564,14 @@ public:
         handler->SendGlobalGMSysMessage("DB table `quest_greeting` reloaded.");
         LOG_INFO("server.loading", "Reloading Quest Greeting locales...");
         sObjectMgr->LoadQuestGreetingsLocales(); // Must be after LoadQuestGreetings()
+        handler->SendGlobalGMSysMessage("DB table `quest_greeting_locale` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadQuestGreetingLocaleCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading Quest Greeting locales...");
+        sObjectMgr->LoadQuestGreetingsLocales();
         handler->SendGlobalGMSysMessage("DB table `quest_greeting_locale` reloaded.");
         return true;
     }
@@ -1274,6 +1284,14 @@ public:
         LOG_INFO("server.loading", "Reloading game_graveyard table...");
         sGraveyard->LoadGraveyardFromDB();
         handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadCreatureSummonGroupsCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading creature_summon_groups table...");
+        sObjectMgr->LoadTempSummons();
+        handler->SendGlobalGMSysMessage("DB table `creature_summon_groups` reloaded.");
         return true;
     }
 };

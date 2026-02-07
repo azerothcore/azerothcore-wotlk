@@ -62,12 +62,15 @@ public:
             { "title",    HandleLookupTitleCommand,        rbac::RBAC_PERM_COMMAND_LOOKUP_TITLE,    Console::Yes  },
             { "spell",    HandleLookupSpellCommand,        rbac::RBAC_PERM_COMMAND_LOOKUP_SPELL,    Console::Yes  },
             { "spell id", HandleLookupSpellIdCommand,      rbac::RBAC_PERM_COMMAND_LOOKUP_SPELL_ID, Console::Yes  },
-            { "player",   lookupPlayerCommandTable },
+            { "map id",   HandleLookupMapIdCommand,        rbac::RBAC_PERM_COMMAND_LOOKUP_MAP_ID,   Console::Yes  },
+            { "item id",  HandleLookupItemIdCommand,       rbac::RBAC_PERM_COMMAND_LOOKUP_ITEM_ID,  Console::Yes  },
+            { "quest id", HandleLookupQuestIdCommand,      rbac::RBAC_PERM_COMMAND_LOOKUP_QUEST_ID, Console::Yes  },
+            { "player",   lookupPlayerCommandTable, rbac::RBAC_PERM_COMMAND_LOOKUP_PLAYER },
         };
 
         static ChatCommandTable commandTable =
         {
-            { "lookup", lookupCommandTable }
+            { "lookup", lookupCommandTable, rbac::RBAC_PERM_COMMAND_LOOKUP }
         };
 
         return commandTable;
@@ -1691,6 +1694,73 @@ public:
             handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
             return false;
         }
+
+        return true;
+    }
+
+    static bool HandleLookupMapIdCommand(ChatHandler* handler, uint32 id)
+    {
+        MapEntry const* mapEntry = sMapStore.LookupEntry(id);
+        if (!mapEntry)
+        {
+            handler->PSendSysMessage("Map %u not found.", id);
+            return true;
+        }
+
+        int locale = handler->GetSessionDbcLocale();
+        std::string name = mapEntry->name[locale];
+        if (name.empty())
+            name = mapEntry->name[sWorld->GetDefaultDbcLocale()];
+
+        handler->PSendSysMessage("Map %u - %s (Type: %u)", id, name.c_str(), mapEntry->map_type);
+        return true;
+    }
+
+    static bool HandleLookupItemIdCommand(ChatHandler* handler, uint32 id)
+    {
+        ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(id);
+        if (!itemTemplate)
+        {
+            handler->PSendSysMessage("Item %u not found.", id);
+            return true;
+        }
+
+        std::string name = itemTemplate->Name1;
+        if (name.empty())
+        {
+            handler->PSendSysMessage("Item %u has no name.", id);
+            return true;
+        }
+
+        if (handler->GetSession())
+            handler->PSendSysMessage("%u - |cffffffff|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r", id, id, name.c_str());
+        else
+            handler->PSendSysMessage("%u - %s", id, name.c_str());
+
+        return true;
+    }
+
+    static bool HandleLookupQuestIdCommand(ChatHandler* handler, uint32 id)
+    {
+        Quest const* quest = sObjectMgr->GetQuestTemplate(id);
+        if (!quest)
+        {
+            handler->PSendSysMessage("Quest %u not found.", id);
+            return true;
+        }
+
+        std::string title = quest->GetTitle();
+        if (title.empty())
+            title = "Unknown";
+
+        if (handler->GetSession())
+        {
+            Player* target = handler->getSelectedPlayerOrSelf();
+            QuestStatus status = target ? target->GetQuestStatus(id) : QUEST_STATUS_NONE;
+            handler->PSendSysMessage("%u - |cffffffff|Hquest:%u:%u|h[%s]|h|r", id, id, status, title.c_str());
+        }
+        else
+            handler->PSendSysMessage("%u - %s", id, title.c_str());
 
         return true;
     }

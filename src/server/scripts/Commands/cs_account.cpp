@@ -50,7 +50,8 @@ public:
             { "gmlevel",    HandleAccountSetGmLevelCommand,   rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_SECLEVEL, Console::Yes },
             { "password",   HandleAccountSetPasswordCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_PASSWORD, Console::Yes },
             { "2fa",        HandleAccountSet2FACommand,       rbac::RBAC_PERM_COMMAND_ACCOUNT_SET, Console::Yes  },
-            { "email",      HandleAccountSetEmailCommand,     rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_SEC_EMAIL, Console::Yes }
+            { "email",      HandleAccountSetEmailCommand,     rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_SEC_EMAIL, Console::Yes },
+            { "sec regmail", HandleAccountSetRegEmailCommand, rbac::RBAC_PERM_COMMAND_ACCOUNT_SET_SEC_REGMAIL, Console::Yes }
         };
 
         static ChatCommandTable accountLockCommandTable
@@ -77,9 +78,10 @@ public:
             { "create",     HandleAccountCreateCommand,      rbac::RBAC_PERM_COMMAND_ACCOUNT_CREATE, Console::Yes },
             { "delete",     HandleAccountDeleteCommand,      rbac::RBAC_PERM_COMMAND_ACCOUNT_DELETE, Console::Yes },
             { "onlinelist", HandleAccountOnlineListCommand,  rbac::RBAC_PERM_COMMAND_ACCOUNT_ONLINE_LIST, Console::Yes },
-            { "lock",       accountLockCommandTable                                      },
+            { "lock",       accountLockCommandTable, rbac::RBAC_PERM_COMMAND_ACCOUNT_LOCK },
             { "set",        accountSetCommandTable                                       },
             { "password",   HandleAccountPasswordCommand,    rbac::RBAC_PERM_COMMAND_ACCOUNT_PASSWORD, Console::No  },
+            { "email",      HandleAccountEmailCommand,       rbac::RBAC_PERM_COMMAND_ACCOUNT_EMAIL, Console::No  },
             { "remove",     accountRemoveCommandTable                                    },
             { "",           HandleAccountCommand,            rbac::RBAC_PERM_COMMAND_ACCOUNT, Console::No  }
         };
@@ -955,6 +957,87 @@ public:
                 handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEEMAIL);
                 return false;
         }
+        return true;
+    }
+    /// Change own email (player command)
+    static bool HandleAccountEmailCommand(ChatHandler* handler, std::string oldEmail, std::string newEmail, std::string newEmailConfirmation)
+    {
+        if (newEmail != newEmailConfirmation)
+        {
+            handler->SendErrorMessage(LANG_NEW_EMAILS_NOT_MATCH);
+            return false;
+        }
+
+        uint32 accountId = handler->GetSession()->GetAccountId();
+
+        // Verify the old email matches
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_GET_EMAIL_BY_ID);
+        stmt->SetData(0, accountId);
+        PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEEMAIL);
+            return false;
+        }
+
+        std::string currentEmail = (*result)[0].Get<std::string>();
+        std::string oldEmailUpper = oldEmail;
+        Utf8ToUpperOnlyLatin(oldEmailUpper);
+        std::string currentEmailUpper = currentEmail;
+        Utf8ToUpperOnlyLatin(currentEmailUpper);
+
+        if (oldEmailUpper != currentEmailUpper)
+        {
+            handler->SendErrorMessage("Current email does not match.");
+            return false;
+        }
+
+        AccountOpResult opResult = AccountMgr::ChangeEmail(accountId, newEmail);
+        switch (opResult)
+        {
+            case AOR_OK:
+                handler->SendSysMessage(LANG_COMMAND_EMAIL);
+                break;
+            case AOR_EMAIL_TOO_LONG:
+                handler->SendErrorMessage(LANG_EMAIL_TOO_LONG);
+                return false;
+            default:
+                handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEEMAIL);
+                return false;
+        }
+        return true;
+    }
+
+    /// Set registration email for account (GM command)
+    static bool HandleAccountSetRegEmailCommand(ChatHandler* handler, AccountIdentifier account, std::string email, std::string emailConfirmation)
+    {
+        if (!account)
+            return false;
+
+        std::string accountName = account.GetName();
+
+        uint32 targetAccountId = account.GetID();
+        if (!targetAccountId)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            return false;
+        }
+
+        if (email != emailConfirmation)
+        {
+            handler->SendErrorMessage(LANG_NEW_EMAILS_NOT_MATCH);
+            return false;
+        }
+
+        Utf8ToUpperOnlyLatin(email);
+
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REG_EMAIL);
+        stmt->SetData(0, email);
+        stmt->SetData(1, targetAccountId);
+        LoginDatabase.Execute(stmt);
+
+        handler->PSendSysMessage("Registration email for account %s set to: %s", accountName.c_str(), email.c_str());
         return true;
     }
 };

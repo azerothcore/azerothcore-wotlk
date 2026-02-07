@@ -44,7 +44,7 @@ public:
 
         static ChatCommandTable learnAllCommandTable =
         {
-            { "my",        learnAllMyCommandTable },
+            { "my",        learnAllMyCommandTable, rbac::RBAC_PERM_COMMAND_LEARN_ALL_MY },
             { "gm",        HandleLearnAllGMCommand,            rbac::RBAC_PERM_COMMAND_LEARN_ALL_GM, Console::No },
             { "crafts",    HandleLearnAllCraftsCommand,        rbac::RBAC_PERM_COMMAND_LEARN_ALL_CRAFTS, Console::No },
             { "default",   HandleLearnAllDefaultCommand,       rbac::RBAC_PERM_COMMAND_LEARN_ALL_DEFAULT, Console::No },

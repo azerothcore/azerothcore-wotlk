@@ -46,6 +46,7 @@ enum ShutdownMask : uint8
 {
     SHUTDOWN_MASK_RESTART = 1,
     SHUTDOWN_MASK_IDLE    = 2,
+    SHUTDOWN_MASK_FORCE   = 4,
 };
 
 enum ShutdownExitCode : uint8

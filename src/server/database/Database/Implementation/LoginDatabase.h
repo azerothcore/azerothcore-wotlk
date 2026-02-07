@@ -127,6 +127,7 @@ enum LoginDatabaseStatements : uint32
     LOGIN_INS_UPTIME,
 
     LOGIN_GET_EMAIL_BY_ID,
+    LOGIN_UPD_REG_EMAIL,
 
     // RBAC
     LOGIN_SEL_RBAC_ACCOUNT_PERMISSIONS,

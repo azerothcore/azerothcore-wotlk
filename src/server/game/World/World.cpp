@@ -1468,8 +1468,13 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, std::strin
 
     LOG_DEBUG("server.worldserver", "Server shutdown called with ShutdownMask {}, ExitCode {}, Time {}, Reason {}", ShutdownMask(options), ShutdownExitCode(exitcode), secsToTimeString(time), reason);
 
+    ///- If force shutdown, disconnect all sessions and stop immediately
+    if (options & SHUTDOWN_MASK_FORCE)
+    {
+        _stopEvent = true;
+    }
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
-    if (time == 0)
+    else if (time == 0)
     {
         if (!(options & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
             _stopEvent = true;                             // exist code already set
