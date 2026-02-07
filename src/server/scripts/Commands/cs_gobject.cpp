@@ -50,6 +50,7 @@ public:
             { "turn",      HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
             { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
             { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "load",      HandleGameObjectLoadCommand,     SEC_ADMINISTRATOR, Console::No },
             { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
             { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No },
             { "respawn",   HandleGameObjectRespawn,         SEC_GAMEMASTER,    Console::No }
@@ -141,6 +142,47 @@ public:
         sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGameObjectData(guidLow));
 
         handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, uint32(objectId), objectInfo->name, guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        return true;
+    }
+
+    static bool HandleGameObjectLoadCommand(ChatHandler* handler, GameObjectSpawnId spawnId)
+    {
+        if (!spawnId)
+            return false;
+
+        GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
+        if (!data)
+        {
+            handler->PSendSysMessage("Gameobject spawn data not found for spawn ID %u.", uint32(spawnId));
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        Map* map = player->GetMap();
+
+        if (data->mapid != map->GetId())
+        {
+            handler->PSendSysMessage("Gameobject spawn %u is on a different map.", uint32(spawnId));
+            return false;
+        }
+
+        GameObjectTemplate const* objectInfo = sObjectMgr->GetGameObjectTemplate(data->id);
+        if (!objectInfo)
+        {
+            handler->PSendSysMessage("Gameobject template not found for entry %u.", data->id);
+            return false;
+        }
+
+        GameObject* object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
+        if (!object->LoadGameObjectFromDB(spawnId, map, true))
+        {
+            delete object;
+            handler->PSendSysMessage("Failed to load gameobject spawn %u.", uint32(spawnId));
+            return false;
+        }
+
+        sObjectMgr->AddGameobjectToGrid(spawnId, data);
+        handler->PSendSysMessage("Gameobject spawn %u loaded successfully.", uint32(spawnId));
         return true;
     }
 

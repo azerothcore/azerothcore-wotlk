@@ -192,6 +192,7 @@ public:
             { "add",            npcAddCommandTable },
             { "delete",         npcDeleteCommandTable },
             { "follow",         npcFollowCommandTable },
+            { "load",           HandleNpcLoadCommand,              SEC_ADMINISTRATOR, Console::No },
             { "set",            npcSetCommandTable }
         };
         static ChatCommandTable commandTable =
@@ -257,6 +258,40 @@ public:
         }
 
         sObjectMgr->AddCreatureToGrid(spawnId, sObjectMgr->GetCreatureData(spawnId));
+        return true;
+    }
+
+    static bool HandleNpcLoadCommand(ChatHandler* handler, CreatureSpawnId spawnId)
+    {
+        if (!spawnId)
+            return false;
+
+        CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+        if (!data)
+        {
+            handler->PSendSysMessage("Creature spawn data not found for spawn ID %u.", uint32(spawnId));
+            return false;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        Map* map = player->GetMap();
+
+        if (data->mapid != map->GetId())
+        {
+            handler->PSendSysMessage("Creature spawn %u is on a different map.", uint32(spawnId));
+            return false;
+        }
+
+        Creature* creature = new Creature();
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, true))
+        {
+            delete creature;
+            handler->PSendSysMessage("Failed to load creature spawn %u.", uint32(spawnId));
+            return false;
+        }
+
+        sObjectMgr->AddCreatureToGrid(spawnId, data);
+        handler->PSendSysMessage("Creature spawn %u loaded successfully.", uint32(spawnId));
         return true;
     }
 
