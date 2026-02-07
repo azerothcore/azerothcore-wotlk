@@ -86,6 +86,7 @@ public:
             { "command",                       HandleReloadCommandCommand,                    SEC_ADMINISTRATOR, Console::Yes },
             { "conditions",                    HandleReloadConditions,                        SEC_ADMINISTRATOR, Console::Yes },
             { "config",                        HandleReloadConfigCommand,                     SEC_ADMINISTRATOR, Console::Yes },
+            { "creature",                      HandleReloadCreatureCommand,                   SEC_ADMINISTRATOR, Console::Yes },
             { "creature_text",                 HandleReloadCreatureText,                      SEC_ADMINISTRATOR, Console::Yes },
             { "creature_questender",           HandleReloadCreatureQuestEnderCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "creature_linked_respawn",       HandleReloadLinkedRespawnCommand,              SEC_ADMINISTRATOR, Console::Yes },
@@ -101,6 +102,7 @@ public:
             { "game_graveyard",                HandleReloadGameGraveyardCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "graveyard_zone",                HandleReloadGameGraveyardZoneCommand,          SEC_ADMINISTRATOR, Console::Yes },
             { "game_tele",                     HandleReloadGameTeleCommand,                   SEC_ADMINISTRATOR, Console::Yes },
+            { "gameobject",                    HandleReloadGameobjectCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "gameobject_questender",         HandleReloadGOQuestEnderCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "gameobject_loot_template",      HandleReloadLootTemplatesGameobjectCommand,    SEC_ADMINISTRATOR, Console::Yes },
             { "gameobject_queststarter",       HandleReloadGOQuestStarterCommand,             SEC_ADMINISTRATOR, Console::Yes },
@@ -1262,6 +1264,22 @@ public:
         LOG_INFO("server.loading", "Reloading game_graveyard table...");
         sGraveyard->LoadGraveyardFromDB();
         handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadCreatureCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading creature table...");
+        sObjectMgr->LoadCreatures();
+        handler->SendGlobalGMSysMessage("DB table `creature` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadGameobjectCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading gameobject table...");
+        sObjectMgr->LoadGameobjects();
+        handler->SendGlobalGMSysMessage("DB table `gameobject` reloaded.");
         return true;
     }
 };
