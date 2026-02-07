@@ -50,7 +50,7 @@ public:
             { "turn",      HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
             { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
             { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "load",      HandleGameObjectLoadCommand,     SEC_ADMINISTRATOR, Console::No },
+            { "load",      HandleGameObjectLoadCommand,     SEC_ADMINISTRATOR, Console::Yes },
             { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
             { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No },
             { "respawn",   HandleGameObjectRespawn,         SEC_GAMEMASTER,    Console::No }
@@ -150,61 +150,17 @@ public:
         if (!spawnId)
             return false;
 
-        GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
+        GameObjectData const* data = sObjectMgr->LoadGameObjectFromDatabase(spawnId);
         if (!data)
         {
-            QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
-                "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, "
-                "ScriptName "
-                "FROM gameobject WHERE gameobject.guid = {}", uint32(spawnId));
-
-            if (!result)
-            {
-                handler->PSendSysMessage("Gameobject spawn %u not found in the database.", uint32(spawnId));
-                return false;
-            }
-
-            Field* fields = result->Fetch();
-            uint32 entry = fields[1].Get<uint32>();
-
-            GameObjectTemplate const* gInfo = sObjectMgr->GetGameObjectTemplate(entry);
-            if (!gInfo)
-            {
-                handler->PSendSysMessage("Gameobject spawn %u has non-existing gameobject entry %u.", uint32(spawnId), entry);
-                return false;
-            }
-
-            GameObjectData& goData = sObjectMgr->NewGOData(spawnId);
-            goData.id             = entry;
-            goData.mapid          = fields[2].Get<uint16>();
-            goData.posX           = fields[3].Get<float>();
-            goData.posY           = fields[4].Get<float>();
-            goData.posZ           = fields[5].Get<float>();
-            goData.orientation    = fields[6].Get<float>();
-            goData.rotation.x    = fields[7].Get<float>();
-            goData.rotation.y    = fields[8].Get<float>();
-            goData.rotation.z    = fields[9].Get<float>();
-            goData.rotation.w    = fields[10].Get<float>();
-            goData.spawntimesecs = fields[11].Get<int32>();
-            goData.animprogress  = fields[12].Get<uint8>();
-            goData.go_state      = GOState(fields[13].Get<uint8>());
-            goData.spawnMask     = fields[14].Get<uint8>();
-            goData.phaseMask     = fields[15].Get<uint32>();
-            goData.artKit        = 0;
-            goData.ScriptId      = sObjectMgr->GetScriptId(fields[16].Get<std::string>());
-
-            if (!goData.ScriptId)
-                goData.ScriptId = gInfo->ScriptId;
-
-            data = sObjectMgr->GetGameObjectData(spawnId);
+            handler->PSendSysMessage("Gameobject spawn %u not found in the database.", uint32(spawnId));
+            return false;
         }
 
-        Player* player = handler->GetSession()->GetPlayer();
-        Map* map = player->GetMap();
-
-        if (data->mapid != map->GetId())
+        Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
+        if (!map)
         {
-            handler->PSendSysMessage("Gameobject spawn %u is on a different map.", uint32(spawnId));
+            handler->PSendSysMessage("Gameobject spawn %u is on a non-instanceable map %u that is not loaded.", uint32(spawnId), data->mapid);
             return false;
         }
 

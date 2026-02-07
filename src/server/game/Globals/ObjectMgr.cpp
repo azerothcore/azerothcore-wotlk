@@ -2422,6 +2422,60 @@ void ObjectMgr::LoadCreatures()
     LOG_INFO("server.loading", " ");
 }
 
+CreatureData const* ObjectMgr::LoadCreatureFromDatabase(ObjectGuid::LowType spawnId)
+{
+    CreatureData const* data = GetCreatureData(spawnId);
+    if (data)
+        return data;
+
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id1, id2, id3, map, equipment_id, "
+        "position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, "
+        "creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.ScriptName "
+        "FROM creature WHERE creature.guid = {}", spawnId);
+
+    if (!result)
+        return nullptr;
+
+    Field* fields = result->Fetch();
+    uint32 id1 = fields[1].Get<uint32>();
+
+    CreatureTemplate const* cInfo = GetCreatureTemplate(id1);
+    if (!cInfo)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with non-existing creature entry {} in id1 field, skipped.", spawnId, id1);
+        return nullptr;
+    }
+
+    CreatureData& creatureData    = _creatureDataStore[spawnId];
+    creatureData.id1              = id1;
+    creatureData.id2              = fields[2].Get<uint32>();
+    creatureData.id3              = fields[3].Get<uint32>();
+    creatureData.mapid            = fields[4].Get<uint16>();
+    creatureData.equipmentId      = fields[5].Get<int8>();
+    creatureData.posX             = fields[6].Get<float>();
+    creatureData.posY             = fields[7].Get<float>();
+    creatureData.posZ             = fields[8].Get<float>();
+    creatureData.orientation      = fields[9].Get<float>();
+    creatureData.spawntimesecs    = fields[10].Get<uint32>();
+    creatureData.wander_distance  = fields[11].Get<float>();
+    creatureData.currentwaypoint  = fields[12].Get<uint32>();
+    creatureData.curhealth        = fields[13].Get<uint32>();
+    creatureData.curmana          = fields[14].Get<uint32>();
+    creatureData.movementType     = fields[15].Get<uint8>();
+    creatureData.spawnMask        = fields[16].Get<uint8>();
+    creatureData.phaseMask        = fields[17].Get<uint32>();
+    creatureData.npcflag          = fields[18].Get<uint32>();
+    creatureData.unit_flags       = fields[19].Get<uint32>();
+    creatureData.dynamicflags     = fields[20].Get<uint32>();
+    creatureData.ScriptId         = GetScriptId(fields[21].Get<std::string>());
+
+    if (!creatureData.ScriptId)
+        creatureData.ScriptId = cInfo->ScriptID;
+
+    return &creatureData;
+}
+
 void ObjectMgr::LoadCreatureSparring()
 {
     uint32 oldMSTime = getMSTime();
@@ -2762,6 +2816,55 @@ void ObjectMgr::LoadGameobjects()
 
     LOG_INFO("server.loading", ">> Loaded {} Gameobjects in {} ms", (unsigned long)_gameObjectDataStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+GameObjectData const* ObjectMgr::LoadGameObjectFromDatabase(ObjectGuid::LowType spawnId)
+{
+    GameObjectData const* data = GetGameObjectData(spawnId);
+    if (data)
+        return data;
+
+    QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, "
+        "ScriptName "
+        "FROM gameobject WHERE gameobject.guid = {}", spawnId);
+
+    if (!result)
+        return nullptr;
+
+    Field* fields = result->Fetch();
+    uint32 entry = fields[1].Get<uint32>();
+
+    GameObjectTemplate const* gInfo = GetGameObjectTemplate(entry);
+    if (!gInfo)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {}) with non-existing gameobject entry {}, skipped.", spawnId, entry);
+        return nullptr;
+    }
+
+    GameObjectData& goData  = _gameObjectDataStore[spawnId];
+    goData.id               = entry;
+    goData.mapid            = fields[2].Get<uint16>();
+    goData.posX             = fields[3].Get<float>();
+    goData.posY             = fields[4].Get<float>();
+    goData.posZ             = fields[5].Get<float>();
+    goData.orientation      = fields[6].Get<float>();
+    goData.rotation.x       = fields[7].Get<float>();
+    goData.rotation.y       = fields[8].Get<float>();
+    goData.rotation.z       = fields[9].Get<float>();
+    goData.rotation.w       = fields[10].Get<float>();
+    goData.spawntimesecs    = fields[11].Get<int32>();
+    goData.animprogress     = fields[12].Get<uint8>();
+    goData.go_state         = GOState(fields[13].Get<uint8>());
+    goData.spawnMask        = fields[14].Get<uint8>();
+    goData.phaseMask        = fields[15].Get<uint32>();
+    goData.artKit           = 0;
+    goData.ScriptId         = GetScriptId(fields[16].Get<std::string>());
+
+    if (!goData.ScriptId)
+        goData.ScriptId = gInfo->ScriptId;
+
+    return &goData;
 }
 
 void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data)
