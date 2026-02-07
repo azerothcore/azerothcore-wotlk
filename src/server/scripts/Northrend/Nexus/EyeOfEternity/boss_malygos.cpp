@@ -17,6 +17,7 @@
 
 #include "CombatAI.h"
 #include "CreatureScript.h"
+#include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "MoveSplineInit.h"
 #include "Opcodes.h"
@@ -503,11 +504,7 @@ struct boss_malygos : public BossAI
             EntryCheckPredicate pred(NPC_POWER_SPARK);
             summons.DoAction(ACTION_POWER_SPARK_FOLLOW, pred);
             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
-            if (Unit* target = me->GetVictim())
-            {
-                AttackStart(target);
-                me->GetMotionMaster()->MoveChase(target);
-            }
+            me->ResumeChasingVictim();
             events.RescheduleEvent(EVENT_START_VORTEX_0, 60s, 1);
             break;
         }
