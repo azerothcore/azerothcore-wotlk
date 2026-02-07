@@ -49,6 +49,7 @@ CREATE TABLE `rbac_account_permissions` (
 -- ============================================================================
 -- Insert permissions
 -- ============================================================================
+DELETE FROM `rbac_permissions`;
 INSERT INTO `rbac_permissions` VALUES
 -- Core permissions (1-53)
 (1,'Instant logout'),
@@ -713,6 +714,7 @@ INSERT INTO `rbac_permissions` VALUES
 -- ============================================================================
 -- Link roles to permissions
 -- ============================================================================
+DELETE FROM `rbac_linked_permissions`;
 INSERT INTO `rbac_linked_permissions` VALUES
 -- ---------------------------------------------------------------------------
 -- Role 192 (Administrator): Core admin permissions + links to GM role and Admin commands
@@ -978,6 +980,7 @@ INSERT INTO `rbac_linked_permissions` VALUES
 -- SEC_MODERATOR = 1 gets Moderator role (194, which includes 195)
 -- SEC_GAMEMASTER = 2 gets GM role (193, which includes 194)
 -- SEC_ADMINISTRATOR = 3 gets Admin role (192, which includes 193)
+DELETE FROM `rbac_default_permissions`;
 INSERT INTO `rbac_default_permissions` VALUES
 (3, 192, -1),  -- Admin gets Admin role
 (2, 193, -1),  -- GM gets GM role
