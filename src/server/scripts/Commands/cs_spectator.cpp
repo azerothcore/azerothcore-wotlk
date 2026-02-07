@@ -20,6 +20,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -32,12 +33,12 @@ public:
     {
         static ChatCommandTable spectatorCommandTable =
         {
-            { "version",  HandleSpectatorVersionCommand,  SEC_PLAYER, Console::No },
-            { "reset",    HandleSpectatorResetCommand,    SEC_PLAYER, Console::No },
-            { "spectate", HandleSpectatorSpectateCommand, SEC_PLAYER, Console::No },
-            { "watch",    HandleSpectatorWatchCommand,    SEC_PLAYER, Console::No },
-            { "leave",    HandleSpectatorLeaveCommand,    SEC_PLAYER, Console::No },
-            { "",         HandleSpectatorCommand,         SEC_PLAYER, Console::No }
+            { "version",  HandleSpectatorVersionCommand,  rbac::RBAC_PERM_COMMAND_SPECT_VERSION,  Console::No },
+            { "reset",    HandleSpectatorResetCommand,    rbac::RBAC_PERM_COMMAND_SPECT_RESET,    Console::No },
+            { "spectate", HandleSpectatorSpectateCommand, rbac::RBAC_PERM_COMMAND_SPECT_SPECTATE, Console::No },
+            { "watch",    HandleSpectatorWatchCommand,    rbac::RBAC_PERM_COMMAND_SPECT_WATCH,    Console::No },
+            { "leave",    HandleSpectatorLeaveCommand,    rbac::RBAC_PERM_COMMAND_SPECT_LEAVE,    Console::No },
+            { "",         HandleSpectatorCommand,         rbac::RBAC_PERM_COMMAND_SPECT,          Console::No }
         };
         static ChatCommandTable commandTable =
         {

@@ -25,6 +25,7 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellAuraEffects.h"
 
 using namespace Acore::ChatCommands;
@@ -38,16 +39,16 @@ public:
     {
         static ChatCommandTable listAurasCommandTable =
         {
-            { "",         HandleListAllAurasCommand,    SEC_MODERATOR, Console::No  },
-            { "id",       HandleListAurasByIdCommand,   SEC_MODERATOR, Console::No  },
-            { "name",     HandleListAurasByNameCommand, SEC_MODERATOR, Console::No  },
+            { "",         HandleListAllAurasCommand,    rbac::RBAC_PERM_COMMAND_LIST_AURAS, Console::No  },
+            { "id",       HandleListAurasByIdCommand,   rbac::RBAC_PERM_COMMAND_LIST_AURAS, Console::No  },
+            { "name",     HandleListAurasByNameCommand, rbac::RBAC_PERM_COMMAND_LIST_AURAS, Console::No  },
         };
 
         static ChatCommandTable listCommandTable =
         {
-            { "creature", HandleListCreatureCommand,    SEC_MODERATOR, Console::Yes },
-            { "item",     HandleListItemCommand,        SEC_MODERATOR, Console::Yes },
-            { "object",   HandleListObjectCommand,      SEC_MODERATOR, Console::Yes },
+            { "creature", HandleListCreatureCommand,    rbac::RBAC_PERM_COMMAND_LIST_CREATURE, Console::Yes },
+            { "item",     HandleListItemCommand,        rbac::RBAC_PERM_COMMAND_LIST_ITEM,     Console::Yes },
+            { "object",   HandleListObjectCommand,      rbac::RBAC_PERM_COMMAND_LIST_OBJECT,   Console::Yes },
             { "auras",    listAurasCommandTable },
         };
         static ChatCommandTable commandTable =

@@ -29,6 +29,7 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "Warden.h"
@@ -46,67 +47,67 @@ public:
     {
         static ChatCommandTable debugPlayCommandTable =
         {
-            { "cinematic",      HandleDebugPlayCinematicCommand,       SEC_ADMINISTRATOR, Console::No },
-            { "movie",          HandleDebugPlayMovieCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "sound",          HandleDebugPlaySoundCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "music",          HandleDebugPlayMusicCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "visual",         HandleDebugVisualCommand,              SEC_ADMINISTRATOR, Console::No }
+            { "cinematic",      HandleDebugPlayCinematicCommand,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "movie",          HandleDebugPlayMovieCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "sound",          HandleDebugPlaySoundCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "music",          HandleDebugPlayMusicCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "visual",         HandleDebugVisualCommand,              rbac::RBAC_PERM_COMMAND_DEBUG, Console::No }
         };
         static ChatCommandTable debugSendCommandTable =
         {
-            { "buyerror",       HandleDebugSendBuyErrorCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "channelnotify",  HandleDebugSendChannelNotifyCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "chatmessage",    HandleDebugSendChatMsgCommand,         SEC_ADMINISTRATOR, Console::No },
-            { "equiperror",     HandleDebugSendEquipErrorCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "largepacket",    HandleDebugSendLargePacketCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "opcode",         HandleDebugSendOpcodeCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "qpartymsg",      HandleDebugSendQuestPartyMsgCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "qinvalidmsg",    HandleDebugSendQuestInvalidMsgCommand, SEC_ADMINISTRATOR, Console::No },
-            { "sellerror",      HandleDebugSendSellErrorCommand,       SEC_ADMINISTRATOR, Console::No },
-            { "setphaseshift",  HandleDebugSendSetPhaseShiftCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "spellfail",      HandleDebugSendSpellFailCommand,       SEC_ADMINISTRATOR, Console::No }
+            { "buyerror",       HandleDebugSendBuyErrorCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "channelnotify",  HandleDebugSendChannelNotifyCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "chatmessage",    HandleDebugSendChatMsgCommand,         rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "equiperror",     HandleDebugSendEquipErrorCommand,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "largepacket",    HandleDebugSendLargePacketCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "opcode",         HandleDebugSendOpcodeCommand,          rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "qpartymsg",      HandleDebugSendQuestPartyMsgCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "qinvalidmsg",    HandleDebugSendQuestInvalidMsgCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "sellerror",      HandleDebugSendSellErrorCommand,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setphaseshift",  HandleDebugSendSetPhaseShiftCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "spellfail",      HandleDebugSendSpellFailCommand,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::No }
         };
         static ChatCommandTable debugCommandTable =
         {
-            { "setbit",         HandleDebugSet32BitCommand,            SEC_ADMINISTRATOR, Console::No },
-            { "threat",         HandleDebugThreatListCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "hostile",        HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
-            { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
-            { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::Yes},
-            { "cooldown",       HandleDebugCooldownCommand,            SEC_ADMINISTRATOR, Console::No },
-            { "getitemstate",   HandleDebugGetItemStateCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "lootrecipient",  HandleDebugGetLootRecipientCommand,    SEC_ADMINISTRATOR, Console::No },
-            { "getvalue",       HandleDebugGetValueCommand,            SEC_ADMINISTRATOR, Console::No },
-            { "getitemvalue",   HandleDebugGetItemValueCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "Mod32Value",     HandleDebugMod32ValueCommand,          SEC_ADMINISTRATOR, Console::No },
+            { "setbit",         HandleDebugSet32BitCommand,            rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "threat",         HandleDebugThreatListCommand,          rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "hostile",        HandleDebugHostileRefListCommand,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "anim",           HandleDebugAnimCommand,                rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "arena",          HandleDebugArenaCommand,               rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "bg",             HandleDebugBattlegroundCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes},
+            { "cooldown",       HandleDebugCooldownCommand,            rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "getitemstate",   HandleDebugGetItemStateCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "lootrecipient",  HandleDebugGetLootRecipientCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "getvalue",       HandleDebugGetValueCommand,            rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "getitemvalue",   HandleDebugGetItemValueCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "Mod32Value",     HandleDebugMod32ValueCommand,          rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "play",           debugPlayCommandTable },
             { "send",           debugSendCommandTable },
-            { "setaurastate",   HandleDebugSetAuraStateCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "setitemvalue",   HandleDebugSetItemValueCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "setvalue",       HandleDebugSetValueCommand,            SEC_ADMINISTRATOR, Console::No },
-            { "spawnvehicle",   HandleDebugSpawnVehicleCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "setvid",         HandleDebugSetVehicleIdCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "entervehicle",   HandleDebugEnterVehicleCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "uws",            HandleDebugUpdateWorldStateCommand,    SEC_ADMINISTRATOR, Console::No },
-            { "update",         HandleDebugUpdateCommand,              SEC_ADMINISTRATOR, Console::No },
-            { "itemexpire",     HandleDebugItemExpireCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "areatriggers",   HandleDebugAreaTriggersCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::Yes},
-            { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
-            { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
-            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
-            { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
-            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No },
-            { "visibilitydata", HandleDebugVisibilityDataCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "zonestats",      HandleDebugZoneStatsCommand,           SEC_MODERATOR,     Console::Yes}
+            { "setaurastate",   HandleDebugSetAuraStateCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setitemvalue",   HandleDebugSetItemValueCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setvalue",       HandleDebugSetValueCommand,            rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "spawnvehicle",   HandleDebugSpawnVehicleCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setvid",         HandleDebugSetVehicleIdCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "entervehicle",   HandleDebugEnterVehicleCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "uws",            HandleDebugUpdateWorldStateCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "update",         HandleDebugUpdateCommand,              rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "itemexpire",     HandleDebugItemExpireCommand,          rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "areatriggers",   HandleDebugAreaTriggersCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "lfg",            HandleDebugDungeonFinderCommand,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes},
+            { "los",            HandleDebugLoSCommand,                 rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "moveflags",      HandleDebugMoveflagsCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "unitstate",      HandleDebugUnitStateCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "objectcount",    HandleDebugObjectCountCommand,         rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes},
+            { "dummy",          HandleDebugDummyCommand,               rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "mapdata",        HandleDebugMapDataCommand,             rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "boundary",       HandleDebugBoundaryCommand,            rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "visibilitydata", HandleDebugVisibilityDataCommand,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "zonestats",      HandleDebugZoneStatsCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes}
         };
         static ChatCommandTable commandTable =
         {
             { "debug", debugCommandTable },
-            { "wpgps", HandleWPGPSCommand, SEC_ADMINISTRATOR, Console::No }
+            { "wpgps", HandleWPGPSCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No }
         };
         return commandTable;
     }

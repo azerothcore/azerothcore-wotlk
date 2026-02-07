@@ -22,6 +22,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "StringFormat.h"
 #include "Tokenize.h"
@@ -514,6 +515,10 @@ bool Acore::Impl::ChatCommands::ChatCommandNode::IsInvokerVisible(ChatHandler co
 
     if (who.IsConsole() && (_permission.AllowConsole == Acore::ChatCommands::Console::Yes))
         return true;
+
+    // RBAC permissions start at 200, SEC_* levels are 0-4
+    if (_permission.RequiredLevel >= rbac::RBAC_PERM_COMMAND_RBAC)
+        return who.HasPermission(_permission.RequiredLevel);
 
     return !who.IsConsole() && who.IsAvailable(_permission.RequiredLevel);
 }

@@ -1345,7 +1345,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
     }
 
     int32 cleanDamage = 0;
-    if (!spellInfo->HasAttribute(SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS) && Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
+    if (Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
     {
         int32 oldDamage = damage;
         damage = Unit::CalcArmorReducedDamage(this, victim, damage, spellInfo, 0, attackType);
@@ -20982,7 +20982,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
     if (posPointers.UnitFieldFlagsPos >= 0)
     {
         uint32 appendValue = m_uint32Values[UNIT_FIELD_FLAGS];
-        if (target->IsGameMaster() && target->GetSession()->IsGMAccount())
+        if (target->IsGameMaster())
             appendValue &= ~UNIT_FLAG_NOT_SELECTABLE;
 
         valuesUpdateBuf.put(posPointers.UnitFieldFlagsPos, appendValue);
@@ -21009,7 +21009,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
 
             if (cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER))
             {
-                if (target->IsGameMaster() && target->GetSession()->IsGMAccount())
+                if (target->IsGameMaster())
                     displayId = cinfo->GetFirstVisibleModel()->CreatureDisplayID;
                 else
                     displayId = cinfo->GetFirstInvisibleModel()->CreatureDisplayID;

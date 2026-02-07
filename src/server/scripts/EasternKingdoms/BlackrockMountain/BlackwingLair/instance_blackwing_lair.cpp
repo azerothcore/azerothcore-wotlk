@@ -204,8 +204,11 @@ public:
             return 0;
         }
 
-        bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
+        bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
+            if (_SkipCheckRequiredBosses(player))
+                return true;
+
             switch (bossId)
             {
                 case DATA_BROODLORD_LASHLAYER:

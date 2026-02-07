@@ -22,6 +22,7 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -34,14 +35,14 @@ public:
     {
         static ChatCommandTable HandleItemRestoreCommandTable =
         {
-            { "list",      HandleItemRestoreListCommand,        SEC_GAMEMASTER,    Console::Yes },
-            { "",          HandleItemRestoreCommand,            SEC_GAMEMASTER,    Console::Yes },
+            { "list",      HandleItemRestoreListCommand,        rbac::RBAC_PERM_COMMAND_ITEM_RESTORE_LIST, Console::Yes },
+            { "",          HandleItemRestoreCommand,            rbac::RBAC_PERM_COMMAND_ITEM_RESTORE,      Console::Yes },
         };
         static ChatCommandTable itemCommandTable =
         {
             { "restore",   HandleItemRestoreCommandTable },
-            { "move",      HandleItemMoveCommand,               SEC_GAMEMASTER,    Console::Yes },
-            { "refund",    HandleItemRefundCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "move",      HandleItemMoveCommand,               rbac::RBAC_PERM_COMMAND_ITEMMOVE,          Console::Yes },
+            { "refund",    HandleItemRefundCommand,             rbac::RBAC_PERM_COMMAND_ITEM_REFUND,       Console::Yes },
         };
         static ChatCommandTable commandTable =
         {

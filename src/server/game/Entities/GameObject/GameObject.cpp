@@ -38,11 +38,6 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 
-bool QuaternionData::IsUnit() const
-{
-    return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
-}
-
 GameObject::GameObject() : WorldObject(), MovableMapObject(),
     m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
@@ -2713,7 +2708,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
         return;
 
     bool forcedFlags = GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo()->chest.groupLootRules && HasLootRecipient();
-    bool targetIsGM = target->IsGameMaster() && target->GetSession()->IsGMAccount();
+    bool targetIsGM = target->IsGameMaster();
 
     ByteBuffer fieldBuffer;
 
