@@ -1,4 +1,4 @@
--- 
+--
 -- Updates more accurate moneyloot values to various NCPs
 UPDATE `creature_template` SET `mingold` = 463, `maxgold` = 1391 WHERE `entry` = 16519; -- Shadowy Executioner
 UPDATE `creature_template` SET `mingold` = 495, `maxgold` = 1485 WHERE `entry` = 16805; -- Broken Skeleton
