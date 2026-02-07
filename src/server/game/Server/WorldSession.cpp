@@ -333,7 +333,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
-    if (IsConnectionIdle() && !HasPermission(rbac::RBAC_PERM_IGNORE_IDLE_CONNECTION))
+    if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && !HasPermission(rbac::RBAC_PERM_IGNORE_IDLE_CONNECTION) && m_Socket)
         m_Socket->CloseSocket();
 
     if (updater.ProcessUnsafe())
@@ -1559,8 +1559,9 @@ bool WorldSession::HasPermission(uint32 permission)
 
 void WorldSession::InvalidateRBACData()
 {
-    LOG_DEBUG("rbac", "WorldSession::InvalidateRBACData [AccountId: {}, Name: {}, realmId: {}]",
-                   _RBACData->GetId(), _RBACData->GetName(), realm.Id.Realm);
+    if (_RBACData)
+        LOG_DEBUG("rbac", "WorldSession::InvalidateRBACData [AccountId: {}, Name: {}, realmId: {}]",
+                       _RBACData->GetId(), _RBACData->GetName(), realm.Id.Realm);
     delete _RBACData;
     _RBACData = nullptr;
 }
