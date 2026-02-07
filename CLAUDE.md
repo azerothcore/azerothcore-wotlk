@@ -113,6 +113,7 @@ Type(Scope/Subscope): Short description (max 50 chars)
 - UTF-8 encoding, LF line endings
 - Max 80 character line length
 - No braces around single-line statements
+- Use {} to parse variables into output instead of %u etc.
 - CI enforces code style checks and compiles with `-Werror`
 
 ## PR Requirements
