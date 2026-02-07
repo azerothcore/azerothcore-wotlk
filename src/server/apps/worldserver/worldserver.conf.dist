@@ -416,33 +416,6 @@ Network.UseSocketActivation = 0
 ###################################################################################################
 
 ###################################################################################################
-# REAL ID / BATTLE.NET IPC
-#
-#    Bnet.Enable
-#        Description: Enable Real ID functionality via bnetserver IPC.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-Bnet.Enable = 0
-
-#
-#    Bnet.ServerAddress
-#        Description: IP address of the bnetserver for IPC connection.
-#        Default:     "127.0.0.1"
-
-Bnet.ServerAddress = "127.0.0.1"
-
-#
-#    Bnet.ServerPort
-#        Description: TCP port of the bnetserver IPC listener.
-#        Default:     1120
-
-Bnet.ServerPort = 1120
-
-#
-###################################################################################################
-
-###################################################################################################
 # REMOTE ACCESS
 #
 #    Ra.Enable
