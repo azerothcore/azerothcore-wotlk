@@ -121,12 +121,22 @@ static ChatSubCommandMap COMMAND_MAP;
             if (!cmd)
                 continue;
 
+            // Only override from DB when the core uses old-style security levels (0-4).
+            // When the core registers an RBAC permission (>= 200), the DB security
+            // field (tinyint 0-4) must not downgrade it.
             if (cmd->_invoker && (cmd->_permission.RequiredLevel != secLevel))
             {
-                LOG_WARN("sql.sql", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
-                    secLevel, name, cmd->_permission.RequiredLevel);
-
-                cmd->_permission.RequiredLevel = secLevel;
+                if (cmd->_permission.RequiredLevel >= rbac::RBAC_PERM_COMMAND_RBAC)
+                {
+                    LOG_DEBUG("sql.sql", "Table `command` has legacy security {} for '{}' but core uses RBAC permission {}. Keeping RBAC.",
+                        secLevel, name, cmd->_permission.RequiredLevel);
+                }
+                else
+                {
+                    LOG_WARN("sql.sql", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
+                        secLevel, name, cmd->_permission.RequiredLevel);
+                    cmd->_permission.RequiredLevel = secLevel;
+                }
             }
 
             if (std::holds_alternative<std::string>(cmd->_help))
@@ -531,13 +541,6 @@ bool Acore::Impl::ChatCommands::ChatCommandNode::IsInvokerVisible(ChatHandler co
 
 bool Acore::Impl::ChatCommands::ChatCommandNode::HasVisibleSubCommands(ChatHandler const& who) const
 {
-    // If parent has an RBAC permission, check it before showing subcommands
-    if (!_invoker && _permission.RequiredLevel >= rbac::RBAC_PERM_COMMAND_RBAC)
-    {
-        if (!who.IsConsole() && !who.HasPermission(_permission.RequiredLevel))
-            return false;
-    }
-
     for (auto it = _subCommands.begin(); it != _subCommands.end(); ++it)
         if (it->second.IsVisible(who))
             return true;
