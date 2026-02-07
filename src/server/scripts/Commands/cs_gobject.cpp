@@ -160,7 +160,7 @@ public:
         Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
         if (!map)
         {
-            handler->SendErrorMessage("Gameobject spawn {} is on a non-instanceable map {} that is not loaded.", uint32(spawnId), data->mapid);
+            handler->SendErrorMessage("Gameobject spawn {} is on an instance map (ID: {}).", uint32(spawnId), data->mapid);
             return false;
         }
 
