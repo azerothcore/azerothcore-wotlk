@@ -141,6 +141,15 @@ void RBACData::SavePermission(uint32 permission, bool granted, int32 realmId)
 
 RBACCommandResult RBACData::RevokePermission(uint32 permissionId, int32 realmId /* = 0*/)
 {
+    // Check if permission Id exists
+    RBACPermission const* perm = sAccountMgr->GetRBACPermission(permissionId);
+    if (!perm)
+    {
+        LOG_TRACE("rbac", "RBACData::RevokePermission [Id: {} Name: {}] (Permission {}, RealmId {}). Permission does not exist",
+                       GetId(), GetName(), permissionId, realmId);
+        return RBAC_ID_DOES_NOT_EXISTS;
+    }
+
     // Check if it's present in any list
     if (!HasGrantedPermission(permissionId) && !HasDeniedPermission(permissionId))
     {

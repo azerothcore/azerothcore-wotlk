@@ -890,10 +890,10 @@ protected:
     std::unique_ptr<rbac::RBACData> rbacData;
 };
 
-TEST_F(RBACRevokeEdgeCasesTest, RevokeUnregistered_ReturnsCantRevoke)
+TEST_F(RBACRevokeEdgeCasesTest, RevokeUnregistered_ReturnsIdDoesNotExist)
 {
     rbac::RBACCommandResult result = rbacData->RevokePermission(TEST_PERM_INVALID);
-    EXPECT_EQ(result, rbac::RBAC_CANT_REVOKE_NOT_IN_LIST);
+    EXPECT_EQ(result, rbac::RBAC_ID_DOES_NOT_EXISTS);
 }
 
 TEST_F(RBACRevokeEdgeCasesTest, RevokeFromEmpty_ReturnsError)
