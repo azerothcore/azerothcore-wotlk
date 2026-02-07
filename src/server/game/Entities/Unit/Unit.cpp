@@ -19808,7 +19808,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
                 pos.Relocate({ seatAddon->ExitParameterX, seatAddon->ExitParameterY, seatAddon->ExitParameterZ, seatAddon->ExitParameterO });
 
             bool isInLoS = GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing);
-            float floorZ = vehicleBase->GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+            float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
 
             if (!isInLoS || pos.GetPositionZ() < floorZ)
                 pos = vehicleBase->GetPosition();
