@@ -37,10 +37,6 @@ BossBoundaryData const boundaries =
     { BOSS_SJONNIR, new RectangleBoundary(1206.56f, 1341.4185f, 579.9434f, 753.9599f) }
 };
 
-Position brannEscortDonePoint = { 939.6467f, 375.48926f, 207.41608f, 0.f };
-Position brannTribunalEventDonePoint = { 1199.685f, 667.15497f, 196.32364f, 3.124139f };
-Position brannDoorDone = { 1256.33f, 667.028f, 189.59921f, 0.f };
-
 class instance_halls_of_stone : public InstanceMapScript
 {
 public:
@@ -111,7 +107,7 @@ public:
                         go->SetGoState(GO_STATE_ACTIVE);
             }
 
-            InstanceScript::SetBossState(id, state);
+            return InstanceScript::SetBossState(id, state);
         }
 
         virtual void OnUnitDeath(Unit* unit) override
@@ -169,14 +165,6 @@ public:
             {
                 case NPC_BRANN:
                     BrannGUID = creature->GetGUID();
-
-                    if (GetBossState(BRANN_DOOR) == DONE)
-                        creature->NearTeleportTo(brannEscortDonePoint);
-                    else if (GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
-                        creature->NearTeleportTo(brannTribunalEventDonePoint);
-                    else if (GetBossState(BRANN_BRONZEBEARD) == DONE)
-                        creature->NearTeleportTo(brannEscortDonePoint);
-
                     break;
             }
 

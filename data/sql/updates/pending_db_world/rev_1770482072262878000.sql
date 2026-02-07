@@ -16,7 +16,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (10012, 36236, 0, 'We\'re with you Brann! Open it!', 31547, 1, 1, 0, 0, 0, 0, '', 0, 0);
 
 -- Summon Groups. They have the same position, yes
-DELETE FROM `creature_summon_groups` WHERE `summonerId`=28070 AND `summonerType`=0;
+DELETE FROM `creature_summon_groups` WHERE `summonerId` = 28070 AND `summonerType` = 0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
 (28070, 0, 0, 27983, 943.0883, 401.3776, 206.16098, 3.804817676544189453, 6, 20000, 'Halls of Stone Tribunal - Dark Rune Protector Group'),
 (28070, 0, 0, 27983, 943.0883, 401.3776, 206.16098, 3.804817676544189453, 6, 20000, 'Halls of Stone Tribunal - Dark Rune Protector Group'),
@@ -66,24 +66,57 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (28070, 31, 0, 'I\'ll use the forge to make batches o\' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!', 14, 0, 100, 1, 0, 14279, 30584, 0, 'brann SAY_VICTORY_SJONNIR_2'),
 (28070, 32, 0, 'I think it\'s time to see what\'s behind the door near the entrance. I\'m going to sneak over there, nice and quiet. Meet me at the door and I\'ll get us in.', 14, 0, 100, 0, 0, 0, 31660, 0, 'brann SAY_ENTRANCE_MEET');
 
-/*
--- Escort
-X: 1062.9545 Y: 475.52713 Z: 207.73082
-X: 1051.7512 Y: 474.38412 Z: 208.46428
-X: 1038.5206 Y: 470.5408 Z: 207.74431
-X: 1025.4148 Y: 461.32217 Z: 207.71443
-X: 1013.8148 Y: 450.56674 Z: 207.71445
-X: 998.8864 Y: 437.2246 Z: 207.36806
-X: 988.21234 Y: 424.72006 Z: 207.41689
-X: 981.52594 Y: 420.01965 Z: 205.98004
-X: 973.29675 Y: 421.35568 Z: 205.98004
-X: 961.14746 Y: 421.33258 Z: 205.98004
-X: 951.749 Y: 416.0841 Z: 205.98004
-X: 944.52466 Y: 406.57574 Z: 205.98004
-X: 945.35394 Y: 395.39194 Z: 205.98003
-X: 946.6389 Y: 386.1174 Z: 205.98001
-X: 939.6467 Y: 375.48926 Z: 207.41608
+-- Abedneum (30899) creature_text
+DELETE FROM `creature_text` WHERE (`CreatureID` = 30899);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(30899, 0, 0, 'Warning: life form pattern not recognized. Archival processing terminated.  Continued interference will result in targeted response.', 14, 0, 100, 0, 0, 13765, 29561, 0, 'abedneum SAY_WARNING'),
+(30899, 1, 0, 'Critical threat index. Void analysis diverted. Initiating sanitization protocol.', 14, 0, 100, 0, 0, 13767, 29577, 0, 'abedneum SAY_CRITICAL'),
+(30899, 2, 0, 'Alert: security fail-safes deactivated. Beginning memory purge and...', 14, 0, 100, 0, 0, 13768, 29579, 0, 'abedneum SAY_FAILSAFE'),
+(30899, 3, 0, 'System online. Life form pattern recognized.  Welcome, Branbronzan.  Query?', 14, 0, 100, 0, 0, 13769, 29580, 0, 'abedneum SAY_ONLINE'),
+(30899, 4, 0, 'Accessing prehistoric data... retrieved. In the beginning the earthen were created to--', 14, 0, 100, 0, 0, 13770, 30611, 0, 'abedneum SAY_LORE_1'),
+(30899, 5, 0, 'Accessing... In the early stages of it\'s development cycle, Azeroth suffered infection by parasitic necrophotic symbiotes.', 14, 0, 100, 0, 0, 13771, 30612, 0, 'abedneum SAY_LORE_2'),
+(30899, 6, 0, 'Designation: Old Gods. Old Gods rendered all systems, including earthen, defenseless in order to facilitate assimilation. This matrix destabilization has been termed the Curse of Flesh. Effects of destabilization increased over time.', 14, 0, 100, 0, 0, 13772, 30613, 0, 'abedneum SAY_LORE_3'),
+(30899, 7, 0, 'Acknowledged, Branbronzan. Session terminated.', 14, 0, 100, 0, 0, 13773, 30614, 0, 'abedneum SAY_SESSION_END');
 
+-- Kaddrak (30898) creature_text
+DELETE FROM `creature_text` WHERE (`CreatureID` = 30898);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(30898, 0, 0, 'Security breach in progress. Analysis of historical archives transferred to lower-priority queue. Countermeasures engaged.', 14, 0, 100, 0, 0, 13756, 29575, 0, 'kaddrak SAY_SECURITY'),
+(30898, 1, 0, 'Accessing... Creators arrived to extirpate symbiotic infection. Assessment revealed that Old God infestation had grown malignant. Excising parasites would result in loss of host--', 14, 0, 100, 0, 0, 13757, 30603, 0, 'kaddrak SAY_LORE_1'),
+(30898, 2, 0, 'Correct. Creators neutralized parasitic threat and contained it within the host. Forge of Wills and other systems were instituted to create new earthen. Safeguards were implemented, and protectors were appointed.', 14, 0, 100, 0, 0, 13758, 30604, 0, 'kaddrak SAY_LORE_2'),
+(30898, 3, 0, 'Designations: Aesir and Vanir. Or in the common nomenclature, storm and earth giants. Sentinel Loken designated supreme. Dragon Aspects appointed to monitor evolution on Azeroth.', 14, 0, 100, 0, 0, 13759, 30605, 0, 'kaddrak SAY_LORE_3');
+
+-- Marnak (30897) creature_text
+DELETE FROM `creature_text` WHERE (`CreatureID` = 30897);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(30897, 0, 0, 'Threat index threshold exceeded.  Celestial archive aborted. Security level heightened.', 14, 0, 100, 0, 0, 13761, 29576, 0, 'marnak SAY_THREAT'),
+(30897, 1, 0, 'Additional background is relevant to your query: following global combat between Aesir and Vanir--', 14, 0, 100, 0, 0, 13762, 30606, 0, 'marnak SAY_LORE_1'),
+(30897, 2, 0, 'Unknown. Data suggests that impetus for global combat originated with prime designate Loken, who neutralized all remaining Aesir and Vanir, affecting termination of conflict. Prime designate Loken then initiated stasis of several seed races, including earthen, giants and vrykul, at designated holding facilities.', 14, 0, 100, 0, 0, 13763, 30607, 0, 'marnak SAY_LORE_2'),
+(30897, 3, 0, 'Essentially that is correct.', 14, 0, 100, 0, 0, 13764, 30608, 0, 'marnak SAY_LORE_3');
+
+DELETE FROM `waypoint_data` WHERE `id` IN (280701, 280702);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`) VALUES
+-- Escort
+(280701, 1 , 1062.9545, 475.52713, 207.73082, NULL, 1),
+(280701, 2 , 1051.7512, 474.38412, 208.46428, NULL, 1),
+(280701, 3 , 1038.5206, 470.5408, 207.74431 , NULL, 1),
+(280701, 4 , 1025.4148, 461.32217, 207.71443, NULL, 1),
+(280701, 5 , 1013.8148, 450.56674, 207.71445, NULL, 1),
+(280701, 6 , 998.8864, 437.2246, 207.36806  , NULL, 1),
+(280701, 7 , 988.21234, 424.72006, 207.41689, NULL, 1),
+(280701, 8 , 981.52594, 420.01965, 205.98004, NULL, 1),
+(280701, 9 , 973.29675, 421.35568, 205.98004, NULL, 1),
+(280701, 10, 961.14746, 421.33258, 205.98004, NULL, 1),
+(280701, 11, 951.749, 416.0841, 205.98004   , NULL, 1),
+(280701, 12, 944.52466, 406.57574, 205.98004, NULL, 1),
+(280701, 13, 945.35394, 395.39194, 205.98003, NULL, 1),
+(280701, 14, 946.6389, 386.1174, 205.98001  , NULL, 1),
+(280701, 15, 939.6467, 375.48926, 207.41608 , NULL, 1),
+-- Fight Start
+(280702, 1, 1304.24, 667.208, 189.5993, NULL, 1),
+(280702, 2, 1308.33, 666.755, 189.5994, NULL, 1);
+
+/* Points
 -- Tribunal Start
 -- Cast 51810
 X: 897.1759 Y: 331.77386 Z: 203.70638
@@ -102,10 +135,6 @@ X: 1202.91 Y: 667.049 Z: 196.23315
 -- Wait 2400ms
 X: 1256.33 Y: 667.028 Z: 189.59921
 -- EmoteState: 27
-
--- Fight Start
-X: 1304.24 Y: 667.208 Z: 189.5993
-X: 1308.33 Y: 666.755 Z: 189.5994
 
 -- Sjonnir Dead
 -- FaceDirection 3.147235631942749023
