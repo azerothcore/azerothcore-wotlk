@@ -708,11 +708,10 @@ class spell_kologarn_focused_eyebeam : public SpellScript
 
 struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
 {
-    boss_kologarn_pit_kill_bunny(Creature* creature) : NullCreatureAI(creature), _boundaryIntersect(nullptr) { }
+    boss_kologarn_pit_kill_bunny(Creature* creature) : NullCreatureAI(creature) { }
 
     void Reset() override
     {
-        delete _boundaryIntersect;
         RectangleBoundary* _boundaryXY = new RectangleBoundary(1782.0f, 1832.0f, -56.0f, 8.0f);
         ZRangeBoundary* _boundaryZ = new ZRangeBoundary(400.0f, 439.0f);
         _boundaryIntersect = new BoundaryIntersectBoundary(_boundaryXY, _boundaryZ);

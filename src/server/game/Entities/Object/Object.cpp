@@ -603,9 +603,6 @@ bool Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uin
     if (data.empty())
         return false;
 
-    if (startOffset + count > m_valuesCount)
-        return false;
-
     std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
     if (tokens.size() != count)
