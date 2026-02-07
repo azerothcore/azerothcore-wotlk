@@ -2506,9 +2506,17 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
+            PathSource pathSource = static_cast<PathSource>(e.action.startClosestWaypoint.pathSource);
+
+            if (pathSource != PathSource::WAYPOINT_MGR && pathSource != PathSource::SMART_WAYPOINT_MGR)
+            {
+                LOG_ERROR("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_START_CLOSEST_WAYPOINT: Invalid PathSource {}",
+                    static_cast<uint32>(pathSource));
+                break;
+            }
+
             float distanceToClosest = std::numeric_limits<float>::max();
             uint32 closestWpId = 0;
-            PathSource pathSource = static_cast<PathSource>(e.action.startClosestWaypoint.pathSource);
 
             for (WorldObject* target : targets)
             {
@@ -2528,10 +2536,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             case PathSource::WAYPOINT_MGR:
                                 path = sWaypointMgr->GetPath(pathId);
                                 break;
-                            default:
-                                LOG_ERROR("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_START_CLOSEST_WAYPOINT: Invalid PathSource {} for creature entry {}",
-                                    static_cast<uint32>(pathSource), creature->GetEntry());
-                                continue;
                             }
 
                             if (!path || path->empty())
