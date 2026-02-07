@@ -37,6 +37,10 @@ BossBoundaryData const boundaries =
     { BOSS_SJONNIR, new RectangleBoundary(1206.56f, 1341.4185f, 579.9434f, 753.9599f) }
 };
 
+Position brannEscortDonePoint = { 939.6467f, 375.48926f, 207.41608f, 0.f };
+Position brannTribunalEventDonePoint = { 1199.685f, 667.15497f, 196.32364f, 3.124139f };
+Position brannDoorDone = { 1256.33f, 667.028f, 189.59921f, 0.f };
+
 class instance_halls_of_stone : public InstanceMapScript
 {
 public:
@@ -98,6 +102,27 @@ public:
             return false;
         }
 
+        bool SetBossState(uint32 id, EncounterState state) override
+        {
+            if (id == BRANN_DOOR && state == DONE)
+            {
+                if (GetBossState(BRANN_DOOR) == DONE)
+                    if (GameObject* go = GetGameObject(GO_SJONNIR_DOOR))
+                        go->SetGoState(GO_STATE_ACTIVE);
+            }
+
+            InstanceScript::SetBossState(id, state);
+        }
+
+        virtual void OnUnitDeath(Unit* unit) override
+        {
+            if (unit->IsPlayer() && GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
+            {
+                if (Creature* brann = GetCreature(NPC_BRANN))
+                    brann->AI()->DoAction(ACTION_PLAYER_DEATH_IN_TRIBUNAL);
+            }
+        }
+
         void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
@@ -126,7 +151,7 @@ public:
                     break;
                 case GO_SJONNIR_DOOR:
                     goSjonnirDoorGUID = go->GetGUID();
-                    if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
+                    if (GetBossState(BRANN_DOOR) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_LEFT_PIPE:
@@ -144,6 +169,14 @@ public:
             {
                 case NPC_BRANN:
                     BrannGUID = creature->GetGUID();
+
+                    if (GetBossState(BRANN_DOOR) == DONE)
+                        creature->NearTeleportTo(brannEscortDonePoint);
+                    else if (GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
+                        creature->NearTeleportTo(brannTribunalEventDonePoint);
+                    else if (GetBossState(BRANN_BRONZEBEARD) == DONE)
+                        creature->NearTeleportTo(brannEscortDonePoint);
+
                     break;
             }
 

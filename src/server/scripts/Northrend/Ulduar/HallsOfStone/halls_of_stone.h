@@ -47,8 +47,8 @@ enum Encounter
     BOSS_MAIDEN_OF_GRIEF        = 1,
     BOSS_TRIBUNAL_OF_AGES       = 2,
     BOSS_SJONNIR                = 3,
-    BRANN_BRONZEBEARD           = 4,
-    BRANN_DOOR                  = 5,
+    BRANN_BRONZEBEARD           = 4, // Escort Event
+    BRANN_DOOR                  = 5, // Sjonnir's Door
     MAX_ENCOUNTER               = 6,
 
     DATA_BRANN_ACHIEVEMENT,
@@ -88,6 +88,7 @@ enum npcs
     ACTION_START_SJONNIR_FIGHT      = 5,
     ACTION_SJONNIR_DEAD             = 6,
     ACTION_SJONNIR_WIPE_START       = 7,
+    ACTION_PLAYER_DEATH_IN_TRIBUNAL = 8,
 };
 
 template <class AI, class T>
