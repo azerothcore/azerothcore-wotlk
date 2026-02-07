@@ -714,7 +714,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (me->IsRooted()) // Rooted inhabit type, never move/reposition
                             continue;
 
-                        CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
@@ -3289,6 +3291,26 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
             break;
         }
+        case SMART_ACTION_SET_ANIM_TIER:
+        {
+            for (WorldObject* target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->SetAnimTier(AnimTier(e.action.animTier.animTier));
+            break;
+        }
+        case SMART_ACTION_SET_GOSSIP_MENU:
+        {
+            for (WorldObject* target : targets)
+            {
+                if (Creature* creature = target->ToCreature())
+                {
+                    creature->SetGossipMenuId(e.action.setGossipMenu.gossipMenuId);
+                    LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_GOSSIP_MENU: Creature {} set gossip menu to {}",
+                        creature->GetGUID().ToString(), e.action.setGossipMenu.gossipMenuId);
+                }
+            }
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -4529,6 +4551,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (e.event.doAction.eventId != var0)
                     return;
+                RecalcTimer(e, e.event.doAction.cooldownMin, e.event.doAction.cooldownMax);
                 ProcessAction(e, unit, var0);
                 break;
             }
@@ -4767,12 +4790,10 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
                     return;
                 }
-
-                // If no targets are found and it's off cooldown, check again in 1200ms
-                RecalcTimer(e, 1200, 1200);
-                break;
             }
 
+            // No targets found
+            RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
             break;
         }
         case SMART_EVENT_AREA_RANGE:

@@ -5170,6 +5170,26 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
     });
 
+    ApplySpellFix({
+        60586, // Mighty Spear Thrust
+        60776, // Claw Swipe
+        60881, // Fatal Strike
+        60864, // Jaws of Death
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
+    });
+
+    // The Brothers Bronzebeard
+    ApplySpellFix({
+        56675, // Summon Brann Bronzebeard
+        56676, // Summon Yorg Stormheart
+        56697, // Summon Magni Bronzebeard
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

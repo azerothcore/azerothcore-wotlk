@@ -1715,19 +1715,23 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     sScriptMgr->OnGuildMemberWitdrawMoney(this, player, amount, repair);
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-    // Add money to player (if required)
+
+    if (!_ModifyBankMoney(trans, amount, false))
+        return false;
+
     if (!repair)
     {
         if (!player->ModifyMoney(amount))
+        {
+            _ModifyBankMoney(trans, amount, true);
             return false;
+        }
 
         player->SaveGoldToDB(trans);
     }
 
     // Update remaining money amount
     member->UpdateBankWithdrawValue(trans, GUILD_BANK_MAX_TABS, amount);
-    // Remove money from bank
-    _ModifyBankMoney(trans, amount, false);
 
     // Log guild bank event
     _LogBankEvent(trans, repair ? GUILD_BANK_LOG_REPAIR_MONEY : GUILD_BANK_LOG_WITHDRAW_MONEY, uint8(0), player->GetGUID(), amount);

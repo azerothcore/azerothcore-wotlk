@@ -81,6 +81,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     _currentRangeMode = false;
     _attackDistance = 0.f;
+    _mainSpellId = 0;
 }
 
 bool SmartAI::IsAIControlled() const
@@ -858,7 +859,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, me->IsWithinMeleeRange(who) || _currentRangeMode))
+    if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
@@ -950,6 +951,14 @@ void SmartAI::InitializeAI()
         if (!(event.action.cast.castFlags & SMARTCAST_MAIN_SPELL))
             continue;
 
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+        if (spellInfo && spellInfo->IsPositive())
+        {
+            LOG_WARN("scripts.ai", "SmartAI: Creature {} has SMARTCAST_MAIN_SPELL on positive spell {} - positive spells should not be used as main spell",
+                me->GetEntry(), event.action.cast.spell);
+            continue;
+        }
+
         SetMainSpell(event.action.cast.spell);
         break;
     }
@@ -963,6 +972,11 @@ void SmartAI::InitializeAI()
                 continue;
 
             if (!(event.action.cast.castFlags & SMARTCAST_COMBAT_MOVE))
+                continue;
+
+            // Don't use positive (healing/buff) spells to determine attack distance
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+            if (spellInfo && spellInfo->IsPositive())
                 continue;
 
             SetMainSpell(event.action.cast.spell);
@@ -1122,6 +1136,7 @@ void SmartAI::SetMainSpell(uint32 spellId)
     if (maxRange <= NOMINAL_MELEE_RANGE)
         return;
 
+    _mainSpellId = spellId;
     _attackDistance = std::max(maxRange - NOMINAL_MELEE_RANGE, 0.0f);
     _currentRangeMode = true;
 }
@@ -1220,6 +1235,27 @@ void SmartAI::DistancingEnded()
 {
     SetCurrentRangeMode(true, _pendingDistancing);
     _pendingDistancing = 0.f;
+}
+
+bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
+{
+    if (me->HasSpellCooldown(spellInfo->Id))
+        return true;
+
+    if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
+        return true;
+    if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
+        return true;
+
+    return false;
+}
+
+void SmartAI::OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason)
+{
+    CreatureAI::OnSpellCastFinished(spell, reason);
+    if (reason == SPELL_FINISHED_CANCELED && _mainSpellId == spell->Id)
+        if (_currentRangeMode && IsMainSpellPrevented(spell))
+            SetCurrentRangeMode(false);
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)

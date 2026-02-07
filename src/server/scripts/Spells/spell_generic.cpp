@@ -2028,7 +2028,8 @@ class spell_gen_animal_blood : public AuraScript
             return;
 
         if (Unit* owner = GetUnitOwner())
-            owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
+            if (owner->IsInWater())
+                owner->CastSpell(owner, SPELL_SPAWN_BLOOD_POOL, true);
     }
 
     void Register() override
@@ -3658,7 +3659,6 @@ class spell_gen_ds_flush_knockback : public SpellScript
    56698 - Shadow Blast             (spell_gen_default_count_pct_from_max_hp)
    59102 - Shadow Blast             (spell_gen_default_count_pct_from_max_hp)
    60532 - Heart Explosion Effects  (spell_gen_default_count_pct_from_max_hp)
-   60864 - Jaws of Death            (spell_gen_default_count_pct_from_max_hp)
    38441 - Cataclysmic Bolt                         (spell_gen_50pct_count_pct_from_max_hp)
    66316, 67100, 67101, 67102 - Spinning Pain Spike (spell_gen_50pct_count_pct_from_max_hp)
    33711/38794 - Murmur's Touch
@@ -5696,6 +5696,28 @@ class spell_gen_whisper_to_controller : public SpellScript
     }
 };
 
+// 35475 Drums of War
+// 35476 Drums of Battle
+// 35478 Drums of Restoration
+class spell_gen_filter_party_level_80 : public SpellScript
+{
+    PrepareSpellScript(spell_gen_filter_party_level_80);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            return unit && unit->GetLevel() >= 80;
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_filter_party_level_80::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_PARTY);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5800,6 +5822,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_default_count_pct_from_max_hp");
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_10pct_count_pct_from_max_hp", 10);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_50pct_count_pct_from_max_hp", 50);
+    RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_26pct_count_pct_from_max_hp", 26);
     RegisterSpellScript(spell_gen_despawn_self);
     RegisterSpellScript(spell_gen_bandage);
     RegisterSpellScript(spell_gen_paralytic_poison);
@@ -5870,4 +5893,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_bm_on);
     RegisterSpellScript(spell_gen_bm_off);
     RegisterSpellScript(spell_gen_whisper_to_controller);
+    RegisterSpellScript(spell_gen_filter_party_level_80);
 }

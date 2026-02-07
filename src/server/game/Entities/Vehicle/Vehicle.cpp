@@ -26,6 +26,7 @@
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
+#include <algorithm>
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE)
@@ -560,6 +561,11 @@ bool Vehicle::IsVehicleInUse()
         }
 
     return false;
+}
+
+bool Vehicle::IsControllableVehicle() const
+{
+    return std::ranges::any_of(Seats, [](auto const& seat) { return seat.second.SeatInfo->CanControl(); });
 }
 
 void Vehicle::TeleportVehicle(float x, float y, float z, float ang)
