@@ -391,7 +391,8 @@ public:
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (why == EVADE_REASON_BOUNDARY)
-                instance->GetCreature(DATA_THADDIUS_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
+                if (Creature* thaddius = instance->GetCreature(DATA_THADDIUS_BOSS))
+                    thaddius->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
 
             ScriptedAI::EnterEvadeMode(why);
         }
