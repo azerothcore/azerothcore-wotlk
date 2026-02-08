@@ -30,7 +30,7 @@ Based on CLAUDE.md, always verify:
 
 ### 3. C++ Specific Standards
 **From C++ Code Standards wiki - verify:**
-- Tabs and indentation: 4 spaces, never tabs
+- Indentation: 4 spaces, never tabs
 - Comments: Above or beside code, avoid external hyperlinks
 - No trailing whitespace or extra spaces within brackets
 - Brackets: Single-line statements don't need braces; multi-line blocks on new line
