@@ -231,7 +231,7 @@ struct brann_bronzebeard : public ScriptedAI
 
             me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LEAVE, 935.955f, 371.031f, 207.41751f);
             break;
-        case ACTION_OPEN_DOOR: // Reveived via gossip
+        case ACTION_OPEN_DOOR: // Received via gossip
             me->RemoveAura(SPELL_STEALTH);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetWalk(true);
