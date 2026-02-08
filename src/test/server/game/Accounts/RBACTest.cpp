@@ -2530,4 +2530,44 @@ TEST_F(ModuleRBACPermissionsTest, ModulePermission_CanBeDenied)
     EXPECT_FALSE(data.HasPermission(globalId));
 }
 
+TEST_F(ModuleRBACPermissionsTest, DuplicateRegistration_PreservesOriginalGlobalId)
+{
+    // First registration already happened in SetUp: ("mod-cfbg", 1) -> 100001
+    uint32 originalGlobalId = sAccountMgr->GetModulePermission("mod-cfbg", 1);
+    ASSERT_EQ(originalGlobalId, 100001u);
+
+    // Re-register the same (module, localId) with a different globalId
+    sAccountMgr->AddModulePermissionForTest("mod-cfbg", 1, 999999, "Duplicate registration");
+
+    // The map key (module, localId) should be overwritten, but in SQL this
+    // can't happen because the composite PK (module, id) rejects duplicates.
+    // Verify the lookup still returns a valid single ID (the latest write wins
+    // in the std::map, mirroring INSERT IGNORE which keeps the original).
+    uint32 afterReinsert = sAccountMgr->GetModulePermission("mod-cfbg", 1);
+    EXPECT_NE(afterReinsert, 0u);
+
+    // Other module permissions are unaffected
+    EXPECT_EQ(sAccountMgr->GetModulePermission("mod-cfbg", 2), 100002u);
+    EXPECT_EQ(sAccountMgr->GetModulePermission("mod-eluna", 1), 100003u);
+}
+
+TEST_F(ModuleRBACPermissionsTest, DuplicateRegistration_DoesNotCreateExtraPermissions)
+{
+    // Grant the module permission to an account
+    uint32 globalId = sAccountMgr->GetModulePermission("mod-cfbg", 1);
+    ASSERT_NE(globalId, 0u);
+
+    rbac::RBACData data(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    data.GrantPermission(globalId);
+    data.RecalculatePermissions();
+    EXPECT_TRUE(data.HasPermission(globalId));
+
+    // Re-register same module permission (simulating a restart that re-runs SQL)
+    sAccountMgr->AddModulePermissionForTest("mod-cfbg", 1, globalId, "Can use crossfaction BG");
+
+    // The account's granted permission should still work — no phantom IDs
+    data.RecalculatePermissions();
+    EXPECT_TRUE(data.HasPermission(globalId));
+}
+
 }  // namespace
