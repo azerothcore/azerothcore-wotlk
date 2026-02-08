@@ -681,23 +681,28 @@ public:
 
     struct npc_tirions_gambit_tirionAI : npc_escortAI
     {
-        npc_tirions_gambit_tirionAI(Creature* creature) : npc_escortAI(creature), summons(me)
+        npc_tirions_gambit_tirionAI(Creature* creature) : npc_escortAI(creature), summons(me), _eventOver(false)
         {
         }
 
         EventMap events;
         SummonList summons;
+        bool _eventOver;
 
         void Reset() override
         {
             me->setActive(false);
             me->SetStandState(UNIT_STAND_STATE_STAND);
+            _eventOver = false;
         }
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == 1 && data == 1)
+            if (type == 1 && data == 1 && !_eventOver)
+            {
                 events.ScheduleEvent(EVENT_SCENE_0 + 30, 10s);
+                _eventOver = true;
+            }
         }
 
         void DoAction(int32 param) override
@@ -747,7 +752,7 @@ public:
             switch (pointId)
             {
                 case 6:
-                    me->SummonCreature(NPC_INVOKER_BASALEPH, 6130.26f, 2764.83f, 573.92f, 5.19f, TEMPSUMMON_TIMED_DESPAWN, 10 * MINUTE * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_INVOKER_BASALEPH, 6130.26f, 2764.83f, 573.92f, 5.19f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
                     Talk(1);
                     break;
                 case 15:
@@ -812,9 +817,9 @@ public:
                     Talk(2);
                     DoSummonAction(NPC_DISGUISED_CRUSADER, ACTION_SUMMON_ORIENTATION, 200);
 
-                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6160.74f, 2695.90f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
-                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6164.98f, 2697.90f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
-                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6160.74f, 2695.90f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6164.98f, 2697.90f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
 
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_MOVE_STRAIGHT, 27);
                     events.ScheduleEvent(EVENT_SCENE_0, 30s);
@@ -835,7 +840,7 @@ public:
                     break;
                 case EVENT_SCENE_0+3:
                     Talk(3);
-                    if (Creature* cr = me->SummonCreature(NPC_TIRION_LICH_KING, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS))
+                    if (Creature* cr = me->SummonCreature(NPC_TIRION_LICH_KING, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
                         cr->GetMotionMaster()->MovePoint(2, 6131.93f, 2756.84f, 573.92f);
                     events.ScheduleEvent(EVENT_SCENE_0 + 4, 4s);
                     break;
@@ -976,7 +981,6 @@ public:
                             if (target)
                                 (*itr)->AI()->AttackStart(target);
                         }
-
                         break;
                     }
                 case EVENT_SCENE_0+30:

@@ -21,9 +21,11 @@
 #include "CreatureGroups.h"
 #include "GameTime.h"
 #include "Language.h"
+#include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "PoolMgr.h"
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
 #include <string>
@@ -188,9 +190,11 @@ public:
             { "whisper",        HandleNpcWhisperCommand,           SEC_GAMEMASTER, Console::No },
             { "yell",           HandleNpcYellCommand,              SEC_GAMEMASTER, Console::No },
             { "tame",           HandleNpcTameCommand,              SEC_GAMEMASTER, Console::No },
+            { "do",             HandleNpcDoActionCommand,          SEC_GAMEMASTER, Console::No },
             { "add",            npcAddCommandTable },
             { "delete",         npcDeleteCommandTable },
             { "follow",         npcFollowCommandTable },
+            { "load",           HandleNpcLoadCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "set",            npcSetCommandTable }
         };
         static ChatCommandTable commandTable =
@@ -256,6 +260,57 @@ public:
         }
 
         sObjectMgr->AddCreatureToGrid(spawnId, sObjectMgr->GetCreatureData(spawnId));
+        return true;
+    }
+
+    static bool HandleNpcLoadCommand(ChatHandler* handler, CreatureSpawnId spawnId)
+    {
+        if (!spawnId)
+            return false;
+
+        if (sObjectMgr->GetCreatureData(spawnId))
+        {
+            handler->SendErrorMessage("Creature spawn {} is already loaded.", uint32(spawnId));
+            return false;
+        }
+
+        CreatureData const* data = sObjectMgr->LoadCreatureDataFromDB(spawnId);
+        if (!data)
+        {
+            handler->SendErrorMessage("Creature spawn {} not found in the database.", uint32(spawnId));
+            return false;
+        }
+
+        if (sPoolMgr->IsPartOfAPool<Creature>(spawnId))
+        {
+            handler->SendErrorMessage("Creature spawn {} is part of a pool and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        QueryResult eventResult = WorldDatabase.Query("SELECT guid FROM game_event_creature WHERE guid = {}", uint32(spawnId));
+        if (eventResult)
+        {
+            handler->SendErrorMessage("Creature spawn {} is managed by the game event system and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
+        if (!map)
+        {
+            handler->SendErrorMessage("Creature spawn {} is on a non-continent map (ID: {}). Only continent maps are supported.", uint32(spawnId), data->mapid);
+            return false;
+        }
+
+        Creature* creature = new Creature();
+        if (!creature->LoadCreatureFromDB(spawnId, map, true, true))
+        {
+            delete creature;
+            handler->SendErrorMessage("Failed to load creature spawn {}.", uint32(spawnId));
+            return false;
+        }
+
+        sObjectMgr->AddCreatureToGrid(spawnId, data);
+        handler->PSendSysMessage("Creature spawn {} loaded successfully.", uint32(spawnId));
         return true;
     }
 
@@ -1209,6 +1264,20 @@ public:
             return false;
         }
 
+        return true;
+    }
+
+    static bool HandleNpcDoActionCommand(ChatHandler* handler, uint32 actionId)
+    {
+        Creature* creature = handler->getSelectedCreature();
+        if (!creature)
+        {
+            handler->SendErrorMessage(LANG_SELECT_CREATURE);
+            return false;
+        }
+
+        creature->AI()->DoAction(actionId);
+        handler->PSendSysMessage(LANG_NPC_DO_ACTION, creature->GetGUID().ToString(), creature->GetEntry(), creature->GetName(), actionId);
         return true;
     }
 

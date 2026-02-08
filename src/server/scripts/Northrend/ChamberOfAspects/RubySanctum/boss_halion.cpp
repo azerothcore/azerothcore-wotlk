@@ -598,7 +598,7 @@ public:
 
         void SetData(uint32 id, uint32 value) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_CHECK_CORPOREALITY))
+            if (!_events.HasTimeUntilEvent(EVENT_CHECK_CORPOREALITY))
                 return;
 
             if (id == DATA_MATERIAL_DAMAGE_TAKEN)

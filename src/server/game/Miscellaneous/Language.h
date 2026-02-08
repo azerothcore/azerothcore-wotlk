@@ -671,6 +671,8 @@ enum AcoreStrings
 
     LANG_REWARDED                       = 602,
 
+    LANG_NPC_DO_ACTION                  = 603,
+
     // 603-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
