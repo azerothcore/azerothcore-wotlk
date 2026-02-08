@@ -1,3 +1,4 @@
+-- DB update 2026_02_08_00 -> 2026_02_08_01
 --
 DELETE FROM `command` WHERE `name` IN ('npc load', 'gobject load');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
