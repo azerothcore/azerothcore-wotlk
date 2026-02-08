@@ -142,7 +142,6 @@ struct brann_bronzebeard : public ScriptedAI
         // Escort to Tribunal of Ages failed, respawn at original location
         if (instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
         {
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -258,9 +257,7 @@ struct brann_bronzebeard : public ScriptedAI
             }, 23500ms);
             break;
         case ACTION_SJONNIR_WIPE_START: // Received by Sjonnir
-            Reset();
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
-            me->StopMovingOnCurrentPos();
+            me->DespawnOrUnsummon(0s, 5s);
             break;
         case ACTION_PLAYER_DEATH_IN_TRIBUNAL: // Received via Instance
             if (!_recentlySpoken)

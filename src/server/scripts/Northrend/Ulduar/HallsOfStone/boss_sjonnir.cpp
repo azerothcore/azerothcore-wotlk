@@ -111,6 +111,9 @@ public:
             {
                 if (GameObject* console = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_READY);
+
+                if (Creature* brann = me->FindNearestCreature(NPC_BRANN, 100.f))
+                    brann->AI()->DoAction(ACTION_SJONNIR_WIPE_START);
             }
 
             if (instance->GetData(BRANN_DOOR) == DONE)
@@ -130,7 +133,7 @@ public:
             });
 
             ScheduleHealthCheckEvent(50, [&] {
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
+                if (Creature* brann = me->FindNearestCreature(NPC_BRANN, 100.f))
                     brann->AI()->Talk(SAY_BRANN_SPAWN_OOZE);
 
                 scheduler.CancelGroup(GROUP_SUMMONS);
@@ -149,7 +152,7 @@ public:
             });
 
             ScheduleHealthCheckEvent(25, [&] {
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
+                if (Creature* brann = me->FindNearestCreature(NPC_BRANN, 100.f))
                     brann->AI()->Talk(SAY_BRANN_SPAWN_EARTHEN);
 
                 scheduler.CancelGroup(GROUP_SUMMONS);
@@ -181,16 +184,6 @@ public:
             });
         }
 
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            me->DespawnOrUnsummon(0s, 10s);
-
-            if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
-                brann->DespawnOrUnsummon(0s, 10s);
-
-            BossAI::EnterEvadeMode(why);
-        }
-
         void ScheduleTasks() override
         {
             ScheduleTimedEvent(14s, 19s, [&] {
@@ -210,7 +203,7 @@ public:
                 context.Repeat(40s);
             });
 
-            if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
+            if (Creature* brann = me->FindNearestCreature(NPC_BRANN, 100.f))
                 brann->AI()->Talk(SAY_BRANN_SPAWN_TROGG, 20s);
 
             scheduler.Schedule(5s, GROUP_SUMMONS, [&](TaskContext context) {
@@ -230,7 +223,7 @@ public:
                 doors->SetGoState(GO_STATE_READY);
 
             if (instance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
+                if (Creature* brann = me->FindNearestCreature(NPC_BRANN, 100.f))
                     brann->AI()->DoAction(ACTION_START_SJONNIR_FIGHT);
         }
 
@@ -251,7 +244,7 @@ public:
             if (GameObject* sd = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))
                 sd->SetGoState(GO_STATE_ACTIVE);
 
-            if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
+            if (Creature* brann = me->FindNearestCreature(NPC_BRANN, 100.f))
                 brann->AI()->DoAction(ACTION_SJONNIR_DEAD);
         }
 
