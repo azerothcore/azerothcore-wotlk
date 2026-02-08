@@ -98,18 +98,6 @@ public:
             return false;
         }
 
-        bool SetBossState(uint32 id, EncounterState state) override
-        {
-            if (id == BRANN_DOOR && state == DONE)
-            {
-                if (GetBossState(BRANN_DOOR) == DONE)
-                    if (GameObject* go = GetGameObject(GO_SJONNIR_DOOR))
-                        go->SetGoState(GO_STATE_ACTIVE);
-            }
-
-            return InstanceScript::SetBossState(id, state);
-        }
-
         void OnUnitDeath(Unit* unit) override
         {
             if (unit->IsPlayer() && GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
@@ -327,6 +315,12 @@ public:
                     pMarnak->SetGoState(GO_STATE_ACTIVE);
                 if (GameObject* pSkyRoomFloor = instance->GetGameObject(goSkyRoomFloorGUID))
                     pSkyRoomFloor->SetGoState(GO_STATE_READY);
+            }
+
+            if (type == BRANN_DOOR && data == DONE)
+            {
+                if (GameObject* pSjonnirDoor = instance->GetGameObject(goSjonnirDoorGUID))
+                    pSjonnirDoor->SetGoState(GO_STATE_ACTIVE);
             }
 
             if (type == DATA_BRANN_ACHIEVEMENT)

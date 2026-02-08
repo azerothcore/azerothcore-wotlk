@@ -111,13 +111,12 @@ public:
             {
                 if (GameObject* console = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_READY);
+            }
 
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
-                {
-                    brann->setDeathState(DeathState::JustDied);
-                    brann->Respawn();
-                    brann->AI()->DoAction(ACTION_SJONNIR_WIPE_START);
-                }
+            if (instance->GetData(BRANN_DOOR) == DONE)
+            {
+                if (GameObject* doors = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))
+                    doors->SetGoState(GO_STATE_ACTIVE);
             }
 
             ScheduleHealthCheckEvent(75, [&] {
@@ -180,6 +179,16 @@ public:
                     DoCastSelf(SPELL_LIGHTNING_RING_5S);
                 }, 11s);
             });
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            me->DespawnOrUnsummon(0s, 10s);
+
+            if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
+                brann->DespawnOrUnsummon(0s, 10s);
+
+            BossAI::EnterEvadeMode(why);
         }
 
         void ScheduleTasks() override
