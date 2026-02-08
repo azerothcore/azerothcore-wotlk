@@ -2506,6 +2506,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
+            PathSource pathSource = static_cast<PathSource>(e.action.startClosestWaypoint.pathSource);
+
+            if (pathSource != PathSource::WAYPOINT_MGR && pathSource != PathSource::SMART_WAYPOINT_MGR)
+            {
+                LOG_ERROR("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_START_CLOSEST_WAYPOINT: Invalid PathSource {} for entryOrGuid {} source_type {} event_id {} link {}",
+                static_cast<uint32>(pathSource), e.entryOrGuid, e.source_type, e.event_id, e.link);
+                break;
+            }
+
             float distanceToClosest = std::numeric_limits<float>::max();
             uint32 closestWpId = 0;
 
@@ -2515,21 +2524,33 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsSmart(creature))
                     {
-                        for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
+                        for (uint32 pathId = e.action.startClosestWaypoint.pathId1; pathId <= e.action.startClosestWaypoint.pathId2; ++pathId)
                         {
-                            WaypointPath* path = sSmartWaypointMgr->GetPath(wp);
+                            WaypointPath const* path = nullptr;
+
+                            switch (pathSource)
+                            {
+                            case PathSource::SMART_WAYPOINT_MGR:
+                                path = sSmartWaypointMgr->GetPath(pathId);
+                                break;
+                            case PathSource::WAYPOINT_MGR:
+                                path = sWaypointMgr->GetPath(pathId);
+                                break;
+                            }
+
                             if (!path || path->empty())
                                 continue;
 
                             auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
-                                WaypointData& wpData = itrWp->second;
+                                WaypointData const& wpData = itrWp->second;
                                 float distToThisPath = creature->GetExactDistSq(wpData.x, wpData.y, wpData.z);
+
                                 if (distToThisPath < distanceToClosest)
                                 {
                                     distanceToClosest = distToThisPath;
-                                    closestWpId = wp;
+                                    closestWpId = pathId;
                                 }
                             }
                         }
@@ -2539,7 +2560,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             bool repeat = e.action.startClosestWaypoint.repeat;
                             ForcedMovement forcedMovement = static_cast<ForcedMovement>(e.action.startClosestWaypoint.forcedMovement);
 
-                            CAST_AI(SmartAI, creature->AI())->StartPath(forcedMovement, closestWpId, repeat);
+                            CAST_AI(SmartAI, creature->AI())->StartPath(forcedMovement, closestWpId, repeat, nullptr, pathSource);
                         }
                     }
                 }
