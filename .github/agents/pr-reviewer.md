@@ -51,7 +51,7 @@ Based on CLAUDE.md, always verify:
 ### 4. SQL Specific Standards
 **From SQL Standards wiki - verify:**
 - Always use backticks around table and column names
-- Single quotes for strings, NO quotes for integers
+- Single quotes for strings, no quotes for numeric values
 - DELETE before INSERT (never use REPLACE)
 - DELETE/UPDATE must include at least primary key in WHERE clause
 - Prefer IN clause for multiple values: `WHERE entry IN (1, 2, 3)`
@@ -62,7 +62,7 @@ Based on CLAUDE.md, always verify:
 - Column naming: UpperCamelCase (`PositionX`, `DisplayID`)
 - Acronyms in uppercase: `ItemGUID`, `DisplayID`, `RequiredNPCOrGOCount`
 - No integer width specification: `INT` not `INT(11)`
-- Never use MEDIUMINT (use INT)
+- Never use MEDIUMINT (use INT instead for consistency)
 - Float/Double: use CHECK constraints instead of UNSIGNED
 - Charset: utf8mb4, Collation: utf8mb4_unicode_ci (utf8mb4_bin for names)
 - Engine: InnoDB, Row Format: DEFAULT
