@@ -24,7 +24,7 @@ Based on CLAUDE.md, always verify:
 - UTF-8 encoding, LF line endings
 - Max 80 character line length
 - No braces around single-line statements
-- Use {} to parse variables into output instead of %u etc.
+- Format variables in output using {} placeholders instead of printf-style format specifiers like %u
 
 ### 3. Architecture Compliance
 - Changes to game logic should be in `src/server/game/`
