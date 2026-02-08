@@ -716,7 +716,6 @@ Logger.module=4,Console Server
 Logger.spells.scripts=2,Console Errors
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server
-#Logger.ahbot=4,Console Server
 #Logger.auctionHouse=4,Console Server
 #Logger.autobroadcast=4, Console Server
 #Logger.bg.arena=4,Console Server
@@ -2501,6 +2500,20 @@ Arena.LegacyArenaPoints = 0
 #        Default:     1
 
 Rate.ArenaPoints = 1
+
+#
+#    Rate.ArenaPoints2v2
+#        Description: Arena points gain rate for 2v2 bracket.
+#        Default:     0.76
+
+Rate.ArenaPoints2v2 = 0.76
+
+#
+#    Rate.ArenaPoints3v3
+#        Description: Arena points gain rate for 3v3 bracket.
+#        Default:     0.88
+
+Rate.ArenaPoints3v3 = 0.88
 
 #
 #    PvPToken.Enable

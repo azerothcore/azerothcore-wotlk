@@ -714,7 +714,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (me->IsRooted()) // Rooted inhabit type, never move/reposition
                             continue;
 
-                        CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
@@ -2504,6 +2506,15 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
+            PathSource pathSource = static_cast<PathSource>(e.action.startClosestWaypoint.pathSource);
+
+            if (pathSource != PathSource::WAYPOINT_MGR && pathSource != PathSource::SMART_WAYPOINT_MGR)
+            {
+                LOG_ERROR("scripts.ai.sai", "SmartScript::ProcessAction: SMART_ACTION_START_CLOSEST_WAYPOINT: Invalid PathSource {} for entryOrGuid {} source_type {} event_id {} link {}",
+                static_cast<uint32>(pathSource), e.entryOrGuid, e.source_type, e.event_id, e.link);
+                break;
+            }
+
             float distanceToClosest = std::numeric_limits<float>::max();
             uint32 closestWpId = 0;
 
@@ -2513,21 +2524,33 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsSmart(creature))
                     {
-                        for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
+                        for (uint32 pathId = e.action.startClosestWaypoint.pathId1; pathId <= e.action.startClosestWaypoint.pathId2; ++pathId)
                         {
-                            WaypointPath* path = sSmartWaypointMgr->GetPath(wp);
+                            WaypointPath const* path = nullptr;
+
+                            switch (pathSource)
+                            {
+                            case PathSource::SMART_WAYPOINT_MGR:
+                                path = sSmartWaypointMgr->GetPath(pathId);
+                                break;
+                            case PathSource::WAYPOINT_MGR:
+                                path = sWaypointMgr->GetPath(pathId);
+                                break;
+                            }
+
                             if (!path || path->empty())
                                 continue;
 
                             auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
-                                WaypointData& wpData = itrWp->second;
+                                WaypointData const& wpData = itrWp->second;
                                 float distToThisPath = creature->GetExactDistSq(wpData.x, wpData.y, wpData.z);
+
                                 if (distToThisPath < distanceToClosest)
                                 {
                                     distanceToClosest = distToThisPath;
-                                    closestWpId = wp;
+                                    closestWpId = pathId;
                                 }
                             }
                         }
@@ -2537,7 +2560,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             bool repeat = e.action.startClosestWaypoint.repeat;
                             ForcedMovement forcedMovement = static_cast<ForcedMovement>(e.action.startClosestWaypoint.forcedMovement);
 
-                            CAST_AI(SmartAI, creature->AI())->StartPath(forcedMovement, closestWpId, repeat);
+                            CAST_AI(SmartAI, creature->AI())->StartPath(forcedMovement, closestWpId, repeat, nullptr, pathSource);
                         }
                     }
                 }
@@ -3294,6 +3317,19 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             for (WorldObject* target : targets)
                 if (IsUnit(target))
                     target->ToUnit()->SetAnimTier(AnimTier(e.action.animTier.animTier));
+            break;
+        }
+        case SMART_ACTION_SET_GOSSIP_MENU:
+        {
+            for (WorldObject* target : targets)
+            {
+                if (Creature* creature = target->ToCreature())
+                {
+                    creature->SetGossipMenuId(e.action.setGossipMenu.gossipMenuId);
+                    LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_SET_GOSSIP_MENU: Creature {} set gossip menu to {}",
+                        creature->GetGUID().ToString(), e.action.setGossipMenu.gossipMenuId);
+                }
+            }
             break;
         }
         default:
@@ -4775,12 +4811,10 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
                     return;
                 }
-
-                // If no targets are found and it's off cooldown, check again in 1200ms
-                RecalcTimer(e, 1200, 1200);
-                break;
             }
 
+            // No targets found
+            RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
             break;
         }
         case SMART_EVENT_AREA_RANGE:

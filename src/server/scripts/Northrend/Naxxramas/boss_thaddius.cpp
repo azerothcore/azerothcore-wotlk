@@ -129,6 +129,15 @@ public:
         uint32 resetTimer{};
         bool ballLightningEnabled;
 
+        bool IsAnyPlayerInMeleeRange() const
+        {
+            for (auto const& ref : me->GetThreatMgr().GetThreatList())
+                if (Unit* target = ref->getTarget())
+                    if (target->IsPlayer() && me->IsWithinMeleeRange(target))
+                        return true;
+            return false;
+        }
+
         void DoAction(int32 param) override
         {
             if (param == ACTION_SUMMON_DIED)
@@ -327,17 +336,11 @@ public:
                     break;
             }
 
-            if (me->IsWithinMeleeRange(me->GetVictim()))
-            {
+            if (IsAnyPlayerInMeleeRange())
                 DoMeleeAttackIfReady();
-            }
-            else if (ballLightningEnabled)
-            {
+            else if (ballLightningEnabled && !IsAnyPlayerInMeleeRange())
                 if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
-                {
                     me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
-                }
-            }
         }
     };
 };
@@ -388,7 +391,8 @@ public:
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (why == EVADE_REASON_BOUNDARY)
-                instance->GetCreature(DATA_THADDIUS_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
+                if (Creature* thaddius = instance->GetCreature(DATA_THADDIUS_BOSS))
+                    thaddius->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
 
             ScriptedAI::EnterEvadeMode(why);
         }

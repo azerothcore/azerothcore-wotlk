@@ -169,10 +169,14 @@ public:
         {
             if (why == EVADE_REASON_BOUNDARY)
             {
-                instance->GetCreature(DATA_BARON_RIVENDARE_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
-                instance->GetCreature(DATA_LADY_BLAUMEUX_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
-                instance->GetCreature(DATA_SIR_ZELIEK_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
-                instance->GetCreature(DATA_THANE_KORTHAZZ_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                if (Creature* cr = instance->GetCreature(DATA_BARON_RIVENDARE_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                if (Creature* cr = instance->GetCreature(DATA_LADY_BLAUMEUX_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                if (Creature* cr = instance->GetCreature(DATA_SIR_ZELIEK_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                if (Creature* cr = instance->GetCreature(DATA_THANE_KORTHAZZ_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
             }
             BossAI::EnterEvadeMode();
         }

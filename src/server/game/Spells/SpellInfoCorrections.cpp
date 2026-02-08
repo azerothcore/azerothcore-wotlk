@@ -5180,6 +5180,16 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
     });
 
+    // The Brothers Bronzebeard
+    ApplySpellFix({
+        56675, // Summon Brann Bronzebeard
+        56676, // Summon Yorg Stormheart
+        56697, // Summon Magni Bronzebeard
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
