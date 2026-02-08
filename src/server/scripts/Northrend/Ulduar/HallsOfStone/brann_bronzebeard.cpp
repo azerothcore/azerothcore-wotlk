@@ -49,6 +49,18 @@ enum Misc
     QUEST_HALLS_OF_STONE            = 13207,
 };
 
+enum Movement
+{
+    PATH_ESCORT            = 280701,
+    PATH_SJONNIR_FIGHT     = 280702,
+
+    POINT_TRIBUNAL_CONSOLE = 1,
+    POINT_TRIBUNAL_LORE    = 2,
+    POINT_TRIBUNAL_LEAVE   = 3,
+    POINT_SJONNIR_DOOR     = 4,
+    POINT_SJONNIR_FIGHT    = 5,
+    POINT_SJONNIR_DEAD   = 6,
+};
 
 enum ContextGroups
 {
@@ -123,14 +135,14 @@ struct brann_bronzebeard : public ScriptedAI
         me->m_Events.KillAllEvents(false);
         me->SetRegeneratingHealth(false);
         me->SetGossipMenuId(TRIBUNAL_BEFORE);
-        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         me->SetReactState(REACT_PASSIVE);
         summons.DespawnAll();
 
         // Escort to Tribunal of Ages failed, respawn at original location
         if (instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
         {
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -139,7 +151,7 @@ struct brann_bronzebeard : public ScriptedAI
         {
             // Past Sjonnir's Door
             me->NearTeleportTo(brannDoorDone);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
             me->SetImmuneToAll(true);
         }
@@ -162,7 +174,7 @@ struct brann_bronzebeard : public ScriptedAI
 
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
-        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         switch (me->GetGossipMenuId())
         {
             case TRIBUNAL_BEFORE:
@@ -188,19 +200,21 @@ struct brann_bronzebeard : public ScriptedAI
         {
         case ACTION_START_ESCORT_EVENT: // Received via gossip
             Talk(SAY_BRANN_ESCORT_START);
-            me->LoadPath(280701);
-            me->GetMotionMaster()->MoveWaypoint(280701, false);
+            me->LoadPath(PATH_ESCORT);
+            me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
             me->SetReactState(REACT_AGGRESSIVE);
+            me->SetImmuneToAll(true); // @TODO: He is cancelling the path when entering combat or when interacted with. Dunno fix for that yet.
             me->SetRegeneratingHealth(true);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             instance->SetBossState(BRANN_BRONZEBEARD, IN_PROGRESS);
             break;
         case ACTION_START_TRIBUNAL: // Received via gossip
         {
             // DoCastSelf 51810
+            me->SetImmuneToAll(false); // @TODO
             me->SetReactState(REACT_PASSIVE);
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            me->GetMotionMaster()->MovePoint(1, 897.1759f, 331.77386f, 203.70638f);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_CONSOLE, 897.1759f, 331.77386f, 203.70638f);
             InitializeEvent();
             break;
         }
@@ -213,26 +227,27 @@ struct brann_bronzebeard : public ScriptedAI
             me->SetRegeneratingHealth(true);
 
             ResetEvent();
-            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             DoCast(me, 58506, false);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
 
-            me->GetMotionMaster()->MovePoint(3, 935.955f, 371.031f, 207.41751f);
+            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LEAVE, 935.955f, 371.031f, 207.41751f);
             break;
         case ACTION_OPEN_DOOR: // Reveived via gossip
-            me->RemoveAura(58506);
+            me->RemoveAura(SPELL_STEALTH);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->SetWalk(true);
+            me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DOOR, 1202.91f, 667.049f, 196.23315f);
             break;
         case ACTION_START_SJONNIR_FIGHT: // Received by Sjonnir
-            me->GetMotionMaster()->MovePath(280702);
+            me->GetMotionMaster()->MovePath(PATH_SJONNIR_FIGHT);
             break;
         case ACTION_SJONNIR_DEAD: // Received by Sjonnir
             me->m_Events.KillAllEvents(false);
             scheduler.CancelAll();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetOrientation(3.147235631942749023f);
+            me->SetFacingTo(3.147235631942749023f);
             me->m_Events.AddEventAtOffset([this] {
                 Talk(SAY_BRANN_VICTORY_SJONNIR_1);
             }, 10s);
@@ -240,7 +255,7 @@ struct brann_bronzebeard : public ScriptedAI
                 Talk(SAY_BRANN_VICTORY_SJONNIR_2);
             }, 22500ms);
             me->m_Events.AddEventAtOffset([this] {
-                me->GetMotionMaster()->MovePoint(6, 1308.33f, 666.755f, 189.5994f);
+                me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DEAD, 1308.33f, 666.755f, 189.5994f);
             }, 23500ms);
             break;
         case ACTION_SJONNIR_WIPE_START: // Received by Sjonnir
@@ -275,18 +290,20 @@ struct brann_bronzebeard : public ScriptedAI
         {
             switch (id)
             {
-            case 1:
+            case POINT_TRIBUNAL_CONSOLE:
                 me->SetEmoteState(EMOTE_STATE_USE_STANDING);
                 break;
-            case 2:
-                me->SetOrientation(3.926990747451782226f);
+            case POINT_TRIBUNAL_LORE:
+                me->SetFacingTo(3.926990747451782226f);
                 me->SetGossipMenuId(TRIBUNAL_END);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 break;
-            case 3:
+            case POINT_TRIBUNAL_LEAVE:
+                // Will respawn in front of Sjonnir's Door
+                // Sniff reveals different GUID, same entry
                 me->DespawnOrUnsummon(0s, 5s);
                 break;
-            case 4:
+            case POINT_SJONNIR_DOOR:
                 me->SetEmoteState(EMOTE_STATE_USE_STANDING);
                 me->SetWalk(false);
                 me->m_Events.AddEventAtOffset([&] {
@@ -294,15 +311,15 @@ struct brann_bronzebeard : public ScriptedAI
                     instance->SetBossState(BRANN_DOOR, DONE); // Opens Door to Sjonnir
                 }, 3200ms);
                 me->m_Events.AddEventAtOffset([&] {
-                    me->GetMotionMaster()->MovePoint(5, 1256.33f, 667.028f, 189.59921);
+                    me->GetMotionMaster()->MovePoint(POINT_SJONNIR_FIGHT, 1256.33f, 667.028f, 189.59921);
                 }, 5600ms);
                 break;
-            case 5:
+            case POINT_SJONNIR_FIGHT:
                 me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
                 break;
-            case 6:
-                me->SetOrientation(0.104719758033752441f);
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            case POINT_SJONNIR_DEAD:
+                me->SetFacingTo(0.104719758033752441f);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 me->SetGossipMenuId(SJONNIR_END);
                 break;
             default:
@@ -313,14 +330,14 @@ struct brann_bronzebeard : public ScriptedAI
 
     void PathEndReached(uint32 pathId) override
     {
-        if (pathId == 280701)
+        if (pathId == PATH_ESCORT)
         {
             instance->SetBossState(BRANN_BRONZEBEARD, DONE);
             Talk(SAY_BRANN_EVENT_INTRO_1);
             me->SetReactState(REACT_PASSIVE);
             me->SetRegeneratingHealth(false);
             me->SetGossipMenuId(TRIBUNAL_START);
-            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
     }
 
@@ -342,7 +359,7 @@ struct brann_bronzebeard : public ScriptedAI
         if (Creature* cr = me->SummonCreature(NPC_MARNAK, 891.309f, 359.38196f, 217.42168f, 4.6774f, TEMPSUMMON_TIMED_DESPAWN, 580000))
             MarnakGUID = cr->GetGUID();
 
-        if (Creature* cr = me->SummonCreature(NPC_ABEDNEUM, 896.07965f, 330.89822f, 237.91263f, 3.5779f, TEMPSUMMON_TIMED_DESPAWN, 580000))
+        if (Creature* cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86833f, 0.68067f, TEMPSUMMON_TIMED_DESPAWN, 580000)) // Left Eye Position, actual position: 896.07965f, 330.89822f, 237.91263f, 3.5779f
             AbedneumGUID = cr->GetGUID();
 
         _currentPhase = 1;
@@ -638,7 +655,7 @@ struct brann_bronzebeard : public ScriptedAI
                 abedneum->AI()->Talk(SAY_ABEDNEUM_ONLINE);
 
             summons.DespawnAll();
-            me->GetMotionMaster()->MovePoint(2, 917.253f, 351.925f, 203.69878f);
+            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LORE, 917.253f, 351.925f, 203.69878f);
             instance->SetBossState(BOSS_TRIBUNAL_OF_AGES, DONE);
             me->CastSpell(me, SPELL_TRIBUNAL_CREDIT_MARKER, true);
 
@@ -789,7 +806,7 @@ struct brann_bronzebeard : public ScriptedAI
         darkMatterTargetGUID = target->GetGUID();
 
         // Right eye visual
-        if (Creature* cra = me->SummonCreature(NPC_DARK_MATTER, 891.30902f, 359.38195f, 217.421676f, 4.67748f, TEMPSUMMON_TIMED_DESPAWN, 5000))
+        if (Creature* cra = me->SummonCreature(NPC_DARK_MATTER, 891.30902f, 359.38195f, 217.421676f + 2.f /* +2 hacked: too low otherwise */, 4.67748f, TEMPSUMMON_TIMED_DESPAWN, 5000))
             cra->CastSpell(cra, SPELL_DARK_MATTER_VISUAL_CHANNEL, false);
 
         // Left eye visual
