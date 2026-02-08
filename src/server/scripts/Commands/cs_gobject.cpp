@@ -50,6 +50,7 @@ public:
             { "turn",      HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
             { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
             { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "load",      HandleGameObjectLoadCommand,     SEC_ADMINISTRATOR, Console::Yes },
             { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
             { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No },
             { "respawn",   HandleGameObjectRespawn,         SEC_GAMEMASTER,    Console::No }
@@ -141,6 +142,64 @@ public:
         sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGameObjectData(guidLow));
 
         handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, uint32(objectId), objectInfo->name, guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        return true;
+    }
+
+    static bool HandleGameObjectLoadCommand(ChatHandler* handler, GameObjectSpawnId spawnId)
+    {
+        if (!spawnId)
+            return false;
+
+        if (sObjectMgr->GetGameObjectData(spawnId))
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is already loaded.", uint32(spawnId));
+            return false;
+        }
+
+        GameObjectData const* data = sObjectMgr->LoadGameObjectDataFromDB(spawnId);
+        if (!data)
+        {
+            handler->SendErrorMessage("Gameobject spawn {} not found in the database.", uint32(spawnId));
+            return false;
+        }
+
+        if (sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is part of a pool and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        QueryResult eventResult = WorldDatabase.Query("SELECT guid FROM game_event_gameobject WHERE guid = {}", uint32(spawnId));
+        if (eventResult)
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is managed by the game event system and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
+        if (!map)
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is on a non-continent map (ID: {}). Only continent maps are supported.", uint32(spawnId), data->mapid);
+            return false;
+        }
+
+        GameObjectTemplate const* objectInfo = sObjectMgr->GetGameObjectTemplate(data->id);
+        if (!objectInfo)
+        {
+            handler->SendErrorMessage("Gameobject template not found for entry {}.", data->id);
+            return false;
+        }
+
+        GameObject* object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
+        if (!object->LoadGameObjectFromDB(spawnId, map, true))
+        {
+            delete object;
+            handler->SendErrorMessage("Failed to load gameobject spawn {}.", uint32(spawnId));
+            return false;
+        }
+
+        sObjectMgr->AddGameobjectToGrid(spawnId, data);
+        handler->PSendSysMessage("Gameobject spawn {} loaded successfully.", uint32(spawnId));
         return true;
     }
 
