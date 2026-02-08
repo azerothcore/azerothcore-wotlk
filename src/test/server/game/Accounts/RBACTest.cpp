@@ -2433,4 +2433,101 @@ TEST_F(RBACPermissionEnumKeyValuesTest, CommandPermissionStartsAt200)
     EXPECT_EQ(static_cast<uint32>(rbac::RBAC_PERM_COMMAND_RBAC), 200u);
 }
 
+// ---------------------------------------------------------------------------
+// Suite 26: ModuleRBACPermissionsTest
+// Tests for module RBAC permission registration and lookup.
+// ---------------------------------------------------------------------------
+class ModuleRBACPermissionsTest : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        // Register module permissions via test helper
+        sAccountMgr->AddModulePermissionForTest("mod-cfbg", 1, 100001, "Can use crossfaction BG");
+        sAccountMgr->AddModulePermissionForTest("mod-cfbg", 2, 100002, "CFBG admin commands");
+        sAccountMgr->AddModulePermissionForTest("mod-eluna", 1, 100003, "Eluna reload");
+    }
+
+    void TearDown() override
+    {
+        sAccountMgr->ClearPermissionsForTest();
+    }
+};
+
+TEST_F(ModuleRBACPermissionsTest, GetModulePermission_ReturnsGlobalId)
+{
+    EXPECT_EQ(sAccountMgr->GetModulePermission("mod-cfbg", 1), 100001u);
+    EXPECT_EQ(sAccountMgr->GetModulePermission("mod-cfbg", 2), 100002u);
+    EXPECT_EQ(sAccountMgr->GetModulePermission("mod-eluna", 1), 100003u);
+}
+
+TEST_F(ModuleRBACPermissionsTest, GetModulePermission_InvalidModule_ReturnsZero)
+{
+    EXPECT_EQ(sAccountMgr->GetModulePermission("mod-nonexistent", 1), 0u);
+}
+
+TEST_F(ModuleRBACPermissionsTest, GetModulePermission_InvalidId_ReturnsZero)
+{
+    EXPECT_EQ(sAccountMgr->GetModulePermission("mod-cfbg", 999), 0u);
+}
+
+TEST_F(ModuleRBACPermissionsTest, SameLocalId_DifferentModules_DifferentGlobalIds)
+{
+    // Both mod-cfbg and mod-eluna use local ID 1
+    uint32 cfbgGlobal = sAccountMgr->GetModulePermission("mod-cfbg", 1);
+    uint32 elunaGlobal = sAccountMgr->GetModulePermission("mod-eluna", 1);
+
+    EXPECT_NE(cfbgGlobal, 0u);
+    EXPECT_NE(elunaGlobal, 0u);
+    EXPECT_NE(cfbgGlobal, elunaGlobal);
+}
+
+TEST_F(ModuleRBACPermissionsTest, ModulePermission_WorksWithHasPermission)
+{
+    uint32 globalId = sAccountMgr->GetModulePermission("mod-cfbg", 1);
+    ASSERT_NE(globalId, 0u);
+
+    rbac::RBACData data(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    data.GrantPermission(globalId);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(globalId));
+}
+
+TEST_F(ModuleRBACPermissionsTest, ModulePermission_ParticipatesInLinking)
+{
+    // Create a role that links to module permissions
+    uint32 roleId = 200;
+    uint32 cfbgPerm = sAccountMgr->GetModulePermission("mod-cfbg", 1);
+    uint32 elunaPerm = sAccountMgr->GetModulePermission("mod-eluna", 1);
+
+    sAccountMgr->AddPermissionForTest(roleId, "Module Admin Role");
+    sAccountMgr->AddLinkedPermissionForTest(roleId, cfbgPerm);
+    sAccountMgr->AddLinkedPermissionForTest(roleId, elunaPerm);
+
+    rbac::RBACData data(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    data.GrantPermission(roleId);
+    data.RecalculatePermissions();
+
+    EXPECT_TRUE(data.HasPermission(roleId));
+    EXPECT_TRUE(data.HasPermission(cfbgPerm));
+    EXPECT_TRUE(data.HasPermission(elunaPerm));
+}
+
+TEST_F(ModuleRBACPermissionsTest, ModulePermission_CanBeDenied)
+{
+    uint32 globalId = sAccountMgr->GetModulePermission("mod-cfbg", 1);
+    ASSERT_NE(globalId, 0u);
+
+    rbac::RBACData data(TEST_ACCOUNT_ID, TEST_ACCOUNT_NAME, TEST_REALM_ID, TEST_SEC_LEVEL);
+    data.GrantPermission(globalId);
+    data.RecalculatePermissions();
+    EXPECT_TRUE(data.HasPermission(globalId));
+
+    data.RevokePermission(globalId);
+    data.DenyPermission(globalId);
+    data.RecalculatePermissions();
+    EXPECT_FALSE(data.HasPermission(globalId));
+}
+
 }  // namespace

@@ -454,6 +454,8 @@ void AccountMgr::LoadRBAC()
         LOG_INFO("server.loading", " ");
     }
 
+    LoadModuleRBACPermissions();
+
     LOG_DEBUG("rbac", "AccountMgr::LoadRBAC: Loading default permissions");
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_RBAC_DEFAULT_PERMISSIONS);
     stmt->SetData(0, int32(realm.Id.Realm));
@@ -509,6 +511,7 @@ void AccountMgr::ClearRBAC()
 
     _permissions.clear();
     _defaultPermissions.clear();
+    _modulePermissions.clear();
 }
 
 void AccountMgr::AddPermissionForTest(uint32 permissionId, std::string const& name)
@@ -531,7 +534,87 @@ void AccountMgr::AddDefaultPermissionForTest(uint8 secLevel, uint32 permissionId
     _defaultPermissions[secLevel].insert(permissionId);
 }
 
+void AccountMgr::AddModulePermissionForTest(std::string const& module, uint32 localId, uint32 globalId, std::string const& name)
+{
+    _modulePermissions[{module, localId}] = globalId;
+
+    if (_permissions.find(globalId) == _permissions.end())
+        _permissions[globalId] = new rbac::RBACPermission(globalId, name);
+}
+
 void AccountMgr::ClearPermissionsForTest()
 {
     ClearRBAC();
+}
+
+void AccountMgr::LoadModuleRBACPermissions()
+{
+    _modulePermissions.clear();
+
+    LOG_DEBUG("rbac", "AccountMgr::LoadModuleRBACPermissions");
+    uint32 oldMSTime = getMSTime();
+    uint32 count = 0;
+
+    QueryResult result = LoginDatabase.Query(
+        "SELECT module, id, global_id, name"
+        " FROM module_rbac_permissions");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading",
+            ">> Loaded 0 module RBAC permissions."
+            " DB table `module_rbac_permissions` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* field = result->Fetch();
+        std::string moduleName = field[0].Get<std::string>();
+        uint32 localId = field[1].Get<uint32>();
+        uint32 globalId = field[2].Get<uint32>();
+        std::string name = field[3].Get<std::string>();
+
+        _modulePermissions[{moduleName, localId}] = globalId;
+
+        if (_permissions.find(globalId) != _permissions.end())
+        {
+            LOG_WARN("sql.sql",
+                "Module RBAC permission global_id {} (module '{}'"
+                " localId {}) collides with existing permission."
+                " Skipping.",
+                globalId, moduleName, localId);
+            continue;
+        }
+
+        _permissions[globalId] =
+            new rbac::RBACPermission(globalId, name);
+
+        // Sync into rbac_permissions so FK constraints work
+        LoginDatabasePreparedStatement* stmt =
+            LoginDatabase.GetPreparedStatement(
+                LOGIN_INS_MODULE_RBAC_SYNC);
+        stmt->SetData(0, globalId);
+        stmt->SetData(1, name);
+        LoginDatabase.Execute(stmt);
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    LOG_INFO("server.loading",
+        ">> Loaded {} module RBAC permissions in {} ms",
+        count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+uint32 AccountMgr::GetModulePermission(
+    std::string const& module, uint32 localId) const
+{
+    auto it = _modulePermissions.find({module, localId});
+    if (it != _modulePermissions.end())
+        return it->second;
+
+    return 0;
 }

@@ -77,16 +77,21 @@ public:
     rbac::RBACPermissionsContainer const& GetRBACPermissionList() const { return _permissions; }
     rbac::RBACPermissionContainer const& GetRBACDefaultPermissions(uint8 secLevel);
 
+    void LoadModuleRBACPermissions();
+    uint32 GetModulePermission(std::string const& module, uint32 localId) const;
+
     // For unit testing - allows adding permissions without database
     void AddPermissionForTest(uint32 permissionId, std::string const& name);
     void AddLinkedPermissionForTest(uint32 permissionId, uint32 linkedPermissionId);
     void AddDefaultPermissionForTest(uint8 secLevel, uint32 permissionId);
+    void AddModulePermissionForTest(std::string const& module, uint32 localId, uint32 globalId, std::string const& name);
     void ClearPermissionsForTest();
 
 private:
     void ClearRBAC();
     rbac::RBACPermissionsContainer _permissions;
     rbac::RBACDefaultPermissionsContainer _defaultPermissions;
+    std::map<std::pair<std::string, uint32>, uint32> _modulePermissions;
 };
 
 #define sAccountMgr AccountMgr::instance()
