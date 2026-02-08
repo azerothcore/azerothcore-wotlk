@@ -110,7 +110,7 @@ public:
             return InstanceScript::SetBossState(id, state);
         }
 
-        virtual void OnUnitDeath(Unit* unit) override
+        void OnUnitDeath(Unit* unit) override
         {
             if (unit->IsPlayer() && GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
             {
