@@ -245,6 +245,7 @@ struct brann_bronzebeard : public ScriptedAI
             scheduler.CancelAll();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetGossipMenuId(SJONNIR_END);
             me->SetFacingTo(3.147235631942749023f);
             me->m_Events.AddEventAtOffset([this] {
                 Talk(SAY_BRANN_VICTORY_SJONNIR_1);

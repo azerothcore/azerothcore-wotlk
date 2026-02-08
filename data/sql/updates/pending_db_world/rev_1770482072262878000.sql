@@ -1,4 +1,6 @@
 --
+UPDATE `creature_template` SET `npcflag` = `npcflag`&~3 WHERE (`entry` IN (28070, 31366));
+
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 9669);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 (9669, 37476, 0, 'Brann, it would be our honor!', 27614, 1, 1, 0, 0, 0, 0, '', 0, 0);
