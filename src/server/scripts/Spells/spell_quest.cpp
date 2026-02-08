@@ -32,6 +32,55 @@
  * Scriptnames of files in this file should be prefixed with "spell_q#questID_".
  */
 
+//                             Aged  Dying Ancient Kodo
+std::vector<uint32> kodoEntry{ 4700, 4701, 4702 };
+class spell_q5561_kodo_roundup_kodo_kombobulator : public SpellScript
+{
+    PrepareSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* player = caster->ToPlayer())
+                if (player->HasAura(18172)) // Kodo Kombobulator
+                    return SPELL_FAILED_NOT_READY;
+
+        bool ok = false;
+        if (Unit* target = GetExplTargetUnit())
+            if (Creature* creature = target->ToCreature())
+                for (uint32 cid : kodoEntry)
+                    if (creature->GetEntry() == cid)
+                        ok = true;
+
+        if (!ok)
+            return SPELL_FAILED_BAD_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q5561_kodo_roundup_kodo_kombobulator::CheckCast);
+    }
+};
+
+class spell_q5561_kodo_roundup_kodo_kombobulator_despawn : public SpellScript
+{
+    PrepareSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator_despawn);
+
+    void HandleDummyEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* creature = caster->ToCreature())
+                creature->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q5561_kodo_roundup_kodo_kombobulator_despawn::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 class spell_q11065_wrangle_some_aether_rays : public SpellScript
 {
     PrepareSpellScript(spell_q11065_wrangle_some_aether_rays);
@@ -2472,6 +2521,8 @@ class spell_q9847_a_spirit_ally : public SpellScript
 
 void AddSC_quest_spell_scripts()
 {
+    RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
+    RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator_despawn);
     RegisterSpellAndAuraScriptPair(spell_q11065_wrangle_some_aether_rays, spell_q11065_wrangle_some_aether_rays_aura);
     RegisterSpellScript(spell_image_of_drakuru_reagent_check);
     RegisterSpellScript(spell_q12014_steady_as_a_rock);
