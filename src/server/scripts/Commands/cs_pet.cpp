@@ -175,7 +175,7 @@ public:
             return true;
         }
 
-        if (*level < 1 || *level > STRONG_MAX_LEVEL)
+        if (*level < 1)
         {
             handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
