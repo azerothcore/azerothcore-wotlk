@@ -107,7 +107,7 @@ public:
             SlugeCount = 0;
             instance->SetData(DATA_SJONNIR_ACHIEVEMENT, false);
 
-            if (instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
+            if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
             {
                 if (GameObject* console = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_READY);
@@ -116,7 +116,7 @@ public:
                     brann->AI()->DoAction(ACTION_SJONNIR_WIPE_START);
             }
 
-            if (instance->GetBossState(BRANN_DOOR) == DONE)
+            if (instance && instance->GetBossState(BRANN_DOOR) == DONE)
             {
                 if (GameObject* doors = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))
                     doors->SetGoState(GO_STATE_ACTIVE);
@@ -222,7 +222,7 @@ public:
             if (GameObject* doors = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))
                 doors->SetGoState(GO_STATE_READY);
 
-            if (instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
+            if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
                     brann->AI()->DoAction(ACTION_START_SJONNIR_FIGHT);
         }

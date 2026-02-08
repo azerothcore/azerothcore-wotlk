@@ -155,7 +155,6 @@ public:
                     BrannGUID = creature->GetGUID();
                     break;
             }
-
             InstanceScript::OnCreatureCreate(creature);
         }
 

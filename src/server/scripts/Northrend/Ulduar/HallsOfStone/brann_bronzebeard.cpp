@@ -140,13 +140,13 @@ struct brann_bronzebeard : public ScriptedAI
         summons.DespawnAll();
 
         // Escort to Tribunal of Ages failed, respawn at original location
-        if (instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
+        if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
         {
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
         // Respawn Handling
-        if (instance->GetBossState(BRANN_DOOR) == DONE)
+        if (instance && instance->GetBossState(BRANN_DOOR) == DONE)
         {
             // Past Sjonnir's Door
             me->NearTeleportTo(brannDoorDone);
@@ -154,7 +154,7 @@ struct brann_bronzebeard : public ScriptedAI
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
             me->SetImmuneToAll(true);
         }
-        else if (instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
+        else if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
         {
             // In front of Sjonnir's Door
             me->NearTeleportTo(brannTribunalEventDonePoint);
@@ -162,7 +162,7 @@ struct brann_bronzebeard : public ScriptedAI
             DoCastSelf(SPELL_STEALTH);
             me->SetImmuneToAll(true);
         }
-        else if (instance->GetBossState(BRANN_BRONZEBEARD) == DONE)
+        else if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == DONE)
         {
             // Escort to Tribunal of Ages arena Finished
             me->NearTeleportTo(brannEscortDonePoint);
@@ -170,7 +170,7 @@ struct brann_bronzebeard : public ScriptedAI
         }
     }
 
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
+    void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32  /*action*/) override
     {
         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         switch (me->GetGossipMenuId())
@@ -352,7 +352,7 @@ struct brann_bronzebeard : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
+        if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
         {
             // During escort: clear combat but don't call MoveTargetedHome(),
             // so the WaypointMovementGenerator stays active and resumes.
@@ -900,7 +900,7 @@ struct brann_bronzebeard : public ScriptedAI
         ResetEvent();
         me->DespawnOrUnsummon(5s, 10s);
 
-        if (instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
+        if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
         {
             instance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
         }
