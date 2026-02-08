@@ -923,7 +923,6 @@ private:
     uint8 _currentPhase = 0;
 };
 
-
 // 51774 - Taunt
 class spell_taunt_brann : public SpellScript
 {
