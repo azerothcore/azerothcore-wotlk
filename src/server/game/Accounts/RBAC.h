@@ -58,9 +58,9 @@ enum RBACPermissions
     RBAC_PERM_IGNORE_IDLE_CONNECTION                         = 7,
     RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS                       = 8,
     RBAC_PERM_CANNOT_EARN_REALM_FIRST_ACHIEVEMENTS           = 9,
-    // 10 not on 3.3.5a (character templates)
+    // Free 10
     RBAC_PERM_LOG_GM_TRADE                                   = 11,
-    // 12 not on 3.3.5a (demon hunter)
+    // Free 12
     RBAC_PERM_SKIP_CHECK_INSTANCE_REQUIRED_BOSSES            = 13,
     RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_TEAMMASK         = 14,
     RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_CLASSMASK        = 15,
@@ -97,7 +97,7 @@ enum RBACPermissions
     RBAC_PERM_CHANGE_CHANNEL_NOT_MODERATOR                   = 46,
     RBAC_PERM_CAN_IGNORE_LOWER_SECURITY_CHECK                = 47,
     RBAC_PERM_COMMANDS_PINFO_CHECK_PERSONAL_DATA             = 48,
-    RBAC_PERM_EMAIL_CONFIRM_FOR_PASS_CHANGE                  = 49, // Reserved - email confirmation for password change not ported from TC
+    // RBAC_PERM_EMAIL_CONFIRM_FOR_PASS_CHANGE               = 49, // Reserved - email confirmation for password change not ported from TC
     RBAC_PERM_MAY_CHECK_OWN_EMAIL                            = 50,
     RBAC_PERM_ALLOW_TWO_SIDE_TRADE                           = 51,
     RBAC_PERM_NO_BATTLEGROUND_DESERTER_DEBUFF                = 52,
@@ -117,7 +117,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_RBAC_ACC_PERM_DENY                     = 204,
     RBAC_PERM_COMMAND_RBAC_ACC_PERM_REVOKE                   = 205,
     RBAC_PERM_COMMAND_RBAC_LIST                              = 206,
-    // 207-216 not on 3.3.5a (bnet)
+    // Free 207-216
     RBAC_PERM_COMMAND_ACCOUNT                                = 217,
     RBAC_PERM_COMMAND_ACCOUNT_ADDON                          = 218,
     RBAC_PERM_COMMAND_ACCOUNT_CREATE                         = 219,
@@ -191,7 +191,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_CHEAT_TAXI                             = 298,
     RBAC_PERM_COMMAND_CHEAT_WATERWALK                        = 299,
     RBAC_PERM_COMMAND_DEBUG                                  = 300,
-    // 301-342 previously used, do not reuse
+    // Free 301-342
     RBAC_PERM_COMMAND_DESERTER_BG_ADD                        = 343,
     RBAC_PERM_COMMAND_DESERTER_BG_REMOVE                     = 344,
     RBAC_PERM_COMMAND_DESERTER_INSTANCE_ADD                  = 346,
@@ -199,7 +199,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_DISABLE_ADD_ACHIEVEMENT_CRITERIA       = 350,
     RBAC_PERM_COMMAND_DISABLE_ADD_BATTLEGROUND               = 351,
     RBAC_PERM_COMMAND_DISABLE_ADD_MAP                        = 352,
-    RBAC_PERM_COMMAND_DISABLE_ADD_MMAP                       = 353, // Reserved - DISABLE_TYPE_MMAP not implemented in AC
+    // RBAC_PERM_COMMAND_DISABLE_ADD_MMAP                    = 353, // Reserved - DISABLE_TYPE_MMAP not implemented in AC
     RBAC_PERM_COMMAND_DISABLE_ADD_OUTDOORPVP                 = 354,
     RBAC_PERM_COMMAND_DISABLE_ADD_QUEST                      = 355,
     RBAC_PERM_COMMAND_DISABLE_ADD_SPELL                      = 356,
@@ -207,7 +207,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_DISABLE_REMOVE_ACHIEVEMENT_CRITERIA    = 359,
     RBAC_PERM_COMMAND_DISABLE_REMOVE_BATTLEGROUND            = 360,
     RBAC_PERM_COMMAND_DISABLE_REMOVE_MAP                     = 361,
-    RBAC_PERM_COMMAND_DISABLE_REMOVE_MMAP                    = 362, // Reserved - DISABLE_TYPE_MMAP not implemented in AC
+    // RBAC_PERM_COMMAND_DISABLE_REMOVE_MMAP                 = 362, // Reserved - DISABLE_TYPE_MMAP not implemented in AC
     RBAC_PERM_COMMAND_DISABLE_REMOVE_OUTDOORPVP              = 363,
     RBAC_PERM_COMMAND_DISABLE_REMOVE_QUEST                   = 364,
     RBAC_PERM_COMMAND_DISABLE_REMOVE_SPELL                   = 365,
@@ -520,7 +520,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_RELOAD_SPELL_AREA                      = 691,
     RBAC_PERM_COMMAND_RELOAD_SPELL_BONUS_DATA                = 692,
     RBAC_PERM_COMMAND_RELOAD_SPELL_GROUP                     = 693,
-    RBAC_PERM_COMMAND_RELOAD_SPELL_LEARN_SPELL               = 694, // Reserved - no LoadSpellLearnSpells() in AC SpellMgr
+    // RBAC_PERM_COMMAND_RELOAD_SPELL_LEARN_SPELL            = 694, // Reserved - no LoadSpellLearnSpells() in AC SpellMgr
     RBAC_PERM_COMMAND_RELOAD_SPELL_LOOT_TEMPLATE             = 695,
     RBAC_PERM_COMMAND_RELOAD_SPELL_LINKED_SPELL              = 696,
     RBAC_PERM_COMMAND_RELOAD_SPELL_PET_AURAS                 = 697,
@@ -609,18 +609,18 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_SERVER_RESTART_FORCE                   = 840,
     RBAC_PERM_COMMAND_NEARGRAVEYARD                          = 841,
     RBAC_PERM_COMMAND_RELOAD_QUEST_GREETING                  = 843,
-    RBAC_PERM_COMMAND_NPC_SPAWNGROUP                         = 856, // Reserved - requires spawn group system not yet in AC
-    RBAC_PERM_COMMAND_NPC_DESPAWNGROUP                       = 857, // Reserved - requires spawn group system not yet in AC
-    RBAC_PERM_COMMAND_GOBJECT_SPAWNGROUP                     = 858, // Reserved - requires spawn group system not yet in AC
-    RBAC_PERM_COMMAND_GOBJECT_DESPAWNGROUP                   = 859, // Reserved - requires spawn group system not yet in AC
-    RBAC_PERM_COMMAND_LIST_RESPAWNS                          = 860, // Reserved - requires spawn group system not yet in AC
+    // RBAC_PERM_COMMAND_NPC_SPAWNGROUP                      = 856, // Reserved - requires spawn group system not yet in AC
+    // RBAC_PERM_COMMAND_NPC_DESPAWNGROUP                    = 857, // Reserved - requires spawn group system not yet in AC
+    // RBAC_PERM_COMMAND_GOBJECT_SPAWNGROUP                  = 858, // Reserved - requires spawn group system not yet in AC
+    // RBAC_PERM_COMMAND_GOBJECT_DESPAWNGROUP                = 859, // Reserved - requires spawn group system not yet in AC
+    // RBAC_PERM_COMMAND_LIST_RESPAWNS                       = 860, // Reserved - requires spawn group system not yet in AC
     RBAC_PERM_COMMAND_GROUP_SET                              = 861,
     RBAC_PERM_COMMAND_GROUP_ASSISTANT                        = 862,
     RBAC_PERM_COMMAND_GROUP_MAINTANK                         = 863,
     RBAC_PERM_COMMAND_GROUP_MAINASSIST                       = 864,
     RBAC_PERM_COMMAND_GROUP_REVIVE                           = 868,
     RBAC_PERM_COMMAND_NPC_SHOWLOOT                           = 865,
-    RBAC_PERM_COMMAND_LIST_SPAWNPOINTS                       = 866, // Reserved - requires spawn group system not yet in AC
+    // RBAC_PERM_COMMAND_LIST_SPAWNPOINTS                    = 866, // Reserved - requires spawn group system not yet in AC
     RBAC_PERM_COMMAND_RELOAD_QUEST_GREETING_LOCALE           = 867,
     RBAC_PERM_COMMAND_SERVER_DEBUG                           = 872,
     RBAC_PERM_COMMAND_RELOAD_CREATURE_MOVEMENT_OVERRIDE      = 873,
@@ -629,7 +629,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_LOOKUP_ITEM_ID                         = 876,
     RBAC_PERM_COMMAND_LOOKUP_QUEST_ID                        = 877,
     RBAC_PERM_COMMAND_PDUMP_COPY                             = 880,
-    RBAC_PERM_COMMAND_RELOAD_VEHICLE_TEMPLATE                = 881, // Reserved - use RELOAD_VEHICLE_TEMPLATE_ACCESSORY (709) instead
+    // RBAC_PERM_COMMAND_RELOAD_VEHICLE_TEMPLATE             = 881, // Reserved - use RELOAD_VEHICLE_TEMPLATE_ACCESSORY (709) instead
     RBAC_PERM_COMMAND_BG_START                               = 884,
     RBAC_PERM_COMMAND_BG_STOP                                = 885,
     RBAC_PERM_COMMAND_ITEM_RESTORE                           = 886,
@@ -671,7 +671,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_COUNTER           = 922,
     RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_GATE              = 923,
     RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_GATECOUNTER       = 924,
-    // custom permissions 1000+
+    // custom permissions 10000+
     RBAC_PERM_MAX
 };
 

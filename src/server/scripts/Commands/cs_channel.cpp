@@ -57,7 +57,7 @@ public:
 
         ChannelMgr::SetChannelRightsFor(channelName, flags, 0, "", "", std::set<uint32>());
 
-        handler->PSendSysMessage("Channel '%s' ownership %s.", channelName.c_str(), ownership ? "enabled" : "disabled");
+        handler->PSendSysMessage("Channel '{}' ownership {}.", channelName, ownership ? "enabled" : "disabled");
         return true;
     }
 };

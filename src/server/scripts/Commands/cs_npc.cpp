@@ -1367,11 +1367,11 @@ public:
 
         if (!lootId)
         {
-            handler->SendErrorMessage("Creature %u has no loot template.", creature->GetEntry());
+            handler->SendErrorMessage("Creature {} has no loot template.", creature->GetEntry());
             return false;
         }
 
-        handler->PSendSysMessage("Loot template for creature %u (lootid: %u):", creature->GetEntry(), lootId);
+        handler->PSendSysMessage("Loot template for creature {} (lootid: {}):", creature->GetEntry(), lootId);
         handler->PSendSysMessage("--------------------------------------------");
 
         QueryResult result = WorldDatabase.Query("SELECT item, ChanceOrQuestChance, groupid, mincountOrRef, maxcount FROM creature_loot_template WHERE entry = {}", lootId);
@@ -1392,13 +1392,13 @@ public:
 
             if (minCount < 0)
             {
-                handler->PSendSysMessage("  [Reference %d] Chance: %.2f%% Group: %u MaxCount: %u", -minCount, chance, group, maxCount);
+                handler->PSendSysMessage("  [Reference {}] Chance: {:.2f}% Group: {} MaxCount: {}", -minCount, chance, group, maxCount);
             }
             else
             {
                 ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item);
                 std::string name = proto ? proto->Name1 : "Unknown";
-                handler->PSendSysMessage("  [%u] %s - Chance: %.2f%% Group: %u Count: %d-%u", item, name.c_str(), chance, group, minCount, maxCount);
+                handler->PSendSysMessage("  [{}] {} - Chance: {:.2f}% Group: {} Count: {}-{}", item, name, chance, group, minCount, maxCount);
             }
         } while (result->NextRow());
 

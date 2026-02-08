@@ -171,7 +171,7 @@ public:
 
         if (!level)
         {
-            handler->PSendSysMessage("Pet level: %u", pet->GetLevel());
+            handler->PSendSysMessage("Pet level: {}", pet->GetLevel());
             return true;
         }
 
@@ -182,7 +182,7 @@ public:
         }
 
         pet->GivePetLevel(*level);
-        handler->PSendSysMessage("Pet level set to %u.", *level);
+        handler->PSendSysMessage("Pet level set to {}.", *level);
         return true;
     }
 };

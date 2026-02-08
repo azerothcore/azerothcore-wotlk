@@ -1037,7 +1037,7 @@ public:
         stmt->SetData(1, targetAccountId);
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage("Registration email for account %s set to: %s", accountName.c_str(), email.c_str());
+        handler->PSendSysMessage("Registration email for account {} set to: {}", accountName, email);
         return true;
     }
 };

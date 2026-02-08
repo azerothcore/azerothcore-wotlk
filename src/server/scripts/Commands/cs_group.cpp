@@ -324,7 +324,7 @@ public:
         }
 
         group->SetGroupMemberFlag(guid, apply, flag);
-        handler->PSendSysMessage("%s flag %s for %s.", apply ? "Set" : "Removed", flagName, target->GetName().c_str());
+        handler->PSendSysMessage("{} flag {} for {}.", apply ? "Set" : "Removed", flagName, target->GetName());
         return true;
     }
 

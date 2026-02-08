@@ -616,11 +616,11 @@ public:
         if (limit)
         {
             sWorldSessionMgr->SetPlayerAmountLimit(*limit);
-            handler->PSendSysMessage("Player limit set to %u.", *limit);
+            handler->PSendSysMessage("Player limit set to {}.", *limit);
         }
         else
         {
-            handler->PSendSysMessage("Player limit: %u (Online: %u, Max: %u, Queue: %u)",
+            handler->PSendSysMessage("Player limit: {} (Online: {}, Max: {}, Queue: {})",
                 sWorldSessionMgr->GetPlayerAmountLimit(),
                 sWorldSessionMgr->GetPlayerCount(),
                 sWorldSessionMgr->GetMaxPlayerCount(),
@@ -632,7 +632,7 @@ public:
     static bool HandleServerSetDiffTimeCommand(ChatHandler* handler, uint32 newTime)
     {
         sWorldUpdateTime.SetRecordUpdateTimeInterval(Milliseconds(newTime));
-        handler->PSendSysMessage("Record update time interval set to %u ms.", newTime);
+        handler->PSendSysMessage("Record update time interval set to {} ms.", newTime);
         return true;
     }
 

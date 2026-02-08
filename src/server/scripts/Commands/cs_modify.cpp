@@ -1003,10 +1003,10 @@ public:
         }
 
         target->GiveXP(xp, nullptr);
-        handler->PSendSysMessage("%u XP given to %s.", xp, handler->GetNameLink(target));
+        handler->PSendSysMessage("{} XP given to {}.", xp, handler->GetNameLink(target));
 
         if (handler->needReportToTarget(target))
-            ChatHandler(target->GetSession()).PSendSysMessage("You received %u XP from %s.", xp, handler->GetNameLink());
+            ChatHandler(target->GetSession()).PSendSysMessage("You received {} XP from {}.", xp, handler->GetNameLink());
 
         return true;
     }

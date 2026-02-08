@@ -3244,7 +3244,7 @@ public:
         if (graveyard)
         {
             float dist = player->GetDistance2d(graveyard->x, graveyard->y);
-            handler->PSendSysMessage("Nearest graveyard: %u (X: %f Y: %f Z: %f, Dist: %f)",
+            handler->PSendSysMessage("Nearest graveyard: {} (X: {} Y: {} Z: {}, Dist: {})",
                 graveyard->ID, graveyard->x, graveyard->y, graveyard->z, dist);
         }
         else
@@ -3263,7 +3263,7 @@ public:
         {
             if (player->HasAura(9454))
             {
-                handler->PSendSysMessage("%s is frozen.", player->GetName().c_str());
+                handler->PSendSysMessage("{} is frozen.", player->GetName());
                 found = true;
             }
         }
@@ -3293,8 +3293,8 @@ public:
         do
         {
             Field* fields = result->Fetch();
-            handler->PSendSysMessage("BG Type: %u | ID: %u | Winner: %s | Score: %u-%u",
-                fields[0].Get<uint8>(), fields[1].Get<uint32>(), fields[2].Get<std::string>().c_str(),
+            handler->PSendSysMessage("BG Type: {} | ID: {} | Winner: {} | Score: {}-{}",
+                fields[0].Get<uint8>(), fields[1].Get<uint32>(), fields[2].Get<std::string>(),
                 fields[3].Get<uint32>(), fields[4].Get<uint32>());
         } while (result->NextRow());
 

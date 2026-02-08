@@ -534,17 +534,17 @@ public:
         QueryResult result = CharacterDatabase.Query("SELECT id, messageType, sender, subject, expire_time FROM mail WHERE receiver = {} ORDER BY id DESC LIMIT 50", target->GetGUID().GetCounter());
         if (!result)
         {
-            handler->PSendSysMessage("No mail found for %s.", target->GetName());
+            handler->PSendSysMessage("No mail found for {}.", target->GetName());
             return true;
         }
 
-        handler->PSendSysMessage("Mail for %s:", target->GetName());
+        handler->PSendSysMessage("Mail for {}:", target->GetName());
         do
         {
             Field* fields = result->Fetch();
-            handler->PSendSysMessage("  ID: %u | Type: %u | Sender: %u | Subject: %s",
+            handler->PSendSysMessage("  ID: {} | Type: {} | Sender: {} | Subject: {}",
                 fields[0].Get<uint32>(), fields[1].Get<uint8>(), fields[2].Get<uint32>(),
-                fields[3].Get<std::string>().c_str());
+                fields[3].Get<std::string>());
         } while (result->NextRow());
 
         return true;

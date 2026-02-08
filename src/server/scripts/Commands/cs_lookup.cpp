@@ -1703,7 +1703,7 @@ public:
         MapEntry const* mapEntry = sMapStore.LookupEntry(id);
         if (!mapEntry)
         {
-            handler->PSendSysMessage("Map %u not found.", id);
+            handler->PSendSysMessage("Map {} not found.", id);
             return true;
         }
 
@@ -1712,7 +1712,7 @@ public:
         if (name.empty())
             name = mapEntry->name[sWorld->GetDefaultDbcLocale()];
 
-        handler->PSendSysMessage("Map %u - %s (Type: %u)", id, name.c_str(), mapEntry->map_type);
+        handler->PSendSysMessage("Map {} - {} (Type: {})", id, name, mapEntry->map_type);
         return true;
     }
 
@@ -1721,21 +1721,21 @@ public:
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(id);
         if (!itemTemplate)
         {
-            handler->PSendSysMessage("Item %u not found.", id);
+            handler->PSendSysMessage("Item {} not found.", id);
             return true;
         }
 
         std::string name = itemTemplate->Name1;
         if (name.empty())
         {
-            handler->PSendSysMessage("Item %u has no name.", id);
+            handler->PSendSysMessage("Item {} has no name.", id);
             return true;
         }
 
         if (handler->GetSession())
-            handler->PSendSysMessage("%u - |cffffffff|Hitem:%u:0:0:0:0:0:0:0:0|h[%s]|h|r", id, id, name.c_str());
+            handler->PSendSysMessage("{} - |cffffffff|Hitem:{}:0:0:0:0:0:0:0:0|h[{}]|h|r", id, id, name);
         else
-            handler->PSendSysMessage("%u - %s", id, name.c_str());
+            handler->PSendSysMessage("{} - {}", id, name);
 
         return true;
     }
@@ -1745,7 +1745,7 @@ public:
         Quest const* quest = sObjectMgr->GetQuestTemplate(id);
         if (!quest)
         {
-            handler->PSendSysMessage("Quest %u not found.", id);
+            handler->PSendSysMessage("Quest {} not found.", id);
             return true;
         }
 
@@ -1757,10 +1757,10 @@ public:
         {
             Player* target = handler->getSelectedPlayerOrSelf();
             QuestStatus status = target ? target->GetQuestStatus(id) : QUEST_STATUS_NONE;
-            handler->PSendSysMessage("%u - |cffffffff|Hquest:%u:%u|h[%s]|h|r", id, id, status, title.c_str());
+            handler->PSendSysMessage("{} - |cffffffff|Hquest:{}:{}|h[{}]|h|r", id, id, status, title);
         }
         else
-            handler->PSendSysMessage("%u - %s", id, title.c_str());
+            handler->PSendSysMessage("{} - {}", id, title);
 
         return true;
     }
