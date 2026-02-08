@@ -32,31 +32,31 @@ public:
     {
         static ChatCommandTable sunsreachCommandTable =
         {
-            { "status",      HandleSunsReachReclamationStatusCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "phase",       HandleSunsReachReclamationPhaseCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "subphase",    HandleSunsReachReclamationSubPhaseCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "counter",     HandleSunsReachReclamationCounterCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "gate",        HandleSunwellGateCommand,                  rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "gatecounter", HandleSunwellGateCounterCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "status",      HandleSunsReachReclamationStatusCommand,   rbac::RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_STATUS,      Console::Yes },
+            { "phase",       HandleSunsReachReclamationPhaseCommand,    rbac::RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_PHASE,       Console::Yes },
+            { "subphase",    HandleSunsReachReclamationSubPhaseCommand, rbac::RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_SUBPHASE,    Console::Yes },
+            { "counter",     HandleSunsReachReclamationCounterCommand,  rbac::RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_COUNTER,     Console::Yes },
+            { "gate",        HandleSunwellGateCommand,                  rbac::RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_GATE,        Console::Yes },
+            { "gatecounter", HandleSunwellGateCounterCommand,           rbac::RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH_GATECOUNTER, Console::Yes },
         };
 
         static ChatCommandTable scourgeInvasionCommandTable =
         {
-            { "show",       HandleScourgeInvasionCommand,           rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "state",      HandleScourgeInvasionStateCommand,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "battleswon", HandleScourgeInvasionBattlesWonCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
-            { "startzone",  HandleScourgeInvasionStartZone,         rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "show",       HandleScourgeInvasionCommand,           rbac::RBAC_PERM_COMMAND_WORLDSTATE_SCOURGEINVASION_SHOW,       Console::Yes },
+            { "state",      HandleScourgeInvasionStateCommand,      rbac::RBAC_PERM_COMMAND_WORLDSTATE_SCOURGEINVASION_STATE,      Console::Yes },
+            { "battleswon", HandleScourgeInvasionBattlesWonCommand, rbac::RBAC_PERM_COMMAND_WORLDSTATE_SCOURGEINVASION_BATTLESWON, Console::Yes },
+            { "startzone",  HandleScourgeInvasionStartZone,         rbac::RBAC_PERM_COMMAND_WORLDSTATE_SCOURGEINVASION_STARTZONE,  Console::Yes },
         };
 
         static ChatCommandTable worldStateCommandTable =
         {
-            { "sunsreach", sunsreachCommandTable },
-            { "scourgeinvasion", scourgeInvasionCommandTable }
+            { "sunsreach",       sunsreachCommandTable,       rbac::RBAC_PERM_COMMAND_WORLDSTATE_SUNSREACH },
+            { "scourgeinvasion", scourgeInvasionCommandTable, rbac::RBAC_PERM_COMMAND_WORLDSTATE_SCOURGEINVASION }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "worldstate", worldStateCommandTable }
+            { "worldstate", worldStateCommandTable, rbac::RBAC_PERM_COMMAND_WORLDSTATE }
         };
         return commandTable;
     }

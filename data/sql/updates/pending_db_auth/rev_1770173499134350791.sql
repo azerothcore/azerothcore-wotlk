@@ -709,7 +709,21 @@ INSERT INTO `rbac_permissions` VALUES
 -- Character check commands (909-911)
 (909,'Command: character check bank'),
 (910,'Command: character check bag'),
-(911,'Command: character check profession');
+(911,'Command: character check profession'),
+-- Worldstate commands (912-924)
+(912,'Command: worldstate'),
+(913,'Command: worldstate scourgeinvasion'),
+(914,'Command: worldstate scourgeinvasion show'),
+(915,'Command: worldstate scourgeinvasion state'),
+(916,'Command: worldstate scourgeinvasion battleswon'),
+(917,'Command: worldstate scourgeinvasion startzone'),
+(918,'Command: worldstate sunsreach'),
+(919,'Command: worldstate sunsreach status'),
+(920,'Command: worldstate sunsreach phase'),
+(921,'Command: worldstate sunsreach subphase'),
+(922,'Command: worldstate sunsreach counter'),
+(923,'Command: worldstate sunsreach gate'),
+(924,'Command: worldstate sunsreach gatecounter');
 
 -- ============================================================================
 -- Link roles to permissions
@@ -842,6 +856,9 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (196, 905), (196, 906), (196, 907), (196, 908),
 -- AC-specific admin commands
 (196, 886), (196, 887), (196, 888), (196, 891), (196, 894), (196, 896),
+-- Worldstate commands (parent groups + modification commands)
+(196, 912), (196, 913), (196, 915), (196, 916), (196, 917),
+(196, 918), (196, 920), (196, 921), (196, 922), (196, 923), (196, 924),
 -- ---------------------------------------------------------------------------
 -- Role 197 (GM Commands): Game manipulation, character, NPC, gobject, quest, etc.
 -- ---------------------------------------------------------------------------
@@ -937,6 +954,8 @@ INSERT INTO `rbac_linked_permissions` VALUES
 (197, 889), (197, 890), (197, 892), (197, 893), (197, 895),
 -- Gear repair
 (197, 897),
+-- Worldstate read-only commands
+(197, 914), (197, 919),
 -- ---------------------------------------------------------------------------
 -- Role 198 (Mod Commands): Community management - ban, mute, kick, tickets, announce
 -- ---------------------------------------------------------------------------
