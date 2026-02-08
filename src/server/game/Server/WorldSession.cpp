@@ -116,7 +116,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _security(sec),
     _skipQueue(skipQueue),
     _accountId(id),
-    _RBACData(nullptr),
+    _RBACData(new rbac::RBACData(id, name, realm.Id.Realm, sec)),
     _accountName(std::move(name)),
     _accountFlags(accountFlags),
     m_expansion(expansion),
@@ -1529,6 +1529,7 @@ void WorldSession::LoadPermissions()
     LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: {}, Name: {}, realmId: {}, secLevel: {}]",
         id, _accountName, realm.Id.Realm, secLevel);
 
+    delete _RBACData;
     _RBACData = new rbac::RBACData(id, _accountName, realm.Id.Realm, secLevel);
     _RBACData->LoadFromDB();
 }
@@ -1541,6 +1542,7 @@ QueryCallback WorldSession::LoadPermissionsAsync()
     LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: {}, Name: {}, realmId: {}, secLevel: {}]",
         id, _accountName, realm.Id.Realm, secLevel);
 
+    delete _RBACData;
     _RBACData = new rbac::RBACData(id, _accountName, realm.Id.Realm, secLevel);
     return _RBACData->LoadFromDBAsync();
 }
