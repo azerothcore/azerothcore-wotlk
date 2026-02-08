@@ -211,6 +211,7 @@ struct boss_malygos : public BossAI
         IntroCounter = 0;
         bLockHealthCheck = false;
 
+        SetInvincibility(true);
         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
         me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
@@ -315,13 +316,9 @@ struct boss_malygos : public BossAI
         }
     }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
     {
-        if (damage >= me->GetHealth() && !me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE)) // allow dying only in phase 3!
-        {
-            damage = 0;
-            return;
-        }
+        BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
         if (!bLockHealthCheck && me->HealthBelowPctDamaged(50, damage))
         {
@@ -670,6 +667,7 @@ struct boss_malygos : public BossAI
             break;
         case EVENT_START_PHASE_3:
             events.SetPhase(PHASE_THREE);
+            SetInvincibility(false);
             me->GetMap()->SetZoneOverrideLight(AREA_EYE_OF_ETERNITY, LIGHT_OBSCURE_ARCANE_RUNES, 1s);
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
