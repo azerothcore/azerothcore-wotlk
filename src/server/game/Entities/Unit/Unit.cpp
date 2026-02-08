@@ -1345,7 +1345,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
     }
 
     int32 cleanDamage = 0;
-    if (Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
+    if (!spellInfo->HasAttribute(SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS) && Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
     {
         int32 oldDamage = damage;
         damage = Unit::CalcArmorReducedDamage(this, victim, damage, spellInfo, 0, attackType);
@@ -2148,7 +2148,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
 
 float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim)
 {
-    float victimResistance = float(victim->GetResistance(schoolMask));
+    float victimResistance = static_cast<float>(victim->GetResistance(schoolMask));
     if (owner)
     {
         // Xinef: pets inherit 100% of masters penetration
@@ -2156,28 +2156,28 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
         Player const* player = owner->GetSpellModOwner();
         if (player && owner->GetEntry() != WORLD_TRIGGER)
         {
-            victimResistance += float(player->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
-            victimResistance -= float(player->GetSpellPenetrationItemMod());
+            victimResistance += static_cast<float>(player->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
+            victimResistance -= static_cast<float>(player->GetSpellPenetrationItemMod());
         }
         else
-            victimResistance += float(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
+            victimResistance += static_cast<float>(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
     }
 
     victimResistance = std::max(victimResistance, 0.0f);
     if (owner)
-        victimResistance += std::max((float(victim->GetLevel()) - float(owner->GetLevel())) * 5.0f, 0.0f);
+        victimResistance += std::max(static_cast<float>(victim->GetLevel() - owner->GetLevel()) * 5.0f, 0.0f);
 
-    static uint32 const BOSS_LEVEL = 83;
-    static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
-    uint32 level = victim->GetLevel();
+    float level = static_cast<float>(victim->GetLevel());
     float resistanceConstant = 0.0f;
 
-    if (level == BOSS_LEVEL)
-        resistanceConstant = BOSS_RESISTANCE_CONSTANT;
+    if (level > 60.0f)
+        resistanceConstant = 150.0f + (level - 60.0f) * (level - 67.5f);
+    else if (level > 20.0f)
+        resistanceConstant = 50.0f + (level - 20.0f) * 2.5f;
     else
-        resistanceConstant = level * 5.0f;
+        resistanceConstant = 50.0f;
 
-    return victimResistance / (victimResistance + resistanceConstant);
+    return std::min(victimResistance / (victimResistance + resistanceConstant), 0.75f);
 }
 
 void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
@@ -5177,7 +5177,7 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, U
                 // Xinef: if stealer has same aura
                 Aura* curAura = stealer->GetAura(aura->GetId());
                 if (!curAura || (!curAura->IsPermanent() && curAura->GetDuration() < (int32)dur))
-                    if (Aura* newAura = Aura::TryRefreshStackOrCreate(aura->GetSpellInfo(), effMask, stealer, nullptr, &baseDamage[0], nullptr, aura->GetCasterGUID()))
+                    if (Aura* newAura = Aura::TryRefreshStackOrCreate(aura->GetSpellInfo(), effMask, stealer, nullptr, &baseDamage[0], nullptr, stealer->GetGUID()))
                     {
                         // created aura must not be single target aura,, so stealer won't loose it on recast
                         if (newAura->IsSingleTarget())
@@ -5189,6 +5189,13 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, U
                         }
                         // FIXME: using aura->GetMaxDuration() maybe not blizzlike but it fixes stealing of spells like Innervate
                         newAura->SetLoadedState(aura->GetMaxDuration(), int32(dur), stealCharge ? 1 : aura->GetCharges(), 1, recalculateMask, &damage[0]);
+
+                        // Reset periodic timers so stolen HoTs tick properly
+                        // For stolen auras we need fresh tick counters since no ticks have occurred yet
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (AuraEffect* aurEff = newAura->GetEffect(i))
+                                aurEff->ResetPeriodic(true);
+
                         newAura->ApplyForTargets();
                     }
             }
@@ -11118,6 +11125,8 @@ void Unit::SetCharm(Unit* charm, bool apply)
     }
     else
     {
+        charm->ClearUnitState(UNIT_STATE_CHARMED);
+
         if (IsPlayer())
         {
             if (!RemoveGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()))
@@ -18618,7 +18627,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     ASSERT(type != CHARM_TYPE_POSSESS || charmer->IsPlayer());
     if (type == CHARM_TYPE_VEHICLE && !IsVehicle()) // pussywizard
         throw 1;
-    ASSERT((type == CHARM_TYPE_VEHICLE) == IsVehicle());
+    ASSERT((type == CHARM_TYPE_VEHICLE) == (GetVehicleKit() && GetVehicleKit()->IsControllableVehicle()));
 
     LOG_DEBUG("entities.unit", "SetCharmedBy: charmer {} ({}), charmed {} ({}), type {}.",
         charmer->GetEntry(), charmer->GetGUID().ToString(), GetEntry(), GetGUID().ToString(), uint32(type));
@@ -18790,6 +18799,8 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     }
     else if (IsPlayer())
         RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+
+    AddUnitState(UNIT_STATE_CHARMED);
 
     if (Creature* creature = ToCreature())
         creature->RefreshSwimmingFlag();
