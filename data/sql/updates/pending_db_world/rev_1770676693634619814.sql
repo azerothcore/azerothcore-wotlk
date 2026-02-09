@@ -1,6 +1,4 @@
 -- Add missing static transport parent_rotation values
--- These were missed by rev_1770210647797541306
-
 DELETE FROM `gameobject_addon` WHERE `guid` IN (2837,6946,18802,18803,18804,18805,18806,18807,56162,56163);
 INSERT INTO `gameobject_addon` (`guid`,`parent_rotation0`,`parent_rotation1`,`parent_rotation2`,`parent_rotation3`,`invisibilityType`,`invisibilityValue`) VALUES
 (2837,0,0,0.996917,-0.078459,0,0),
