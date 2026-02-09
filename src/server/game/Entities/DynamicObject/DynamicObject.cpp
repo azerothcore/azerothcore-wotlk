@@ -272,3 +272,14 @@ void DynamicObject::UnbindFromCaster()
     _caster->_UnregisterDynObject(this);
     _caster = nullptr;
 }
+
+bool DynamicObject::IsUpdateNeeded()
+{
+    // Area spell DynamicObjects (like Death and Decay) must always update to ensure periodic ticks
+    // even when the caster is stationary. Without this, grid cell updates may not occur, causing
+    // the periodic aura to stop ticking until the caster moves.
+    if (GetByteValue(DYNAMICOBJECT_BYTES, 0) == DYNAMIC_OBJECT_AREA_SPELL)
+        return true;
+
+    return WorldObject::IsUpdateNeeded();
+}
