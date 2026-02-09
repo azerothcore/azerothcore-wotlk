@@ -36,7 +36,7 @@ public:
     static RaceMgr* instance();
 
     static void LoadRaces();
-    static uint8 GetMaxRaces() { if (_maxRaces != 12) LOG_ERROR("sql.sql", "bad!"); return _maxRaces; }
+    static uint8 GetMaxRaces() { return _maxRaces; }
     static void SetMaxRaces(uint8 max) { _maxRaces = max; }
     static uint64 GetPlayableRaceMask() { return _playableRaceMask; }
     static uint64 GetAllianceRaceMask() { return _allianceRaceMask; }

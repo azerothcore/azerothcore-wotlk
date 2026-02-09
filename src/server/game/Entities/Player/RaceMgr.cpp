@@ -46,8 +46,6 @@ RaceMgr* RaceMgr::instance()
 
 void RaceMgr::LoadRaces()
 {
-    //LOG_ERROR("sql.sql", "shareddefines!");
-    //LOG_ERROR("sql.sql.", "max races: {}, playable: {}, horde: {}, alliance: {}", MAX_RACES, RACEMASK_ALL_PLAYABLE, RACEMASK_HORDE, RACEMASK_ALLIANCE);
     for (auto const& raceEntry : sChrRacesStore)
     {
         if (!raceEntry)
@@ -62,30 +60,15 @@ void RaceMgr::LoadRaces()
         if (GetMaxRaces() <= raceId)
             SetMaxRaces(raceId + 1);
 
-        uint64 raceBit = (1ULL << (raceId - 1));  // Races are 1-indexed
+        uint64 raceBit = (1ULL << (raceId - 1));
 
         _playableRaceMask |= raceBit;
 
         if (alliance == ALLIANCE_HORDE)
-            _hordeRaceMask |= raceBit; // do something
+            _hordeRaceMask |= raceBit;
         else if (alliance == ALLIANCE_ALLIANCE)
-            _allianceRaceMask |= raceBit; // do something else
-
-
-        /*
-        // Store race data
-        RaceEntry& race = _races[raceId];
-        race.raceId = raceId;
-        race.faction = raceEntry->FactionID;  // Check actual field name
-        race.isPlayable = (raceEntry->Flags & 0x01) != 0;  // Check actual playable flag
-
-        // Track max race ID
-        if (raceId >= _maxRaces)
-            _maxRaces = raceId + 1;
-            */
+            _allianceRaceMask |= raceBit;
     }
 
-    LOG_ERROR("sql.sql", "racemgr!");
-    LOG_ERROR("sql.sql.", "max races: {}, playable: {}, horde: {}, alliance: {}", GetMaxRaces(), GetPlayableRaceMask(), GetHordeRaceMask(), GetAllianceRaceMask());
     return;
 }
