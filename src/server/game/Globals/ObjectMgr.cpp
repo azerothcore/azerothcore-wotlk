@@ -2888,6 +2888,13 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
+        if (fabs(data.rotation.x * data.rotation.x + data.rotation.y * data.rotation.y +
+                 data.rotation.z * data.rotation.z + data.rotation.w * data.rotation.w - 1.0f) >= 1e-5f)
+        {
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotation quaternion (non-unit), defaulting to orientation on Z axis only", guid, data.id);
+            data.rotation = G3D::Quat(G3D::Matrix3::fromEulerAnglesZYX(data.orientation, 0.0f, 0.0f));
+        }
+
         if (!MapMgr::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
         {
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid coordinates, skip", guid, data.id);
@@ -3026,6 +3033,13 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
         LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationW ({}) value, skipped.", spawnId, entry, goData.rotation.w);
         _gameObjectDataStore.erase(spawnId);
         return nullptr;
+    }
+
+    if (fabs(goData.rotation.x * goData.rotation.x + goData.rotation.y * goData.rotation.y +
+             goData.rotation.z * goData.rotation.z + goData.rotation.w * goData.rotation.w - 1.0f) >= 1e-5f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotation quaternion (non-unit), defaulting to orientation on Z axis only", spawnId, entry);
+        goData.rotation = G3D::Quat(G3D::Matrix3::fromEulerAnglesZYX(goData.orientation, 0.0f, 0.0f));
     }
 
     if (!MapMgr::IsValidMapCoord(goData.mapid, goData.posX, goData.posY, goData.posZ, goData.orientation))
