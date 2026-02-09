@@ -12331,16 +12331,14 @@ float Player::GetReputationPriceDiscount(Creature const* creature) const
 float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
 {
     float discount = 1.0f;
+
     if (!factionTemplate || !factionTemplate->faction)
-    {
         return discount;
-    }
 
     ReputationRank rank = GetReputationRank(factionTemplate->faction);
+
     if (rank <= REP_NEUTRAL)
-    {
         return discount;
-    }
 
     discount = discount - 0.05f * (rank - REP_NEUTRAL);
 
