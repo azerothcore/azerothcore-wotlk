@@ -1,3 +1,4 @@
+-- DB update 2026_02_08_02 -> 2026_02_09_00
 --
 -- Updates more accurate moneyloot values to various NCPs
 UPDATE `creature_template` SET `mingold` = 463, `maxgold` = 1391 WHERE `entry` = 16519; -- Shadowy Executioner
