@@ -4300,7 +4300,7 @@ void ObjectMgr::LoadPlayerInfo()
 
                 if (!current_race || !current_class)
                 {
-                    uint32 min_race = current_race ? current_race : RACE_HUMAN;
+                    uint32 min_race = current_race ? current_race : 1;
                     uint32 max_race = current_race ? current_race + 1 : sRaceMgr->GetMaxRaces();
                     uint32 min_class = current_class ? current_class : 1;
                     uint32 max_class = current_class ? current_class + 1 : MAX_CLASSES;
