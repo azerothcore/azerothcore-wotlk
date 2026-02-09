@@ -1362,6 +1362,40 @@ MapUpdateInterval = 10
 MapUpdate.Threads = 1
 
 #
+#    MapPartitioning.Enable
+#        Description: Enable map partitioning for continent maps (Eastern Kingdoms, Kalimdor,
+#                     Outland, Northrend). Divides maps into smaller partitions that can be
+#                     updated in parallel, improving performance on high-population servers.
+#                     Note: This is an experimental feature. Test thoroughly before production use.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+MapPartitioning.Enable = 0
+
+#
+#    MapPartitioning.GridSize
+#        Description: The number of partitions per axis for continent maps (GridSize x GridSize).
+#                     For example, GridSize = 4 creates a 4x4 grid with 16 total partitions.
+#                     Higher values create more partitions (better parallelization but more overhead).
+#                     Lower values create fewer partitions (less overhead but less parallelization).
+#                     Only applies when MapPartitioning.Enable = 1.
+#        Default:     4 - (4x4 grid = 16 partitions per continent)
+
+MapPartitioning.GridSize = 4
+
+#
+#    MapPartitioning.BorderMargin
+#        Description: Distance in yards from partition borders where entities are considered
+#                     "near border" for cross-partition visibility and interaction handling.
+#                     Affects how smoothly entities transition between partitions.
+#                     Too small: May cause visibility issues at partition boundaries.
+#                     Too large: Increases cross-partition processing overhead.
+#                     Only applies when MapPartitioning.Enable = 1.
+#        Default:     100.0 - (100 yards)
+
+MapPartitioning.BorderMargin = 100.0
+
+#
 #    MoveMaps.Enable
 #        Description: Enable/Disable pathfinding using mmaps - recommended.
 #        Default:     0 - (Disabled)
