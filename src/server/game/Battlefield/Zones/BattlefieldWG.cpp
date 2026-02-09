@@ -50,6 +50,7 @@ bool BattlefieldWG::SetupBattlefield()
     m_ZoneId = AREA_WINTERGRASP;
     m_MapId = MAP_NORTHREND;
     m_Map = sMapMgr->FindMap(m_MapId, 0);
+    m_TugOfWar = std::make_unique<TugOfWarWG>(this);
 
     // init stalker AFTER setting map id... we spawn it at map=random memory value?...
     InitStalker(BATTLEFIELD_WG_NPC_STALKER, WintergraspStalkerPos[0], WintergraspStalkerPos[1], WintergraspStalkerPos[2], WintergraspStalkerPos[3]);
@@ -119,10 +120,9 @@ bool BattlefieldWG::SetupBattlefield()
     for (uint8 i = 0; i < WG_MAX_WORKSHOP; i++)
     {
         WGWorkshop* workshop = new WGWorkshop(this, i);
-        if (i == BATTLEFIELD_WG_WORKSHOP_SE || i == BATTLEFIELD_WG_WORKSHOP_SW)
-            workshop->GiveControlTo(GetAttackerTeam(), true);
-        else
-            workshop->GiveControlTo(GetDefenderTeam(), true);
+        TeamId controlTeam = DetermineWorkshopControl(i);
+        workshop->GiveControlTo(controlTeam, true);
+        workshop->Save();
 
         // Note: Capture point is added once the gameobject is created.
         WorkshopsList.insert(workshop);
@@ -223,6 +223,9 @@ bool BattlefieldWG::Update(uint32 diff)
 
 void BattlefieldWG::OnBattleStart()
 {
+    // Update Tug of War state, calculate bonuses
+    m_TugOfWar->OnBattleStart();
+
     // Spawn titan relic
     GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.0f, 2840.8f, 430.43f, 0);
     if (go)
@@ -269,8 +272,17 @@ void BattlefieldWG::OnBattleStart()
 
     // Set Sliders capture points data to his owners when battle start
     for (BfCapturePointVector::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        (*itr)->SetCapturePointData((*itr)->GetCapturePointGo(),
-            (*itr)->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || (*itr)->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
+    {
+        int8 workshopId = GetRelatedWorkshopId((*itr)->GetCapturePointGo()->GetEntry());
+        if (workshopId < 0)
+        {
+            LOG_ERROR("bg.battlefield", "WG: Failed to find related workshop for a capture point {}.", (*itr)->GetCapturePointGo()->GetEntry());
+            continue;
+        }
+
+        TeamId controlTeam = DetermineWorkshopControl(workshopId);
+        (*itr)->SetCapturePointData((*itr)->GetCapturePointGo(), controlTeam);
+    }
 
     for (uint8 team = 0; team < 2; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
@@ -347,6 +359,9 @@ void BattlefieldWG::CapturePointTaken(uint32 areaId)
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
+    // Update Tug of War state, so the buildings could be correctly assigned
+    m_TugOfWar->OnBattleEnd(endByTimer);
+
     // Remove relic
     if (GameObject* go = GetRelic())
         go->RemoveFromWorld();
@@ -407,7 +422,8 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
 
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
     {
-        (*itr)->GiveControlTo((*itr)->workshopId == BATTLEFIELD_WG_WORKSHOP_SE || (*itr)->workshopId == BATTLEFIELD_WG_WORKSHOP_SW ? GetAttackerTeam() : GetDefenderTeam(), true);
+        TeamId controlTeam = DetermineWorkshopControl((*itr)->workshopId);
+        (*itr)->GiveControlTo(controlTeam, true);
         (*itr)->Save();
     }
 
@@ -504,6 +520,36 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     }
 }
 
+TeamId BattlefieldWG::DetermineWorkshopControl(uint8 workshopId)
+{
+    TeamId attackerTeam = GetAttackerTeam();
+    TeamId defenderTeam = GetDefenderTeam();
+    int16 scale = m_TugOfWar->GetScale();
+
+    switch (workshopId)
+    {
+        case BATTLEFIELD_WG_WORKSHOP_SE:
+        case BATTLEFIELD_WG_WORKSHOP_SW:
+            return attackerTeam;
+
+        case BATTLEFIELD_WG_WORKSHOP_NE:
+            if ((attackerTeam == TEAM_ALLIANCE && scale >= 400) ||
+                (attackerTeam == TEAM_HORDE && scale <= -400))
+                return attackerTeam;
+            break;
+
+        case BATTLEFIELD_WG_WORKSHOP_NW:
+            if ((attackerTeam == TEAM_ALLIANCE && scale >= 500) ||
+                (attackerTeam == TEAM_HORDE && scale <= -500))
+                return attackerTeam;
+            break;
+
+        default:
+            break;
+    }
+
+    return defenderTeam;
+}
 // *******************************************************
 // ******************* Reward System *********************
 // *******************************************************
@@ -674,11 +720,10 @@ void BattlefieldWG::OnCreatureRemove(Creature*  /*creature*/)
         }*/
 }
 
-void BattlefieldWG::OnGameObjectCreate(GameObject* go)
+int8 BattlefieldWG::GetRelatedWorkshopId(uint32 GoEntry)
 {
-    uint8 workshopId = 0;
-
-    switch (go->GetEntry())
+    int8 workshopId = -1;
+    switch (GoEntry)
     {
         case GO_WINTERGRASP_FACTORY_BANNER_NE:
             workshopId = BATTLEFIELD_WG_WORKSHOP_NE;
@@ -693,8 +738,17 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
             workshopId = BATTLEFIELD_WG_WORKSHOP_SW;
             break;
         default:
-            return;
+            break;
     }
+
+    return workshopId;
+}
+
+void BattlefieldWG::OnGameObjectCreate(GameObject* go)
+{
+    int8 workshopId = GetRelatedWorkshopId(go->GetEntry());
+    if (workshopId < 0)
+        return;
 
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
     {
@@ -703,7 +757,6 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
             if (workshop->workshopId == workshopId)
             {
                 WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, workshop->teamControl);
-                //Sending neutral team at start to set normal capture points by workshop->teamControl, TEAM_NEUTRAL is ignored at first call
                 capturePoint->SetCapturePointData(go, TEAM_NEUTRAL);
                 capturePoint->LinkToWorkshop(workshop);
                 AddCapturePoint(capturePoint);
@@ -807,11 +860,21 @@ void BattlefieldWG::PromotePlayer(Player* killer)
     // Updating rank of player
     if (Aura* recruitAura = killer->GetAura(SPELL_RECRUIT))
     {
+        TeamId attackerTeam = GetAttackerTeam();
+        bool fastCorporal = m_TugOfWar->CanFastPromoteToCorporal();
+        bool fastLieutenant = m_TugOfWar->CanFastPromoteToLieutenant();
+
         if (recruitAura->GetStackAmount() >= 5)
         {
             killer->RemoveAura(SPELL_RECRUIT);
             killer->CastSpell(killer, SPELL_CORPORAL, true);
             SendWarning(BATTLEFIELD_WG_TEXT_FIRSTRANK, killer);
+        }
+        else if (killer->GetTeamId() == attackerTeam && (fastCorporal || fastLieutenant))
+        {
+            killer->RemoveAura(SPELL_RECRUIT);
+            killer->CastSpell(killer, fastCorporal ? SPELL_CORPORAL : SPELL_LIEUTENANT, true);
+            SendWarning(fastCorporal ? BATTLEFIELD_WG_TEXT_FIRSTRANK: BATTLEFIELD_WG_TEXT_SECONDRANK, killer);
         }
         else
         {
@@ -1251,4 +1314,78 @@ BfGraveyardWG::BfGraveyardWG(BattlefieldWG* battlefield) : BfGraveyard(battlefie
 {
     m_Bf = battlefield;
     m_GossipTextId = 0;
+}
+
+// *******************************************************
+// ******************** Tug of War ***********************
+// *******************************************************
+TugOfWarWG::~TugOfWarWG()
+{
+}
+
+TugOfWarWG::TugOfWarWG(BattlefieldWG* WG)
+{
+    m_WG = WG;
+
+    if (!sWorld->getWorldState(TUG_OF_WAR_SCALE))
+    {
+        sWorld->setWorldState(TUG_OF_WAR_SCALE, uint64(0));
+    }
+    if (!sWorld->getWorldState(TUG_OF_WAR_DEFENSE_STREAK))
+    {
+        sWorld->setWorldState(TUG_OF_WAR_DEFENSE_STREAK, uint64(0));
+    }
+
+    m_Scale = sWorld->getWorldState(TUG_OF_WAR_SCALE);
+    m_DefenseStreak = sWorld->getWorldState(TUG_OF_WAR_DEFENSE_STREAK);
+    m_FastCorporal = false;
+    m_FastLieutenant = false;
+}
+
+void TugOfWarWG::OnBattleStart()
+{
+    TeamId attackerTeam = m_WG->GetAttackerTeam();
+
+    if ((attackerTeam == TEAM_ALLIANCE && m_Scale >= 700) || (attackerTeam == TEAM_HORDE && m_Scale <= -700))
+    {
+        m_FastLieutenant = true;
+    }
+    else if ((attackerTeam == TEAM_ALLIANCE && m_Scale >= 600) || (attackerTeam == TEAM_HORDE && m_Scale <= -600))
+    {
+        m_FastCorporal = true;
+    }
+}
+
+void TugOfWarWG::OnBattleEnd(bool endByTimer)
+{
+    TeamId team = m_WG->GetDefenderTeam();
+
+    if (endByTimer)
+    {
+        m_DefenseStreak++;
+        sWorld->setWorldState(TUG_OF_WAR_DEFENSE_STREAK, uint64(m_DefenseStreak));
+
+        if (m_DefenseStreak >= 2)
+        {
+            if ((team == TEAM_ALLIANCE && m_Scale >= -600) || (team == TEAM_HORDE && m_Scale <= 600))
+            {
+                m_Scale += (team == TEAM_ALLIANCE ? -100 : 100);
+                sWorld->setWorldState(TUG_OF_WAR_SCALE, uint64(m_Scale));
+            }
+        }
+    }
+    else
+    {
+        m_DefenseStreak = 0;
+        sWorld->setWorldState(TUG_OF_WAR_DEFENSE_STREAK, uint64(m_DefenseStreak));
+
+        if ((team == TEAM_ALLIANCE && m_Scale >= 400) || (team == TEAM_HORDE && m_Scale <= -400))
+        {
+            m_Scale += (team == TEAM_ALLIANCE ? -100 : 100);
+            sWorld->setWorldState(TUG_OF_WAR_SCALE, uint64(m_Scale));
+        }
+    }
+
+    m_FastCorporal = false;
+    m_FastLieutenant = false;
 }

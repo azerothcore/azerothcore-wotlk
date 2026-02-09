@@ -28,6 +28,7 @@
 class Group;
 class BattlefieldWG;
 class WintergraspCapturePoint;
+class TugOfWarWG;
 
 struct BfWGGameObjectBuilding;
 struct WGWorkshop;
@@ -85,8 +86,8 @@ enum WintergraspSpells
     SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT    = 56618,// ADDS PHASE 16
     SPELL_ALLIANCE_CONTROLS_FACTORY_PHASE_SHIFT = 56617,// ADDS PHASE 32
 
-    SPELL_HORDE_CONTROL_PHASE_SHIFT             = 55773,// ADDS PHASE 64
-    SPELL_ALLIANCE_CONTROL_PHASE_SHIFT          = 55774,// ADDS PHASE 128
+    SPELL_HORDE_CONTROL_PHASE_SHIFT             = 55773,// ADDS PHASE 65 (64 + 1)
+    SPELL_ALLIANCE_CONTROL_PHASE_SHIFT          = 55774,// ADDS PHASE 129 (128 + 1)
 };
 
 enum WintergraspData
@@ -246,6 +247,35 @@ protected:
 };
 
 /* ######################### *
+ * WinterGrasp Tug-of-War    *
+ * ######################### */
+
+enum TugOfWarWorldstates
+{
+    TUG_OF_WAR_SCALE = 99000,
+    TUG_OF_WAR_DEFENSE_STREAK = 99001,
+};
+
+class TugOfWarWG
+{
+public:
+    ~TugOfWarWG();
+    TugOfWarWG(BattlefieldWG* WG);
+
+    int16 GetScale() { return m_Scale; }
+    void OnBattleStart();
+    void OnBattleEnd(bool endByTimer);
+    bool CanFastPromoteToCorporal() { return m_FastCorporal; }
+    bool CanFastPromoteToLieutenant() { return m_FastLieutenant; }
+protected:
+    BattlefieldWG* m_WG;
+    int16 m_Scale;
+    uint32 m_DefenseStreak;
+    bool m_FastCorporal;
+    bool m_FastLieutenant;
+};
+
+/* ######################### *
  * WinterGrasp Battlefield   *
  * ######################### */
 
@@ -329,6 +359,7 @@ public:
      */
     void OnCreatureRemove(Creature* creature) override;
 
+    int8 GetRelatedWorkshopId(uint32 GoEntry);
     /**
      * \brief Called when a gameobject is created
      */
@@ -403,6 +434,8 @@ public:
 
     uint32 GetData(uint32 data) const override;
 
+    TeamId DetermineWorkshopControl(uint8 workshopId);
+
     bool IsKeepNpc(uint32 entry)
     {
         switch (entry)
@@ -435,6 +468,7 @@ public:
     }
 protected:
     bool m_isRelicInteractible;
+    std::unique_ptr<TugOfWarWG> m_TugOfWar;
 
     Workshop WorkshopsList;
 
