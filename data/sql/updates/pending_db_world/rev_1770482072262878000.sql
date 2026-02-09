@@ -1,5 +1,5 @@
 --
-UPDATE `creature_template` SET `npcflag` = `npcflag`&~3 WHERE (`entry` IN (28070, 31366));
+UPDATE `creature_template` SET `npcflag` = 3 WHERE (`entry` IN (28070, 31366));
 
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 9669);
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
