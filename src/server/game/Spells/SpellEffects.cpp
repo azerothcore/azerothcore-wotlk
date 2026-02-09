@@ -3039,34 +3039,48 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
         return;
     }
 
-    // select enchantment duration
-    uint32 duration;
+    // Enchantment duration
+    uint32 duration = 3600; // Default 1 hour
 
-    // rogue family enchantments exception by duration
-    if (m_spellInfo->Id == 38615)
-        duration = 1800;                                    // 30 mins
-    // other rogue family enchantments always 1 hour (some have spell damage=0, but some have wrong data in EffBasePoints)
-    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-        duration = 3600;                                    // 1 hour
-    // shaman family enchantments
-    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
-        duration = 1800;                                    // 30 mins
-    // other cases with this SpellVisual already selected
-    else if (m_spellInfo->SpellVisual[0] == 215)
-        duration = 1800;                                    // 30 mins
-    // some fishing pole bonuses except Glow Worm which lasts full hour
-    else if (m_spellInfo->SpellVisual[0] == 563 && m_spellInfo->Id != 64401)
-        duration = 600;                                     // 10 mins
-    // shaman rockbiter enchantments
-    else if (m_spellInfo->SpellVisual[0] == 0)
-        duration = 1800;                                    // 30 mins
-    else if (m_spellInfo->Id == 29702)
-        duration = 300;                                     // 5 mins
-    else if (m_spellInfo->Id == 37360)
-        duration = 300;                                     // 5 mins
-    // default case
+    // Exceptions
+    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)  // Shaman weapon enchants
+        duration = 1800; // 30 mins
     else
-        duration = 3600;                                    // 1 hour
+    {
+        switch (m_spellInfo->Id)
+        {
+            case 37360: // Consecrated Weapon
+                duration = 300; // 5 mins
+                break;
+            case 8087: // Shiny Bauble
+            case 8088: // Nightcrawlers
+            case 8089: // Aquadynamic Fish Attractor
+            case 8090: // Bright Baubles
+            case 8532: // Aquadynamic Fish Lens
+            case 9092: // Flesh Eating Worm
+            case 43699: // Fishing Hat Lure
+            case 45731: // Sharpened Fish Hook
+                duration = 600; // 10 mins
+                break;
+            case 3594: // Shadow Oil
+            case 3595: // Frost Oil
+            case 6650: // Instant Toxin
+            case 38615: // Bloodboil Poison
+            // Explicitly listing Rockbiter Weapon because it isn't caught by spellfamily check
+            case 36744: // Rockbiter Weapon Rank 1
+            case 36753: // Rockbiter Weapon Rank 2
+            case 36751: // Rockbiter Weapon Rank 2
+            case 36754: // Rockbiter Weapon Rank 3
+            case 36755: // Rockbiter Weapon Rank 3
+            case 36761: // Rockbiter Weapon Rank 4
+            case 36758: // Rockbiter Weapon Rank 4
+            case 36760: // Rockbiter Weapon Rank 4
+                duration = 1800; // 30 mins
+                break;
+            default:
+                break;
+        }
+    }
 
     // item can be in trade slot and have owner diff. from caster
     Player* item_owner = itemTarget->GetOwner();
