@@ -820,35 +820,26 @@ public:
         if (!target || target->IsTotem() || target->IsPet())
             return false;
 
-        auto const& threatList = target->GetThreatMgr().GetThreatList();
-        ThreatContainer::StorageType::const_iterator itr;
         uint32 count = 0;
 
         handler->PSendSysMessage("Threat list of {} ({})", target->GetName(), target->GetGUID().ToString());
 
-        for (itr = threatList.begin(); itr != threatList.end(); ++itr)
+        for (ThreatReference const* ref : target->GetThreatMgr().GetSortedThreatList())
         {
-            Unit* unit = (*itr)->getTarget();
+            Unit* unit = ref->GetVictim();
             if (!unit)
             {
-                handler->PSendSysMessage("   {}.   No Unit  - threat {}", ++count, (*itr)->GetThreat());
+                handler->PSendSysMessage("   {}.   No Unit  - threat {}", ++count, ref->GetThreat());
                 continue;
             }
 
-            handler->PSendSysMessage("   {}.   {}   ({})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), (*itr)->GetThreat());
-        }
+            std::string stateStr = "";
+            if (ref->IsOffline())
+                stateStr = "[offline] ";
+            else if (ref->IsSuppressed())
+                stateStr = "[suppressed] ";
 
-        auto const& threatList2 = target->GetThreatMgr().GetOfflineThreatList();
-        for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
-        {
-            Unit* unit = (*itr)->getTarget();
-            if (!unit)
-            {
-                handler->PSendSysMessage("   {}.   [offline] No Unit  - threat {}", ++count, (*itr)->GetThreat());
-                continue;
-            }
-
-            handler->PSendSysMessage("   {}.   [offline] {}   ({})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), (*itr)->GetThreat());
+            handler->PSendSysMessage("   {}.   {}{}   ({})  - threat {}", ++count, stateStr, unit->GetName(), unit->GetGUID().ToString(), ref->GetThreat());
         }
 
         handler->SendSysMessage("End of threat list.");
@@ -862,27 +853,32 @@ public:
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
-        HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
 
-        handler->PSendSysMessage("Hostile reference list of {} ({})", target->GetName(), target->GetGUID().ToString());
+        handler->PSendSysMessage("Threatened by me list of {} ({})", target->GetName(), target->GetGUID().ToString());
 
-        while (ref)
+        for (auto const& pair : target->GetThreatMgr().GetThreatenedByMeList())
         {
-            if (Unit* unit = ref->GetSource()->GetOwner())
+            ThreatReference const* ref = pair.second;
+            Creature* owner = ref->GetOwner();
+            if (owner)
             {
-                handler->PSendSysMessage("   {}.   {} {}   ({})  - threat {}", ++count, (ref->IsOnline() ? "" : "[offline]"),
-                    unit->GetName(), unit->GetGUID().ToString(), ref->GetThreat());
+                std::string stateStr = "";
+                if (ref->IsOffline())
+                    stateStr = "[offline] ";
+                else if (ref->IsSuppressed())
+                    stateStr = "[suppressed] ";
+
+                handler->PSendSysMessage("   {}.   {}{}   ({})  - threat {}", ++count, stateStr,
+                    owner->GetName(), owner->GetGUID().ToString(), ref->GetThreat());
             }
             else
             {
                 handler->PSendSysMessage("   {}.   No Owner  - threat {}", ++count, ref->GetThreat());
             }
-
-            ref = ref->next();
         }
 
-        handler->SendSysMessage("End of hostile reference list.");
+        handler->SendSysMessage("End of threatened by me list.");
         return true;
     }
 

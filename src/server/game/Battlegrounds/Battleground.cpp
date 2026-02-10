@@ -903,7 +903,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
         {
             //needed cause else in av some creatures will kill the players at the end
             player->CombatStop();
-            player->getHostileRefMgr().deleteReferences();
+            player->GetThreatMgr().RemoveMeFromThreatLists();
         }
 
         uint32 winner_kills = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_HONOR_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_HONOR_FIRST);

@@ -99,9 +99,12 @@ public:
 
     WorldObject* GetSummoner() const;
 
-    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
+    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), _isEngaged(false), m_MoveInLineOfSight_locked(false) { }
 
     ~CreatureAI() override {}
+
+    /// @brief Check if creature is currently engaged in combat
+    bool IsEngaged() const { return _isEngaged; }
 
     void MoveCircleChecks();
     void MoveBackwardsChecks();
@@ -120,10 +123,23 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
+    // Called for reaction whenever we start being in combat (overridden from UnitAI)
+    void JustEnteredCombat(Unit* who) override;
+
+    // Called for reaction when a new non-offline unit is added to the threat list
+    virtual void JustStartedThreateningMe(Unit* who) { if (!IsEngaged()) EngagementStart(who); }
+
     /**
-     * @brief Called for reaction when initially engaged
+     * @brief Called for reaction when initially engaged - this happens _after_ JustEnteredCombat
      */
     virtual void JustEngagedWith(Unit* /*who*/) {}
+
+    // Engagement handling
+    void EngagementStart(Unit* who);
+    void EngagementOver();
+
+    // Called when combat ends - clears engagement state and triggers evade if needed
+    void JustExitedCombat() override;
 
     // Called when the creature is killed
     virtual void JustDied(Unit* /*killer*/) {}
@@ -241,6 +257,7 @@ protected:
 
     CreatureBoundary const* _boundary;
     bool _negateBoundary;
+    bool _isEngaged;
 
 private:
     bool m_MoveInLineOfSight_locked;

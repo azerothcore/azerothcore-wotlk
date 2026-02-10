@@ -339,10 +339,9 @@ public:
 
         Unit* SelectUnitCasting()
         {
-          ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-          for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+          for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
           {
-              if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+              if (Unit* unit = ref->GetVictim())
               {
                   if (unit->HasUnitState(UNIT_STATE_CASTING))
                   {

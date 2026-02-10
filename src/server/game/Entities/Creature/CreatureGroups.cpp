@@ -226,9 +226,9 @@ void CreatureGroup::MemberEngagingTarget(Creature* member, Unit* target)
             continue;
         }
 
-        if (pMember->IsValidAttackTarget(target) && pMember->AI())
+        if (pMember->IsValidAttackTarget(target))
         {
-            pMember->AI()->AttackStart(target);
+            pMember->EngageWithTarget(target);
         }
     }
 }

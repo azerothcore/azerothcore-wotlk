@@ -2726,7 +2726,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (caster->IsClass(CLASS_PALADIN))
             threat *= 0.5f;
 
-        unitTarget->getHostileRefMgr().threatAssist(caster, threat, m_spellInfo);
+        unitTarget->GetThreatMgr().ForwardThreatForAssistingMe(caster, threat, m_spellInfo);
         m_healing = gain;
 
         // Xinef: if heal acutally healed something, add no overheal flag
@@ -2848,8 +2848,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
         if (missInfo == SPELL_MISS_RESIST && m_spellInfo->HasAttribute(SPELL_ATTR0_CU_PICKPOCKET) && unitTarget->IsCreature() && m_caster)
         {
             m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
-            if (unitTarget->ToCreature()->IsAIEnabled)
-                unitTarget->ToCreature()->AI()->AttackStart(m_caster);
+            unitTarget->ToCreature()->EngageWithTarget(m_caster);
         }
     }
 
@@ -3009,8 +3008,11 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             // xinef: triggered spells should not prolong combat
             if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
             {
-                m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
-                unit->getHostileRefMgr().threatAssist(m_caster, 0.0f);
+                if (m_caster->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
+                    m_caster->GetCombatManager().InheritCombatStatesFrom(unit);
+                else
+                    m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
+                unit->GetThreatMgr().ForwardThreatForAssistingMe(m_caster, 0.0f, nullptr, true);
             }
         }
     }
@@ -5536,11 +5538,13 @@ void Spell::HandleThreatSpells()
     if (m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS))
         return;
 
+    Unit* unitCaster = m_originalCaster ? m_originalCaster : m_caster;
+
     float threat = 0.0f;
     if (SpellThreatEntry const* threatEntry = sSpellMgr->GetSpellThreatEntry(m_spellInfo->Id))
     {
         if (threatEntry->apPctMod != 0.0f)
-            threat += threatEntry->apPctMod * m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+            threat += threatEntry->apPctMod * unitCaster->GetTotalAttackPowerValue(BASE_ATTACK);
 
         threat += threatEntry->flatMod;
     }
@@ -5554,23 +5558,22 @@ void Spell::HandleThreatSpells()
     // since 2.0.1 threat from positive effects also is distributed among all targets, so the overall caused threat is at most the defined bonus
     threat /= m_UniqueTargetInfo.size();
 
-    for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+    for (auto& ihit : m_UniqueTargetInfo)
     {
         float threatToAdd = threat;
-        if (ihit->missCondition != SPELL_MISS_NONE)
+        if (ihit.missCondition != SPELL_MISS_NONE)
             threatToAdd = 0.0f;
 
-        Unit* target = ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID);
+        Unit* target = ObjectAccessor::GetUnit(*unitCaster, ihit.targetGUID);
         if (!target)
             continue;
 
-        bool IsFriendly = m_caster->IsFriendlyTo(target);
         // positive spells distribute threat among all units that are in combat with target, like healing
-        if (m_spellInfo->_IsPositiveSpell() && IsFriendly)
-            target->getHostileRefMgr().threatAssist(m_caster, threatToAdd, m_spellInfo);
+        if (m_spellInfo->_IsPositiveSpell() && unitCaster->IsFriendlyTo(target))
+            target->GetThreatMgr().ForwardThreatForAssistingMe(unitCaster, threatToAdd, m_spellInfo);
         // for negative spells threat gets distributed among affected targets
-        else if (!m_spellInfo->_IsPositiveSpell() && !IsFriendly && target->CanHaveThreatList())
-            target->AddThreat(m_caster, threatToAdd, m_spellInfo->GetSchoolMask(), m_spellInfo);
+        else if (!m_spellInfo->_IsPositiveSpell() && !unitCaster->IsFriendlyTo(target) && target->CanHaveThreatList())
+            target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo);
     }
     LOG_DEBUG("spells.aura", "Spell {}, added an additional {} threat for {} {} target(s)", m_spellInfo->Id, threat, m_spellInfo->_IsPositiveSpell() ? "assisting" : "harming", uint32(m_UniqueTargetInfo.size()));
 }

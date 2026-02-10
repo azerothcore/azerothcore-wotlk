@@ -313,6 +313,11 @@ public:
 
     void SetInCombatWithZone();
 
+    // Engagement callbacks (called from CreatureAI::EngagementStart/EngagementOver)
+    void AtEngage(Unit* target) override;
+    void AtDisengage() override;
+    [[nodiscard]] bool IsEngaged() const override;
+
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id)  const override;
 
@@ -330,6 +335,7 @@ public:
 
     void SetCannotReachTarget(ObjectGuid const& target = ObjectGuid::Empty);
     [[nodiscard]] bool CanNotReachTarget() const;
+    [[nodiscard]] ObjectGuid const& GetCannotReachTarget() const { return m_cannotReachTarget; }
     [[nodiscard]] bool IsNotReachableAndNeedRegen() const;
 
     void SetPosition(float x, float y, float z, float o);

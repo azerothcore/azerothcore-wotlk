@@ -1009,7 +1009,7 @@ void SmartAI::OnCharmed(bool /* apply */)
             StartPath(mForcedMovement, GetScript()->GetPathId(), true);
 
         if (Unit* charmer = me->GetCharmer())
-            AttackStart(charmer);
+            me->EngageWithTarget(charmer);
     }
 
     GetScript()->ProcessEventsFor(SMART_EVENT_CHARMED, nullptr, 0, 0, charmed);

@@ -877,7 +877,7 @@ class spell_hun_misdirection : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT || !GetTarget()->HasAura(SPELL_HUNTER_MISDIRECTION_PROC))
-            GetTarget()->ResetRedirectThreat();
+            GetTarget()->GetThreatMgr().ResetAllRedirects();
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
@@ -886,7 +886,7 @@ class spell_hun_misdirection : public AuraScript
         if ((eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)) || (eventInfo.GetHealInfo() && (eventInfo.GetHealInfo()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)))
             return false;
 
-        return GetTarget()->GetRedirectThreatTarget();
+        return GetTarget()->GetThreatMgr().HasRedirects();
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -910,7 +910,7 @@ class spell_hun_misdirection_proc : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->ResetRedirectThreat();
+        GetTarget()->GetThreatMgr().ResetAllRedirects();
     }
 
     void Register() override

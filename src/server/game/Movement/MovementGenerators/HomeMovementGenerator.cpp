@@ -16,6 +16,7 @@
  */
 
 #include "HomeMovementGenerator.h"
+#include "CombatManager.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
@@ -23,11 +24,13 @@
 
 void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {
+    owner->GetCombatManager().SetEvadeState(EVADE_STATE_HOME);
     _setTargetLocation(owner);
 }
 
 void HomeMovementGenerator<Creature>::DoFinalize(Creature* owner)
 {
+    owner->GetCombatManager().SetEvadeState(EVADE_STATE_NONE);
     owner->ClearUnitState(UNIT_STATE_EVADE);
     if (arrived)
     {

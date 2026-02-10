@@ -615,13 +615,13 @@ class spell_rog_tricks_of_the_trade : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
-            GetTarget()->ResetRedirectThreat();
+            GetTarget()->GetThreatMgr().ResetAllRedirects();
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        _redirectTarget = GetTarget()->GetRedirectThreatTarget();
-        return _redirectTarget;
+        _redirectTarget = GetTarget()->GetThreatMgr().GetAnyRedirectTarget();
+        return _redirectTarget != nullptr;
     }
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
@@ -652,7 +652,7 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->ResetRedirectThreat();
+        GetTarget()->GetThreatMgr().ResetAllRedirects();
     }
 
     void Register() override
