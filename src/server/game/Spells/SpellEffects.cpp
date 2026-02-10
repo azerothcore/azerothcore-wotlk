@@ -3316,8 +3316,6 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
                 mgr.AddThreat(m_caster, topThreat - myThreat, nullptr, true, true);
         }
 
-        // Fixate on the taunter
-        mgr.FixateTarget(m_caster);
     }
 }
 

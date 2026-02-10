@@ -426,4 +426,125 @@ TEST_F(ThreatManagerIntegrationTest, SendThreatList_ThreatUpdate_Path)
     delete creatureC;
 }
 
+// ============================================================================
+// TauntState Victim Selection Tests
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntState_OverridesHigherThreat)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B has low threat, C has high threat
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    // Taunt B — should override despite lower threat
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        _creatureB);
+
+    // Remove taunt — should revert to C
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_NONE);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntState_DoesNotClobberFixate)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 300.0f);
+
+    // Script fixate on C
+    _creatureA->TestGetThreatMgr().FixateTarget(creatureC);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    // Taunt from B — fixate should still win
+    // (fixate is checked before heap in ReselectVictim)
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+    // Fixate ref should still be intact
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetFixateTarget(),
+        creatureC);
+
+    // Clear taunt — fixate still holds
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_NONE);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetFixateTarget(),
+        creatureC);
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       Detaunt_LowersPriority)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B and C have same threat
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 100.0f);
+
+    // Detaunt B — C should be selected
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_DETAUNT);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
 } // namespace

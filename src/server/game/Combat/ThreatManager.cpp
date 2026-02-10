@@ -537,6 +537,15 @@ void ThreatManager::TauntUpdate()
     EvaluateSuppressed(true);
 }
 
+void ThreatManager::SetTauntStateForTesting(
+    Unit* target, uint32 state)
+{
+    auto it = _myThreatListEntries.find(target->GetGUID());
+    if (it != _myThreatListEntries.end())
+        it->second->UpdateTauntState(
+            static_cast<ThreatReference::TauntState>(state));
+}
+
 void ThreatManager::ResetAllThreat()
 {
     for (auto const& pair : _myThreatListEntries)

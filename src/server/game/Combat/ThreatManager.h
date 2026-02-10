@@ -179,6 +179,10 @@ public:
     // re-calculate SPELL_AURA_MOD_THREAT modifiers
     void UpdateMySpellSchoolModifiers();
 
+    // Test-only: directly set taunt state on a threat ref
+    // Uses uint32 to avoid incomplete-type issue with ThreatReference
+    void SetTauntStateForTesting(Unit* target, uint32 state);
+
     ///== REDIRECT SYSTEM ==
     void RegisterRedirectThreat(uint32 spellId, ObjectGuid const& victim, uint32 pct);
     void UnregisterRedirectThreat(uint32 spellId);
