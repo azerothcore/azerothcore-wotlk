@@ -527,7 +527,6 @@ private:
     mutable std::shared_ptr<time_t> m_lastLeashExtensionTime;
 
     ObjectGuid m_cannotReachTarget;
-    uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
 
