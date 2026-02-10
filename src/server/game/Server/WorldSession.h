@@ -383,6 +383,11 @@ public:
     void ValidateAccountFlags();
 
     bool IsGMAccount() const;
+    bool IsTrialAccount() const;
+    bool IsInternetGameRoomAccount() const;
+    bool IsRecurringBillingAccount() const;
+
+    uint8 GetBillingPlanFlags() const;
 
     bool PlayerLoading() const { return m_playerLoading; }
     bool PlayerLogout() const { return m_playerLogout; }
