@@ -1226,6 +1226,21 @@ public:
     [[nodiscard]] CreatureSparringContainer const& GetSparringData() const { return _creatureSparringStore; }
 
     CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
+    /**
+     * @brief Loads a single creature spawn entry from the database into the data store cache.
+     *
+     * This is needed as a prerequisite for Creature::LoadCreatureFromDB(), which reads
+     * from the in-memory cache (via GetCreatureData()) rather than querying the DB itself.
+     * For spawns not loaded during server startup, this method populates the cache so that
+     * Creature::LoadCreatureFromDB() can then create the live entity.
+     *
+     * Returns the cached data if already loaded, or nullptr if the spawn doesn't exist
+     * or fails validation.
+     *
+     * @param spawnId The creature spawn GUID to load.
+     * @return Pointer to the cached CreatureData, or nullptr on failure.
+     */
+    CreatureData const* LoadCreatureDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteCreatureData(ObjectGuid::LowType spawnId);
     [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
     {
@@ -1311,6 +1326,21 @@ public:
     [[nodiscard]] QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
+    /**
+     * @brief Loads a single gameobject spawn entry from the database into the data store cache.
+     *
+     * This is needed as a prerequisite for GameObject::LoadGameObjectFromDB(), which reads
+     * from the in-memory cache (via GetGameObjectData()) rather than querying the DB itself.
+     * For spawns not loaded during server startup, this method populates the cache so that
+     * GameObject::LoadGameObjectFromDB() can then create the live entity.
+     *
+     * Returns the cached data if already loaded, or nullptr if the spawn doesn't exist
+     * or fails validation.
+     *
+     * @param spawnId The gameobject spawn GUID to load.
+     * @return Pointer to the cached GameObjectData, or nullptr on failure.
+     */
+    GameObjectData const* LoadGameObjectDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteGOData(ObjectGuid::LowType guid);
 
     [[nodiscard]] ModuleString const* GetModuleString(std::string module, uint32 id) const

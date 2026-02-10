@@ -6080,6 +6080,28 @@ class spell_gen_black_bow_of_the_betrayer : public AuraScript
     }
 };
 
+// 35475 Drums of War
+// 35476 Drums of Battle
+// 35478 Drums of Restoration
+class spell_gen_filter_party_level_80 : public SpellScript
+{
+    PrepareSpellScript(spell_gen_filter_party_level_80);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            return unit && unit->GetLevel() >= 80;
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_filter_party_level_80::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_PARTY);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -6266,4 +6288,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_vampiric_might);
     RegisterSpellScript(spell_gen_mirrored_soul);
     RegisterSpellScript(spell_gen_black_bow_of_the_betrayer);
+    RegisterSpellScript(spell_gen_filter_party_level_80);
 }
