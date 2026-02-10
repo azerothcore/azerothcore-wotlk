@@ -741,10 +741,10 @@ private:
     bool _horsemanAchievement;
 };
 
-class npc_mr_bigglesworth : public NullCreatureAI
+class npc_mr_bigglesworth : public CritterAI
 {
 public:
-    npc_mr_bigglesworth(Creature* c) : NullCreatureAI(c) { }
+    npc_mr_bigglesworth(Creature* c) : CritterAI(c) { }
 
     void JustDied(Unit* /*killer*/) override
     {
