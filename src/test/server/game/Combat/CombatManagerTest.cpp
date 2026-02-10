@@ -202,6 +202,41 @@ TEST_F(CombatManagerIntegrationTest, EvadeState_Transitions)
 }
 
 // ============================================================================
+// ContinueEvadeRegen Tests
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, ContinueEvadeRegen_KeepsRegenActive)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // StartEvadeTimer begins at 10s — NOT in regen zone yet
+    cm.StartEvadeTimer();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_FALSE(cm.IsEvadeRegen());
+
+    // ContinueEvadeRegen sets timer to regen threshold
+    cm.ContinueEvadeRegen();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_TRUE(cm.IsEvadeRegen());
+
+    // After partial countdown, still in regen zone
+    cm.Update(3000);
+    EXPECT_TRUE(cm.IsEvadeRegen());
+}
+
+TEST_F(CombatManagerIntegrationTest, ContinueEvadeRegen_StopEvadeClearsIt)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.ContinueEvadeRegen();
+    EXPECT_TRUE(cm.IsEvadeRegen());
+
+    cm.StopEvade();
+    EXPECT_FALSE(cm.IsEvadeRegen());
+    EXPECT_FALSE(cm.IsInEvadeMode());
+}
+
+// ============================================================================
 // Constants Tests (compacted)
 // ============================================================================
 

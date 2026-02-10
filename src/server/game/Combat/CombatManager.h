@@ -121,6 +121,7 @@ public:
     bool IsInEvadeMode() const { return _evadeTimer > 0 || _evadeState != EVADE_STATE_NONE; }
     bool IsEvadeRegen() const { return (_evadeTimer > 0 && _evadeTimer <= EVADE_REGEN_DELAY) || _evadeState != EVADE_STATE_NONE; }
     void StartEvadeTimer() { _evadeTimer = EVADE_TIMER_DURATION; }
+    void ContinueEvadeRegen() { _evadeTimer = EVADE_REGEN_DELAY; }
     void StopEvade();
 
     bool HasCombat() const { return HasPvECombat() || HasPvPCombat(); }

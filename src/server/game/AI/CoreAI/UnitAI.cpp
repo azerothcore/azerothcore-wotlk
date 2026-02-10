@@ -410,9 +410,11 @@ void UnitAI::EvadeTimerExpired()
         }
     }
 
-    // Don't evade in raids
     if (creature->GetMap()->IsRaid())
+    {
+        creature->GetCombatManager().ContinueEvadeRegen();
         return;
+    }
 
     // If only one target, enter evade mode
     if (creature->GetThreatMgr().GetThreatListSize() <= 1)
