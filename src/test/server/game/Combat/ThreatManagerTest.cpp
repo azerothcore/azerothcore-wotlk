@@ -302,4 +302,128 @@ TEST_F(ThreatManagerIntegrationTest, ThreatConstants)
     EXPECT_EQ(static_cast<uint32>(ThreatReference::TAUNT_STATE_TAUNT), 2);
 }
 
+// ============================================================================
+// GetThreatListPlayerCount Tests (Bug 1 regression)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest, GetThreatListPlayerCount_CreatureOnlyList_ReturnsZero)
+{
+    // All entries are creatures, not players — count should be 0
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListSize(), 2u);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListPlayerCount(), 0u);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListPlayerCount(true), 0u);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// ResetAllMyThreatOnOthers Tests (Bug 4/5 regression)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest, ResetAllMyThreatOnOthers_ZerosThreatOnAllCreatures)
+{
+    // creatureA and creatureC both add threat against creatureB
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    creatureC->TestGetThreatMgr().AddThreat(_creatureB, 200.0f);
+
+    // creatureB appears on both A's and C's threat lists
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
+    EXPECT_FLOAT_EQ(creatureC->TestGetThreatMgr().GetThreat(_creatureB), 200.0f);
+
+    // Reset creatureB's threat on all others' lists
+    _creatureB->TestGetThreatMgr().ResetAllMyThreatOnOthers();
+
+    // creatureB's threat should be zeroed on both lists
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+    EXPECT_FLOAT_EQ(creatureC->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+    // Entries still exist — only zeroed, not removed
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    EXPECT_TRUE(creatureC->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest, ResetAllMyThreatOnOthers_NoEntries_DoesNothing)
+{
+    // creatureB is not on anyone's threat list
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone());
+
+    // Should not crash or assert
+    _creatureB->TestGetThreatMgr().ResetAllMyThreatOnOthers();
+}
+
+// ============================================================================
+// SendThreatListToClients code path tests
+// Exercises SMSG_HIGHEST_THREAT_UPDATE and SMSG_THREAT_UPDATE
+// packet building without crashing (no real sessions to receive)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest, SendThreatList_HighestThreatUpdate_Path)
+{
+    // SMSG_HIGHEST_THREAT_UPDATE is sent when victim changes
+    // (newHighest=true in UpdateVictim)
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+
+    // Update forces ReselectVictim → victim switches from B
+    // to C → newHighest=true → SendThreatListToClients(true)
+    // exercises the SMSG_HIGHEST_THREAT_UPDATE packet path
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest, SendThreatList_ThreatUpdate_Path)
+{
+    // SMSG_THREAT_UPDATE is sent when _needClientUpdate=true
+    // but victim doesn't change (newHighest=false)
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Add lower threat — victim stays as B,
+    // but PutThreatListRef sets _needClientUpdate=true
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 50.0f);
+
+    // Update → victim unchanged (B still highest) →
+    // newHighest=false, _needClientUpdate=true →
+    // SendThreatListToClients(false)
+    // exercises the SMSG_THREAT_UPDATE packet path
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
 } // namespace

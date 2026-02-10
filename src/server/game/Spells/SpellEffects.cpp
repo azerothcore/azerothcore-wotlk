@@ -4036,7 +4036,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
 
         // Night Elf: Shadowmeld only resets threat temporarily
         if (m_spellInfo->Id != 59646)
-            unitTarget->GetThreatMgr().ResetAllThreat();
+            unitTarget->GetThreatMgr().ResetAllMyThreatOnOthers();
 
         if (unitTarget->IsPlayer())
             unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel

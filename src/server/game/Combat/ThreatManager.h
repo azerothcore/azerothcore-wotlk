@@ -170,6 +170,8 @@ public:
     ///== AFFECT OTHERS' THREAT LISTS ==
     // call AddThreat on everything that's threatened by us with the specified params
     void ForwardThreatForAssistingMe(Unit* assistant, float baseAmount, SpellInfo const* spell = nullptr, bool ignoreModifiers = false);
+    // zeros this unit's threat on every creature's threat list where it appears (used for Feign Death, Sanctuary)
+    void ResetAllMyThreatOnOthers();
     // delete all ThreatReferences with victim == owner
     void RemoveMeFromThreatLists();
     // re-calculates the temporary threat modifier from auras on myself

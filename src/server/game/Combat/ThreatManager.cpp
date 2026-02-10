@@ -291,12 +291,14 @@ size_t ThreatManager::GetThreatListSize() const
 
 uint32 ThreatManager::GetThreatListPlayerCount(bool includeOffline/* = false*/) const
 {
-    if (includeOffline)
-        return uint32(_sortedThreatList->size());
     uint32 returnValue = 0;
     for (ThreatReference const* ref : *_sortedThreatList)
-        if (ref->IsAvailable() && ref->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (!includeOffline && !ref->IsAvailable())
+            continue;
+        if (ref->GetVictim()->IsPlayer())
             ++returnValue;
+    }
     return returnValue;
 }
 
@@ -770,6 +772,12 @@ void ThreatManager::ForwardThreatForAssistingMe(Unit* assistant, float baseAmoun
 
     for (Creature* threatened : cannotBeThreatened)
         threatened->GetThreatMgr().AddThreat(assistant, 0.0f, spell, true);
+}
+
+void ThreatManager::ResetAllMyThreatOnOthers()
+{
+    for (auto const& pair : _threatenedByMe)
+        pair.second->ScaleThreat(0.0f);
 }
 
 void ThreatManager::RemoveMeFromThreatLists()
