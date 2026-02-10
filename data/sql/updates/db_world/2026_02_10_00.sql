@@ -1,3 +1,4 @@
+-- DB update 2026_02_09_00 -> 2026_02_10_00
 -- Fix gameobject spawns with non-unit rotation quaternions (sniffed values)
 
 -- Barbershop Chairs
