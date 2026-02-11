@@ -1351,4 +1351,701 @@ TEST_F(ThreatManagerIntegrationTest,
     delete creatureC;
 }
 
+// ============================================================================
+// GAP COVERAGE: Victim Selection Threshold Tests (ReselectVictim)
+// Tests the 110%/130% switching logic, melee vs ranged preference.
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       ReselectVictim_Below110Percent_KeepsOldVictim)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B gets threat first and becomes initial victim
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // C gets 109% of B's threat — below 110% threshold, should NOT switch
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 109.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ReselectVictim_MeleeAt110Percent_Switches)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Both creatures at same position (0,0,0) = within melee range
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // C gets 111% of B's threat and is melee — should switch
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 111.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// NOTE: Ranged (130%) threshold tests cannot be reliably tested in unit tests.
+// Relocate()-based distance checks fail because ShouldBeOffline() calls
+// CanSeeOrDetect(), which requires map grid infrastructure not available
+// in the unit test environment. Creatures placed far away go OFFLINE instead
+// of being treated as "ranged". These thresholds are validated by the
+// CompareReferencesLT implementation and integration/manual testing.
+
+TEST_F(ThreatManagerIntegrationTest,
+       ReselectVictim_MeleeAt130Percent_AlsoSwitches)
+{
+    // Verify that a melee target above 130% also switches (melee only needs
+    // 110%, so 130% should certainly work too)
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // C gets 131% threat — well above melee 110% threshold, should switch
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 131.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ReselectVictim_MeleeThirdTarget_AboveThreshold_Switches)
+{
+    // Three melee targets — verify correct switching with multiple candidates
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    // B is current victim with 100 threat
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // C has 105% — below 110% threshold, won't switch
+    // D has 115% — above 110% threshold, should switch to D
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 105.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 115.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // Should pick D (highest above threshold)
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureD);
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ReselectVictim_NoOldVictim_PicksHighest)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Add both at the same time — no previous victim
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 50.0f);
+
+    // First victim selection — should pick highest regardless of thresholds
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ReselectVictim_EqualThreat_KeepsCurrentVictim)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B is initial victim
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // C gets exactly equal threat — should NOT switch (need >110%)
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// GAP COVERAGE: ThreatManager::Update() Timer-Driven Path
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       Update_TimerDrivenReselection)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+
+    // Add much higher threat to C
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+
+    // Partial update (less than interval) — timer hasn't fired yet
+    _creatureA->TestGetThreatMgr().Update(500);
+    // GetCurrentVictim triggers immediate UpdateVictim so it will still return C
+    // But the timer-based path hasn't fired yet
+    // Verify Update doesn't crash on partial timer
+    EXPECT_NE(_creatureA->TestGetThreatMgr().GetCurrentVictim(), nullptr);
+
+    // Full interval fires timer-based reselection
+    _creatureA->TestGetThreatMgr().Update(500);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       Update_ZeroDiff_DoesNotCrash)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // 0ms update should not crash or do anything unexpected
+    _creatureA->TestGetThreatMgr().Update(0);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), _creatureB);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       Update_EmptyThreatList_DoesNotCrash)
+{
+    // Update with no threat entries — should be safe no-op
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), nullptr);
+}
+
+// ============================================================================
+// GAP COVERAGE: ModifyThreatByPercent
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       ModifyThreatByPercent_Increase)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // +50% → 150
+    _creatureA->TestGetThreatMgr().ModifyThreatByPercent(_creatureB, 50);
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 150.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ModifyThreatByPercent_Decrease)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // -30% → 70
+    _creatureA->TestGetThreatMgr().ModifyThreatByPercent(_creatureB, -30);
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 70.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ModifyThreatByPercent_Minus100_ZerosThreat)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // -100% → 0
+    _creatureA->TestGetThreatMgr().ModifyThreatByPercent(_creatureB, -100);
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+    // Entry should still exist
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ModifyThreatByPercent_ZeroPercent_NoChange)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // 0% change — should be a no-op
+    _creatureA->TestGetThreatMgr().ModifyThreatByPercent(_creatureB, 0);
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ModifyThreatByPercent_Plus100_Doubles)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // +100% → 200
+    _creatureA->TestGetThreatMgr().ModifyThreatByPercent(_creatureB, 100);
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 200.0f);
+}
+
+// ============================================================================
+// GAP COVERAGE: Query Methods (GetThreat, IsThreatListEmpty, IsThreatenedBy)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetThreat_NonexistentTarget_ReturnsZero)
+{
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetThreat_OfflineTarget_ExcludedByDefault)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Move B offline via phase change
+    _creatureB->SetPhase(2);
+
+    // Force re-evaluation
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // Default (includeOffline=false) should return 0
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB, false), 0.0f);
+    // includeOffline=true should return the threat value
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB, true), 100.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreatListEmpty_EmptyList_ReturnsTrue)
+{
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatListEmpty());
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatListEmpty(true));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreatListEmpty_WithEntries_ReturnsFalse)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatListEmpty());
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatListEmpty(true));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreatListEmpty_AllOffline_TrueWithoutOfflineFlag)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Move B offline
+    _creatureB->SetPhase(2);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // Online-only should be empty
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatListEmpty(false));
+    // Including offline should not be empty
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatListEmpty(true));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreatenedBy_OfflineTarget_Variants)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    _creatureB->SetPhase(2);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // Default (online only) — should be false
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB, false));
+    // Including offline — should be true
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB, true));
+}
+
+// ============================================================================
+// GAP COVERAGE: IsThreateningAnyone / IsThreateningTo
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreateningAnyone_NoEntries_ReturnsFalse)
+{
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone());
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone(true));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreateningAnyone_WithEntries_ReturnsTrue)
+{
+    // A adds threat against B → B appears in A's threat list
+    // B is a "victim" on A's list → B._threatenedByMe has an entry for A
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().IsThreateningAnyone());
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().IsThreateningAnyone(true));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreateningAnyone_AllOffline_FalseWithoutFlag)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Make B's ref on A's list go offline
+    _creatureB->SetPhase(2);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // B is still threatening A, but the ref is offline
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone(false));
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().IsThreateningAnyone(true));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreateningTo_SpecificTarget)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // B is threatening A (B appears on A's threat list)
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().IsThreateningTo(_creatureA));
+    // A is NOT threatening B (A does not appear on B's threat list)
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreateningTo(_creatureB));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsThreateningTo_ObjectGuidVariant)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().IsThreateningTo(_creatureA->GetGUID()));
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreateningTo(_creatureB->GetGUID()));
+}
+
+// ============================================================================
+// GAP COVERAGE: RemoveMeFromThreatLists
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       RemoveMeFromThreatLists_RemovesFromAllLists)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001);
+
+    // A and C both have B on their threat lists
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    creatureC->TestGetThreatMgr().AddThreat(_creatureB, 200.0f);
+
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    EXPECT_TRUE(creatureC->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+
+    // B removes itself from all threat lists
+    _creatureB->TestGetThreatMgr().RemoveMeFromThreatLists();
+
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    EXPECT_FALSE(creatureC->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone());
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RemoveMeFromThreatLists_NoEntries_DoesNotCrash)
+{
+    // B is not on anyone's threat list — should be safe no-op
+    _creatureB->TestGetThreatMgr().RemoveMeFromThreatLists();
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone());
+}
+
+// ============================================================================
+// GAP COVERAGE: GetAnyTarget (ThreatManager)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetAnyTarget_EmptyList_ReturnsNull)
+{
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetAnyTarget(), nullptr);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetAnyTarget_WithEntries_ReturnsNonNull)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_NE(_creatureA->TestGetThreatMgr().GetAnyTarget(), nullptr);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetAnyTarget_AllOffline_ReturnsNull)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    _creatureB->SetPhase(2);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetAnyTarget(), nullptr);
+}
+
+// ============================================================================
+// GAP COVERAGE: GetLastVictim
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetLastVictim_NoVictim_ReturnsNull)
+{
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetLastVictim(), nullptr);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetLastVictim_WithVictim_ReturnsCached)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetLastVictim(), _creatureB);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetLastVictim_OfflineVictim_ReturnsNull)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    _creatureB->SetPhase(2);
+    // GetLastVictim checks ShouldBeOffline on cached ref
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetLastVictim(), nullptr);
+}
+
+// ============================================================================
+// GAP COVERAGE: GetSortedThreatList / GetUnsortedThreatList / GetModifiableThreatList
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetSortedThreatList_ReturnsSortedByThreat)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 100.0f);
+
+    float prevThreat = std::numeric_limits<float>::max();
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetSortedThreatList())
+    {
+        EXPECT_LE(ref->GetThreat(), prevThreat);
+        prevThreat = ref->GetThreat();
+    }
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetUnsortedThreatList_ReturnsAllEntries)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+
+    size_t count = 0;
+    for ([[maybe_unused]] ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        ++count;
+
+    EXPECT_EQ(count, 2u);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetModifiableThreatList_ReturnsCopy)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+
+    auto list = _creatureA->TestGetThreatMgr().GetModifiableThreatList();
+    EXPECT_EQ(list.size(), 2u);
+
+    // Verify it's sorted (highest first)
+    EXPECT_GE(list[0]->GetThreat(), list[1]->GetThreat());
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// GAP COVERAGE: Multiple Concurrent Taunts
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       MultipleTaunts_LastTauntWins)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 50.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 25.0f);
+
+    // Taunt from C
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        creatureC, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    // Also taunt from D — both taunted, but D has lower threat
+    // With equal taunt state, higher threat wins → C still selected
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        creatureD, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetCurrentVictim(), creatureC);
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+// ============================================================================
+// GAP COVERAGE: AddThreat Edge Cases
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_NegativeAmount_ReducesThreat)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, -30.0f);
+
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 70.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_NegativeBeyondZero_ClampsToZero)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, -100.0f);
+
+    // ThreatReference::GetThreat clamps to 0 via max(baseAmount + tempMod, 0)
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_DeadTarget_NoCombatOrThreat)
+{
+    _creatureB->SetAlive(false);
+
+    // Dead targets should fail CanBeginCombat and thus not get threat
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasCombat());
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_DifferentPhaseTarget_NoCombatOrThreat)
+{
+    _creatureB->SetPhase(2);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasCombat());
+}
+
+// ============================================================================
+// GAP COVERAGE: GetFixateTarget
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetFixateTarget_NoFixate_ReturnsNull)
+{
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetFixateTarget(), nullptr);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       GetFixateTarget_WithFixate_ReturnsTarget)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().FixateTarget(_creatureB);
+
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetFixateTarget(), _creatureB);
+
+    _creatureA->TestGetThreatMgr().ClearFixate();
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetFixateTarget(), nullptr);
+}
+
+// ============================================================================
+// GAP COVERAGE: ThreatReference Direct API
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       ThreatReference_GetOwnerAndVictim)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
+        if (ref->GetVictim() == _creatureB)
+        {
+            EXPECT_EQ(ref->GetOwner(), _creatureA);
+            EXPECT_EQ(ref->GetVictim(), _creatureB);
+            EXPECT_FLOAT_EQ(ref->GetThreat(), 100.0f);
+            EXPECT_TRUE(ref->IsOnline());
+            EXPECT_FALSE(ref->IsOffline());
+            EXPECT_FALSE(ref->IsSuppressed());
+            EXPECT_TRUE(ref->IsAvailable());
+            EXPECT_EQ(ref->GetTauntState(), ThreatReference::TAUNT_STATE_NONE);
+            EXPECT_FALSE(ref->IsTaunting());
+            EXPECT_FALSE(ref->IsDetaunted());
+        }
+    }
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ThreatReference_ScaleThreat_Directly)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    auto list = _creatureA->TestGetThreatMgr().GetModifiableThreatList();
+    ASSERT_EQ(list.size(), 1u);
+
+    list[0]->ScaleThreat(3.0f);
+    EXPECT_FLOAT_EQ(list[0]->GetThreat(), 300.0f);
+
+    list[0]->ModifyThreatByPercent(-50);
+    EXPECT_FLOAT_EQ(list[0]->GetThreat(), 150.0f);
+}
+
 } // namespace

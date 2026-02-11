@@ -795,4 +795,454 @@ TEST_F(CombatManagerIntegrationTest, SuppressedRef_DoesNotGenerateCombat)
     EXPECT_TRUE(_creatureB->TestGetCombatMgr().IsInCombatWith(_creatureA));
 }
 
+// ============================================================================
+// GAP COVERAGE: GetAnyTarget (CombatManager)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, GetAnyTarget_NoCombat_ReturnsNull)
+{
+    EXPECT_EQ(_creatureA->TestGetCombatMgr().GetAnyTarget(), nullptr);
+}
+
+TEST_F(CombatManagerIntegrationTest, GetAnyTarget_WithCombat_ReturnsTarget)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    Unit* target = _creatureA->TestGetCombatMgr().GetAnyTarget();
+    EXPECT_EQ(target, _creatureB);
+}
+
+TEST_F(CombatManagerIntegrationTest, GetAnyTarget_SuppressedOnly_ReturnsNull)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB, true);
+    // A's ref is not suppressed, but B's is
+    EXPECT_NE(_creatureA->TestGetCombatMgr().GetAnyTarget(), nullptr);
+    // B's only ref is suppressed, so GetAnyTarget skips it
+    EXPECT_EQ(_creatureB->TestGetCombatMgr().GetAnyTarget(), nullptr);
+}
+
+// ============================================================================
+// GAP COVERAGE: HasPvECombatWithPlayers (creatures only → always false)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, HasPvECombatWithPlayers_CreaturesOnly_ReturnsFalse)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    // All our units are creatures, not players
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasPvECombatWithPlayers());
+}
+
+// ============================================================================
+// GAP COVERAGE: EndAllCombat
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, EndAllCombat_ClearsEverything)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetCombatMgr().SetInCombatWith(creatureC);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+
+    _creatureA->TestGetCombatMgr().EndAllCombat();
+
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasCombat());
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListSize(), 0u);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// GAP COVERAGE: EndAllPvPCombat (no PvP refs with creatures, verify no crash)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, EndAllPvPCombat_NoRefs_DoesNotCrash)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    // PvE combat exists but no PvP
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasPvECombat());
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasPvPCombat());
+
+    // Should not crash, should not affect PvE
+    _creatureA->TestGetCombatMgr().EndAllPvPCombat();
+
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasPvECombat());
+}
+
+// ============================================================================
+// GAP COVERAGE: InheritCombatStatesFrom
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, InheritCombatStatesFrom_InheritsPvERefs)
+{
+    // C must be faction 90001 (hostile to B's 90002) so it can enter combat with B
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001);
+
+    // A is in combat with B
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_FALSE(creatureC->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    // C inherits A's combat states — should now be in combat with B
+    creatureC->TestGetCombatMgr().InheritCombatStatesFrom(_creatureA);
+
+    EXPECT_TRUE(creatureC->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(CombatManagerIntegrationTest, InheritCombatStatesFrom_SkipsDuplicate)
+{
+    // C must be faction 90001 (hostile to B's 90002) so it can enter combat with B
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001);
+
+    // Both A and C already in combat with B
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    creatureC->TestGetCombatMgr().SetInCombatWith(_creatureB);
+
+    // Should be a no-op (already in combat with B)
+    creatureC->TestGetCombatMgr().InheritCombatStatesFrom(_creatureA);
+
+    EXPECT_TRUE(creatureC->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(CombatManagerIntegrationTest, InheritCombatStatesFrom_SkipsImmuneTargets)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+
+    // Make C immune to NPCs — should skip inheriting combat with B
+    creatureC->SetImmuneToNPC(true, false);
+    creatureC->TestGetCombatMgr().InheritCombatStatesFrom(_creatureA);
+
+    EXPECT_FALSE(creatureC->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    creatureC->SetImmuneToNPC(false, false);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// GAP COVERAGE: EndCombatBeyondRange
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, EndCombatBeyondRange_InRange_KeepsCombat)
+{
+    // Both creatures at origin (0,0,0) — distance is 0
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    // Range of 50 — creatures are well within range
+    _creatureA->TestGetCombatMgr().EndCombatBeyondRange(50.0f);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+}
+
+TEST_F(CombatManagerIntegrationTest, EndCombatBeyondRange_OutOfRange_EndsCombat)
+{
+    // Place B far away
+    _creatureB->Relocate(200.0f, 200.0f, 0.0f);
+
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    // Range of 50 — B is ~283 units away
+    _creatureA->TestGetCombatMgr().EndCombatBeyondRange(50.0f);
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+}
+
+TEST_F(CombatManagerIntegrationTest, EndCombatBeyondRange_MixedDistances_EndsOnlyFar)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B at origin (close), C far away
+    creatureC->Relocate(200.0f, 200.0f, 0.0f);
+
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    _creatureA->TestGetCombatMgr().SetInCombatWith(creatureC);
+
+    _creatureA->TestGetCombatMgr().EndCombatBeyondRange(50.0f);
+
+    // B should remain, C should be gone
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// GAP COVERAGE: RevalidateCombat
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, RevalidateCombat_ValidRefs_KeepsAll)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    _creatureA->TestGetCombatMgr().RevalidateCombat();
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+}
+
+TEST_F(CombatManagerIntegrationTest, RevalidateCombat_InvalidRef_RemovesIt)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    // Make B dead — CanBeginCombat will now return false
+    _creatureB->SetAlive(false);
+
+    _creatureA->TestGetCombatMgr().RevalidateCombat();
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    _creatureB->SetAlive(true);
+}
+
+TEST_F(CombatManagerIntegrationTest, RevalidateCombat_DifferentPhase_RemovesIt)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+
+    _creatureB->SetPhase(2);
+
+    _creatureA->TestGetCombatMgr().RevalidateCombat();
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+}
+
+// ============================================================================
+// GAP COVERAGE: CombatReference::Refresh (Un-suppress)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, CombatRefresh_UnsuppressesRef)
+{
+    // Create combat with B suppressed
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB, true);
+    EXPECT_FALSE(_creatureB->TestGetCombatMgr().HasPvECombat()); // B is suppressed
+
+    // SetInCombatWith again should refresh the existing ref (un-suppress)
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureB->TestGetCombatMgr().HasPvECombat()); // B un-suppressed
+}
+
+// ============================================================================
+// GAP COVERAGE: CombatReference::SuppressFor
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, SuppressFor_SuppressesOneSide)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasPvECombat());
+    EXPECT_TRUE(_creatureB->TestGetCombatMgr().HasPvECombat());
+
+    // Suppress B's side
+    auto const& refs = _creatureA->TestGetCombatMgr().GetPvECombatRefs();
+    ASSERT_FALSE(refs.empty());
+    refs.begin()->second->SuppressFor(_creatureB);
+
+    // A still in combat, B no longer
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasPvECombat());
+    EXPECT_FALSE(_creatureB->TestGetCombatMgr().HasPvECombat());
+
+    // But reference still exists on both sides
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_TRUE(_creatureB->TestGetCombatMgr().IsInCombatWith(_creatureA));
+}
+
+// ============================================================================
+// GAP COVERAGE: CanBeginCombat Edge Cases
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_UnitStateEvade_Fails)
+{
+    _creatureB->AddUnitState(UNIT_STATE_EVADE);
+    EXPECT_FALSE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
+    _creatureB->ClearUnitState(UNIT_STATE_EVADE);
+}
+
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_UnitStateInFlight_Fails)
+{
+    _creatureB->AddUnitState(UNIT_STATE_IN_FLIGHT);
+    EXPECT_FALSE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
+    _creatureB->ClearUnitState(UNIT_STATE_IN_FLIGHT);
+}
+
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_CombatDisallowed_Fails)
+{
+    _creatureB->SetIsCombatDisallowed(true);
+    EXPECT_FALSE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
+    _creatureB->SetIsCombatDisallowed(false);
+}
+
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_FriendlyFactions_Fails)
+{
+    // Set both to same faction — they should be friendly
+    _creatureB->SetFaction(90001); // same as A
+    EXPECT_FALSE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
+}
+
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_ValidUnits_Succeeds)
+{
+    EXPECT_TRUE(CombatManager::CanBeginCombat(_creatureA, _creatureB));
+}
+
+// ============================================================================
+// GAP COVERAGE: CombatManager::IsInCombatWith (ObjectGuid variant)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, IsInCombatWith_ObjectGuid_Variant)
+{
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB->GetGUID()));
+
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB->GetGUID()));
+}
+
+// ============================================================================
+// GAP COVERAGE: CombatManager::Update with evade timer and no PvP refs
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, Update_NoPvPRefs_DoesNotCrash)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+
+    // Update should handle PvP iteration gracefully when no PvP refs exist
+    _creatureA->TestGetCombatMgr().Update(1000);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+}
+
+TEST_F(CombatManagerIntegrationTest, Update_EvadeTimerAndCombat_BothWork)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    _creatureA->TestGetCombatMgr().StartEvadeTimer();
+
+    // Both combat and evade timer are active
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInEvadeMode());
+
+    // Update ticks both
+    _creatureA->TestGetCombatMgr().Update(5000);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat()); // combat unchanged
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInEvadeMode()); // timer still active
+}
+
+// ============================================================================
+// GAP COVERAGE: CombatReference::GetOther
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, CombatReference_GetOther_ReturnsPeer)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+
+    auto const& aRefs = _creatureA->TestGetCombatMgr().GetPvECombatRefs();
+    ASSERT_FALSE(aRefs.empty());
+
+    CombatReference* ref = aRefs.begin()->second;
+    EXPECT_EQ(ref->GetOther(_creatureA), _creatureB);
+    EXPECT_EQ(ref->GetOther(_creatureB), _creatureA);
+}
+
+// ============================================================================
+// GAP COVERAGE: HasPvPCombat with no PvP refs
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, HasPvPCombat_NoPvPRefs_ReturnsFalse)
+{
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasPvPCombat());
+
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    // Creatures create PvE refs, not PvP
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasPvPCombat());
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasPvECombat());
+}
+
+// ============================================================================
+// GAP COVERAGE: SuppressPvPCombat (no PvP refs, verify no crash)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, SuppressPvPCombat_NoPvPRefs_DoesNotCrash)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+
+    // Should not crash with no PvP refs
+    _creatureA->TestGetCombatMgr().SuppressPvPCombat();
+
+    // PvE combat should be unaffected
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasPvECombat());
+}
+
+// ============================================================================
+// GAP COVERAGE: SetInCombatWith existing combat (refresh path)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, SetInCombatWith_ExistingPvE_RefreshesRef)
+{
+    // Create initial combat with B suppressed
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB, true);
+    EXPECT_FALSE(_creatureB->TestGetCombatMgr().HasPvECombat()); // suppressed
+
+    // SetInCombatWith again (existing ref path) — should un-suppress via Refresh
+    bool result = _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(result);
+    EXPECT_TRUE(_creatureB->TestGetCombatMgr().HasPvECombat()); // refreshed
+}
+
+// ============================================================================
+// GAP COVERAGE: Multiple combat references lifecycle
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, MultipleRefs_IndependentLifecycle)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    _creatureA->TestGetCombatMgr().SetInCombatWith(creatureC);
+    _creatureA->TestGetCombatMgr().SetInCombatWith(creatureD);
+
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureD));
+
+    // End combat with C only
+    auto const& refs = _creatureA->TestGetCombatMgr().GetPvECombatRefs();
+    for (auto const& pair : refs)
+    {
+        if (pair.second->GetOther(_creatureA) == creatureC)
+        {
+            pair.second->EndCombat();
+            break;
+        }
+    }
+
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureD));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
 } // namespace
