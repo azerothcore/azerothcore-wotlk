@@ -245,6 +245,11 @@ void TempSummon::InitStats(uint32 duration)
 
     if (m_Properties->Faction)
         SetFaction(m_Properties->Faction);
+    else if (m_Properties->Flags & SUMMON_PROP_FLAG_USE_SUMMONER_FACTION)
+    {
+        if (owner)
+            SetFaction(owner->GetFaction());
+    }
     else if (IsVehicle() && owner) // properties should be vehicle
         SetFaction(owner->GetFaction());
 }
