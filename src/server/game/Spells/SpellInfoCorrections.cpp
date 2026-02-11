@@ -3308,12 +3308,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValue = 100;
     });
 
-    // Empowered Blood
-    ApplySpellFix({ 70227, 70232 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AreaGroupId = 2452; // Whole icc instead of Crimson Halls only, remove when area calculation is fixed
-    });
-
     ApplySpellFix({ 74509 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
