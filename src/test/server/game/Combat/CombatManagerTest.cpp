@@ -415,4 +415,388 @@ TEST_F(CombatManagerIntegrationTest, ClearInCombat_ClearsAllState)
     EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListSize(), 0u);
 }
 
+// ============================================================================
+// Evade Timer Flow Tests
+// Tests the complete evade timer lifecycle:
+//   StartEvadeTimer -> countdown -> expiry -> EvadeTimerExpired callback
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_PartialCountdown_StillActive)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Advance 3 seconds — timer started at 10s, should still be active
+    cm.Update(3000);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Advance another 3 seconds — 6s total, still active
+    cm.Update(3000);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    cm.StopEvade();
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_FullCountdown_Expires)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Advance the full 10 seconds — timer should expire
+    // Note: EvadeTimerExpired would be called but no AI is set in tests,
+    // so it's a no-op. We verify the timer state itself.
+    cm.Update(CombatManager::EVADE_TIMER_DURATION);
+
+    // Timer has expired and no evade state was set by AI callback
+    EXPECT_FALSE(cm.IsInEvadeMode());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_Overshoot_StillExpires)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+
+    // Advance more than the timer duration
+    cm.Update(CombatManager::EVADE_TIMER_DURATION + 5000);
+
+    EXPECT_FALSE(cm.IsInEvadeMode());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_IncrementalCountdown_Expires)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+
+    // Advance in 1-second increments
+    for (uint32 i = 0; i < 9; ++i)
+    {
+        cm.Update(1000);
+        EXPECT_TRUE(cm.IsInEvadeMode()) << "Timer should be active at " << (i + 1) << "s";
+    }
+
+    // 10th second — should expire
+    cm.Update(1000);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_StopEvade_CancelsBeforeExpiry)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+    cm.Update(5000); // 5 seconds in
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    cm.StopEvade();
+    EXPECT_FALSE(cm.IsInEvadeMode());
+
+    // Further updates should not re-trigger anything
+    cm.Update(10000);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_RestartAfterStop_WorksAgain)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+    cm.Update(5000);
+    cm.StopEvade();
+    EXPECT_FALSE(cm.IsInEvadeMode());
+
+    // Restart the timer
+    cm.StartEvadeTimer();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    cm.Update(5000);
+    EXPECT_TRUE(cm.IsInEvadeMode()); // Still active — 5s into new 10s timer
+
+    cm.Update(5000);
+    EXPECT_FALSE(cm.IsInEvadeMode()); // Expired
+}
+
+// ============================================================================
+// Evade Timer + Regen Phase Interaction
+// Tests the IsEvadeRegen state machine.
+// Timer > EVADE_REGEN_DELAY: not in regen (just counting down)
+// Timer <= EVADE_REGEN_DELAY: in regen (creature should regenerate)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_InitialStart_NotInRegen)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // StartEvadeTimer sets timer to 10s — above the 5s regen threshold
+    cm.StartEvadeTimer();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_FALSE(cm.IsEvadeRegen());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_CountdownToRegenPhase)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+
+    // Advance 5 seconds — timer is now at exactly EVADE_REGEN_DELAY (5000)
+    cm.Update(CombatManager::EVADE_TIMER_DURATION - CombatManager::EVADE_REGEN_DELAY);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_TRUE(cm.IsEvadeRegen()); // timer <= EVADE_REGEN_DELAY
+
+    // Advance 1 more second — timer at 4000, still in regen
+    cm.Update(1000);
+    EXPECT_TRUE(cm.IsEvadeRegen());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_ContinueEvadeRegen_ResetsToRegenDelay)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // Start from a non-regen state
+    cm.StartEvadeTimer();
+    EXPECT_FALSE(cm.IsEvadeRegen());
+
+    // ContinueEvadeRegen jumps the timer directly to the regen delay value
+    cm.ContinueEvadeRegen();
+    EXPECT_TRUE(cm.IsEvadeRegen());
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Advance 4 seconds — timer at 1000, still regen
+    cm.Update(4000);
+    EXPECT_TRUE(cm.IsEvadeRegen());
+
+    // Advance final 1 second — timer expires
+    cm.Update(1000);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+    EXPECT_FALSE(cm.IsEvadeRegen());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_ContinueEvadeRegen_RepeatKeepsRegen)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // In raids, ContinueEvadeRegen is called repeatedly to keep regen going
+    cm.ContinueEvadeRegen();
+    EXPECT_TRUE(cm.IsEvadeRegen());
+
+    // Advance 3 seconds
+    cm.Update(3000);
+    EXPECT_TRUE(cm.IsEvadeRegen());
+
+    // Call ContinueEvadeRegen again (simulates raid behavior — reset timer)
+    cm.ContinueEvadeRegen();
+    EXPECT_TRUE(cm.IsEvadeRegen());
+
+    // Advance another 3 seconds (timer reset to 5s, so 3s in, still active)
+    cm.Update(3000);
+    EXPECT_TRUE(cm.IsEvadeRegen());
+}
+
+// ============================================================================
+// Evade State + Timer Interaction Tests
+// Tests how SetEvadeState interacts with the evade timer.
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, EvadeState_SetToNone_ClearsTimer)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.StartEvadeTimer();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // SetEvadeState(NONE) has an early return if _evadeState is already NONE.
+    // Set to HOME first so that the NONE transition actually executes.
+    cm.SetEvadeState(EVADE_STATE_HOME);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Now setting to NONE should clear the timer
+    cm.SetEvadeState(EVADE_STATE_NONE);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeState_HomeState_IsInEvadeMode)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.SetEvadeState(EVADE_STATE_HOME);
+
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_TRUE(cm.IsEvadingHome());
+    EXPECT_TRUE(cm.IsEvadeRegen()); // _evadeState != NONE triggers regen
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeState_CombatState_IsInEvadeMode)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    cm.SetEvadeState(EVADE_STATE_COMBAT);
+
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_FALSE(cm.IsEvadingHome());
+    EXPECT_TRUE(cm.IsEvadeRegen());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeState_FullLifecycle)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // Phase 1: Target unreachable → start evade timer
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+
+    cm.StartEvadeTimer();
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_FALSE(cm.IsEvadeRegen()); // Timer at 10s, above regen threshold
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE); // State not changed yet
+
+    // Phase 2: Timer counts down past regen threshold
+    cm.Update(6000); // 4s left
+    EXPECT_TRUE(cm.IsEvadeRegen());
+
+    // Phase 3: Timer expires
+    cm.Update(4000);
+    EXPECT_FALSE(cm.IsInEvadeMode()); // No AI to set state
+
+    // Phase 4: Simulate what AI would do — set state to HOME
+    cm.SetEvadeState(EVADE_STATE_HOME);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_TRUE(cm.IsEvadingHome());
+
+    // Phase 5: Creature arrives home — state cleared
+    cm.SetEvadeState(EVADE_STATE_NONE);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+    EXPECT_FALSE(cm.IsEvadingHome());
+    EXPECT_FALSE(cm.IsEvadeRegen());
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_StopEvade_WithActiveState_ClearsState)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // Set evade state (no timer involved)
+    cm.SetEvadeState(EVADE_STATE_HOME);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // StopEvade should clear the state
+    cm.StopEvade();
+    EXPECT_FALSE(cm.IsInEvadeMode());
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
+}
+
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_StopEvade_TimerAndState_ClearsTimer)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // Both timer and state active
+    cm.StartEvadeTimer();
+    cm.SetEvadeState(EVADE_STATE_COMBAT);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // StopEvade first clears the timer (if active), then on second call clears state
+    cm.StopEvade(); // clears timer
+    EXPECT_TRUE(cm.IsInEvadeMode()); // state still active
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_COMBAT);
+
+    cm.StopEvade(); // clears state
+    EXPECT_FALSE(cm.IsInEvadeMode());
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
+}
+
+// ============================================================================
+// SetCannotReachTarget Integration Tests
+// Verifies Creature::SetCannotReachTarget starts/stops evade timer.
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, SetCannotReachTarget_StartsEvadeTimer)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    EXPECT_FALSE(cm.IsInEvadeMode());
+
+    // Setting a target as unreachable starts the evade timer
+    _creatureA->SetCannotReachTarget(_creatureB->GetGUID());
+    EXPECT_TRUE(cm.IsInEvadeMode());
+    EXPECT_TRUE(_creatureA->CanNotReachTarget());
+}
+
+TEST_F(CombatManagerIntegrationTest, SetCannotReachTarget_Clear_StopsEvade)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    _creatureA->SetCannotReachTarget(_creatureB->GetGUID());
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Clear unreachable target — should stop evade
+    _creatureA->SetCannotReachTarget();
+    EXPECT_FALSE(cm.IsInEvadeMode());
+    EXPECT_FALSE(_creatureA->CanNotReachTarget());
+}
+
+TEST_F(CombatManagerIntegrationTest, SetCannotReachTarget_SameTarget_NoDuplicate)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    _creatureA->SetCannotReachTarget(_creatureB->GetGUID());
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Count down 5 seconds
+    cm.Update(5000);
+
+    // Setting the same target again should be a no-op (early return)
+    _creatureA->SetCannotReachTarget(_creatureB->GetGUID());
+
+    // Timer should NOT have been restarted — still mid-countdown
+    // Advance 5 more seconds, timer should expire (was at 5s remaining)
+    cm.Update(5000);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+}
+
+TEST_F(CombatManagerIntegrationTest, IsNotReachableAndNeedRegen_Integration)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    EXPECT_FALSE(_creatureA->IsNotReachableAndNeedRegen());
+
+    // Set unreachable — starts timer at 10s, not in regen yet
+    _creatureA->SetCannotReachTarget(_creatureB->GetGUID());
+    EXPECT_FALSE(_creatureA->IsNotReachableAndNeedRegen());
+
+    // Advance past the regen threshold
+    cm.Update(6000); // 4s left, within regen range
+    EXPECT_TRUE(_creatureA->IsNotReachableAndNeedRegen());
+
+    // Clear unreachable — regen stops
+    _creatureA->SetCannotReachTarget();
+    EXPECT_FALSE(_creatureA->IsNotReachableAndNeedRegen());
+}
+
+// ============================================================================
+// CombatReference Suppression Tests
+// Verifies that suppressed combat refs don't generate combat state.
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, SuppressedRef_DoesNotGenerateCombat)
+{
+    // Create combat with second unit suppressed
+    bool result = _creatureA->TestGetCombatMgr().SetInCombatWith(
+        _creatureB, /* addSecondUnitSuppressed */ true);
+    EXPECT_TRUE(result);
+
+    // A should be in combat (not suppressed)
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasPvECombat());
+    // B's side is suppressed — check HasPvECombat (which skips suppressed refs)
+    EXPECT_FALSE(_creatureB->TestGetCombatMgr().HasPvECombat());
+
+    // But the reference still exists on both sides
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_TRUE(_creatureB->TestGetCombatMgr().IsInCombatWith(_creatureA));
+}
+
 } // namespace

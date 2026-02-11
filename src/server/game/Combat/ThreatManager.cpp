@@ -849,6 +849,8 @@ void ThreatManager::UnregisterRedirectThreat(uint32 spellId, ObjectGuid const& v
     if (it2 == victimMap.end())
         return;
     victimMap.erase(it2);
+    if (victimMap.empty())
+        _redirectRegistry.erase(it);
     UpdateRedirectInfo();
 }
 

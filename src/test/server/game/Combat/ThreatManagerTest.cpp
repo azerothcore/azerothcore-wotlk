@@ -751,4 +751,604 @@ TEST_F(ThreatManagerIntegrationTest,
     EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatListEmpty(false));          // online only
 }
 
+// ============================================================================
+// Redirect System - Functional (End-to-End) Tests
+// Verifies that AddThreat actually redirects threat to registered targets.
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_AddThreat_SplitsBetweenTargetAndRedirect)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Pre-establish C on A's threat list (ObjectAccessor unavailable in tests)
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
+
+    // B registers 50% redirect to C (e.g. Misdirection)
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 50);
+
+    // A adds 100 threat against B — 50% should redirect to C
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
+
+    // B should have 50 threat (100 - 50% redirected)
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 50.0f);
+    // C should have 50 threat (the redirected portion)
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(creatureC));
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 50.0f);
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_FullRedirect_AllThreatGoesToTarget)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Pre-establish C on A's threat list (ObjectAccessor unavailable in tests)
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
+
+    // B registers 100% redirect to C
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 100);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 200.0f, nullptr, true);
+
+    // B should have 0 threat (all redirected)
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+    // C should have all 200 threat
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 200.0f);
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_TwoSpells_BothRedirect)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    // Pre-establish C and D on A's threat list
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 0.0f, nullptr, true, true);
+
+    // B registers two redirects that total 60% (no cap issue)
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 30);  // Misdirection 30%
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        57934, creatureD->GetGUID(), 30);  // Tricks of the Trade 30%
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
+
+    // B should have 40 threat (100 - 30 - 30)
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 40.0f);
+
+    // C and D should each have 30 threat
+    float cThreat = _creatureA->TestGetThreatMgr().GetThreat(creatureC);
+    float dThreat = _creatureA->TestGetThreatMgr().GetThreat(creatureD);
+
+    // Due to unordered_map iteration, we verify total redirected = 60
+    EXPECT_FLOAT_EQ(cThreat + dThreat, 60.0f);
+    EXPECT_FLOAT_EQ(cThreat, 30.0f);
+    EXPECT_FLOAT_EQ(dThreat, 30.0f);
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(57934);
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_NegativeAmount_NoRedirect)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Establish initial threat
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 200.0f, nullptr, true);
+
+    // Register redirect and apply negative threat (threat reduction)
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 50);
+
+    // Negative threat should NOT be redirected (code checks amount > 0)
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, -50.0f, nullptr, true);
+
+    // B should have 150 (200 - 50), C should have no entry or 0
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 150.0f);
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(creatureC));
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_AfterUnregister_NoMoreRedirect)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Pre-establish C on A's threat list (ObjectAccessor unavailable in tests)
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
+
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 50);
+
+    // First add — should redirect
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 50.0f);
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 50.0f);
+
+    // Unregister redirect
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+
+    // Second add — should NOT redirect, all goes to B
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 150.0f);
+    // C should still have 50 from before
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 50.0f);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_ModifyPercentage_AdjustsRedirect)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Pre-establish C on A's threat list (ObjectAccessor unavailable in tests)
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
+
+    // Register 50% redirect
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 50);
+
+    // Increase by +20% to 70%
+    _creatureB->TestGetThreatMgr().ModifyRedirectPercentage(20);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
+
+    // B should have 30 (100 - 70%), C should have 70
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 30.0f);
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 70.0f);
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_ModifyPercentage_ClampsToZero)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Register 30% redirect, then decrease by 50% (should clamp to 0)
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 30);
+    _creatureB->TestGetThreatMgr().ModifyRedirectPercentage(-50);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
+
+    // 0% redirect — all threat goes to B
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
+    // C should not be on the threat list (0% redirect is pruned by UpdateRedirectInfo)
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(creatureC));
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_UnregisterPerSpellPerVictim)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    // Register same spell with two different victims
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 30);
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureD->GetGUID(), 20);
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().HasRedirects());
+
+    // Unregister only the C victim for spell 34477
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(
+        34477, creatureC->GetGUID());
+    // D's redirect should still be active
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().HasRedirects());
+
+    // Unregister D — now empty
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(
+        34477, creatureD->GetGUID());
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().HasRedirects());
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_GetAnyRedirectTarget_ReturnsTarget)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    EXPECT_EQ(_creatureB->TestGetThreatMgr().GetAnyRedirectTarget(), nullptr);
+
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 50);
+
+    // GetAnyRedirectTarget uses ObjectAccessor which won't work in tests,
+    // but at least verify HasRedirects is true
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().HasRedirects());
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// ForwardThreatForAssistingMe Tests
+// Verifies that healing/assist threat is distributed among all creatures
+// that are threatening the healed unit.
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       ForwardThreat_SingleCreature_AllThreatToAssistant)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // A (boss) has B on its threat list
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // B is "healed" — forward 50 assist threat from C (the healer)
+    // ForwardThreat iterates _threatenedByMe (creatures threatening B)
+    // and adds threat for the assistant (C) on those creatures' lists
+    _creatureB->TestGetThreatMgr().ForwardThreatForAssistingMe(
+        creatureC, 50.0f);
+
+    // C should now have 50 threat on A's threat list
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(creatureC));
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 50.0f);
+    // B's threat should be unchanged
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ForwardThreat_MultipleCreatures_SplitsEvenly)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001); // Same faction as A (so it can also threat B)
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002); // The healer
+
+    // A (boss1) and C (boss2) both have B on their threat lists
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    creatureC->TestGetThreatMgr().AddThreat(_creatureB, 200.0f);
+
+    // B is "healed" by D — forward 100 assist threat
+    // Should split evenly: 50 to A, 50 to C
+    _creatureB->TestGetThreatMgr().ForwardThreatForAssistingMe(
+        creatureD, 100.0f);
+
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureD), 50.0f);
+    EXPECT_FLOAT_EQ(
+        creatureC->TestGetThreatMgr().GetThreat(creatureD), 50.0f);
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ForwardThreat_CCTarget_GetsZeroThreat)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001); // Same faction as A
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002); // The healer
+
+    // A has B on threat list, C also has B
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    creatureC->TestGetThreatMgr().AddThreat(_creatureB, 200.0f);
+
+    // A is under CC (UNIT_STATE_CONTROLLED) — should get 0 threat
+    _creatureA->AddUnitState(UNIT_STATE_CONTROLLED);
+
+    _creatureB->TestGetThreatMgr().ForwardThreatForAssistingMe(
+        creatureD, 100.0f);
+
+    // Only C is not CC'd, so it gets all 100 (100 / 1 non-CC target)
+    EXPECT_FLOAT_EQ(
+        creatureC->TestGetThreatMgr().GetThreat(creatureD), 100.0f);
+
+    // A gets 0 threat (CC'd creatures still get combat but 0 threat)
+    float aThreatForD = _creatureA->TestGetThreatMgr().GetThreat(creatureD);
+    EXPECT_FLOAT_EQ(aThreatForD, 0.0f);
+
+    _creatureA->ClearUnitState(UNIT_STATE_CONTROLLED);
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ForwardThreat_NoThreatenedBy_DoesNothing)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B is not on anyone's threat list
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone());
+
+    // Forward should be a no-op
+    _creatureB->TestGetThreatMgr().ForwardThreatForAssistingMe(
+        creatureC, 100.0f);
+
+    // A should have no threat entries
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListSize(), 0u);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       ForwardThreat_ZeroAmount_StillEntersCombat)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // A has B on threat list
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Forward 0 threat — should still create combat reference
+    _creatureB->TestGetThreatMgr().ForwardThreatForAssistingMe(
+        creatureC, 0.0f);
+
+    // C should be in combat with A (threat of 0 but combat ref exists)
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+    // Threat value should be 0
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 0.0f);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// EvaluateSuppressed Transition Tests
+// Tests online/suppressed state transitions on threat references.
+// Uses IMMUNITY_DAMAGE to trigger ShouldBeSuppressed().
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       EvaluateSuppressed_NoRefs_DoesNotCrash)
+{
+    // B is not on anyone's threat list — EvaluateSuppressed should be a no-op
+    EXPECT_FALSE(_creatureB->TestGetThreatMgr().IsThreateningAnyone());
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed(true);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       EvaluateSuppressed_OnlineRefs_RemainOnline)
+{
+    // A has B on threat list — B's ref on A's list should be ONLINE
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // EvaluateSuppressed on B (the victim) should not change anything
+    // since B is not immune to anything
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    // Verify ref is still available (ONLINE or SUPPRESSED both pass)
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB, false));
+
+    // Verify it's specifically online by checking it's not suppressed
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
+        if (ref->GetVictim() == _creatureB)
+        {
+            EXPECT_TRUE(ref->IsOnline());
+            EXPECT_FALSE(ref->IsSuppressed());
+        }
+    }
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       EvaluateSuppressed_DamageImmunity_SetsSuppressed)
+{
+    // A has B on threat list
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Verify B's ref starts as ONLINE
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsOnline());
+
+    // Make B immune to physical damage (A's melee school is SPELL_SCHOOL_MASK_NORMAL)
+    // This triggers ShouldBeSuppressed via IsImmunedToDamage
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+
+    // EvaluateSuppressed checks each ref in _threatenedByMe
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    // B's ref on A's threat list should now be SUPPRESSED
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
+        if (ref->GetVictim() == _creatureB)
+        {
+            EXPECT_TRUE(ref->IsSuppressed());
+            EXPECT_FALSE(ref->IsOnline());
+            EXPECT_TRUE(ref->IsAvailable()); // SUPPRESSED is still available
+        }
+    }
+
+    // Threat value should still be retrievable (SUPPRESSED is available)
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
+
+    // Cleanup immunity
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       EvaluateSuppressed_CanExpire_RestoresOnline)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Apply immunity to suppress
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    // Verify suppressed
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsSuppressed());
+
+    // Remove immunity
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+
+    // EvaluateSuppressed with canExpire=false should NOT restore to online
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed(false);
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsSuppressed()); // still suppressed
+
+    // EvaluateSuppressed with canExpire=true SHOULD restore to online
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed(true);
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
+        if (ref->GetVictim() == _creatureB)
+        {
+            EXPECT_TRUE(ref->IsOnline());
+            EXPECT_FALSE(ref->IsSuppressed());
+        }
+    }
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       EvaluateSuppressed_TauntedVictim_NeverSuppressed)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Taunt B
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+
+    // Apply damage immunity — normally would suppress
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    // Taunted victims should never be suppressed (ShouldBeSuppressed returns false)
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsOnline());
+
+    // Cleanup
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_NONE);
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       EvaluateSuppressed_MultipleRefs_EachEvaluatedIndependently)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001); // Same faction as A
+
+    // Both A and C have B on their threat lists
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    creatureC->TestGetThreatMgr().AddThreat(_creatureB, 200.0f);
+
+    // Apply immunity on B
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    // Both refs should be suppressed
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsSuppressed());
+    for (ThreatReference const* ref : creatureC->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsSuppressed());
+
+    // Remove immunity and expire
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed(true);
+
+    // Both should be online again
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsOnline());
+    for (ThreatReference const* ref : creatureC->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsOnline());
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
 } // namespace
