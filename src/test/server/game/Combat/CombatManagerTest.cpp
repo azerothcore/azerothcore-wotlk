@@ -1245,4 +1245,75 @@ TEST_F(CombatManagerIntegrationTest, MultipleRefs_IndependentLifecycle)
     delete creatureD;
 }
 
+// ============================================================================
+// GAP COVERAGE: CanBeginCombat — different maps
+// Units on different maps cannot enter combat.
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, CanBeginCombat_DifferentMaps_Fails)
+{
+    TestMap* map2 = new TestMap();
+
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(map2, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // A is on _map, C is on map2 — different maps
+    EXPECT_NE(_creatureA->GetMap(), creatureC->GetMap());
+    EXPECT_FALSE(CombatManager::CanBeginCombat(_creatureA, creatureC));
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+    delete map2;
+}
+
+// ============================================================================
+// GAP COVERAGE: SetEvadeState — same-state early return
+// Setting the same evade state twice should be a no-op.
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, SetEvadeState_SameState_NoOp)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // Set to HOME
+    cm.SetEvadeState(EVADE_STATE_HOME);
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_HOME);
+    EXPECT_TRUE(cm.IsEvadingHome());
+
+    // Set to HOME again — early return, no crash, state unchanged
+    cm.SetEvadeState(EVADE_STATE_HOME);
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_HOME);
+    EXPECT_TRUE(cm.IsEvadingHome());
+
+    // Same for NONE (after transitioning away first)
+    cm.SetEvadeState(EVADE_STATE_NONE);
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
+
+    // NONE → NONE early return
+    cm.SetEvadeState(EVADE_STATE_NONE);
+    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
+    EXPECT_FALSE(cm.IsInEvadeMode());
+}
+
+TEST_F(CombatManagerIntegrationTest, SetEvadeState_SameState_DoesNotClearTimer)
+{
+    auto& cm = _creatureA->TestGetCombatMgr();
+
+    // Start evade timer (sets timer to 10s) and set evade state to COMBAT
+    cm.StartEvadeTimer();
+    cm.SetEvadeState(EVADE_STATE_COMBAT);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Set to COMBAT again — should be no-op, timer should NOT be affected
+    cm.SetEvadeState(EVADE_STATE_COMBAT);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    // Timer should still be counting down normally
+    cm.Update(5000);
+    EXPECT_TRUE(cm.IsInEvadeMode());
+
+    cm.StopEvade();
+}
+
 } // namespace

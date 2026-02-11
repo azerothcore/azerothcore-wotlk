@@ -2048,4 +2048,342 @@ TEST_F(ThreatManagerIntegrationTest,
     EXPECT_FLOAT_EQ(list[0]->GetThreat(), 150.0f);
 }
 
+// ============================================================================
+// GAP COVERAGE: MatchUnitThreatToHighestThreat — taunted-highest skip
+// When the heap-top ref is the taunting target, the code peeks at the next
+// entry to find the real highest threat value.
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       MatchUnitThreatToHighestThreat_HighestIsTaunted_UsesNextEntry)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    // B has low threat (100), C has high threat (500), D has none yet
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 10.0f);
+
+    // Taunt B — B becomes heap top (taunt state wins over threat value)
+    // but B's actual threat is only 100.
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+
+    // MatchUnitThreatToHighestThreat should skip the taunted entry (B=100)
+    // and use C's 500 as the real highest.
+    _creatureA->TestGetThreatMgr().MatchUnitThreatToHighestThreat(creatureD);
+
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureD), 500.0f);
+
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_NONE);
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       MatchUnitThreatToHighestThreat_TauntedIsAlsoHighest_UsesTauntedThreat)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    // B has highest threat AND is taunted — no skip needed
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 500.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 10.0f);
+
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+
+    _creatureA->TestGetThreatMgr().MatchUnitThreatToHighestThreat(creatureD);
+
+    // B's 500 is the real highest — D should get 500
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(creatureD), 500.0f);
+
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_NONE);
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+// ============================================================================
+// GAP COVERAGE: AddThreat — suppressed-to-online transition
+// When adding threat to an existing SUPPRESSED ref that no longer qualifies
+// for suppression, the ref transitions back to ONLINE (without needing
+// EvaluateSuppressed(true)).
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_SuppressedRef_UnsuppressesOnNewThreat)
+{
+    // A has B on threat list
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Make B immune → suppress B's ref on A's list
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    // Verify B is SUPPRESSED
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsSuppressed());
+
+    // Remove immunity (but do NOT call EvaluateSuppressed)
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+
+    // Add more threat — the AddThreat path should detect that the ref
+    // no longer ShouldBeSuppressed() and transition it to ONLINE
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f, nullptr, true);
+
+    // Verify B is now ONLINE and threat was applied
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
+        if (ref->GetVictim() == _creatureB)
+        {
+            EXPECT_TRUE(ref->IsOnline());
+            EXPECT_FALSE(ref->IsSuppressed());
+        }
+    }
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 150.0f);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       AddThreat_SuppressedRef_StillSuppressed_NoTransition)
+{
+    // A has B on threat list
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Make B immune → suppress
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    _creatureB->TestGetThreatMgr().EvaluateSuppressed();
+
+    // Add more threat while B is still immune — should stay SUPPRESSED
+    // and threat should NOT be applied (AddThreat only adds to ONLINE refs)
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f, nullptr, true);
+
+    for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+        if (ref->GetVictim() == _creatureB)
+            EXPECT_TRUE(ref->IsSuppressed());
+
+    // Threat should be unchanged (AddThreat skips non-online refs)
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
+
+    _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
+}
+
+// ============================================================================
+// GAP COVERAGE: Redirect total cap at 100%
+// UpdateRedirectInfo() caps the total redirect percentage at 100%.
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_TotalExceeds100_CappedAt100)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    // Pre-establish C and D on A's threat list
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 0.0f, nullptr, true, true);
+
+    // Register redirects totaling 130% (70% + 60%)
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 70);
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        57934, creatureD->GetGUID(), 60);
+
+    // Add 100 threat from A to B
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
+
+    // Total redirected should be capped at 100%, so B gets 0
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+
+    // C + D together should have exactly 100 (the full amount)
+    float cThreat = _creatureA->TestGetThreatMgr().GetThreat(creatureC);
+    float dThreat = _creatureA->TestGetThreatMgr().GetThreat(creatureD);
+    EXPECT_FLOAT_EQ(cThreat + dThreat, 100.0f);
+
+    // First redirect should get its full 70%, second gets capped to 30%
+    // (iteration order of unordered_map may vary, so check the sum is correct
+    // and each individual value is within expected bounds)
+    EXPECT_GE(cThreat, 0.0f);
+    EXPECT_LE(cThreat, 100.0f);
+    EXPECT_GE(dThreat, 0.0f);
+    EXPECT_LE(dThreat, 100.0f);
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(57934);
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_Exactly100Percent_AllRedirected)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    // Pre-establish C and D on A's threat list
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 0.0f, nullptr, true, true);
+
+    // Register redirects totaling exactly 100% (60% + 40%)
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, creatureC->GetGUID(), 60);
+    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
+        57934, creatureD->GetGUID(), 40);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 200.0f, nullptr, true);
+
+    // B should get 0 (all redirected)
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 0.0f);
+
+    // C + D should have 200 total
+    float cThreat = _creatureA->TestGetThreatMgr().GetThreat(creatureC);
+    float dThreat = _creatureA->TestGetThreatMgr().GetThreat(creatureD);
+    EXPECT_FLOAT_EQ(cThreat + dThreat, 200.0f);
+
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(57934);
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+// ============================================================================
+// GAP COVERAGE: ThreatReference::ScaleThreat with factor=1.0 (no-op)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       ThreatReference_ScaleThreat_Factor1_NoOp)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    auto list = _creatureA->TestGetThreatMgr().GetModifiableThreatList();
+    ASSERT_EQ(list.size(), 1u);
+
+    // ScaleThreat(1.0f) has an early return — no heap notification
+    list[0]->ScaleThreat(1.0f);
+    EXPECT_FLOAT_EQ(list[0]->GetThreat(), 100.0f);
+}
+
+// ============================================================================
+// GAP COVERAGE: ThreatReference::AddThreat with amount=0.0 (no-op)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       ThreatReference_AddThreat_ZeroAmount_NoOp)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    auto list = _creatureA->TestGetThreatMgr().GetModifiableThreatList();
+    ASSERT_EQ(list.size(), 1u);
+
+    // AddThreat(0.0f) has an early return — no heap notification
+    list[0]->AddThreat(0.0f);
+    EXPECT_FLOAT_EQ(list[0]->GetThreat(), 100.0f);
+}
+
+// ============================================================================
+// GAP COVERAGE: ThreatReference::ClearThreat() via direct method
+// The ThreatReference self-deallocation path (ref->ClearThreat delegates
+// to ThreatManager::ClearThreat(this)).
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       ThreatReference_ClearThreat_DirectCall_RemovesEntry)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListSize(), 1u);
+
+    // Get the reference via modifiable list and call ClearThreat() on it
+    auto list = _creatureA->TestGetThreatMgr().GetModifiableThreatList();
+    ASSERT_EQ(list.size(), 1u);
+    list[0]->ClearThreat(); // self-deallocation — pointer is now invalid
+
+    // Entry should be gone
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListSize(), 0u);
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+}
+
+// ============================================================================
+// GAP COVERAGE: FixateTarget on a unit not on the threat list
+// Should fall through to _fixateRef = nullptr.
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       FixateTarget_NotOnThreatList_ClearsFixate)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B is on the threat list, C is NOT
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(creatureC));
+
+    // Fixate on C (not on threat list) — should result in nullptr fixate
+    _creatureA->TestGetThreatMgr().FixateTarget(creatureC);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetFixateTarget(), nullptr);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       FixateTarget_NotOnThreatList_ClearsExistingFixate)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Both B and C are on the threat list
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // Set a valid fixate first
+    _creatureA->TestGetThreatMgr().FixateTarget(_creatureB);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetFixateTarget(), _creatureB);
+
+    // Now fixate on C (not on threat list) — should clear the existing fixate
+    _creatureA->TestGetThreatMgr().FixateTarget(creatureC);
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetFixateTarget(), nullptr);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
 } // namespace
