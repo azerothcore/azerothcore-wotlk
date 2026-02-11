@@ -3296,27 +3296,21 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         unitTarget->CombatStart(m_caster);
     }
 
-    // this effect use before aura Taunt apply for prevent taunt already attacking target
-    // for spell as marked "non effective at already attacking target"
-    if (!unitTarget->CanHaveThreatList() || (unitTarget->GetVictim() == m_caster && !m_spellInfo->HasAura(SPELL_AURA_MOD_TAUNT)))
+    if (!unitTarget->CanHaveThreatList())
     {
         SendCastResult(SPELL_FAILED_DONT_REPORT);
         return;
     }
 
     ThreatManager& mgr = unitTarget->GetThreatMgr();
-    if (!mgr.IsThreatListEmpty())
+    if (mgr.GetCurrentVictim() == m_caster)
     {
-        // Also use this effect to set the taunter's threat to the taunted creature's highest value
-        float myThreat = mgr.GetThreat(m_caster);
-        if (Unit* topTarget = mgr.GetCurrentVictim())
-        {
-            float topThreat = mgr.GetThreat(topTarget);
-            if (topThreat > myThreat)
-                mgr.AddThreat(m_caster, topThreat - myThreat, nullptr, true, true);
-        }
-
+        SendCastResult(SPELL_FAILED_DONT_REPORT);
+        return;
     }
+
+    if (!mgr.IsThreatListEmpty())
+        mgr.MatchUnitThreatToHighestThreat(m_caster);
 }
 
 void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
@@ -3668,7 +3662,8 @@ void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
     if (!unitTarget->CanHaveThreatList() || m_caster->IsFriendlyTo(unitTarget))
         return;
 
-    unitTarget->AddThreat(m_caster, float(damage));
+    // SPELL_EFFECT_THREAT adds flat threat that should not be modified by threat reduction
+    unitTarget->GetThreatMgr().AddThreat(m_caster, float(damage), m_spellInfo, true);
 }
 
 void Spell::EffectHealMaxHealth(SpellEffIndex /*effIndex*/)

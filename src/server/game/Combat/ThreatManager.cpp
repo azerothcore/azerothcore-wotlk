@@ -476,10 +476,8 @@ void ThreatManager::AddThreat(Unit* target, float amount, SpellInfo const* spell
 
     ref->UpdateOffline();
     if (ref->IsOnline()) // we only add the threat if the ref is currently available
-    {
-        RegisterForAIUpdate(target->GetGUID()); // notify AI that a new threatening unit was added
         ref->AddThreat(amount);
-    }
+    // Note: AI update registration is handled inside UpdateOffline() when transitioning from OFFLINE
 
     if (!_currentVictimRef)
         UpdateVictim();

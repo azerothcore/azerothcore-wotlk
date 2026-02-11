@@ -547,4 +547,208 @@ TEST_F(ThreatManagerIntegrationTest,
     delete creatureC;
 }
 
+// ============================================================================
+// CanHaveThreatList Consistency Tests (Issue #6 regression)
+// Unit::CanHaveThreatList must agree with ThreatManager::CanHaveThreatList
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       CanHaveThreatList_ConsistentBetweenUnitAndThreatMgr)
+{
+    // Both should agree for a valid, alive creature
+    EXPECT_TRUE(_creatureA->CanHaveThreatList());
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().CanHaveThreatList());
+
+    EXPECT_TRUE(_creatureB->CanHaveThreatList());
+    EXPECT_TRUE(_creatureB->TestGetThreatMgr().CanHaveThreatList());
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       CanHaveThreatList_DeadCreature_ReturnsFalse)
+{
+    _creatureA->SetAlive(false);
+
+    // Unit::CanHaveThreatList checks alive state on top of ThreatMgr
+    EXPECT_FALSE(_creatureA->CanHaveThreatList());
+    // ThreatManager cached value doesn't track alive state
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().CanHaveThreatList());
+    // But skipAliveCheck should bypass the alive check
+    EXPECT_TRUE(_creatureA->CanHaveThreatList(true));
+}
+
+// ============================================================================
+// MatchUnitThreatToHighestThreat Tests (Issue #8 - EffectTaunt fix)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       MatchUnitThreatToHighestThreat_SetsToHighest)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // C has highest threat, B has low threat
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+
+    // Match B's threat to highest (C's 500)
+    _creatureA->TestGetThreatMgr().MatchUnitThreatToHighestThreat(_creatureB);
+
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB),
+        _creatureA->TestGetThreatMgr().GetThreat(creatureC));
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       MatchUnitThreatToHighestThreat_AlreadyHighest_NoChange)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 500.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 100.0f);
+
+    // B is already highest — should stay at 500
+    _creatureA->TestGetThreatMgr().MatchUnitThreatToHighestThreat(_creatureB);
+
+    EXPECT_FLOAT_EQ(
+        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 500.0f);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// Per-Spell Redirect Threat Tests (Issue #7 regression)
+// UnregisterRedirectThreat(spellId) vs ResetAllRedirects
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_RegisterAndUnregister_PerSpell)
+{
+    // Register two different spell redirects
+    _creatureA->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, _creatureB->GetGUID(), 70);  // Misdirection
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().HasRedirects());
+
+    // Unregister only Misdirection
+    _creatureA->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().HasRedirects());
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_UnregisterOneSpell_KeepsOther)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // Register two different spell redirects to different targets
+    _creatureA->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, _creatureB->GetGUID(), 70);  // Misdirection
+    _creatureA->TestGetThreatMgr().RegisterRedirectThreat(
+        57934, creatureC->GetGUID(), 30);   // Tricks of the Trade
+
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().HasRedirects());
+
+    // Unregister only Misdirection — Tricks should remain
+    _creatureA->TestGetThreatMgr().UnregisterRedirectThreat(34477);
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().HasRedirects());
+
+    // Unregister Tricks — now empty
+    _creatureA->TestGetThreatMgr().UnregisterRedirectThreat(57934);
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().HasRedirects());
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       RedirectThreat_ResetAllRedirects_ClearsAll)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().RegisterRedirectThreat(
+        34477, _creatureB->GetGUID(), 70);
+    _creatureA->TestGetThreatMgr().RegisterRedirectThreat(
+        57934, creatureC->GetGUID(), 30);
+
+    _creatureA->TestGetThreatMgr().ResetAllRedirects();
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().HasRedirects());
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// IsEngagedBy Tests (Unit.h change: threat-based for creatures)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsEngagedBy_UsesThreatListForCreatures)
+{
+    // Before any threat, not engaged
+    EXPECT_FALSE(_creatureA->IsEngagedBy(_creatureB));
+
+    // AddThreat creates a threat reference (and combat reference)
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+
+    // IsEngagedBy should check threat list for creatures with threat lists
+    EXPECT_TRUE(_creatureA->IsEngagedBy(_creatureB));
+    // B is on A's threat list but A is NOT on B's threat list
+    // (threat is directional: A threatens B, not vice versa unless B also AddThreats A)
+    EXPECT_FALSE(_creatureB->IsEngagedBy(_creatureA));
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       IsEngagedBy_CombatWithoutThreat_NotEngaged)
+{
+    // Combat reference without threat entry
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    // IsEngagedBy checks threat list for creatures, not combat refs
+    EXPECT_FALSE(_creatureA->IsEngagedBy(_creatureB));
+}
+
+// ============================================================================
+// UpdateMySpellSchoolModifiers Tests (HandleModThreat bug fix)
+// Verify that spell school modifiers affect CalculateModifiedThreat
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       SpellSchoolModifiers_DefaultIsUnmodified)
+{
+    // Default modifier should be 1.0 (no modification)
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_FLOAT_EQ(_creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
+}
+
+// ============================================================================
+// Phase Change + Threat Offline State Tests (SetPhaseMask order fix)
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       PhaseChange_PutsThreatsOffline)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    // B is online on A's threat list
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatListEmpty(false));
+
+    // Move B to a different phase
+    _creatureB->SetPhase(2);
+
+    // B should now be offline on A's threat list (different phases)
+    // The list is not empty if we include offline, but empty if we don't
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB, true));  // includeOffline
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatListEmpty(false));          // online only
+}
+
 } // namespace

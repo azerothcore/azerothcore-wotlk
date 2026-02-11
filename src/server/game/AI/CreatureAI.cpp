@@ -33,20 +33,25 @@
 #include <functional>
 
 //Disable CreatureAI when charmed
-void CreatureAI::OnCharmed(bool apply)
+void CreatureAI::OnCharmed(bool /* apply */)
 {
-    if (apply)
+    if (!me->IsCharmed() && !me->LastCharmerGUID.IsEmpty())
     {
-        me->NeedChangeAI = true;
-        me->IsAIEnabled = false;
+        if (!me->HasReactState(REACT_PASSIVE))
+        {
+            if (Unit* lastCharmer = ObjectAccessor::GetUnit(*me, me->LastCharmerGUID))
+                me->EngageWithTarget(lastCharmer);
+        }
+
+        me->LastCharmerGUID.Clear();
+
+        if (!me->IsInCombat())
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
     }
-    else
-    {
-        me->NeedChangeAI = true;
-        me->IsAIEnabled = false;
-        if (Unit* charmer = me->GetCharmer())
-            me->EngageWithTarget(charmer);
-    }
+
+    // trigger AI switch
+    me->NeedChangeAI = true;
+    me->IsAIEnabled = false;
 }
 
 AISpellInfoType* UnitAI::AISpellInfo;
@@ -149,7 +154,12 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
             }
 
             creature->EngageWithTarget(player);
-            player->SetInCombatWith(creature);
+
+            for (Unit* pet : player->m_Controlled)
+                creature->EngageWithTarget(pet);
+
+            if (Unit* vehicle = player->GetVehicleBase())
+                creature->EngageWithTarget(vehicle);
         }
     }
 }

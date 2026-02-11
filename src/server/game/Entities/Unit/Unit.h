@@ -919,7 +919,7 @@ public:
     bool IsImmuneToNPC() const { return HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC); }
 
     virtual bool IsEngaged() const { return IsInCombat(); }
-    bool IsEngagedBy(Unit const* who) const { return IsInCombatWith(who); }
+    bool IsEngagedBy(Unit const* who) const { return CanHaveThreatList() ? IsThreatenedBy(who) : IsInCombatWith(who); }
     void EngageWithTarget(Unit* who);
 
     [[nodiscard]] bool IsInCombat() const { return HasUnitFlag(UNIT_FLAG_IN_COMBAT); }
@@ -938,9 +938,7 @@ public:
     // Threat related methods
     [[nodiscard]] bool CanHaveThreatList(bool skipAliveCheck = false) const;
     void AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
-    float ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
-    void TauntApply(Unit* victim);
-    void TauntFadeOut(Unit* taunter);
+    void AtTargetAttacked(Unit* target, bool canInitialAggro);
 
     // ThreatManager/CombatManager accessors
     ThreatManager& GetThreatMgr() { return m_threatManager; }
@@ -1818,7 +1816,7 @@ public:
     [[nodiscard]] bool HasIgnoreTargetResistAura()  const { return HasAuraType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST); }
     [[nodiscard]] bool HasIncreaseMountedSpeedAura() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED); }
     [[nodiscard]] bool HasIncreaseMountedFlightSpeedAura() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED); }
-    [[nodiscard]] bool HasThreatAura()              const { return HasAuraType(SPELL_AURA_MOD_THREAT); }
+
     [[nodiscard]] bool HasAttackerSpellCritChanceAura() const { return HasAuraType(SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE); }
     [[nodiscard]] bool HasUnattackableAura()        const { return HasAuraType(SPELL_AURA_MOD_UNATTACKABLE); }
     [[nodiscard]] bool HasHealthRegenInCombatAura() const { return HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT); }
@@ -2043,8 +2041,6 @@ public:
     void SendMovementFeatherFall(Player* sendTo);
     void SendMovementHover(Player* sendTo);
 
-    void SendClearThreatListOpcode();
-    void SendThreatListUpdate();
     void SendClearTarget();
 
     // Misc functions
@@ -2074,7 +2070,6 @@ public:
     float m_modSpellHitChance;
     int32 m_baseSpellCritChance;
 
-    float m_threatModifier[MAX_SPELL_SCHOOL];
     float m_modAttackSpeedPct[3];
 
     SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
@@ -2084,6 +2079,7 @@ public:
     typedef std::set<PetAura const*> PetAuraSet;
     PetAuraSet m_petAuras;
 
+    ObjectGuid LastCharmerGUID;
     bool IsAIEnabled;
     bool NeedChangeAI;
 

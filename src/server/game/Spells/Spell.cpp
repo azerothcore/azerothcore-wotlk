@@ -5572,8 +5572,9 @@ void Spell::HandleThreatSpells()
         if (m_spellInfo->_IsPositiveSpell() && unitCaster->IsFriendlyTo(target))
             target->GetThreatMgr().ForwardThreatForAssistingMe(unitCaster, threatToAdd, m_spellInfo);
         // for negative spells threat gets distributed among affected targets
+        // ignoreModifiers=true because flat SpellThreatEntry threat should not have modifiers applied twice
         else if (!m_spellInfo->_IsPositiveSpell() && !unitCaster->IsFriendlyTo(target) && target->CanHaveThreatList())
-            target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo);
+            target->GetThreatMgr().AddThreat(unitCaster, threatToAdd, m_spellInfo, true);
     }
     LOG_DEBUG("spells.aura", "Spell {}, added an additional {} threat for {} {} target(s)", m_spellInfo->Id, threat, m_spellInfo->_IsPositiveSpell() ? "assisting" : "harming", uint32(m_UniqueTargetInfo.size()));
 }

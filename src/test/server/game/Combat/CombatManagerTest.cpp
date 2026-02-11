@@ -256,4 +256,163 @@ TEST_F(CombatManagerIntegrationTest, EvadeConstants)
     EXPECT_EQ(static_cast<uint8>(EVADE_STATE_HOME), 2);
 }
 
+// ============================================================================
+// Individual CombatReference::EndCombat Tests (Issue #4 regression)
+// Used by SetImmuneToPC/NPC to end specific combat references
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, EndCombat_SingleReference_KeepsOthers)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // A in combat with both B and C
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    _creatureA->TestGetCombatMgr().SetInCombatWith(creatureC);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+
+    // End only the reference with B
+    auto const& refs = _creatureA->TestGetCombatMgr().GetPvECombatRefs();
+    CombatReference* refToEnd = nullptr;
+    for (auto const& pair : refs)
+        if (pair.second->GetOther(_creatureA) == _creatureB)
+            refToEnd = pair.second;
+
+    ASSERT_NE(refToEnd, nullptr);
+    refToEnd->EndCombat();
+
+    // B reference gone, C reference remains
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(CombatManagerIntegrationTest, EndCombat_AlsoClearsThreatForThatRef)
+{
+    // Add threat (which implies combat)
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    // End the combat reference directly
+    auto const& refs = _creatureA->TestGetCombatMgr().GetPvECombatRefs();
+    ASSERT_FALSE(refs.empty());
+    auto it = refs.begin();
+    it->second->EndCombat();
+
+    // Both combat and threat should be cleared
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+}
+
+TEST_F(CombatManagerIntegrationTest, EndCombat_BidirectionalCleanup)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+
+    // End from A's side
+    auto const& refs = _creatureA->TestGetCombatMgr().GetPvECombatRefs();
+    ASSERT_FALSE(refs.empty());
+    refs.begin()->second->EndCombat();
+
+    // Both sides should be cleaned up
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasCombat());
+    EXPECT_FALSE(_creatureB->TestGetCombatMgr().HasCombat());
+}
+
+// ============================================================================
+// SetImmuneToNPC Tests (selective EndCombat by unit flag)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, SetImmuneToNPC_EndsCombatWithNPCs)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // A in combat with both B and C (all NPCs, none have UNIT_FLAG_PLAYER_CONTROLLED)
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    _creatureA->TestGetCombatMgr().SetInCombatWith(creatureC);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+
+    // SetImmuneToNPC should end combat with non-player-controlled units
+    _creatureA->SetImmuneToNPC(true, false);
+
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(creatureC));
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasCombat());
+
+    _creatureA->SetImmuneToNPC(false, false);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(CombatManagerIntegrationTest, SetImmuneToNPC_KeepCombat_PreservesRefs)
+{
+    _creatureA->TestGetCombatMgr().SetInCombatWith(_creatureB);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+
+    // keepCombat=true should not end any combat
+    _creatureA->SetImmuneToNPC(true, true);
+
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    _creatureA->SetImmuneToNPC(false, false);
+}
+
+// ============================================================================
+// StopAttackFaction Tests (EndCombat instead of ClearThreat)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, StopAttackFaction_EndsCombatForFaction)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90001); // same faction as A
+
+    // A in combat with B (faction 90002), threat too
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_TRUE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+
+    // Also have C fight B
+    creatureC->TestGetThreatMgr().AddThreat(_creatureB, 200.0f);
+    EXPECT_TRUE(creatureC->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    // A stops attacking faction 90002 (B's faction)
+    _creatureA->StopAttackFaction(90002);
+
+    // A should no longer be in combat with B, and threat should be cleared
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().IsInCombatWith(_creatureB));
+    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(_creatureB));
+
+    // C's combat with B should be unaffected
+    EXPECT_TRUE(creatureC->TestGetCombatMgr().IsInCombatWith(_creatureB));
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// ClearInCombat Tests (deferred flag removal)
+// ============================================================================
+
+TEST_F(CombatManagerIntegrationTest, ClearInCombat_ClearsAllState)
+{
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    EXPECT_TRUE(_creatureA->TestGetCombatMgr().HasCombat());
+
+    _creatureA->ClearInCombat();
+
+    // All combat and threat should be cleared
+    EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasCombat());
+    EXPECT_FALSE(_creatureA->IsInCombat());
+    EXPECT_EQ(_creatureA->TestGetThreatMgr().GetThreatListSize(), 0u);
+}
+
 } // namespace

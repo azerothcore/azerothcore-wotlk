@@ -2877,7 +2877,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
             }
         }
 
-        if (target->GetInstanceScript() && target->GetInstanceScript()->IsEncounterInProgress())
+        if (target->GetMap()->IsDungeon()) // feign death does not remove combat in dungeons
         {
             // Xinef: replaced with CombatStop(false)
             target->AttackStop();
@@ -3450,17 +3450,7 @@ void AuraEffect::HandleModThreat(AuraApplication const* aurApp, uint8 mode, bool
         return;
 
     Unit* target = aurApp->GetTarget();
-    for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
-        if (GetMiscValue() & (1 << i))
-        {
-            if (apply)
-                AddPct(target->m_threatModifier[i], GetAmount());
-            else
-            {
-                float amount = target->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_THREAT, 1 << i);
-                target->m_threatModifier[i] = amount;
-            }
-        }
+    target->GetThreatMgr().UpdateMySpellSchoolModifiers();
 }
 
 void AuraEffect::HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 mode, bool apply) const

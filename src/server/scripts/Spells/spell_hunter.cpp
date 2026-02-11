@@ -52,6 +52,7 @@ enum HunterSpells
     SPELL_HUNTER_IMPROVED_MEND_PET                  = 24406,
     SPELL_HUNTER_INVIGORATION_TRIGGERED             = 53398,
     SPELL_HUNTER_MASTERS_CALL_TRIGGERED             = 62305,
+    SPELL_HUNTER_MISDIRECTION                       = 34477,
     SPELL_HUNTER_MISDIRECTION_PROC                  = 35079,
     SPELL_HUNTER_PET_LAST_STAND_TRIGGERED           = 53479,
     SPELL_HUNTER_PET_HEART_OF_THE_PHOENIX           = 55709,
@@ -877,7 +878,7 @@ class spell_hun_misdirection : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT || !GetTarget()->HasAura(SPELL_HUNTER_MISDIRECTION_PROC))
-            GetTarget()->GetThreatMgr().ResetAllRedirects();
+            GetTarget()->GetThreatMgr().UnregisterRedirectThreat(SPELL_HUNTER_MISDIRECTION);
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
@@ -910,7 +911,7 @@ class spell_hun_misdirection_proc : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->GetThreatMgr().ResetAllRedirects();
+        GetTarget()->GetThreatMgr().UnregisterRedirectThreat(SPELL_HUNTER_MISDIRECTION);
     }
 
     void Register() override

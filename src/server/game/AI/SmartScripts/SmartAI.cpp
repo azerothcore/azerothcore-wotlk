@@ -523,8 +523,16 @@ void SmartAI::CheckConditions(const uint32 diff)
 
 void SmartAI::UpdateAI(uint32 diff)
 {
-    bool hasVictim = UpdateVictim();
+    if (!me->IsAlive())
+    {
+        if (IsEngaged())
+            EngagementOver();
+        return;
+    }
+
     CheckConditions(diff);
+
+    bool hasVictim = UpdateVictim();
     GetScript()->OnUpdate(diff);
     UpdatePath(diff);
     UpdateDespawn(diff);
@@ -689,7 +697,12 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 
     GetScript()->ProcessEventsFor(SMART_EVENT_EVADE); //must be after aura clear so we can cast spells from db
 
-    if (HasEscortState(SMART_ESCORT_ESCORTING))
+    if (Unit* owner = me->GetCharmerOrOwner())
+    {
+        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        me->ClearUnitState(UNIT_STATE_EVADE);
+    }
+    else if (HasEscortState(SMART_ESCORT_ESCORTING))
     {
         AddEscortState(SMART_ESCORT_RETURNING);
         ReturnToLastOOCPos();
@@ -1003,13 +1016,24 @@ void SmartAI::OnCharmed(bool /* apply */)
 
     mIsCharmed = charmed;
 
+    if (charmed && !me->isPossessed() && !me->IsVehicle())
+        me->GetMotionMaster()->MoveFollow(me->GetCharmer(), PET_FOLLOW_DIST, me->GetFollowAngle());
+
     if (!charmed && !me->IsInEvadeMode())
     {
         if (mCanRepeatPath)
             StartPath(mForcedMovement, GetScript()->GetPathId(), true);
 
-        if (Unit* charmer = me->GetCharmer())
-            me->EngageWithTarget(charmer);
+        if (!me->LastCharmerGUID.IsEmpty())
+        {
+            if (!me->HasReactState(REACT_PASSIVE))
+                if (Unit* lastCharmer = ObjectAccessor::GetUnit(*me, me->LastCharmerGUID))
+                    me->EngageWithTarget(lastCharmer);
+            me->LastCharmerGUID.Clear();
+
+            if (!me->IsInCombat())
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+        }
     }
 
     GetScript()->ProcessEventsFor(SMART_EVENT_CHARMED, nullptr, 0, 0, charmed);

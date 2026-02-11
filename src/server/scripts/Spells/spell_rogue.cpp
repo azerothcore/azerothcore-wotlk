@@ -41,6 +41,7 @@ enum RogueSpells
     SPELL_ROGUE_KILLING_SPREE_DMG_BUFF          = 61851,
     SPELL_ROGUE_PREY_ON_THE_WEAK                = 58670,
     SPELL_ROGUE_SHIV_TRIGGERED                  = 5940,
+    SPELL_ROGUE_TRICKS_OF_THE_TRADE             = 57934,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST   = 57933,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
 };
@@ -615,7 +616,7 @@ class spell_rog_tricks_of_the_trade : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
-            GetTarget()->GetThreatMgr().ResetAllRedirects();
+            GetTarget()->GetThreatMgr().UnregisterRedirectThreat(SPELL_ROGUE_TRICKS_OF_THE_TRADE);
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
@@ -652,7 +653,7 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->GetThreatMgr().ResetAllRedirects();
+        GetTarget()->GetThreatMgr().UnregisterRedirectThreat(SPELL_ROGUE_TRICKS_OF_THE_TRADE);
     }
 
     void Register() override

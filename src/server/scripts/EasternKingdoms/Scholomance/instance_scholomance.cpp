@@ -254,14 +254,13 @@ class spell_scholomance_fixate_aura : public AuraScript
     {
         Unit* target = GetTarget();
         if (Unit* caster = GetCaster())
-            caster->TauntApply(target);
+            caster->GetThreatMgr().FixateTarget(target);
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Unit* target = GetTarget();
         if (Unit* caster = GetCaster())
-            caster->TauntFadeOut(target);
+            caster->GetThreatMgr().ClearFixate();
     }
 
     void Register() override
