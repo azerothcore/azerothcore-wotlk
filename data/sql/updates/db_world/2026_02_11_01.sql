@@ -1,3 +1,4 @@
+-- DB update 2026_02_11_00 -> 2026_02_11_01
 -- Pathing for  Entry: 5042
 SET @NPC := 90458;
 SET @PATH := @NPC * 10;
