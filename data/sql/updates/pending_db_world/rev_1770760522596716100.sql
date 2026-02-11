@@ -128,7 +128,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2525101, 9, 2, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3726.4373, 3568.1, 477.54553, 0, 'Leryssa - Actionlist - Move To Thassarian'),
 (2525101, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 19, 26170, 50, 0, 0, 0, 0, 0, 0, 'Leryssa - Actionlist - Thassarian Say Line 3'),
 (2525101, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 19, 26170, 50, 0, 0, 0, 0, 0, 0, 'Leryssa - Actionlist - Set Thassarian Standstate Kneel'),
-(2525101, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 19, 26170, 50, 0, 0, 0, 0, 0, 0, 'Leryssa - Actionlist - Set Thassarian as Questgiver');
+(2525101, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 19, 26170, 50, 0, 0, 0, 0, 0, 0, 'Leryssa - Actionlist - Set Thassarian as Questgiver');
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2525102);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2525102, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Leryssa - Actionlist - Set Flag Standstate Sit Down'),
@@ -160,12 +160,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (261701, 2, 3701.8281, 3574.434, 473.95667, NULL, 0),
 (261701, 3, 3708.717, 3572.3823, 477.50854, NULL, 0),
 (261701, 4, 3713.3604, 3570.719, 477.5991 , NULL, 0),
--- Lich King
+-- Talbot
 (253011, 1, 3746.9602, 3607.5066, 473.43402, NULL, 0),
 (253011, 2, 3745.358, 3600.3086, 477.3036  , NULL, 0),
 (253011, 3, 3742.5251, 3586.4634, 477.68497, NULL, 0),
 (253011, 4, 3738.2366, 3570.346, 477.63406 , NULL, 0),
--- Talbot
+-- Lich King
 (262031, 1, 3732.6357, 3535.3997, 477.41446, NULL, 0),
 (262031, 2, 3733.244, 3538.2766, 477.50858 , NULL, 0),
 (262031, 3, 3736.5, 3556.1492, 477.63403   , NULL, 0),
