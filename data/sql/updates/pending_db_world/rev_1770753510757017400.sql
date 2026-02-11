@@ -14,7 +14,6 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,6,-8755.52,814.1872,97.88151,3.839724302291870117,12000,0,0,100,0),
 (@PATH,7,-8766.348,820.14746,97.870056,NULL,0,0,0,100,0),
 (@PATH,8,-8766.348,820.14746,97.870056,3.874630928039550781,12000,0,0,100,0);
--- 0x20481C000004EC8000001600000D2C54 .go xyz -8760.21 811.9198 97.793724
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 5042;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 5042);
