@@ -451,10 +451,6 @@ void CombatManager::SetEvadeState(EvadeState state)
 
 void CombatManager::StopEvade()
 {
-    if (_evadeTimer)
-    {
-        _evadeTimer = 0;
-        return;
-    }
+    _evadeTimer = 0;
     SetEvadeState(EVADE_STATE_NONE);
 }

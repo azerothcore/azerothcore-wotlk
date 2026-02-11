@@ -184,6 +184,9 @@ void ThreatReference::HeapNotifyDecreased()
 
 /*static*/ bool ThreatManager::CanHaveThreatList(Unit const* who)
 {
+    if (!who)
+        return false;
+
     Creature const* cWho = who->ToCreature();
     // only creatures can have threat list
     if (!cWho)

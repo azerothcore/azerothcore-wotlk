@@ -690,7 +690,7 @@ TEST_F(CombatManagerIntegrationTest, EvadeTimer_StopEvade_WithActiveState_Clears
     EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
 }
 
-TEST_F(CombatManagerIntegrationTest, EvadeTimer_StopEvade_TimerAndState_ClearsTimer)
+TEST_F(CombatManagerIntegrationTest, EvadeTimer_StopEvade_TimerAndState_ClearsBoth)
 {
     auto& cm = _creatureA->TestGetCombatMgr();
 
@@ -699,12 +699,8 @@ TEST_F(CombatManagerIntegrationTest, EvadeTimer_StopEvade_TimerAndState_ClearsTi
     cm.SetEvadeState(EVADE_STATE_COMBAT);
     EXPECT_TRUE(cm.IsInEvadeMode());
 
-    // StopEvade first clears the timer (if active), then on second call clears state
-    cm.StopEvade(); // clears timer
-    EXPECT_TRUE(cm.IsInEvadeMode()); // state still active
-    EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_COMBAT);
-
-    cm.StopEvade(); // clears state
+    // StopEvade clears both timer and state in a single call
+    cm.StopEvade();
     EXPECT_FALSE(cm.IsInEvadeMode());
     EXPECT_EQ(cm.GetEvadeState(), EVADE_STATE_NONE);
 }
