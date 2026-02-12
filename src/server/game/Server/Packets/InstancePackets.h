@@ -38,7 +38,7 @@ namespace WorldPackets
         class InstanceResetFailed final : public ServerPacket
         {
         public:
-            InstanceResetFailed() : ServerPacket(SMSG_INSTANCE_RESET_FAILED, 4) {}
+            InstanceResetFailed() : ServerPacket(SMSG_INSTANCE_RESET_FAILED, 4 + 4) {}
 
             WorldPacket const* Write() override;
 
