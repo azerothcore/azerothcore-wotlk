@@ -25,6 +25,7 @@
 #include "ModuleMgr.h"
 #include "MotdMgr.h"
 #include "MySQLThreading.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"
@@ -48,52 +49,56 @@ public:
     {
         static ChatCommandTable serverIdleRestartCommandTable =
         {
-            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "",             HandleServerIdleRestartCommand,    SEC_CONSOLE,       Console::Yes }
+            { "cancel",       HandleServerShutDownCancelCommand, rbac::RBAC_PERM_COMMAND_SERVER_IDLERESTART_CANCEL, Console::Yes },
+            { "",             HandleServerIdleRestartCommand,    rbac::RBAC_PERM_COMMAND_SERVER_IDLERESTART,        Console::Yes }
         };
 
         static ChatCommandTable serverIdleShutdownCommandTable =
         {
-            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "",             HandleServerIdleShutDownCommand,   SEC_CONSOLE,       Console::Yes }
+            { "cancel",       HandleServerShutDownCancelCommand, rbac::RBAC_PERM_COMMAND_SERVER_IDLESHUTDOWN_CANCEL, Console::Yes },
+            { "",             HandleServerIdleShutDownCommand,   rbac::RBAC_PERM_COMMAND_SERVER_IDLESHUTDOWN,        Console::Yes }
         };
 
         static ChatCommandTable serverRestartCommandTable =
         {
-            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "",             HandleServerRestartCommand,        SEC_ADMINISTRATOR, Console::Yes }
+            { "cancel",       HandleServerShutDownCancelCommand,   rbac::RBAC_PERM_COMMAND_SERVER_RESTART_CANCEL, Console::Yes },
+            { "force",        HandleServerForceRestartCommand,     rbac::RBAC_PERM_COMMAND_SERVER_RESTART_FORCE,  Console::Yes },
+            { "",             HandleServerRestartCommand,          rbac::RBAC_PERM_COMMAND_SERVER_RESTART,        Console::Yes }
         };
 
         static ChatCommandTable serverShutdownCommandTable =
         {
-            { "cancel",       HandleServerShutDownCancelCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "",             HandleServerShutDownCommand,       SEC_ADMINISTRATOR, Console::Yes }
+            { "cancel",       HandleServerShutDownCancelCommand,   rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN_CANCEL, Console::Yes },
+            { "force",        HandleServerForceShutdownCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN_FORCE,  Console::Yes },
+            { "",             HandleServerShutDownCommand,         rbac::RBAC_PERM_COMMAND_SERVER_SHUTDOWN,        Console::Yes }
         };
 
         static ChatCommandTable serverSetCommandTable =
         {
-            { "loglevel",     HandleServerSetLogLevelCommand,    SEC_CONSOLE,       Console::Yes },
-            { "motd",         HandleServerSetMotdCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "closed",       HandleServerSetClosedCommand,      SEC_CONSOLE,       Console::Yes },
+            { "loglevel",     HandleServerSetLogLevelCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SET_LOGLEVEL, Console::Yes },
+            { "motd",         HandleServerSetMotdCommand,        rbac::RBAC_PERM_COMMAND_SERVER_SET_MOTD,     Console::Yes },
+            { "closed",       HandleServerSetClosedCommand,      rbac::RBAC_PERM_COMMAND_SERVER_SET_CLOSED,   Console::Yes },
+            { "difftime",     HandleServerSetDiffTimeCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SET_DIFFTIME, Console::Yes },
         };
 
         static ChatCommandTable serverCommandTable =
         {
-            { "corpses",      HandleServerCorpsesCommand,        SEC_GAMEMASTER,    Console::Yes },
-            { "debug",        HandleServerDebugCommand,          SEC_ADMINISTRATOR, Console::Yes },
-            { "exit",         HandleServerExitCommand,           SEC_CONSOLE,       Console::Yes },
+            { "corpses",      HandleServerCorpsesCommand,        rbac::RBAC_PERM_COMMAND_SERVER_CORPSES,  Console::Yes },
+            { "debug",        HandleServerDebugCommand,          rbac::RBAC_PERM_COMMAND_SERVER_DEBUG,    Console::Yes },
+            { "exit",         HandleServerExitCommand,           rbac::RBAC_PERM_COMMAND_SERVER_EXIT,     Console::Yes },
             { "idlerestart",  serverIdleRestartCommandTable },
             { "idleshutdown", serverIdleShutdownCommandTable },
-            { "info",         HandleServerInfoCommand,           SEC_PLAYER,        Console::Yes },
-            { "motd",         HandleServerMotdCommand,           SEC_PLAYER,        Console::Yes },
+            { "info",         HandleServerInfoCommand,           rbac::RBAC_PERM_COMMAND_SERVER_INFO,     Console::Yes },
+            { "plimit",       HandleServerPLimitCommand,         rbac::RBAC_PERM_COMMAND_SERVER_PLIMIT,   Console::Yes },
+            { "motd",         HandleServerMotdCommand,           rbac::RBAC_PERM_COMMAND_SERVER_MOTD,     Console::Yes },
             { "restart",      serverRestartCommandTable },
             { "shutdown",     serverShutdownCommandTable },
-            { "set",          serverSetCommandTable }
+            { "set",          serverSetCommandTable, rbac::RBAC_PERM_COMMAND_SERVER_SET }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "server", serverCommandTable }
+            { "server", serverCommandTable, rbac::RBAC_PERM_COMMAND_SERVER }
         };
 
         return commandTable;
@@ -603,6 +608,51 @@ public:
     static bool HandleServerSetLogLevelCommand(ChatHandler* /*handler*/, bool isLogger, std::string const& name, int32 level)
     {
         sLog->SetLogLevel(name, level, isLogger);
+        return true;
+    }
+
+    static bool HandleServerPLimitCommand(ChatHandler* handler, Optional<uint32> limit)
+    {
+        if (limit)
+        {
+            sWorldSessionMgr->SetPlayerAmountLimit(*limit);
+            handler->PSendSysMessage("Player limit set to {}.", *limit);
+        }
+        else
+        {
+            handler->PSendSysMessage("Player limit: {} (Online: {}, Max: {}, Queue: {})",
+                sWorldSessionMgr->GetPlayerAmountLimit(),
+                sWorldSessionMgr->GetPlayerCount(),
+                sWorldSessionMgr->GetMaxPlayerCount(),
+                sWorldSessionMgr->GetQueuedSessionCount());
+        }
+        return true;
+    }
+
+    static bool HandleServerSetDiffTimeCommand(ChatHandler* handler, uint32 newTime)
+    {
+        sWorldUpdateTime.SetRecordUpdateTimeInterval(Milliseconds(newTime));
+        handler->PSendSysMessage("Record update time interval set to {} ms.", newTime);
+        return true;
+    }
+
+    static bool HandleServerForceShutdownCommand(ChatHandler* /*handler*/, Optional<std::string> reason)
+    {
+        std::string strReason;
+        if (reason)
+            strReason = *reason;
+
+        sWorld->ShutdownServ(0, SHUTDOWN_MASK_FORCE, SHUTDOWN_EXIT_CODE, strReason);
+        return true;
+    }
+
+    static bool HandleServerForceRestartCommand(ChatHandler* /*handler*/, Optional<std::string> reason)
+    {
+        std::string strReason;
+        if (reason)
+            strReason = *reason;
+
+        sWorld->ShutdownServ(0, SHUTDOWN_MASK_FORCE | SHUTDOWN_MASK_RESTART, RESTART_EXIT_CODE, strReason);
         return true;
     }
 };

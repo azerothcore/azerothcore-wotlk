@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
+#include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "CharacterCache.h"
@@ -41,6 +42,7 @@
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -137,66 +139,73 @@ public:
     {
         static ChatCommandTable auraCommandTable =
         {
-            { "stack",             HandleAuraStacksCommand,        SEC_GAMEMASTER,         Console::No  },
-            { "",                  HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  }
+            { "stack",             HandleAuraStacksCommand,        rbac::RBAC_PERM_COMMAND_AURA_STACK,        Console::No  },
+            { "",                  HandleAuraCommand,              rbac::RBAC_PERM_COMMAND_AURA,              Console::No  }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "commentator",       HandleCommentatorCommand,       SEC_MODERATOR,          Console::No  },
-            { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
-            { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
-            { "aura",              auraCommandTable                                                     },
-            { "unaura",            HandleUnAuraCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "appear",            HandleAppearCommand,            SEC_MODERATOR,          Console::No  },
-            { "summon",            HandleSummonCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "groupsummon",       HandleGroupSummonCommand,       SEC_GAMEMASTER,         Console::No  },
-            { "commands",          HandleCommandsCommand,          SEC_PLAYER,             Console::Yes },
-            { "die",               HandleDieCommand,               SEC_GAMEMASTER,         Console::No  },
-            { "revive",            HandleReviveCommand,            SEC_GAMEMASTER,         Console::Yes },
-            { "dismount",          HandleDismountCommand,          SEC_PLAYER,             Console::No  },
-            { "guid",              HandleGUIDCommand,              SEC_GAMEMASTER,         Console::No  },
-            { "help",              HandleHelpCommand,              SEC_PLAYER,             Console::Yes },
-            { "cooldown",          HandleCooldownCommand,          SEC_GAMEMASTER,         Console::No  },
-            { "distance",          HandleGetDistanceCommand,       SEC_ADMINISTRATOR,      Console::No  },
-            { "recall",            HandleRecallCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "save",              HandleSaveCommand,              SEC_PLAYER,             Console::No  },
-            { "saveall",           HandleSaveAllCommand,           SEC_GAMEMASTER,         Console::Yes },
-            { "kick",              HandleKickPlayerCommand,        SEC_GAMEMASTER,         Console::Yes },
-            { "unstuck",           HandleUnstuckCommand,           SEC_GAMEMASTER,         Console::Yes },
-            { "linkgrave",         HandleLinkGraveCommand,         SEC_ADMINISTRATOR,      Console::No  },
-            { "neargrave",         HandleNearGraveCommand,         SEC_GAMEMASTER,         Console::No  },
-            { "showarea",          HandleShowAreaCommand,          SEC_GAMEMASTER,         Console::No  },
-            { "hidearea",          HandleHideAreaCommand,          SEC_ADMINISTRATOR,      Console::No  },
-            { "additem",           HandleAddItemCommand,           SEC_GAMEMASTER,         Console::Yes },
-            { "additem set",       HandleAddItemSetCommand,        SEC_GAMEMASTER,         Console::No  },
-            { "wchange",           HandleChangeWeather,            SEC_ADMINISTRATOR,      Console::No  },
-            { "maxskill",          HandleMaxSkillCommand,          SEC_GAMEMASTER,         Console::No  },
-            { "setskill",          HandleSetSkillCommand,          SEC_GAMEMASTER,         Console::No  },
-            { "pinfo",             HandlePInfoCommand,             SEC_GAMEMASTER,         Console::Yes },
-            { "respawn",           HandleRespawnCommand,           SEC_GAMEMASTER,         Console::No  },
-            { "respawn all",       HandleRespawnAllCommand,        SEC_GAMEMASTER,         Console::No  },
-            { "mute",              HandleMuteCommand,              SEC_GAMEMASTER,         Console::Yes },
-            { "mutehistory",       HandleMuteInfoCommand,          SEC_GAMEMASTER,         Console::Yes },
-            { "unmute",            HandleUnmuteCommand,            SEC_GAMEMASTER,         Console::Yes },
-            { "movegens",          HandleMovegensCommand,          SEC_ADMINISTRATOR,      Console::No  },
-            { "cometome",          HandleComeToMeCommand,          SEC_ADMINISTRATOR,      Console::No  },
-            { "damage",            HandleDamageCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "combatstop",        HandleCombatStopCommand,        SEC_GAMEMASTER,         Console::Yes },
-            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::Yes },
-            { "freeze",            HandleFreezeCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "unfreeze",          HandleUnFreezeCommand,          SEC_GAMEMASTER,         Console::No  },
-            { "possess",           HandlePossessCommand,           SEC_GAMEMASTER,         Console::No  },
-            { "unpossess",         HandleUnPossessCommand,         SEC_GAMEMASTER,         Console::No  },
-            { "bindsight",         HandleBindSightCommand,         SEC_ADMINISTRATOR,      Console::No  },
-            { "unbindsight",       HandleUnbindSightCommand,       SEC_ADMINISTRATOR,      Console::No  },
-            { "playall",           HandlePlayAllCommand,           SEC_GAMEMASTER,         Console::No  },
-            { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
-            { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
-            { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
-            { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  },
-            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::Yes }
+            { "commentator",       HandleCommentatorCommand,       rbac::RBAC_PERM_COMMAND_COMMENTATOR,       Console::No  },
+            { "dev",               HandleDevCommand,               rbac::RBAC_PERM_COMMAND_DEV,               Console::No  },
+            { "gps",               HandleGPSCommand,               rbac::RBAC_PERM_COMMAND_GPS,               Console::No  },
+            { "aura",              auraCommandTable                                                                        },
+            { "unaura",            HandleUnAuraCommand,            rbac::RBAC_PERM_COMMAND_UNAURA,            Console::No  },
+            { "appear",            HandleAppearCommand,            rbac::RBAC_PERM_COMMAND_APPEAR,            Console::No  },
+            { "summon",            HandleSummonCommand,            rbac::RBAC_PERM_COMMAND_SUMMON,            Console::No  },
+            { "groupsummon",       HandleGroupSummonCommand,       rbac::RBAC_PERM_COMMAND_GROUP_SUMMON,      Console::No  },
+            { "commands",          HandleCommandsCommand,          rbac::RBAC_PERM_COMMAND_COMMANDS,          Console::Yes },
+            { "die",               HandleDieCommand,               rbac::RBAC_PERM_COMMAND_DIE,               Console::No  },
+            { "revive",            HandleReviveCommand,            rbac::RBAC_PERM_COMMAND_REVIVE,            Console::Yes },
+            { "dismount",          HandleDismountCommand,          rbac::RBAC_PERM_COMMAND_DISMOUNT,          Console::No  },
+            { "guid",              HandleGUIDCommand,              rbac::RBAC_PERM_COMMAND_GUID,              Console::No  },
+            { "help",              HandleHelpCommand,              rbac::RBAC_PERM_COMMAND_HELP,              Console::Yes },
+            { "cooldown",          HandleCooldownCommand,          rbac::RBAC_PERM_COMMAND_COOLDOWN,          Console::No  },
+            { "distance",          HandleGetDistanceCommand,       rbac::RBAC_PERM_COMMAND_DISTANCE,          Console::No  },
+            { "recall",            HandleRecallCommand,            rbac::RBAC_PERM_COMMAND_RECALL,            Console::No  },
+            { "save",              HandleSaveCommand,              rbac::RBAC_PERM_COMMAND_SAVE,              Console::No  },
+            { "saveall",           HandleSaveAllCommand,           rbac::RBAC_PERM_COMMAND_SAVEALL,           Console::Yes },
+            { "kick",              HandleKickPlayerCommand,        rbac::RBAC_PERM_COMMAND_KICK,              Console::Yes },
+            { "unstuck",           HandleUnstuckCommand,           rbac::RBAC_PERM_COMMAND_UNSTUCK,           Console::Yes },
+            { "linkgrave",         HandleLinkGraveCommand,         rbac::RBAC_PERM_COMMAND_LINKGRAVE,         Console::No  },
+            { "neargrave",         HandleNearGraveCommand,         rbac::RBAC_PERM_COMMAND_NEARGRAVE,         Console::No  },
+            { "showarea",          HandleShowAreaCommand,          rbac::RBAC_PERM_COMMAND_SHOWAREA,          Console::No  },
+            { "hidearea",          HandleHideAreaCommand,          rbac::RBAC_PERM_COMMAND_HIDEAREA,          Console::No  },
+            { "additem",           HandleAddItemCommand,           rbac::RBAC_PERM_COMMAND_ADDITEM,           Console::Yes },
+            { "additem set",       HandleAddItemSetCommand,        rbac::RBAC_PERM_COMMAND_ADDITEMSET,        Console::No  },
+            { "wchange",           HandleChangeWeather,            rbac::RBAC_PERM_COMMAND_WCHANGE,           Console::No  },
+            { "maxskill",          HandleMaxSkillCommand,          rbac::RBAC_PERM_COMMAND_MAXSKILL,          Console::No  },
+            { "setskill",          HandleSetSkillCommand,          rbac::RBAC_PERM_COMMAND_SETSKILL,          Console::No  },
+            { "pinfo",             HandlePInfoCommand,             rbac::RBAC_PERM_COMMAND_PINFO,             Console::Yes },
+            { "respawn",           HandleRespawnCommand,           rbac::RBAC_PERM_COMMAND_RESPAWN,           Console::No  },
+            { "respawn all",       HandleRespawnAllCommand,        rbac::RBAC_PERM_COMMAND_RESPAWN_ALL,       Console::No  },
+            { "mute",              HandleMuteCommand,              rbac::RBAC_PERM_COMMAND_MUTE,              Console::Yes },
+            { "mutehistory",       HandleMuteInfoCommand,          rbac::RBAC_PERM_COMMAND_MUTEHISTORY,       Console::Yes },
+            { "unmute",            HandleUnmuteCommand,            rbac::RBAC_PERM_COMMAND_UNMUTE,            Console::Yes },
+            { "movegens",          HandleMovegensCommand,          rbac::RBAC_PERM_COMMAND_MOVEGENS,          Console::No  },
+            { "cometome",          HandleComeToMeCommand,          rbac::RBAC_PERM_COMMAND_COMETOME,          Console::No  },
+            { "damage",            HandleDamageCommand,            rbac::RBAC_PERM_COMMAND_DAMAGE,            Console::No  },
+            { "combatstop",        HandleCombatStopCommand,        rbac::RBAC_PERM_COMMAND_COMBATSTOP,        Console::Yes },
+            { "flusharenapoints",  HandleFlushArenaPointsCommand,  rbac::RBAC_PERM_COMMAND_FLUSHARENAPOINTS,  Console::Yes },
+            { "freeze",            HandleFreezeCommand,            rbac::RBAC_PERM_COMMAND_FREEZE,            Console::No  },
+            { "unfreeze",          HandleUnFreezeCommand,          rbac::RBAC_PERM_COMMAND_UNFREEZE,          Console::No  },
+            { "possess",           HandlePossessCommand,           rbac::RBAC_PERM_COMMAND_POSSESS,           Console::No  },
+            { "unpossess",         HandleUnPossessCommand,         rbac::RBAC_PERM_COMMAND_UNPOSSESS,         Console::No  },
+            { "bindsight",         HandleBindSightCommand,         rbac::RBAC_PERM_COMMAND_BINDSIGHT,         Console::No  },
+            { "unbindsight",       HandleUnbindSightCommand,       rbac::RBAC_PERM_COMMAND_UNBINDSIGHT,       Console::No  },
+            { "playall",           HandlePlayAllCommand,           rbac::RBAC_PERM_COMMAND_PLAYALL,           Console::No  },
+            { "skirmish",          HandleSkirmishCommand,          rbac::RBAC_PERM_COMMAND_SKIRMISH,          Console::No  },
+            { "mailbox",           HandleMailBoxCommand,           rbac::RBAC_PERM_COMMAND_MAILBOX,           Console::No  },
+            { "string",            HandleStringCommand,            rbac::RBAC_PERM_COMMAND_STRING,            Console::No  },
+            { "opendoor",          HandleOpenDoorCommand,          rbac::RBAC_PERM_COMMAND_OPENDOOR,          Console::No  },
+            { "bm",                HandleBMCommand,                rbac::RBAC_PERM_COMMAND_BEASTMASTER,       Console::No  },
+            { "packetlog",         HandlePacketLog,                rbac::RBAC_PERM_COMMAND_PACKETLOG,         Console::Yes },
+            { "bank",              HandleBankCommand,              rbac::RBAC_PERM_COMMAND_BANK,              Console::No  },
+            { "repairitems",       HandleRepairitemsCommand,       rbac::RBAC_PERM_COMMAND_REPAIRITEMS,       Console::No  },
+            { "bg start",          HandleBGStartCommand,           rbac::RBAC_PERM_COMMAND_BG_START,          Console::No  },
+            { "bg stop",           HandleBGStopCommand,            rbac::RBAC_PERM_COMMAND_BG_STOP,           Console::No  },
+            { "neargraveyard",     HandleNearGraveyardCommand,     rbac::RBAC_PERM_COMMAND_NEARGRAVEYARD,     Console::No  },
+            { "listfreeze",        HandleListFreezeCommand,        rbac::RBAC_PERM_COMMAND_LISTFREEZE,        Console::No  },
+            { "pvpstats",          HandlePvPstatsCommand,          rbac::RBAC_PERM_COMMAND_PVPSTATS,          Console::Yes }
         };
 
         return commandTable;
@@ -1234,7 +1243,7 @@ public:
         {
             auto targetPlayer = target->GetConnectedPlayer();
             targetPlayer->RemoveAurasDueToSpell(27827); // Spirit of Redemption
-            targetPlayer->ResurrectPlayer(!AccountMgr::IsPlayerAccount(targetPlayer->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
+            targetPlayer->ResurrectPlayer(targetPlayer->GetSession()->HasPermission(rbac::RBAC_PERM_RESURRECT_WITH_FULL_HPS) ? 1.0f : 0.5f);
             targetPlayer->SpawnCorpseBones();
             targetPlayer->SaveToDB(false, false);
         }
@@ -1397,7 +1406,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
 
         // save GM account without delay and output message
-        if (handler->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+        if (handler->GetSession()->HasPermission(rbac::RBAC_PERM_COMMANDS_SAVE_WITHOUT_DELAY))
         {
             if (Player* target = handler->getSelectedPlayer())
             {
@@ -1480,7 +1489,7 @@ public:
     static bool HandleUnstuckCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<std::string_view> location)
     {
         // No args required for players
-        if (handler->GetSession() && AccountMgr::IsPlayerAccount(handler->GetSession()->GetSecurity()))
+        if (handler->GetSession() && !handler->GetSession()->HasPermission(rbac::RBAC_PERM_COMMANDS_USE_UNSTUCK_WITH_ARGS))
         {
             if (Player* player = handler->GetSession()->GetPlayer())
             {
@@ -2137,7 +2146,8 @@ public:
             security      = fields[1].Get<uint8>();
 
             // Only fetch these fields if commander has sufficient rights)
-            if (!handler->GetSession() || handler->GetSession()->GetSecurity() >= AccountTypes(security))
+            if (handler->HasPermission(rbac::RBAC_PERM_COMMANDS_PINFO_CHECK_PERSONAL_DATA) &&
+                (!handler->GetSession() || handler->GetSession()->GetSecurity() >= AccountTypes(security)))
             {
                 eMail     = fields[2].Get<std::string>();
                 regMail   = fields[3].Get<std::string>();
@@ -3171,6 +3181,124 @@ public:
 
         handler->SendErrorMessage(LANG_USE_BOL);
         return false;
+    }
+
+    static bool HandleBankCommand(ChatHandler* handler)
+    {
+        handler->GetSession()->SendShowBank(handler->GetSession()->GetPlayer()->GetGUID());
+        return true;
+    }
+
+    static bool HandleRepairitemsCommand(ChatHandler* handler)
+    {
+        Player* target = handler->getSelectedPlayerOrSelf();
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            return false;
+        }
+
+        target->DurabilityRepairAll(false, 0, false);
+        handler->PSendSysMessage(LANG_YOU_REPAIR_ITEMS, handler->GetNameLink(target));
+        if (handler->needReportToTarget(target))
+            ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_ITEMS_REPAIRED, handler->GetNameLink());
+        return true;
+    }
+
+    static bool HandleBGStartCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        Battleground* bg = player->GetBattleground();
+        if (!bg)
+        {
+            handler->SendErrorMessage("You are not in a battleground.");
+            return false;
+        }
+
+        bg->SetStartDelayTime(0);
+        handler->PSendSysMessage("Battleground start forced.");
+        return true;
+    }
+
+    static bool HandleBGStopCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        Battleground* bg = player->GetBattleground();
+        if (!bg)
+        {
+            handler->SendErrorMessage("You are not in a battleground.");
+            return false;
+        }
+
+        bg->EndBattleground(PVP_TEAM_NEUTRAL);
+        handler->PSendSysMessage("Battleground ended.");
+        return true;
+    }
+
+    static bool HandleNearGraveyardCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("linked")> /*linked*/)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        GraveyardStruct const* graveyard = sGraveyard->GetClosestGraveyard(player, player->GetTeamId());
+
+        if (graveyard)
+        {
+            float dist = player->GetDistance2d(graveyard->x, graveyard->y);
+            handler->PSendSysMessage("Nearest graveyard: {} (X: {} Y: {} Z: {}, Dist: {})",
+                graveyard->ID, graveyard->x, graveyard->y, graveyard->z, dist);
+        }
+        else
+            handler->PSendSysMessage("No nearby graveyard found.");
+
+        return true;
+    }
+
+    static bool HandleListFreezeCommand(ChatHandler* handler)
+    {
+        // Find all online players who have the freeze aura (spell 9454)
+        std::shared_lock<std::shared_mutex> lock(*HashMapHolder<Player>::GetLock());
+        HashMapHolder<Player>::MapType const& playerMap = ObjectAccessor::GetPlayers();
+        bool found = false;
+        for (auto const& [guid, player] : playerMap)
+        {
+            if (player->HasAura(9454))
+            {
+                handler->PSendSysMessage("{} is frozen.", player->GetName());
+                found = true;
+            }
+        }
+
+        if (!found)
+            handler->SendSysMessage("No frozen players found.");
+
+        return true;
+    }
+
+    static bool HandlePvPstatsCommand(ChatHandler* handler)
+    {
+        if (!sWorld->getBoolConfig(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE))
+        {
+            handler->SendErrorMessage("PvP statistics are disabled.");
+            return false;
+        }
+
+        QueryResult result = CharacterDatabase.Query("SELECT slot, id, SUBSTRING_INDEX(SUBSTRING_INDEX(characters.name, ' ', 1), ' ', -1) AS name, score0, score1 FROM pvpstats_battlegrounds JOIN characters ON characters.guid = pvpstats_battlegrounds.winner_faction ORDER BY id DESC LIMIT 5");
+        if (!result)
+        {
+            handler->SendSysMessage("No PvP stats found.");
+            return true;
+        }
+
+        handler->SendSysMessage("Recent battleground statistics:");
+        do
+        {
+            Field* fields = result->Fetch();
+            handler->PSendSysMessage("BG Type: {} | ID: {} | Winner: {} | Score: {}-{}",
+                fields[0].Get<uint8>(), fields[1].Get<uint32>(), fields[2].Get<std::string>(),
+                fields[3].Get<uint32>(), fields[4].Get<uint32>());
+        } while (result->NextRow());
+
+        return true;
     }
 
 };

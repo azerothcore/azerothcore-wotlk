@@ -1507,14 +1507,6 @@ DeletedCharacterTicketTrace = 0
 ###################################################################################################
 # COMMAND
 #
-#    AllowPlayerCommands
-#        Description: Allow players to use commands.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-AllowPlayerCommands = 1
-
-#
 #    Command.LookupMaxResults
 #        Description: Number of results being displayed using a .lookup command.
 #        Default:     0 - (Unlimited)

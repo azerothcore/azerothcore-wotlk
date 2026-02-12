@@ -28,6 +28,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "WorldSession.h"
@@ -380,6 +381,11 @@ void InstanceScript::SetSummoner(Creature* creature)
         if (Creature* summoner = GetCreature(summonData->second))
             if (summoner->IsAIEnabled)
                 summoner->AI()->JustSummoned(creature);
+}
+
+bool InstanceScript::_SkipCheckRequiredBosses(Player const* player /*= nullptr*/) const
+{
+    return player && player->GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_INSTANCE_REQUIRED_BOSSES);
 }
 
 bool InstanceScript::SetBossState(uint32 id, EncounterState state)

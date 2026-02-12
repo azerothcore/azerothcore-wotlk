@@ -22,6 +22,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "StringFormat.h"
 #include "Tokenize.h"
@@ -38,6 +39,12 @@ void Acore::Impl::ChatCommands::ChatCommandNode::LoadFromBuilder(ChatCommandBuil
         std::tie(_invoker, help, _permission) = *(std::get<ChatCommandBuilder::InvokerEntry>(builder._data));
         if (help)
             _help.emplace<AcoreStrings>(help);
+    }
+    else if (std::holds_alternative<ChatCommandBuilder::SubCommandWithPermEntry>(builder._data))
+    {
+        auto const& entry = std::get<ChatCommandBuilder::SubCommandWithPermEntry>(builder._data);
+        _permission = entry._permissions;
+        LoadCommandsIntoMap(this, _subCommands, entry._subCommands);
     }
     else
         LoadCommandsIntoMap(this, _subCommands, std::get<ChatCommandBuilder::SubCommandEntry>(builder._data));
@@ -114,12 +121,22 @@ static ChatSubCommandMap COMMAND_MAP;
             if (!cmd)
                 continue;
 
+            // Only override from DB when the core uses old-style security levels (0-4).
+            // When the core registers an RBAC permission (>= 200), the DB security
+            // field (tinyint 0-4) must not downgrade it.
             if (cmd->_invoker && (cmd->_permission.RequiredLevel != secLevel))
             {
-                LOG_WARN("sql.sql", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
-                    secLevel, name, cmd->_permission.RequiredLevel);
-
-                cmd->_permission.RequiredLevel = secLevel;
+                if (cmd->_permission.RequiredLevel >= rbac::RBAC_PERM_COMMAND_RBAC)
+                {
+                    LOG_DEBUG("sql.sql", "Table `command` has legacy security {} for '{}' but core uses RBAC permission {}. Keeping RBAC.",
+                        secLevel, name, cmd->_permission.RequiredLevel);
+                }
+                else
+                {
+                    LOG_WARN("sql.sql", "Table `command` has permission {} for '{}' which does not match the core ({}). Overriding.",
+                        secLevel, name, cmd->_permission.RequiredLevel);
+                    cmd->_permission.RequiredLevel = secLevel;
+                }
             }
 
             if (std::holds_alternative<std::string>(cmd->_help))
@@ -514,6 +531,10 @@ bool Acore::Impl::ChatCommands::ChatCommandNode::IsInvokerVisible(ChatHandler co
 
     if (who.IsConsole() && (_permission.AllowConsole == Acore::ChatCommands::Console::Yes))
         return true;
+
+    // RBAC permissions start at 200, SEC_* levels are 0-4
+    if (_permission.RequiredLevel >= rbac::RBAC_PERM_COMMAND_RBAC)
+        return who.HasPermission(_permission.RequiredLevel);
 
     return !who.IsConsole() && who.IsAvailable(_permission.RequiredLevel);
 }

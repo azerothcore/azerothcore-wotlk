@@ -254,6 +254,8 @@ public:
     // Checks boss requirements (one boss required to kill other)
     virtual bool CheckRequiredBosses(uint32 /*bossId*/, Player const* /*player*/ = nullptr) const { return true; }
 
+    bool _SkipCheckRequiredBosses(Player const* player = nullptr) const;
+
     void SetCompletedEncountersMask(uint32 newMask, bool save);
 
     // Returns completed encounters mask for packets

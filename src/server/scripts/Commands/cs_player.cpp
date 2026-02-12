@@ -17,6 +17,7 @@
 
 #include "CommandScript.h"
 #include "PlayerCommand.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -29,8 +30,8 @@ public:
     {
         static ChatCommandTable playerCommandTable =
         {
-            { "learn",   HandlePlayerLearnCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "unlearn", HandlePlayerUnLearnCommand, SEC_GAMEMASTER, Console::Yes }
+            { "learn",   HandlePlayerLearnCommand,   rbac::RBAC_PERM_COMMAND_LEARN,   Console::Yes },
+            { "unlearn", HandlePlayerUnLearnCommand, rbac::RBAC_PERM_COMMAND_UNLEARN, Console::Yes }
         };
 
         static ChatCommandTable commandTable =

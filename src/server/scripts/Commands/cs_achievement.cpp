@@ -18,6 +18,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -30,8 +31,8 @@ public:
     {
         static ChatCommandTable achievementCommandTable =
         {
-            { "add",      HandleAchievementAddCommand,      SEC_GAMEMASTER,    Console::No },
-            { "checkall", HandleAchievementCheckAllCommand, SEC_ADMINISTRATOR, Console::Yes }
+            { "add",      HandleAchievementAddCommand,      rbac::RBAC_PERM_COMMAND_ACHIEVEMENT_ADD,      Console::No },
+            { "checkall", HandleAchievementCheckAllCommand, rbac::RBAC_PERM_COMMAND_ACHIEVEMENT_CHECKALL, Console::Yes }
         };
         static ChatCommandTable commandTable =
         {
