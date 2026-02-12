@@ -814,7 +814,7 @@ public:
      * @param factionTemplate Contains information about the creature involved in the transaction
      * @param discount Float value of the discount, as a multiplier of the base price
      */
-    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {};
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
 };
 
 #endif
