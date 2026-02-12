@@ -9849,7 +9849,7 @@ void ObjectMgr::LoadVendors()
             count += LoadReferenceVendor(entry, -item_id, &skip_vendors);
         else
         {
-            uint32 maxcount     = fields[2].Get<uint8>();
+            uint32 maxcount     = fields[2].Get<uint32>();
             uint32 incrtime     = fields[3].Get<uint32>();
             uint32 ExtendedCost = fields[4].Get<uint32>();
 
