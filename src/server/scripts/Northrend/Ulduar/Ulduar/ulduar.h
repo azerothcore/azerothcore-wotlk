@@ -90,6 +90,7 @@ enum UlduarData
     DATA_ALGALON_SUMMON_STATE               = 600,
     DATA_DESPAWN_ALGALON                    = 601,
     DATA_ALGALON_DEFEATED                   = 602,
+    DATA_ALGALON_TIMER                      = 603,
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
