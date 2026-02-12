@@ -4439,7 +4439,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     return;
                 if (!me->HealthBelowPctDamaged(e.event.healthCheck.hpPct, var0))
                     return;
-                RecalcTimer(e, e.event.healthCheck.repeatMin, e.event.healthCheck.repeatMax);
                 ProcessAction(e, unit);
                 break;
             }

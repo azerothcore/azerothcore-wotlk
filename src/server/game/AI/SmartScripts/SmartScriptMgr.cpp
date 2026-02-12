@@ -295,8 +295,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             case SMART_EVENT_HEALTH_CHECK:
-                if (temp.event.healthCheck.repeatMin == 0 && temp.event.healthCheck.repeatMax == 0)
-                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_FRIENDLY_IS_CC:
@@ -1076,10 +1075,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
 
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
-                    return false;
-                break;
-            case SMART_EVENT_HEALTH_CHECK:
-                if (!IsMinMaxValid(e, e.event.healthCheck.repeatMin, e.event.healthCheck.repeatMax))
                     return false;
                 break;
             case SMART_EVENT_AREA_RANGE:
