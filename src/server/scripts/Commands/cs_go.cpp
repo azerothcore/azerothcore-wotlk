@@ -23,6 +23,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "TicketMgr.h"
+#include "Transport.h"
 
 #include "boost/algorithm/string.hpp"
 #include <regex>
@@ -66,7 +67,11 @@ public:
 
         if (mapId == MAPID_INVALID)
             mapId = player->GetMapId();
-        if (!MapMgr::IsValidMapCoord(mapId, pos) || sObjectMgr->IsTransportMap(mapId))
+
+        if (sObjectMgr->IsTransportMap(mapId))
+            return DoTeleportToTransport(handler, pos, mapId);
+
+        if (!MapMgr::IsValidMapCoord(mapId, pos))
         {
             handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), mapId);
             return false;
@@ -83,6 +88,84 @@ public:
             player->SaveRecallPosition();
 
         player->TeleportTo({ mapId, pos });
+        return true;
+    }
+
+    static bool DoTeleportToTransport(ChatHandler* handler, Position pos, uint32 transportMapId)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        uint32 transportEntry = 0;
+        for (auto const& [entry, goTemplate] : *sObjectMgr->GetGameObjectTemplates())
+        {
+            if (goTemplate.type == GAMEOBJECT_TYPE_MO_TRANSPORT && goTemplate.moTransport.mapID == transportMapId)
+            {
+                transportEntry = entry;
+                break;
+            }
+        }
+
+        if (!transportEntry)
+        {
+            handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), transportMapId);
+            return false;
+        }
+
+        MotionTransport* transport = nullptr;
+        sMapMgr->DoForAllMaps([&](Map* map)
+        {
+            if (transport)
+                return;
+
+            for (Transport* t : map->GetAllTransports())
+            {
+                if (MotionTransport* mt = t->ToMotionTransport())
+                {
+                    if (mt->GetEntry() == transportEntry)
+                    {
+                        transport = mt;
+                        return;
+                    }
+                }
+            }
+        });
+
+        if (!transport)
+        {
+            handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), transportMapId);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            player->GetMotionMaster()->MovementExpired();
+            player->CleanupAfterTaxiFlight();
+        }
+        else
+            player->SaveRecallPosition();
+
+        if (Transport* oldTransport = player->GetTransport())
+            oldTransport->RemovePassenger(player, true);
+
+        float const localX = pos.GetPositionX();
+        float const localY = pos.GetPositionY();
+        float const localZ = pos.GetPositionZ();
+        float const localO = pos.GetOrientation();
+
+        player->SetTransport(transport);
+        player->m_movementInfo.transport.guid = transport->GetGUID();
+        player->m_movementInfo.transport.pos.Relocate(localX, localY, localZ, localO);
+        player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
+        float worldX = localX;
+        float worldY = localY;
+        float worldZ = localZ;
+        float worldO = localO;
+        transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
+
+        transport->AddPassenger(player, false);
+
+        player->TeleportTo(transport->GetMapId(), worldX, worldY, worldZ, worldO, TELE_TO_NOT_LEAVE_TRANSPORT);
         return true;
     }
 
