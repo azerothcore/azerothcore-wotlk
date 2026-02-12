@@ -12333,12 +12333,18 @@ float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemp
     float discount = 1.0f;
 
     if (!factionTemplate || !factionTemplate->faction)
+    {
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
         return discount;
+    }
 
     ReputationRank rank = GetReputationRank(factionTemplate->faction);
 
     if (rank <= REP_NEUTRAL)
+    {
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
         return discount;
+    }
 
     discount = discount - 0.05f * (rank - REP_NEUTRAL);
 
