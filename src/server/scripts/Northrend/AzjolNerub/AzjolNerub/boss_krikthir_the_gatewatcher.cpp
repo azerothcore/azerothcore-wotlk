@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,8 +16,10 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellInfo.h"
 #include "azjol_nerub.h"
 
 enum Spells
@@ -27,13 +29,6 @@ enum Spells
     SPELL_MIND_FLAY                     = 52586,
     SPELL_CURSE_OF_FATIGUE              = 52592,
     SPELL_FRENZY                        = 28747
-};
-
-enum Npcs
-{
-    NPC_WARRIOR                         = 28732,
-    NPC_SKIRMISHER                      = 28734,
-    NPC_SHADOWCASTER                    = 28733
 };
 
 enum Yells
@@ -49,7 +44,8 @@ enum Yells
 enum MiscActions
 {
     ACTION_MINION_ENGAGED               = 1,
-    GROUP_SWARM                         = 1
+    GROUP_SWARM                         = 1,
+    GROUP_WATCHERS                      = 2
 };
 
 class boss_krik_thir : public CreatureScript
@@ -75,16 +71,6 @@ public:
         {
             BossAI::Reset();
 
-            me->SummonCreature(NPC_WATCHER_NARJIL, 511.8f, 666.493f, 776.278f, 0.977f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SHADOWCASTER, 511.63f, 672.44f, 775.71f, 0.90f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WARRIOR, 506.75f, 670.7f, 776.24f, 0.92f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WATCHER_GASHRA, 526.66f, 663.605f, 775.805f, 1.23f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SKIRMISHER, 522.91f, 660.18f, 776.19f, 1.28f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WARRIOR, 528.14f, 659.72f, 776.14f, 1.37f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_WATCHER_SILTHIK, 543.826f, 665.123f, 776.245f, 1.55f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SKIRMISHER, 547.5f, 669.96f, 776.1f, 2.3f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-            me->SummonCreature(NPC_SHADOWCASTER, 548.64f, 664.27f, 776.74f, 1.77f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-
             ScheduleHealthCheckEvent(25, [&] {
                 DoCastSelf(SPELL_FRENZY, true);
 
@@ -100,6 +86,21 @@ public:
 
             _canTalk = true;
             _minionInCombat = false;
+            _firstCall = true;
+            _minionsEngaged = 0;
+
+            if (me->IsInEvadeMode())
+                return;
+
+            Creature* narjil = instance->GetCreature(DATA_NARJIL);
+            Creature* gashra = instance->GetCreature(DATA_GASHRA);
+            Creature* silthik = instance->GetCreature(DATA_SILTHIK);
+
+            for (Creature* watcher : { narjil, gashra, silthik })
+            {
+                if (watcher && watcher->GetFormation())
+                    watcher->GetFormation()->RespawnFormation(true);
+            }
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -116,28 +117,72 @@ public:
 
         void DoAction(int32 actionId) override
         {
+            if (actionId == ACTION_MINION_ENGAGED)
+                ++_minionsEngaged;
+
             if (actionId == ACTION_MINION_ENGAGED && !_minionInCombat)
             {
                 _minionInCombat = true;
 
-                for (Seconds const& timer : { 10s, 40s, 70s })
-                {
-                    me->m_Events.AddEventAtOffset([this] {
-                        me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
-                        Talk(SAY_SEND_GROUP);
-                    }, timer);
-                }
+                Talk(SAY_SEND_GROUP, 10s);
+
+                for (Seconds const& timer : { 60s, 120s })
+                    CallWatcher(timer);
 
                 me->m_Events.AddEventAtOffset([this] {
                     me->SetInCombatWithZone();
-                }, 100s);
+                }, IsHeroic() ? 200s : 180s);
             }
+            else if (actionId == ACTION_MINION_DIED)
+            {
+                me->m_Events.CancelEventGroup(GROUP_WATCHERS);
+
+                // Check if any of the watchers is alive
+                if (!me->FindNearestCreature(NPC_WATCHER_SILTHIK, 100.0f) &&
+                    !me->FindNearestCreature(NPC_WATCHER_NARJIL, 100.0f) &&
+                    !me->FindNearestCreature(NPC_WATCHER_GASHRA, 100.0f))
+                    return;
+
+                me->m_Events.AddEventAtOffset([this] {
+                    SummonWatcher();
+                }, 5s, GROUP_WATCHERS);
+
+                // Schedule the next (10s + 60s)
+                CallWatcher(70s);
+            }
+        }
+
+        void CallWatcher(Seconds timer)
+        {
+            me->m_Events.AddEventAtOffset([this] {
+                _firstCall = false;
+                Talk(SAY_SEND_GROUP);
+                SummonWatcher();
+            }, timer, GROUP_WATCHERS);
+        }
+
+        void SummonWatcher()
+        {
+            me->m_Events.AddEventAtOffset([this] {
+                me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                _firstCall = false;
+            }, 5s, GROUP_WATCHERS);
         }
 
         uint32 GetData(uint32 data) const override
         {
             if (data == me->GetEntry())
-                return summons.HasEntry(NPC_WATCHER_NARJIL) && summons.HasEntry(NPC_WATCHER_GASHRA) && summons.HasEntry(NPC_WATCHER_SILTHIK);
+            {
+                Creature* narjil = instance->GetCreature(DATA_NARJIL);
+                Creature* gashra = instance->GetCreature(DATA_GASHRA);
+                Creature* silthik = instance->GetCreature(DATA_SILTHIK);
+
+                if (!narjil || !gashra || !silthik)
+                    return false;
+
+                return narjil->IsAlive() && gashra->IsAlive() && silthik->IsAlive();
+            }
+
             return 0;
         }
 
@@ -166,7 +211,26 @@ public:
                 DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE);
             }, 27s, 35s);
 
-            summons.DoZoneInCombat();
+            if (Creature* narjil = instance->GetCreature(DATA_NARJIL))
+                narjil->SetInCombatWithZone();
+
+            if (Creature* gashra = instance->GetCreature(DATA_GASHRA))
+                gashra->SetInCombatWithZone();
+
+            if (Creature* silthik = instance->GetCreature(DATA_SILTHIK))
+                silthik->SetInCombatWithZone();
+        }
+
+        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_SUBBOSS_AGGRO_TRIGGER)
+            {
+                if (_minionsEngaged == 2 && _firstCall)
+                    return;
+
+                if (Creature* creature = target->ToCreature())
+                    creature->SetInCombatWithZone();
+            }
         }
 
         void JustDied(Unit* killer) override
@@ -187,12 +251,6 @@ public:
             }
         }
 
-        void JustSummoned(Creature* summon) override
-        {
-            summon->SetNoCallAssistance(true);
-            summons.Summon(summon);
-        }
-
         void SummonedCreatureDies(Creature* summon, Unit*) override
         {
             summons.Despawn(summon);
@@ -202,6 +260,8 @@ public:
         bool _initTalk;
         bool _canTalk;
         bool _minionInCombat;
+        uint8 _minionsEngaged;
+        bool _firstCall;
 
         [[nodiscard]] bool IsInFrenzy() const { return me->HasAura(SPELL_FRENZY); }
     };

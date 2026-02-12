@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -89,14 +89,16 @@ struct boss_priestess_delrissa : public BossAI
     void InitializeAI() override
     {
         ScriptedAI::InitializeAI();
-        std::list<uint32> helpersList;
-        for (uint8 i = 0; i < MAX_HELPERS_COUNT; ++i)
-            helpersList.push_back(helpersEntries[i]);
-        Acore::Containers::RandomResize(helpersList, MAX_ACTIVE_HELPERS);
 
-        uint8 j = 0;
-        for (std::list<uint32>::const_iterator itr = helpersList.begin(); itr != helpersList.end(); ++itr, ++j)
-            me->SummonCreature(*itr, helpersLocations[j], TEMPSUMMON_MANUAL_DESPAWN, 0);
+        if (instance->GetBossState(DATA_DELRISSA) != DONE)
+        {
+            std::vector<uint32> helpersList(std::begin(helpersEntries), std::end(helpersEntries));
+            Acore::Containers::RandomResize(helpersList, MAX_ACTIVE_HELPERS);
+
+            uint8 j = 0;
+            for (uint32 entry : helpersList)
+                me->SummonCreature(entry, helpersLocations[j++], TEMPSUMMON_MANUAL_DESPAWN, 0);
+        }
     }
 
     void JustSummoned(Creature* summon) override
@@ -126,6 +128,10 @@ struct boss_priestess_delrissa : public BossAI
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
+
+        // Prevent Splitting
+        DoZoneInCombat();
+        summons.DoZoneInCombat();
 
         ScheduleTimedEvent(15s, [&] {
             if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))

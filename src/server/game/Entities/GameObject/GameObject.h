@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -144,12 +144,12 @@ public:
     [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
-    void SetLocalRotationAngles(float z_rot, float y_rot, float x_rot);
-    void SetLocalRotation(G3D::Quat const& rot);
+    void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
+    void SetWorldRotation(G3D::Quat const& rot);
     void SetTransportPathRotation(float qx, float qy, float qz, float qw);
-    [[nodiscard]] G3D::Quat const& GetLocalRotation() const { return m_localRotation; }
-    [[nodiscard]] int64 GetPackedLocalRotation() const { return m_packedRotation; }
-    [[nodiscard]] G3D::Quat GetWorldRotation() const;
+    [[nodiscard]] G3D::Quat const& GetWorldRotation() const { return WorldRotation; }
+    [[nodiscard]] int64 GetPackedWorldRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat GetFinalWorldRotation() const;
 
     // overwrite WorldObject function for proper name localization
     [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
@@ -231,8 +231,8 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    void AddToSkillupList(ObjectGuid playerGuid);
-    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const;
+    void AddToSkillupList(ObjectGuid const& playerGuid);
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid const& playerGuid) const;
 
     void AddUniqueUse(Player* player);
     void AddUse() { ++m_usetimes; }
@@ -394,7 +394,7 @@ protected:
     bool m_allowModifyDestructibleBuilding;
 
     int64 m_packedRotation;
-    G3D::Quat m_localRotation;
+    G3D::Quat WorldRotation;
     Position m_stationaryPosition;
 
     ObjectGuid m_lootRecipient;
@@ -414,7 +414,7 @@ private:
     void UpdatePackedRotation();
 
     //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*useBoundingRadius = true*/) const override
+    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*incOwnRadius = true*/, bool /*incTargetRadius = true*/) const override
     {
         //! Following check does check 3d distance
         dist2compare += obj->GetObjectSize();

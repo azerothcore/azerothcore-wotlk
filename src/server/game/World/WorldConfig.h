@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -94,6 +94,7 @@ enum ServerConfigs
     CONFIG_ALLOW_TICKETS,
     CONFIG_DELETE_CHARACTER_TICKET_TRACE,
     CONFIG_LFG_CAST_DESERTER,
+    CONFIG_LFG_ALLOW_COMPLETED,
     CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES,
     CONFIG_PRESERVE_CUSTOM_CHANNELS,
     CONFIG_PDUMP_NO_PATHS,
@@ -371,6 +372,7 @@ enum ServerConfigs
     CONFIG_NPC_EVADE_IF_NOT_REACHABLE,
     CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID,
     CONFIG_FFA_PVP_TIMER,
+    CONFIG_OUTDOOR_PVP_CAPTURE_RATE,
     CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION,
     CONFIG_LFG_MAX_KICK_COUNT,
     CONFIG_LFG_KICK_PREVENTION_TIMER,
@@ -437,6 +439,9 @@ enum ServerConfigs
     RATE_XP_PET_NEXT_LEVEL,
     RATE_REPAIRCOST,
     RATE_REPUTATION_GAIN,
+    RATE_REPUTATION_GAIN_AB,
+    RATE_REPUTATION_GAIN_AV,
+    RATE_REPUTATION_GAIN_WSG,
     RATE_REPUTATION_LOWLEVEL_KILL,
     RATE_REPUTATION_LOWLEVEL_QUEST,
     RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS,
@@ -466,6 +471,8 @@ enum ServerConfigs
     RATE_AUCTION_CUT,
     RATE_HONOR,
     RATE_ARENA_POINTS,
+    RATE_ARENA_POINTS_2V2,
+    RATE_ARENA_POINTS_3V3,
     RATE_TALENT,
     RATE_TALENT_PET,
     RATE_CORPSE_DECAY_LOOTED,

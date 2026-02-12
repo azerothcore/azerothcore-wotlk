@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -52,6 +52,7 @@ BattlegroundSA::BattlegroundSA()
     EndRoundTimer = 0s;
     ShipsStarted = false;
     Status = BG_SA_NOTSTARTED;
+    _nextShipIsEast = true;
 
     for (uint8 i = 0; i < 6; i++)
         GateStatus[i] = BG_SA_GATE_OK;
@@ -85,6 +86,7 @@ void BattlegroundSA::Init()
     _notEvenAScratch[TEAM_HORDE] = true;
     Status = BG_SA_WARMUP;
     _relicClicked = false;
+    _nextShipIsEast = true;
 }
 
 bool BattlegroundSA::SetupBattleground()
@@ -181,6 +183,7 @@ bool BattlegroundSA::ResetObjs()
 
     TotalTime = 0s;
     ShipsStarted = false;
+    _nextShipIsEast = true;
 
     //Graveyards!
     for (uint8 i = 0; i < BG_SA_MAX_GY; i++)
@@ -307,7 +310,7 @@ void BattlegroundSA::StartShips()
             WorldPacket pkt;
             GetBGObject(i)->BuildValuesUpdateBlockForPlayer(&data, itr->second);
             data.BuildPacket(pkt);
-            itr->second->GetSession()->SendPacket(&pkt);
+            itr->second->SendDirectMessage(&pkt);
         }
     }
     ShipsStarted = true;
@@ -574,10 +577,12 @@ void BattlegroundSA::TeleportToEntrancePosition(Player* player)
         if (!ShipsStarted)
         {
             player->CastSpell(player, 12438, true);//Without this player falls before boat loads...
-            if (urand(0, 1))
+            if (_nextShipIsEast)
                 player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 2682.936f, -830.368f, 15.0f, 2.895f, 0);
             else
                 player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 2577.003f, 980.261f, 15.0f, 0.807f, 0);
+
+            _nextShipIsEast = !_nextShipIsEast;
         }
         else
             player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 1600.381f, -106.263f, 8.8745f, 3.78f, 0);
@@ -1141,7 +1146,7 @@ void BattlegroundSA::SendTransportInit(Player* player)
             GetBGObject(BG_SA_BOAT_TWO)->BuildCreateUpdateBlockForPlayer(&transData, player);
         WorldPacket packet;
         transData.BuildPacket(packet);
-        player->GetSession()->SendPacket(&packet);
+        player->SendDirectMessage(&packet);
     }
 }
 
@@ -1156,7 +1161,7 @@ void BattlegroundSA::SendTransportsRemove(Player* player)
             GetBGObject(BG_SA_BOAT_TWO)->BuildOutOfRangeUpdateBlock(&transData);
         WorldPacket packet;
         transData.BuildPacket(packet);
-        player->GetSession()->SendPacket(&packet);
+        player->SendDirectMessage(&packet);
     }
 }
 

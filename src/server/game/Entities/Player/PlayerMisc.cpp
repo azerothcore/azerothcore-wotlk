@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -79,7 +79,7 @@ bool Player::CanSpeak() const
 void Player::SendAttackSwingNotInRange()
 {
     WorldPacket data(SMSG_ATTACKSWING_NOTINRANGE, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid)
@@ -129,25 +129,25 @@ void Player::Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDat
 void Player::SendAttackSwingDeadTarget()
 {
     WorldPacket data(SMSG_ATTACKSWING_DEADTARGET, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAttackSwingCantAttack()
 {
     WorldPacket data(SMSG_ATTACKSWING_CANT_ATTACK, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAttackSwingCancelAttack()
 {
     WorldPacket data(SMSG_CANCEL_COMBAT, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAttackSwingBadFacingAttack()
 {
     WorldPacket data(SMSG_ATTACKSWING_BADFACING, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAutoRepeatCancel(Unit* target)
@@ -162,7 +162,7 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
     WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
     data << uint32(Area);
     data << uint32(Experience);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendDungeonDifficulty(bool IsInGroup)
@@ -170,7 +170,7 @@ void Player::SendDungeonDifficulty(bool IsInGroup)
     WorldPackets::Instance::SetDungeonDifficulty setDungeonDifficulty;
     setDungeonDifficulty.Difficulty = GetDungeonDifficulty();
     setDungeonDifficulty.IsInGroup = IsInGroup;
-    GetSession()->SendPacket(setDungeonDifficulty.Write());
+    SendDirectMessage(setDungeonDifficulty.Write());
 }
 
 void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
@@ -178,14 +178,14 @@ void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
     WorldPackets::Instance::SetRaidDifficulty setRaidDifficulty;
     setRaidDifficulty.Difficulty = (forcedDifficulty == -1 ? GetRaidDifficulty() : forcedDifficulty);
     setRaidDifficulty.IsInGroup = IsInGroup;
-    GetSession()->SendPacket(setRaidDifficulty.Write());
+    SendDirectMessage(setRaidDifficulty.Write());
 }
 
 void Player::SendResetFailedNotify(uint32 mapid)
 {
     WorldPackets::Instance::ResetFailedNotify resetFailedNotify;
     resetFailedNotify.MapId = mapid;
-    GetSession()->SendPacket(resetFailedNotify.Write());
+    SendDirectMessage(resetFailedNotify.Write());
 }
 
 /// Reset all solo instances and optionally send a message on success for each
@@ -324,7 +324,7 @@ void Player::SendResetInstanceSuccess(uint32 MapId)
 {
     WorldPackets::Instance::InstanceReset instanceReset;
     instanceReset.MapId = MapId;
-    GetSession()->SendPacket(instanceReset.Write());
+    SendDirectMessage(instanceReset.Write());
 }
 
 void Player::SendResetInstanceFailed(InstanceResetFailureReason reason, uint32 MapId)
@@ -332,7 +332,7 @@ void Player::SendResetInstanceFailed(InstanceResetFailureReason reason, uint32 M
     WorldPackets::Instance::InstanceResetFailed instanceResetFailed;
     instanceResetFailed.Reason = reason;
     instanceResetFailed.MapId = MapId;
-    GetSession()->SendPacket(instanceResetFailed.Write());
+    SendDirectMessage(instanceResetFailed.Write());
 }
 
 /*********************************************************/

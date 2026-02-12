@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,6 +41,7 @@ enum Spells
     SPELL_ARCANE_MAGUS_SUMMON       = 47708,
 
     SPELL_FIRE_MAGUS_DEATH          = 47711,
+    SPELL_FROST_MAGUS_DEATH         = 47712,
     SPELL_ARCANE_MAGUS_DEATH        = 47713,
 
     SPELL_WEAR_CHRISTMAS_HAT        = 61400
@@ -83,13 +84,11 @@ struct boss_magus_telestra : public BossAI
 {
     boss_magus_telestra(Creature* creature) : BossAI(creature, DATA_MAGUS_TELESTRA_EVENT) { }
 
-    uint8 copiesDied;
     bool achievement;
 
     void Reset() override
     {
         BossAI::Reset();
-        copiesDied = 0;
         achievement = true;
 
         if (IsHeroic() && sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL) && !me->HasAura(SPELL_WEAR_CHRISTMAS_HAT))
@@ -132,7 +131,7 @@ struct boss_magus_telestra : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_KILL);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -150,11 +149,10 @@ struct boss_magus_telestra : public BossAI
         if (spellInfo->Id >= SPELL_FIRE_MAGUS_DEATH && spellInfo->Id <= SPELL_ARCANE_MAGUS_DEATH && caster->ToCreature())
         {
             events.ScheduleEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT, 5s);
-            caster->ToCreature()->DespawnOrUnsummon(1000);
+            caster->ToCreature()->DespawnOrUnsummon(1s);
 
-            if (++copiesDied >= 3)
+            if (me->HasAura(SPELL_FIRE_MAGUS_DEATH) && me->HasAura(SPELL_FROST_MAGUS_DEATH) && me->HasAura(SPELL_ARCANE_MAGUS_DEATH))
             {
-                copiesDied = 0;
                 events.CancelEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT);
                 events.ScheduleEvent(EVENT_MAGUS_MERGED, 5s);
                 me->CastSpell(me, SPELL_BURNING_WINDS, true);
@@ -168,13 +166,14 @@ struct boss_magus_telestra : public BossAI
             return;
 
         events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
+        if (me->HasUnitState(UNIT_STATE_CASTING) ||
+           (me->HasUnitState(UNIT_STATE_STUNNED) && !me->HasAura(SPELL_START_SUMMON_CLONES))) // Reflected Ice Nova can stun her as its mechanic bypasses immunities
             return;
 
         switch (events.ExecuteEvent())
         {
         case EVENT_MAGUS_HEALTH1:
-            if (me->HealthBelowPct(51))
+            if (me->HealthBelowPct(51) && me->HealthAbovePct(11))
             {
                 me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
                 events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);

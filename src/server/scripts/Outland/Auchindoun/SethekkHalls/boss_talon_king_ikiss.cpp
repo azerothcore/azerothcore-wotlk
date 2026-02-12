@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -56,17 +56,20 @@ struct boss_talon_king_ikiss : public BossAI
     void Reset() override
     {
         _Reset();
-        _spoken = false;
+        me->SetReactState(REACT_AGGRESSIVE);
         ScheduleHealthCheckEvent({ 80, 50, 25 }, [&] {
             me->InterruptNonMeleeSpells(false);
+            me->SetReactState(REACT_PASSIVE);
+            me->AttackStop();
             DoCastAOE(SPELL_BLINK);
             DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             Talk(EMOTE_ARCANE_EXP);
             scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
-            }).Schedule(6500ms, [this](TaskContext /*context*/)
+            }).Schedule(7s, [this](TaskContext /*context*/)
             {
+                me->SetReactState(REACT_AGGRESSIVE);
                 me->GetThreatMgr().ResetAllThreat();
             });
         });
@@ -74,12 +77,6 @@ struct boss_talon_king_ikiss : public BossAI
         ScheduleHealthCheckEvent(20, [&] {
             DoCastSelf(SPELL_MANA_SHIELD);
         });
-    }
-
-    /// @todo: remove this once pets stop going through doors.
-    bool CanAIAttack(Unit const* /*victim*/) const override
-    {
-        return _spoken;
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -166,7 +163,7 @@ class spell_talon_king_ikiss_blink : public SpellScript
     void HandleDummyHitTarget(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        GetHitUnit()->CastSpell(GetCaster(), SPELL_BLINK_TELEPORT, true);
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_BLINK_TELEPORT, true);
     }
 
     void Register() override

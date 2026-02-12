@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -85,6 +85,9 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_BUYVALUE_ITEM_HEIRLOOM, "Rate.BuyValue.Item.Heirloom", 1.0f);
 
     SetConfigValue<float>(RATE_REPUTATION_GAIN, "Rate.Reputation.Gain", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_GAIN_AB, "Rate.Reputation.Gain.AB", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_GAIN_AV, "Rate.Reputation.Gain.AV", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_GAIN_WSG, "Rate.Reputation.Gain.WSG", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_KILL, "Rate.Reputation.LowLevel.Kill", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_QUEST, "Rate.Reputation.LowLevel.Quest", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS, "Rate.Reputation.RecruitAFriendBonus", 0.1f);
@@ -114,6 +117,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_AUCTION_CUT, "Rate.Auction.Cut", 1.0f);
     SetConfigValue<float>(RATE_HONOR, "Rate.Honor", 1.0f);
     SetConfigValue<float>(RATE_ARENA_POINTS, "Rate.ArenaPoints", 1.0f);
+    SetConfigValue<float>(RATE_ARENA_POINTS_2V2, "Rate.ArenaPoints2v2", 0.76f);
+    SetConfigValue<float>(RATE_ARENA_POINTS_3V3, "Rate.ArenaPoints3v3", 0.88f);
     SetConfigValue<float>(RATE_INSTANCE_RESET_TIME, "Rate.InstanceResetTime", 1.0f);
 
     SetConfigValue<float>(RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE, "Rate.MissChanceMultiplier.TargetCreature", 11.0f);
@@ -485,6 +490,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_FFA_PVP_TIMER, "FFAPvPTimer", 30);
 
+    SetConfigValue<float>(CONFIG_OUTDOOR_PVP_CAPTURE_RATE, "OutdoorPvPCaptureRate", 1.0f);
+
     SetConfigValue<uint32>(CONFIG_LOOT_NEED_BEFORE_GREED_ILVL_RESTRICTION, "LootNeedBeforeGreedILvlRestriction", 70);
 
     SetConfigValue<bool>(CONFIG_PLAYER_SETTINGS_ENABLED, "EnablePlayerSettings", 0);
@@ -552,8 +559,8 @@ void WorldConfig::BuildConfigCache()
 
     // Dungeon finder
     SetConfigValue<uint32>(CONFIG_LFG_OPTIONSMASK, "DungeonFinder.OptionsMask", 5);
-
     SetConfigValue<bool>(CONFIG_LFG_CAST_DESERTER, "DungeonFinder.CastDeserter", true);
+    SetConfigValue<bool>(CONFIG_LFG_ALLOW_COMPLETED, "DungeonFinder.AllowCompleted", true);
 
     // DBC_ItemAttributes
     SetConfigValue<bool>(CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES, "DBC.EnforceItemAttributes", true);

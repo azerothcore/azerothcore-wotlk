@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -40,7 +40,7 @@ enum Spells
     SPELL_PSYCHIC_SCREAM                = 34322,
     SPELL_VOID_BOLT                     = 39329,
     SPELL_TRUE_BEAM                     = 33365,
-    SPELL_TELEPORT_START_POSITION       = 33244,
+    SPELL_TELEPORT_START_POSITION       = 33244, // Serverside
 };
 
 enum Misc
@@ -153,7 +153,7 @@ struct boss_high_astromancer_solarian : public BossAI
         {
             me->SetReactState(REACT_PASSIVE);
             scheduler.DelayAll(22s);
-            // blink to room center in this line using SPELL_TELEPORT_START_POSITION and START_POSITION_X, START_POSITION_Y, START_POSITION_Z
+            DoCastSelf(SPELL_TELEPORT_START_POSITION);
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 for (uint8 i = 0; i < 3; ++i)
@@ -198,6 +198,7 @@ struct boss_high_astromancer_solarian : public BossAI
                 });
             }).Schedule(23s, [this](TaskContext)
             {
+                me->GetThreatMgr().ClearAllThreat();
                 me->SetReactState(REACT_AGGRESSIVE);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
@@ -271,12 +272,12 @@ class spell_astromancer_solarian_transform : public AuraScript
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, true);
+        GetUnitOwner()->ApplyStatPctModifier(UNIT_MOD_ARMOR, TOTAL_PCT, 400.0f);
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->HandleStatModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, 400.0f, false);
+        GetUnitOwner()->ApplyStatPctModifier(UnitMods(UNIT_MOD_ARMOR), TOTAL_PCT, -80.0f);
     }
 
     void Register() override

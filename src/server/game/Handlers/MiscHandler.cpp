@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -469,7 +469,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
         }
 
-        GetPlayer()->SetRooted(true);
+        GetPlayer()->SetRooted(true, true, true);
         GetPlayer()->SetUnitFlag(UNIT_FLAG_STUNNED);
     }
 
@@ -493,7 +493,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCance
     // not remove flags if can't free move - its not set in Logout request code.
     if (GetPlayer()->CanFreeMove())
     {
-        GetPlayer()->SetRooted(false);
+        GetPlayer()->SetRooted(false, true, true);
 
         GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
         GetPlayer()->RemoveUnitFlag(UNIT_FLAG_STUNNED);
@@ -657,7 +657,8 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
     if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(GameTime::GetGameTime().count()))
         return;
 
-    if (!corpse->IsWithinDistInMap(_player, CORPSE_RECLAIM_RADIUS, true))
+    // skip phase check
+    if (!corpse->IsInMap(_player) || !corpse->IsWithinDist(_player, CORPSE_RECLAIM_RADIUS, true))
         return;
 
     // resurrect
@@ -1139,45 +1140,18 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     LOG_DEBUG("network", "Received whois command from player {} for character {}", GetPlayer()->GetName(), charname);
 }
 
-void WorldSession::HandleComplainOpcode(WorldPacket& recv_data)
+void WorldSession::HandleComplainOpcode(WorldPackets::Misc::Complain& packet)
 {
     LOG_DEBUG("network", "WORLD: CMSG_COMPLAIN");
-
-    uint8 spam_type;                                        // 0 - mail, 1 - chat
-    ObjectGuid spammer_guid;
-    uint32 unk1 = 0;
-    uint32 unk2 = 0;
-    uint32 unk3 = 0;
-    uint32 unk4 = 0;
-    std::string description = "";
-    recv_data >> spam_type;                                 // unk 0x01 const, may be spam type (mail/chat)
-    recv_data >> spammer_guid;                              // player guid
-    switch (spam_type)
-    {
-        case 0:
-            recv_data >> unk1;                              // const 0
-            recv_data >> unk2;                              // probably mail id
-            recv_data >> unk3;                              // const 0
-            break;
-        case 1:
-            recv_data >> unk1;                              // probably language
-            recv_data >> unk2;                              // message type?
-            recv_data >> unk3;                              // probably channel id
-            recv_data >> unk4;                              // unk random value
-            recv_data >> description;                       // spam description string (messagetype, channel name, player name, message)
-            break;
-    }
 
     // NOTE: all chat messages from this spammer automatically ignored by spam reporter until logout in case chat spam.
     // if it's mail spam - ALL mails from this spammer automatically removed by client
 
     // Complaint Received message
-    WorldPacket data(SMSG_COMPLAIN_RESULT, 1);
-    data << uint8(0);
-    SendPacket(&data);
+    SendPacket(WorldPackets::Misc::ComplainResult().Write());
 
     LOG_DEBUG("network", "REPORT SPAM: type {}, {}, unk1 {}, unk2 {}, unk3 {}, unk4 {}, message {}",
-        spam_type, spammer_guid.ToString(), unk1, unk2, unk3, unk4, description);
+        packet.SpamType, packet.SpammerGuid.ToString(), packet.Unk1, packet.Unk2, packet.Unk3, packet.Unk4, packet.Description);
 }
 
 void WorldSession::HandleRealmSplitOpcode(WorldPacket& recv_data)
@@ -1512,6 +1486,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
 {
     LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging((Opcodes)recv_data.GetOpcode()));
 
+    Opcodes opcode = (Opcodes)recv_data.GetOpcode();
+
     ObjectGuid guid;
     uint32 counter;
     uint32 isApplied;
@@ -1529,7 +1505,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
 
-    recv_data >> isApplied;
+    if (opcode != CMSG_MOVE_GRAVITY_DISABLE_ACK && opcode != CMSG_MOVE_GRAVITY_ENABLE_ACK)
+        recv_data >> isApplied;
 
     sScriptMgr->AnticheatSetCanFlybyServer(_player, movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
 
@@ -1537,6 +1514,19 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     Player* plrMover = mover->ToPlayer();
 
     mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
+
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
+
+    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
+    {
+        recv_data.rfinish();                     // prevent warnings spam
+        return;
+    }
+
+    if (_player->GetPendingFlightChange() == counter && opcode == CMSG_MOVE_SET_CAN_FLY_ACK)
+        _player->SetPendingFlightChange(false);
 
     Opcodes response;
 
@@ -1546,17 +1536,12 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
         case CMSG_MOVE_FEATHER_FALL_ACK: response = MSG_MOVE_FEATHER_FALL; break;
         case CMSG_MOVE_WATER_WALK_ACK: response = MSG_MOVE_WATER_WALK; break;
         case CMSG_MOVE_SET_CAN_FLY_ACK: response = MSG_MOVE_UPDATE_CAN_FLY; break;
+        case CMSG_MOVE_GRAVITY_DISABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
+        case CMSG_MOVE_GRAVITY_ENABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
         default: return;
     }
 
-    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
-    {
-        recv_data.rfinish();                     // prevent warnings spam
-        return;
-    }
-
     WorldPacket data(response, 8);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     _player->m_mover->SendMessageToSet(&data, _player);
 }
@@ -1570,8 +1555,15 @@ void WorldSession::HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& /*pac
 
     if (_player->GetPet())
         _player->PetSpellInitialize();
-    else if (_player->GetCharm())
-        _player->CharmSpellInitialize();
+    else if (Unit* charm = _player->GetCharm())
+    {
+        if (charm->HasUnitState(UNIT_STATE_POSSESSED))
+            _player->PossessSpellInitialize();
+        else if (charm->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && charm->HasUnitFlag(UNIT_FLAG_POSSESSED))
+            _player->VehicleSpellInitialize();
+        else
+            _player->CharmSpellInitialize();
+    }
 }
 
 void WorldSession::HandleSetTaxiBenchmarkOpcode(WorldPacket& recv_data)

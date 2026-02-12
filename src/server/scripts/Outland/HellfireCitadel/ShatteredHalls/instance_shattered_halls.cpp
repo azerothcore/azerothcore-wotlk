@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -117,9 +117,23 @@ public:
                     return PrisonerGUID[data - DATA_PRISONER_1];
                 case DATA_EXECUTIONER:
                     return ExecutionerGUID;
+                case DATA_LAST_FLAME_ARROW:
+                    return LastArrowGUID;
             }
 
             return ObjectGuid::Empty;
+        }
+
+        void SetGuidData(uint32 data, ObjectGuid value) override
+        {
+            switch (data)
+            {
+                case DATA_LAST_FLAME_ARROW:
+                    LastArrowGUID = value;
+                    break;
+                default:
+                    break;
+            }
         }
 
         void Update(uint32 diff) override
@@ -164,6 +178,7 @@ public:
         }
 
     protected:
+        ObjectGuid LastArrowGUID;
         ObjectGuid ExecutionerGUID;
         ObjectGuid PrisonerGUID[3];
         uint32 RescueTimer;

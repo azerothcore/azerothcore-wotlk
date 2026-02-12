@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -33,6 +33,7 @@
 #include "ObjectDefines.h"
 #include "QuestDef.h"
 #include "TemporarySummon.h"
+#include "Trainer.h"
 #include "VehicleDefines.h"
 #include <functional>
 #include <limits>
@@ -664,7 +665,6 @@ typedef std::unordered_map<uint32, QuestPOIVector> QuestPOIContainer;
 typedef std::map<std::pair<uint32, uint8>, QuestGreeting> QuestGreetingContainer;
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
-typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 
 typedef std::vector<uint32> CreatureCustomIDsContainer;
 
@@ -1106,8 +1106,8 @@ public:
     void LoadGossipMenuItems();
 
     void LoadVendors();
-    void LoadTrainerSpell();
-    void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
+    void LoadTrainers();
+    void LoadCreatureDefaultTrainers();
 
     std::string GeneratePetName(uint32 entry);
     std::string GeneratePetNameLocale(uint32 entry, LocaleConstant locale);
@@ -1144,6 +1144,18 @@ public:
     typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
 
     ExclusiveQuestGroups mExclusiveQuestGroups;
+
+    typedef std::unordered_map<uint32, std::vector<uint32>> BreadcrumbQuestMap;
+    BreadcrumbQuestMap _breadcrumbsForQuest;
+
+    [[nodiscard]] std::vector<uint32> const* GetBreadcrumbsForQuest(uint32 questId) const
+    {
+        auto itr = _breadcrumbsForQuest.find(questId);
+        if (itr != _breadcrumbsForQuest.end())
+            return &itr->second;
+
+        return nullptr;
+    }
 
     MailLevelReward const* GetMailLevelReward(uint32 level, uint32 raceMask)
     {
@@ -1214,6 +1226,21 @@ public:
     [[nodiscard]] CreatureSparringContainer const& GetSparringData() const { return _creatureSparringStore; }
 
     CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
+    /**
+     * @brief Loads a single creature spawn entry from the database into the data store cache.
+     *
+     * This is needed as a prerequisite for Creature::LoadCreatureFromDB(), which reads
+     * from the in-memory cache (via GetCreatureData()) rather than querying the DB itself.
+     * For spawns not loaded during server startup, this method populates the cache so that
+     * Creature::LoadCreatureFromDB() can then create the live entity.
+     *
+     * Returns the cached data if already loaded, or nullptr if the spawn doesn't exist
+     * or fails validation.
+     *
+     * @param spawnId The creature spawn GUID to load.
+     * @return Pointer to the cached CreatureData, or nullptr on failure.
+     */
+    CreatureData const* LoadCreatureDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteCreatureData(ObjectGuid::LowType spawnId);
     [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
     {
@@ -1299,6 +1326,21 @@ public:
     [[nodiscard]] QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
+    /**
+     * @brief Loads a single gameobject spawn entry from the database into the data store cache.
+     *
+     * This is needed as a prerequisite for GameObject::LoadGameObjectFromDB(), which reads
+     * from the in-memory cache (via GetGameObjectData()) rather than querying the DB itself.
+     * For spawns not loaded during server startup, this method populates the cache so that
+     * GameObject::LoadGameObjectFromDB() can then create the live entity.
+     *
+     * Returns the cached data if already loaded, or nullptr if the spawn doesn't exist
+     * or fails validation.
+     *
+     * @param spawnId The gameobject spawn GUID to load.
+     * @return Pointer to the cached GameObjectData, or nullptr on failure.
+     */
+    GameObjectData const* LoadGameObjectDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteGOData(ObjectGuid::LowType guid);
 
     [[nodiscard]] ModuleString const* GetModuleString(std::string module, uint32 id) const
@@ -1364,14 +1406,7 @@ public:
     bool AddGameTele(GameTele& data);
     bool DeleteGameTele(std::string_view name);
 
-    [[nodiscard]] TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
-    {
-        CacheTrainerSpellContainer::const_iterator  iter = _cacheTrainerSpellStore.find(entry);
-        if (iter == _cacheTrainerSpellStore.end())
-            return nullptr;
-
-        return &iter->second;
-    }
+    Trainer::Trainer* GetTrainer(uint32 creatureId);
 
     [[nodiscard]] VendorItemData const* GetNpcVendorItemList(uint32 entry) const
     {
@@ -1617,7 +1652,8 @@ private:
     PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
 
     CacheVendorItemContainer _cacheVendorItemStore;
-    CacheTrainerSpellContainer _cacheTrainerSpellStore;
+    std::unordered_map<uint32, Trainer::Trainer> _trainers;
+    std::unordered_map<uint32, uint32> _creatureDefaultTrainers;
 
     std::set<uint32> _difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures, used in CheckCreatureTemplate
     std::set<uint32> _hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1 values, used in CheckCreatureTemplate

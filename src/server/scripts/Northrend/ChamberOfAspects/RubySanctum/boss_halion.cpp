@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -199,7 +199,7 @@ public:
 
         WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 4);
         data << uint32(ENCOUNTER_FRAME_REFRESH_FRAMES);
-        _owner->GetSession()->SendPacket(&data);
+        _owner->SendDirectMessage(&data);
         return true;
     }
 
@@ -310,7 +310,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->IsPlayer() && events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (victim->IsPlayer() && !events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -335,7 +335,7 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (events.GetNextEventTime(EVENT_CHECK_HEALTH) != 0)
+            if (events.HasTimeUntilEvent(EVENT_CHECK_HEALTH))
                 return;
 
             if (!attacker || !me->InSamePhase(attacker))
@@ -477,7 +477,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->IsPlayer() && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (victim->IsPlayer() && !_events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 _events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -598,7 +598,7 @@ public:
 
         void SetData(uint32 id, uint32 value) override
         {
-            if (_events.GetNextEventTime(EVENT_CHECK_CORPOREALITY) == 0)
+            if (!_events.HasTimeUntilEvent(EVENT_CHECK_CORPOREALITY))
                 return;
 
             if (id == DATA_MATERIAL_DAMAGE_TAKEN)
@@ -1120,7 +1120,7 @@ class spell_halion_twilight_realm_aura : public AuraScript
         target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
         if (!GetTarget()->IsPlayer())
             return;
-        GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
+        GetTarget()->m_Events.AddEventAtOffset(new SendEncounterUnit(GetTarget()->ToPlayer()), 500ms);
     }
 
     void Register() override
@@ -1153,7 +1153,7 @@ class spell_halion_leave_twilight_realm_aura : public AuraScript
 
         if (!GetTarget()->IsPlayer())
             return;
-        GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
+        GetTarget()->m_Events.AddEventAtOffset(new SendEncounterUnit(GetTarget()->ToPlayer()), 500ms);
     }
 
     void Register() override
@@ -1322,7 +1322,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
     };
 

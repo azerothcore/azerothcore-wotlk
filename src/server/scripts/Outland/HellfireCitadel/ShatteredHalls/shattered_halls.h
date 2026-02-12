@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -37,7 +37,8 @@ enum DataTypes
     DATA_EXECUTIONER                = 14,
     DATA_OMROGG_LEFT_HEAD           = 15,
     DATA_OMROGG_RIGHT_HEAD          = 16,
-    DATA_WARCHIEF_PORTAL            = 17
+    DATA_WARCHIEF_PORTAL            = 17,
+    DATA_LAST_FLAME_ARROW           = 18
 };
 
 enum CreatureIds
@@ -49,6 +50,7 @@ enum CreatureIds
     NPC_SH_ZEALOT                   = 17462,
     NPC_SH_ARCHER                   = 17427,
     NPC_SH_SCOUT                    = 17693,
+    NPC_SH_FLAME_ARROW              = 17687,
 
     // Warchief Kargath
     NPC_WARCHIEF_KARGATH            = 16808,
@@ -76,7 +78,8 @@ enum CreatureIds
 enum GameobjectIds
 {
     GO_GRAND_WARLOCK_CHAMBER_DOOR_1 = 182539,
-    GO_GRAND_WARLOCK_CHAMBER_DOOR_2 = 182540
+    GO_GRAND_WARLOCK_CHAMBER_DOOR_2 = 182540,
+    GO_BLAZE                        = 181915
 };
 
 enum SpellIds

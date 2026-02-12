@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,7 @@
 #define SocketMgr_h__
 
 #include "AsyncAcceptor.h"
+#include "Config.h"
 #include "Errors.h"
 #include "NetworkThread.h"
 #include <boost/asio/ip/tcp.hpp>
@@ -42,7 +43,8 @@ public:
         std::unique_ptr<AsyncAcceptor> acceptor;
         try
         {
-            acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port);
+            bool supportSocketActivation = sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false);
+            acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port, supportSocketActivation);
         }
         catch (boost::system::system_error const& err)
         {
@@ -89,7 +91,7 @@ public:
             _threads[i].Wait();
     }
 
-    virtual void OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
+    virtual void OnSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
         try
         {
@@ -115,7 +117,7 @@ public:
         return min;
     }
 
-    std::pair<tcp::socket*, uint32> GetSocketForAccept()
+    std::pair<IoContextTcpSocket*, uint32> GetSocketForAccept()
     {
         uint32 threadIndex = SelectThreadWithMinConnections();
         return { _threads[threadIndex].GetSocketForAccept(), threadIndex };

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -266,7 +266,7 @@ public:
                     Talk(SAY_EMOTE_SURGE_OF_DARKNESS);
                     me->CastSpell(me, SPELL_SURGE_OF_DARKNESS, false);
                     events.Repeat(63s);
-                    events.DelayEvents(10000, 1);
+                    events.DelayEvents(10s, 1);
                     break;
                 case EVENT_SPELL_MARK_OF_THE_FACELESS:
                     {
@@ -312,8 +312,8 @@ public:
                                     sv->GetMotionMaster()->MoveCharge(1852.78f, 81.38f, 342.461f, 28.0f);
                                 }
 
-                            events.DelayEvents(12000, 0);
-                            events.DelayEvents(12000, 1);
+                            events.DelayEvents(12s, 0);
+                            events.DelayEvents(12s, 1);
                             events.ScheduleEvent(EVENT_SARONITE_VAPORS_SWIRL, 6s);
                         }
                     }
@@ -450,7 +450,7 @@ public:
 
         void JustDied(Unit*  /*killer*/) override
         {
-            me->DespawnOrUnsummon(3000);
+            me->DespawnOrUnsummon(3s);
 
             if (pInstance)
                 if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))

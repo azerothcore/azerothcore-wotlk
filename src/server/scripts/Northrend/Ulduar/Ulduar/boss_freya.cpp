@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,31 +29,23 @@ enum FreyaSpells
     SPELL_AUTO_GROW                             = 62559,
     SPELL_LIFEBINDER_PHERONOMES                 = 62619,
     SPELL_LIFEBINDER_VISUAL                     = 62579,
-    SPELL_LIFEBINDER_HEAL_10                    = 62584,
-    SPELL_LIFEBINDER_HEAL_25                    = 64185,
+    SPELL_LIFEBINDER_HEAL                       = 62584,
 
     // FREYA
-    SPELL_TOUCH_OF_EONAR_10                     = 62528,
-    SPELL_TOUCH_OF_EONAR_25                     = 62892,
+    SPELL_TOUCH_OF_EONAR                        = 62528,
     SPELL_ATTUNED_TO_NATURE                     = 62519,
     SPELL_SUMMON_LIFEBINDER                     = 62870,
-    SPELL_SUNBEAM_10                            = 62623,
-    SPELL_SUNBEAM_25                            = 62872,
+    SPELL_SUNBEAM                               = 62623,
     SPELL_NATURE_BOMB_FLIGHT                    = 64648,
-    SPELL_NATURE_BOMB_DAMAGE_10                 = 64587,
-    SPELL_NATURE_BOMB_DAMAGE_25                 = 64650,
+    SPELL_NATURE_BOMB_DAMAGE                    = 64587,
     SPELL_GREEN_BANISH_STATE                    = 32567,
     SPELL_BERSERK                               = 47008,
 
     // HARD MODE
-    SPELL_GROUND_TREMOR_FREYA_10                = 62437,
-    SPELL_GROUND_TREMOR_FREYA_25                = 62859,
-    SPELL_IRON_ROOTS_FREYA_10                   = 62862,
-    SPELL_IRON_ROOTS_FREYA_25                   = 62439,
-    SPELL_IRON_ROOTS_FREYA_DAMAGE_10            = 62861,
-    SPELL_IRON_ROOTS_FREYA_DAMAGE_25            = 62438,
-    SPELL_UNSTABLE_SUN_FREYA_DAMAGE_10          = 62451,
-    SPELL_UNSTABLE_SUN_FREYA_DAMAGE_25          = 62865,
+    SPELL_GROUND_TREMOR_FREYA                   = 62437,
+    SPELL_IRON_ROOTS_FREYA                      = 62862,
+    SPELL_IRON_ROOTS_FREYA_DAMAGE               = 62861,
+    SPELL_UNSTABLE_SUN_FREYA_DAMAGE             = 62451,
     SPELL_UNSTABLE_SUN_VISUAL                   = 62216,
 
     // ELDERS
@@ -64,85 +56,48 @@ enum FreyaSpells
 
     // BRIGHTLEAF
     SPELL_BRIGHTLEAF_FLUX                       = 62239,
-    SPELL_SOLAR_FLARE_10                        = 62240,
-    SPELL_SOLAR_FLARE_25                        = 64087,
+    SPELL_SOLAR_FLARE                           = 62240,
     SPELL_UNSTABLE_SUN_BEAM_AURA                = 62211,
     SPELL_PHOTOSYNTHESIS                        = 62209,
-    SPELL_UNSTABLE_SUN_DAMAGE_10                = 62217,
-    SPELL_UNSTABLE_SUN_DAMAGE_25                = 62922,
+    SPELL_UNSTABLE_SUN_DAMAGE                   = 62217,
 
     // IRONBRANCH
-    SPELL_IMPALE_10                             = 62310,
-    SPELL_IMPALE_25                             = 62928,
-    SPELL_IRON_ROOTS_10                         = 62275,
-    SPELL_IRON_ROOTS_25                         = 62929,
-    SPELL_IRON_ROOTS_DAMAGE_10                  = 62283,
-    SPELL_IRON_ROOTS_DAMAGE_25                  = 62930,
-    SPELL_THORN_SWARM_10                        = 62285,
-    SPELL_THORN_SWARM_25                        = 62931,
+    SPELL_IMPALE                                = 62310,
+    SPELL_IRON_ROOTS                            = 62275,
+    SPELL_IRON_ROOTS_DAMAGE                     = 62283,
+    SPELL_THORN_SWARM                           = 62285,
 
     // STONEBARK
     SPELL_FISTS_OF_STONE                        = 62344,
-    SPELL_GROUND_TREMOR_10                      = 62325,
-    SPELL_GROUND_TREMOR_25                      = 62932,
-    SPELL_PETRIFIED_BARK_10                     = 62337,
-    SPELL_PETRIFIED_BARK_25                     = 62933,
+    SPELL_GROUND_TREMOR                         = 62325,
+    SPELL_PETRIFIED_BARK                        = 62337,
 
     // SNAPLASHER
-    SPELL_HARDENED_BARK_10                      = 62664,
-    SPELL_HARDENED_BARK_25                      = 64191,
+    SPELL_HARDENED_BARK                         = 62664,
 
     // ANCIENT WATER SPIRIT
-    SPELL_TIDAL_WAVE_10                         = 62653,
-    SPELL_TIDAL_WAVE_25                         = 62935,
-    SPELL_TIDAL_WAVE_DAMAGE_10                  = 62654,
-    SPELL_TIDAL_WAVE_DAMAGE_25                  = 62936,
+    SPELL_TIDAL_WAVE                            = 62653,
+    SPELL_TIDAL_WAVE_DAMAGE                     = 62654,
     SPELL_TIDAL_WAVE_AURA                       = 62655,
 
     // STORM LASHER
-    SPELL_LIGHTNING_LASH_10                     = 62648,
-    SPELL_LIGHTNING_LASH_25                     = 62939,
-    SPELL_STORMBOLT_10                          = 62649,
-    SPELL_STORMBOLT_25                          = 62938,
+    SPELL_LIGHTNING_LASH                        = 62648,
+    SPELL_STORMBOLT                             = 62649,
 
     // ANCIENT CONSERVATOR
     SPELL_CONSERVATOR_GRIP                      = 62532,
-    SPELL_NATURE_FURY_10                        = 62589,
-    SPELL_NATURE_FURY_25                        = 63571,
+    SPELL_NATURE_FURY                           = 62589,
     SPELL_POTENT_PHEROMONES                     = 62541,
     SPELL_HEALTHY_SPORE_VISUAL                  = 62538,
     SPELL_HEALTHY_SPORE_SUMMON                  = 62566,
 
     // DETONATING LASHER
-    SPELL_DETONATE_10                           = 62598,
-    SPELL_DETONATE_25                           = 62937,
+    SPELL_DETONATE                              = 62598,
     SPELL_FLAME_LASH                            = 62608,
 
     // ACHIEVEMENT
     SPELL_DEFORESTATION_CREDIT                  = 65015,
 };
-
-#define SPELL_GROUND_TREMOR                     RAID_MODE(SPELL_GROUND_TREMOR_10, SPELL_GROUND_TREMOR_25)
-#define SPELL_PETRIFIED_BARK                    RAID_MODE(SPELL_PETRIFIED_BARK_10, SPELL_PETRIFIED_BARK_25)
-#define SPELL_IRON_ROOTS                        RAID_MODE(SPELL_IRON_ROOTS_10, SPELL_IRON_ROOTS_25)
-#define SPELL_IMPALE                            RAID_MODE(SPELL_IMPALE_10, SPELL_IMPALE_25)
-#define SPELL_THORN_SWARM                       RAID_MODE(SPELL_THORN_SWARM_10, SPELL_THORN_SWARM_25)
-#define SPELL_UNSTABLE_SUN_DAMAGE               RAID_MODE(SPELL_UNSTABLE_SUN_DAMAGE_10, SPELL_UNSTABLE_SUN_DAMAGE_25)
-#define SPELL_SOLAR_FLARE                       RAID_MODE(SPELL_SOLAR_FLARE_10, SPELL_SOLAR_FLARE_25)
-#define SPELL_TOUCH_OF_EONAR                    RAID_MODE(SPELL_TOUCH_OF_EONAR_10, SPELL_TOUCH_OF_EONAR_25)
-#define SPELL_LIFEBINDER_HEAL                   RAID_MODE(SPELL_LIFEBINDER_HEAL_10, SPELL_LIFEBINDER_HEAL_25)
-#define SPELL_TIDAL_WAVE                        RAID_MODE(SPELL_TIDAL_WAVE_10, SPELL_TIDAL_WAVE_25)
-#define SPELL_TIDAL_WAVE_DAMAGE                 RAID_MODE(SPELL_TIDAL_WAVE_DAMAGE_10, SPELL_TIDAL_WAVE_DAMAGE_25)
-#define SPELL_NATURE_FURY                       RAID_MODE(SPELL_NATURE_FURY_10, SPELL_NATURE_FURY_25)
-#define SPELL_HARDENED_BARK                     RAID_MODE(SPELL_HARDENED_BARK_10, SPELL_HARDENED_BARK_25)
-#define SPELL_DETONATE                          RAID_MODE(SPELL_DETONATE_10, SPELL_DETONATE_25)
-//#define SPELL_NATURE_BOMB_DAMAGE                RAID_MODE(SPELL_NATURE_BOMB_DAMAGE_10, SPELL_NATURE_BOMB_DAMAGE_25)
-#define SPELL_SUNBEAM                           RAID_MODE(SPELL_SUNBEAM_10, SPELL_SUNBEAM_25)
-#define SPELL_GROUND_TREMOR_FREYA               RAID_MODE(SPELL_GROUND_TREMOR_FREYA_10, SPELL_GROUND_TREMOR_FREYA_25)
-#define SPELL_IRON_ROOTS_FREYA                  RAID_MODE(SPELL_IRON_ROOTS_FREYA_10, SPELL_IRON_ROOTS_FREYA_25)
-#define SPELL_UNSTABLE_SUN_FREYA_DAMAGE         RAID_MODE(SPELL_UNSTABLE_SUN_FREYA_DAMAGE_10, SPELL_UNSTABLE_SUN_FREYA_DAMAGE_25)
-#define SPELL_LIGHTNING_LASH                    RAID_MODE(SPELL_LIGHTNING_LASH_10, SPELL_LIGHTNING_LASH_25)
-#define SPELL_STORMBOLT                         RAID_MODE(SPELL_STORMBOLT_10, SPELL_STORMBOLT_25)
 
 enum FreyaEvents
 {
@@ -983,9 +938,9 @@ public:
             if (Unit* target = ObjectAccessor::GetUnit(*me, me->ToTempSummon()->GetSummonerGUID()))
             {
                 if (me->GetEntry() == NPC_IRON_ROOT_TRIGGER) // Iron Branch spell
-                    target->RemoveAura(target->GetMap()->Is25ManRaid() ? SPELL_IRON_ROOTS_DAMAGE_25 : SPELL_IRON_ROOTS_DAMAGE_10);
+                    target->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_IRON_ROOTS_DAMAGE, me));
                 else
-                    target->RemoveAura(target->GetMap()->Is25ManRaid() ? SPELL_IRON_ROOTS_FREYA_DAMAGE_25 : SPELL_IRON_ROOTS_FREYA_DAMAGE_10);
+                    target->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_IRON_ROOTS_FREYA_DAMAGE, me));
             }
         }
     };
@@ -1023,8 +978,8 @@ public:
             if (_healTimer >= 12000)
             {
                 me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
-                me->CastSpell(me, me->GetMap()->Is25ManRaid() ? SPELL_LIFEBINDER_HEAL_25 : SPELL_LIFEBINDER_HEAL_10, true);
-                me->DespawnOrUnsummon(2000);
+                me->CastSpell(me, SPELL_LIFEBINDER_HEAL, true);
+                me->DespawnOrUnsummon(2s);
                 _healTimer = 0;
             }
         }
@@ -1063,7 +1018,7 @@ public:
             if (_despawnTimer >= 22000)
             {
                 me->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
-                me->DespawnOrUnsummon(2200);
+                me->DespawnOrUnsummon(2200ms);
                 _despawnTimer = 0;
             }
         }
@@ -1203,7 +1158,7 @@ public:
                     if (Unit* target = SelectTargetFromPlayerList(80))
                         AttackStart(target);
                     else
-                        me->DespawnOrUnsummon(1);
+                        me->DespawnOrUnsummon(1ms);
                     events.Repeat(10s);
                     break;
             }
@@ -1249,8 +1204,8 @@ public:
             _explodeTimer += diff;
             if (_explodeTimer >= 11000)
             {
-                me->CastSpell(me, me->GetMap()->Is25ManRaid() ? SPELL_NATURE_BOMB_DAMAGE_25 : SPELL_NATURE_BOMB_DAMAGE_10, false);
-                me->DespawnOrUnsummon(1000);
+                me->CastSpell(me, SPELL_NATURE_BOMB_DAMAGE, false);
+                me->DespawnOrUnsummon(1s);
                 _explodeTimer = 0;
             }
 

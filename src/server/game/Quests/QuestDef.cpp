@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -177,17 +177,18 @@ void Quest::LoadQuestTemplateAddon(Field* fields)
     PrevQuestId = fields[4].Get<int32>();
     NextQuestId = fields[5].Get<uint32>();
     ExclusiveGroup = fields[6].Get<int32>();
-    RewardMailTemplateId = fields[7].Get<uint32>();
-    RewardMailDelay = fields[8].Get<uint32>();
-    RequiredSkillId = fields[9].Get<uint16>();
-    RequiredSkillPoints = fields[10].Get<uint16>();
-    RequiredMinRepFaction = fields[11].Get<uint16>();
-    RequiredMaxRepFaction = fields[12].Get<uint16>();
-    RequiredMinRepValue = fields[13].Get<int32>();
-    RequiredMaxRepValue = fields[14].Get<int32>();
-    StartItemCount = fields[15].Get<uint8>();
-    RewardMailSenderEntry = fields[16].Get<uint32>();
-    SpecialFlags = fields[17].Get<uint32>();
+    BreadcrumbForQuestId = fields[7].Get<uint32>();
+    RewardMailTemplateId = fields[8].Get<uint32>();
+    RewardMailDelay = fields[9].Get<uint32>();
+    RequiredSkillId = fields[10].Get<uint16>();
+    RequiredSkillPoints = fields[11].Get<uint16>();
+    RequiredMinRepFaction = fields[12].Get<uint16>();
+    RequiredMaxRepFaction = fields[13].Get<uint16>();
+    RequiredMinRepValue = fields[14].Get<int32>();
+    RequiredMaxRepValue = fields[15].Get<int32>();
+    StartItemCount = fields[16].Get<uint8>();
+    RewardMailSenderEntry = fields[17].Get<uint32>();
+    SpecialFlags = fields[18].Get<uint32>();
 
     if ((SpecialFlags & QUEST_SPECIAL_FLAGS_AUTO_ACCEPT) && !sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_AUTO_ACCEPT))
     {

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -79,11 +79,11 @@ public:
             if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
                 return;
 
-            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 0);
-            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 0);
+            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 0ms);
+            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 0ms);
 
             if (_encounterProgress == ENCOUNTER_PROGRESS_BARRELS)
-                _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 0);
+                _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 0ms);
             else
                 SetData(DATA_THRALL_REPOSITION, 2);
         }
@@ -138,7 +138,7 @@ public:
             {
                 case DATA_THRALL_REPOSITION:
                     if (data > 1)
-                        _events.ScheduleEvent(EVENT_THRALL_REPOSITION, data == 2 ? 0 : 10000);
+                        _events.ScheduleEvent(EVENT_THRALL_REPOSITION, data == 2 ? 0ms : 10s);
                     else if (Creature* thrall = instance->GetCreature(_thrallGUID))
                         Reposition(thrall);
                     return;
@@ -157,9 +157,9 @@ public:
                         DoUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, ++_barrelCount);
                         if (_barrelCount == 5)
                         {
-                            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
-                            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12000);
-                            _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18000);
+                            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4s);
+                            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12s);
+                            _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18s);
                         }
                         break;
                     }

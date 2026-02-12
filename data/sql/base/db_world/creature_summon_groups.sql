@@ -1249,7 +1249,42 @@ INSERT INTO `creature_summon_groups` VALUES
 (534,2,42,17898,5361.22,-3266.66,1619.22,5.21686,7,0,'Night Elf Wave'),
 (17852,0,0,17920,5489.71,-2781.63,1497.73,1.32645,3,21000,'Horde Retreat'),
 (17852,0,0,17920,5480.39,-2778.91,1497.07,1.0472,3,21000,'Horde Retreat'),
-(17852,0,0,17772,5486.3,-2777.72,1496.69,1.0821,3,21000,'Horde Retreat');
+(17852,0,0,17772,5486.3,-2777.72,1496.69,1.0821,3,21000,'Horde Retreat'),
+(29120,0,1,22515,549.622,352.047,240.89,3.45575,8,0,'Anub\'arak - Group 1 - World Trigger'),
+(29120,0,2,22515,478.739,252.85,250.544,0.0523599,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(29120,0,2,22515,621.319,268.482,250.544,3.33358,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(29120,0,2,22515,622.904,252.945,250.544,3.12414,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(29120,0,2,22515,478.149,269.009,250.544,6.12611,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(29120,0,2,22515,478.547,297.045,250.544,5.79449,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(29120,0,2,22515,478.291,224.827,250.235,0.401426,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(29120,0,2,22515,620.622,298.263,250.544,3.7001,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(29120,0,2,22515,620.704,224.562,250.232,2.53073,8,0,'Anub\'arak - Group 2 - World Trigger'),
+(28998,0,1,28931,6184.15,-1970.17,586.842,4.5902,8,0,'Overlord Drakuru - Group 1 - Blightblood Troll'),
+(28998,0,1,28931,6222.85,-2026.63,586.842,3.00197,8,0,'Overlord Drakuru - Group 1 - Blightblood Troll'),
+(28998,0,1,28931,6166.28,-2065.31,586.842,1.44862,8,0,'Overlord Drakuru - Group 1 - Blightblood Troll'),
+(28998,0,1,28931,6127.51,-2008.65,586.842,6.16101,8,0,'Overlord Drakuru - Group 1 - Blightblood Troll'),
+(29310,0,2,30111,434.004,-702.897,-17.958,3.12414,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,429.734,-712.182,-17.9569,2.86234,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,388.308,-766.784,-17.9608,2.0944,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,392.577,-765.636,-17.9589,2.25147,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,381.838,-773.39,-17.953,1.76278,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,439.983,-699.07,-17.9528,3.19395,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,394.354,-760.811,-17.9546,2.44346,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,434.437,-709.475,-17.9614,2.94961,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,387.069,-770.95,-17.9576,1.97222,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310,0,2,30111,427.302,-717.399,-17.9518,2.70526,8,0,'Jedoga Shadowseeker - Twilight Worshipper'),
+(28921,0,1,28922,529.691,547.126,731.916,4.79965,6,45000,'Hadronox - Group 1 - Anub\'ar Crusher'),
+(28921,0,1,29117,539.208,549.754,732.867,4.55531,6,30000,'Hadronox - Group 1 - Anub\'ar Champion'),
+(28921,0,1,29118,520.391,548.789,732.012,5.0091,6,30000,'Hadronox - Group 1 - Anub\'ar Crypt Fiend'),
+(28921,0,2,28922,493.477,603.344,760.563,5.44024,6,45000,'Hadronox - Group 2 - Anub\'ar Crusher'),
+(28921,0,2,29117,490.442,604.335,763.182,5.6256,6,30000,'Hadronox - Group 2 - Anub\'ar Champion'),
+(28921,0,2,29119,488.825,609.282,767.588,5.59029,6,30000,'Hadronox - Group 2 - Anub\'ar Necromancer'),
+(28921,0,3,28922,566.979,602.571,759.642,3.88597,6,45000,'Hadronox - Group 3 - Anub\'ar Crusher'),
+(28921,0,3,29118,569.348,604.999,763.214,4.17983,6,30000,'Hadronox - Group 3 - Anub\'ar Crypt Fiend'),
+(28921,0,3,29119,572.474,607.411,767.178,3.94417,6,30000,'Hadronox - Group 3 - Anub\'ar Necromancer'),
+(28921,0,4,23472,581.448,608.841,739.405,1.72788,6,3600000,'Hadronox - Group 4 - World Trigger'),
+(28921,0,4,23472,477.016,618.4,771.515,2.35619,6,3600000,'Hadronox - Group 4 - World Trigger'),
+(28921,0,4,23472,583.091,617.371,771.551,0.645772,6,3600000,'Hadronox - Group 4 - World Trigger');
 /*!40000 ALTER TABLE `creature_summon_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1261,4 +1296,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:08:48
+-- Dump completed on 2025-12-29 17:53:45

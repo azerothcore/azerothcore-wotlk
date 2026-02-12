@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -46,6 +46,7 @@
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
+#include "Transport.h"
 #include "WeatherMgr.h"
 #include "WorldSessionMgr.h"
 
@@ -193,7 +194,9 @@ public:
             { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  }
+            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  },
+            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::Yes }
         };
 
         return commandTable;
@@ -485,7 +488,7 @@ public:
             uint32 queueSlot = 0;
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
 
             // Remove from LFG queues
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
@@ -504,6 +507,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -537,9 +541,6 @@ public:
             SetCommentatorMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
@@ -548,6 +549,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -582,9 +584,6 @@ public:
             SetDevMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleGPSCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
@@ -879,13 +878,39 @@ public:
                 _player->CleanupAfterTaxiFlight();
             }
             else // save only in non-flight case
-            {
                 _player->SaveRecallPosition();
-            }
 
-            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            if (Transport* transport = targetPlayer->GetTransport())
             {
-                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+                if (Transport* oldTransport = _player->GetTransport())
+                    oldTransport->RemovePassenger(_player, true);
+
+                float x;
+                float y;
+                float z;
+                float o;
+                targetPlayer->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+
+                _player->SetTransport(transport);
+                _player->m_movementInfo.transport.guid = transport->GetGUID();
+                _player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+                _player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
+                float worldX = x;
+                float worldY = y;
+                float worldZ = z;
+                float worldO = o;
+                transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
+
+                transport->AddPassenger(_player, false);
+
+                if (_player->TeleportTo(transport->GetMapId(), worldX, worldY, worldZ + 0.25f, worldO, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+            }
+            else
+            {
+                if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
             }
         }
         else
@@ -3069,6 +3094,85 @@ public:
         handler->SendErrorMessage(LANG_CMD_NO_DOOR_FOUND, range ? *range : 5.0f);
         return false;
     }
+
+    static bool HandleBMCommand(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+            return false;
+
+        auto SetBMMod = [&](bool enable)
+        {
+            char const* enabled = "ON";
+            char const* disabled = "OFF";
+            handler->SendNotification(LANG_COMMAND_BEASTMASTER_MODE, enable ? enabled : disabled);
+
+            session->GetPlayer()->SetBeastMaster(enable);
+        };
+
+        if (!enableArg)
+        {
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
+                SetBMMod(true);
+            else
+                SetBMMod(false);
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetBMMod(true);
+            return true;
+        }
+        else
+        {
+            SetBMMod(false);
+            return true;
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
+    static bool HandlePacketLog(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<bool> enableArg)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target || !target->IsConnected())
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        WorldSession* session = playerTarget->GetSession();
+
+        if (!session)
+            return false;
+
+        if (enableArg)
+        {
+            if (*enableArg)
+            {
+                session->SetPacketLogging(true);
+                handler->PSendSysMessage("Packet logging enabled for {}.", playerTarget->GetName());
+                return true;
+            }
+            else
+            {
+                session->SetPacketLogging(false);
+                handler->PSendSysMessage("Packet logging disabled for {}.", playerTarget->GetName());
+                return true;
+            }
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
 };
 
 void AddSC_misc_commandscript()

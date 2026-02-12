@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,7 +41,7 @@ public:
     /// Stops all network threads, It will wait for all running threads .
     void StopNetwork() override;
 
-    void OnSocketOpen(tcp::socket&& sock, uint32 threadIndex) override;
+    void OnSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex) override;
 
     std::size_t GetApplicationSendBufferSize() const { return _socketApplicationSendBufferSize; }
 
@@ -50,9 +50,9 @@ protected:
 
     NetworkThread<WorldSocket>* CreateThreads() const override;
 
-    static void OnSocketAccept(tcp::socket&& sock, uint32 threadIndex)
+    static void OnSocketAccept(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
-        Instance().OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
+        Instance().OnSocketOpen(std::move(sock), threadIndex);
     }
 
 private:

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -34,36 +34,28 @@ enum Misc
 
     // PALEHOOF
     SPELL_ARCING_SMASH                      = 48260,
-    SPELL_IMPALE_N                          = 48261,
-    SPELL_IMPALE_H                          = 59268,
-    SPELL_WITHERING_ROAR_N                  = 48256,
-    SPELL_WITHERING_ROAR_H                  = 59267,
+    SPELL_IMPALE                            = 48261,
+    SPELL_WITHERING_ROAR                    = 48256,
     SPELL_FREEZE                            = 16245,
 
     // Massive Jormungar
     SPELL_ACID_SPIT                         = 48132,
-    SPELL_ACID_SPLATTER_N                   = 48136,
-    SPELL_ACID_SPLATTER_H                   = 59272,
-    SPELL_POISON_BREATH_N                   = 48133,
-    SPELL_POISON_BREATH_H                   = 59271,
+    SPELL_ACID_SPLATTER                     = 48136,
+    SPELL_POISON_BREATH                     = 48133,
     NPC_JORMUNGAR_WORM                      = 27228,
 
     // Ferocious Rhino
-    SPELL_GORE_N                            = 48130,
-    SPELL_GORE_H                            = 59264,
-    SPELL_GRIEVOUS_WOUND_N                  = 48105,
-    SPELL_GRIEVOUS_WOUND_H                  = 59263,
+    SPELL_GORE                              = 48130,
+    SPELL_GRIEVOUS_WOUND                    = 48105,
     SPELL_STOMP                             = 48131,
 
     // Ravenous Furbolg
-    SPELL_CHAIN_LIGHTING_N                  = 48140,
-    SPELL_CHAIN_LIGHTING_H                  = 59273,
+    SPELL_CHAIN_LIGHTNING                    = 48140,
     SPELL_CRAZED                            = 48139,
     SPELL_TERRIFYING_ROAR                   = 48144,
 
     // Frenzied Worgen
-    SPELL_MORTAL_WOUND_N                    = 48137,
-    SPELL_MORTAL_WOUND_H                    = 59265,
+    SPELL_MORTAL_WOUND                      = 48137,
     SPELL_ENRAGE_1                          = 48138,
     SPELL_ENRAGE_2                          = 48142,
 
@@ -284,6 +276,7 @@ public:
                             orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
 
                         me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                        me->GetThreatMgr().ResetAllThreat();
                         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                         me->SetControlled(false, UNIT_STATE_STUNNED);
                         // SETINCOMBATWITHZONE
@@ -296,14 +289,14 @@ public:
                     }
                 case EVENT_PALEHOOF_WITHERING_ROAR:
                     {
-                        me->CastSpell(me, IsHeroic() ? SPELL_WITHERING_ROAR_H : SPELL_WITHERING_ROAR_N, false);
+                        me->CastSpell(me, SPELL_WITHERING_ROAR, false);
                         events.Repeat(8s, 12s);
                         break;
                     }
                 case EVENT_PALEHOOF_IMPALE:
                     {
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
-                            me->CastSpell(tgt, IsHeroic() ? SPELL_IMPALE_H : SPELL_IMPALE_N, false);
+                            me->CastSpell(tgt, SPELL_IMPALE, false);
 
                         events.Repeat(8s, 12s);
                         break;
@@ -424,7 +417,7 @@ public:
                     }
                 case EVENT_JORMUNGAR_ACID_SPLATTER:
                     {
-                        me->CastSpell(me, IsHeroic() ? SPELL_ACID_SPLATTER_H : SPELL_ACID_SPLATTER_N, false);
+                        me->CastSpell(me, SPELL_ACID_SPLATTER, false);
 
                         // Aura summon wont work because of duration
                         float x, y, z;
@@ -443,7 +436,7 @@ public:
                 case EVENT_JORMUNGAR_POISON_BREATH:
                     {
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
-                            me->CastSpell(tgt, IsHeroic() ? SPELL_POISON_BREATH_H : SPELL_POISON_BREATH_N, false);
+                            me->CastSpell(tgt, SPELL_POISON_BREATH, false);
 
                         events.Repeat(8s, 12s);
                         break;
@@ -546,14 +539,14 @@ public:
                     }
                 case EVENT_RHINO_GORE:
                     {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_GORE_H : SPELL_GORE_N, false);
+                        me->CastSpell(me->GetVictim(), SPELL_GORE, false);
                         events.Repeat(13s, 17s);
                         break;
                     }
                 case EVENT_RHINO_WOUND:
                     {
                         if (Unit* tgt = SelectTarget(SelectTargetMethod::Random, 0))
-                            me->CastSpell(tgt, IsHeroic() ? SPELL_GRIEVOUS_WOUND_H : SPELL_GRIEVOUS_WOUND_N, false);
+                            me->CastSpell(tgt, SPELL_GRIEVOUS_WOUND, false);
 
                         events.Repeat(18s, 22s);
                         break;
@@ -650,7 +643,7 @@ public:
             {
                 case EVENT_FURBOLG_CHAIN:
                     {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_CHAIN_LIGHTING_H : SPELL_CHAIN_LIGHTING_N, false);
+                        me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
                         events.Repeat(4s, 7s);
                         break;
                     }
@@ -758,7 +751,7 @@ public:
             {
                 case EVENT_WORGEN_MORTAL:
                     {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_MORTAL_WOUND_H : SPELL_MORTAL_WOUND_N, false);
+                        me->CastSpell(me->GetVictim(), SPELL_MORTAL_WOUND, false);
                         events.Repeat(4s, 7s);
                         break;
                     }

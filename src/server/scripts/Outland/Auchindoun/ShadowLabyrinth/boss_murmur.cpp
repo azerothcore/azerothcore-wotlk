@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -85,11 +85,6 @@ struct boss_murmur : public BossAI
         }, 3600ms, 10900ms, GROUP_OOC_CAST);
     }
 
-    bool CanAIAttack(Unit const* victim) const override
-    {
-        return me->IsWithinMeleeRange(victim);
-    }
-
     void EnterEvadeMode(EvadeReason why) override
     {
         if (me->GetThreatMgr().GetThreatList().empty())
@@ -114,7 +109,7 @@ struct boss_murmur : public BossAI
         return true;
     }
 
-    void SetGUID(ObjectGuid guid, int32 index) override
+    void SetGUID(ObjectGuid const& guid, int32 index) override
     {
         if (index == GUID_MURMUR_NPCS)
         {

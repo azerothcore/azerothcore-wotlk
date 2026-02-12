@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -342,8 +342,6 @@ ObjectMgr::~ObjectMgr()
     for (CacheVendorItemContainer::iterator itr = _cacheVendorItemStore.begin(); itr != _cacheVendorItemStore.end(); ++itr)
         itr->second.Clear();
 
-    _cacheTrainerSpellStore.clear();
-
     for (DungeonEncounterContainer::iterator itr = _dungeonEncounterStore.begin(); itr != _dungeonEncounterStore.end(); ++itr)
         for (DungeonEncounterList::iterator encounterItr = itr->second.begin(); encounterItr != itr->second.end(); ++encounterItr)
             delete *encounterItr;
@@ -523,19 +521,19 @@ void ObjectMgr::LoadCreatureTemplates()
 {
     uint32 oldMSTime = getMSTime();
 
-//                                                   0      1                   2                   3                   4            5            6     7        8
+//                                                        0      1                   2                   3                   4            5            6     7        8
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, name, subname, IconName, "
 //                        9               10        11        12   13       14       15          16         17          18            19               20     21      22
                          "gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, speed_swim, speed_flight, detection_range, scale, `rank`, dmgschool, "
-//                        23              24              25               26            27             28          29          30           31            32      33            34
-                         "DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, dynamicflags, family, trainer_type, trainer_spell, "
-//                        35             36            37    38          39      40              41
-                         "trainer_class, trainer_race, type, type_flags, lootid, pickpocketloot, skinloot, "
-//                        42              43         44       45       46      47            48          49        50          51
+//                        23              24              25               26            27             28          29          30           31            32
+                         "DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, dynamicflags, family, "
+//                        33    34          35      36              37
+                         "type, type_flags, lootid, pickpocketloot, skinloot, "
+//                        38              39         40       41       42      43            44          45        46          47
                          "PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, ctm.Ground, ctm.Swim, ctm.Flight, ctm.Rooted, "
-//                        52         53          54                         55           56              57            58             59                  60            61          62           63
+//                        48         49          50                         51           52              53            54             55                  56            57          58           59
                          "ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, "
-//                        64                        65           66
+//                        60                        61           62
                          "spell_school_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId ORDER BY entry DESC;");
 
@@ -635,15 +633,11 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     creatureTemplate.unit_flags2      = fields[30].Get<uint32>();
     creatureTemplate.dynamicflags     = fields[31].Get<uint32>();
     creatureTemplate.family           = uint32(fields[32].Get<uint8>());
-    creatureTemplate.trainer_type     = uint32(fields[33].Get<uint8>());
-    creatureTemplate.trainer_spell    = fields[34].Get<uint32>();
-    creatureTemplate.trainer_class    = uint32(fields[35].Get<uint8>());
-    creatureTemplate.trainer_race     = uint32(fields[36].Get<uint8>());
-    creatureTemplate.type             = uint32(fields[37].Get<uint8>());
-    creatureTemplate.type_flags       = fields[38].Get<uint32>();
-    creatureTemplate.lootid           = fields[39].Get<uint32>();
-    creatureTemplate.pickpocketLootId = fields[40].Get<uint32>();
-    creatureTemplate.SkinLootId       = fields[41].Get<uint32>();
+    creatureTemplate.type             = uint32(fields[33].Get<uint8>());
+    creatureTemplate.type_flags       = fields[34].Get<uint32>();
+    creatureTemplate.lootid           = fields[35].Get<uint32>();
+    creatureTemplate.pickpocketLootId = fields[36].Get<uint32>();
+    creatureTemplate.SkinLootId       = fields[37].Get<uint32>();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
     {
@@ -655,49 +649,49 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
         creatureTemplate.spells[i] = 0;
     }
 
-    creatureTemplate.PetSpellDataId = fields[42].Get<uint32>();
-    creatureTemplate.VehicleId      = fields[43].Get<uint32>();
-    creatureTemplate.mingold        = fields[44].Get<uint32>();
-    creatureTemplate.maxgold        = fields[45].Get<uint32>();
-    creatureTemplate.AIName         = fields[46].Get<std::string>(); // stopped here, fix it
-    creatureTemplate.MovementType   = uint32(fields[47].Get<uint8>());
+    creatureTemplate.PetSpellDataId = fields[38].Get<uint32>();
+    creatureTemplate.VehicleId      = fields[39].Get<uint32>();
+    creatureTemplate.mingold        = fields[40].Get<uint32>();
+    creatureTemplate.maxgold        = fields[41].Get<uint32>();
+    creatureTemplate.AIName         = fields[42].Get<std::string>();
+    creatureTemplate.MovementType   = uint32(fields[43].Get<uint8>());
+    if (!fields[44].IsNull())
+    {
+        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[44].Get<uint8>());
+    }
+
+    creatureTemplate.Movement.Swim = fields[45].Get<bool>();
+    if (!fields[46].IsNull())
+    {
+        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[46].Get<uint8>());
+    }
+
+    creatureTemplate.Movement.Rooted = fields[47].Get<bool>();
     if (!fields[48].IsNull())
     {
-        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[48].Get<uint8>());
+        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[48].Get<uint8>());
     }
-
-    creatureTemplate.Movement.Swim = fields[49].Get<bool>();
+    if (!fields[49].IsNull())
+    {
+        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[49].Get<uint8>());
+    }
     if (!fields[50].IsNull())
     {
-        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[50].Get<uint8>());
+        creatureTemplate.Movement.InteractionPauseTimer = fields[50].Get<uint32>();
     }
 
-    creatureTemplate.Movement.Rooted = fields[51].Get<bool>();
-    if (!fields[52].IsNull())
-    {
-        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[52].Get<uint8>());
-    }
-    if (!fields[53].IsNull())
-    {
-        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[53].Get<uint8>());
-    }
-    if (!fields[54].IsNull())
-    {
-        creatureTemplate.Movement.InteractionPauseTimer = fields[54].Get<uint32>();
-    }
-
-    creatureTemplate.HoverHeight           = fields[55].Get<float>();
-    creatureTemplate.ModHealth             = fields[56].Get<float>();
-    creatureTemplate.ModMana               = fields[57].Get<float>();
-    creatureTemplate.ModArmor              = fields[58].Get<float>();
-    creatureTemplate.ModExperience         = fields[59].Get<float>();
-    creatureTemplate.RacialLeader          = fields[60].Get<bool>();
-    creatureTemplate.movementId            = fields[61].Get<uint32>();
-    creatureTemplate.RegenHealth           = fields[62].Get<bool>();
-    creatureTemplate.MechanicImmuneMask    = fields[63].Get<uint32>();
-    creatureTemplate.SpellSchoolImmuneMask = fields[64].Get<uint8>();
-    creatureTemplate.flags_extra           = fields[65].Get<uint32>();
-    creatureTemplate.ScriptID              = GetScriptId(fields[66].Get<std::string>());
+    creatureTemplate.HoverHeight           = fields[51].Get<float>();
+    creatureTemplate.ModHealth             = fields[52].Get<float>();
+    creatureTemplate.ModMana               = fields[53].Get<float>();
+    creatureTemplate.ModArmor              = fields[54].Get<float>();
+    creatureTemplate.ModExperience         = fields[55].Get<float>();
+    creatureTemplate.RacialLeader          = fields[56].Get<bool>();
+    creatureTemplate.movementId            = fields[57].Get<uint32>();
+    creatureTemplate.RegenHealth           = fields[58].Get<bool>();
+    creatureTemplate.MechanicImmuneMask    = fields[59].Get<uint32>();
+    creatureTemplate.SpellSchoolImmuneMask = fields[60].Get<uint8>();
+    creatureTemplate.flags_extra           = fields[61].Get<uint32>();
+    creatureTemplate.ScriptID              = GetScriptId(fields[62].Get<std::string>());
 
     // useful if the creature template load is being triggered from outside this class
     if (triggerHook)
@@ -1037,30 +1031,6 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
                              cInfo->Entry, cInfo->family, diff + 1, cInfo->DifficultyEntry[diff], difficultyInfo->family);
         }
 
-        if (cInfo->trainer_class != difficultyInfo->trainer_class)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) has different `trainer_class` in difficulty {} mode (Entry: {}).", cInfo->Entry, diff + 1, cInfo->DifficultyEntry[diff]);
-            continue;
-        }
-
-        if (cInfo->trainer_race != difficultyInfo->trainer_race)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) has different `trainer_race` in difficulty {} mode (Entry: {}).", cInfo->Entry, diff + 1, cInfo->DifficultyEntry[diff]);
-            continue;
-        }
-
-        if (cInfo->trainer_type != difficultyInfo->trainer_type)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) has different `trainer_type` in difficulty {} mode (Entry: {}).", cInfo->Entry, diff + 1, cInfo->DifficultyEntry[diff]);
-            continue;
-        }
-
-        if (cInfo->trainer_spell != difficultyInfo->trainer_spell)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) has different `trainer_spell` in difficulty {} mode (Entry: {}).", cInfo->Entry, diff + 1, cInfo->DifficultyEntry[diff]);
-            continue;
-        }
-
         if (cInfo->type != difficultyInfo->type)
         {
             LOG_ERROR("sql.sql", "Creature (Entry: {}, type {}) has different `type` in difficulty {} mode (Entry: {}, type {}).",
@@ -1122,8 +1092,22 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (!cInfo->Models.size())
         LOG_ERROR("sql.sql", "Creature (Entry: {}) does not have any existing display id in creature_template_model.", cInfo->Entry);
-    else if (std::accumulate(cInfo->Models.begin(), cInfo->Models.end(), 0.0f, [](float sum, CreatureModel const& model) { return sum + model.Probability; }) <= 0.0f)
-        LOG_ERROR("sql.sql", "Creature (Entry: {}) has zero total chance for all models in creature_template_model.", cInfo->Entry);
+    else
+    {
+        float const totalProbability = std::accumulate(cInfo->Models.begin(), cInfo->Models.end(), 0.0f, [](float sum, CreatureModel const& model) { return sum + model.Probability; });
+
+        if (totalProbability <= 0.0f)
+        { // There are many cases in official data of all models having a probability of 0. Believe to be treated equivalent to equal chance ONLY if all are zeroed
+            if (totalProbability == 0.0f)
+                LOG_DEBUG("sql.sql", "Creature (Entry: {}) has zero total chance for all models in creature_template_model. Setting all to 1.0.", cInfo->Entry);
+            else // Custom, likely bad data
+                LOG_ERROR("sql.sql", "Creature (Entry: {}) has less than zero total chance for all models in creature_template_model. Setting all to 1.0.", cInfo->Entry);
+
+            auto& models = const_cast<CreatureTemplate*>(cInfo)->Models;
+            for (auto& model : models)
+                model.Probability = 1.0f;
+        }
+    }
 
     if (!cInfo->unit_class || ((1 << (cInfo->unit_class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
     {
@@ -1142,9 +1126,6 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
 
     if (cInfo->RangeAttackTime == 0)
         const_cast<CreatureTemplate*>(cInfo)->RangeAttackTime = BASE_ATTACK_TIME;
-
-    if ((cInfo->npcflag & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= MAX_TRAINER_TYPE)
-        LOG_ERROR("sql.sql", "Creature (Entry: {}) has wrong trainer type {}.", cInfo->Entry, cInfo->trainer_type);
 
     if (cInfo->speed_walk == 0.0f)
     {
@@ -1374,8 +1355,8 @@ void ObjectMgr::LoadGameObjectAddons()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                               0     1                 2
-    QueryResult result = WorldDatabase.Query("SELECT guid, invisibilityType, invisibilityValue FROM gameobject_addon");
+    //                                               0     1                 2                 3                 4                 5                 6
+    QueryResult result = WorldDatabase.Query("SELECT guid, parent_rotation0, parent_rotation1, parent_rotation2, parent_rotation3, invisibilityType, invisibilityValue FROM gameobject_addon");
 
     if (!result)
     {
@@ -1399,8 +1380,9 @@ void ObjectMgr::LoadGameObjectAddons()
         }
 
         GameObjectAddon& gameObjectAddon = _gameObjectAddonStore[guid];
-        gameObjectAddon.invisibilityType = InvisibilityType(fields[1].Get<uint8>());
-        gameObjectAddon.InvisibilityValue = fields[2].Get<uint32>();
+        gameObjectAddon.ParentRotation = QuaternionData(fields[1].Get<float>(), fields[2].Get<float>(), fields[3].Get<float>(), fields[4].Get<float>());
+        gameObjectAddon.invisibilityType = InvisibilityType(fields[5].Get<uint8>());
+        gameObjectAddon.InvisibilityValue = fields[6].Get<uint32>();
 
         if (gameObjectAddon.invisibilityType >= TOTAL_INVISIBILITY_TYPES)
         {
@@ -1413,6 +1395,12 @@ void ObjectMgr::LoadGameObjectAddons()
         {
             LOG_ERROR("sql.sql", "GameObject (GUID: {}) has InvisibilityType set but has no InvisibilityValue in `gameobject_addon`, set to 1", guid);
             gameObjectAddon.InvisibilityValue = 1;
+        }
+
+        if (!gameObjectAddon.ParentRotation.IsUnit())
+        {
+            LOG_ERROR("sql.sql", "GameObject (GUID: {}) has invalid parent rotation in `gameobject_addon`, set to default", guid);
+            gameObjectAddon.ParentRotation = QuaternionData();
         }
 
         ++count;
@@ -2434,6 +2422,164 @@ void ObjectMgr::LoadCreatures()
     LOG_INFO("server.loading", " ");
 }
 
+// Loads a single creature spawn from DB into the cache.
+// Creature::LoadCreatureFromDB() reads from cache (GetCreatureData()), not from DB directly,
+// so this must be called first for spawns not loaded at startup.
+CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnId)
+{
+    CreatureData const* data = GetCreatureData(spawnId);
+    if (data)
+        return data;
+
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id1, id2, id3, map, equipment_id, "
+        "position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
+        "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, "
+        "creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.ScriptName "
+        "FROM creature WHERE creature.guid = {}", spawnId);
+
+    if (!result)
+        return nullptr;
+
+    Field* fields = result->Fetch();
+    uint32 id1 = fields[1].Get<uint32>();
+    uint32 id2 = fields[2].Get<uint32>();
+    uint32 id3 = fields[3].Get<uint32>();
+
+    CreatureTemplate const* cInfo = GetCreatureTemplate(id1);
+    if (!cInfo)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with non-existing creature entry {} in id1 field, skipped.", spawnId, id1);
+        return nullptr;
+    }
+
+    if (id2 && !GetCreatureTemplate(id2))
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with non-existing creature entry {} in id2 field, skipped.", spawnId, id2);
+        return nullptr;
+    }
+
+    if (id3 && !GetCreatureTemplate(id3))
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with non-existing creature entry {} in id3 field, skipped.", spawnId, id3);
+        return nullptr;
+    }
+
+    if (!id2 && id3)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with creature entry {} in id3 field but no entry in id2 field, skipped.", spawnId, id3);
+        return nullptr;
+    }
+
+    CreatureData& creatureData    = _creatureDataStore[spawnId];
+    creatureData.id1              = id1;
+    creatureData.id2              = id2;
+    creatureData.id3              = id3;
+    creatureData.mapid            = fields[4].Get<uint16>();
+    creatureData.equipmentId      = fields[5].Get<int8>();
+    creatureData.posX             = fields[6].Get<float>();
+    creatureData.posY             = fields[7].Get<float>();
+    creatureData.posZ             = fields[8].Get<float>();
+    creatureData.orientation      = fields[9].Get<float>();
+    creatureData.spawntimesecs    = fields[10].Get<uint32>();
+    creatureData.wander_distance  = fields[11].Get<float>();
+    creatureData.currentwaypoint  = fields[12].Get<uint32>();
+    creatureData.curhealth        = fields[13].Get<uint32>();
+    creatureData.curmana          = fields[14].Get<uint32>();
+    creatureData.movementType     = fields[15].Get<uint8>();
+    creatureData.spawnMask        = fields[16].Get<uint8>();
+    creatureData.phaseMask        = fields[17].Get<uint32>();
+    creatureData.npcflag          = fields[18].Get<uint32>();
+    creatureData.unit_flags       = fields[19].Get<uint32>();
+    creatureData.dynamicflags     = fields[20].Get<uint32>();
+    creatureData.ScriptId         = GetScriptId(fields[21].Get<std::string>());
+
+    if (!creatureData.ScriptId)
+        creatureData.ScriptId = cInfo->ScriptID;
+
+    MapEntry const* mapEntry = sMapStore.LookupEntry(creatureData.mapid);
+    if (!mapEntry)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) that spawned at non-existing map (Id: {}), skipped.", spawnId, creatureData.mapid);
+        _creatureDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (mapEntry->IsRaid() && creatureData.spawntimesecs >= 7 * DAY && creatureData.spawntimesecs < 14 * DAY)
+        creatureData.spawntimesecs = 14 * DAY;
+
+    bool ok = true;
+    for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
+    {
+        if (_difficultyEntries[diff].find(id1) != _difficultyEntries[diff].end() ||
+            _difficultyEntries[diff].find(id2) != _difficultyEntries[diff].end() ||
+            _difficultyEntries[diff].find(id3) != _difficultyEntries[diff].end())
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) that is listed as difficulty {} template (Entries: {}, {}, {}) in `creature_template`, skipped.",
+                spawnId, diff + 1, id1, id2, id3);
+            ok = false;
+        }
+    }
+
+    if (!ok)
+    {
+        _creatureDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (creatureData.equipmentId != 0)
+    {
+        if (!GetEquipmentInfo(id1, creatureData.equipmentId) ||
+            (id2 && !GetEquipmentInfo(id2, creatureData.equipmentId)) ||
+            (id3 && !GetEquipmentInfo(id3, creatureData.equipmentId)))
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (Entries: {}, {}, {}) with equipment_id {} not found in table `creature_equip_template`, set to no equipment.",
+                id1, id2, id3, creatureData.equipmentId);
+            creatureData.equipmentId = 0;
+        }
+    }
+
+    if (creatureData.movementType >= MAX_DB_MOTION_TYPE)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with wrong movement generator type ({}), set to IDLE.",
+            spawnId, id1, id2, id3, creatureData.movementType);
+        creatureData.movementType = IDLE_MOTION_TYPE;
+    }
+
+    if (creatureData.wander_distance < 0.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `wander_distance`< 0, set to 0.",
+            spawnId, id1, id2, id3);
+        creatureData.wander_distance = 0.0f;
+    }
+    else if (creatureData.movementType == RANDOM_MOTION_TYPE)
+    {
+        if (creatureData.wander_distance == 0.0f)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).",
+                spawnId, id1, id2, id3);
+            creatureData.movementType = IDLE_MOTION_TYPE;
+        }
+    }
+    else if (creatureData.movementType == IDLE_MOTION_TYPE)
+    {
+        if (creatureData.wander_distance != 0.0f)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.",
+                spawnId, id1, id2, id3);
+            creatureData.wander_distance = 0.0f;
+        }
+    }
+
+    if (creatureData.phaseMask == 0)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {} Entries: {}, {}, {}) with `phaseMask`=0 (not visible for anyone), set to 1.",
+            spawnId, id1, id2, id3);
+        creatureData.phaseMask = 1;
+    }
+
+    return &creatureData;
+}
+
 void ObjectMgr::LoadCreatureSparring()
 {
     uint32 oldMSTime = getMSTime();
@@ -2742,6 +2888,13 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
+        if (fabs(data.rotation.x * data.rotation.x + data.rotation.y * data.rotation.y +
+                 data.rotation.z * data.rotation.z + data.rotation.w * data.rotation.w - 1.0f) >= 1e-5f)
+        {
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotation quaternion (non-unit), defaulting to orientation on Z axis only", guid, data.id);
+            data.rotation = G3D::Quat(G3D::Matrix3::fromEulerAnglesZYX(data.orientation, 0.0f, 0.0f));
+        }
+
         if (!MapMgr::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
         {
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid coordinates, skip", guid, data.id);
@@ -2774,6 +2927,135 @@ void ObjectMgr::LoadGameobjects()
 
     LOG_INFO("server.loading", ">> Loaded {} Gameobjects in {} ms", (unsigned long)_gameObjectDataStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+// Loads a single gameobject spawn from DB into the cache.
+// GameObject::LoadGameObjectFromDB() reads from cache (GetGameObjectData()), not from DB directly,
+// so this must be called first for spawns not loaded at startup.
+GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType spawnId)
+{
+    GameObjectData const* data = GetGameObjectData(spawnId);
+    if (data)
+        return data;
+
+    QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
+        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, "
+        "ScriptName "
+        "FROM gameobject WHERE gameobject.guid = {}", spawnId);
+
+    if (!result)
+        return nullptr;
+
+    Field* fields = result->Fetch();
+    uint32 entry = fields[1].Get<uint32>();
+
+    GameObjectTemplate const* gInfo = GetGameObjectTemplate(entry);
+    if (!gInfo)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {}) with non-existing gameobject entry {}, skipped.", spawnId, entry);
+        return nullptr;
+    }
+
+    if (gInfo->displayId && !sGameObjectDisplayInfoStore.LookupEntry(gInfo->displayId))
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry {} GoType: {}) with an invalid displayId ({}), not loaded.",
+            spawnId, entry, gInfo->type, gInfo->displayId);
+        return nullptr;
+    }
+
+    GameObjectData& goData  = _gameObjectDataStore[spawnId];
+    goData.id               = entry;
+    goData.mapid            = fields[2].Get<uint16>();
+    goData.posX             = fields[3].Get<float>();
+    goData.posY             = fields[4].Get<float>();
+    goData.posZ             = fields[5].Get<float>();
+    goData.orientation      = fields[6].Get<float>();
+    goData.rotation.x       = fields[7].Get<float>();
+    goData.rotation.y       = fields[8].Get<float>();
+    goData.rotation.z       = fields[9].Get<float>();
+    goData.rotation.w       = fields[10].Get<float>();
+    goData.spawntimesecs    = fields[11].Get<int32>();
+    goData.animprogress     = fields[12].Get<uint8>();
+    goData.artKit           = 0;
+    goData.ScriptId         = GetScriptId(fields[16].Get<std::string>());
+
+    if (!goData.ScriptId)
+        goData.ScriptId = gInfo->ScriptId;
+
+    MapEntry const* mapEntry = sMapStore.LookupEntry(goData.mapid);
+    if (!mapEntry)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) spawned on a non-existing map (Id: {}), skipped.", spawnId, entry, goData.mapid);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.spawntimesecs == 0 && gInfo->IsDespawnAtAction())
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `spawntimesecs` (0) value, but the gameobject is marked as despawnable at action.", spawnId, entry);
+    }
+
+    uint32 go_state = fields[13].Get<uint8>();
+    if (go_state >= MAX_GO_STATE)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid `state` ({}) value, skipped.", spawnId, entry, go_state);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+    goData.go_state = GOState(go_state);
+
+    goData.spawnMask        = fields[14].Get<uint8>();
+    goData.phaseMask        = fields[15].Get<uint32>();
+
+    if (goData.rotation.x < -1.0f || goData.rotation.x > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationX ({}) value, skipped.", spawnId, entry, goData.rotation.x);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.rotation.y < -1.0f || goData.rotation.y > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationY ({}) value, skipped.", spawnId, entry, goData.rotation.y);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.rotation.z < -1.0f || goData.rotation.z > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationZ ({}) value, skipped.", spawnId, entry, goData.rotation.z);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.rotation.w < -1.0f || goData.rotation.w > 1.0f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotationW ({}) value, skipped.", spawnId, entry, goData.rotation.w);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (fabs(goData.rotation.x * goData.rotation.x + goData.rotation.y * goData.rotation.y +
+             goData.rotation.z * goData.rotation.z + goData.rotation.w * goData.rotation.w - 1.0f) >= 1e-5f)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid rotation quaternion (non-unit), defaulting to orientation on Z axis only", spawnId, entry);
+        goData.rotation = G3D::Quat(G3D::Matrix3::fromEulerAnglesZYX(goData.orientation, 0.0f, 0.0f));
+    }
+
+    if (!MapMgr::IsValidMapCoord(goData.mapid, goData.posX, goData.posY, goData.posZ, goData.orientation))
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid coordinates, skipped.", spawnId, entry);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
+    }
+
+    if (goData.phaseMask == 0)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `phaseMask`=0 (not visible for anyone), set to 1.", spawnId, entry);
+        goData.phaseMask = 1;
+    }
+
+    return &goData;
 }
 
 void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data)
@@ -3191,7 +3473,10 @@ void ObjectMgr::LoadItemTemplates()
             {
                 case ITEM_MOD_SPELL_HEALING_DONE:
                 case ITEM_MOD_SPELL_DAMAGE_DONE:
-                    LOG_WARN("sql.sql", "Item (Entry: {}) has deprecated stat_type{} ({})", entry, j + 1, itemTemplate.ItemStat[j].ItemStatType);
+                    // Skip warning for specific items: 13113 (Feathermoon Headdress - Blizzard oversight), 34967 (test item)
+                    if (entry != 13113 && entry != 34967)
+                        LOG_WARN("sql.sql", "Item (Entry: {}) has deprecated stat_type{} ({})", entry, j + 1, itemTemplate.ItemStat[j].ItemStatType);
+
                     break;
                 default:
                     break;
@@ -4754,10 +5039,10 @@ void ObjectMgr::LoadQuests()
     }
 
     // Load `quest_template_addon`
-    //                                   0   1         2                 3              4            5            6               7                     8
-    result = WorldDatabase.Query("SELECT ID, MaxLevel, AllowableClasses, SourceSpellID, PrevQuestID, NextQuestID, ExclusiveGroup, RewardMailTemplateID, RewardMailDelay, "
-                                 //9               10                   11                     12                     13                   14                   15                 16                     17
-                                 "RequiredSkillID, RequiredSkillPoints, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, ProvidedItemCount, RewardMailSenderEntry, SpecialFlags FROM quest_template_addon LEFT JOIN quest_mail_sender ON Id=QuestId");
+    //                                   0   1         2                 3              4            5            6               7                      8
+    result = WorldDatabase.Query("SELECT ID, MaxLevel, AllowableClasses, SourceSpellID, PrevQuestID, NextQuestID, ExclusiveGroup, BreadcrumbForQuestId, RewardMailTemplateID, "
+                                 //9                10               11                   12                     13                     14                   15                   16                 17                     18
+                                 "RewardMailDelay, RequiredSkillID, RequiredSkillPoints, RequiredMinRepFaction, RequiredMaxRepFaction, RequiredMinRepValue, RequiredMaxRepValue, ProvidedItemCount, RewardMailSenderEntry, SpecialFlags FROM quest_template_addon LEFT JOIN quest_mail_sender ON Id=QuestId");
 
     if (!result)
     {
@@ -5334,10 +5619,52 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->ExclusiveGroup)
             mExclusiveQuestGroups.insert(std::pair<int32, uint32>(qinfo->ExclusiveGroup, qinfo->GetQuestId()));
+
+        if (uint32 breadcrumbForQuestId = qinfo->GetBreadcrumbForQuestId())
+        {
+            if (_questTemplates.find(breadcrumbForQuestId) == _questTemplates.end())
+                LOG_ERROR("sql.sql", "Quest {} has BreadcrumbForQuestId {}, but no such quest exists", qinfo->GetQuestId(), breadcrumbForQuestId);
+            else
+                _breadcrumbsForQuest[breadcrumbForQuestId].push_back(qinfo->GetQuestId());
+
+            if (qinfo->GetNextQuestId())
+                LOG_ERROR("sql.sql", "Quest {} is a breadcrumb quest but also has NextQuestID {} set", qinfo->GetQuestId(), qinfo->GetNextQuestId());
+            if (qinfo->GetExclusiveGroup())
+                LOG_ERROR("sql.sql", "Quest {} is a breadcrumb quest but also has ExclusiveGroup {} set", qinfo->GetQuestId(), qinfo->GetExclusiveGroup());
+        }
+
         if (qinfo->TimeAllowed)
             qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAGS_TIMED);
         if (qinfo->RequiredPlayerKills)
             qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAGS_PLAYER_KILL);
+    }
+
+    for (auto const& [questId, quest] : _questTemplates)
+    {
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, questId, nullptr))
+            continue;
+
+        uint32 breadcrumbForQuestId = quest->GetBreadcrumbForQuestId();
+        if (!breadcrumbForQuestId)
+            continue;
+
+        std::set<uint32> visitedQuests;
+        visitedQuests.insert(questId);
+
+        while (breadcrumbForQuestId)
+        {
+            if (!visitedQuests.insert(breadcrumbForQuestId).second)
+            {
+                LOG_ERROR("sql.sql", "Breadcrumb quests {} and {} form a loop", questId, breadcrumbForQuestId);
+                break;
+            }
+
+            Quest const* targetQuest = GetQuestTemplate(breadcrumbForQuestId);
+            if (!targetQuest)
+                break;
+
+            breadcrumbForQuestId = targetQuest->GetBreadcrumbForQuestId();
+        }
     }
 
     // check QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT for spell with SPELL_EFFECT_QUEST_COMPLETE
@@ -9296,130 +9623,158 @@ void ObjectMgr::LoadMailLevelRewards()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell)
-{
-    if (entry >= ACORE_TRAINER_START_REF)
-        return;
-
-    CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
-    if (!cInfo)
-    {
-        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry for a non-existing creature template (Entry: {}), ignoring", entry);
-        return;
-    }
-
-    if (!(cInfo->npcflag & UNIT_NPC_FLAG_TRAINER))
-    {
-        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry for a creature template (Entry: {}) without trainer flag, ignoring", entry);
-        return;
-    }
-
-    SpellInfo const* spellinfo = sSpellMgr->GetSpellInfo(spell);
-    if (!spellinfo)
-    {
-        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry (Entry: {}) for a non-existing spell (Spell: {}), ignoring", entry, spell);
-        return;
-    }
-
-    if (!SpellMgr::ComputeIsSpellValid(spellinfo))
-    {
-        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry (Entry: {}) for a broken spell (Spell: {}), ignoring", entry, spell);
-        return;
-    }
-
-    if (GetTalentSpellCost(spell))
-    {
-        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry (Entry: {}) for a non-existing spell (Spell: {}) which is a talent, ignoring", entry, spell);
-        return;
-    }
-
-    if (reqSpell && !sSpellMgr->GetSpellInfo(reqSpell))
-    {
-        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry (Entry: {}) for a non-existing reqSpell (Spell: {}), ignoring", entry, reqSpell);
-        return;
-    }
-
-    TrainerSpellData& data = _cacheTrainerSpellStore[entry];
-
-    TrainerSpell& trainerSpell = data.spellList[spell];
-    trainerSpell.spell         = spell;
-    trainerSpell.spellCost     = spellCost;
-    trainerSpell.reqSkill      = reqSkill;
-    trainerSpell.reqSkillValue = reqSkillValue;
-    trainerSpell.reqLevel      = reqLevel;
-    trainerSpell.reqSpell      = reqSpell;
-
-    if (!trainerSpell.reqLevel)
-        trainerSpell.reqLevel = spellinfo->SpellLevel;
-
-    // calculate learned spell for profession case when stored cast-spell
-    trainerSpell.learnedSpell[0] = spell;
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (spellinfo->Effects[i].Effect != SPELL_EFFECT_LEARN_SPELL)
-            continue;
-        if (trainerSpell.learnedSpell[0] == spell)
-            trainerSpell.learnedSpell[0] = 0;
-        // player must be able to cast spell on himself
-        if (spellinfo->Effects[i].TargetA.GetTarget() != 0 && spellinfo->Effects[i].TargetA.GetTarget() != TARGET_UNIT_TARGET_ALLY
-                && spellinfo->Effects[i].TargetA.GetTarget() != TARGET_UNIT_TARGET_ANY && spellinfo->Effects[i].TargetA.GetTarget() != TARGET_UNIT_CASTER)
-        {
-            LOG_ERROR("sql.sql", "Table `npc_trainer` has spell {} for trainer entry {} with learn effect which has incorrect target type, ignoring learn effect!", spell, entry);
-            continue;
-        }
-
-        trainerSpell.learnedSpell[i] = spellinfo->Effects[i].TriggerSpell;
-
-        if (trainerSpell.learnedSpell[i])
-        {
-            SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(trainerSpell.learnedSpell[i]);
-            if (learnedSpellInfo && learnedSpellInfo->IsProfession())
-                data.trainerType = 2;
-        }
-    }
-
-    return;
-}
-
-void ObjectMgr::LoadTrainerSpell()
+void ObjectMgr::LoadTrainers()
 {
     uint32 oldMSTime = getMSTime();
 
     // For reload case
-    _cacheTrainerSpellStore.clear();
+    _trainers.clear();
 
-    QueryResult result = WorldDatabase.Query("SELECT b.ID, a.SpellID, a.MoneyCost, a.ReqSkillLine, a.ReqSkillRank, a.ReqLevel, a.ReqSpell FROM npc_trainer AS a "
-                         "INNER JOIN npc_trainer AS b ON a.ID = -(b.SpellID) "
-                         "UNION SELECT * FROM npc_trainer WHERE SpellID > 0");
-
-    if (!result)
+    std::unordered_map<int32, std::vector<Trainer::Spell>> spellsByTrainer;
+    if (QueryResult trainerSpellsResult = WorldDatabase.Query("SELECT TrainerId, SpellId, MoneyCost, ReqSkillLine, ReqSkillRank, ReqAbility1, ReqAbility2, ReqAbility3, ReqLevel FROM trainer_spell"))
     {
-        LOG_WARN("server.loading", ">> Loaded 0 Trainers. DB table `npc_trainer` is empty!");
-        LOG_INFO("server.loading", " ");
-        return;
+        do
+        {
+            Field* fields = trainerSpellsResult->Fetch();
+
+            Trainer::Spell spell;
+            uint32 trainerId = fields[0].Get<uint32>();
+            spell.SpellId = fields[1].Get<uint32>();
+            spell.MoneyCost = fields[2].Get<uint32>();
+            spell.ReqSkillLine = fields[3].Get<uint32>();
+            spell.ReqSkillRank = fields[4].Get<uint32>();
+            spell.ReqAbility[0] = fields[5].Get<uint32>();
+            spell.ReqAbility[1] = fields[6].Get<uint32>();
+            spell.ReqAbility[2] = fields[7].Get<uint32>();
+            spell.ReqLevel = fields[8].Get<uint8>();
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell.SpellId);
+            if (!spellInfo)
+            {
+                LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: {}) for TrainerId {}, ignoring", spell.SpellId, trainerId);
+                continue;
+            }
+
+            if (GetTalentSpellCost(spell.SpellId))
+            {
+                LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (SpellId: {}) which is a talent, for TrainerId {}, ignoring", spell.SpellId, trainerId);
+                continue;
+            }
+
+            if (spell.ReqSkillLine && !sSkillLineStore.LookupEntry(spell.ReqSkillLine))
+            {
+                LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing skill (ReqSkillLine: {}) for TrainerId {} and SpellId {}, ignoring",
+                    spell.ReqSkillLine, spell.SpellId, trainerId);
+                continue;
+            }
+
+            bool allReqValid = true;
+            for (std::size_t i = 0; i < spell.ReqAbility.size(); ++i)
+            {
+                uint32 requiredSpell = spell.ReqAbility[i];
+                if (requiredSpell && !sSpellMgr->GetSpellInfo(requiredSpell))
+                {
+                    LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing spell (ReqAbility {} : {}) for TrainerId {} and SpellId {}, ignoring",
+                        i + 1, requiredSpell, trainerId, spell.SpellId);
+                    allReqValid = false;
+                }
+            }
+
+            if (!allReqValid)
+                continue;
+
+            spellsByTrainer[trainerId].push_back(spell);
+        } while (trainerSpellsResult->NextRow());
     }
 
-    uint32 count = 0;
-
-    do
+    if (QueryResult trainersResult = WorldDatabase.Query("SELECT Id, Type, Requirement, Greeting FROM trainer"))
     {
-        Field* fields = result->Fetch();
+        do
+        {
+            Field* fields = trainersResult->Fetch();
 
-        uint32 entry         = fields[0].Get<uint32>();
-        uint32 spell         = fields[1].Get<uint32>();
-        uint32 spellCost     = fields[2].Get<uint32>();
-        uint32 reqSkill      = fields[3].Get<uint16>();
-        uint32 reqSkillValue = fields[4].Get<uint16>();
-        uint32 reqLevel      = fields[5].Get<uint8>();
-        uint32 reqSpell      = fields[6].Get<uint32>();
+            uint32 trainerId = fields[0].Get<uint32>();
+            Trainer::Type trainerType = Trainer::Type(fields[1].Get<uint8>());
+            uint32 requirement = fields[2].Get<uint32>();
+            std::string greeting = fields[3].Get<std::string>();
+            std::vector<Trainer::Spell> spells;
+            auto spellsItr = spellsByTrainer.find(trainerId);
+            if (spellsItr != spellsByTrainer.end())
+            {
+                spells = std::move(spellsItr->second);
+                spellsByTrainer.erase(spellsItr);
+            }
 
-        AddSpellToTrainer(entry, spell, spellCost, reqSkill, reqSkillValue, reqLevel, reqSpell);
+            _trainers.emplace(std::piecewise_construct, std::forward_as_tuple(trainerId), std::forward_as_tuple(trainerId, trainerType, requirement, std::move(greeting), std::move(spells)));
+        } while (trainersResult->NextRow());
+    }
 
-        ++count;
-    } while (result->NextRow());
+    for (auto const& unusedSpells : spellsByTrainer)
+    {
+        for (Trainer::Spell const& unusedSpell : unusedSpells.second)
+        {
+            LOG_ERROR("sql.sql", "Table `trainer_spell` references non-existing trainer (TrainerId: {}) for SpellId {}, ignoring", unusedSpells.first, unusedSpell.SpellId);
+        }
+    }
 
-    LOG_INFO("server.loading", ">> Loaded {} Trainers in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
+    if (QueryResult trainerLocalesResult = WorldDatabase.Query("SELECT Id, locale, Greeting_lang FROM trainer_locale"))
+    {
+        do
+        {
+            Field* fields = trainerLocalesResult->Fetch();
+            uint32 trainerId = fields[0].Get<uint32>();
+            std::string localeName = fields[1].Get<std::string>();
+
+            LocaleConstant locale = GetLocaleByName(localeName);
+            if (locale == LOCALE_enUS)
+                continue;
+
+            if (Trainer::Trainer* trainer = Acore::Containers::MapGetValuePtr(_trainers, trainerId))
+                trainer->AddGreetingLocale(locale, fields[2].Get<std::string>());
+            else
+                LOG_ERROR("sql.sql", "Table `trainer_locale` references non-existing trainer (TrainerId: {}) for locale %s, ignoring",
+                    trainerId, localeName.c_str());
+        } while (trainerLocalesResult->NextRow());
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} Trainers in {} ms", _trainers.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::LoadCreatureDefaultTrainers()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureDefaultTrainers.clear();
+
+    if (QueryResult result = WorldDatabase.Query("SELECT CreatureId, TrainerId FROM creature_default_trainer"))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 creatureId = fields[0].Get<uint32>();
+            uint32 trainerId = fields[1].Get<uint32>();
+
+            if (!GetCreatureTemplate(creatureId))
+            {
+                LOG_ERROR("sql.sql", "Table `creature_default_trainer` references non-existing creature template (CreatureId: %u), ignoring", creatureId);
+                continue;
+            }
+
+            _creatureDefaultTrainers[creatureId] = trainerId;
+
+        } while (result->NextRow());
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} default trainers in {} ms", _creatureDefaultTrainers.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+Trainer::Trainer* ObjectMgr::GetTrainer(uint32 creatureId)
+{
+    auto itr = _creatureDefaultTrainers.find(creatureId);
+    if (itr != _creatureDefaultTrainers.end())
+        return Acore::Containers::MapGetValuePtr(_trainers, itr->second);
+
+    return nullptr;
 }
 
 int ObjectMgr::LoadReferenceVendor(int32 vendor, int32 item, std::set<uint32>* skip_vendors)
@@ -9616,6 +9971,28 @@ void ObjectMgr::LoadGossipMenuItems()
 
         _gossipMenuItemsStore.insert(GossipMenuItemsContainer::value_type(gMenuItem.MenuID, gMenuItem));
     } while (result->NextRow());
+
+    // Warn if any trainer creature templates reference a GossipMenuId that has no gossip_menu_option entries
+    // This will cause the gossip menu to fallback to MenuID 0 at runtime which will display: "I wish to unlearn my talents."
+    std::set<uint32> checkedMenuIds;
+    for (auto const& [entry, tmpl] : _creatureTemplateStore)
+    {
+        uint32 menuId = tmpl.GossipMenuId;
+        if (!menuId)
+            continue;
+
+        if (!(tmpl.npcflag & UNIT_NPC_FLAG_TRAINER))
+            continue;
+
+        if (checkedMenuIds.contains(menuId))
+            continue;
+
+        checkedMenuIds.insert(menuId);
+
+        auto [first, second] = _gossipMenuItemsStore.equal_range(menuId);
+        if (first == second)
+            LOG_WARN("server.loading", "Trainer creature template references GossipMenuId {} has no `gossip_menu_option` entries. This will fallback to MenuID 0.", menuId);
+    }
 
     LOG_INFO("server.loading", ">> Loaded {} gossip_menu_option entries in {} ms", uint32(_gossipMenuItemsStore.size()), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");

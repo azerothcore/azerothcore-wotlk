@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,23 @@
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "halls_of_stone.h"
+
+ObjectData const summonData[] =
+{
+    { NPC_IRON_SLUDGE, BOSS_SJONNIR },
+    { 0,               0            }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_SJONNIR,     BOSS_SJONNIR },
+    { 0,               0            }
+};
+
+BossBoundaryData const boundaries =
+{
+    { BOSS_SJONNIR, new RectangleBoundary(1206.56f, 1341.4185f, 579.9434f, 753.9599f) }
+};
 
 class instance_halls_of_stone : public InstanceMapScript
 {
@@ -45,7 +62,6 @@ public:
         ObjectGuid goSjonnirDoorGUID;
         ObjectGuid goLeftPipeGUID;
         ObjectGuid goRightPipeGUID;
-        ObjectGuid goTribunalDoorGUID;
 
         ObjectGuid SjonnirGUID;
         ObjectGuid BrannGUID;
@@ -58,6 +74,10 @@ public:
         void Initialize() override
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
+            LoadSummonData(summonData);
+            LoadBossBoundaries(boundaries);
             memset(&Encounter, 0, sizeof(Encounter));
 
             brannAchievement = false;
@@ -96,10 +116,6 @@ public:
                 case GO_TRIBUNAL_CONSOLE:
                     goTribunalConsoleGUID = go->GetGUID();
                     break;
-                case GO_TRIBUNAL_ACCESS_DOOR:
-                    goTribunalDoorGUID = go->GetGUID();
-                    go->SetGoState(GO_STATE_READY);
-                    break;
                 case GO_SKY_FLOOR:
                     goSkyRoomFloorGUID = go->GetGUID();
                     if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
@@ -126,13 +142,12 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_SJONNIR:
-                    SjonnirGUID = creature->GetGUID();
-                    break;
                 case NPC_BRANN:
                     BrannGUID = creature->GetGUID();
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         ObjectGuid GetGuidData(uint32 id) const override
@@ -141,8 +156,6 @@ public:
             {
                 case GO_TRIBUNAL_CONSOLE:
                     return goTribunalConsoleGUID;
-                case GO_TRIBUNAL_ACCESS_DOOR:
-                    return goTribunalDoorGUID;
                 case GO_SJONNIR_CONSOLE:
                     return goSjonnirConsoleGUID;
                 case GO_SJONNIR_DOOR:
@@ -207,10 +220,6 @@ public:
                 isMaidenOfGriefDead = type == BOSS_MAIDEN_OF_GRIEF || isMaidenOfGriefDead;
                 isKrystalusDead = type == BOSS_KRYSTALLUS || isKrystalusDead;
             }
-
-            if (isMaidenOfGriefDead && isKrystalusDead)
-                if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
-                    tribunalDoor->SetGoState(GO_STATE_ACTIVE);
 
             if (type == BOSS_TRIBUNAL_OF_AGES && data == SPECIAL)
             {

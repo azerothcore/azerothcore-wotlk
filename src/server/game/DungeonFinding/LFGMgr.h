@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -506,6 +506,9 @@ namespace lfg
         uint8 RemovePlayerFromGroup(ObjectGuid gguid, ObjectGuid guid);
         /// Adds player to group
         void AddPlayerToGroup(ObjectGuid gguid, ObjectGuid guid);
+        /// Store player that selected random queue to group
+        void AddPlayerQueuedForRandomDungeonToGroup(ObjectGuid gguid, ObjectGuid guid);
+        bool IsPlayerQueuedForRandomDungeon(ObjectGuid guid);
         /// Xinef: Set Random Players Count
         void SetRandomPlayersCount(ObjectGuid guid, uint8 count);
         /// Xinef: Get Random Players Count
@@ -518,6 +521,8 @@ namespace lfg
         LfgUpdateData GetLfgStatus(ObjectGuid guid);
         /// Checks if Seasonal dungeon is active
         bool IsSeasonActive(uint32 dungeonId);
+        /// Checks if given dungeon map is disabled
+        bool IsDungeonDisabled(uint32 mapId, Difficulty difficulty) const;
         /// Gets the random dungeon reward corresponding to given dungeon and player level
         LfgReward const* GetRandomDungeonReward(uint32 dungeon, uint8 level);
         /// Returns all random and seasonal dungeons for given level and expansion
@@ -568,7 +573,7 @@ namespace lfg
         /// Checks if all players are queued
         bool AllQueued(Lfg5Guids const& check);
         /// Checks if given roles match, modifies given roles map with new roles
-        static uint8 CheckGroupRoles(LfgRolesMap& groles, bool removeLeaderFlag = true);
+        static uint8 CheckGroupRoles(LfgRolesMap& groles);
         /// Checks if given players are ignoring each other
         static bool HasIgnore(ObjectGuid guid1, ObjectGuid guid2);
         /// Sends queue status to player
@@ -589,7 +594,7 @@ namespace lfg
         void DecreaseKicksLeft(ObjectGuid guid);
         void SetState(ObjectGuid guid, LfgState state);
         void SetCanOverrideRBState(ObjectGuid guid, bool val);
-        void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap);
+        void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId = 0);
         void _SaveToDB(ObjectGuid guid);
         LFGDungeonData const* GetLFGDungeon(uint32 id);
 

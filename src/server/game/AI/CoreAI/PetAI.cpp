@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -634,9 +634,11 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
             if (_canMeleeAttack())
             {
-                float angle = combatRange == 0.f && !target->IsPlayer() && !target->IsPet() ? float(M_PI) : 0.f;
-                float tolerance = combatRange == 0.f ? float(M_PI_4) : float(M_PI * 2);
-                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, combatRange), ChaseAngle(angle, tolerance));
+                std::optional<ChaseAngle> chaseAngle;
+                if (combatRange == 0.f && !target->IsPlayer() && !target->IsPet())
+                    chaseAngle.emplace(float(M_PI), float(M_PI_4));
+
+                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, combatRange), chaseAngle);
             }
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -433,7 +433,7 @@ enum SummonPropFlags
     SUMMON_PROP_FLAG_JOIN_SUMMONER_SPAWN_GROUP       = 0x00000200,          /// @todo: NYI 51 spells in 3.0.3, something defensive
     SUMMON_PROP_FLAG_DO_NOT_TOGGLE                   = 0x00000400,          /// @todo: NYI 3 spells, requires something near?
     SUMMON_PROP_FLAG_DESPAWN_WHEN_EXPIRED            = 0x00000800,          /// @todo: NYI 30 spells in 3.0.3, no idea
-    SUMMON_PROP_FLAG_USE_SUMMONER_FACTION            = 0x00001000,          /// @todo: NYI Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)
+    SUMMON_PROP_FLAG_USE_SUMMONER_FACTION            = 0x00001000,          /// Lightwell, Jeeves, Gnomish Alarm-o-bot, Build vehicles(wintergrasp)
     SUMMON_PROP_FLAG_DO_NOT_FOLLOW_MOUNTED_SUMMONER  = 0x00002000,          /// @todo: NYI Guides, player follows
     SUMMON_PROP_FLAG_SAVE_PET_AUTOCAST               = 0x00004000,          /// @todo: NYI Force of Nature, Shadowfiend, Feral Spirit, Summon Water Elemental
     SUMMON_PROP_FLAG_IGNORE_SUMMONER_PHASE           = 0x00008000,          /// @todo: NYI Light/Dark Bullet, Soul/Fiery Consumption, Twisted Visage, Twilight Whelp. Phase related?

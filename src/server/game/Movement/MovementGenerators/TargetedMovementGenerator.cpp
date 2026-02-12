@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -105,15 +105,27 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
         owner->UpdateAllowedPositionZ(x, y, z);
 
     bool success = i_path->CalculatePath(x, y, z, forceDest);
-    if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
+    uint32 pathType = i_path->GetPathType();
+    bool pathFailed = !success || (pathType & PATHFIND_NOPATH);
+
+    // For pets, treat incomplete paths as failures to avoid clipping through geometry
+    // Players and Player-controlled units have more erratic movement, skip failure
+    if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer()) && !i_target.getTarget()->IsCharmedOwnedByPlayerOrPlayer())
+        if (pathType & PATHFIND_INCOMPLETE)
+            pathFailed = true;
+
+    if (pathFailed)
     {
         if (cOwner)
         {
             cOwner->SetCannotReachTarget(i_target.getTarget()->GetGUID());
+
+            if (cOwner->IsPet() || cOwner->IsControlledByPlayer())
+                cOwner->AttackStop();
         }
 
         owner->StopMoving();
-        return true;
+        return false;
     }
 
     if (cutPath)
@@ -134,7 +146,7 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
     init.SetWalk(walk);
     init.Launch();
 
-    return false;
+    return true;
 }
 
 template<class T>
@@ -219,18 +231,21 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_recheckDistance.Reset(400); // Sniffed value
 
-        if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
+        if (m_currentMode != CHASE_MODE_DISTANCING)
         {
-            if ((owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase) || _range)
+            if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
             {
-                i_recalculateTravel = false;
-                i_path = nullptr;
-                if (cOwner)
-                    cOwner->SetCannotReachTarget();
-                owner->StopMoving();
-                owner->SetInFront(target);
-                MovementInform(owner);
-                return true;
+                if ((owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase) || _range)
+                {
+                    i_recalculateTravel = false;
+                    i_path = nullptr;
+                    if (cOwner)
+                        cOwner->SetCannotReachTarget();
+                    owner->StopMoving();
+                    owner->SetInFront(target);
+                    MovementInform(owner);
+                    return true;
+                }
             }
         }
     }
@@ -261,6 +276,9 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         else if (i_recalculateTravel)
             i_leashExtensionTimer.Reset(cOwner->GetAttackTime(BASE_ATTACK));
     }
+
+    if (m_currentMode == CHASE_MODE_DISTANCING)
+        return true;
 
     // if the target moved, we have to consider whether to adjust
     if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase || !owner->IsWithinLOSInMap(target))
@@ -365,7 +383,6 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     _lastTargetPosition.reset();
     i_recheckDistance.Reset(0);
     i_leashExtensionTimer.Reset(owner->GetAttackTime(BASE_ATTACK));
-    owner->SetWalk(false);
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
@@ -420,7 +437,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
         (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
     {
         uint32 moveFlags = target->GetUnitMovementFlags();
-        if (target->movespline->isWalking())
+        if (target->IsWalking())
         {
             moveFlags |= MOVEMENTFLAG_WALKING;
         }
@@ -444,8 +461,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
 static Position const PredictPosition(Unit* target)
 {
     Position pos = target->GetPosition();
-
-     // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
+    // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
     float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
     float orientation = target->GetOrientation();
 
@@ -472,6 +488,20 @@ static Position const PredictPosition(Unit* target)
     }
 
     return pos;
+}
+
+static bool IsValidPredictedPosition(Unit* target, Position const& predicted)
+{
+    Position current = target->GetPosition();
+
+    if (current.GetExactDist2d(&predicted) > 15.0f)
+        return false;
+
+    // Check line of sight from current to predicted to avoid clipping through geometry
+    if (!target->IsWithinLOS(predicted.GetPositionX(), predicted.GetPositionY(), predicted.GetPositionZ()))
+        return false;
+
+    return true;
 }
 
 template<class T>
@@ -554,7 +584,10 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
-    if (PositionOkay(target, owner->IsGuardian() && target->IsPlayer(), targetIsMoving, time_diff))
+    bool isPlayerPet = owner->IsGuardian() && target->IsPlayer();
+    bool isFollowingPlayer = target->IsPlayer();
+
+    if (PositionOkay(target, isPlayerPet, targetIsMoving, time_diff))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -582,14 +615,23 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             if (_lastPredictedPosition && _lastPredictedPosition->GetExactDistSq(&predictedPosition) < 0.25f)
                 return true;
 
-            _lastPredictedPosition = predictedPosition;
-            targetPosition = predictedPosition;
-            i_recheckPredictedDistance = true;
+            if (IsValidPredictedPosition(target, predictedPosition))
+            {
+                _lastPredictedPosition = predictedPosition;
+                targetPosition = predictedPosition;
+                i_recheckPredictedDistance = true;
+            }
+            else
+            {
+                _lastPredictedPosition.reset();
+                i_recheckPredictedDistance = false;
+            }
         }
         else
         {
             i_recheckPredictedDistance = false;
             i_recheckPredictedDistanceTimer.Reset(0);
+            _lastPredictedPosition.reset();
         }
 
         if (!i_path)
@@ -611,6 +653,22 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             if (!owner->IsStopped())
                 owner->StopMoving();
 
+            // Teleport if stuck and too far away
+            if (cOwner && isFollowingPlayer)
+            {
+                float distance = owner->GetDistance(target);
+                if (distance > 20.f)
+                {
+                    float teleX;
+                    float teleY;
+                    float teleZ;
+
+                    target->GetClosePoint(teleX, teleY, teleZ, owner->GetCombatReach());
+                    owner->NearTeleportTo(teleX, teleY, teleZ, target->GetOrientation());
+                    _lastTargetPosition.reset();
+                    _lastPredictedPosition.reset();
+                }
+            }
             return true;
         }
 
@@ -619,7 +677,7 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
         if (_inheritWalkState)
-            init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+            init.SetWalk(target->IsWalking());
 
         if (_inheritSpeed)
             if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
