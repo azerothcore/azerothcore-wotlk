@@ -115,7 +115,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2617005, 9, 8 , 0, 0, 0, 100, 0, 4400, 4400, 0, 0, 0, 0, 231, 1, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 0, 0, 0, 3.006659984588623, 'Thassarian - Actionlist - Set Lich King Orientation'),
 (2617005, 9, 9 , 0, 0, 0, 100, 0, 400, 400, 0, 0, 0, 0, 5, 25, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Lich King Play Emote 25'),
 (2617005, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 4800, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Lich King Despawn In 4800 ms'),
-(2617005, 9, 11, 0, 0, 0, 100, 0, 6600, 6600, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 12, 3, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Lich King Say Line 4'),
+(2617005, 9, 11, 0, 0, 0, 100, 0, 6600, 6600, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Talbot Say Line 4'),
 (2617005, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 1988, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Talbot Set Faction 1988'),
 (2617005, 9, 13, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Talbot Remove Flags Immune To Players & Immune To NPC\'s'),
 (2617005, 9, 14, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 86, 9613, 2, 12, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Talbot Cross Cast \'Shadow Bolt\''),
