@@ -291,8 +291,11 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
             case SMART_EVENT_IS_IN_MELEE_RANGE:
-            case SMART_EVENT_HEALTH_CHECK:
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
+                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
+            case SMART_EVENT_HEALTH_CHECK:
+                if (temp.event.healthCheck.repeatMin == 0 && temp.event.healthCheck.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             case SMART_EVENT_VICTIM_CASTING:
@@ -683,7 +686,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_SUMMONED_UNIT_EVADE: return sizeof(SmartEvent::summoned);
             case SMART_EVENT_WAYPOINT_REACHED: return sizeof(SmartEvent::wpData);
             case SMART_EVENT_WAYPOINT_ENDED: return sizeof(SmartEvent::wpData);
-            case SMART_EVENT_HEALTH_CHECK: return sizeof(SmartEvent::minMaxRepeat);
+            case SMART_EVENT_HEALTH_CHECK: return sizeof(SmartEvent::healthCheck);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -1069,11 +1072,14 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_DAMAGED:
             case SMART_EVENT_DAMAGED_TARGET:
             case SMART_EVENT_RECEIVE_HEAL:
-            case SMART_EVENT_HEALTH_CHECK:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
 
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
+                    return false;
+                break;
+            case SMART_EVENT_HEALTH_CHECK:
+                if (!IsMinMaxValid(e, e.event.healthCheck.repeatMin, e.event.healthCheck.repeatMax))
                     return false;
                 break;
             case SMART_EVENT_AREA_RANGE:

@@ -4437,9 +4437,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (!me || !me->IsEngaged() || !me->GetMaxHealth())
                     return;
-                if (!me->HealthBelowPctDamaged(e.event.minMaxRepeat.max, var0) || me->HealthBelowPctDamaged(e.event.minMaxRepeat.min, var0))
+                if (!me->HealthBelowPctDamaged(e.event.healthCheck.hpPct, var0))
                     return;
-                RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
+                RecalcTimer(e, e.event.healthCheck.repeatMin, e.event.healthCheck.repeatMax);
                 ProcessAction(e, unit);
                 break;
             }

@@ -197,7 +197,7 @@ enum SMART_EVENT
     SMART_EVENT_WAYPOINT_REACHED         = 108,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_WAYPOINT_ENDED           = 109,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_IS_IN_MELEE_RANGE        = 110,      // min, max, repeatMin, repeatMax, dist, invert (0: false, 1: true)
-    SMART_EVENT_HEALTH_CHECK             = 111,      // hpPct_min, hpPct_max, repeatMin, repeatMax (triggered on damage taken, only while engaged)
+    SMART_EVENT_HEALTH_CHECK             = 111,      // hpPct, repeatMin, repeatMax (triggered on damage taken, only while engaged)
 
     SMART_EVENT_AC_END                   = 112
 };
@@ -509,6 +509,13 @@ struct SmartEvent
             uint32 pointId;
             uint32 pathId;
         } wpData;
+
+        struct
+        {
+            uint32 hpPct;
+            uint32 repeatMin;
+            uint32 repeatMax;
+        } healthCheck;
 
         struct
         {
