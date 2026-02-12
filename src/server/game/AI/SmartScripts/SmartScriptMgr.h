@@ -197,8 +197,9 @@ enum SMART_EVENT
     SMART_EVENT_WAYPOINT_REACHED         = 108,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_WAYPOINT_ENDED           = 109,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_IS_IN_MELEE_RANGE        = 110,      // min, max, repeatMin, repeatMax, dist, invert (0: false, 1: true)
+    SMART_EVENT_HEALTH_CHECK             = 111,      // hpPct_min, hpPct_max, repeatMin, repeatMax (triggered on damage taken, only while engaged)
 
-    SMART_EVENT_AC_END                   = 111
+    SMART_EVENT_AC_END                   = 112
 };
 
 struct SmartEvent
@@ -1923,6 +1924,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_WAYPOINT_REACHED,     SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_WAYPOINT_ENDED,       SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_IS_IN_MELEE_RANGE,         SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_HEALTH_CHECK,              SMART_SCRIPT_TYPE_MASK_CREATURE },
 };
 
 enum SmartEventFlags

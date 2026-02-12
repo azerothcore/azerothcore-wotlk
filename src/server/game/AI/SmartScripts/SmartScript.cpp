@@ -4433,6 +4433,18 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 ProcessAction(e, unit);
                 break;
             }
+        case SMART_EVENT_HEALTH_CHECK:
+            {
+                if (!me || !me->IsEngaged() || !me->GetMaxHealth())
+                    return;
+                int64 newHealth = static_cast<int64>(me->GetHealth()) - static_cast<int64>(var0);
+                uint32 perc = static_cast<uint32>(std::max<int64>(0, newHealth * 100 / static_cast<int64>(me->GetMaxHealth())));
+                if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
+                    return;
+                RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
+                ProcessAction(e, unit);
+                break;
+            }
         case SMART_EVENT_MOVEMENTINFORM:
             {
                 if ((e.event.movementInform.type && var0 != e.event.movementInform.type) || (e.event.movementInform.id && var1 != e.event.movementInform.id))

@@ -891,6 +891,8 @@ void SmartAI::DamageTaken(Unit* doneBy, uint32& damage, DamageEffectType damaget
     if (doneBy)
         GetScript()->ProcessEventsFor(SMART_EVENT_DAMAGED, doneBy, damage);
 
+    GetScript()->ProcessEventsFor(SMART_EVENT_HEALTH_CHECK, doneBy, damage);
+
     if (!IsAIControlled()) // don't allow players to use unkillable units
         return;
 
