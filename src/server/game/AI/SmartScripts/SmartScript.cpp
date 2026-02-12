@@ -4437,9 +4437,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             {
                 if (!me || !me->IsEngaged() || !me->GetMaxHealth())
                     return;
-                int64 newHealth = static_cast<int64>(me->GetHealth()) - static_cast<int64>(var0);
-                uint32 perc = static_cast<uint32>(std::max<int64>(0, newHealth * 100 / static_cast<int64>(me->GetMaxHealth())));
-                if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
+                if (!me->HealthBelowPctDamaged(e.event.minMaxRepeat.max, var0) || me->HealthBelowPctDamaged(e.event.minMaxRepeat.min, var0))
                     return;
                 RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
                 ProcessAction(e, unit);
