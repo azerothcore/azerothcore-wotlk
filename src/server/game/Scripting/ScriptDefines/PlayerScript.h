@@ -800,7 +800,7 @@ public:
     virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
 
     /**
-     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. This then uses this information to call OnPlayerGetReputationPriceDiscoun(Player, FactionTemplateEntry, float)
      *
      * @param player Contains information about the Player
      * @param creature Contains information about the creature involved in the transaction
@@ -812,7 +812,7 @@ public:
      * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. It is also called when continuing along taxis
      *
      * @param player Contains information about the Player
-     * @param factionTemplate Contains information about the creature involved in the transaction
+     * @param factionTemplate Contains information about the faction template involved in the transaction. Can be null!
      * @param discount Float value of the discount, as a multiplier of the base price
      */
     virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
