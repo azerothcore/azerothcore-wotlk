@@ -227,6 +227,14 @@ bool WorldSession::IsRecurringBillingAccount() const
     return HasAccountFlag(ACCOUNT_FLAG_RECURRING_BILLING);
 }
 
+bool WorldSession::IsAffectedByCAIS() const
+{
+    // China realm system for restricting play times
+    // Don't know of any account flag or similar denoting whether an account/session is affected by CAIS (possibly just a realm-wide flag)
+    // But just in case we find something down the road, this function just acts as a switch for accounts to use the system.
+    return false;
+}
+
 uint8 WorldSession::GetBillingPlanFlags() const
 {
     uint8 flags = SESSION_NONE;
@@ -239,6 +247,9 @@ uint8 WorldSession::GetBillingPlanFlags() const
 
     if (IsInternetGameRoomAccount())
         flags |= SESSION_IGR;
+
+    if (IsAffectedByCAIS())
+        flags |= SESSION_ENABLE_CAIS;
 
     return flags;
 }
@@ -686,14 +697,6 @@ void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemainin
     playTimeWarning.Flag = flag;
     playTimeWarning.PlayTimeRemaining = playTimeRemaining;
     GetPlayer()->SendDirectMessage(playTimeWarning.Write());
-}
-
-bool WorldSession::IsAffectedByCAIS()
-{
-    // China realm system for restricting play times
-    // Don't know of any account flag or similar denoting whether an account/session is affected by CAIS (possibly just a realm-wide flag)
-    // But just in case we find something down the road, this function just acts as a switch for accounts to use the system.
-    return false;
 }
 
 /// %Log the player out
