@@ -294,13 +294,13 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
-            case SMART_EVENT_HEALTH_CHECK:
-                temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
-                break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_FRIENDLY_IS_CC:
                 if (temp.event.friendlyCC.repeatMin == 0 && temp.event.friendlyCC.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
+            case SMART_EVENT_HEALTH_CHECK:
+                temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             default:
                 break;
