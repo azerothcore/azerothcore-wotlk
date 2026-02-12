@@ -67,7 +67,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2617000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 63, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Reset Counter'),
 (2617000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 204, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Despawn Instant'),
 (2617000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 1974, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Set Faction 1974'),
-(2617000, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Set Flag Standstate Stand Up'),
+(2617000, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Remove StandState Kneel'),
 (2617000, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Reset EmoteState'),
 (2617000, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Remove Npc Flags Questgiver'),
 (2617000, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Thassarian - Actionlist - Add Npc Flags Gossip'),
