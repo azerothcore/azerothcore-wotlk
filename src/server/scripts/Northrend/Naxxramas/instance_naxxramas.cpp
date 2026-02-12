@@ -435,10 +435,6 @@ public:
             case ACHIEV_CRITERIA_THE_IMMORTAL_MAEXXNA:
             case ACHIEV_CRITERIA_THE_IMMORTAL_LOATHEB:
             case ACHIEV_CRITERIA_THE_IMMORTAL_THADDIUS:
-                for (int i = 0; i < MAX_ENCOUNTERS; ++i)
-                    if (GetBossState(i) != DONE)
-                        return false;
-
                 return !GetPersistentData(PERSISTENT_DATA_IMMORTAL_FAIL);
             default:
                 return false;
