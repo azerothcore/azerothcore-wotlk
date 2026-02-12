@@ -20,6 +20,7 @@
 
 #include "ScriptObject.h"
 #include "SharedDefines.h"
+#include "DBCStructure.h"
 #include <vector>
 
 // TODO to remove
