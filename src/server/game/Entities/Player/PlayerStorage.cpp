@@ -5023,6 +5023,9 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetByteValue(PLAYER_BYTES_3, 1, fields[54].Get<uint8>());
     ReplaceAllPlayerFlags((PlayerFlags)fields[16].Get<uint32>());
 
+    RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+    RemovePlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+
     time_t const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime().count());
 
     if (GetSession()->IsAffectedByCAIS())
