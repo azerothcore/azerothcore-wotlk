@@ -985,7 +985,7 @@ INSERT INTO `acore_string` VALUES
 (5055,'Map is not a dungeon.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5056,'Map has no instance data.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5057,'Boss id {} state is now set to {} ({}).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(5058,'Boss id {} state is {} ({}).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(5058,'Boss id {} ({}) state is {} ({}).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5059,'Mutes for account: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5060,'No mutes for account: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5061,'Mute Date: {} Mutetime: {} mins. Reason: {} Set by: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
