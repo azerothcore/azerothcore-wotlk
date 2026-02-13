@@ -5200,13 +5200,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
     });
 
-    // Avenging Fury
-    ApplySpellFix({ 57742 }, [](SpellInfo* spellInfo)
-        {
-            spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_2_YARDS);
-            spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_2_YARDS);
-        });
-
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
