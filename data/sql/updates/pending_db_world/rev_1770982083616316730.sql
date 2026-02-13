@@ -28,3 +28,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (304510, 6, 3254.0688, 489.25906, 108.92368, 0, 0, @MOVE_TYPE, 0, 100, 0),
 (304510, 7, 3223.111, 488.90338, 110.53484, 0, 0, @MOVE_TYPE, 0, 100, 0),
 (304510, 8, 3197.9263, 511.4375, 113.22937, 0, 0, @MOVE_TYPE, 0, 100, 0);
+
+-- +512	NO_MOVE_FLAGS_UPDATE - Creature won't update movement flags
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 512 WHERE (`entry` IN (30452, 30451, 30449));
