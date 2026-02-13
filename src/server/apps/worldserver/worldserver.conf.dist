@@ -176,6 +176,25 @@ Database.Reconnect.Seconds = 15
 Database.Reconnect.Attempts = 20
 
 #
+#    EnableDBCDatabase
+#        Description: Enable DBC Database separation and automatic migration.
+#                     0 = Disabled (Use acore_world for DBC tables, with fallback logic)
+#                         - DBC tables are queried from acore_dbc first
+#                         - If empty, fallback to acore_world (backward compatibility)
+#                     1 = Enabled (Migrate DBC tables to acore_dbc on startup)
+#                         - Creates tables in acore_dbc if they don't exist
+#                         - Migrates data from acore_world to acore_dbc
+#                         - Drops migrated tables from acore_world
+#
+#                     Once activated, data from the _dbc tables will be migrated from your World database to DBC.
+#                     Once activated, it is impossible to deactivate it in order to retrieve the data from World again.
+#                     Once the migration is complete, the _dbc tables in World will be destroyed.
+#
+#        Default:     0 - (Disabled, fallback mode for backward compatibility)
+
+EnableDBCDatabase = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
