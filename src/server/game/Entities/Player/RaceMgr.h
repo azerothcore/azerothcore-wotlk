@@ -38,15 +38,15 @@ public:
     static void LoadRaces();
     static uint8 GetMaxRaces() { return _maxRaces; }
     static void SetMaxRaces(uint8 max) { _maxRaces = max; }
-    static uint64 GetPlayableRaceMask() { return _playableRaceMask; }
-    static uint64 GetAllianceRaceMask() { return _allianceRaceMask; }
-    static uint64 GetHordeRaceMask() { return _hordeRaceMask; }
+    static uint32 GetPlayableRaceMask() { return _playableRaceMask; }
+    static uint32 GetAllianceRaceMask() { return _allianceRaceMask; }
+    static uint32 GetHordeRaceMask() { return _hordeRaceMask; }
 private:
     static uint8 _maxRaces; // Max playable race + 1
 
-    static uint64 _playableRaceMask;
-    static uint64 _allianceRaceMask;
-    static uint64 _hordeRaceMask;
+    static uint32 _playableRaceMask;
+    static uint32 _allianceRaceMask;
+    static uint32 _hordeRaceMask;
 };
 
 #define sRaceMgr RaceMgr::instance()

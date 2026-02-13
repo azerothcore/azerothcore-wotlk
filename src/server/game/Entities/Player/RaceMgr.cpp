@@ -26,9 +26,9 @@
 
 uint8  RaceMgr::_maxRaces = 0;
 
-uint64 RaceMgr::_playableRaceMask = 0;
-uint64 RaceMgr::_allianceRaceMask = 0;
-uint64 RaceMgr::_hordeRaceMask = 0;
+uint32 RaceMgr::_playableRaceMask = 0;
+uint32 RaceMgr::_allianceRaceMask = 0;
+uint32 RaceMgr::_hordeRaceMask = 0;
 
 RaceMgr::RaceMgr()
 {
@@ -46,6 +46,11 @@ RaceMgr* RaceMgr::instance()
 
 void RaceMgr::LoadRaces()
 {
+    SetMaxRaces(0 + 1);
+    _playableRaceMask = 0;
+    _hordeRaceMask    = 0;
+    _allianceRaceMask = 0;
+
     for (auto const& raceEntry : sChrRacesStore)
     {
         if (!raceEntry)
@@ -54,13 +59,13 @@ void RaceMgr::LoadRaces()
         uint8 alliance = raceEntry->alliance;
         uint8 raceId = raceEntry->RaceID;
 
-        if (alliance == ALLIANCE_NEUTRAL)
-            continue; // Not playable race (no flags obviously distinguishing playable from not)
+        if (raceEntry->Flags & CHRRACES_FLAGS_NOT_PLAYABLE)
+            continue;
 
         if (GetMaxRaces() <= raceId)
             SetMaxRaces(raceId + 1);
 
-        uint64 raceBit = (1ULL << (raceId - 1));
+        uint32 raceBit = (1 << (raceId - 1));
 
         _playableRaceMask |= raceBit;
 
