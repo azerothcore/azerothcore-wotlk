@@ -35,12 +35,10 @@ uint32 ModuleDatabasePool::Open()
     return _connections.size();
 }
 
-
 void ModuleDatabasePool::Close()
 {
     _connections.clear();
 }
-
 
 void ModuleDatabasePool::Execute(std::string const& sql)
 {
