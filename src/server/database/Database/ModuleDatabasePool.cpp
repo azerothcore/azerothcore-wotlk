@@ -93,4 +93,3 @@ MySQLConnectionInfo const* ModuleDatabasePool::GetConnectionInfo() const
 {
     return &_connectionInfo;
 }
-

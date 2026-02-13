@@ -16,4 +16,3 @@ struct AC_DATABASE_API DatabaseUpdatePool
 };
 
 #endif
-
