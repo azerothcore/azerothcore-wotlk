@@ -681,8 +681,8 @@ struct boss_sartharion_dragonAI : public BossAI
 
         me->SetImmuneToNPC(false);
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
-        me->SetCanFly(false);
         me->SetDisableGravity(false);
+        me->SetHover(true);
         me->ResetLootMode();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         portalGUID.Clear();
@@ -714,10 +714,10 @@ struct boss_sartharion_dragonAI : public BossAI
     {
         if (type == POINT_MOTION_TYPE && pointId == POINT_LANDING)
         {
-            me->SetAnimTier(AnimTier::Ground);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisableGravity(false);
             me->SetHover(false);
+            me->SetAnimTier(AnimTier::Ground);
             me->SetImmuneToNPC(false);
             me->SetInCombatWithZone();
         }
@@ -744,7 +744,6 @@ struct boss_sartharion_dragonAI : public BossAI
         if (me->IsFlying())
         {
             me->SetSpeed(MOVE_FLIGHT, 1.0f);
-            me->SetCanFly(false);
         }
 
         if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
@@ -896,7 +895,6 @@ struct boss_sartharion_dragonAI : public BossAI
         {
             Talk(SAY_DRAKE_RESPOND);
             me->GetMotionMaster()->Clear();
-            me->SetCanFly(true);
             me->SetSpeed(MOVE_FLIGHT, 3.0f);
             me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()));
         }
