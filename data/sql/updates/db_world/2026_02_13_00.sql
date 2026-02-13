@@ -1,3 +1,4 @@
+-- DB update 2026_02_12_01 -> 2026_02_13_00
 
 -- Set Avenging Fury target on self
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30680;
