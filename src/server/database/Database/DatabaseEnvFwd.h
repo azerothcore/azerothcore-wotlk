@@ -29,6 +29,7 @@ using QueryResultFuture = std::future<QueryResult>;
 using QueryResultPromise = std::promise<QueryResult>;
 
 class CharacterDatabaseConnection;
+class DBCDatabaseConnection;
 class LoginDatabaseConnection;
 class WorldDatabaseConnection;
 
@@ -38,6 +39,7 @@ template<typename T>
 class PreparedStatement;
 
 using CharacterDatabasePreparedStatement = PreparedStatement<CharacterDatabaseConnection>;
+using DBCDatabasePreparedStatement = PreparedStatement<DBCDatabaseConnection>;
 using LoginDatabasePreparedStatement = PreparedStatement<LoginDatabaseConnection>;
 using WorldDatabasePreparedStatement = PreparedStatement<WorldDatabaseConnection>;
 
@@ -67,6 +69,7 @@ template<typename T>
 using SQLTransaction = std::shared_ptr<Transaction<T>>;
 
 using CharacterDatabaseTransaction = SQLTransaction<CharacterDatabaseConnection>;
+using DBCDatabaseTransaction = SQLTransaction<DBCDatabaseConnection>;
 using LoginDatabaseTransaction = SQLTransaction<LoginDatabaseConnection>;
 using WorldDatabaseTransaction = SQLTransaction<WorldDatabaseConnection>;
 
@@ -78,6 +81,7 @@ template<typename T>
 class SQLQueryHolder;
 
 using CharacterDatabaseQueryHolder = SQLQueryHolder<CharacterDatabaseConnection>;
+using DBCDatabaseQueryHolder = SQLQueryHolder<DBCDatabaseConnection>;
 using LoginDatabaseQueryHolder = SQLQueryHolder<LoginDatabaseConnection>;
 using WorldDatabaseQueryHolder = SQLQueryHolder<WorldDatabaseConnection>;
 
