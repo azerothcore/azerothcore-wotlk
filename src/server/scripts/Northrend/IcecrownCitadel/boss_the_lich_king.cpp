@@ -2220,7 +2220,7 @@ public:
             me->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL, true);
             if (TempSummon* summon = me->ToTempSummon())
                 if (Unit* summoner = summon->GetSummonerUnit())
-                    if (summoner->IsPlayer() && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
+                    if (summoner->IsPlayer() && summoner->IsAlive() && summoner->FindMap() == me->GetMap())
                     {
                         valid = true;
                         summoner->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL_CLONE, true);
@@ -2281,7 +2281,7 @@ public:
                             bool valid = false;
                             if (TempSummon* summon = me->ToTempSummon())
                                 if (Unit* summoner = summon->GetSummonerUnit())
-                                    if (summoner->IsPlayer() && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
+                                    if (summoner->IsPlayer() && summoner->IsAlive() && summoner->FindMap() == me->GetMap())
                                     {
                                         valid = true;
                                         AttackStart(summoner);
