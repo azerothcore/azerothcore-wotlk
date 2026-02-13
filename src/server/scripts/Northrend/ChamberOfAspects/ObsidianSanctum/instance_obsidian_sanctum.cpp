@@ -177,6 +177,27 @@ public:
                     }
                     break;
                 }
+                case ACTION_START_PATROL:
+                {
+                    if (Creature* tenebron = instance->GetCreature(m_uiTenebronGUID))
+                    {
+                        if (tenebron->IsAlive() && GetBossState(DATA_TENEBRON) != DONE)
+                            tenebron->AI()->DoAction(ACTION_START_PATROL);
+                    }
+
+                    if (Creature* shadron = instance->GetCreature(m_uiShadronGUID))
+                    {
+                        if (shadron->IsAlive() && GetBossState(DATA_SHADRON) != DONE)
+                            shadron->AI()->DoAction(ACTION_START_PATROL);
+                    }
+
+                    if (Creature* vesperon = instance->GetCreature(m_uiVesperonGUID))
+                    {
+                        if (vesperon->IsAlive() && GetBossState(DATA_VESPERON) != DONE)
+                            vesperon->AI()->DoAction(ACTION_START_PATROL);
+                    }
+                    break;
+                }
             }
         }
 

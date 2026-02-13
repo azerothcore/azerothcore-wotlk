@@ -36,6 +36,8 @@ enum Says
     SAY_SARTHARION_SLAY                         = 8,
     SAY_SARTHARION_SPECIAL_4                    = 10, // 9 is whisper
 
+    SAY_DRAKE_RESPOND                           = 4,
+
     // TENEBRON
     SAY_TENEBRON_AGGRO                          = 0,
     SAY_TENEBRON_SLAY                           = 1,
@@ -105,6 +107,7 @@ enum Spells
     SPELL_FLAME_TSUNAMI_DAMAGE_AURA             = 57492,
     SPELL_FLAME_TSUNAMI_LEAP                    = 60241,
     SPELL_SARTHARION_PYROBUFFET_TRIGGER         = 57557,
+    SPELL_FULL_HEAL                             = 43978,
 };
 
 enum NPCs
@@ -130,9 +133,7 @@ enum Misc
     ACTION_DRAKE_DIED                           = 3,
 
     // Movement points
-    POINT_FINAL_TENEBRON                        = 9,
-    POINT_FINAL_SHADRON                         = 5,
-    POINT_FINAL_VESPERON                        = 5,
+    POINT_LANDING                               = 1,
 
     // Lava directions. Its used to identify to which side lava was moving by last time
     LAVA_LEFT_SIDE                              = 0,
@@ -157,6 +158,7 @@ enum Events
     EVENT_MINIBOSS_OPEN_PORTAL                  = 4,
     EVENT_MINIBOSS_SPAWN_HELPERS                = 5,
     EVENT_MINIBOSS_RESPOND                      = 6,
+    EVENT_DRAGON_START_PATROL                   = 7,
 
     // Sartharion abilities
     EVENT_SARTHARION_CAST_CLEAVE                = 10,
@@ -249,6 +251,23 @@ const Position bigIslandMiddlePos = { 3242.822754f, 477.279816f, 57.430473f };
 
 const uint32 dragons[MAX_DRAGONS] = { DATA_TENEBRON, DATA_VESPERON, DATA_SHADRON };
 
+const Position dragonLandingPos[MAX_DRAGONS] ={
+    {3249.75f, 566.95184f, 59.424007f, 0}, // Tenebron
+    {3230.4963f, 533.0001f, 59.5598f, 0}, // Shadron
+    {3269.7134f, 532.7908f, 59.51278f, 0} // Vesperon
+ };
+
+static Position const& GetDragonLandingPos(uint32 entry)
+{
+    switch (entry)
+    {
+        case NPC_TENEBRON: return dragonLandingPos[0];
+        case NPC_SHADRON:  return dragonLandingPos[1];
+        case NPC_VESPERON: return dragonLandingPos[2];
+        default:           return dragonLandingPos[0];
+    }
+}
+
 /////////////////////////////
 // SARTHARION
 /////////////////////////////
@@ -313,7 +332,7 @@ struct boss_sartharion : public BossAI
                 continue;
 
             dragon->SetImmuneToNPC(true);
-            dragon->SetFullHealth();
+            dragon->CastSpell(dragon, SPELL_FULL_HEAL, true);
 
             ++dragonsCount;
             me->AddLootMode(1 << dragonsCount);
@@ -323,26 +342,29 @@ struct boss_sartharion : public BossAI
                 case DATA_TENEBRON:
                 {
                     dragon->CastSpell(dragon, SPELL_POWER_OF_TENEBRON, true);
-                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 10s);
+                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 20s);
                     break;
                 }
                 case DATA_SHADRON:
                 {
                     dragon->CastSpell(dragon, SPELL_POWER_OF_SHADRON, true);
-                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 65s);
+                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 60s);
                     break;
                 }
                 case DATA_VESPERON:
                 {
                     dragon->CastSpell(dragon, SPELL_POWER_OF_VESPERON, true);
-                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 115s);
+                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 120s);
                     break;
                 }
             }
         }
 
         if (dragonsCount)
+        {
             DoCastSelf(SPELL_WILL_OF_SARTHARION, true);
+            instance->DoAction(ACTION_START_PATROL);
+        }
 
         me->CallForHelp(500.0f);
     }
@@ -698,6 +720,7 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
         me->SetCanFly(false);
         me->ResetLootMode();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         portalGUID.Clear();
         isCalledBySartharion = false;
         instance->DoAction(ACTION_CLEAR_PORTAL);
@@ -710,11 +733,14 @@ struct boss_sartharion_dragonAI : public BossAI
             isCalledBySartharion = true;
             extraEvents.RescheduleEvent(EVENT_MINIDRAKE_SPEECH, 4s);
         }
+        else if (param == ACTION_START_PATROL)
+            extraEvents.ScheduleEvent(EVENT_DRAGON_START_PATROL, 500ms);
     }
 
     void MoveInLineOfSight(Unit* who) final
     {
-        if (isCalledBySartharion)
+        // Prevent aggro during patrol (NOT_SELECTABLE set) and while flying to landing position
+        if (isCalledBySartharion || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             return;
 
         ScriptedAI::MoveInLineOfSight(who);
@@ -722,33 +748,15 @@ struct boss_sartharion_dragonAI : public BossAI
 
     void MovementInform(uint32 type, uint32 pointId) final
     {
-        if (type != WAYPOINT_MOTION_TYPE)
-            return;
-
-        switch (me->GetEntry())
+        if (type == POINT_MOTION_TYPE && pointId == POINT_LANDING)
         {
-            case NPC_TENEBRON:
-            {
-                if (pointId != POINT_FINAL_TENEBRON)
-                    return;
-                break;
-            }
-            case NPC_SHADRON:
-            {
-                if (pointId != POINT_FINAL_SHADRON)
-                    return;
-                break;
-            }
-            case NPC_VESPERON:
-            {
-                if (pointId != POINT_FINAL_VESPERON)
-                    return;
-                break;
-            }
+            me->SetAnimTier(AnimTier::Ground);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetDisableGravity(false);
+            me->SetHover(false);
+            me->SetImmuneToNPC(false);
+            me->SetInCombatWithZone();
         }
-
-        me->SetImmuneToNPC(false);
-        me->SetInCombatWithZone();
     }
 
     void JustSummoned(Creature* summon) override
@@ -918,7 +926,26 @@ struct boss_sartharion_dragonAI : public BossAI
         RemoveTwilightPortal();
     }
 
-    virtual void HandleExtraEvent(uint32 const /*eventId*/) { }
+    void HandleExtraEvent(uint32 const eventId)
+    {
+        if (eventId == EVENT_MINIDRAKE_SPEECH)
+        {
+            Talk(SAY_DRAKE_RESPOND);
+            me->GetMotionMaster()->Clear();
+            me->SetCanFly(true);
+            me->SetSpeed(MOVE_FLIGHT, 3.0f);
+            me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()));
+        }
+        else if (eventId == EVENT_DRAGON_START_PATROL)
+        {
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetAnimTier(AnimTier::Fly);
+            me->SetDisableGravity(true);
+            me->SetHover(true);
+            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
+        }
+    }
+
 protected:
     void RemoveTwilightPortal()
     {
@@ -970,17 +997,6 @@ struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
             summons2.DespawnAll();
 
         boss_sartharion_dragonAI::JustDied(killer);
-    }
-
-    void HandleExtraEvent(uint32 const eventId) override
-    {
-        if (eventId == EVENT_MINIDRAKE_SPEECH)
-        {
-            Talk(SAY_TENEBRON_RESPOND);
-            me->SetCanFly(true);
-            me->SetSpeed(MOVE_FLIGHT, 3.0f);
-            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
-        }
     }
 
     void ExecuteEvent(uint32 eventId) override
@@ -1124,17 +1140,6 @@ struct boss_sartharion_shadron : public boss_sartharion_dragonAI
         events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
     }
 
-    void HandleExtraEvent(uint32 const eventId) override
-    {
-        if (eventId == EVENT_MINIDRAKE_SPEECH)
-        {
-            Talk(SAY_SHADRON_RESPOND);
-            me->SetCanFly(true);
-            me->SetSpeed(MOVE_FLIGHT, 3.0f);
-            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
-        }
-    }
-
     void ExecuteEvent(uint32 eventId) override
     {
         switch (eventId)
@@ -1217,17 +1222,6 @@ struct boss_sartharion_vesperon : public boss_sartharion_dragonAI
         }
 
         events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
-    }
-
-    void HandleExtraEvent(uint32 const eventId) override
-    {
-        if (eventId == EVENT_MINIDRAKE_SPEECH)
-        {
-            Talk(SAY_SHADRON_RESPOND);
-            me->SetCanFly(true);
-            me->SetSpeed(MOVE_FLIGHT, 3.0f);
-            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
-        }
     }
 
     void ExecuteEvent(uint32 eventId) override
