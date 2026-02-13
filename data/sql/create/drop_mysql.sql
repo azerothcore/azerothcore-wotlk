@@ -7,3 +7,5 @@ DROP DATABASE IF EXISTS `acore_world`;
 DROP DATABASE IF EXISTS `acore_characters`;
 
 DROP DATABASE IF EXISTS `acore_auth`;
+
+DROP DATABASE IF EXISTS `acore_dbc`;
