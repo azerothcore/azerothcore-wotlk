@@ -1,8 +1,7 @@
 -- KABLAMM FARFLINGER (Engineering(350 / Goblin Engineer)) - Dimensional Ripper: Area 52
 
 -- Update Broadcast Text for base gossip to fix spacing
-UPDATE `broadcast_text` SET `MaleText` = 'With the help of my brother Zap in Everlook I have constructed a Dimensional Imploder right here in Area 52. Who needs a rocket when you have instant transportation via Goblin Engineering! Are you a skilled enough Goblin Engineer to learn how to build your own Imploder beacon?
-' WHERE (`ID` = 19134);
+UPDATE `broadcast_text` SET `MaleText` = 'With the help of my brother Zap in Everlook I have constructed a Dimensional Imploder right here in Area 52. Who needs a rocket when you have instant transportation via Goblin Engineering! Are you a skilled enough Goblin Engineer to learn how to build your own Imploder beacon?' WHERE (`ID` = 19134);
 
 -- Update NPC Text for base gossip to fix spacing
 UPDATE `npc_text` SET `text0_0` = 'With the help of my brother Zap in Everlook I have constructed a Dimensional Imploder right here in Area 52. Who needs a rocket when you have instant transportation via Goblin Engineering! Are you a skilled enough Goblin Engineer to lean how to build your own Imploder beacon?' WHERE (`ID` = 10365);
