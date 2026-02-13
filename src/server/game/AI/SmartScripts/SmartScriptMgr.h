@@ -128,7 +128,7 @@ enum SMART_EVENT
     SMART_EVENT_CHARMED                  = 29,      // onRemove (0 - on apply, 1 - on remove)
     SMART_EVENT_CHARMED_TARGET           = 30,      // NONE
     SMART_EVENT_SPELLHIT_TARGET          = 31,      // SpellID, School, CooldownMin, CooldownMax
-    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax
+    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax, hpPct (if set: health check mode, one-shot)
     SMART_EVENT_DAMAGED_TARGET           = 33,      // MinDmg, MaxDmg, CooldownMin, CooldownMax
     SMART_EVENT_MOVEMENTINFORM           = 34,      // MovementType(any), PointID, PathId(0 - any)
     SMART_EVENT_SUMMON_DESPAWNED         = 35,      // Entry, CooldownMin, CooldownMax
@@ -197,9 +197,8 @@ enum SMART_EVENT
     SMART_EVENT_WAYPOINT_REACHED         = 108,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_WAYPOINT_ENDED           = 109,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_IS_IN_MELEE_RANGE        = 110,      // min, max, repeatMin, repeatMax, dist, invert (0: false, 1: true)
-    SMART_EVENT_HEALTH_CHECK             = 111,      // hpPct (triggered on damage taken, only while engaged, one-shot)
 
-    SMART_EVENT_AC_END                   = 112
+    SMART_EVENT_AC_END                   = 111
 };
 
 struct SmartEvent
@@ -509,11 +508,6 @@ struct SmartEvent
             uint32 pointId;
             uint32 pathId;
         } wpData;
-
-        struct
-        {
-            uint32 hpPct;
-        } healthCheck;
 
         struct
         {
@@ -1929,7 +1923,6 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_WAYPOINT_REACHED,     SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_WAYPOINT_ENDED,       SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_IS_IN_MELEE_RANGE,         SMART_SCRIPT_TYPE_MASK_CREATURE },
-    {SMART_EVENT_HEALTH_CHECK,              SMART_SCRIPT_TYPE_MASK_CREATURE },
 };
 
 enum SmartEventFlags

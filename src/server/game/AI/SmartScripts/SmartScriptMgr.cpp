@@ -294,13 +294,16 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
+            case SMART_EVENT_DAMAGED:
+                if (temp.event.minMaxRepeat.rangeMin) // health check mode: always one-shot
+                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                else if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
+                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_FRIENDLY_IS_CC:
                 if (temp.event.friendlyCC.repeatMin == 0 && temp.event.friendlyCC.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
-                break;
-            case SMART_EVENT_HEALTH_CHECK:
-                temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             default:
                 break;
@@ -453,7 +456,6 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
         case SMART_EVENT_DATA_SET:
         case SMART_EVENT_IS_IN_MELEE_RANGE:
-        case SMART_EVENT_HEALTH_CHECK:
             return true;
         default:
             return false;
@@ -685,7 +687,6 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_SUMMONED_UNIT_EVADE: return sizeof(SmartEvent::summoned);
             case SMART_EVENT_WAYPOINT_REACHED: return sizeof(SmartEvent::wpData);
             case SMART_EVENT_WAYPOINT_ENDED: return sizeof(SmartEvent::wpData);
-            case SMART_EVENT_HEALTH_CHECK: return sizeof(SmartEvent::healthCheck);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -1068,7 +1069,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_MANA_PCT:
             case SMART_EVENT_TARGET_HEALTH_PCT:
             case SMART_EVENT_TARGET_MANA_PCT:
-            case SMART_EVENT_DAMAGED:
             case SMART_EVENT_DAMAGED_TARGET:
             case SMART_EVENT_RECEIVE_HEAL:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
@@ -1076,6 +1076,16 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
                     return false;
+                break;
+            case SMART_EVENT_DAMAGED:
+                if (!e.event.minMaxRepeat.rangeMin) // normal mode
+                {
+                    if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
+                        return false;
+
+                    if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
+                        return false;
+                }
                 break;
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:

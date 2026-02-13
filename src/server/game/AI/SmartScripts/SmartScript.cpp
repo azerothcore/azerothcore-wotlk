@@ -4424,7 +4424,6 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 break;
             }
         case SMART_EVENT_RECEIVE_HEAL:
-        case SMART_EVENT_DAMAGED:
         case SMART_EVENT_DAMAGED_TARGET:
             {
                 if (var0 > e.event.minMaxRepeat.max || var0 < e.event.minMaxRepeat.min)
@@ -4433,13 +4432,23 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 ProcessAction(e, unit);
                 break;
             }
-        case SMART_EVENT_HEALTH_CHECK:
+        case SMART_EVENT_DAMAGED:
             {
-                if (!me || !me->IsEngaged() || !me->GetMaxHealth())
-                    return;
-                if (!me->HealthBelowPctDamaged(e.event.healthCheck.hpPct, var0))
-                    return;
-                ProcessAction(e, unit);
+                if (e.event.minMaxRepeat.rangeMin) // health check mode
+                {
+                    if (!me || !me->IsEngaged() || !me->GetMaxHealth())
+                        return;
+                    if (!me->HealthBelowPctDamaged(e.event.minMaxRepeat.rangeMin, var0))
+                        return;
+                    ProcessAction(e, unit);
+                }
+                else
+                {
+                    if (var0 > e.event.minMaxRepeat.max || var0 < e.event.minMaxRepeat.min)
+                        return;
+                    RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
+                    ProcessAction(e, unit);
+                }
                 break;
             }
         case SMART_EVENT_MOVEMENTINFORM:
