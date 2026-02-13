@@ -21,6 +21,7 @@
  */
 
 #include "CreatureScript.h"
+#include "MotionMaster.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 
@@ -46,13 +47,34 @@ struct npc_pet_shaman_earth_elemental : public ScriptedAI
 {
     npc_pet_shaman_earth_elemental(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
+    void InitializeAI() override
+    {
+        MoveToTotem();
+    }
+
     void JustEngagedWith(Unit*) override
     {
         _events.Reset();
         _events.ScheduleEvent(EVENT_SHAMAN_ANGEREDEARTH, 0ms);
     }
 
-    void InitializeAI() override { }
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (!_EnterEvadeMode(why))
+            return;
+
+        MoveToTotem();
+    }
+
+    void MoveToTotem()
+    {
+        if (Unit* owner = me->GetCharmerOrOwner())
+            if (Creature* totem = ObjectAccessor::GetCreature(*me, owner->m_SummonSlot[SUMMON_SLOT_TOTEM_EARTH]))
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(totem, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
+    }
 
     void UpdateAI(uint32 diff) override
     {
@@ -89,7 +111,10 @@ struct npc_pet_shaman_fire_elemental : public ScriptedAI
 {
     npc_pet_shaman_fire_elemental(Creature* creature) : ScriptedAI(creature), _initAttack(true) { }
 
-    void InitializeAI() override { }
+    void InitializeAI() override
+    {
+        MoveToTotem();
+    }
 
     void JustEngagedWith(Unit*) override
     {
@@ -100,6 +125,24 @@ struct npc_pet_shaman_fire_elemental : public ScriptedAI
 
         me->RemoveAurasDueToSpell(SPELL_SHAMAN_FIRESHIELD);
         me->CastSpell(me, SPELL_SHAMAN_FIRESHIELD, true);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (!_EnterEvadeMode(why))
+            return;
+
+        MoveToTotem();
+    }
+
+    void MoveToTotem()
+    {
+        if (Unit* owner = me->GetCharmerOrOwner())
+            if (Creature* totem = ObjectAccessor::GetCreature(*me, owner->m_SummonSlot[SUMMON_SLOT_TOTEM_FIRE]))
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(totem, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
     }
 
     void UpdateAI(uint32 diff) override
