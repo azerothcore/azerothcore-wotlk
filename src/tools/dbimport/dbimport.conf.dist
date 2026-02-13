@@ -98,6 +98,7 @@ TempDir = ""
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
 CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
+DBCDatabaseInfo       = "127.0.0.1;3306;acore;acore;acore_dbc"
 
 #
 #    Database.Reconnect.Seconds
@@ -152,12 +153,13 @@ CharacterDatabase.SynchThreads = 1
 #           DATABASE_LOGIN     = 1, // Auth database
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
+#           DATABASE_DBC       = 8, // DBC database
 #
-#        Default:     7  - (All enabled)
-#                     4  - (Enable world only)
+#        Default:     15 - (All enabled: 1 + 2 + 4 + 8 = 15)
+#                     7  - (Enable all except DBC: 1 + 2 + 4 = 7)
 #                     0  - (All disabled)
 
-Updates.EnableDatabases = 7
+Updates.EnableDatabases = 15
 
 #
 #   Updates.AllowedModules

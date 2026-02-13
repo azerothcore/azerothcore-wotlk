@@ -15,9 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DatabaseEnv.h"
+#include "DBCDatabase.h"
+#include "PreparedStatement.h"
 
-DatabaseWorkerPool<WorldDatabaseConnection> WorldDatabase;
-DatabaseWorkerPool<CharacterDatabaseConnection> CharacterDatabase;
-DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase;
-DatabaseWorkerPool<DBCDatabaseConnection> DBCDatabase;
+void DBCDatabaseConnection::DoPrepareStatements()
+{
+    // DBC database is read-only, no prepared statements needed
+}
+
+DBCDatabaseConnection::DBCDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
+{
+}
+
+DBCDatabaseConnection::DBCDatabaseConnection(ProducerConsumerQueue<SQLOperation*>* q, MySQLConnectionInfo& connInfo) : MySQLConnection(q, connInfo)
+{
+}
+
+DBCDatabaseConnection::~DBCDatabaseConnection()
+{
+}

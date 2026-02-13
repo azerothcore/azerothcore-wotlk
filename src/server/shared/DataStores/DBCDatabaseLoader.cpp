@@ -39,8 +39,12 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 {
     std::string query = Acore::StringFormat("SELECT * FROM `{}` ORDER BY `ID` DESC", _sqlTableName);
 
+    // spell_dbc remains in World database for legacy/compatibility reasons
+    // All other DBC tables are in the DBC database
+    bool useWorldDB = (std::string(_sqlTableName) == "spell_dbc");
+    
     // no error if empty set
-    QueryResult result = WorldDatabase.Query(query);
+    QueryResult result = useWorldDB ? WorldDatabase.Query(query) : DBCDatabase.Query(query);
     if (!result)
         return nullptr;
 
