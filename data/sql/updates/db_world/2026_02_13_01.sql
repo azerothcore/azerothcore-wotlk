@@ -1,3 +1,4 @@
+-- DB update 2026_02_13_00 -> 2026_02_13_01
 --
 -- uint8 to uint32 conversion for maxcount in npc_vendor
 -- game_event_npc_vendor does not need to be updated
