@@ -41,32 +41,6 @@ LOCK TABLES `updates` WRITE;
 /*!40000 ALTER TABLE `updates` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `updates_include`
---
-
-DROP TABLE IF EXISTS `updates_include`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `updates_include` (
-  `path` varchar(200) NOT NULL COMMENT 'directory to include. $ means relative to the source directory.',
-  `state` enum('RELEASED','CUSTOM','MODULE','ARCHIVED') NOT NULL DEFAULT 'RELEASED' COMMENT 'defines if the directory contains released or archived updates.',
-  PRIMARY KEY (`path`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='List of directories where we want to include sql updates.';
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `updates_include`
---
-
-LOCK TABLES `updates_include` WRITE;
-/*!40000 ALTER TABLE `updates_include` DISABLE KEYS */;
-INSERT INTO `updates_include` (`path`, `state`) VALUES
-('$/data/sql/updates/db_dbc','RELEASED'),
-('$/data/sql/updates/pending_db_dbc','CUSTOM');
-/*!40000 ALTER TABLE `updates_include` ENABLE KEYS */;
-UNLOCK TABLES;
-
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
