@@ -23,6 +23,7 @@
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
 #include <list>
+#include <map>
 #include <unordered_map>
 
 class Player;
