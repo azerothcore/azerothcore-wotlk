@@ -1244,7 +1244,6 @@ void AddSC_npc_professions()
 {
     new npc_prof_alchemy();
     new npc_prof_blacksmith();
-    new npc_engineering_tele_trinket();
     new npc_prof_leather();
     new npc_prof_tailor();
     new go_evil_book_for_dummies();
