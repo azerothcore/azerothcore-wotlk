@@ -16,6 +16,7 @@
  */
 
 #include "DBCDatabaseLoader.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "Errors.h"
 #include "QueryResult.h"
@@ -42,9 +43,15 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     // spell_dbc remains in World database for legacy/compatibility reasons
     // All other DBC tables are in the DBC database
     bool useWorldDB = (std::string(_sqlTableName) == "spell_dbc");
+    bool enableDBCDatabase = sConfigMgr->GetOption<bool>("EnableDBCDatabase", false);
 
-    // no error if empty set
+    // Query DBC database first (or World for spell_dbc)
     QueryResult result = useWorldDB ? WorldDatabase.Query(query) : DBCDatabase.Query(query);
+    
+    // Fallback to WorldDatabase if EnableDBCDatabase is disabled and result is empty
+    if (!result && !useWorldDB && !enableDBCDatabase)
+        result = WorldDatabase.Query(query);
+    
     if (!result)
         return nullptr;
 
