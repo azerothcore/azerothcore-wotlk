@@ -36,6 +36,7 @@ BossBoundaryData const boundaries =
     /* Plague Quarter */
     { BOSS_NOTH,      new RectangleBoundary(2618.0f, 2754.0f, -3557.43f, -3450.0f) },
     { BOSS_HEIGAN,    new CircleBoundary(Position(2772.57f, -3685.28f), 56.0f) },
+    { BOSS_HEIGAN,    new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f) },
     { BOSS_LOATHEB,   new CircleBoundary(Position(2909.0f, -3997.41f), 57.0f) },
 
     /* Military Quarter */
@@ -55,10 +56,7 @@ BossBoundaryData const boundaries =
 
     /* Frostwyrm Lair */
     { BOSS_SAPPHIRON, new CircleBoundary(Position(3517.627f, -5255.5f), 110.0) },
-    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0) },
-
-    /* Heigan */
-    { DATA_HEIGAN_BOSS, new RectangleBoundary(2723.0f, 2826.0f, -3736.0f, -3641.0f) }
+    { BOSS_KELTHUZAD, new CircleBoundary(Position(3716.0f, -5107.0f), 85.0) }
 };
 
 struct LivingPoisonData
@@ -428,20 +426,49 @@ public:
             case ACHIEV_CRITERIA_THE_HUNDRED_CLUB_25_PLAYER:
                 return _sapphironAchievement;
             case ACHIEV_CRITERIA_THE_UNDYING_KELTHUZAD:
-            case ACHIEV_CRITERIA_THE_UNDYING_THE_FOUR_HORSEMEN:
-            case ACHIEV_CRITERIA_THE_UNDYING_MAEXXNA:
-            case ACHIEV_CRITERIA_THE_UNDYING_LOATHEB:
-            case ACHIEV_CRITERIA_THE_UNDYING_THADDIUS:
             case ACHIEV_CRITERIA_THE_IMMORTAL_KELTHUZAD:
+            case ACHIEV_CRITERIA_THE_UNDYING_THE_FOUR_HORSEMEN:
             case ACHIEV_CRITERIA_THE_IMMORTAL_THE_FOUR_HORSEMEN:
+            case ACHIEV_CRITERIA_THE_UNDYING_MAEXXNA:
             case ACHIEV_CRITERIA_THE_IMMORTAL_MAEXXNA:
+            case ACHIEV_CRITERIA_THE_UNDYING_LOATHEB:
             case ACHIEV_CRITERIA_THE_IMMORTAL_LOATHEB:
+            case ACHIEV_CRITERIA_THE_UNDYING_THADDIUS:
             case ACHIEV_CRITERIA_THE_IMMORTAL_THADDIUS:
-                for (int i = 0; i < MAX_ENCOUNTERS; ++i)
-                    if (GetBossState(i) != DONE)
+            {
+                uint32 currentBoss;
+                switch (criteria_id)
+                {
+                    case ACHIEV_CRITERIA_THE_UNDYING_KELTHUZAD:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_KELTHUZAD:
+                        currentBoss = BOSS_KELTHUZAD;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_THE_FOUR_HORSEMEN:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_THE_FOUR_HORSEMEN:
+                        currentBoss = BOSS_HORSEMAN;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_MAEXXNA:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_MAEXXNA:
+                        currentBoss = BOSS_MAEXXNA;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_LOATHEB:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_LOATHEB:
+                        currentBoss = BOSS_LOATHEB;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_THADDIUS:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_THADDIUS:
+                        currentBoss = BOSS_THADDIUS;
+                        break;
+                    default:
+                        return false;
+                }
+
+                for (uint32 i = 0; i < MAX_ENCOUNTERS; ++i)
+                    if (i != currentBoss && GetBossState(i) != DONE)
                         return false;
 
                 return !GetPersistentData(PERSISTENT_DATA_IMMORTAL_FAIL);
+            }
             default:
                 return false;
         }
@@ -743,10 +770,10 @@ private:
     bool _horsemanAchievement;
 };
 
-class npc_mr_bigglesworth : public NullCreatureAI
+class npc_mr_bigglesworth : public CritterAI
 {
 public:
-    npc_mr_bigglesworth(Creature* c) : NullCreatureAI(c) { }
+    npc_mr_bigglesworth(Creature* c) : CritterAI(c) { }
 
     void JustDied(Unit* /*killer*/) override
     {

@@ -2583,6 +2583,18 @@ namespace lfg
         GroupsStore[gguid].AddPlayer(guid);
     }
 
+    void LFGMgr::AddPlayerQueuedForRandomDungeonToGroup(ObjectGuid gguid, ObjectGuid guid)
+    {
+        const LfgDungeonSet& dungeons = GetSelectedDungeons(guid);
+        if (dungeons.empty())
+            return;
+
+        uint32 dungeonId = *dungeons.begin();
+        LFGDungeonData const* dungeon = GetLFGDungeon(dungeonId);
+        if (dungeon && (dungeon->type == LFG_TYPE_RANDOM))
+            GroupsStore[gguid].AddRandomQueuedPlayer(guid);
+    }
+
     void LFGMgr::SetLeader(ObjectGuid gguid, ObjectGuid leader)
     {
         GroupsStore[gguid].SetLeader(leader);
@@ -2839,4 +2851,12 @@ namespace lfg
             sDisableMgr->IsDisabledFor(DISABLE_TYPE_LFG_MAP, mapId, nullptr);
     }
 
+    bool LFGMgr::IsPlayerQueuedForRandomDungeon(ObjectGuid guid)
+    {
+        auto gguid = GetGroup(guid);
+        if (!gguid)
+            return false;
+
+        return GroupsStore[gguid].IsRandomQueuedPlayer(guid);
+    }
 } // namespace lfg

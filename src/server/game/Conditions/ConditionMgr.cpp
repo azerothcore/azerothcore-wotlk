@@ -542,18 +542,18 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
         condMeets = object->GetMap()->GetDifficulty() == ConditionValue1;
         break;
     }
-    case CONDITION_RANDOM_DUNGEON:
+    case CONDITION_PLAYER_QUEUED_RANDOM_DUNGEON:
     {
         if (Unit* unit = object->ToUnit())
         {
-            if (Player* player = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+            if (Player* player = unit->ToPlayer())
             {
-                if (sLFGMgr->selectedRandomLfgDungeon(player->GetGUID()))
+                if (sLFGMgr->IsPlayerQueuedForRandomDungeon(player->GetGUID()))
                 {
                     if (!ConditionValue1)
                         condMeets = true;
                     else if (Map* map = player->GetMap())
-                        condMeets = map->GetDifficulty() == Difficulty(ConditionValue1);
+                        condMeets = map->GetDifficulty() == Difficulty(ConditionValue2);
                 }
             }
         }
@@ -803,7 +803,7 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
     case CONDITION_CHARMED:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
         break;
-    case CONDITION_RANDOM_DUNGEON:
+    case CONDITION_PLAYER_QUEUED_RANDOM_DUNGEON:
         mask |= GRID_MAP_TYPE_MASK_PLAYER;
         break;
     case CONDITION_WORLD_SCRIPT:
@@ -2486,14 +2486,17 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             return false;
         }
         break;
-    case CONDITION_RANDOM_DUNGEON:
-        if (cond->ConditionValue1 >= MAX_DIFFICULTY)
+    case CONDITION_PLAYER_QUEUED_RANDOM_DUNGEON:
+        if (cond->ConditionValue1 > 1)
         {
-            LOG_ERROR("sql.sql", "RandomDungeon condition has invalid difficulty in value1 ({}).", cond->ConditionValue1);
+            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value1 ({}).", cond->ConditionValue1);
             return false;
         }
-        if (cond->ConditionValue2)
-            LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value2 ({}).", cond->ConditionValue2);
+        if (cond->ConditionValue2 >= MAX_DIFFICULTY)
+        {
+            LOG_ERROR("sql.sql", "RandomDungeon condition has invalid difficulty in value2 ({}).", cond->ConditionValue1);
+            return false;
+        }
         if (cond->ConditionValue3)
             LOG_ERROR("sql.sql", "RandomDungeon condition has useless data in value3 ({}).", cond->ConditionValue3);
         break;

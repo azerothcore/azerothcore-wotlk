@@ -794,6 +794,13 @@ enum InstanceResetWarningType
     RAID_INSTANCE_EXPIRED           = 5
 };
 
+enum InstanceResetFailureReason : uint32
+{
+    INSTANCE_RESET_FAILED         = 0, // Cannot reset %s.  There are players still inside the instance.
+    INSTANCE_RESET_FAILED_OFFLINE = 1, // Cannot reset %s.  There are players offline in your party.
+    INSTANCE_RESET_FAILED_ZONING  = 2, // Cannot reset %s.  There are players in your party attempting to zone into an instance.
+};
+
 class InstanceSave;
 
 enum RestFlag
@@ -970,6 +977,9 @@ enum PlayerRestState
 {
     REST_STATE_RESTED                                = 0x01,
     REST_STATE_NOT_RAF_LINKED                        = 0x02,
+    REST_STATE_TIRED                                 = 0x03,
+    REST_STATE_TIRED_XP_REDUCED                      = 0x04, // 50% XP
+    REST_STATE_EXHAUSTED                             = 0x05, // 25% XP
     REST_STATE_RAF_LINKED                            = 0x06
 };
 
@@ -1443,6 +1453,7 @@ public:
     bool SatisfyQuestConditions(Quest const* qInfo, bool msg);
     bool SatisfyQuestTimed(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestExclusiveGroup(Quest const* qInfo, bool msg) const;
+    bool SatisfyQuestBreadcrumb(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestNextChain(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestPrevChain(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestDay(Quest const* qInfo, bool msg) const;
@@ -2009,7 +2020,7 @@ public:
     void SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty = -1);
     static void ResetInstances(ObjectGuid guid, uint8 method, bool isRaid);
     void SendResetInstanceSuccess(uint32 MapId);
-    void SendResetInstanceFailed(uint32 reason, uint32 MapId);
+    void SendResetInstanceFailed(InstanceResetFailureReason reason, uint32 MapId);
     void SendResetFailedNotify(uint32 mapid);
 
     bool UpdatePosition(float x, float y, float z, float orientation, bool teleport = false) override;

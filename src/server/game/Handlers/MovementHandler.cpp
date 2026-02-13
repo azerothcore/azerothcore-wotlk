@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
@@ -490,6 +491,10 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
             {
                 if (plrMover->IsAlive())
                 {
+                    // The Oculus under map case is handled by areatrigger (5001) and should not kill the player
+                    if (plrMover->GetMapId() == MAP_THE_OCULUS)
+                        return;
+
                     plrMover->SetPlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
                     plrMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
                     // player can be alive if GM
