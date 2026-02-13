@@ -29,6 +29,7 @@
 #include "UpdateTime.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Entities/Item/ItemGuidMap.h"
 #include <vector>
 
 constexpr auto AH_MINIMUM_DEPOSIT = 100;
@@ -580,7 +581,11 @@ void AuctionEntry::SaveToDB(CharacterDatabaseTransaction trans) const
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AUCTION);
     stmt->SetData(0, Id);
     stmt->SetData(1, houseId);
-    stmt->SetData(2, item_guid.GetCounter());
+    {
+        Item* it = sAuctionMgr->GetAItem(item_guid);
+        uint64 dbGuid = it ? it->GetDbGuid() : static_cast<uint64>(item_guid.GetCounter());
+        stmt->SetData(2, dbGuid);
+    }
     stmt->SetData(3, owner.GetCounter());
     stmt->SetData (4, buyout);
     stmt->SetData(5, uint32(expire_time));
@@ -595,7 +600,11 @@ bool AuctionEntry::LoadFromDB(Field* fields)
 {
     Id = fields[0].Get<uint32>();
     houseId = AuctionHouseId(fields[1].Get<uint8>());
-    item_guid = ObjectGuid::Create<HighGuid::Item>(fields[2].Get<uint32>());
+    {
+        uint64 dbGuid = fields[2].Get<uint64>();
+        uint32 low = sItemGuidMap->Acquire(dbGuid);
+        item_guid = ObjectGuid::Create<HighGuid::Item>(low);
+    }
     item_template = fields[3].Get<uint32>();
     itemCount = fields[4].Get<uint32>();
     owner = ObjectGuid::Create<HighGuid::Player>(fields[5].Get<uint32>());
