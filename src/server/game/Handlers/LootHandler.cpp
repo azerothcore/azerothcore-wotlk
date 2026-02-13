@@ -203,13 +203,13 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 uint32 finalGold = goldPerPlayer;
 
                 if ((*i)->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
-                    break;
+                    continue;
 
                 if ((*i)->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
                     finalGold /= 2;
 
                 if (!finalGold)
-                    break;
+                    continue;
 
                 (*i)->ModifyMoney(finalGold);
                 (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
