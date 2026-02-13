@@ -117,6 +117,7 @@ protected:
 // ------------------------------------------------------------------
 // Baseline: Spawn1Object correctly adds pooled quest to NPC
 // ------------------------------------------------------------------
+// cppcheck-suppress syntaxError
 TEST_F(PoolQuestReloadTest, Spawn1ObjectAddsQuestToCreatureRelationMap)
 {
     // Initially the quest should NOT be on the creature
