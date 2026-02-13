@@ -939,9 +939,9 @@ struct boss_sartharion_dragonAI : public BossAI
         else if (eventId == EVENT_DRAGON_START_PATROL)
         {
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetAnimTier(AnimTier::Fly);
             me->SetDisableGravity(true);
             me->SetHover(true);
+            me->SetAnimTier(AnimTier::Fly);
             me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
         }
     }
