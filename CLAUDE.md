@@ -86,7 +86,7 @@ Scripts follow a registration pattern:
 
 - SQL updates go in `data/sql/updates/pending_*` with separate subdirectories per database until pull request is merged. Pending SQL files are assigned random names.
 - SQL updates go in `data/sql/updates/` with separate subdirectories per database after their pull request is merged.
-- SQL files outside the `pending` folders should never be updated.
+- SQL files outside the `data/sql/updates/pending_*` folders should never be updated.
 
 ### Module system
 
