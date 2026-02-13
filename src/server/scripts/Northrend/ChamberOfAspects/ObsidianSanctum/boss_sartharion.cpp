@@ -719,6 +719,7 @@ struct boss_sartharion_dragonAI : public BossAI
         me->SetImmuneToNPC(false);
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
         me->SetCanFly(false);
+        me->SetDisableGravity(false);
         me->ResetLootMode();
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         portalGUID.Clear();

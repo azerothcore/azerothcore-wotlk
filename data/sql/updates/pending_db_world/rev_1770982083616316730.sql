@@ -29,5 +29,3 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (304510, 7, 3223.111, 488.90338, 110.53484, 0, 0, @MOVE_TYPE, 0, 100, 0),
 (304510, 8, 3197.9263, 511.4375, 113.22937, 0, 0, @MOVE_TYPE, 0, 100, 0);
 
--- Disable Gravity
-UPDATE `creature_template_movement` SET `Flight` = 1 WHERE (`CreatureId` IN (30452, 30451, 30449));
