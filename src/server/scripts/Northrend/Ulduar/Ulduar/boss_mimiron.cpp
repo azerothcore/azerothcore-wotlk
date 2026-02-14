@@ -266,15 +266,15 @@ struct boss_mimiron : public BossAI
     }
 
     bool bIsEvading;
-        bool hardmode;
-        bool berserk;
-        bool bAchievProximityMine;
-        bool bAchievBombBot;
-        bool bAchievRocketStrike;
-        uint32 allowedFlameSpreadTime;
-        bool changeAllowedFlameSpreadTime;
-        uint8 minutesTalkNum;
-        uint32 outofCombatTimer;
+    bool hardmode;
+    bool berserk;
+    bool bAchievProximityMine;
+    bool bAchievBombBot;
+    bool bAchievRocketStrike;
+    uint32 allowedFlameSpreadTime;
+    bool changeAllowedFlameSpreadTime;
+    uint8 minutesTalkNum;
+    uint32 outofCombatTimer;
 
     void Reset() override
     {
@@ -313,52 +313,52 @@ struct boss_mimiron : public BossAI
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         events.Reset();
 
-            if (Creature* c = GetLMK2())
-            {
-                if (c->IsInEvadeMode())
-                {
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    return;
-                }
-                if (!c->IsAlive())
-                    c->Respawn();
-
-                me->EnterVehicle(c, 1);
-            }
-            else
+        if (Creature* c = GetLMK2())
+        {
+            if (c->IsInEvadeMode())
             {
                 EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
             }
-            CloseDoorAndButton();
+            if (!c->IsAlive())
+                c->Respawn();
 
-            if (!hardmode)
-            {
-                Talk(SAY_MKII_ACTIVATE);
-                events.ScheduleEvent(EVENT_SIT_LMK2, 6s);
-                events.ScheduleEvent(EVENT_BERSERK, 15min);
-            }
-            else
-            {
-                events.ScheduleEvent(EVENT_MIMIRON_SAY_HARDMODE, 7s);
-                events.ScheduleEvent(EVENT_BERSERK, Is25ManRaid() ? 10min : 8min);
+            me->EnterVehicle(c, 1);
+        }
+        else
+        {
+            EnterEvadeMode(EVADE_REASON_OTHER);
+            return;
+        }
+        CloseDoorAndButton();
 
-                if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                    computer->AI()->Talk(TALK_COMPUTER_INITIATED);
+        if (!hardmode)
+        {
+            Talk(SAY_MKII_ACTIVATE);
+            events.ScheduleEvent(EVENT_SIT_LMK2, 6s);
+            events.ScheduleEvent(EVENT_BERSERK, 15min);
+        }
+        else
+        {
+            events.ScheduleEvent(EVENT_MIMIRON_SAY_HARDMODE, 7s);
+            events.ScheduleEvent(EVENT_BERSERK, Is25ManRaid() ? 10min : 8min);
 
-                events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, 3s);
-                minutesTalkNum = Is25ManRaid() ? TALK_COMPUTER_TEN : TALK_COMPUTER_EIGHT;
-                for (uint32 i = 0; i < uint32(TALK_COMPUTER_ZERO - minutesTalkNum - 1); ++i)
-                    events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((i + 1) * 60000));
-                events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((TALK_COMPUTER_ZERO - minutesTalkNum) * 60000));
-            }
+            if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                computer->AI()->Talk(TALK_COMPUTER_INITIATED);
+
+            events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, 3s);
+            minutesTalkNum = Is25ManRaid() ? TALK_COMPUTER_TEN : TALK_COMPUTER_EIGHT;
+            for (uint32 i = 0; i < uint32(TALK_COMPUTER_ZERO - minutesTalkNum - 1); ++i)
+                events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((i + 1) * 60000));
+            events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((TALK_COMPUTER_ZERO - minutesTalkNum) * 60000));
+        }
 
         // ensure LMK2 is at proper position
-            if (Creature* LMK2 = GetLMK2())
-            {
-                LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
-                LMK2->StopMovingOnCurrentPos();
-            }
+        if (Creature* LMK2 = GetLMK2())
+        {
+            LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
+            LMK2->StopMovingOnCurrentPos();
+        }
 
         if (!instance->IsBossDone(BOSS_MIMIRON))
             instance->SetBossState(BOSS_MIMIRON, IN_PROGRESS);
@@ -387,402 +387,402 @@ struct boss_mimiron : public BossAI
 
         events.Update(diff);
 
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_COMPUTER_SAY_MINUTES:
-                    if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                        computer->AI()->Talk(minutesTalkNum++);
-                    break;
-                case EVENT_MIMIRON_SAY_HARDMODE:
-                    Talk(SAY_HARDMODE_ON);
-                    events.ScheduleEvent(EVENT_SPAWN_FLAMES_INITIAL, 0ms);
-                    events.ScheduleEvent(EVENT_SIT_LMK2, 4s);
-                    break;
-                case EVENT_SPAWN_FLAMES_INITIAL:
-                    {
-                        if (changeAllowedFlameSpreadTime)
-                            allowedFlameSpreadTime = GameTime::GetGameTime().count();
+        switch (events.ExecuteEvent())
+        {
+            case 0:
+                break;
+            case EVENT_COMPUTER_SAY_MINUTES:
+                if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                    computer->AI()->Talk(minutesTalkNum++);
+                break;
+            case EVENT_MIMIRON_SAY_HARDMODE:
+                Talk(SAY_HARDMODE_ON);
+                events.ScheduleEvent(EVENT_SPAWN_FLAMES_INITIAL, 0ms);
+                events.ScheduleEvent(EVENT_SIT_LMK2, 4s);
+                break;
+            case EVENT_SPAWN_FLAMES_INITIAL:
+                {
+                    if (changeAllowedFlameSpreadTime)
+                        allowedFlameSpreadTime = GameTime::GetGameTime().count();
 
-                        std::vector<Player*> pg;
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            if (Player* plr = itr->GetSource())
-                                if (plr->IsAlive() && plr->GetExactDist2d(me) < 150.0f && !plr->IsGameMaster())
-                                    pg.push_back(plr);
+                    std::vector<Player*> pg;
+                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                    for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                        if (Player* plr = itr->GetSource())
+                            if (plr->IsAlive() && plr->GetExactDist2d(me) < 150.0f && !plr->IsGameMaster())
+                                pg.push_back(plr);
 
-                        for( uint8 i = 0; i < 3; ++i )
-                            if (!pg.empty())
-                            {
-                                uint8 index = urand(0, pg.size() - 1);
-                                Player* player = pg[index];
-                                float angle = rand_norm() * 2 * M_PI;
-                                float z = 364.35f;
-                                if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z))
-                                {
-                                    angle = player->GetAngle(2744.65f, 2569.46f);
-                                }
-                                me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
-                                pg.erase(pg.begin() + index);
-                            }
-
-                        events.Repeat(30s);
-                    }
-                    break;
-                case EVENT_BERSERK:
-                    berserk = true;
-                    Talk(SAY_BERSERK);
-                    if (hardmode)
-                        me->SummonCreature(33576, 2744.78f, 2569.47f, 364.32f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000);
-                    events.ScheduleEvent(EVENT_BERSERK_2, 0ms);
-                    break;
-                case EVENT_BERSERK_2:
-                    {
-                        Creature* VX001 = nullptr;
-                        Creature* LMK2 = nullptr;
-                        Creature* ACU = nullptr;
-                        if ((VX001 = GetVX001()))
-                            VX001->CastSpell(VX001, SPELL_BERSERK, true);
-                        if ((LMK2 = GetLMK2()))
-                            LMK2->CastSpell(LMK2, SPELL_BERSERK, true);
-                        if ((ACU = GetACU()))
-                            ACU->CastSpell(ACU, SPELL_BERSERK, true);
-                        events.Repeat(30s);
-                    }
-                    break;
-                case EVENT_SIT_LMK2:
-                    if (Creature* LMK2 = GetLMK2())
-                    {
-                        me->EnterVehicle(LMK2, 6);
-                        events.ScheduleEvent(EVENT_SIT_LMK2_INTERVAL, 2s);
-                        break;
-                    }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_SIT_LMK2_INTERVAL:
-                    if (Creature* LMK2 = GetLMK2())
-                    {
-                        if (hardmode)
+                    for( uint8 i = 0; i < 3; ++i )
+                        if (!pg.empty())
                         {
-                            LMK2->CastSpell(LMK2, SPELL_EMERGENCY_MODE, true);
-                            if (Vehicle* veh = LMK2->GetVehicleKit())
-                                if (Unit* cannon = veh->GetPassenger(3))
-                                    cannon->CastSpell(cannon, SPELL_EMERGENCY_MODE, true);
+                            uint8 index = urand(0, pg.size() - 1);
+                            Player* player = pg[index];
+                            float angle = rand_norm() * 2 * M_PI;
+                            float z = 364.35f;
+                            if (!player->IsWithinLOS(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z))
+                            {
+                                angle = player->GetAngle(2744.65f, 2569.46f);
+                            }
+                            me->CastSpell(player->GetPositionX() + cos(angle) * 5.0f, player->GetPositionY() + std::sin(angle) * 5.0f, z, SPELL_SUMMON_FLAMES_INITIAL, true);
+                            pg.erase(pg.begin() + index);
                         }
-                        LMK2->AI()->SetData(1, 1);
-                        break;
-                    }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
+
+                    events.Repeat(30s);
+                }
+                break;
+            case EVENT_BERSERK:
+                berserk = true;
+                Talk(SAY_BERSERK);
+                if (hardmode)
+                    me->SummonCreature(33576, 2744.78f, 2569.47f, 364.32f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000);
+                events.ScheduleEvent(EVENT_BERSERK_2, 0ms);
+                break;
+            case EVENT_BERSERK_2:
+                {
+                    Creature* VX001 = nullptr;
+                    Creature* LMK2 = nullptr;
+                    Creature* ACU = nullptr;
+                    if ((VX001 = GetVX001()))
+                        VX001->CastSpell(VX001, SPELL_BERSERK, true);
+                    if ((LMK2 = GetLMK2()))
+                        LMK2->CastSpell(LMK2, SPELL_BERSERK, true);
+                    if ((ACU = GetACU()))
+                        ACU->CastSpell(ACU, SPELL_BERSERK, true);
+                    events.Repeat(30s);
+                }
+                break;
+            case EVENT_SIT_LMK2:
+                if (Creature* LMK2 = GetLMK2())
+                {
+                    me->EnterVehicle(LMK2, 6);
+                    events.ScheduleEvent(EVENT_SIT_LMK2_INTERVAL, 2s);
                     break;
-                case EVENT_LMK2_RETREAT_INTERVAL:
-                    if (Creature* LMK2 = GetLMK2())
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_SIT_LMK2_INTERVAL:
+                if (Creature* LMK2 = GetLMK2())
+                {
+                    if (hardmode)
                     {
-                        me->EnterVehicle(LMK2, 1);
-                        Talk(SAY_MKII_DEATH);
-                        LMK2->SetFacingTo(3.58f);
-                        events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_0, 6s);
-                        break;
+                        LMK2->CastSpell(LMK2, SPELL_EMERGENCY_MODE, true);
+                        if (Vehicle* veh = LMK2->GetVehicleKit())
+                            if (Unit* cannon = veh->GetPassenger(3))
+                                cannon->CastSpell(cannon, SPELL_EMERGENCY_MODE, true);
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
+                    LMK2->AI()->SetData(1, 1);
                     break;
-                case EVENT_ELEVATOR_INTERVAL_0:
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_LMK2_RETREAT_INTERVAL:
+                if (Creature* LMK2 = GetLMK2())
+                {
+                    me->EnterVehicle(LMK2, 1);
+                    Talk(SAY_MKII_DEATH);
+                    LMK2->SetFacingTo(3.58f);
+                    events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_0, 6s);
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_ELEVATOR_INTERVAL_0:
+                if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f))
+                {
+                    elevator->SetLootState(GO_READY);
+                    elevator->UseDoorOrButton(0, false);
+                    elevator->EnableCollision(false);
+                }
+                events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6s);
+                break;
+            case EVENT_ELEVATOR_INTERVAL_1:
+                if (me->SummonCreature(NPC_VX001, 2744.65f, 2569.46f, 364.40f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN))
+                {
                     if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f))
                     {
                         elevator->SetLootState(GO_READY);
-                        elevator->UseDoorOrButton(0, false);
+                        elevator->UseDoorOrButton(0, true);
                         elevator->EnableCollision(false);
                     }
-                    events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6s);
+                    events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_2, 18s);
                     break;
-                case EVENT_ELEVATOR_INTERVAL_1:
-                    if (me->SummonCreature(NPC_VX001, 2744.65f, 2569.46f, 364.40f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN))
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_ELEVATOR_INTERVAL_2:
+                if (Creature* VX001 = GetVX001())
+                {
+                    me->EnterVehicle(VX001, 0);
+                    events.ScheduleEvent(EVENT_SITTING_ON_VX001, 4s);
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_SITTING_ON_VX001:
+                Talk(SAY_VX001_ACTIVATE);
+                events.ScheduleEvent(EVENT_ENTER_VX001, 5s);
+                break;
+            case EVENT_ENTER_VX001:
+                if (Creature* VX001 = GetVX001())
+                {
+                    me->EnterVehicle(VX001, 1);
+                    events.ScheduleEvent(EVENT_EMOTE_VX001, 2s);
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_EMOTE_VX001:
+                if (Creature* VX001 = GetVX001())
+                {
+                    VX001->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+                    events.ScheduleEvent(EVENT_VX001_START_FIGHT, 1750ms);
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_VX001_START_FIGHT:
+                if (Creature* VX001 = GetVX001())
+                {
+                    if (hardmode)
+                        VX001->CastSpell(VX001, SPELL_EMERGENCY_MODE, true);
+                    VX001->AI()->SetData(1, 2);
+                    me->SetInCombatWithZone();
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_VX001_EMOTESTATE_DEATH:
+                if (Creature* VX001 = GetVX001())
+                {
+                    VX001->HandleEmoteCommand(EMOTE_STATE_DROWNED);
+                    VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DROWNED);
+                    events.ScheduleEvent(EVENT_GET_OUT_VX001, 2500ms);
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_GET_OUT_VX001:
+                if (Creature* VX001 = GetVX001())
+                    if (Creature* ACU = me->SummonCreature(NPC_AERIAL_COMMAND_UNIT, 2743.91f, 2568.78f, 391.34f, M_PI, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f))
-                        {
-                            elevator->SetLootState(GO_READY);
-                            elevator->UseDoorOrButton(0, true);
-                            elevator->EnableCollision(false);
-                        }
-                        events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_2, 18s);
+                        me->EnterVehicle(VX001, 4);
+                        float speed = ACU->GetDistance(2737.75f, 2574.22f, 381.34f) / 2.0f;
+                        ACU->GetMotionMaster()->MovePoint(0, 2737.75f, 2574.22f, 381.34f, FORCED_MOVEMENT_NONE, speed);
+                        ACU->SetPosition(2737.75f, 2574.22f, 381.34f, M_PI);
+                        events.ScheduleEvent(EVENT_SAY_VX001_DEAD, 2s);
                         break;
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_SAY_VX001_DEAD:
+                changeAllowedFlameSpreadTime = true;
+                Talk(SAY_VX001_DEATH);
+                events.ScheduleEvent(EVENT_ENTER_ACU, 7s);
+                break;
+            case EVENT_ENTER_ACU:
+                if (Creature* ACU = GetACU())
+                {
+                    me->EnterVehicle(ACU, 0);
+                    events.ScheduleEvent(EVENT_SAY_ACU_ACTIVATE, 6s);
                     break;
-                case EVENT_ELEVATOR_INTERVAL_2:
-                    if (Creature* VX001 = GetVX001())
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_SAY_ACU_ACTIVATE:
+                Talk(SAY_AERIAL_ACTIVATE);
+                events.ScheduleEvent(EVENT_ACU_START_ATTACK, 4s);
+                break;
+            case EVENT_ACU_START_ATTACK:
+                if (Creature* ACU = GetACU())
+                {
+                    if (hardmode)
+                        ACU->CastSpell(ACU, SPELL_EMERGENCY_MODE, true);
+                    ACU->AI()->SetData(1, 3);
+                    me->SetInCombatWithZone();
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_SAY_ACU_DEAD:
+                Talk(SAY_AERIAL_DEATH);
+                events.ScheduleEvent(EVENT_LEVIATHAN_COME_CLOSER, 5s);
+                break;
+            case EVENT_LEVIATHAN_COME_CLOSER:
+                if (Creature* LMK2 = GetLMK2())
+                {
+                    LMK2->GetMotionMaster()->MoveCharge(2755.77f, 2574.95f, 364.31f, 21.0f);
+                    events.ScheduleEvent(EVENT_VX001_EMOTE_JUMP, 4s);
+                    break;
+                }
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                break;
+            case EVENT_VX001_EMOTE_JUMP:
+                {
+                    Creature* LMK2 = GetLMK2();
+                    Creature* VX001 = GetVX001();
+                    if (!VX001 || !LMK2)
                     {
-                        me->EnterVehicle(VX001, 0);
-                        events.ScheduleEvent(EVENT_SITTING_ON_VX001, 4s);
-                        break;
+                        EnterEvadeMode(EVADE_REASON_OTHER);
+                        return;
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_SITTING_ON_VX001:
-                    Talk(SAY_VX001_ACTIVATE);
-                    events.ScheduleEvent(EVENT_ENTER_VX001, 5s);
-                    break;
-                case EVENT_ENTER_VX001:
-                    if (Creature* VX001 = GetVX001())
+
+                    VX001->SendMeleeAttackStop();
+                    VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CUSTOM_SPELL_02);
+                    VX001->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_02);
+                    events.ScheduleEvent(EVENT_LEVIATHAN_RIDE_MIDDLE, 4800ms);
+                }
+                break;
+            case EVENT_LEVIATHAN_RIDE_MIDDLE:
+                {
+                    Creature* VX001 = GetVX001();
+                    Creature* LMK2 = GetLMK2();
+                    if (!VX001 || !LMK2)
                     {
-                        me->EnterVehicle(VX001, 1);
-                        events.ScheduleEvent(EVENT_EMOTE_VX001, 2s);
-                        break;
+                        EnterEvadeMode(EVADE_REASON_OTHER);
+                        return;
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_EMOTE_VX001:
-                    if (Creature* VX001 = GetVX001())
+
+                    LMK2->GetMotionMaster()->MoveCharge(2744.65f, 2569.46f, 364.31f, 21.0f);
+                    VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+                    VX001->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+                    VX001->EnterVehicle(LMK2, 3);
+                    events.ScheduleEvent(EVENT_JOIN_TOGETHER, 3s);
+                }
+                break;
+            case EVENT_JOIN_TOGETHER:
+                {
+                    Creature* ACU = GetACU();
+                    Creature* VX001 = GetVX001();
+                    if (!VX001 || !ACU)
                     {
-                        VX001->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
-                        events.ScheduleEvent(EVENT_VX001_START_FIGHT, 1750ms);
-                        break;
+                        EnterEvadeMode(EVADE_REASON_OTHER);
+                        return;
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_VX001_START_FIGHT:
-                    if (Creature* VX001 = GetVX001())
+
+                    ACU->SetDisableGravity(false);
+                    ACU->EnterVehicle(VX001, 3);
+                    me->EnterVehicle(VX001, 1);
+                    Talk(SAY_V07TRON_ACTIVATE);
+                    events.ScheduleEvent(EVENT_START_PHASE4, 10s);
+                }
+                break;
+            case EVENT_START_PHASE4:
+                {
+                    Creature* VX001 = GetVX001();
+                    Creature* LMK2 = GetLMK2();
+                    Creature* ACU = GetACU();
+                    if (!VX001 || !LMK2 || !ACU)
                     {
-                        if (hardmode)
-                            VX001->CastSpell(VX001, SPELL_EMERGENCY_MODE, true);
-                        VX001->AI()->SetData(1, 2);
-                        me->SetInCombatWithZone();
-                        break;
+                        EnterEvadeMode(EVADE_REASON_OTHER);
+                        return;
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_VX001_EMOTESTATE_DEATH:
-                    if (Creature* VX001 = GetVX001())
+
+                    LMK2->AI()->SetData(1, 4);
+                    VX001->AI()->SetData(1, 4);
+                    ACU->AI()->SetData(1, 4);
+                    LMK2->CastSpell(LMK2, SPELL_SELF_REPAIR, true); //LMK2->SetHealth( LMK2->GetMaxHealth()/2 );
+                    VX001->CastSpell(VX001, SPELL_SELF_REPAIR, true); //VX001->SetHealth( VX001->GetMaxHealth()/2 );
+                    ACU->CastSpell(ACU, SPELL_SELF_REPAIR, true); //ACU->SetHealth( ACU->GetMaxHealth()/2 );
+                    if (hardmode)
                     {
-                        VX001->HandleEmoteCommand(EMOTE_STATE_DROWNED);
-                        VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DROWNED);
-                        events.ScheduleEvent(EVENT_GET_OUT_VX001, 2500ms);
-                        break;
+                        LMK2->CastSpell(LMK2, SPELL_EMERGENCY_MODE, true);
+                        VX001->CastSpell(VX001, SPELL_EMERGENCY_MODE, true);
+                        ACU->CastSpell(ACU, SPELL_EMERGENCY_MODE, true);
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_GET_OUT_VX001:
-                    if (Creature* VX001 = GetVX001())
-                        if (Creature* ACU = me->SummonCreature(NPC_AERIAL_COMMAND_UNIT, 2743.91f, 2568.78f, 391.34f, M_PI, TEMPSUMMON_MANUAL_DESPAWN))
-                        {
-                            me->EnterVehicle(VX001, 4);
-                            float speed = ACU->GetDistance(2737.75f, 2574.22f, 381.34f) / 2.0f;
-                            ACU->GetMotionMaster()->MovePoint(0, 2737.75f, 2574.22f, 381.34f, FORCED_MOVEMENT_NONE, speed);
-                            ACU->SetPosition(2737.75f, 2574.22f, 381.34f, M_PI);
-                            events.ScheduleEvent(EVENT_SAY_VX001_DEAD, 2s);
-                            break;
-                        }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_SAY_VX001_DEAD:
-                    changeAllowedFlameSpreadTime = true;
-                    Talk(SAY_VX001_DEATH);
-                    events.ScheduleEvent(EVENT_ENTER_ACU, 7s);
-                    break;
-                case EVENT_ENTER_ACU:
-                    if (Creature* ACU = GetACU())
+                    me->SetInCombatWithZone();
+                }
+                break;
+            case EVENT_FINISH:
+                {
+                    Creature* LMK2 = GetLMK2();
+                    Creature* VX001 = GetVX001();
+                    Creature* ACU = GetACU();
+
+                    if (!VX001 || !LMK2 || !ACU)
+                        return;
+
+                    LMK2->GetMotionMaster()->Clear();
+                    LMK2->StopMoving();
+                    LMK2->InterruptNonMeleeSpells(false);
+                    LMK2->AttackStop();
+                    LMK2->AI()->SetData(1, 0);
+                    LMK2->DespawnOrUnsummon(7s);
+                    LMK2->SetReactState(REACT_PASSIVE);
+                    VX001->InterruptNonMeleeSpells(false);
+                    VX001->AttackStop();
+                    VX001->AI()->SetData(1, 0);
+                    VX001->DespawnOrUnsummon(7s);
+                    VX001->SetReactState(REACT_PASSIVE);
+                    ACU->InterruptNonMeleeSpells(false);
+                    ACU->AttackStop();
+                    ACU->AI()->SetData(1, 0);
+                    ACU->DespawnOrUnsummon(7s);
+                    ACU->SetReactState(REACT_PASSIVE);
+
+                    Position exitPos = me->GetPosition();
+                    me->_ExitVehicle(&exitPos);
+                    me->AttackStop();
+                    me->GetMotionMaster()->Clear();
+                    summons.DoAction(1337); // despawn summons of summons
+                    summons.DespawnEntry(NPC_FLAMES_INITIAL);
+                    summons.DespawnEntry(33576);
+
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+                    float angle = VX001->GetOrientation();
+                    float v_x = me->GetPositionX() + cos(angle) * 10.0f;
+                    float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
+                    me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
+
+                    DoCastSelf(SPELL_SLEEP_VISUAL_1);
+
+                    if (instance)
+                        for( uint16 i = 0; i < 3; ++i )
+                            if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                                if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
+                                    if (door->GetGoState() != GO_STATE_ACTIVE )
+                                    {
+                                        door->SetLootState(GO_READY);
+                                        door->UseDoorOrButton(0, false);
+                                    }
+
+                    instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LEVIATHAN_MKII, 1, me);
+
+                    if (hardmode)
+                        if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                            computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
+
+                    events.Reset();
+                    events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 6s);
+                }
+                break;
+            case EVENT_STAND_UP_FRIENDLY:
+                me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL_1);
+                DoCastSelf(SPELL_SLEEP_VISUAL_2);
+                me->SetFaction(FACTION_FRIENDLY);
+                events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 4s);
+                break;
+            case EVENT_SAY_VOLTRON_DEAD:
+                Talk(SAY_V07TRON_DEATH);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                instance->SetBossState(BOSS_MIMIRON, DONE);
+                // spawn chest
+                if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
+                {
+                    if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
                     {
-                        me->EnterVehicle(ACU, 0);
-                        events.ScheduleEvent(EVENT_SAY_ACU_ACTIVATE, 6s);
-                        break;
+                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                        go->SetLootRecipient(me->GetMap());
                     }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_SAY_ACU_ACTIVATE:
-                    Talk(SAY_AERIAL_ACTIVATE);
-                    events.ScheduleEvent(EVENT_ACU_START_ATTACK, 4s);
-                    break;
-                case EVENT_ACU_START_ATTACK:
-                    if (Creature* ACU = GetACU())
-                    {
-                        if (hardmode)
-                            ACU->CastSpell(ACU, SPELL_EMERGENCY_MODE, true);
-                        ACU->AI()->SetData(1, 3);
-                        me->SetInCombatWithZone();
-                        break;
-                    }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_SAY_ACU_DEAD:
-                    Talk(SAY_AERIAL_DEATH);
-                    events.ScheduleEvent(EVENT_LEVIATHAN_COME_CLOSER, 5s);
-                    break;
-                case EVENT_LEVIATHAN_COME_CLOSER:
-                    if (Creature* LMK2 = GetLMK2())
-                    {
-                        LMK2->GetMotionMaster()->MoveCharge(2755.77f, 2574.95f, 364.31f, 21.0f);
-                        events.ScheduleEvent(EVENT_VX001_EMOTE_JUMP, 4s);
-                        break;
-                    }
-                    EnterEvadeMode(EVADE_REASON_OTHER);
-                    break;
-                case EVENT_VX001_EMOTE_JUMP:
-                    {
-                        Creature* LMK2 = GetLMK2();
-                        Creature* VX001 = GetVX001();
-                        if (!VX001 || !LMK2)
-                        {
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            return;
-                        }
-
-                        VX001->SendMeleeAttackStop();
-                        VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_CUSTOM_SPELL_02);
-                        VX001->HandleEmoteCommand(EMOTE_ONESHOT_CUSTOM_SPELL_02);
-                        events.ScheduleEvent(EVENT_LEVIATHAN_RIDE_MIDDLE, 4800ms);
-                    }
-                    break;
-                case EVENT_LEVIATHAN_RIDE_MIDDLE:
-                    {
-                        Creature* VX001 = GetVX001();
-                        Creature* LMK2 = GetLMK2();
-                        if (!VX001 || !LMK2)
-                        {
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            return;
-                        }
-
-                        LMK2->GetMotionMaster()->MoveCharge(2744.65f, 2569.46f, 364.31f, 21.0f);
-                        VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
-                        VX001->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
-                        VX001->EnterVehicle(LMK2, 3);
-                        events.ScheduleEvent(EVENT_JOIN_TOGETHER, 3s);
-                    }
-                    break;
-                case EVENT_JOIN_TOGETHER:
-                    {
-                        Creature* ACU = GetACU();
-                        Creature* VX001 = GetVX001();
-                        if (!VX001 || !ACU)
-                        {
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            return;
-                        }
-
-                        ACU->SetDisableGravity(false);
-                        ACU->EnterVehicle(VX001, 3);
-                        me->EnterVehicle(VX001, 1);
-                        Talk(SAY_V07TRON_ACTIVATE);
-                        events.ScheduleEvent(EVENT_START_PHASE4, 10s);
-                    }
-                    break;
-                case EVENT_START_PHASE4:
-                    {
-                        Creature* VX001 = GetVX001();
-                        Creature* LMK2 = GetLMK2();
-                        Creature* ACU = GetACU();
-                        if (!VX001 || !LMK2 || !ACU)
-                        {
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            return;
-                        }
-
-                        LMK2->AI()->SetData(1, 4);
-                        VX001->AI()->SetData(1, 4);
-                        ACU->AI()->SetData(1, 4);
-                        LMK2->CastSpell(LMK2, SPELL_SELF_REPAIR, true); //LMK2->SetHealth( LMK2->GetMaxHealth()/2 );
-                        VX001->CastSpell(VX001, SPELL_SELF_REPAIR, true); //VX001->SetHealth( VX001->GetMaxHealth()/2 );
-                        ACU->CastSpell(ACU, SPELL_SELF_REPAIR, true); //ACU->SetHealth( ACU->GetMaxHealth()/2 );
-                        if (hardmode)
-                        {
-                            LMK2->CastSpell(LMK2, SPELL_EMERGENCY_MODE, true);
-                            VX001->CastSpell(VX001, SPELL_EMERGENCY_MODE, true);
-                            ACU->CastSpell(ACU, SPELL_EMERGENCY_MODE, true);
-                        }
-                        me->SetInCombatWithZone();
-                    }
-                    break;
-                case EVENT_FINISH:
-                    {
-                        Creature* LMK2 = GetLMK2();
-                        Creature* VX001 = GetVX001();
-                        Creature* ACU = GetACU();
-
-                        if (!VX001 || !LMK2 || !ACU)
-                            return;
-
-                        LMK2->GetMotionMaster()->Clear();
-                        LMK2->StopMoving();
-                        LMK2->InterruptNonMeleeSpells(false);
-                        LMK2->AttackStop();
-                        LMK2->AI()->SetData(1, 0);
-                        LMK2->DespawnOrUnsummon(7s);
-                        LMK2->SetReactState(REACT_PASSIVE);
-                        VX001->InterruptNonMeleeSpells(false);
-                        VX001->AttackStop();
-                        VX001->AI()->SetData(1, 0);
-                        VX001->DespawnOrUnsummon(7s);
-                        VX001->SetReactState(REACT_PASSIVE);
-                        ACU->InterruptNonMeleeSpells(false);
-                        ACU->AttackStop();
-                        ACU->AI()->SetData(1, 0);
-                        ACU->DespawnOrUnsummon(7s);
-                        ACU->SetReactState(REACT_PASSIVE);
-
-                        Position exitPos = me->GetPosition();
-                        me->_ExitVehicle(&exitPos);
-                        me->AttackStop();
-                        me->GetMotionMaster()->Clear();
-                        summons.DoAction(1337); // despawn summons of summons
-                        summons.DespawnEntry(NPC_FLAMES_INITIAL);
-                        summons.DespawnEntry(33576);
-
-                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
-                        float angle = VX001->GetOrientation();
-                        float v_x = me->GetPositionX() + cos(angle) * 10.0f;
-                        float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
-                        me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
-
-                        DoCastSelf(SPELL_SLEEP_VISUAL_1);
-
-                        if (instance)
-                            for( uint16 i = 0; i < 3; ++i )
-                                if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
-                                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
-                                        if (door->GetGoState() != GO_STATE_ACTIVE )
-                                        {
-                                            door->SetLootState(GO_READY);
-                                            door->UseDoorOrButton(0, false);
-                                        }
-
-                        instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LEVIATHAN_MKII, 1, me);
-
-                        if (hardmode)
-                            if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                                computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
-
-                        events.Reset();
-                        events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 6s);
-                    }
-                    break;
-                case EVENT_STAND_UP_FRIENDLY:
-                    me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL_1);
-                    DoCastSelf(SPELL_SLEEP_VISUAL_2);
-                    me->SetFaction(FACTION_FRIENDLY);
-                    events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 4s);
-                    break;
-                case EVENT_SAY_VOLTRON_DEAD:
-                    Talk(SAY_V07TRON_DEATH);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    instance->SetBossState(BOSS_MIMIRON, DONE);
-                    // spawn chest
-                    if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
-                    {
-                        if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
-                        {
-                            go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                            go->SetLootRecipient(me->GetMap());
-                        }
-                    }
-                    events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
-                    break;
-                case EVENT_DISAPPEAR:
-                    DoCastSelf(SPELL_TELEPORT);
-                    summons.DespawnAll();
-                    break;
-            }
+                }
+                events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
+                break;
+            case EVENT_DISAPPEAR:
+                DoCastSelf(SPELL_TELEPORT);
+                summons.DespawnAll();
+                break;
         }
+    }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
     {
@@ -825,33 +825,33 @@ struct boss_mimiron : public BossAI
 
     void ResetGameObjects()
     {
-            for (uint16 i = 0; i < 3; ++i)
-                if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
-                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
-                        if (door->GetGoState() != GO_STATE_ACTIVE)
-                        {
-                            door->SetLootState(GO_READY);
-                            door->UseDoorOrButton(0, false);
-                        }
+        for (uint16 i = 0; i < 3; ++i)
+            if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
+                    if (door->GetGoState() != GO_STATE_ACTIVE)
+                    {
+                        door->SetLootState(GO_READY);
+                        door->UseDoorOrButton(0, false);
+                    }
 
-            if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 200.0f))
+        if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 200.0f))
+        {
+            if (elevator->GetGoState() != GO_STATE_ACTIVE )
             {
-                if (elevator->GetGoState() != GO_STATE_ACTIVE )
-                {
-                    elevator->SetLootState(GO_READY);
-                    elevator->SetByteValue(GAMEOBJECT_BYTES_1, 0, GO_STATE_ACTIVE);
-                }
-                elevator->EnableCollision(false);
+                elevator->SetLootState(GO_READY);
+                elevator->SetByteValue(GAMEOBJECT_BYTES_1, 0, GO_STATE_ACTIVE);
             }
-
-            if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f))
-                if (button->GetGoState() != GO_STATE_READY )
-                {
-                    button->SetLootState(GO_READY);
-                    button->UseDoorOrButton(0, false);
-                    button->RemoveGameObjectFlag(GO_FLAG_IN_USE);
-                }
+            elevator->EnableCollision(false);
         }
+
+        if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f))
+            if (button->GetGoState() != GO_STATE_READY )
+            {
+                button->SetLootState(GO_READY);
+                button->UseDoorOrButton(0, false);
+                button->RemoveGameObjectFlag(GO_FLAG_IN_USE);
+            }
+    }
 
     void CloseDoorAndButton()
     {
@@ -875,71 +875,70 @@ struct boss_mimiron : public BossAI
     void SetData(uint32  /*id*/, uint32 value) override
     {
         switch (value) // end of phase 1-3, 4-6 for voltron
-            {
-                case 1:
-                    events.ScheduleEvent(EVENT_LMK2_RETREAT_INTERVAL, 5s);
-                    break;
-                case 2:
-                    events.ScheduleEvent(EVENT_VX001_EMOTESTATE_DEATH, 2500ms);
-                    break;
-                case 3:
-                    events.ScheduleEvent(EVENT_SAY_ACU_DEAD, 5s);
-                    break;
-                case 4:
-                case 5:
-                case 6:
-                    {
-                        Creature* LMK2 = GetLMK2();
-                        Creature* VX001 = GetVX001();
-                        Creature* ACU = GetACU();
-                        if (!LMK2 || !VX001 || !ACU)
-                        {
-                            EnterEvadeMode(EVADE_REASON_OTHER);
-                            return;
-                        }
-
-                        Spell* s1 = LMK2->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-                        Spell* s2 = VX001->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-                        Spell* s3 = ACU->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-                        if (s1 && s2 && s3 && s1->GetSpellInfo()->Id == SPELL_SELF_REPAIR && s2->GetSpellInfo()->Id == SPELL_SELF_REPAIR && s3->GetSpellInfo()->Id == SPELL_SELF_REPAIR)
-                            events.ScheduleEvent(EVENT_FINISH, 0ms);
-                    }
-                    break;
-                case 7:
-                    hardmode = true;
-                    break;
-                case 11:
-                    bAchievProximityMine = true;
-                    break;
-                case 12:
-                    bAchievBombBot = true;
-                    break;
-                case 13:
-                    bAchievRocketStrike = true;
-                    break;
-            }
-        }
-
-        uint32 GetData(uint32 id) const override
         {
-            switch (id)
-            {
-                case 1:
-                    return (hardmode ? 1 : 0);
-                case 2:
-                    return (berserk ? 1 : 0);
-                case 10:
-                    return allowedFlameSpreadTime;
-                case 11:
-                    return (bAchievProximityMine ? 1 : 0);
-                case 12:
-                    return (bAchievBombBot ? 1 : 0);
-                case 13:
-                    return (bAchievRocketStrike ? 1 : 0);
-            }
-            return 0;
+            case 1:
+                events.ScheduleEvent(EVENT_LMK2_RETREAT_INTERVAL, 5s);
+                break;
+            case 2:
+                events.ScheduleEvent(EVENT_VX001_EMOTESTATE_DEATH, 2500ms);
+                break;
+            case 3:
+                events.ScheduleEvent(EVENT_SAY_ACU_DEAD, 5s);
+                break;
+            case 4:
+            case 5:
+            case 6:
+                {
+                    Creature* LMK2 = GetLMK2();
+                    Creature* VX001 = GetVX001();
+                    Creature* ACU = GetACU();
+                    if (!LMK2 || !VX001 || !ACU)
+                    {
+                        EnterEvadeMode(EVADE_REASON_OTHER);
+                        return;
+                    }
+
+                    Spell* s1 = LMK2->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                    Spell* s2 = VX001->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                    Spell* s3 = ACU->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                    if (s1 && s2 && s3 && s1->GetSpellInfo()->Id == SPELL_SELF_REPAIR && s2->GetSpellInfo()->Id == SPELL_SELF_REPAIR && s3->GetSpellInfo()->Id == SPELL_SELF_REPAIR)
+                        events.ScheduleEvent(EVENT_FINISH, 0ms);
+                }
+                break;
+            case 7:
+                hardmode = true;
+                break;
+            case 11:
+                bAchievProximityMine = true;
+                break;
+            case 12:
+                bAchievBombBot = true;
+                break;
+            case 13:
+                bAchievRocketStrike = true;
+                break;
         }
-    };
+    }
+
+    uint32 GetData(uint32 id) const override
+    {
+        switch (id)
+        {
+            case 1:
+                return (hardmode ? 1 : 0);
+            case 2:
+                return (berserk ? 1 : 0);
+            case 10:
+                return allowedFlameSpreadTime;
+            case 11:
+                return (bAchievProximityMine ? 1 : 0);
+            case 12:
+                return (bAchievBombBot ? 1 : 0);
+            case 13:
+                return (bAchievRocketStrike ? 1 : 0);
+        }
+        return 0;
+    }
 };
 
 class npc_ulduar_leviathan_mkii : public CreatureScript
