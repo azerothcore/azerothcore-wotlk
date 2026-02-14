@@ -733,7 +733,9 @@ class spell_warr_vigilance : public AuraScript
         if (Unit* caster = GetCaster())
         {
             if (AuraEffect const* glyph = caster->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_VIGILANCE, EFFECT_0))
-                GetTarget()->ModifyRedirectThreat(glyph->GetAmount());
+                // TODO: After QAston proc system merge, apply glyph bonus via
+                // SetEffectValue() in spell_warr_vigilance_redirect_threat SpellScript instead.
+                GetTarget()->GetThreatMgr().ModifyRedirectPercentage(glyph->GetAmount());
         }
     }
 
@@ -748,7 +750,7 @@ class spell_warr_vigilance : public AuraScript
             target->RemoveAurasDueToSpell(SPELL_GEN_DAMAGE_REDUCTION_AURA);
         }
 
-        target->ResetRedirectThreat();
+        target->GetThreatMgr().UnregisterRedirectThreat(SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT);
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)

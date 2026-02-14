@@ -593,12 +593,12 @@ public:
             {
                 checkTimer = 3000;
                 me->SetInCombatWithZone();
-                ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
-                if (!threatList.empty())
-                    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-                        if (Unit* target = (*itr)->getTarget())
-                            if (target->IsAlive() && target->IsPlayer() && me->GetExactDist(target) < 200.0f && !target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
-                                return;
+                for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+                {
+                    if (Unit* target = ref->GetVictim())
+                        if (target->IsAlive() && target->IsPlayer() && me->GetExactDist(target) < 200.0f && !target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
+                            return;
+                }
                 EnterEvadeMode();
             }
             else

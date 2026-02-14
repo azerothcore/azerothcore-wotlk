@@ -411,6 +411,7 @@ public:
     bool HasAura(AuraType aura) const;
     bool HasAnyAura() const;
     bool HasAreaAuraEffect() const;
+    bool HasInitialAggro() const;
 
     inline bool HasAttribute(SpellAttr0 attribute) const { return (Attributes & attribute) != 0; }
     inline bool HasAttribute(SpellAttr1 attribute) const { return (AttributesEx & attribute) != 0; }

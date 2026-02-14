@@ -172,7 +172,9 @@ public:
                 if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
                 {
                     charmer->RemoveAurasDueToSpell(SPELL_MINDCONTROL_VISUAL);
-                    me->TauntApply(charmer);
+                    me->EngageWithTarget(charmer);
+                    me->AddThreat(charmer, 100.0f);
+                    me->AI()->AttackStart(charmer);
                 }
             }
         }

@@ -168,13 +168,14 @@ struct boss_supremus : public BossAI
     Unit* FindHatefulStrikeTarget()
     {
         Unit* target = nullptr;
-        ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
-            if (unit && me->IsWithinMeleeRange(unit))
-                if (!target || unit->GetHealth() > target->GetHealth())
-                    target = unit;
+            if (Unit* unit = ref->GetVictim())
+            {
+                if (me->IsWithinMeleeRange(unit))
+                    if (!target || unit->GetHealth() > target->GetHealth())
+                        target = unit;
+            }
         }
 
         return target;

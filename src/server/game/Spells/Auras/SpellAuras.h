@@ -274,6 +274,13 @@ private:
     Unit::AuraApplicationList m_removedApplications;
 
     SpellInfo const* m_triggeredByAuraSpellInfo;
+
+#ifdef AC_BUILD_TESTING
+protected:
+    // Minimal constructor for testing - skips script hooks
+    Aura(SpellInfo const* spellproto, ObjectGuid casterGUID,
+         WorldObject* owner, bool /*testTag*/);
+#endif
 };
 
 class UnitAura : public Aura
