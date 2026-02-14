@@ -301,7 +301,7 @@ const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
 
 struct boss_thorim : public BossAI
 {
-    boss_thorim(Creature* pCreature) : BossAI(pCreature, BOSS_THORIM)
+    boss_thorim(Creature* creature) : BossAI(creature, BOSS_THORIM)
     {
         if ((_encounterFinished = (!me->IsAlive())))
             instance->SetBossState(BOSS_THORIM, DONE);
@@ -759,7 +759,7 @@ struct boss_thorim : public BossAI
 
 struct boss_thorim_sif : public ScriptedAI
 {
-    boss_thorim_sif(Creature* pCreature) : ScriptedAI(pCreature) { }
+    boss_thorim_sif(Creature* creature) : ScriptedAI(creature) { }
 
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
@@ -857,7 +857,7 @@ struct boss_thorim_sif : public ScriptedAI
 
 struct boss_thorim_lightning_orb : public npc_escortAI
 {
-    boss_thorim_lightning_orb(Creature* pCreature) : npc_escortAI(pCreature)
+    boss_thorim_lightning_orb(Creature* creature) : npc_escortAI(creature)
         {
             InitWaypoint();
             Reset();
@@ -895,7 +895,7 @@ struct boss_thorim_lightning_orb : public npc_escortAI
 
 struct boss_thorim_trap : public NullCreatureAI
 {
-    boss_thorim_trap(Creature* pCreature) : NullCreatureAI(pCreature) { }
+    boss_thorim_trap(Creature* creature) : NullCreatureAI(creature) { }
 
         uint32 _checkTimer;
 
@@ -923,7 +923,7 @@ struct boss_thorim_trap : public NullCreatureAI
 
 struct boss_thorim_sif_blizzard : public npc_escortAI
 {
-    boss_thorim_sif_blizzard(Creature* pCreature) : npc_escortAI(pCreature)
+    boss_thorim_sif_blizzard(Creature* creature) : npc_escortAI(creature)
         {
             InitWaypoint();
             Reset();
@@ -1656,21 +1656,21 @@ public:
 void AddSC_boss_thorim()
 {
     // Main encounter
-    new boss_thorim();
-    new boss_thorim_sif();
-    new boss_thorim_lightning_orb();
-    new boss_thorim_trap();
-    new boss_thorim_pillar();
-    new boss_thorim_sif_blizzard();
+    RegisterUlduarCreatureAI(boss_thorim);
+    RegisterUlduarCreatureAI(boss_thorim_sif);
+    RegisterUlduarCreatureAI(boss_thorim_lightning_orb);
+    RegisterUlduarCreatureAI(boss_thorim_trap);
+    RegisterUlduarCreatureAI(boss_thorim_pillar);
+    RegisterUlduarCreatureAI(boss_thorim_sif_blizzard);
 
     // Trash
-    new boss_thorim_start_npcs();
-    new boss_thorim_gauntlet_npcs();
-    new boss_thorim_arena_npcs();
+    RegisterUlduarCreatureAI(boss_thorim_start_npcs);
+    RegisterUlduarCreatureAI(boss_thorim_gauntlet_npcs);
+    RegisterUlduarCreatureAI(boss_thorim_arena_npcs);
 
     // Mini bosses
-    new boss_thorim_runic_colossus();
-    new boss_thorim_ancient_rune_giant();
+    RegisterUlduarCreatureAI(boss_thorim_runic_colossus);
+    RegisterUlduarCreatureAI(boss_thorim_ancient_rune_giant);
 
     // GOs
     new go_thorim_lever();

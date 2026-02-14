@@ -48,7 +48,6 @@ enum IgnisSpellData
 
 enum IgnisNPCs
 {
-    NPC_IGNIS                      = 33118,
     NPC_IRON_CONSTRUCT             = 33121,
     NPC_SCORCHED_GROUND            = 33123,
     NPC_WATER_TRIGGER              = 22515,
