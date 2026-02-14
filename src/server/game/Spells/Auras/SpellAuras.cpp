@@ -2104,6 +2104,11 @@ bool Aura::CanStackWith(Aura const* existingAura) const
 
 bool Aura::IsProcOnCooldown(TimePoint now) const
 {
+    if (GetType() == UNIT_AURA_TYPE)
+        if (Player* player = GetUnitOwner()->ToPlayer())
+            if (player->GetCommandStatus(CHEAT_COOLDOWN))
+                return false;
+
     return m_procCooldown > now;
 }
 
