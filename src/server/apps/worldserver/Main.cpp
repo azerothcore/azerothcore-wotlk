@@ -554,7 +554,7 @@ void MigrateDBCTablesToSeparateDatabase()
     }
     std::string worldDbName = (*worldDbResult)[0].Get<std::string>();
 
-    for (const auto& tableName : dbcTables)
+    for (auto const& tableName : dbcTables)
     {
         try
         {
@@ -590,7 +590,7 @@ void MigrateDBCTablesToSeparateDatabase()
 
                 // Drop table from world database
                 WorldDatabase.DirectExecute("DROP TABLE IF EXISTS `{}`", tableName);
-                
+
                 LOG_INFO("server.loading", ">> Migrated '{}' ({} rows)", tableName, worldCount);
                 migratedCount++;
             }

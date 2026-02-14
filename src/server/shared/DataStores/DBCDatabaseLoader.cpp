@@ -47,11 +47,11 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
 
     // Query DBC database first (or World for spell_dbc)
     QueryResult result = useWorldDB ? WorldDatabase.Query(query) : DBCDatabase.Query(query);
-    
+
     // Fallback to WorldDatabase if EnableDBCDatabase is disabled and result is empty
     if (!result && !useWorldDB && !enableDBCDatabase)
         result = WorldDatabase.Query(query);
-    
+
     if (!result)
         return nullptr;
 
