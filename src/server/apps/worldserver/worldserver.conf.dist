@@ -190,9 +190,9 @@ Database.Reconnect.Attempts = 20
 #                     Once activated, it is impossible to deactivate it in order to retrieve the data from World again.
 #                     Once the migration is complete, the _dbc tables in World will be destroyed.
 #
-#        Default:     0 - (Disabled, fallback mode for backward compatibility)
+#        Default:     1 - (Enabled, automatic migration mode)
 
-EnableDBCDatabase = 0
+EnableDBCDatabase = 1
 
 #
 ###################################################################################################
