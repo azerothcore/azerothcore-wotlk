@@ -158,6 +158,7 @@ enum Events
     EVENT_MINIBOSS_SPAWN_HELPERS                = 5,
     EVENT_MINIBOSS_RESPOND                      = 6,
     EVENT_DRAGON_START_PATROL                   = 7,
+    EVENT_DRAGON_PATROL_WAYPOINT                = 8,
 
     // Sartharion abilities
     EVENT_SARTHARION_CAST_CLEAVE                = 10,
@@ -222,6 +223,45 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
 {
     { 3244.14f, 512.597f, 58.6534f, 0.0f },
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
+};
+
+// Patrol waypoints for Vesperon (circular patrol above Sartharion)
+const Position VesperonPatrolPath[8] =
+{
+    { 3296.785f, 555.0555f, 87.29027f, 0.0f },
+    { 3266.8242f, 575.95245f, 89.76242f, 0.0f },
+    { 3227.2224f, 577.1228f, 89.87349f, 0.0f },
+    { 3197.2644f, 553.5248f, 88.651405f, 0.0f },
+    { 3195.9875f, 507.7954f, 87.45695f, 0.0f },
+    { 3224.5435f, 481.11807f, 84.70684f, 0.0f },
+    { 3265.2356f, 481.7216f, 83.595764f, 0.0f },
+    { 3299.8765f, 506.4301f, 83.87355f, 0.0f },
+};
+
+// Patrol waypoints for Tenebron (circular patrol above Sartharion)
+const Position TenebronPatrolPath[8] =
+{
+    { 3232.0261f, 569.16376f, 97.53158f, 0.0f },
+    { 3203.6875f, 548.84595f, 98.50729f, 0.0f },
+    { 3206.0713f, 513.54425f, 99.3684f, 0.0f },
+    { 3234.5671f, 489.96832f, 99.47933f, 0.0f },
+    { 3265.446f, 490.026f, 98.423836f, 0.0f },
+    { 3287.5674f, 503.39835f, 97.645226f, 0.0f },
+    { 3288.8157f, 549.16187f, 96.70078f, 0.0f },
+    { 3264.5164f, 568.97516f, 95.97868f, 0.0f },
+};
+
+// Patrol waypoints for Shadron (circular patrol above Sartharion)
+const Position ShadronPatrolPath[8] =
+{
+    { 3196.095f, 548.7049f, 115.83286f, 0.0f },
+    { 3224.809f, 573.8922f, 116.08303f, 0.0f },
+    { 3270.8267f, 572.1468f, 112.77744f, 0.0f },
+    { 3295.5364f, 547.12506f, 109.66705f, 0.0f },
+    { 3296.5833f, 503.22397f, 106.95133f, 0.0f },
+    { 3254.0688f, 489.25906f, 108.92368f, 0.0f },
+    { 3223.111f, 488.90338f, 110.53484f, 0.0f },
+    { 3197.9263f, 511.4375f, 113.22937f, 0.0f },
 };
 
 float const FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
@@ -669,7 +709,7 @@ private:
 
 struct boss_sartharion_dragonAI : public BossAI
 {
-    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false)
+    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false), currentPatrolPoint(0)
     {
     }
 
@@ -714,12 +754,18 @@ struct boss_sartharion_dragonAI : public BossAI
     {
         if (type == POINT_MOTION_TYPE && pointId == POINT_LANDING)
         {
+            // Dragon has landed - set ground flags
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetDisableGravity(false);
             me->SetHover(false);
             me->SetAnimTier(AnimTier::Ground);
             me->SetImmuneToNPC(false);
             me->SetInCombatWithZone();
+        }
+        else if (type == POINT_MOTION_TYPE && pointId >= 100 && pointId < 200)
+        {
+            // Patrol waypoint reached - schedule next waypoint
+            extraEvents.ScheduleEvent(EVENT_DRAGON_PATROL_WAYPOINT, 100ms);
         }
     }
 
@@ -893,8 +939,12 @@ struct boss_sartharion_dragonAI : public BossAI
     {
         if (eventId == EVENT_MINIDRAKE_SPEECH)
         {
+            // Dragon speaks and starts flying to landing position
             Talk(SAY_DRAKE_RESPOND);
             me->GetMotionMaster()->Clear();
+            me->SetDisableGravity(true);
+            me->SetHover(true);
+            me->SetAnimTier(AnimTier::Fly);
             me->SetSpeed(MOVE_FLIGHT, 3.0f);
             me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()));
         }
@@ -904,7 +954,44 @@ struct boss_sartharion_dragonAI : public BossAI
             me->SetDisableGravity(true);
             me->SetHover(true);
             me->SetAnimTier(AnimTier::Fly);
-            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
+            currentPatrolPoint = 0;
+
+            // Start patrol using custom waypoint system
+            extraEvents.ScheduleEvent(EVENT_DRAGON_PATROL_WAYPOINT, 100ms);
+        }
+        else if (eventId == EVENT_DRAGON_PATROL_WAYPOINT)
+        {
+            // Only continue patrol if not in combat and still selectable flag is set
+            if (!me->IsInCombat() && me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                // Ensure flying flags are maintained
+                me->SetDisableGravity(true);
+                me->SetHover(true);
+                me->SetAnimTier(AnimTier::Fly);
+
+                // Get the appropriate patrol path based on creature entry
+                Position const* patrolPath = nullptr;
+                switch (me->GetEntry())
+                {
+                    case NPC_VESPERON:
+                        patrolPath = VesperonPatrolPath;
+                        break;
+                    case NPC_TENEBRON:
+                        patrolPath = TenebronPatrolPath;
+                        break;
+                    case NPC_SHADRON:
+                        patrolPath = ShadronPatrolPath;
+                        break;
+                    default:
+                        return;
+                }
+
+                // Move to next patrol point (use pointId 100+ to identify patrol points)
+                me->GetMotionMaster()->MovePoint(100 + currentPatrolPoint, patrolPath[currentPatrolPoint]);
+
+                // Cycle to next waypoint
+                currentPatrolPoint = (currentPatrolPoint + 1) % 8;
+            }
         }
     }
 
@@ -923,6 +1010,7 @@ protected:
     EventMap extraEvents;
     ObjectGuid portalGUID;
     bool isCalledBySartharion;
+    uint8 currentPatrolPoint;
 };
 
 /////////////////////////////
