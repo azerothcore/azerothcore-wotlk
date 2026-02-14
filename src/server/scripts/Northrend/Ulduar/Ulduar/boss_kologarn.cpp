@@ -471,7 +471,6 @@ struct boss_kologarnAI : public BossAI
                 me->resetAttackTimer();
             }
         }
-    };
 };
 
 // also used for left arm, all functions except JustDied wont be used by left arm

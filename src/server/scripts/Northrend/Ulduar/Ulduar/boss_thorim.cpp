@@ -852,7 +852,6 @@ struct boss_thorim_sif : public ScriptedAI
                     me->StopMoving();
                 }
         }
-    };
 };
 
 struct boss_thorim_lightning_orb : public npc_escortAI
@@ -890,7 +889,6 @@ struct boss_thorim_lightning_orb : public npc_escortAI
         void WaypointReached(uint32  /*point*/) override
         {
         }
-    };
 };
 
 struct boss_thorim_trap : public NullCreatureAI
@@ -918,7 +916,6 @@ struct boss_thorim_trap : public NullCreatureAI
                 }
             }
         }
-    };
 };
 
 struct boss_thorim_sif_blizzard : public npc_escortAI
@@ -957,7 +954,6 @@ struct boss_thorim_sif_blizzard : public npc_escortAI
         void WaypointReached(uint32  /*point*/) override
         {
         }
-    };
 };
 
 struct boss_thorim_pillar : public NullCreatureAI
@@ -990,7 +986,6 @@ struct boss_thorim_pillar : public NullCreatureAI
             if (_resetTimer >= 10000)
                 Reset(); // _resetTimer set to 0
         }
-    };
 };
 
 struct boss_thorim_start_npcs : public ScriptedAI
@@ -1134,7 +1129,6 @@ struct boss_thorim_start_npcs : public ScriptedAI
             if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
                 DoMeleeAttackIfReady();
         }
-    };
 };
 
 struct boss_thorim_gauntlet_npcs : public ScriptedAI
@@ -1231,7 +1225,6 @@ struct boss_thorim_gauntlet_npcs : public ScriptedAI
             if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
                 DoMeleeAttackIfReady();
         }
-    };
 };
 
 struct boss_thorim_runic_colossus : public ScriptedAI
@@ -1362,7 +1355,6 @@ struct boss_thorim_runic_colossus : public ScriptedAI
 
             DoMeleeAttackIfReady();
         }
-    };
 };
 
 struct boss_thorim_ancient_rune_giant : public ScriptedAI
