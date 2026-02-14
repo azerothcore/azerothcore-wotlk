@@ -19,6 +19,7 @@
 #define AZEROTHCORE_TEMPSUMMON_H
 
 #include "Creature.h"
+#include "G3D/Quat.h"
 
 enum SummonerType
 {
@@ -34,6 +35,15 @@ struct TempSummonData
     Position pos;        ///< Position, where should be creature spawned
     TempSummonType type; ///< Summon type, see TempSummonType for available types
     uint32 time;         ///< Despawn time, usable only with certain temp summon types
+};
+
+/// Stores data for temp gameobject summons
+struct GameObjectSummonData
+{
+    uint32 entry;        ///< Entry of summoned gameobject
+    Position pos;        ///< Position where gameobject should be spawned
+    G3D::Quat rot;      ///< Quaternion rotation
+    uint32 respawnTime;  ///< Despawn time in seconds
 };
 
 class TempSummon : public Creature
