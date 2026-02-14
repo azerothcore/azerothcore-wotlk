@@ -135,480 +135,453 @@ enum Misc
 const Position CORDS_GROUND                 = {588.0f, -166.0f, 391.1f};
 const Position CORDS_AIR                    = {588.0f, -178.0f, 490.0f};
 
-class boss_razorscale : public CreatureScript
+struct boss_razorscaleAI : public BossAI
 {
-public:
-    boss_razorscale() : CreatureScript("boss_razorscale") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_razorscaleAI(Creature* creature) : BossAI(creature, BOSS_RAZORSCALE)
     {
-        return GetUlduarAI<boss_razorscaleAI>(pCreature);
+        startPath = true;
     }
 
-    struct boss_razorscaleAI : public ScriptedAI
+    ObjectGuid ExpeditionEngineerGUIDs[3];
+    ObjectGuid CommanderGUID;
+    float cords[4][2];
+    bool bGroundPhase;
+    bool startPath;
+    uint8 flyTimes;
+
+    void InitializeAI() override
     {
-        boss_razorscaleAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+        me->SetDisableGravity(true);
+        me->setActive(true);
+        Reset();
+    }
+
+    void Reset() override
+    {
+        _Reset();
+
+        for (uint8 i = 0; i < 3; ++i)
+            ExpeditionEngineerGUIDs[i].Clear();
+
+        // Show gossip icon if previously hidden
+        if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
+            if (!commander->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+                commander->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+
+        CommanderGUID.Clear();
+        bGroundPhase = false;
+        flyTimes = 0;
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (who && me->Attack(who, true) && bGroundPhase)
+            me->GetMotionMaster()->MoveChase(who);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        events.Reset();
+        events.ScheduleEvent(EVENT_COMMANDER_SAY_AGGRO, 5s);
+        events.ScheduleEvent(EVENT_EE_SAY_MOVE_OUT, 10s);
+        events.ScheduleEvent(EVENT_ENRAGE, 10min);
+        events.ScheduleEvent(EVENT_SPELL_FIREBALL, 6s);
+        events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 13s);
+        events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 11s);
+
+        std::list<Creature*> eeList;
+        me->GetCreaturesWithEntryInRange(eeList, 300.0f, NPC_EXPEDITION_ENGINEER);
+        uint8 i = 0;
+        for( std::list<Creature*>::iterator itr = eeList.begin(); itr != eeList.end(); ++itr )
         {
-            pInstance = me->GetInstanceScript();
-            startPath = true;
+            if (i > 2)
+                break;
+            ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
+            if (!i)
+                (*itr)->AI()->Talk(SAY_EE_AGGRO);
+            ++i;
         }
+        if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
+            CommanderGUID = c->GetGUID();
+    }
 
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-        ObjectGuid ExpeditionEngineerGUIDs[3];
-        ObjectGuid CommanderGUID;
-        float cords[4][2];
-        bool bGroundPhase;
-        bool startPath;
-        uint8 flyTimes;
+    void JustDied(Unit* killer) override
+    {
+        _JustDied();
+    }
 
-        void InitializeAI() override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        if (!caster || !instance)
+            return;
+
+        switch (spell->Id)
         {
-            me->SetDisableGravity(true);
-            me->setActive(true);
-            Reset();
-        }
+            case SPELL_LAUNCH_CHAIN:
+                {
+                    uint32 spellId = SPELL_CHAIN_4;
 
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-
-            for (uint8 i = 0; i < 3; ++i)
-                ExpeditionEngineerGUIDs[i].Clear();
-
-            // Show gossip icon if previously hidden
-            if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
-                if (!commander->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
-                    commander->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-
-            CommanderGUID.Clear();
-            bGroundPhase = false;
-            flyTimes = 0;
-
-            if (pInstance)
-                pInstance->SetData(TYPE_RAZORSCALE, NOT_STARTED);
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (who && me->Attack(who, true) && bGroundPhase)
-                me->GetMotionMaster()->MoveChase(who);
-        }
-
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            me->SetInCombatWithZone();
-            events.Reset();
-            events.ScheduleEvent(EVENT_COMMANDER_SAY_AGGRO, 5s);
-            events.ScheduleEvent(EVENT_EE_SAY_MOVE_OUT, 10s);
-            events.ScheduleEvent(EVENT_ENRAGE, 10min);
-            events.ScheduleEvent(EVENT_SPELL_FIREBALL, 6s);
-            events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 13s);
-            events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 11s);
-
-            std::list<Creature*> eeList;
-            me->GetCreaturesWithEntryInRange(eeList, 300.0f, NPC_EXPEDITION_ENGINEER);
-            uint8 i = 0;
-            for( std::list<Creature*>::iterator itr = eeList.begin(); itr != eeList.end(); ++itr )
-            {
-                if (i > 2)
-                    break;
-                ExpeditionEngineerGUIDs[i] = (*itr)->GetGUID();
-                if (!i)
-                    (*itr)->AI()->Talk(SAY_EE_AGGRO);
-                ++i;
-            }
-            if (Creature* c = me->FindNearestCreature(NPC_EXPEDITION_COMMANDER, 300.0f, true))
-                CommanderGUID = c->GetGUID();
-
-            if (pInstance)
-                pInstance->SetData(TYPE_RAZORSCALE, IN_PROGRESS);
-        }
-
-        void JustDied(Unit*  /*Killer*/) override
-        {
-            summons.DespawnAll();
-
-            if (pInstance)
-                pInstance->SetData(TYPE_RAZORSCALE, DONE);
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
-        {
-            if (!caster || !pInstance)
-                return;
-
-            switch (spell->Id)
-            {
-                case SPELL_LAUNCH_CHAIN:
+                    if (caster->GetGUID() == instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
                     {
-                        uint32 spellId = SPELL_CHAIN_4;
-
-                        if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
-                        {
-                            spellId = SPELL_CHAIN_1;
-                        }
-                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
-                        {
-                            spellId = SPELL_CHAIN_2;
-                        }
-                        else if (caster->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
-                        {
-                            spellId = SPELL_CHAIN_3;
-                        }
-
-                        caster->CastSpell(me, spellId, true);
+                        spellId = SPELL_CHAIN_1;
                     }
-                    break;
-                case SPELL_CHAIN_1:
-                case SPELL_CHAIN_2:
-                case SPELL_CHAIN_3:
-                case SPELL_CHAIN_4:
+                    else if (caster->GetGUID() == instance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
                     {
-                        uint8 count = 0;
-                        if (me->HasAura(SPELL_CHAIN_1))
-                            count++;
-                        if (me->HasAura(SPELL_CHAIN_3))
-                            count++;
-                        if (RAID_MODE(0, 1))
-                        {
-                            if (me->HasAura(SPELL_CHAIN_2))
-                                count++;
-                            if (me->HasAura(SPELL_CHAIN_4))
-                                count++;
-                        }
-                        if (count >= REQ_CHAIN_COUNT)
-                        {
-                            if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
-                                commander->AI()->Talk(SAY_COMMANDER_GROUND_PHASE);
-
-                            me->InterruptNonMeleeSpells(true);
-                            events.CancelEvent(EVENT_SPELL_FIREBALL);
-                            events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
-                            events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
-                            me->SetTarget();
-                            me->SendMeleeAttackStop(me->GetVictim());
-                            me->GetMotionMaster()->MoveLand(0, CORDS_GROUND, 25.0f);
-                        }
+                        spellId = SPELL_CHAIN_2;
                     }
-                    break;
-            }
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-        {
-            if (me->GetPositionZ() > 440.0f) // protection, razorscale is attackable (so harpoons can hit him, etc.), but should not receive dmg while in air
-                damage = 0;
-            else if (!bGroundPhase && ((me->GetHealth() * 100) / me->GetMaxHealth() < 50) && me->HasAura(62794)) // already below 50%, but still in chains and stunned
-                events.RescheduleEvent(EVENT_WARN_DEEP_BREATH, 0ms);
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type == POINT_MOTION_TYPE && id == POINT_RAZORSCALE_INIT)
-            {
-                me->SetFacingTo(1.6f);
-                return;
-            }
-            else if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && !me->IsInCombat())
-            {
-                startPath = true;
-                return;
-            }
-
-            if (type != EFFECT_MOTION_TYPE)
-                return;
-            if (id == 0) // landed
-            {
-                me->SetControlled(true, UNIT_STATE_ROOT);
-                me->DisableRotate(true);
-                me->SetOrientation((float)(M_PI + 0.01) / 2);
-                me->SetFacingTo(M_PI / 2);
-                me->SetDisableGravity(false);
-                me->CastSpell(me, 62794, true);
-                events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30s);
-            }
-            else if (id == 1) // flied up
-            {
-                events.ScheduleEvent(EVENT_SPELL_FIREBALL, 2s);
-                events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 4s);
-                events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 5s);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (startPath)
-            {
-                me->StopMoving();
-                startPath = false;
-                me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_ENRAGE:
-                    Talk(EMOTE_BERSERK);
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
-                case EVENT_COMMANDER_SAY_AGGRO:
-                    if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
-                        commander->AI()->Talk(SAY_COMMANDER_AGGRO);
-                    break;
-                case EVENT_EE_SAY_MOVE_OUT:
-                    for (uint8 i = 0; i < 3; ++i)
-                        if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
-                        {
-                            if (!i)
-                                c->AI()->Talk(SAY_EE_START_REPAIR);
-                            c->AI()->SetData(1, 0); // start repairing
-                        }
-                    break;
-                case EVENT_SPELL_FIREBALL:
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
-                        me->CastSpell(pTarget, SPELL_FIREBALL, false);
-                    events.Repeat(4s);
-                    break;
-                case EVENT_SPELL_DEVOURING_FLAME:
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
-                        me->CastSpell(pTarget, SPELL_DEVOURINGFLAME, false);
-                    events.Repeat(13s);
-                    break;
-                case EVENT_SUMMON_MOLE_MACHINES:
+                    else if (caster->GetGUID() == instance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
                     {
-                        memset(cords, '\0', sizeof(cords));
-                        uint8 num = RAID_MODE( urand(2, 3), urand(2, 4));
-                        for( int i = 0; i < num; ++i )
-                        {
-                            // X: (550, 625) Y: (-185, -230)
-                            cords[i][0] = urand(550, 625);
-                            cords[i][1] = -230 + rand() % 45;
-                            if (GameObject* drill = me->SummonGameObject(GO_DRILL, cords[i][0], cords[i][1], 391.1f, M_PI / 4, 0.0f, 0.0f, 0.0f, 0.0f, 8))
-                            {
-                                //drill->SetGoAnimProgress(0);
-                                //drill->SetLootState(GO_READY);
-                                //drill->UseDoorOrButton(8);
-                                //drill->SetGoState(GO_STATE_READY);
-                                drill->SetGoState(GO_STATE_ACTIVE);
-                                drill->SetGoAnimProgress(0);
-                            }
-                        }
-                        events.Repeat(45s);
-                        events.RescheduleEvent(EVENT_SUMMON_ADDS, 4s);
+                        spellId = SPELL_CHAIN_3;
                     }
-                    break;
-                case EVENT_SUMMON_ADDS:
-                    for( int i = 0; i < 4; ++i )
-                    {
-                        if (!cords[i][0])
-                            break;
 
-                        uint8 opt;
-                        uint8 r = urand(1, 100);
-                        if (r <= 30) opt = 1;
-                        else if (r <= 65) opt = 2;
-                        else opt = 3;
-
-                        for( int j = 0; j < 4; ++j )
-                        {
-                            float x = cords[i][0] + 4.0f * cos(j * M_PI / 2);
-                            float y = cords[i][1] + 4.0f * std::sin(j * M_PI / 2);
-
-                            uint32 npc_entry = 0;
-                            switch (opt)
-                            {
-                                case 1:
-                                    if (j == 1) npc_entry = NPC_DARK_RUNE_SENTINEL;
-                                    break;
-                                case 2:
-                                    switch (j)
-                                    {
-                                        case 1:
-                                            npc_entry = NPC_DARK_RUNE_WATCHER;
-                                            break;
-                                        case 2:
-                                            npc_entry = NPC_DARK_RUNE_GUARDIAN;
-                                            break;
-                                    }
-                                    break;
-                                default: // case 3:
-                                    switch (j)
-                                    {
-                                        case 1:
-                                            npc_entry = NPC_DARK_RUNE_WATCHER;
-                                            break;
-                                        case 2:
-                                            npc_entry = NPC_DARK_RUNE_GUARDIAN;
-                                            break;
-                                        case 3:
-                                            npc_entry = NPC_DARK_RUNE_GUARDIAN;
-                                            break;
-                                    }
-                                    break;
-                            }
-
-                            if (npc_entry)
-                                if (Creature* c = me->SummonCreature(npc_entry, x, y, 391.1f, j * M_PI / 2, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
-                                    DoZoneInCombat(c);
-                        }
-                    }
-                    break;
-                case EVENT_WARN_DEEP_BREATH:
-                    Talk(EMOTE_BREATH);
-                    me->RemoveAura(62794);
-                    events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500ms);
-                    break;
-                case EVENT_PHASE2_FLAME_BREATH:
-                    me->CastSpell(me, SPELL_FLAMEBREATH, true);
-                    events.ScheduleEvent(EVENT_FLY_UP, 2s);
-                    break;
-                case EVENT_FLY_UP:
-                    me->SetInCombatWithZone(); // just in case
-                    if (pInstance)
-                        for( int i = 0; i < 4; ++i )
-                            if (ObjectGuid guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i))
-                                if (Creature* hfs = ObjectAccessor::GetCreature(*me, guid))
-                                {
-                                    me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
-                                    hfs->AI()->SetData(1, 0);
-                                }
-
-                    me->RemoveAura(SPELL_LAUNCH_CHAIN);
-                    me->RemoveAura(SPELL_CHAIN_1);
-                    me->RemoveAura(SPELL_CHAIN_3);
+                    caster->CastSpell(me, spellId, true);
+                }
+                break;
+            case SPELL_CHAIN_1:
+            case SPELL_CHAIN_2:
+            case SPELL_CHAIN_3:
+            case SPELL_CHAIN_4:
+                {
+                    uint8 count = 0;
+                    if (me->HasAura(SPELL_CHAIN_1))
+                        count++;
+                    if (me->HasAura(SPELL_CHAIN_3))
+                        count++;
                     if (RAID_MODE(0, 1))
                     {
-                        me->RemoveAura(SPELL_CHAIN_2);
-                        me->RemoveAura(SPELL_CHAIN_4);
+                        if (me->HasAura(SPELL_CHAIN_2))
+                            count++;
+                        if (me->HasAura(SPELL_CHAIN_4))
+                            count++;
                     }
-                    me->CastSpell(me, SPELL_WINGBUFFET, true);
-
-                    if ((me->GetHealth() * 100) / me->GetMaxHealth() < 50 ) // start phase 3
+                    if (count >= REQ_CHAIN_COUNT)
                     {
-                        Talk(EMOTE_PERMA_GROUND);
-                        me->SetControlled(false, UNIT_STATE_ROOT);
-                        me->DisableRotate(false);
-                        DoResetThreatList();
-                        Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0, true);
-                        if (!target)
-                            target = me->SelectNearestPlayer(200.0f);
-                        if (target)
-                        {
-                            AttackStart(target);
-                            me->GetMotionMaster()->MoveChase(target);
-                        }
-                        bGroundPhase = true;
+                        if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
+                            commander->AI()->Talk(SAY_COMMANDER_GROUND_PHASE);
+
+                        me->InterruptNonMeleeSpells(true);
                         events.CancelEvent(EVENT_SPELL_FIREBALL);
                         events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
                         events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
-
-                        events.ScheduleEvent(EVENT_SPELL_FLAME_BREATH, 20s);
-                        events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME_GROUND, 5s);
-                        events.ScheduleEvent(EVENT_SPELL_FUSE_ARMOR, 10s);
-                        events.ScheduleEvent(EVENT_SPELL_FLAME_BUFFET, 3s);
-
-                        break;
-                    }
-                    else
-                    {
-                        ++flyTimes;
-                        me->SetControlled(false, UNIT_STATE_ROOT);
-                        me->DisableRotate(false);
+                        me->SetTarget();
                         me->SendMeleeAttackStop(me->GetVictim());
-                        me->GetMotionMaster()->MoveIdle();
-                        me->StopMoving();
-                        me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
-                        events.ScheduleEvent(EVENT_RESUME_FIXING, 22s);
+                        me->GetMotionMaster()->MoveLand(0, CORDS_GROUND, 25.0f);
                     }
-
-                    break;
-                case EVENT_RESUME_FIXING:
-                    for (uint8 i = 0; i < 3; ++i)
-                        if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
-                        {
-                            if (!i)
-                                c->AI()->Talk(SAY_EE_REBUILD_TURRETS);
-                            c->AI()->SetData(1, 0); // start repairing
-                        }
-                    break;
-                case EVENT_SPELL_FLAME_BREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_FLAMEBREATH, false);
-                    events.Repeat(20s);
-                    break;
-                case EVENT_SPELL_DEVOURING_FLAME_GROUND:
-                    me->CastSpell(me->GetVictim(), SPELL_DEVOURINGFLAME, false);
-                    events.Repeat(13s);
-                    break;
-                case EVENT_SPELL_FUSE_ARMOR:
-                    if (Unit* victim = me->GetVictim())
-                        if (me->IsWithinMeleeRange(victim))
-                        {
-                            me->CastSpell(victim, SPELL_FUSEARMOR, false);
-                            if (Aura* aur = victim->GetAura(SPELL_FUSEARMOR))
-                                if (aur->GetStackAmount() == 5)
-                                    victim->CastSpell(victim, SPELL_FUSED_ARMOR, true);
-                            events.Repeat(10s);
-                            break;
-                        }
-                    events.Repeat(2s);
-                    break;
-                case EVENT_SPELL_FLAME_BUFFET:
-                    me->CastSpell(me->GetVictim(), SPELL_FLAMEBUFFET, false);
-                    events.Repeat(7s);
-                    break;
-            }
-
-            if (bGroundPhase)
-                DoMeleeAttackIfReady();
+                }
+                break;
         }
+    }
 
-        void MoveInLineOfSight(Unit* /*who*/) override {}
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
+    {
+        if (me->GetPositionZ() > 440.0f) // protection, razorscale is attackable (so harpoons can hit him, etc.), but should not receive dmg while in air
+            damage = 0;
+        else if (!bGroundPhase && ((me->GetHealth() * 100) / me->GetMaxHealth() < 50) && me->HasAura(62794)) // already below 50%, but still in chains and stunned
+            events.RescheduleEvent(EVENT_WARN_DEEP_BREATH, 0ms);
 
-        void JustReachedHome() override
+        BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_RAZORSCALE_INIT)
+        {
+            me->SetFacingTo(1.6f);
+            return;
+        }
+        else if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && !me->IsInCombat())
         {
             startPath = true;
+            return;
         }
 
-        void JustSummoned(Creature* s) override
+        if (type != EFFECT_MOTION_TYPE)
+            return;
+        if (id == 0) // landed
         {
-            summons.Summon(s);
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            me->DisableRotate(true);
+            me->SetOrientation((float)(M_PI + 0.01) / 2);
+            me->SetFacingTo(M_PI / 2);
+            me->SetDisableGravity(false);
+            me->CastSpell(me, 62794, true);
+            events.ScheduleEvent(EVENT_WARN_DEEP_BREATH, 30s);
+        }
+        else if (id == 1) // flied up
+        {
+            events.ScheduleEvent(EVENT_SPELL_FIREBALL, 2s);
+            events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME, 4s);
+            events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINES, 5s);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (startPath)
+        {
+            me->StopMoving();
+            startPath = false;
+            me->GetMotionMaster()->MovePath(me->GetWaypointPath(), FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
         }
 
-        uint32 GetData(uint32 id) const override
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (id == 1)
-                return (flyTimes <= 1 ? 1 : 0);
-            return 0;
+            case 0:
+                break;
+            case EVENT_ENRAGE:
+                Talk(EMOTE_BERSERK);
+                me->CastSpell(me, SPELL_BERSERK, true);
+                break;
+            case EVENT_COMMANDER_SAY_AGGRO:
+                if (Creature* commander = ObjectAccessor::GetCreature(*me, CommanderGUID))
+                    commander->AI()->Talk(SAY_COMMANDER_AGGRO);
+                break;
+            case EVENT_EE_SAY_MOVE_OUT:
+                for (uint8 i = 0; i < 3; ++i)
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
+                    {
+                        if (!i)
+                            c->AI()->Talk(SAY_EE_START_REPAIR);
+                        c->AI()->SetData(1, 0); // start repairing
+                    }
+                break;
+            case EVENT_SPELL_FIREBALL:
+                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
+                    me->CastSpell(pTarget, SPELL_FIREBALL, false);
+                events.Repeat(4s);
+                break;
+            case EVENT_SPELL_DEVOURING_FLAME:
+                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
+                    me->CastSpell(pTarget, SPELL_DEVOURINGFLAME, false);
+                events.Repeat(13s);
+                break;
+            case EVENT_SUMMON_MOLE_MACHINES:
+                {
+                    memset(cords, '\0', sizeof(cords));
+                    uint8 num = RAID_MODE( urand(2, 3), urand(2, 4));
+                    for( int i = 0; i < num; ++i )
+                    {
+                        // X: (550, 625) Y: (-185, -230)
+                        cords[i][0] = urand(550, 625);
+                        cords[i][1] = -230 + rand() % 45;
+                        if (GameObject* drill = me->SummonGameObject(GO_DRILL, cords[i][0], cords[i][1], 391.1f, M_PI / 4, 0.0f, 0.0f, 0.0f, 0.0f, 8))
+                        {
+                            //drill->SetGoAnimProgress(0);
+                            //drill->SetLootState(GO_READY);
+                            //drill->UseDoorOrButton(8);
+                            //drill->SetGoState(GO_STATE_READY);
+                            drill->SetGoState(GO_STATE_ACTIVE);
+                            drill->SetGoAnimProgress(0);
+                        }
+                    }
+                    events.Repeat(45s);
+                    events.RescheduleEvent(EVENT_SUMMON_ADDS, 4s);
+                }
+                break;
+            case EVENT_SUMMON_ADDS:
+                for( int i = 0; i < 4; ++i )
+                {
+                    if (!cords[i][0])
+                        break;
+
+                    uint8 opt;
+                    uint8 r = urand(1, 100);
+                    if (r <= 30) opt = 1;
+                    else if (r <= 65) opt = 2;
+                    else opt = 3;
+
+                    for( int j = 0; j < 4; ++j )
+                    {
+                        float x = cords[i][0] + 4.0f * cos(j * M_PI / 2);
+                        float y = cords[i][1] + 4.0f * std::sin(j * M_PI / 2);
+
+                        uint32 npc_entry = 0;
+                        switch (opt)
+                        {
+                            case 1:
+                                if (j == 1) npc_entry = NPC_DARK_RUNE_SENTINEL;
+                                break;
+                            case 2:
+                                switch (j)
+                                {
+                                    case 1:
+                                        npc_entry = NPC_DARK_RUNE_WATCHER;
+                                        break;
+                                    case 2:
+                                        npc_entry = NPC_DARK_RUNE_GUARDIAN;
+                                        break;
+                                }
+                                break;
+                            default: // case 3:
+                                switch (j)
+                                {
+                                    case 1:
+                                        npc_entry = NPC_DARK_RUNE_WATCHER;
+                                        break;
+                                    case 2:
+                                        npc_entry = NPC_DARK_RUNE_GUARDIAN;
+                                        break;
+                                    case 3:
+                                        npc_entry = NPC_DARK_RUNE_GUARDIAN;
+                                        break;
+                                }
+                                break;
+                        }
+
+                        if (npc_entry)
+                            if (Creature* c = me->SummonCreature(npc_entry, x, y, 391.1f, j * M_PI / 2, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+                                DoZoneInCombat(c);
+                    }
+                }
+                break;
+            case EVENT_WARN_DEEP_BREATH:
+                Talk(EMOTE_BREATH);
+                me->RemoveAura(62794);
+                events.ScheduleEvent(EVENT_PHASE2_FLAME_BREATH, 2500ms);
+                break;
+            case EVENT_PHASE2_FLAME_BREATH:
+                me->CastSpell(me, SPELL_FLAMEBREATH, true);
+                events.ScheduleEvent(EVENT_FLY_UP, 2s);
+                break;
+            case EVENT_FLY_UP:
+                me->SetInCombatWithZone(); // just in case
+                if (instance)
+                    for( int i = 0; i < 4; ++i )
+                        if (ObjectGuid guid = instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i))
+                            if (Creature* hfs = ObjectAccessor::GetCreature(*me, guid))
+                            {
+                                me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
+                                hfs->AI()->SetData(1, 0);
+                            }
+
+                me->RemoveAura(SPELL_LAUNCH_CHAIN);
+                me->RemoveAura(SPELL_CHAIN_1);
+                me->RemoveAura(SPELL_CHAIN_3);
+                if (RAID_MODE(0, 1))
+                {
+                    me->RemoveAura(SPELL_CHAIN_2);
+                    me->RemoveAura(SPELL_CHAIN_4);
+                }
+                me->CastSpell(me, SPELL_WINGBUFFET, true);
+
+                if ((me->GetHealth() * 100) / me->GetMaxHealth() < 50 ) // start phase 3
+                {
+                    Talk(EMOTE_PERMA_GROUND);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->DisableRotate(false);
+                    DoResetThreatList();
+                    Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0.0, true);
+                    if (!target)
+                        target = me->SelectNearestPlayer(200.0f);
+                    if (target)
+                    {
+                        AttackStart(target);
+                        me->GetMotionMaster()->MoveChase(target);
+                    }
+                    bGroundPhase = true;
+                    events.CancelEvent(EVENT_SPELL_FIREBALL);
+                    events.CancelEvent(EVENT_SPELL_DEVOURING_FLAME);
+                    events.CancelEvent(EVENT_SUMMON_MOLE_MACHINES);
+
+                    events.ScheduleEvent(EVENT_SPELL_FLAME_BREATH, 20s);
+                    events.ScheduleEvent(EVENT_SPELL_DEVOURING_FLAME_GROUND, 5s);
+                    events.ScheduleEvent(EVENT_SPELL_FUSE_ARMOR, 10s);
+                    events.ScheduleEvent(EVENT_SPELL_FLAME_BUFFET, 3s);
+
+                    break;
+                }
+                else
+                {
+                    ++flyTimes;
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->DisableRotate(false);
+                    me->SendMeleeAttackStop(me->GetVictim());
+                    me->GetMotionMaster()->MoveIdle();
+                    me->StopMoving();
+                    me->SetDisableGravity(true);
+                    me->GetMotionMaster()->MoveTakeoff(1, CORDS_AIR, 25.0f);
+                    events.ScheduleEvent(EVENT_RESUME_FIXING, 22s);
+                }
+
+                break;
+            case EVENT_RESUME_FIXING:
+                for (uint8 i = 0; i < 3; ++i)
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
+                    {
+                        if (!i)
+                            c->AI()->Talk(SAY_EE_REBUILD_TURRETS);
+                        c->AI()->SetData(1, 0); // start repairing
+                    }
+                break;
+            case EVENT_SPELL_FLAME_BREATH:
+                me->CastSpell(me->GetVictim(), SPELL_FLAMEBREATH, false);
+                events.Repeat(20s);
+                break;
+            case EVENT_SPELL_DEVOURING_FLAME_GROUND:
+                me->CastSpell(me->GetVictim(), SPELL_DEVOURINGFLAME, false);
+                events.Repeat(13s);
+                break;
+            case EVENT_SPELL_FUSE_ARMOR:
+                if (Unit* victim = me->GetVictim())
+                    if (me->IsWithinMeleeRange(victim))
+                    {
+                        me->CastSpell(victim, SPELL_FUSEARMOR, false);
+                        if (Aura* aur = victim->GetAura(SPELL_FUSEARMOR))
+                            if (aur->GetStackAmount() == 5)
+                                victim->CastSpell(victim, SPELL_FUSED_ARMOR, true);
+                        events.Repeat(10s);
+                        break;
+                    }
+                events.Repeat(2s);
+                break;
+            case EVENT_SPELL_FLAME_BUFFET:
+                me->CastSpell(me->GetVictim(), SPELL_FLAMEBUFFET, false);
+                events.Repeat(7s);
+                break;
         }
 
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim && victim->GetEntry() == NPC_DARK_RUNE_GUARDIAN)
-                if (pInstance)
-                    pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_DARK_RUNE_GUARDIAN, 1, me);
-        }
+        if (bGroundPhase)
+            DoMeleeAttackIfReady();
+    }
 
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            me->SetDisableGravity(true);
-            me->SetControlled(false, UNIT_STATE_ROOT);
-            me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode(why);
-        }
-    };
+    void MoveInLineOfSight(Unit* /*who*/) override {}
+
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        startPath = true;
+    }
+
+    uint32 GetData(uint32 id) const override
+    {
+        if (id == 1)
+            return (flyTimes <= 1 ? 1 : 0);
+        return 0;
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim && victim->GetEntry() == NPC_DARK_RUNE_GUARDIAN)
+            if (instance)
+                instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_DARK_RUNE_GUARDIAN, 1, me);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->SetDisableGravity(true);
+        me->SetControlled(false, UNIT_STATE_ROOT);
+        me->DisableRotate(false);
+        BossAI::EnterEvadeMode(why);
+    }
 };
 
 class npc_ulduar_expedition_commander : public CreatureScript
@@ -1150,7 +1123,7 @@ public:
 
 void AddSC_boss_razorscale()
 {
-    new boss_razorscale();
+    RegisterUlduarCreatureAI(boss_razorscaleAI);
     new npc_ulduar_expedition_commander();
     new npc_ulduar_harpoonfirestate();
     new npc_ulduar_expedition_engineer();

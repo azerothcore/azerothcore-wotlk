@@ -19,6 +19,7 @@
 #include "CreatureScript.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
+#include "InstanceScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
@@ -26,6 +27,35 @@
 #include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include "ulduar.h"
+
+DoorData const doorData[] =
+{
+    { GO_LEVIATHAN_DOORS,   BOSS_LEVIATHAN, DOOR_TYPE_ROOM    },
+    { GO_XT002_DOORS,       BOSS_XT002,     DOOR_TYPE_ROOM    },
+    { GO_KOLOGARN_DOORS,    BOSS_KOLOGARN,  DOOR_TYPE_ROOM    },
+    { GO_ASSEMBLY_DOORS,    BOSS_ASSEMBLY,  DOOR_TYPE_ROOM    },
+    { GO_ARCHIVUM_DOORS,    BOSS_ASSEMBLY,  DOOR_TYPE_PASSAGE },
+    { GO_YOGG_SARON_DOORS,  BOSS_YOGGSARON, DOOR_TYPE_ROOM    },
+    { 0,                    0,              DOOR_TYPE_ROOM    }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_LEVIATHAN,    BOSS_LEVIATHAN  },
+    { NPC_IGNIS,        BOSS_IGNIS      },
+    { NPC_RAZORSCALE,   BOSS_RAZORSCALE },
+    { NPC_XT002,        BOSS_XT002      },
+    { NPC_KOLOGARN,     BOSS_KOLOGARN   },
+    { NPC_AURIAYA,      BOSS_AURIAYA    },
+    { NPC_MIMIRON,      BOSS_MIMIRON    },
+    { NPC_HODIR,        BOSS_HODIR      },
+    { NPC_THORIM,       BOSS_THORIM     },
+    { NPC_FREYA,        BOSS_FREYA      },
+    { NPC_VEZAX,        BOSS_VEZAX      },
+    { NPC_YOGGSARON,    BOSS_YOGGSARON  },
+    { NPC_ALGALON,      BOSS_ALGALON    },
+    { 0,                0               }
+};
 
 class instance_ulduar : public InstanceMapScript
 {
@@ -41,14 +71,18 @@ public:
     {
         instance_ulduar_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
-            Initialize();
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
+            LoadDoorData(doorData);
+            LoadObjectData(creatureData, nullptr);
+            Initialize();
             // 0: 10 man difficulty
             // 1: 25 man difficulty
             m_difficulty = (pMap->Is25ManRaid() ? 0 : 1);
         };
 
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
+        // Extra entries beyond MAX_ENCOUNTER for TYPE_WATCHERS (14)
+        uint32 m_auiEncounter[MAX_ENCOUNTER + 1];
         uint32 C_of_Ulduar_MASK;
 
         int m_difficulty;
@@ -217,9 +251,9 @@ public:
 
         bool IsEncounterInProgress() const override
         {
-            for (uint8 i = 0; i < (MAX_ENCOUNTER - 1); ++i)
+            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             {
-                if (m_auiEncounter[i] == IN_PROGRESS)
+                if (GetBossState(i) == IN_PROGRESS)
                     return true;
             }
 
@@ -237,6 +271,116 @@ public:
             // destory towers
             if (eventId >= EVENT_TOWER_OF_LIFE_DESTROYED && eventId <= EVENT_TOWER_OF_FLAMES_DESTROYED)
                 SetData(eventId, 0);
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            // Keep m_auiEncounter in sync for backward compatibility
+            if (type < MAX_ENCOUNTER)
+                m_auiEncounter[type] = state;
+
+            switch (type)
+            {
+                case BOSS_LEVIATHAN:
+                    if (state == DONE)
+                    {
+                        Map::PlayerList const& pList = instance->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                            if (Creature* vehicleCreature = itr->GetSource()->GetVehicleCreatureBase())
+                                vehicleCreature->DespawnOrUnsummon();
+
+                        if (GameObject* go = instance->GetGameObject(m_leviathanDoorsGUID))
+                            go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    }
+                    break;
+                case BOSS_ASSEMBLY:
+                    // Assembly doors handled by DoorData, archivum
+                    // doors stay open only after DONE
+                    if (GameObject* go = instance->GetGameObject(m_archivumDoorsGUID))
+                        go->SetGoState(state == DONE ? GO_STATE_ACTIVE : GO_STATE_READY);
+                    break;
+                case BOSS_MIMIRON:
+                    if (state == IN_PROGRESS)
+                        m_mimironTramUsed = true;
+                    [[fallthrough]];
+                case BOSS_HODIR:
+                case BOSS_THORIM:
+                case BOSS_FREYA:
+                    if (GetBossState(BOSS_MIMIRON) == DONE && GetBossState(BOSS_FREYA) == DONE && GetBossState(BOSS_HODIR) == DONE && GetBossState(BOSS_THORIM) == DONE)
+                    {
+                        scheduler.Schedule(45s, [this](TaskContext /*context*/)
+                        {
+                            if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
+                            {
+                                go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                                if (Creature* trigger = instance->SummonCreature(NPC_ANCIENT_GATE_WORLD_TRIGGER, triggerAncientGatePosition, nullptr, 10 * IN_MILLISECONDS))
+                                    trigger->AI()->Talk(EMOTE_ANCIENT_GATE_UNLOCKED);
+                            }
+                        });
+                    }
+                    if (type == BOSS_HODIR && state == DONE)
+                        setChestsLootable(TYPE_HODIR);
+                    break;
+                case BOSS_ALGALON:
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_SIGILDOOR_03)))
+                    {
+                        go->SetGoState(state != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
+                        go->EnableCollision(false);
+                    }
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_01)))
+                    {
+                        go->SetGoState(state != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
+                        go->EnableCollision(false);
+                    }
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_02)))
+                    {
+                        go->SetGoState(state == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
+                        go->EnableCollision(false);
+                    }
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEGLOBE01)))
+                    {
+                        go->SetGoState(state == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
+                        go->EnableCollision(false);
+                    }
+                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_ULDUAR_TRAPDOOR_03)))
+                    {
+                        go->SetGoState(state == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
+                        go->EnableCollision(false);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            // take care of herbs
+            if (type == BOSS_FREYA && state == DONE)
+            {
+                std::list<GameObject*> goList;
+                if (Creature* freya = instance->GetCreature(GetGuidData(TYPE_FREYA)))
+                {
+                    freya->GetGameObjectListWithEntryInGrid(goList, { 191019, 190176, 190171, 190170, 189973 }, 333.0f);
+
+                    for (GameObject* herb : goList)
+                        herb->SetRespawnTime(7 * DAY);
+                }
+            }
+
+            if (state == DONE)
+                SaveToDB();
+
+            if (type > BOSS_LEVIATHAN && type < MAX_ENCOUNTER && state == IN_PROGRESS)
+            {
+                instance->DoForAllPlayers([&](Player* player)
+                {
+                    if (Creature* vehicleCreature = player->GetVehicleCreatureBase())
+                        vehicleCreature->DespawnOrUnsummon();
+                });
+            }
+
+            return true;
         }
 
         void SpawnHodirChests(Difficulty diff, Creature* hodir)
@@ -312,6 +456,8 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
                 case NPC_LEVIATHAN:
@@ -353,7 +499,7 @@ public:
                     break;
                 case NPC_HODIR:
                     m_uiHodirGUID = creature->GetGUID();
-                    if (m_auiEncounter[TYPE_HODIR] != DONE)
+                    if (GetBossState(BOSS_HODIR) != DONE)
                     {
                         SpawnHodirChests(instance->GetDifficulty(), creature);
                     }
@@ -446,6 +592,8 @@ public:
 
         void OnGameObjectCreate(GameObject* gameObject) override
         {
+            InstanceScript::OnGameObjectCreate(gameObject);
+
             switch (gameObject->GetEntry())
             {
                 // Flame Leviathan
@@ -673,61 +821,24 @@ public:
         {
             switch (type)
             {
+                // Boss encounter types - forward to SetBossState
+                // for backward compatibility with unconverted scripts
                 case TYPE_LEVIATHAN:
-                    m_auiEncounter[type] = data;
-                    if (data == DONE)
-                    {
-                        Map::PlayerList const& pList = instance->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                        {
-                            if (Creature* vehicleCreature = itr->GetSource()->GetVehicleCreatureBase())
-                            {
-                                vehicleCreature->DespawnOrUnsummon();
-                            }
-                        }
-                    }
-                    break;
                 case TYPE_IGNIS:
                 case TYPE_RAZORSCALE:
                 case TYPE_XT002:
-                case TYPE_AURIAYA:
-                case TYPE_VEZAX:
-                case TYPE_YOGGSARON:
-                case TYPE_KOLOGARN:
-                    m_auiEncounter[type] = data;
-                    break;
                 case TYPE_ASSEMBLY:
-                    if (GameObject* go = instance->GetGameObject(m_assemblyDoorsGUID))
-                        go->SetGoState(data == IN_PROGRESS ? GO_STATE_READY : GO_STATE_ACTIVE);
-                    if (GameObject* go = instance->GetGameObject(m_archivumDoorsGUID))
-                        go->SetGoState(data == DONE ? GO_STATE_ACTIVE : GO_STATE_READY);
-
-                    m_auiEncounter[type] = data;
-                    break;
+                case TYPE_AURIAYA:
                 case TYPE_MIMIRON:
                 case TYPE_HODIR:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
-                    m_auiEncounter[type] = data;
-                    if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
-                    {
-                        scheduler.Schedule(45s, [this](TaskContext /*context*/)
-                        {
-                            if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
-                            {
-                                go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                                if (Creature* trigger = instance->SummonCreature(NPC_ANCIENT_GATE_WORLD_TRIGGER, triggerAncientGatePosition, nullptr, 10*IN_MILLISECONDS))
-                                {
-                                    trigger->AI()->Talk(EMOTE_ANCIENT_GATE_UNLOCKED);
-                                }
-                            }
-                        });
-                    }
-                    if (type == TYPE_MIMIRON && data == IN_PROGRESS) // after reaching him without tram and starting the fight
-                        m_mimironTramUsed = true;
-                    if (GetData(TYPE_HODIR) == DONE)
-                        setChestsLootable(TYPE_HODIR);
-                    break;
+                case TYPE_VEZAX:
+                case TYPE_YOGGSARON:
+                case TYPE_KOLOGARN:
+                case TYPE_ALGALON:
+                    SetBossState(type, EncounterState(data));
+                    return;
                 case TYPE_HODIR_HM_FAIL:
                     if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
                     {
@@ -784,36 +895,6 @@ public:
                     _events.CancelEvent(EVENT_UPDATE_ALGALON_TIMER);
                     SaveToDB();
                     return;
-                case TYPE_ALGALON:
-                    m_auiEncounter[type] = data;
-                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_SIGILDOOR_03)))
-                    {
-                        go->SetGoState(data != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
-                        go->EnableCollision(false);
-                    }
-                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_01)))
-                    {
-                        go->SetGoState(data != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
-                        go->EnableCollision(false);
-                    }
-                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEFLOOR_02)))
-                    {
-                        go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
-                        go->EnableCollision(false);
-                    }
-                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_UNIVERSEGLOBE01)))
-                    {
-                        go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
-                        go->EnableCollision(false);
-                    }
-                    if (GameObject* go = instance->GetGameObject(GetGuidData(GO_DOODAD_UL_ULDUAR_TRAPDOOR_03)))
-                    {
-                        go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
-                        go->EnableCollision(false);
-                    }
-
-                    break;
-
                 // Achievement
                 case DATA_DWARFAGEDDON:
                     DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, SPELL_DWARFAGEDDON);
@@ -873,9 +954,7 @@ public:
                     break;
                 case DATA_BRANN_MEMOTESAY:
                     if (Creature* cr = instance->GetCreature(m_brannBronzebeardBaseCamp))
-                    {
                         cr->TextEmote("Go to your vehicles!", nullptr, true);
-                    }
                     break;
                 case DATA_BRANN_EASY_MODE:
                     ProcessEvent(nullptr, EVENT_TOWER_OF_STORM_DESTROYED);
@@ -885,37 +964,8 @@ public:
                     break;
             }
 
-            // take care of herbs
-            if (type == TYPE_FREYA && data == DONE)
-            {
-                std::list<GameObject*> goList;
-                if (Creature* freya = instance->GetCreature(GetGuidData(TYPE_FREYA)))
-                {
-                    freya->GetGameObjectListWithEntryInGrid(goList, 191019 /*Adder's Tongue*/, 333.0f);
-                    freya->GetGameObjectListWithEntryInGrid(goList, 190176 /*Frost Lotus*/, 333.0f);
-                    freya->GetGameObjectListWithEntryInGrid(goList, 190171 /*Lichbloom*/, 333.0f);
-                    freya->GetGameObjectListWithEntryInGrid(goList, 190170 /*Talandra's Rose*/, 333.0f);
-                    freya->GetGameObjectListWithEntryInGrid(goList, 189973 /*Goldclover*/, 333.0f);
-
-                    for (std::list<GameObject*>::const_iterator itr = goList.begin(); itr != goList.end(); ++itr)
-                        (*itr)->SetRespawnTime(7 * DAY);
-                }
-            }
-
-            if (data == DONE || type == TYPE_LEVIATHAN || type == TYPE_WATCHERS)
+            if (type == TYPE_WATCHERS)
                 SaveToDB();
-
-            if (type > TYPE_LEVIATHAN && type < TYPE_WATCHERS && data == IN_PROGRESS)
-            {
-                Map::PlayerList const& pList = instance->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                {
-                    if (Creature* vehicleCreature = itr->GetSource()->GetVehicleCreatureBase())
-                    {
-                        vehicleCreature->DespawnOrUnsummon();
-                    }
-                }
-            }
         }
 
         ObjectGuid GetGuidData(uint32 data) const override
@@ -1061,6 +1111,7 @@ public:
                 case TYPE_VEZAX:
                 case TYPE_YOGGSARON:
                 case TYPE_ALGALON:
+                    return GetBossState(type);
                 case TYPE_WATCHERS:
                     return m_auiEncounter[type];
 
@@ -1114,7 +1165,7 @@ public:
                                 go = true;
                     }
                     else
-                        go = (m_auiEncounter[i] == IN_PROGRESS);
+                        go = (GetBossState(i) == IN_PROGRESS);
 
                     if (go && (C_of_Ulduar_MASK & (1 << i)) == 0)
                     {
@@ -1126,21 +1177,12 @@ public:
 
         void ReadSaveDataMore(std::istringstream& data) override
         {
-            data >> m_auiEncounter[0];
-            data >> m_auiEncounter[1];
-            data >> m_auiEncounter[2];
-            data >> m_auiEncounter[3];
-            data >> m_auiEncounter[4];
-            data >> m_auiEncounter[5];
-            data >> m_auiEncounter[6];
-            data >> m_auiEncounter[7];
-            data >> m_auiEncounter[8];
-            data >> m_auiEncounter[9];
-            data >> m_auiEncounter[10];
-            data >> m_auiEncounter[11];
-            data >> m_auiEncounter[12];
-            data >> m_auiEncounter[13];
-            data >> m_auiEncounter[14];
+            // Boss states 0-13 are read by base InstanceScript.
+            // Sync m_auiEncounter from boss states for backward compat.
+            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                m_auiEncounter[i] = GetBossState(i);
+
+            data >> m_auiEncounter[TYPE_WATCHERS];
             data >> m_conspeedatoryAttempt;
             data >> m_unbrokenAchievement;
             data >> m_algalonTimer;
@@ -1148,7 +1190,7 @@ public:
             if (m_algalonTimer == TIMER_ALGALON_SUMMONED)
                 m_algalonTimer = TIMER_ALGALON_TO_SUMMON;
 
-            if (m_algalonTimer && m_algalonTimer <= 60 && GetData(TYPE_ALGALON) != DONE)
+            if (m_algalonTimer && m_algalonTimer <= 60 && GetBossState(BOSS_ALGALON) != DONE)
             {
                 DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 1);
                 DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, m_algalonTimer);
@@ -1156,23 +1198,18 @@ public:
 
             data >> C_of_Ulduar_MASK;
             data >> m_mageBarrier;
-
-            for (uint8 i = 0; i < (MAX_ENCOUNTER - 1); ++i)
-            {
-                if (m_auiEncounter[i] == IN_PROGRESS)
-                {
-                    m_auiEncounter[i] = NOT_STARTED;
-                }
-            }
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
         {
-            data << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' '
-                << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' '
-                << m_auiEncounter[8] << ' ' << m_auiEncounter[9] << ' ' << m_auiEncounter[10] << ' ' << m_auiEncounter[11] << ' '
-                << m_auiEncounter[12] << ' ' << m_auiEncounter[13] << ' ' << m_auiEncounter[14] << ' ' << m_conspeedatoryAttempt << ' '
-                << m_unbrokenAchievement << ' ' << m_algalonTimer << ' ' << C_of_Ulduar_MASK << ' ' << m_mageBarrier;
+            // Boss states 0-13 are written by base InstanceScript.
+            // Only write extra non-boss data here.
+            data << m_auiEncounter[TYPE_WATCHERS] << ' '
+                << m_conspeedatoryAttempt << ' '
+                << m_unbrokenAchievement << ' '
+                << m_algalonTimer << ' '
+                << C_of_Ulduar_MASK << ' '
+                << m_mageBarrier;
         }
 
         void Update(uint32 diff) override
@@ -1187,9 +1224,7 @@ public:
             {
                 case EVENT_UPDATE_ALGALON_TIMER:
                     if (m_algalonTimer == TIMER_ALGALON_DEFEATED)
-                    {
                         return;
-                    }
 
                     SaveToDB();
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, --m_algalonTimer);

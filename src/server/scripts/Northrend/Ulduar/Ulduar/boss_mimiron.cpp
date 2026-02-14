@@ -250,36 +250,22 @@ enum Texts
     TALK_COMPUTER_ZERO                              = 12,
 };
 
-#define GetMimiron() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_MIMIRON))
-#define GetLMK2() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_LEVIATHAN_MKII))
-#define GetVX001() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_VX001))
-#define GetACU() ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_MIMIRON_ACU))
+#define GetMimiron() ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_MIMIRON))
+#define GetLMK2() ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MIMIRON_LEVIATHAN_MKII))
+#define GetVX001() ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MIMIRON_VX001))
+#define GetACU() ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MIMIRON_ACU))
 
-class boss_mimiron : public CreatureScript
+struct boss_mimiron : public BossAI
 {
-public:
-    boss_mimiron() : CreatureScript("boss_mimiron") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_mimiron(Creature* pCreature) : BossAI(pCreature, BOSS_MIMIRON)
     {
-        return GetUlduarAI<boss_mimironAI>(pCreature);
+        if (!me->IsAlive())
+            instance->SetBossState(BOSS_MIMIRON, DONE);
+
+        bIsEvading = false;
     }
 
-    struct boss_mimironAI : public ScriptedAI
-    {
-        boss_mimironAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-            if (!me->IsAlive())
-                if (pInstance)
-                    pInstance->SetData(TYPE_MIMIRON, DONE);
-            bIsEvading = false;
-        }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-        bool bIsEvading;
+    bool bIsEvading;
         bool hardmode;
         bool berserk;
         bool bAchievProximityMine;
@@ -290,44 +276,42 @@ public:
         uint8 minutesTalkNum;
         uint32 outofCombatTimer;
 
-        void Reset() override
-        {
-            hardmode = false;
-            berserk = false;
-            bAchievProximityMine = false;
-            bAchievBombBot = false;
-            bAchievRocketStrike = false;
-            allowedFlameSpreadTime = 0;
-            outofCombatTimer = 0;
-            changeAllowedFlameSpreadTime = false;
-            ResetGameObjects();
-            events.Reset();
-            summons.DespawnAll();
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+    void Reset() override
+    {
+        hardmode = false;
+        berserk = false;
+        bAchievProximityMine = false;
+        bAchievBombBot = false;
+        bAchievRocketStrike = false;
+        allowedFlameSpreadTime = 0;
+        outofCombatTimer = 0;
+        changeAllowedFlameSpreadTime = false;
+        ResetGameObjects();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
-            if (pInstance && pInstance->GetData(TYPE_MIMIRON) != DONE)
-                pInstance->SetData(TYPE_MIMIRON, NOT_STARTED);
-        }
+        if (!instance->IsBossDone(BOSS_MIMIRON))
+            _Reset();
+    }
 
-        void AttackStart(Unit* who) override
-        {
-            if (who)
-                me->Attack(who, true); // skip following
-        }
+    void AttackStart(Unit* who) override
+    {
+        if (who)
+            me->Attack(who, true); // skip following
+    }
 
-        void JustReachedHome() override
-        {
-            me->setActive(false);
-            ScriptedAI::JustReachedHome();
-        }
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        me->setActive(false);
+    }
 
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            me->setActive(true);
-            DoZoneInCombat();
-            me->RemoveAllAuras();
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            events.Reset();
+    void JustEngagedWith(Unit*  /*who*/) override
+    {
+        me->setActive(true);
+        DoZoneInCombat();
+        me->RemoveAllAuras();
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        events.Reset();
 
             if (Creature* c = GetLMK2())
             {
@@ -359,7 +343,9 @@ public:
                 events.ScheduleEvent(EVENT_MIMIRON_SAY_HARDMODE, 7s);
                 events.ScheduleEvent(EVENT_BERSERK, Is25ManRaid() ? 10min : 8min);
 
-                events.ScheduleEvent(EVENT_COMPUTER_SAY_INITIATED, 0ms);
+                if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                    computer->AI()->Talk(TALK_COMPUTER_INITIATED);
+
                 events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, 3s);
                 minutesTalkNum = Is25ManRaid() ? TALK_COMPUTER_TEN : TALK_COMPUTER_EIGHT;
                 for (uint32 i = 0; i < uint32(TALK_COMPUTER_ZERO - minutesTalkNum - 1); ++i)
@@ -367,48 +353,43 @@ public:
                 events.ScheduleEvent(EVENT_COMPUTER_SAY_MINUTES, Milliseconds((TALK_COMPUTER_ZERO - minutesTalkNum) * 60000));
             }
 
-            // ensure LMK2 is at proper position
-            if (pInstance)
-                if (Creature* LMK2 = GetLMK2())
-                {
-                    LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
-                    LMK2->StopMovingOnCurrentPos();
-                }
+        // ensure LMK2 is at proper position
+            if (Creature* LMK2 = GetLMK2())
+            {
+                LMK2->UpdatePosition(LMK2->GetHomePosition(), true);
+                LMK2->StopMovingOnCurrentPos();
+            }
 
-            if (pInstance && pInstance->GetData(TYPE_MIMIRON) != DONE)
-                pInstance->SetData(TYPE_MIMIRON, IN_PROGRESS);
+        if (!instance->IsBossDone(BOSS_MIMIRON))
+            instance->SetBossState(BOSS_MIMIRON, IN_PROGRESS);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!me->IsInCombat())
+        {
+            outofCombatTimer += diff;
+            if (outofCombatTimer >= 10000)
+            {
+                outofCombatTimer = 0;
+                if (Creature* c = GetLMK2())
+                    me->CastSpell(c, RAND(SPELL_ENTER_VEHICLE_0, SPELL_ENTER_VEHICLE_1, SPELL_ENTER_VEHICLE_2, SPELL_ENTER_VEHICLE_4), true);
+            }
+            return;
         }
 
-        void UpdateAI(uint32 diff) override
+        Position p = me->GetHomePosition();
+        if (me->GetExactDist(&p) > 80.0f || !SelectTargetFromPlayerList(150.0f))
         {
-            if (!me->IsInCombat())
-            {
-                outofCombatTimer += diff;
-                if (outofCombatTimer >= 10000)
-                {
-                    outofCombatTimer = 0;
-                    if (Creature* c = GetLMK2())
-                        me->CastSpell(c, RAND(SPELL_ENTER_VEHICLE_0, SPELL_ENTER_VEHICLE_1, SPELL_ENTER_VEHICLE_2, SPELL_ENTER_VEHICLE_4), true);
-                }
-                return;
-            }
+            EnterEvadeMode(EVADE_REASON_OTHER);
+            return;
+        }
 
-            Position p = me->GetHomePosition();
-            if (me->GetExactDist(&p) > 80.0f || !SelectTargetFromPlayerList(150.0f))
-            {
-                EnterEvadeMode(EVADE_REASON_OTHER);
-                return;
-            }
-
-            events.Update(diff);
+        events.Update(diff);
 
             switch (events.ExecuteEvent())
             {
                 case 0:
-                    break;
-                case EVENT_COMPUTER_SAY_INITIATED:
-                    if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
-                        computer->AI()->Talk(TALK_COMPUTER_INITIATED);
                     break;
                 case EVENT_COMPUTER_SAY_MINUTES:
                     if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
@@ -755,9 +736,9 @@ public:
 
                         DoCastSelf(SPELL_SLEEP_VISUAL_1);
 
-                        if (pInstance)
+                        if (instance)
                             for( uint16 i = 0; i < 3; ++i )
-                                if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                                if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
                                     if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
                                         if (door->GetGoState() != GO_STATE_ACTIVE )
                                         {
@@ -765,8 +746,7 @@ public:
                                             door->UseDoorOrButton(0, false);
                                         }
 
-                        if (pInstance)
-                            pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LEVIATHAN_MKII, 1, me);
+                        instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LEVIATHAN_MKII, 1, me);
 
                         if (hardmode)
                             if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
@@ -785,8 +765,7 @@ public:
                 case EVENT_SAY_VOLTRON_DEAD:
                     Talk(SAY_V07TRON_DEATH);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                    if (pInstance)
-                        pInstance->SetData(TYPE_MIMIRON, DONE);
+                    instance->SetBossState(BOSS_MIMIRON, DONE);
                     // spawn chest
                     if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                     {
@@ -805,68 +784,55 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_TELEPORT)
         {
-            if (spellInfo->Id == SPELL_TELEPORT)
-            {
-                me->DespawnOrUnsummon();
-                pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
-            }
+            me->DespawnOrUnsummon();
+            instance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+        }
+    }
+
+    void MoveInLineOfSight(Unit*  /*mover*/) override {}
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (bIsEvading)
+            return;
+        bIsEvading = true;
+
+        if (Creature* c = GetLMK2())
+            c->AI()->EnterEvadeMode(why);
+        if (Creature* c = GetVX001())
+        {
+            c->AI()->EnterEvadeMode(why);
+            c->DespawnOrUnsummon();
+        }
+        if (Creature* c = GetACU())
+        {
+            c->AI()->EnterEvadeMode(why);
+            c->DespawnOrUnsummon();
         }
 
-        void MoveInLineOfSight(Unit*  /*mover*/) override {}
+        summons.DoAction(1337); // despawn summons of summons
 
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (bIsEvading)
-                return;
-            bIsEvading = true;
+        me->RemoveAllAuras();
+        me->ExitVehicle();
+        BossAI::EnterEvadeMode(why);
 
-            if (Creature* c = GetLMK2())
-            {
-                c->AI()->EnterEvadeMode(why);
-            }
-            if (Creature* c = GetVX001())
-            {
-                c->AI()->EnterEvadeMode(why);
-                c->DespawnOrUnsummon();
-            }
-            if (Creature* c = GetACU())
-            {
-                c->AI()->EnterEvadeMode(why);
-                c->DespawnOrUnsummon();
-            }
+        bIsEvading = false;
+    }
 
-            summons.DoAction(1337); // despawn summons of summons
-
-            me->RemoveAllAuras();
-            me->ExitVehicle();
-            ScriptedAI::EnterEvadeMode(why);
-
-            bIsEvading = false;
-        }
-
-        void JustSummoned(Creature* s) override
-        {
-            summons.Summon(s);
-        }
-
-        void SummonedCreatureDespawn(Creature* s) override
-        {
-            summons.Despawn(s);
-        }
-
-        void ResetGameObjects()
-        {
-            if (pInstance)
-                for( uint16 i = 0; i < 3; ++i )
-                    if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
-                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
-                            if (door->GetGoState() != GO_STATE_ACTIVE )
-                            {
-                                door->SetLootState(GO_READY);
-                                door->UseDoorOrButton(0, false);
-                            }
+    void ResetGameObjects()
+    {
+            for (uint16 i = 0; i < 3; ++i)
+                if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
+                        if (door->GetGoState() != GO_STATE_ACTIVE)
+                        {
+                            door->SetLootState(GO_READY);
+                            door->UseDoorOrButton(0, false);
+                        }
 
             if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 200.0f))
             {
@@ -887,29 +853,28 @@ public:
                 }
         }
 
-        void CloseDoorAndButton()
-        {
-            if (pInstance)
-                for( uint16 i = 0; i < 3; ++i )
-                    if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
-                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
-                            if (door->GetGoState() != GO_STATE_READY )
-                            {
-                                door->SetLootState(GO_READY);
-                                door->UseDoorOrButton(0, false);
-                            }
+    void CloseDoorAndButton()
+    {
+        for (uint16 i = 0; i < 3; ++i)
+            if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
+                    if (door->GetGoState() != GO_STATE_READY)
+                    {
+                        door->SetLootState(GO_READY);
+                        door->UseDoorOrButton(0, false);
+                    }
 
-            if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f))
-                if (button->GetGoState() != GO_STATE_ACTIVE )
-                {
-                    button->SetLootState(GO_READY);
-                    button->UseDoorOrButton(0, false);
-                }
-        }
+        if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f))
+            if (button->GetGoState() != GO_STATE_ACTIVE)
+            {
+                button->SetLootState(GO_READY);
+                button->UseDoorOrButton(0, false);
+            }
+    }
 
-        void SetData(uint32  /*id*/, uint32 value) override
-        {
-            switch (value) // end of phase 1-3, 4-6 for voltron
+    void SetData(uint32  /*id*/, uint32 value) override
+    {
+        switch (value) // end of phase 1-3, 4-6 for voltron
             {
                 case 1:
                     events.ScheduleEvent(EVENT_LMK2_RETREAT_INTERVAL, 5s);
@@ -991,11 +956,11 @@ public:
     {
         npc_ulduar_leviathan_mkiiAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            pInstance = me->GetInstanceScript();
+            instance = me->GetInstanceScript();
             bIsEvading = false;
         }
 
-        InstanceScript* pInstance;
+        InstanceScript* instance;
         EventMap events;
         bool bIsEvading;
         uint8 Phase;
@@ -1244,11 +1209,11 @@ public:
     {
         npc_ulduar_vx001AI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            pInstance = me->GetInstanceScript();
+            instance = me->GetInstanceScript();
             bIsEvading = false;
         }
 
-        InstanceScript* pInstance;
+        InstanceScript* instance;
         EventMap events;
         bool bIsEvading;
         uint8 Phase;
@@ -1568,13 +1533,13 @@ public:
     {
         npc_ulduar_aerial_command_unitAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
         {
-            pInstance = me->GetInstanceScript();
+            instance = me->GetInstanceScript();
             bIsEvading = false;
             immobilized = false;
             me->SetDisableGravity(true);
         }
 
-        InstanceScript* pInstance;
+        InstanceScript* instance;
         EventMap events;
         SummonList summons;
         bool bIsEvading;
@@ -1911,8 +1876,8 @@ class spell_ulduar_mimiron_mine_explosion : public SpellScript
     void HandleDamage(SpellEffIndex /*effIndex*/)
     {
         if (GetHitPlayer())
-            if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
-                if (Creature* mimi = pInstance->GetCreature(TYPE_MIMIRON))
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                if (Creature* mimi = instance->GetCreature(TYPE_MIMIRON))
                     mimi->AI()->SetData(0, 11);
     }
 
@@ -1979,7 +1944,7 @@ public:
     {
         npc_ulduar_magnetic_coreAI(Creature* pCreature) : NullCreatureAI(pCreature)
         {
-            pInstance = me->GetInstanceScript();
+            instance = me->GetInstanceScript();
             if (Creature* c = GetACU())
                 if (c->GetExactDist2d(me) <= 10.0f)
                 {
@@ -1993,7 +1958,7 @@ public:
             despawnTimer = 60000;
         }
 
-        InstanceScript* pInstance;
+        InstanceScript* instance;
         uint16 despawnTimer;
 
         void SetData(uint32  /*id*/, uint32  /*value*/) override
@@ -2061,7 +2026,7 @@ public:
             if (timer <= diff)
             {
                 uint32 option_npcid[3] = {NPC_JUNK_BOT, NPC_ASSAULT_BOT, NPC_EMERGENCY_FIRE_BOT};
-                InstanceScript* pInstance = me->GetInstanceScript();
+                InstanceScript* instance = me->GetInstanceScript();
                 if (Creature* ACU = GetACU()) // ACU summons for easy removing
                     if (Creature* bot = ACU->SummonCreature( option_npcid[option - 1], *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000))
                     {
@@ -2246,8 +2211,8 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (pInstance->GetData(TYPE_MIMIRON) != IN_PROGRESS)
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (instance->GetData(TYPE_MIMIRON) != IN_PROGRESS)
                 {
                     RemoveAll();
                     return;
@@ -2267,12 +2232,10 @@ public:
                             return;
                         }
 
-                        if (InstanceScript* pInstance = me->GetInstanceScript())
+                        if (InstanceScript* instance = me->GetInstanceScript())
                             if (Creature* mimiron = GetMimiron())
                                 if (CreateTime < mimiron->AI()->GetData(10))
-                                {
                                     break;
-                                }
 
                         Creature* last = ObjectAccessor::GetCreature(*me, FlameList.back());
                         if (last)
@@ -2426,7 +2389,7 @@ public:
                 if (target->GetEntry() == NPC_ASSAULT_BOT)
                     me->CastSpell(me, 65040, true); // achievement Not-So-Friendly Fire
                 else if (target->IsPlayer())
-                    if (InstanceScript* pInstance = me->GetInstanceScript())
+                    if (InstanceScript* instance = me->GetInstanceScript())
                         if (Creature* c = GetMimiron())
                             c->AI()->SetData(0, 13);
             }
@@ -2480,7 +2443,7 @@ public:
 
 void AddSC_boss_mimiron()
 {
-    new boss_mimiron();
+    RegisterUlduarCreatureAI(boss_mimiron);
     new npc_ulduar_leviathan_mkii();
     new npc_ulduar_vx001();
     new npc_ulduar_aerial_command_unit();

@@ -112,278 +112,257 @@ enum Misc
     DATA_XT002_GRAVITY_ACHIEV   = 51,
 };
 
-class boss_xt002 : public CreatureScript
+struct boss_xt002AI : public BossAI
 {
-public:
-    boss_xt002() : CreatureScript("boss_xt002") { }
+    boss_xt002AI(Creature* pCreature) : BossAI(pCreature, BOSS_XT002) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    uint8 _healthCheck;
+    bool _hardMode;
+    bool _nerfAchievement;
+    bool _gravityAchievement;
+
+    void RescheduleEvents()
     {
-        return GetUlduarAI<boss_xt002AI>(pCreature);
+        events.RescheduleEvent(EVENT_GRAVITY_BOMB, 1s, 1);
+        events.RescheduleEvent(EVENT_TYMPANIC_TANTARUM, 1min, 1);
+        if (!_hardMode)
+            events.RescheduleEvent(EVENT_HEALTH_CHECK, 2s, 1);
     }
 
-    struct boss_xt002AI : public ScriptedAI
+    void Reset() override
     {
-        boss_xt002AI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+        _Reset();
+
+        me->ResetLootMode();
+        me->RemoveAllAuras();
+
+        // first heart expose
+        _healthCheck = 75;
+        _hardMode = false;
+        _nerfAchievement = true;
+        _gravityAchievement = true;
+
+        me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        me->SetControlled(false, UNIT_STATE_STUNNED);
+
+        if (instance)
         {
-            m_pInstance = pCreature->GetInstanceScript();
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
+            if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_XT002_DOORS)))
+                pGo->SetGoState(GO_STATE_ACTIVE);
+        }
+    }
+
+    void AttachHeart()
+    {
+        if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
+            heart->SetHealth(heart->GetMaxHealth());
+        else if (Creature* accessory = me->SummonCreature(NPC_XT002_HEART, *me, TEMPSUMMON_MANUAL_DESPAWN))
+        {
+            accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
+            if (!me->HandleSpellClick(accessory, 0))
+                accessory->DespawnOrUnsummon();
+        }
+    }
+
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        me->setActive(false);
+    }
+
+    void JustEngagedWith(Unit*) override
+    {
+        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+        events.ScheduleEvent(EVENT_ENRAGE, 10min, 0, 0);
+        events.ScheduleEvent(EVENT_CHECK_ROOM, 5s, 0, 0);
+        RescheduleEvents(); // Other events are scheduled here
+
+        me->setActive(true);
+        Talk(SAY_AGGRO);
+
+        if (instance)
+        {
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
+            instance->SetBossState(BOSS_XT002, IN_PROGRESS);
+            if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_XT002_DOORS)))
+                pGo->SetGoState(GO_STATE_READY);
         }
 
-        InstanceScript* m_pInstance;
-        uint8 _healthCheck;
-        bool _hardMode;
-        bool _nerfAchievement;
-        bool _gravityAchievement;
-        EventMap events;
-        SummonList summons;
+        me->CallForHelp(175);
+        me->SetInCombatWithZone();
+        AttachHeart();
+    }
 
-        void RescheduleEvents()
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer() && !urand(0, 2))
         {
-            events.RescheduleEvent(EVENT_GRAVITY_BOMB, 1s, 1);
-            events.RescheduleEvent(EVENT_TYMPANIC_TANTARUM, 1min, 1);
-            if (!_hardMode)
-                events.RescheduleEvent(EVENT_HEALTH_CHECK, 2s, 1);
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        _JustDied();
+
+        if (instance)
+        {
+            if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_XT002_DOORS)))
+                pGo->SetGoState(GO_STATE_ACTIVE);
+        }
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == DATA_XT002_NERF_ENGINEERING)
+        {
+            _nerfAchievement = false;
+            return;
+        }
+        if (param == DATA_XT002_GRAVITY_ACHIEV)
+        {
+            _gravityAchievement = false;
+            return;
         }
 
-        void Reset() override
+        if (!me->IsAlive() || _hardMode)
+            return;
+
+        // heart destory
+        if (param == ACTION_HEART_BROKEN)
         {
-            summons.DespawnAll();
-            events.Reset();
-
-            me->ResetLootMode();
-            me->RemoveAllAuras();
-
-            // first heart expose
-            _healthCheck = 75;
-            _hardMode = false;
-            _nerfAchievement = true;
-            _gravityAchievement = true;
-
+            _hardMode = true;
+            me->SetLootMode(3); // hard mode + normal loot
+            me->SetMaxHealth(me->GetMaxHealth());
+            me->SetHealth(me->GetMaxHealth());
             me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            me->SetControlled(false, UNIT_STATE_STUNNED);
 
-            if (m_pInstance)
-            {
-                m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
-                m_pInstance->SetData(TYPE_XT002, NOT_STARTED);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-            }
+            me->CastSpell(me, SPELL_HEARTBREAK, true);
+
+            Talk(EMOTE_HEART_CLOSED);
+            events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4s);
+            return;
         }
 
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
-        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
-
-        void AttachHeart()
+        // damage from heart
+        if (param > 0)
         {
-            if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
-                heart->SetHealth(heart->GetMaxHealth());
-            else if (Creature* accessory = me->SummonCreature(NPC_XT002_HEART, *me, TEMPSUMMON_MANUAL_DESPAWN))
-            {
-                accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
-                if (!me->HandleSpellClick(accessory, 0))
-                    accessory->DespawnOrUnsummon();
-            }
+            // avoid reducing health under 1
+            int32 _final = std::min(param, int32(me->GetHealth() - 1));
+
+            me->ModifyHealth(-_final);
+            me->LowerPlayerDamageReq(_final);
         }
+    }
 
-        void JustReachedHome() override { me->setActive(false); }
+    uint32 GetData(uint32 param) const override
+    {
+        if (param == DATA_XT002_NERF_ENGINEERING)
+            return _nerfAchievement;
+        else if (param == DATA_XT002_GRAVITY_ACHIEV)
+            return _gravityAchievement;
 
-        void JustEngagedWith(Unit*) override
+        return 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-            events.ScheduleEvent(EVENT_ENRAGE, 10min, 0, 0);
-            events.ScheduleEvent(EVENT_CHECK_ROOM, 5s, 0, 0);
-            RescheduleEvents(); // Other events are scheduled here
+            // Control events
+            case EVENT_HEALTH_CHECK:
+                if (_hardMode)
+                {
+                    return;
+                }
 
-            me->setActive(true);
-            Talk(SAY_AGGRO);
+                if (me->HealthBelowPct(_healthCheck))
+                {
+                    _healthCheck -= 25;
+                    me->SetControlled(true, UNIT_STATE_STUNNED);
+                    me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
 
-            if (m_pInstance)
-            {
-                m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_MUST_DECONSTRUCT_FASTER);
-                m_pInstance->SetData(TYPE_XT002, IN_PROGRESS);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
-                    pGo->SetGoState(GO_STATE_READY);
-            }
+                    Talk(SAY_HEART_OPENED);
 
-            me->CallForHelp(175);
-            me->SetInCombatWithZone();
-            AttachHeart();
-        }
+                    events.CancelEventGroup(1);
+                    events.ScheduleEvent(EVENT_START_SECOND_PHASE, 5s);
+                    return;
+                }
+                events.Repeat(1s);
+                break;
+            case EVENT_CHECK_ROOM:
+                events.Repeat(5s);
+                if (me->GetPositionX() < 722 || me->GetPositionX() > 987 || me->GetPositionY() < -139 || me->GetPositionY() > 124)
+                    EnterEvadeMode();
 
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->IsPlayer() && !urand(0, 2))
-            {
-                Talk(SAY_SLAY);
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-
-            if (m_pInstance)
-            {
-                m_pInstance->SetData(TYPE_XT002, DONE);
-                if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_XT002_DOORS)))
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-            }
-
-            // Despawn summons
-            summons.DespawnAll();
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == DATA_XT002_NERF_ENGINEERING)
-            {
-                _nerfAchievement = false;
-                return;
-            }
-            if (param == DATA_XT002_GRAVITY_ACHIEV)
-            {
-                _gravityAchievement = false;
-                return;
-            }
-
-            if (!me->IsAlive() || _hardMode)
                 return;
 
-            // heart destory
-            if (param == ACTION_HEART_BROKEN)
-            {
-                _hardMode = true;
-                me->SetLootMode(3); // hard mode + normal loot
-                me->SetMaxHealth(me->GetMaxHealth());
-                me->SetHealth(me->GetMaxHealth());
+            // Abilities events
+            case EVENT_GRAVITY_BOMB:
+                me->CastCustomSpell(SPELL_GRAVITY_BOMB, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                events.ScheduleEvent(EVENT_SEARING_LIGHT, 10s, 1);
+                break;
+            case EVENT_SEARING_LIGHT:
+                me->CastCustomSpell(SPELL_SEARING_LIGHT, SPELLVALUE_MAX_TARGETS, 1, me, true);
+                events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10s, 1);
+                break;
+            case EVENT_TYMPANIC_TANTARUM:
+                Talk(EMOTE_TYMPANIC_TANTRUM);
+                Talk(SAY_TYMPANIC_TANTRUM);
+                me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
+                events.Repeat(1min);
+                return;
+            case EVENT_ENRAGE:
+                Talk(SAY_BERSERK);
+                me->CastSpell(me, SPELL_XT002_ENRAGE, true);
+                break;
+
+            // Animation events
+            case EVENT_START_SECOND_PHASE:
+                Talk(EMOTE_HEART_OPENED);
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
+                    heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
+
+                events.ScheduleEvent(EVENT_RESTORE, 30s);
+                return;
+            // Restore from heartbreak
+            case EVENT_RESTORE:
+                if (_hardMode)
+                {
+                    return;
+                }
+
+                Talk(SAY_HEART_CLOSED);
+
                 me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
+                // Hide heart
+                if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
+                    heart->GetAI()->DoAction(ACTION_HIDE_HEART);
 
-                me->CastSpell(me, SPELL_HEARTBREAK, true);
-
-                Talk(EMOTE_HEART_CLOSED);
                 events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4s);
                 return;
-            }
+            case EVENT_REMOVE_EMOTE:
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetControlled(false, UNIT_STATE_STUNNED);
 
-            // damage from heart
-            if (param > 0)
-            {
-                // avoid reducing health under 1
-                int32 _final = std::min(param, int32(me->GetHealth() - 1));
-
-                me->ModifyHealth(-_final);
-                me->LowerPlayerDamageReq(_final);
-            }
-        }
-
-        uint32 GetData(uint32 param) const override
-        {
-            if (param == DATA_XT002_NERF_ENGINEERING)
-                return _nerfAchievement;
-            else if (param == DATA_XT002_GRAVITY_ACHIEV)
-                return _gravityAchievement;
-
-            return 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
+                RescheduleEvents();
                 return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                // Control events
-                case EVENT_HEALTH_CHECK:
-                    if (_hardMode)
-                    {
-                        return;
-                    }
-
-                    if (me->HealthBelowPct(_healthCheck))
-                    {
-                        _healthCheck -= 25;
-                        me->SetControlled(true, UNIT_STATE_STUNNED);
-                        me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_SUBMERGED); // submerge with animation
-
-                        Talk(SAY_HEART_OPENED);
-
-                        events.CancelEventGroup(1);
-                        events.ScheduleEvent(EVENT_START_SECOND_PHASE, 5s);
-                        return;
-                    }
-                    events.Repeat(1s);
-                    break;
-                case EVENT_CHECK_ROOM:
-                    events.Repeat(5s);
-                    if (me->GetPositionX() < 722 || me->GetPositionX() > 987 || me->GetPositionY() < -139 || me->GetPositionY() > 124)
-                        EnterEvadeMode();
-
-                    return;
-
-                // Abilities events
-                case EVENT_GRAVITY_BOMB:
-                    me->CastCustomSpell(SPELL_GRAVITY_BOMB, SPELLVALUE_MAX_TARGETS, 1, me, true);
-                    events.ScheduleEvent(EVENT_SEARING_LIGHT, 10s, 1);
-                    break;
-                case EVENT_SEARING_LIGHT:
-                    me->CastCustomSpell(SPELL_SEARING_LIGHT, SPELLVALUE_MAX_TARGETS, 1, me, true);
-                    events.ScheduleEvent(EVENT_GRAVITY_BOMB, 10s, 1);
-                    break;
-                case EVENT_TYMPANIC_TANTARUM:
-                    Talk(EMOTE_TYMPANIC_TANTRUM);
-                    Talk(SAY_TYMPANIC_TANTRUM);
-                    me->CastSpell(me, SPELL_TYMPANIC_TANTARUM, true);
-                    events.Repeat(1min);
-                    return;
-                case EVENT_ENRAGE:
-                    Talk(SAY_BERSERK);
-                    me->CastSpell(me, SPELL_XT002_ENRAGE, true);
-                    break;
-
-                // Animation events
-                case EVENT_START_SECOND_PHASE:
-                    Talk(EMOTE_HEART_OPENED);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
-                        heart->GetAI()->DoAction(ACTION_AWAKEN_HEART);
-
-                    events.ScheduleEvent(EVENT_RESTORE, 30s);
-                    return;
-                // Restore from heartbreak
-                case EVENT_RESTORE:
-                    if (_hardMode)
-                    {
-                        return;
-                    }
-
-                    Talk(SAY_HEART_CLOSED);
-
-                    me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_STAND); // emerge
-                    // Hide heart
-                    if (Unit* heart = me->GetVehicleKit() ? me->GetVehicleKit()->GetPassenger(HEART_VEHICLE_SEAT) : nullptr)
-                        heart->GetAI()->DoAction(ACTION_HIDE_HEART);
-
-                    events.ScheduleEvent(EVENT_REMOVE_EMOTE, 4s);
-                    return;
-                case EVENT_REMOVE_EMOTE:
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetControlled(false, UNIT_STATE_STUNNED);
-
-                    RescheduleEvents();
-                    return;
-            }
-
-            // Disabled by stunned state
-            DoMeleeAttackIfReady();
         }
-    };
+
+        // Disabled by stunned state
+        DoMeleeAttackIfReady();
+    }
 };
 
 class npc_xt002_heart : public CreatureScript
@@ -1025,7 +1004,7 @@ public:
 void AddSC_boss_xt002()
 {
     // Npcs
-    new boss_xt002();
+    RegisterUlduarCreatureAI(boss_xt002AI);
     new npc_xt002_heart();
     new npc_xt002_scrapbot();
     new npc_xt002_pummeller();

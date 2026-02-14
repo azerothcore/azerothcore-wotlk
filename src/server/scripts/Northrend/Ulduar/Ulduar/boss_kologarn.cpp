@@ -117,34 +117,19 @@ enum Misc
     DATA_KOLOGARN_ARMS_ACHIEV           = 57,
 };
 
-class boss_kologarn : public CreatureScript
+struct boss_kologarnAI : public BossAI
 {
-public:
-    boss_kologarn() : CreatureScript("boss_kologarn") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_kologarnAI(Creature* pCreature) : BossAI(pCreature, BOSS_KOLOGARN), vehicle(me->GetVehicleKit()), breathReady(false)
     {
-        return GetUlduarAI<boss_kologarnAI>(pCreature);
+        assert(vehicle);
+        me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
     }
 
-    struct boss_kologarnAI : public ScriptedAI
-    {
-        boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()), summons(me), breathReady(false)
-        {
-            m_pInstance = me->GetInstanceScript();
-            assert(vehicle);
-            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-        }
+    Vehicle* vehicle;
+    ObjectGuid _left, _right;
 
-        InstanceScript* m_pInstance;
-
-        Vehicle* vehicle;
-        ObjectGuid _left, _right;
-        EventMap events;
-        SummonList summons;
-
-        bool _looksAchievement, breathReady;
-        uint8 _rubbleAchievement;
+    bool _looksAchievement, breathReady;
+    uint8 _rubbleAchievement;
 
         void MoveInLineOfSight(Unit* who) override
         {
@@ -158,7 +143,7 @@ public:
             }
 
             if (me->GetExactDist2d(who) < 30.0f)
-                ScriptedAI::MoveInLineOfSight(who);
+                BossAI::MoveInLineOfSight(who);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -214,15 +199,12 @@ public:
             me->SetDisableGravity(true);
             me->DisableRotate(true);
 
-            events.Reset();
-            summons.DespawnAll();
+            _Reset();
 
-            if (m_pInstance)
+            if (instance)
             {
-                m_pInstance->SetData(TYPE_KOLOGARN, NOT_STARTED);
-
                 // Open the door inside Kologarn chamber
-                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(GO_KOLOGARN_DOORS)))
                     door->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -240,8 +222,8 @@ public:
             if (param == DATA_KOLOGARN_RUBBLE_ACHIEV)
             {
                 // Means arm died
-                if (m_pInstance && (!_left || !_right))
-                    m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_DISARMED_CRITERIA);
+                if (instance && (!_left || !_right))
+                    instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEVEMENT_DISARMED_CRITERIA);
 
                 ++_rubbleAchievement;
             }
@@ -267,12 +249,12 @@ public:
         void JustSummoned(Creature* cr) override
         {
             if (cr->GetEntry() != NPC_LEFT_ARM && cr->GetEntry() != NPC_RIGHT_ARM)
-                summons.Summon(cr);
+                BossAI::JustSummoned(cr);
         }
 
         void SummonedCreatureDespawn(Creature* cr) override
         {
-            if (m_pInstance->GetData(TYPE_KOLOGARN) > NOT_STARTED)
+            if (instance->GetData(TYPE_KOLOGARN) > NOT_STARTED)
                 return;
 
             if (cr->GetEntry() == NPC_LEFT_ARM)
@@ -290,17 +272,15 @@ public:
 
         void JustDied(Unit*) override
         {
-            summons.DespawnAll();
+            _JustDied();
             me->StopMoving();
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_KOLOGARN, DONE);
 
             Talk(SAY_DEATH);
 
-            if (m_pInstance)
+            if (instance)
             {
                 // Open the door inside Kologarn chamber
-                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(GO_KOLOGARN_DOORS)))
                     door->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -333,7 +313,7 @@ public:
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
-            if (!me->IsAlive() || m_pInstance->GetData(TYPE_KOLOGARN) != IN_PROGRESS)
+            if (!me->IsAlive() || instance->GetData(TYPE_KOLOGARN) != IN_PROGRESS)
                 return;
 
             if (!apply)
@@ -375,8 +355,8 @@ public:
 
         void JustEngagedWith(Unit*  /*who*/) override
         {
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_KOLOGARN, IN_PROGRESS);
+            if (instance)
+                instance->SetBossState(BOSS_KOLOGARN, IN_PROGRESS);
 
             events.ScheduleEvent(EVENT_SMASH, 8s);
             events.ScheduleEvent(EVENT_SWEEP, 17s);
@@ -389,9 +369,9 @@ public:
             me->setActive(true);
 
             // Close the door inside Kologarn chamber
-            if (m_pInstance)
+            if (instance)
             {
-                if (GameObject* door = m_pInstance->instance->GetGameObject(m_pInstance->GetGuidData(GO_KOLOGARN_DOORS)))
+                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(GO_KOLOGARN_DOORS)))
                 {
                     door->SetGoState(GO_STATE_READY);
                 }
@@ -909,7 +889,7 @@ public:
 void AddSC_boss_kologarn()
 {
     // Npcs
-    new boss_kologarn();
+    RegisterUlduarCreatureAI(boss_kologarnAI);
     new boss_kologarn_arms();
     new boss_kologarn_eyebeam();
     RegisterUlduarCreatureAI(boss_kologarn_pit_kill_bunny);

@@ -48,7 +48,7 @@ enum IgnisSpellData
 
 enum IgnisNPCs
 {
-    BOSS_IGNIS                     = 33118,
+    NPC_IGNIS                      = 33118,
     NPC_IRON_CONSTRUCT             = 33121,
     NPC_SCORCHED_GROUND            = 33123,
     NPC_WATER_TRIGGER              = 22515,
@@ -186,47 +186,33 @@ public:
     };
 };
 
-class boss_ignis : public CreatureScript
+struct boss_ignisAI : public BossAI
 {
-public:
-    boss_ignis() : CreatureScript("boss_ignis") { }
+    boss_ignisAI(Creature* pCreature) : BossAI(pCreature, BOSS_IGNIS) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    uint8 counter;
+    bool bShattered;
+    uint32 lastShatterMSTime;
+
+    void Reset() override
     {
-        return GetUlduarAI<boss_ignisAI>(pCreature);
+        _Reset();
+        me->SetControlled(false, UNIT_STATE_ROOT);
+        me->DisableRotate(false);
+        counter = 0;
+        bShattered = false;
+        lastShatterMSTime = 0;
+
+        if (instance)
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
     }
 
-    struct boss_ignisAI : public ScriptedAI
+    void JustEngagedWith(Unit*  /*who*/) override
     {
-        boss_ignisAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+        me->setActive(true);
 
-        EventMap events;
-        uint8 counter;
-        bool bShattered;
-        uint32 lastShatterMSTime;
-
-        void Reset() override
-        {
-            events.Reset();
-            me->SetControlled(false, UNIT_STATE_ROOT);
-            me->DisableRotate(false);
-            counter = 0;
-            bShattered = false;
-            lastShatterMSTime = 0;
-
-            if (InstanceScript* m_pInstance = me->GetInstanceScript())
-            {
-                m_pInstance->SetData(TYPE_IGNIS, NOT_STARTED);
-                m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
-            }
-        }
-
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            me->setActive(true);
-
-            std::list<Creature*> icl;
-            me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
+        std::list<Creature*> icl;
+        me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
             for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
             {
                 if (!(*itr)->IsAlive())
@@ -240,185 +226,183 @@ public:
                     (*itr)->CastSpell((*itr), 38757, true);
             }
 
-            bShattered = false;
-            lastShatterMSTime = 0;
-            events.Reset();
-            events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40s, 30s));
-            events.ScheduleEvent(EVENT_SPELL_SCORCH, 10s);
-            events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32s);
-            events.ScheduleEvent(EVENT_GRAB, 25s);
+        bShattered = false;
+        lastShatterMSTime = 0;
+        events.Reset();
+        events.ScheduleEvent(EVENT_ACTIVATE_CONSTRUCT, RAID_MODE(40s, 30s));
+        events.ScheduleEvent(EVENT_SPELL_SCORCH, 10s);
+        events.ScheduleEvent(EVENT_SPELL_FLAME_JETS, 32s);
+        events.ScheduleEvent(EVENT_GRAB, 25s);
 
-            Talk(SAY_AGGRO);
-            DoZoneInCombat();
+        Talk(SAY_AGGRO);
+        DoZoneInCombat();
 
-            if (InstanceScript* m_pInstance = me->GetInstanceScript())
-            {
-                m_pInstance->SetData(TYPE_IGNIS, IN_PROGRESS);
-                m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
-                m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
-            }
+        if (instance)
+        {
+            instance->SetBossState(BOSS_IGNIS, IN_PROGRESS);
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
+        }
+    }
+
+    void SetData(uint32 id, uint32  /*value*/) override
+    {
+        if (id == 1337)
+        {
+            if (lastShatterMSTime)
+                if (getMSTimeDiff(lastShatterMSTime, GameTime::GetGameTimeMS().count()) <= 5000)
+                    bShattered = true;
+
+            lastShatterMSTime = GameTime::GetGameTimeMS().count();
+        }
+    }
+
+    uint32 GetData(uint32 id) const override
+    {
+        if (id == 1337)
+            return (bShattered ? 1 : 0);
+        return 0;
+    }
+
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        me->setActive(false);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+            Talk(SAY_SLAY);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        _JustDied();
+
+        std::list<Creature*> icl;
+        me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
+        for (std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr)
+            if ((*itr)->IsAlive() && (*itr)->IsInCombat())
+                Unit::Kill(*itr, *itr);
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        if (caster && spell->Id == SPELL_GRAB_CONTROL_2)
+        {
+            //caster->ClearUnitState(UNIT_STATE_ONVEHICLE);
+            me->CastSpell(caster, SPELL_SLAG_POT, true);
+        }
+    }
+
+    void MoveInLineOfSight(Unit*  /*who*/) override {}
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        if (me->GetPositionX() < 490.0f || me->GetPositionX() > 690.0f || me->GetPositionY() < 130.0f || me->GetPositionY() > 410.0f)
+        {
+            EnterEvadeMode(EVADE_REASON_OTHER);
+            return;
         }
 
-        void SetData(uint32 id, uint32  /*value*/) override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (id == 1337)
-            {
-                if (lastShatterMSTime)
-                    if (getMSTimeDiff(lastShatterMSTime, GameTime::GetGameTimeMS().count()) <= 5000)
-                        bShattered = true;
-
-                lastShatterMSTime = GameTime::GetGameTimeMS().count();
-            }
-        }
-
-        uint32 GetData(uint32 id) const override
-        {
-            if (id == 1337)
-                return (bShattered ? 1 : 0);
-            return 0;
-        }
-
-        void JustReachedHome() override
-        {
-            me->setActive(false);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->IsPlayer())
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-
-            if (me->GetInstanceScript())
-                me->GetInstanceScript()->SetData(TYPE_IGNIS, DONE);
-
-            std::list<Creature*> icl;
-            me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
-            for( std::list<Creature*>::iterator itr = icl.begin(); itr != icl.end(); ++itr )
-                if ((*itr)->IsAlive() && (*itr)->IsInCombat())
-                    Unit::Kill(*itr, *itr);
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
-        {
-            if (caster && spell->Id == SPELL_GRAB_CONTROL_2)
-            {
-                //caster->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                me->CastSpell(caster, SPELL_SLAG_POT, true);
-            }
-        }
-
-        void MoveInLineOfSight(Unit*  /*who*/) override {}
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (me->GetPositionX() < 490.0f || me->GetPositionX() > 690.0f || me->GetPositionY() < 130.0f || me->GetPositionY() > 410.0f )
-            {
-                EnterEvadeMode(EVADE_REASON_OTHER);
-                return;
-            }
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
+            case 0:
+                break;
+            case EVENT_ACTIVATE_CONSTRUCT:
+                Talk(SAY_SUMMON);
+                me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
+                if (++counter >= 20)
+                {
+                    Talk(SAY_BERSERK);
+                    me->CastSpell(me, SPELL_BERSERK, true);
                     break;
-                case EVENT_ACTIVATE_CONSTRUCT:
-                    Talk(SAY_SUMMON);
-                    me->CastCustomSpell(SPELL_ACTIVATE_CONSTRUCT, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
-                    if (++counter >= 20)
+                }
+                events.Repeat(RAID_MODE(40s, 30s));
+                break;
+            case EVENT_SPELL_SCORCH:
+                Talk(SAY_SCORCH);
+                me->SetControlled(true, UNIT_STATE_ROOT);
+                me->DisableRotate(true);
+                me->SendMovementFlagUpdate();
+                me->CastSpell(me->GetVictim(), SPELL_SCORCH, false);
+                events.Repeat(20s);
+                events.RescheduleEvent(EVENT_ENABLE_ROTATE, 3s);
+                break;
+            case EVENT_ENABLE_ROTATE:
+                me->SetControlled(false, UNIT_STATE_ROOT);
+                me->DisableRotate(false);
+                break;
+            case EVENT_SPELL_FLAME_JETS:
+                Talk(EMOTE_JETS);
+                me->CastSpell(me->GetVictim(), SPELL_FLAME_JETS, false);
+                events.Repeat(25s);
+                break;
+            case EVENT_GRAB:
+                {
+                    std::list<Creature*> icl;
+                    me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
+
+                    GuidVector playerGUIDs;
+                    Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                    Player* temp = nullptr;
+
+                    for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                     {
-                        Talk(SAY_BERSERK);
-                        me->CastSpell(me, SPELL_BERSERK, true);
-                        break;
-                    }
-                    events.Repeat(RAID_MODE(40s, 30s));
-                    break;
-                case EVENT_SPELL_SCORCH:
-                    Talk(SAY_SCORCH);
-                    me->SetControlled(true, UNIT_STATE_ROOT);
-                    me->DisableRotate(true);
-                    me->SendMovementFlagUpdate();
-                    me->CastSpell(me->GetVictim(), SPELL_SCORCH, false);
-                    events.Repeat(20s);
-                    events.RescheduleEvent(EVENT_ENABLE_ROTATE, 3s);
-                    break;
-                case EVENT_ENABLE_ROTATE:
-                    me->SetControlled(false, UNIT_STATE_ROOT);
-                    me->DisableRotate(false);
-                    break;
-                case EVENT_SPELL_FLAME_JETS:
-                    Talk(EMOTE_JETS);
-                    me->CastSpell(me->GetVictim(), SPELL_FLAME_JETS, false);
-                    events.Repeat(25s);
-                    break;
-                case EVENT_GRAB:
-                    {
-                        std::list<Creature*> icl;
-                        me->GetCreaturesWithEntryInRange(icl, 300.0f, NPC_IRON_CONSTRUCT);
-
-                        GuidVector playerGUIDs;
-                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-                        Player* temp = nullptr;
-
-                        for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                        temp = itr->GetSource();
+                        if (!temp->IsAlive() || temp->GetExactDist2d(me) > 90.0f)
+                            continue;
+                        if (me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID())
+                            continue;
+                        bool found = false;
+                        for (std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
                         {
-                            temp = itr->GetSource();
-                            if (!temp->IsAlive() || temp->GetExactDist2d(me) > 90.0f )
-                                continue;
-                            if (me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID())
-                                continue;
-                            bool found = false;
-                            for (std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
+                            if ((*iterator)->GetVictim() && (*iterator)->GetVictim()->GetGUID() == temp->GetGUID())
                             {
-                                if ((*iterator)->GetVictim() && (*iterator)->GetVictim()->GetGUID() == temp->GetGUID())
-                                {
-                                    found = true;
-                                    break;
-                                }
-                            }
-
-                            if (!found)
-                                playerGUIDs.push_back(temp->GetGUID());
-                        }
-
-                        if (!playerGUIDs.empty())
-                        {
-                            int8 pos = urand(0, playerGUIDs.size() - 1);
-                            if (Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)))
-                            {
-                                Talk(SAY_SLAG_POT);
-                                me->CastSpell(pTarget, SPELL_GRAB, false);
+                                found = true;
+                                break;
                             }
                         }
 
-                        events.Repeat(24s);
-                        events.DelayEvents(6s);
+                        if (!found)
+                            playerGUIDs.push_back(temp->GetGUID());
                     }
-                    break;
-            }
 
-            DoMeleeAttackIfReady();
+                    if (!playerGUIDs.empty())
+                    {
+                        int8 pos = urand(0, playerGUIDs.size() - 1);
+                        if (Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)))
+                        {
+                            Talk(SAY_SLAG_POT);
+                            me->CastSpell(pTarget, SPELL_GRAB, false);
+                        }
+                    }
+
+                    events.Repeat(24s);
+                    events.DelayEvents(6s);
+                }
+                break;
         }
 
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            me->SetControlled(false, UNIT_STATE_ROOT);
-            me->DisableRotate(false);
-            ScriptedAI::EnterEvadeMode(why);
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->SetControlled(false, UNIT_STATE_ROOT);
+        me->DisableRotate(false);
+        BossAI::EnterEvadeMode(why);
+    }
 };
 
 class spell_ignis_scorch_aura : public AuraScript
@@ -541,7 +525,7 @@ public:
 
 void AddSC_boss_ignis()
 {
-    new boss_ignis();
+    RegisterUlduarCreatureAI(boss_ignisAI);
     new npc_ulduar_iron_construct();
     RegisterSpellScript(spell_ignis_scorch_aura);
     RegisterSpellScript(spell_ignis_grab_initial);

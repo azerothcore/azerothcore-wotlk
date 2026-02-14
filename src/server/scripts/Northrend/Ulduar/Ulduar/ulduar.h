@@ -25,24 +25,43 @@
 
 #define UlduarScriptName "instance_ulduar"
 
+enum UlduarBossIds
+{
+    // Boss IDs used by SetBossNumber/SetBossState (0-indexed)
+    BOSS_LEVIATHAN                          = 0,
+    BOSS_IGNIS                              = 1,
+    BOSS_RAZORSCALE                         = 2,
+    BOSS_XT002                              = 3,
+    BOSS_ASSEMBLY                           = 4,
+    BOSS_KOLOGARN                           = 5,
+    BOSS_AURIAYA                            = 6,
+    BOSS_FREYA                              = 7,
+    BOSS_HODIR                              = 8,
+    BOSS_MIMIRON                            = 9,
+    BOSS_THORIM                             = 10,
+    BOSS_VEZAX                              = 11,
+    BOSS_YOGGSARON                          = 12,
+    BOSS_ALGALON                            = 13,
+    MAX_ENCOUNTER                           = 14
+};
+
+// Legacy encounter type aliases for compatibility with existing scripts
 enum UlduarEncounters
 {
-    MAX_ENCOUNTER                           = 15,
-
-    TYPE_LEVIATHAN                          = 0,
-    TYPE_IGNIS                              = 1,
-    TYPE_RAZORSCALE                         = 2,
-    TYPE_XT002                              = 3,
-    TYPE_ASSEMBLY                           = 4,
-    TYPE_KOLOGARN                           = 5,
-    TYPE_AURIAYA                            = 6,
-    TYPE_FREYA                              = 7,
-    TYPE_HODIR                              = 8,
-    TYPE_MIMIRON                            = 9,
-    TYPE_THORIM                             = 10,
-    TYPE_VEZAX                              = 11,
-    TYPE_YOGGSARON                          = 12,
-    TYPE_ALGALON                            = 13,
+    TYPE_LEVIATHAN                          = BOSS_LEVIATHAN,
+    TYPE_IGNIS                              = BOSS_IGNIS,
+    TYPE_RAZORSCALE                         = BOSS_RAZORSCALE,
+    TYPE_XT002                              = BOSS_XT002,
+    TYPE_ASSEMBLY                           = BOSS_ASSEMBLY,
+    TYPE_KOLOGARN                           = BOSS_KOLOGARN,
+    TYPE_AURIAYA                            = BOSS_AURIAYA,
+    TYPE_FREYA                              = BOSS_FREYA,
+    TYPE_HODIR                              = BOSS_HODIR,
+    TYPE_MIMIRON                            = BOSS_MIMIRON,
+    TYPE_THORIM                             = BOSS_THORIM,
+    TYPE_VEZAX                              = BOSS_VEZAX,
+    TYPE_YOGGSARON                          = BOSS_YOGGSARON,
+    TYPE_ALGALON                            = BOSS_ALGALON,
     TYPE_WATCHERS                           = 14,
     TYPE_HODIR_HM_FAIL                      = 15,
     TYPE_WINTER_CACHE                       = 16
