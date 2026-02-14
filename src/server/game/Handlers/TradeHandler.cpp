@@ -631,13 +631,6 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetLevel() < sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ))
-    {
-        ChatHandler(this).SendNotification(LANG_TRADE_OTHER_REQ, sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
-        SendTradeStatus(TRADE_STATUS_CLOSE_WINDOW);
-        return;
-    }
-
     if (!sScriptMgr->OnPlayerCanInitTrade(_player, pOther))
         return;
 
