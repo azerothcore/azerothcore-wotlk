@@ -94,7 +94,7 @@ void ThreatReference::UpdateOffline()
 
 /*static*/ bool ThreatReference::FlagsAllowFighting(Unit const* a, Unit const* b)
 {
-    if (a->GetTypeId() == TYPEID_UNIT && a->ToCreature()->IsTrigger())
+    if (a->IsCreature() && a->ToCreature()->IsTrigger())
         return false;
     if (a->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
     {

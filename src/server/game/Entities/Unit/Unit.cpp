@@ -19308,7 +19308,6 @@ uint32 Unit::GetModelForForm(ShapeshiftForm form, uint32 spellId)
     return modelid;
 }
 
-
 bool Unit::IsAttackSpeedOverridenShapeShift() const
 {
     // Mirroring clientside gameplay logic
