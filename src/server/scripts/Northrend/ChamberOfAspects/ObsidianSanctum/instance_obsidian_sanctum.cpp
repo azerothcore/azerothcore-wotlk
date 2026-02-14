@@ -45,8 +45,8 @@ public:
         explicit instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap), portalCount(0)
         {
             SetHeaders(DataHeader);
-            SetBossNumber(MAX_ENCOUNTERS);            LoadObjectData(creatureData, nullptr);
-            LoadSummonData(summonData);
+            SetBossNumber(MAX_ENCOUNTERS);
+            LoadObjectData(creatureData, nullptr);
         }
 
         ObjectGuid GetGuidData(uint32 uiData) const override
