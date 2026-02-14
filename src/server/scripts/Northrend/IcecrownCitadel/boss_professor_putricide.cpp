@@ -564,16 +564,16 @@ public:
                     {
                         case 2:
                             {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_CREATE_CONCOCTION);
+                                SpellInfo const* spell = sSpellMgr.GetSpellInfo(SPELL_CREATE_CONCOCTION);
                                 me->CastSpell(me, SPELL_CREATE_CONCOCTION, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
+                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr.GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
                                 break;
                             }
                         case 3:
                             {
-                                SpellInfo const* spell = sSpellMgr->GetSpellInfo(SPELL_GUZZLE_POTIONS);
+                                SpellInfo const* spell = sSpellMgr.GetSpellInfo(SPELL_GUZZLE_POTIONS);
                                 me->CastSpell(me, SPELL_GUZZLE_POTIONS, false);
-                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr->GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
+                                events.ScheduleEvent(EVENT_PHASE_TRANSITION, Milliseconds(sSpellMgr.GetSpellForDifficultyFromSpell(spell, me)->CalcCastTime() + 2250));
                                 break;
                             }
                         default:
@@ -775,7 +775,7 @@ public:
 
     void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
     {
-        if (!_newTargetSelectTimer && spell->Id == sSpellMgr->GetSpellIdForDifficulty(_hitTargetSpellId, me))
+        if (!_newTargetSelectTimer && spell->Id == sSpellMgr.GetSpellIdForDifficulty(_hitTargetSpellId, me))
             SelectNewTarget();
     }
 
@@ -885,8 +885,8 @@ class spell_putricide_slime_puddle : public SpellScript
     // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
     void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        SpellInfo const* s1 = sSpellMgr->GetSpellInfo(70346);
-        SpellInfo const* s2 = sSpellMgr->GetSpellInfo(72456);
+        SpellInfo const* s1 = sSpellMgr.GetSpellInfo(70346);
+        SpellInfo const* s2 = sSpellMgr.GetSpellInfo(72456);
         if (s1 && s2)
             if (Unit* target = GetHitUnit())
             {
@@ -1107,7 +1107,7 @@ class spell_putricide_ooze_eruption_searcher : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        uint32 adhesiveId = sSpellMgr->GetSpellIdForDifficulty(SPELL_VOLATILE_OOZE_ADHESIVE, GetCaster());
+        uint32 adhesiveId = sSpellMgr.GetSpellIdForDifficulty(SPELL_VOLATILE_OOZE_ADHESIVE, GetCaster());
         if (GetHitUnit()->HasAura(adhesiveId))
         {
             GetHitUnit()->RemoveAurasDueToSpell(adhesiveId, GetCaster()->GetGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
@@ -1133,8 +1133,8 @@ class spell_putricide_mutated_plague_aura : public AuraScript
             return;
 
         uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-        SpellInfo const* spell = sSpellMgr->AssertSpellInfo(triggerSpell);
-        spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, caster);
+        SpellInfo const* spell = sSpellMgr.AssertSpellInfo(triggerSpell);
+        spell = sSpellMgr.GetSpellForDifficultyFromSpell(spell, caster);
 
         int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
         damage = damage * pow(2.5f, GetStackAmount());
@@ -1145,10 +1145,10 @@ class spell_putricide_mutated_plague_aura : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         uint32 healSpell = uint32(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
-        SpellInfo const* spell = sSpellMgr->GetSpellInfo(healSpell);
+        SpellInfo const* spell = sSpellMgr.GetSpellInfo(healSpell);
         if (!spell)
             return;
-        spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, GetTarget());
+        spell = sSpellMgr.GetSpellForDifficultyFromSpell(spell, GetTarget());
         int32 healAmount = spell->Effects[EFFECT_0].CalcValue();
         healAmount *= GetStackAmount();
         GetTarget()->CastCustomSpell(healSpell, SPELLVALUE_BASE_POINT0, healAmount, GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
@@ -1181,7 +1181,7 @@ class spell_putricide_unbound_plague : public SpellScript
             }
         }
 
-        targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
+        targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr.GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
         Acore::Containers::RandomResize(targets, 1);
     }
 
@@ -1194,7 +1194,7 @@ class spell_putricide_unbound_plague : public SpellScript
         if (!instance)
             return;
 
-        uint32 plagueId = sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster());
+        uint32 plagueId = sSpellMgr.GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster());
 
         if (!GetHitUnit()->HasAura(plagueId))
         {
@@ -1274,7 +1274,7 @@ class spell_putricide_clear_aura_effect_value : public SpellScript
     void HandleScript(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        uint32 auraId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), GetCaster());
+        uint32 auraId = sSpellMgr.GetSpellIdForDifficulty(uint32(GetEffectValue()), GetCaster());
         GetHitUnit()->RemoveAurasDueToSpell(auraId);
     }
 

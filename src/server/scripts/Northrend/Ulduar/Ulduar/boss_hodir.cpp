@@ -1003,7 +1003,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            uint32 spellid = sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, me);
+            uint32 spellid = sSpellMgr.GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, me);
             if (target && spell->Id == spellid)
                 if (Aura* a = target->GetAura(spellid, me->GetGUID()))
                     a->SetStackAmount(spell->StackAmount);
@@ -1041,7 +1041,7 @@ public:
                     break;
                 case EVENT_SHAMAN_STORM_CLOUD:
                     {
-                        uint32 spellid = sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, me);
+                        uint32 spellid = sSpellMgr.GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, me);
                         if (Player* target = ScriptedAI::SelectTargetFromPlayerList(35.0f, spellid))
                             me->CastSpell(target, spellid, false);
                         events.Repeat(30s);
@@ -1402,7 +1402,7 @@ class spell_hodir_storm_power_aura : public AuraScript
     void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
-            if (Aura* a = caster->GetAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, caster)))
+            if (Aura* a = caster->GetAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_CLOUD, caster)))
                 a->ModStackAmount(-1);
     }
 
@@ -1433,7 +1433,7 @@ class spell_hodir_storm_cloud_aura : public AuraScript
     {
         PreventDefaultAction();
         if (Unit* target = GetTarget())
-            target->CastSpell((Unit*)nullptr, (sSpellMgr->GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_POWER, GetCaster())), true);
+            target->CastSpell((Unit*)nullptr, (sSpellMgr.GetSpellIdForDifficulty(SPELL_SHAMAN_STORM_POWER, GetCaster())), true);
     }
 
     void Register() override

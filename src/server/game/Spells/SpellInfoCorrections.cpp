@@ -25,7 +25,7 @@ inline void ApplySpellFix(std::initializer_list<uint32> spellIds, void(*fix)(Spe
 {
     for (uint32 spellId : spellIds)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
         if (!spellInfo)
         {
             LOG_ERROR("sql.sql", "Spell info correction specified for non-existing spell {}", spellId);

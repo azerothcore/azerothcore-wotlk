@@ -288,7 +288,7 @@ class spell_festergut_pungent_blight : public SpellScript
             return;
 
         // Get Inhaled Blight id for our difficulty
-        uint32 blightId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), caster);
+        uint32 blightId = sSpellMgr.GetSpellIdForDifficulty(uint32(GetEffectValue()), caster);
 
         // ...and remove it
         caster->RemoveAurasDueToSpell(blightId);
@@ -302,7 +302,7 @@ class spell_festergut_pungent_blight : public SpellScript
     void HandleHit(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
-            target->RemoveAurasDueToSpell(sSpellMgr->GetSpellIdForDifficulty(SPELL_INOCULATED, GetCaster()));
+            target->RemoveAurasDueToSpell(sSpellMgr.GetSpellIdForDifficulty(SPELL_INOCULATED, GetCaster()));
     }
 
     void Register() override
@@ -326,7 +326,7 @@ class spell_festergut_blighted_spores_aura : public AuraScript
         if (Aura* a = aurEff->GetBase())
             if (a->GetDuration() > a->GetMaxDuration() - 1000) // this does not stack for different casters and previous is removed by new DoT, prevent it from giving inoculation in such case
                 return;
-        uint32 inoculatedId = sSpellMgr->GetSpellIdForDifficulty(SPELL_INOCULATED, GetTarget());
+        uint32 inoculatedId = sSpellMgr.GetSpellIdForDifficulty(SPELL_INOCULATED, GetTarget());
         uint8 inoculatedStack = 1;
         if (Aura* a = GetTarget()->GetAura(inoculatedId))
         {

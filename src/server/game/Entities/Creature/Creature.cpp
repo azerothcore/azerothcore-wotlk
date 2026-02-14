@@ -2249,7 +2249,7 @@ SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
     {
         if (!m_spells[i])
             continue;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(m_spells[i]);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(m_spells[i]);
         if (!spellInfo)
         {
             LOG_ERROR("entities.unit", "WORLD: unknown spell id {}", m_spells[i]);
@@ -2297,7 +2297,7 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
     {
         if (!m_spells[i])
             continue;
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(m_spells[i]);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(m_spells[i]);
         if (!spellInfo)
         {
             LOG_ERROR("entities.unit", "WORLD: unknown spell id {}", m_spells[i]);
@@ -2727,7 +2727,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
     {
         for (std::vector<uint32>::const_iterator itr = cainfo->auras.begin(); itr != cainfo->auras.end(); ++itr)
         {
-            SpellInfo const* AdditionalSpellInfo = sSpellMgr->GetSpellInfo(*itr);
+            SpellInfo const* AdditionalSpellInfo = sSpellMgr.GetSpellInfo(*itr);
             if (!AdditionalSpellInfo)
             {
                 LOG_ERROR("sql.sql", "Creature ({}) has wrong spell {} defined in `auras` field.", GetGUID().ToString(), *itr);
@@ -2825,7 +2825,7 @@ void Creature::_AddCreatureSpellCooldown(uint32 spell_id, uint16 categoryId, uin
 
 void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_time, bool /*needSendToClient*/, bool /*forceSendToSpectator*/)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell_id);
     if (!spellInfo)
         return;
 
@@ -2858,7 +2858,7 @@ void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_t
         _AddCreatureSpellCooldown(spellInfo->Id, 0, spellcooldown);
     }
 
-    if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
+    if (sSpellMgr.HasSpellCooldownOverride(spellInfo->Id))
     {
         if (IsCharmed() && GetCharmer()->IsPlayer())
         {
@@ -3701,7 +3701,7 @@ uint32 Creature::GetPlayerDamageReq() const
 
 bool Creature::CanCastSpell(uint32 spellID) const
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellID);
     int32 currentPower = GetPower(getPowerType());
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsSpellProhibited(spellInfo->GetSchoolMask()))

@@ -83,7 +83,7 @@ void LoadSkillDiscoveryTable()
         if (reqSkillOrSpell > 0)                            // spell case
         {
             uint32 absReqSkillOrSpell = uint32(reqSkillOrSpell);
-            SpellInfo const* reqSpellInfo = sSpellMgr->GetSpellInfo(absReqSkillOrSpell);
+            SpellInfo const* reqSpellInfo = sSpellMgr.GetSpellInfo(absReqSkillOrSpell);
             if (!reqSpellInfo)
             {
                 if (reportedReqSpells.find(absReqSkillOrSpell) == reportedReqSpells.end())
@@ -113,7 +113,7 @@ void LoadSkillDiscoveryTable()
         }
         else if (reqSkillOrSpell == 0)                      // skill case
         {
-            SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellId);
 
             if (bounds.first == bounds.second)
             {
@@ -137,9 +137,9 @@ void LoadSkillDiscoveryTable()
         LOG_ERROR("sql.sql", "Some items can't be successfully discovered: have in chance field value < 0.000001 in `skill_discovery_template` DB table . List:\n{}", ssNonDiscoverableEntries.str());
 
     // report about empty data for explicit discovery spells
-    for (uint32 spell_id = 1; spell_id < sSpellMgr->GetSpellInfoStoreSize(); ++spell_id)
+    for (uint32 spell_id = 1; spell_id < sSpellMgr.GetSpellInfoStoreSize(); ++spell_id)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell_id);
         if (!spellInfo)
             continue;
 
@@ -163,7 +163,7 @@ uint32 GetExplicitDiscoverySpell(uint32 spellId, Player* player)
     if (tab == SkillDiscoveryStore.end())
         return 0;
 
-    SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellId);
     uint32 skillvalue = bounds.first != bounds.second ? player->GetSkillValue(bounds.first->second->SkillLine) : uint32(0);
 
     float full_chance = 0;

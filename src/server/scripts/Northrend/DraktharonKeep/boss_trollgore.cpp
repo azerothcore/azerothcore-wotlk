@@ -258,7 +258,7 @@ public:
         if (!target)
             return false;
 
-        return target->GetAuraCount(sSpellMgr->GetSpellIdForDifficulty(SPELL_CONSUME_AURA, target)) < 10;
+        return target->GetAuraCount(sSpellMgr.GetSpellIdForDifficulty(SPELL_CONSUME_AURA, target)) < 10;
     }
 };
 

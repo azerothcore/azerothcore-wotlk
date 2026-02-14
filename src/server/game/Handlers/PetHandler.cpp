@@ -85,7 +85,7 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
     if (!pet->IsAlive())
     {
         // xinef: allow dissmis dead pets
-        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr->GetSpellInfo(spellId) : nullptr;
+        SpellInfo const* spell = (flag == ACT_ENABLED || flag == ACT_PASSIVE) ? sSpellMgr.GetSpellInfo(spellId) : nullptr;
         if ((flag != ACT_COMMAND || spellId != COMMAND_ABANDON) && (!spell || !spell->HasAttribute(SPELL_ATTR0_ALLOW_CAST_WHILE_DEAD)))
             return;
     }
@@ -329,7 +329,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 Unit* unit_target = nullptr;
 
                 // do not cast unknown spells
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
                 if (!spellInfo)
                 {
                     LOG_ERROR("network.opcode", "WORLD: unknown PET spell id {}", spellId);
@@ -770,7 +770,7 @@ void WorldSession::HandlePetSetAction(WorldPacket& recvData)
             //if it's act for spell (en/disable/cast) and there is a spell given (0 = remove spell) which pet doesn't know, don't add
             if (!((act_state == ACT_ENABLED || act_state == ACT_DISABLED || act_state == ACT_PASSIVE) && spell_id && !pet->HasSpell(spell_id)))
             {
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id))
+                if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell_id))
                 {
                     //sign for autocast
                     if (act_state == ACT_ENABLED)
@@ -940,7 +940,7 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutoc
         return;
     }
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(packet.SpellID);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(packet.SpellID);
     if (!spellInfo)
     {
         LOG_ERROR("spells.pet", "WorldSession::HandlePetSpellAutocastOpcode: Unknown spell id {} used by {}.", packet.SpellID, packet.PetGUID.ToString());
@@ -1012,7 +1012,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
     {
         LOG_ERROR("network.opcode", "WORLD: unknown PET spell id {}", spellId);

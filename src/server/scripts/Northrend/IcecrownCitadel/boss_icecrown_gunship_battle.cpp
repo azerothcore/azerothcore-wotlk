@@ -1999,7 +1999,7 @@ class spell_igb_rocket_pack_aura : public AuraScript
 
     void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
+        SpellInfo const* damageInfo = sSpellMgr.AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
         GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
         GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
     }
@@ -2368,7 +2368,7 @@ class spell_igb_incinerating_blast : public SpellScript
     void CalculateDamage(SpellEffIndex /*effIndex*/)
     {
         PreventHitEffect(EFFECT_0);
-        SpellInfo const* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
+        SpellInfo const* si = sSpellMgr.GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
         if (!si)
             return;
         SpellCastTargets targets;

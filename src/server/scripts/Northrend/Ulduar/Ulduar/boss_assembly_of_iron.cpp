@@ -700,7 +700,7 @@ public:
 
         void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_CHAIN_LIGHTNING, me)  || spellInfo->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_LIGHTNING_WHIRL_TRIGG, me))
+            if (spellInfo->Id == sSpellMgr.GetSpellIdForDifficulty(SPELL_CHAIN_LIGHTNING, me)  || spellInfo->Id == sSpellMgr.GetSpellIdForDifficulty(SPELL_LIGHTNING_WHIRL_TRIGG, me))
                 _stunnedAchievement = false;
         }
 
@@ -801,7 +801,7 @@ public:
 
                     me->SetRegeneratingHealth(true);
                     _flyTargetGUID.Clear();
-                    me->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_LIGHTNING_TENDRILS, me));
+                    me->RemoveAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_LIGHTNING_TENDRILS, me));
                     me->RemoveAura(SPELL_LIGHTNING_TENDRILS_2);
                     DoResetThreatList();
                     events.CancelEvent(EVENT_LIGHTNING_FLIGHT);

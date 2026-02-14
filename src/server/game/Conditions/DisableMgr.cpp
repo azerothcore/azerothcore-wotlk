@@ -128,7 +128,7 @@ bool DisableMgr::HandleDisableType(DisableType type, uint32 entry, uint8 flags, 
             LOG_ERROR("sql.sql", "Disable flags specified for gameobject {}, useless data.", entry);
         break;
     case DISABLE_TYPE_SPELL:
-        if (!(sSpellMgr->GetSpellInfo(entry) || flags & SPELL_DISABLE_DEPRECATED_SPELL))
+        if (!(sSpellMgr.GetSpellInfo(entry) || flags & SPELL_DISABLE_DEPRECATED_SPELL))
         {
             LOG_ERROR("sql.sql", "Spell entry {} from `disables` doesn't exist in dbc, skipped.", entry);
             return false;
@@ -165,7 +165,7 @@ bool DisableMgr::HandleDisableType(DisableType type, uint32 entry, uint8 flags, 
         // xinef: if spell has disabled los, add flag
         if (flags & SPELL_DISABLE_LOS)
         {
-            SpellInfo* spellInfo = const_cast<SpellInfo*>(sSpellMgr->GetSpellInfo(entry));
+            SpellInfo* spellInfo = const_cast<SpellInfo*>(sSpellMgr.GetSpellInfo(entry));
             spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         }
 

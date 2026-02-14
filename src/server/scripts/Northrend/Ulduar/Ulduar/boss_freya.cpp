@@ -938,9 +938,9 @@ public:
             if (Unit* target = ObjectAccessor::GetUnit(*me, me->ToTempSummon()->GetSummonerGUID()))
             {
                 if (me->GetEntry() == NPC_IRON_ROOT_TRIGGER) // Iron Branch spell
-                    target->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_IRON_ROOTS_DAMAGE, me));
+                    target->RemoveAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_IRON_ROOTS_DAMAGE, me));
                 else
-                    target->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_IRON_ROOTS_FREYA_DAMAGE, me));
+                    target->RemoveAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_IRON_ROOTS_FREYA_DAMAGE, me));
             }
         }
     };

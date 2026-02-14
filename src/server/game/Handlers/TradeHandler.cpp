@@ -338,7 +338,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         // not accept if spell can't be casted now (cheating)
         if (uint32 my_spell_id = my_trade->GetSpell())
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(my_spell_id);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(my_spell_id);
             Item* castItem = my_trade->GetSpellCastItem();
 
             if (!spellInfo || !his_trade->GetItem(TRADE_SLOT_NONTRADED) ||
@@ -373,7 +373,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         // not accept if spell can't be casted now (cheating)
         if (uint32 his_spell_id = his_trade->GetSpell())
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(his_spell_id);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(his_spell_id);
             Item* castItem = his_trade->GetSpellCastItem();
 
             if (!spellInfo || !my_trade->GetItem(TRADE_SLOT_NONTRADED) || (his_trade->HasSpellCastItem() && !castItem))

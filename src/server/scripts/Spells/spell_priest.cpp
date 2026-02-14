@@ -262,7 +262,7 @@ class spell_pri_glyph_of_prayer_of_healing : public AuraScript
             return;
         }
 
-        SpellInfo const* triggeredSpellInfo = sSpellMgr->AssertSpellInfo(SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL);
+        SpellInfo const* triggeredSpellInfo = sSpellMgr.AssertSpellInfo(SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL);
         int32 heal = int32(CalculatePct(int32(healInfo->GetHeal()), aurEff->GetAmount()) / triggeredSpellInfo->GetMaxTicks());
         GetTarget()->CastCustomSpell(SPELL_PRIEST_GLYPH_OF_PRAYER_OF_HEALING_HEAL, SPELLVALUE_BASE_POINT0, heal, eventInfo.GetProcTarget(), true, nullptr, aurEff);
     }
@@ -559,7 +559,7 @@ class spell_pri_penance : public SpellScript
 
     bool Validate(SpellInfo const* spellInfo) override
     {
-        SpellInfo const* firstRankSpellInfo = sSpellMgr->GetSpellInfo(SPELL_PRIEST_PENANCE_R1);
+        SpellInfo const* firstRankSpellInfo = sSpellMgr.GetSpellInfo(SPELL_PRIEST_PENANCE_R1);
         if (!firstRankSpellInfo)
             return false;
 
@@ -568,9 +568,9 @@ class spell_pri_penance : public SpellScript
             return false;
 
         uint8 rank = spellInfo->GetRank();
-        if (!sSpellMgr->GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_DAMAGE, rank, true))
+        if (!sSpellMgr.GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_DAMAGE, rank, true))
             return false;
-        if (!sSpellMgr->GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_HEAL, rank, true))
+        if (!sSpellMgr.GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_HEAL, rank, true))
             return false;
 
         return true;
@@ -587,9 +587,9 @@ class spell_pri_penance : public SpellScript
             uint8 rank = GetSpellInfo()->GetRank();
 
             if (caster->IsFriendlyTo(unitTarget))
-                caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_HEAL, rank), false);
+                caster->CastSpell(unitTarget, sSpellMgr.GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_HEAL, rank), false);
             else
-                caster->CastSpell(unitTarget, sSpellMgr->GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_DAMAGE, rank), false);
+                caster->CastSpell(unitTarget, sSpellMgr.GetSpellWithRank(SPELL_PRIEST_PENANCE_R1_DAMAGE, rank), false);
         }
     }
 

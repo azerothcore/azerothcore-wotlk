@@ -903,7 +903,7 @@ void Aura::SetCharges(uint8 charges)
 uint8 Aura::CalcMaxCharges(Unit* caster) const
 {
     uint32 maxProcCharges = m_spellInfo->ProcCharges;
-    if (SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId()))
+    if (SpellProcEntry const* procEntry = sSpellMgr.GetSpellProcEntry(GetId()))
         maxProcCharges = procEntry->Charges;
 
     if (caster)
@@ -1219,7 +1219,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
     Unit* target = aurApp->GetTarget();
     AuraRemoveMode removeMode = aurApp->GetRemoveMode();
     // handle spell_area table
-    SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAuraMapBounds(GetId());
+    SpellAreaForAreaMapBounds saBounds = sSpellMgr.GetSpellAreaForAuraMapBounds(GetId());
     if (saBounds.first != saBounds.second)
     {
         uint32 zone, area;
@@ -1245,7 +1245,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         // apply linked auras
         if (apply)
         {
-            if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(GetId() + SPELL_LINK_AURA))
+            if (std::vector<int32> const* spellTriggered = sSpellMgr.GetSpellLinked(GetId() + SPELL_LINK_AURA))
             {
                 for (std::vector<int32>::const_iterator itr = spellTriggered->begin(); itr != spellTriggered->end(); ++itr)
                 {
@@ -1259,7 +1259,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         else
         {
             // remove linked auras
-            if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(-(int32)GetId()))
+            if (std::vector<int32> const* spellTriggered = sSpellMgr.GetSpellLinked(-(int32)GetId()))
             {
                 for (std::vector<int32>::const_iterator itr = spellTriggered->begin(); itr != spellTriggered->end(); ++itr)
                 {
@@ -1269,7 +1269,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         target->CastSpell(target, *itr, true, nullptr, nullptr, GetCasterGUID());
                 }
             }
-            if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(GetId() + SPELL_LINK_AURA))
+            if (std::vector<int32> const* spellTriggered = sSpellMgr.GetSpellLinked(GetId() + SPELL_LINK_AURA))
             {
                 for (std::vector<int32>::const_iterator itr = spellTriggered->begin(); itr != spellTriggered->end(); ++itr)
                 {
@@ -1284,7 +1284,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
     else if (apply)
     {
         // modify stack amount of linked auras
-        if (std::vector<int32> const* spellTriggered = sSpellMgr->GetSpellLinked(GetId() + SPELL_LINK_AURA))
+        if (std::vector<int32> const* spellTriggered = sSpellMgr.GetSpellLinked(GetId() + SPELL_LINK_AURA))
         {
             for (std::vector<int32>::const_iterator itr = spellTriggered->begin(); itr != spellTriggered->end(); ++itr)
                 if (*itr > 0)
@@ -1396,8 +1396,8 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         {
                             if (SpellInfo const* triggeringSpellInfo = GetTriggeredByAuraSpellInfo())
                             {
-                                uint8 fbRank = sSpellMgr->GetSpellRank(triggeringSpellInfo->Id);
-                                uint8 fofRank = sSpellMgr->GetSpellRank(aurEff->GetId());
+                                uint8 fbRank = sSpellMgr.GetSpellRank(triggeringSpellInfo->Id);
+                                uint8 fofRank = sSpellMgr.GetSpellRank(aurEff->GetId());
                                 uint8 chance = uint8(std::ceil(fofRank * fbRank * 16.6f));
 
                                 if (roll_chance_i(chance))
@@ -1541,13 +1541,13 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 // Alchemy: Mixology
                 if (caster && caster->HasAura(53042) && caster->IsPlayer() && !caster->ToPlayer()->GetSession()->PlayerLoading())
                 {
-                    if (sSpellMgr->IsSpellMemberOfSpellGroup(GetId(), SPELL_GROUP_ELIXIR_BATTLE) || sSpellMgr->IsSpellMemberOfSpellGroup(GetId(), SPELL_GROUP_ELIXIR_GUARDIAN))
+                    if (sSpellMgr.IsSpellMemberOfSpellGroup(GetId(), SPELL_GROUP_ELIXIR_BATTLE) || sSpellMgr.IsSpellMemberOfSpellGroup(GetId(), SPELL_GROUP_ELIXIR_GUARDIAN))
                     {
                         if (caster->HasSpell(GetSpellInfo()->Effects[EFFECT_0].TriggerSpell))
                         {
                             for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
                                 if (GetEffect(i))
-                                    GetEffect(i)->SetAmount(CalculatePct(GetEffect(i)->GetAmount(), 100 + sSpellMgr->GetSpellMixologyBonus(GetId())));
+                                    GetEffect(i)->SetAmount(CalculatePct(GetEffect(i)->GetAmount(), 100 + sSpellMgr.GetSpellMixologyBonus(GetId())));
 
                             SetMaxDuration(caster->CalcSpellDuration(GetSpellInfo()) * 2);
                             SetDuration(GetMaxDuration());
@@ -2008,7 +2008,7 @@ bool Aura::CanStackWith(Aura const* existingAura) const
         return false;
 
     // check spell group stack rules
-    switch (sSpellMgr->CheckSpellGroupStackRules(m_spellInfo, existingSpellInfo))
+    switch (sSpellMgr.CheckSpellGroupStackRules(m_spellInfo, existingSpellInfo))
     {
         case SPELL_GROUP_STACK_RULE_EXCLUSIVE:
         case SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST: // if it reaches this point, existing aura is lower/equal
@@ -2140,7 +2140,7 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
         SetNeedClientUpdateForTargets();
     }
 
-    SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId());
+    SpellProcEntry const* procEntry = sSpellMgr.GetSpellProcEntry(GetId());
 
     ASSERT(procEntry);
 
@@ -2150,7 +2150,7 @@ void Aura::PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInf
 
 bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo) const
 {
-    SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(GetId());
+    SpellProcEntry const* procEntry = sSpellMgr.GetSpellProcEntry(GetId());
     // only auras with spell proc entry can trigger proc
     if (!procEntry)
         return false;
@@ -2167,7 +2167,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
     // something about triggered spells triggering, and add extra attack effect
 
     // do checks against db data
-    if (!sSpellMgr->CanSpellTriggerProcOnEvent(*procEntry, eventInfo))
+    if (!sSpellMgr.CanSpellTriggerProcOnEvent(*procEntry, eventInfo))
         return false;
 
     // do checks using conditions table

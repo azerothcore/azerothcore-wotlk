@@ -501,7 +501,7 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                     break;
             }
 
-            if ((sSpellMgr->GetSpellInfo(_spellInfo->Effects[EffectIndex].TriggerSpell) && sSpellMgr->GetSpellInfo(_spellInfo->Effects[EffectIndex].TriggerSpell)->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL)) && _spellInfo->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
+            if ((sSpellMgr.GetSpellInfo(_spellInfo->Effects[EffectIndex].TriggerSpell) && sSpellMgr.GetSpellInfo(_spellInfo->Effects[EffectIndex].TriggerSpell)->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL)) && _spellInfo->HasAttribute(SPELL_ATTR0_SCALES_WITH_CREATURE_LEVEL))
                 canEffectScale = false;
 
             if (canEffectScale)
@@ -987,7 +987,7 @@ bool SpellInfo::IsPrimaryProfessionFirstRank() const
 
 bool SpellInfo::IsAbilityLearnedWithProfession() const
 {
-    SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(Id);
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(Id);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
@@ -1004,7 +1004,7 @@ bool SpellInfo::IsAbilityLearnedWithProfession() const
 
 bool SpellInfo::IsAbilityOfSkillType(uint32 skillType) const
 {
-    SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(Id);
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(Id);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
         if (_spell_idx->second->SkillLine == uint32(skillType))
@@ -1297,7 +1297,7 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
         if (!IsAffectedBySpellMods())
             return false;
 
-    SpellInfo const* affectSpell = sSpellMgr->GetSpellInfo(mod->spellId);
+    SpellInfo const* affectSpell = sSpellMgr.GetSpellInfo(mod->spellId);
 
     if (!affectSpell)
     {
@@ -1532,7 +1532,7 @@ SpellCastResult SpellInfo::CheckLocation(uint32 map_id, uint32 zone_id, uint32 a
     }
 
     // DB base check (if non empty then must fit at least single for allow)
-    SpellAreaMapBounds saBounds = sSpellMgr->GetSpellAreaMapBounds(Id);
+    SpellAreaMapBounds saBounds = sSpellMgr.GetSpellAreaMapBounds(Id);
     if (saBounds.first != saBounds.second)
     {
         for (SpellAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
@@ -1812,10 +1812,10 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
             return SPELL_FAILED_TARGET_AURASTATE;
     }
 
-    if (TargetAuraSpell && !unitTarget->HasAura(sSpellMgr->GetSpellIdForDifficulty(TargetAuraSpell, caster)))
+    if (TargetAuraSpell && !unitTarget->HasAura(sSpellMgr.GetSpellIdForDifficulty(TargetAuraSpell, caster)))
         return SPELL_FAILED_TARGET_AURASTATE;
 
-    if (ExcludeTargetAuraSpell && unitTarget->HasAura(sSpellMgr->GetSpellIdForDifficulty(ExcludeTargetAuraSpell, caster)))
+    if (ExcludeTargetAuraSpell && unitTarget->HasAura(sSpellMgr.GetSpellIdForDifficulty(ExcludeTargetAuraSpell, caster)))
         return SPELL_FAILED_TARGET_AURASTATE;
 
     if (unitTarget->HasPreventResurectionAura() && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
@@ -2606,7 +2606,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                         if (!deep)
                         {
-                            if (SpellInfo const* spellTriggeredProto = sSpellMgr->GetSpellInfo(Effects[effIndex].TriggerSpell))
+                            if (SpellInfo const* spellTriggeredProto = sSpellMgr.GetSpellInfo(Effects[effIndex].TriggerSpell))
                             {
                                 // negative targets of main spell return early
                                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -2715,7 +2715,7 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
     // negative spell if triggered spell is negative
     if (!deep && !Effects[effIndex].ApplyAuraName && Effects[effIndex].TriggerSpell)
     {
-        if (SpellInfo const* spellTriggeredProto = sSpellMgr->GetSpellInfo(Effects[effIndex].TriggerSpell))
+        if (SpellInfo const* spellTriggeredProto = sSpellMgr.GetSpellInfo(Effects[effIndex].TriggerSpell))
             if (!spellTriggeredProto->_IsPositiveSpell())
                 return false;
     }

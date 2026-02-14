@@ -80,9 +80,9 @@ public:
 
     static bool HandleLearnAllGMCommand(ChatHandler* handler)
     {
-        for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i)
+        for (uint32 i = 0; i < sSpellMgr.GetSpellInfoStoreSize(); ++i)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(i);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(i);
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
                 continue;
 
@@ -116,7 +116,7 @@ public:
             if (!entry)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry->Spell);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(entry->Spell);
             if (!spellInfo)
                 continue;
 
@@ -133,7 +133,7 @@ public:
                 continue;
 
             // skip spells with first rank learned as talent (and all talents then also)
-            uint32 firstRank = sSpellMgr->GetFirstSpellInChain(spellInfo->Id);
+            uint32 firstRank = sSpellMgr.GetFirstSpellInChain(spellInfo->Id);
             if (GetTalentSpellCost(firstRank) > 0)
                 continue;
 
@@ -183,7 +183,7 @@ public:
             if (!spellId || rankId == MAX_TALENT_RANK)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
                 continue;
 
@@ -257,7 +257,7 @@ public:
             if (!spellId)                                        // ??? none spells in talent
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
                 continue;
 
@@ -397,7 +397,7 @@ public:
             if (skillLine->ClassMask && (skillLine->ClassMask & classmask) == 0)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(skillLine->Spell);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(skillLine->Spell);
             if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
                 continue;
 

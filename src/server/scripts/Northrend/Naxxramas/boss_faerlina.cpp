@@ -145,7 +145,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_WIDOWS_EMBRACE, me))
+            if (spell->Id == sSpellMgr.GetSpellIdForDifficulty(SPELL_WIDOWS_EMBRACE, me))
             {
                 Talk(EMOTE_WIDOWS_EMBRACE);
                 scheduler.RescheduleGroup(GROUP_FRENZY, 1min);

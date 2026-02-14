@@ -281,7 +281,7 @@ int32 DoLowUnlearnCost(Player* player)                     //blacksmith
 
 bool EquippedOk(Player* player, uint32 spellId)
 {
-    SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spell = sSpellMgr.GetSpellInfo(spellId);
     if (!spell)
         return false;
 

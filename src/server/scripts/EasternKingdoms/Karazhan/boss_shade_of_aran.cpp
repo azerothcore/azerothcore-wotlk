@@ -291,7 +291,7 @@ struct boss_shade_of_aran : public BossAI
                     me->SetWalk(false);
                     me->ResumeChasingVictim();
 
-                    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(_currentNormalSpell))
+                    if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(_currentNormalSpell))
                     {
                         if (int32(me->GetPower(POWER_MANA)) < spellInfo->CalcPowerCost(me, (SpellSchoolMask)spellInfo->SchoolMask))
                         {

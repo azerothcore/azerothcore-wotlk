@@ -105,7 +105,7 @@ public:
         }
 
         SpellScriptsBounds bounds = sObjectMgr->GetSpellScriptsBounds(spell->Id);
-        uint32 spellDifficultyId = sSpellMgr->GetSpellDifficultyId(spell->Id);
+        uint32 spellDifficultyId = sSpellMgr.GetSpellDifficultyId(spell->Id);
         if (bounds.first != bounds.second || spellDifficultyId)
         {
             handler->SendErrorMessage("Spell {} cannot be learnt using a command!", spell->Id);

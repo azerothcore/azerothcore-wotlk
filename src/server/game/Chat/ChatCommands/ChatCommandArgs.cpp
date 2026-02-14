@@ -99,7 +99,7 @@ struct SpellInfoVisitor
     };
     value_type operator()(Hyperlink<trade> trade) const { return trade->Spell; };
 
-    value_type operator()(uint32 spellId) const { return sSpellMgr->GetSpellInfo(spellId); }
+    value_type operator()(uint32 spellId) const { return sSpellMgr.GetSpellInfo(spellId); }
 };
 
 ChatCommandResult Acore::Impl::ChatCommands::ArgInfo<SpellInfo const*>::TryConsume(SpellInfo const*& data, ChatHandler const* handler, std::string_view args)

@@ -1179,7 +1179,7 @@ public:
                     events.Repeat(1600ms);
                     break;
                 case EVENT_DR_ACOLYTE_R:
-                    if (HealthBelowPct(75) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_RENEW, me)))
+                    if (HealthBelowPct(75) && !me->HasAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_RENEW, me)))
                         me->CastSpell(me, SPELL_GREATER_HEAL, false);
                     else if (Unit* target = DoSelectLowestHpFriendly(60.0f, 10))
                         me->CastSpell(target, SPELL_RENEW, false);
@@ -1304,7 +1304,7 @@ public:
                     events.Repeat(1600ms);
                     break;
                 case EVENT_DR_ACOLYTE_R:
-                    if (HealthBelowPct(75) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_RENEW, me)))
+                    if (HealthBelowPct(75) && !me->HasAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_RENEW, me)))
                         me->CastSpell(me, SPELL_GREATER_HEAL, false);
                     else if (Unit* target = DoSelectLowestHpFriendly(60.0f, 10))
                         me->CastSpell(target, SPELL_RENEW, false);

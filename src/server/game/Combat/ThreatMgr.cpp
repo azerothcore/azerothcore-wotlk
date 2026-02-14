@@ -35,7 +35,7 @@ float ThreatCalcHelper::calcThreat(Unit* hatedUnit, float threat, SpellSchoolMas
 {
     if (threatSpell)
     {
-        if (SpellThreatEntry const* threatEntry = sSpellMgr->GetSpellThreatEntry(threatSpell->Id))
+        if (SpellThreatEntry const* threatEntry = sSpellMgr.GetSpellThreatEntry(threatSpell->Id))
             if (threatEntry->pctMod != 1.0f)
                 threat *= threatEntry->pctMod;
 

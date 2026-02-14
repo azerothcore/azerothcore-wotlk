@@ -86,10 +86,10 @@ void Pet::AddToWorld()
         if (Unit* owner = GetOwner())
             if (Player* plr = owner->ToPlayer())
             {
-                SpellAreaForAreaMapBounds saBounds = sSpellMgr->GetSpellAreaForAreaMapBounds(4812);
+                SpellAreaForAreaMapBounds saBounds = sSpellMgr.GetSpellAreaForAreaMapBounds(4812);
                 for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
                     if ((itr->second->raceMask & plr->getRaceMask()) && !HasAura(itr->second->spellId))
-                        if (SpellInfo const* si = sSpellMgr->GetSpellInfo(itr->second->spellId))
+                        if (SpellInfo const* si = sSpellMgr.GetSpellInfo(itr->second->spellId))
                             if (si->HasAura(SPELL_AURA_MOD_INCREASE_HEALTH_PERCENT))
                                 AddAura(itr->second->spellId, this);
             }
@@ -243,7 +243,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     if (!forceLoadFromDB && (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET) && !owner->CanSeeDKPet())) // DK Pet exception
         return false;
 
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(petInfo->CreatedBySpellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(petInfo->CreatedBySpellId);
 
     bool isTemporarySummon = spellInfo && spellInfo->GetDuration() > 0;
     if (current && isTemporarySummon)
@@ -736,7 +736,7 @@ void Pet::Update(uint32 diff)
 
                     if (tempspellTarget && tempspellTarget->IsAlive())
                     {
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(tempspell);
+                        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(tempspell);
                         if (!spellInfo)
                             return;
                         float max_range = GetSpellMaxRangeForTarget(tempspellTarget, spellInfo);
@@ -1474,7 +1474,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
             uint16 category = fields[1].Get<uint16>();
             time_t db_time  = time_t(fields[2].Get<uint32>());
 
-            if (!sSpellMgr->GetSpellInfo(spell_id))
+            if (!sSpellMgr.GetSpellInfo(spell_id))
             {
                 LOG_ERROR("entities.pet", "Pet {} have unknown spell {} in `pet_spell_cooldown`, skipping.", m_charmInfo->GetPetNumber(), spell_id);
                 continue;
@@ -1624,7 +1624,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 remaintime = fields[12].Get<int32>();
             uint8 remaincharges = fields[13].Get<uint8>();
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellid);
             if (!spellInfo)
             {
                 LOG_ERROR("entities.pet", "Unknown aura (spellid {}), ignore.", spellid);
@@ -1759,7 +1759,7 @@ void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
 
 bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpellState state /*= PETSPELL_NEW*/, PetSpellType type /*= PETSPELL_NORMAL*/)
 {
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
     if (!spellInfo)
     {
         // do pet spell book cleanup
@@ -1836,7 +1836,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
             if (petSpell.state == PETSPELL_REMOVED)
                 continue;
 
-            SpellInfo const* oldRankSpellInfo = sSpellMgr->GetSpellInfo(spellID);
+            SpellInfo const* oldRankSpellInfo = sSpellMgr.GetSpellInfo(spellID);
 
             if (!oldRankSpellInfo)
                 continue;
@@ -1915,7 +1915,7 @@ void Pet::InitLevelupSpellsForLevel()
 {
     uint8 level = GetLevel();
 
-    if (PetLevelupSpellSet const* levelupSpells = GetCreatureTemplate()->family ? sSpellMgr->GetPetLevelupSpellList(GetCreatureTemplate()->family) : nullptr)
+    if (PetLevelupSpellSet const* levelupSpells = GetCreatureTemplate()->family ? sSpellMgr.GetPetLevelupSpellList(GetCreatureTemplate()->family) : nullptr)
     {
         // PetLevelupSpellSet ordered by levels, process in reversed order
         for (PetLevelupSpellSet::const_reverse_iterator itr = levelupSpells->rbegin(); itr != levelupSpells->rend(); ++itr)
@@ -1932,11 +1932,11 @@ void Pet::InitLevelupSpellsForLevel()
     int32 petSpellsId = GetCreatureTemplate()->PetSpellDataId ? -(int32)GetCreatureTemplate()->PetSpellDataId : GetEntry();
 
     // default spells (can be not learned if pet level (as owner level decrease result for example) less first possible in normal game)
-    if (PetDefaultSpellsEntry const* defSpells = sSpellMgr->GetPetDefaultSpellsEntry(petSpellsId))
+    if (PetDefaultSpellsEntry const* defSpells = sSpellMgr.GetPetDefaultSpellsEntry(petSpellsId))
     {
         for (uint32 spellId : defSpells->spellid)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
             if (!spellInfo)
                 continue;
 
@@ -1997,7 +1997,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 
     if (learn_prev)
     {
-        if (uint32 prev_id = sSpellMgr->GetPrevSpellInChain (spell_id))
+        if (uint32 prev_id = sSpellMgr.GetPrevSpellInChain (spell_id))
             learnSpell(prev_id);
         else
             learn_prev = false;
@@ -2026,7 +2026,7 @@ void Pet::CleanupActionBar()
             {
                 if (!HasSpell(ab->GetAction()))
                     m_charmInfo->SetActionBar(i, 0, ACT_PASSIVE);
-                else if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(ab->GetAction()))
+                else if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(ab->GetAction()))
                     ToggleAutocast(spellInfo, ab->GetType() == ACT_ENABLED);
             }
 }
@@ -2098,7 +2098,7 @@ bool Pet::resetTalents()
                     continue;
                 }
                 // remove learned spells (all ranks)
-                uint32 itrFirstId = sSpellMgr->GetFirstSpellInChain(itr->first);
+                uint32 itrFirstId = sSpellMgr.GetFirstSpellInChain(itr->first);
 
                 // unlearn if first rank is talent or learned by talent
                 if (itrFirstId == talentSpellId)
@@ -2375,7 +2375,7 @@ void Pet::learnSpellHighRank(uint32 spellid)
 {
     learnSpell(spellid);
 
-    if (uint32 next = sSpellMgr->GetNextSpellInChain(spellid))
+    if (uint32 next = sSpellMgr.GetNextSpellInChain(spellid))
         learnSpellHighRank(next);
 }
 

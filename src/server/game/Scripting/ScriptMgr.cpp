@@ -239,16 +239,16 @@ void ScriptMgr::FillSpellSummary()
 {
     UnitAI::FillAISpellInfo();
 
-    SpellSummary = new TSpellSummary[sSpellMgr->GetSpellInfoStoreSize()];
+    SpellSummary = new TSpellSummary[sSpellMgr.GetSpellInfoStoreSize()];
 
     SpellInfo const* pTempSpell;
 
-    for (uint32 i = 0; i < sSpellMgr->GetSpellInfoStoreSize(); ++i)
+    for (uint32 i = 0; i < sSpellMgr.GetSpellInfoStoreSize(); ++i)
     {
         SpellSummary[i].Effects = 0;
         SpellSummary[i].Targets = 0;
 
-        pTempSpell = sSpellMgr->GetSpellInfo(i);
+        pTempSpell = sSpellMgr.GetSpellInfo(i);
         // This spell doesn't exist.
         if (!pTempSpell)
             continue;

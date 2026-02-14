@@ -191,7 +191,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            instance->DoRemoveAurasDueToSpellOnPlayers(sSpellMgr->GetSpellIdForDifficulty(SPELL_MUTATED_INFECTION, me));
+            instance->DoRemoveAurasDueToSpellOnPlayers(sSpellMgr.GetSpellIdForDifficulty(SPELL_MUTATED_INFECTION, me));
             _JustDied();
             Talk(SAY_DEATH);
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))

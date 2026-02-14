@@ -33,7 +33,7 @@ bool _SpellScript::_Validate(SpellInfo const* entry)
 
 bool _SpellScript::_ValidateSpellInfo(uint32 spellId)
 {
-    if (!sSpellMgr->GetSpellInfo(spellId))
+    if (!sSpellMgr.GetSpellInfo(spellId))
     {
         LOG_ERROR("spells.scripts", "_SpellScript::ValidateSpellInfo: Spell {} does not exist.", spellId);
         return false;

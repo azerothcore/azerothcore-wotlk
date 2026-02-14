@@ -907,7 +907,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
-            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_HARVESTED_SOUL_LK_BUFF, me) && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
+            if (spell->Id == sSpellMgr.GetSpellIdForDifficulty(SPELL_HARVESTED_SOUL_LK_BUFF, me) && me->IsInCombat() && !IsHeroic() && _phase != PHASE_OUTRO && _lastTalkTimeBuff + 5 <= GameTime::GetGameTime().count())
             {
                 _lastTalkTimeBuff = GameTime::GetGameTime().count();
                 Talk(SAY_LK_FROSTMOURNE_KILL);
@@ -916,7 +916,7 @@ public:
 
         void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
         {
-            if (spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_REMORSELESS_WINTER_1, me) || spell->Id == sSpellMgr->GetSpellIdForDifficulty(SPELL_REMORSELESS_WINTER_2, me))
+            if (spell->Id == sSpellMgr.GetSpellIdForDifficulty(SPELL_REMORSELESS_WINTER_1, me) || spell->Id == sSpellMgr.GetSpellIdForDifficulty(SPELL_REMORSELESS_WINTER_2, me))
             {
                 me->GetMap()->SetZoneOverrideLight(AREA_THE_FROZEN_THRONE, LIGHT_SNOWSTORM, 5s);
                 me->GetMap()->SetZoneWeather(AREA_THE_FROZEN_THRONE, WEATHER_STATE_LIGHT_SNOW, 0.5f);
@@ -1056,7 +1056,7 @@ public:
                     events.ScheduleEvent(EVENT_INFEST, 22s + 500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_NECROTIC_PLAGUE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NecroticPlagueTargetCheck(me, sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, me), sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE_JUMP, me))))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, NecroticPlagueTargetCheck(me, sSpellMgr.GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, me), sSpellMgr.GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE_JUMP, me))))
                     {
                         Talk(EMOTE_NECROTIC_PLAGUE_WARNING, target);
                         me->CastSpell(target, SPELL_NECROTIC_PLAGUE, false);
@@ -1927,7 +1927,7 @@ class spell_the_lich_king_necrotic_plague_jump : public SpellScript
 
         if (GetHitUnit()->HasAura(GetSpellInfo()->Id))
             _hadJumpingAura = true;
-        else if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
+        else if (uint32 spellId = sSpellMgr.GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
             if (GetHitUnit()->HasAura(spellId))
                 _hadInitialAura = true;
     }
@@ -1936,7 +1936,7 @@ class spell_the_lich_king_necrotic_plague_jump : public SpellScript
     {
         if (GetHitAura() && !_hadJumpingAura)
         {
-            uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit());
+            uint32 spellId = sSpellMgr.GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit());
             if (GetSpellValue()->EffectBasePoints[EFFECT_1] != AURA_REMOVE_BY_ENEMY_SPELL || _hadInitialAura)
                 GetHitAura()->ModStackAmount(1);
             if (_hadInitialAura)
@@ -2344,7 +2344,7 @@ class spell_the_lich_king_defile : public SpellScript
     {
         targets.remove_if(VehicleCheck());
         targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
-        targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_HARVEST_SOUL, GetCaster())));
+        targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr.GetSpellIdForDifficulty(SPELL_HARVEST_SOUL, GetCaster())));
     }
 
     void ChangeDamageAndGrow()

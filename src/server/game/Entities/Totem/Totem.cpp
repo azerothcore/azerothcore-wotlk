@@ -70,7 +70,7 @@ void Totem::InitStats(uint32 duration)
     Minion::InitStats(duration);
 
     // Get spell cast by totem
-    if (SpellInfo const* totemSpell = sSpellMgr->GetSpellInfo(GetSpell()))
+    if (SpellInfo const* totemSpell = sSpellMgr.GetSpellInfo(GetSpell()))
         if (totemSpell->CalcCastTime())   // If spell has cast time -> its an active totem
             m_type = TOTEM_ACTIVE;
 
@@ -153,7 +153,7 @@ void Totem::UnSummon(Milliseconds msTime)
         {
             player->SendAutoRepeatCancel(this);
 
-            if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+            if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(GetUInt32Value(UNIT_CREATED_BY_SPELL)))
                 player->SendCooldownEvent(spell, 0, nullptr, false);
 
             if (Group* group = player->GetGroup())

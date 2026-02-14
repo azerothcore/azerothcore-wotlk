@@ -758,7 +758,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
     }
 
     // pet auras
-    if (PetAura const* petSpell = sSpellMgr->GetPetAura(m_spellInfo->Id, effIndex))
+    if (PetAura const* petSpell = sSpellMgr.GetPetAura(m_spellInfo->Id, effIndex))
     {
         m_caster->AddPetAura(petSpell);
         return;
@@ -825,7 +825,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             case 29284:
                 {
                     // Brittle Armor
-                    SpellInfo const* spell = sSpellMgr->GetSpellInfo(24575);
+                    SpellInfo const* spell = sSpellMgr.GetSpellInfo(24575);
                     if (!spell)
                         return;
 
@@ -837,7 +837,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
             case 29286:
                 {
                     // Mercurial Shield
-                    SpellInfo const* spell = sSpellMgr->GetSpellInfo(26464);
+                    SpellInfo const* spell = sSpellMgr.GetSpellInfo(26464);
                     if (!spell)
                         return;
 
@@ -891,7 +891,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
     }
 
     // normal case
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(triggered_spell_id);
     if (!spellInfo)
     {
         LOG_DEBUG("spells.aura", "Spell::EffectTriggerSpell spell {} tried to trigger unknown spell {}", m_spellInfo->Id, triggered_spell_id);
@@ -948,7 +948,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
 
     // normal case
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(triggered_spell_id);
     if (!spellInfo)
     {
         LOG_DEBUG("spells.aura", "Spell::EffectTriggerMissileSpell spell {} tried to trigger unknown spell {}", m_spellInfo->Id, triggered_spell_id);
@@ -1004,7 +1004,7 @@ void Spell::EffectForceCast(SpellEffIndex effIndex)
     uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
 
     // normal case
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(triggered_spell_id);
 
     if (!spellInfo)
     {
@@ -1053,7 +1053,7 @@ void Spell::EffectTriggerRitualOfSummoning(SpellEffIndex effIndex)
         return;
 
     uint32 triggered_spell_id = m_spellInfo->Effects[effIndex].TriggerSpell;
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(triggered_spell_id);
+    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(triggered_spell_id);
 
     if (!spellInfo)
     {
@@ -1952,9 +1952,9 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         Unit::AuraApplicationMap& Auras = unitTarget->GetAppliedAuras();
         for (Unit::AuraApplicationMap::iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
         {
-            if (!guardianFound && sSpellMgr->IsSpellMemberOfSpellGroup(itr->second->GetBase()->GetId(), SPELL_GROUP_ELIXIR_GUARDIAN))
+            if (!guardianFound && sSpellMgr.IsSpellMemberOfSpellGroup(itr->second->GetBase()->GetId(), SPELL_GROUP_ELIXIR_GUARDIAN))
                 guardianFound = true;
-            if (!battleFound && sSpellMgr->IsSpellMemberOfSpellGroup(itr->second->GetBase()->GetId(), SPELL_GROUP_ELIXIR_BATTLE))
+            if (!battleFound && sSpellMgr.IsSpellMemberOfSpellGroup(itr->second->GetBase()->GetId(), SPELL_GROUP_ELIXIR_BATTLE))
                 battleFound = true;
             if (battleFound && guardianFound)
                 break;
@@ -1963,12 +1963,12 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         // get all available elixirs by mask and spell level
         std::set<uint32> availableElixirs;
         if (!guardianFound)
-            sSpellMgr->GetSetOfSpellsInSpellGroup(SPELL_GROUP_ELIXIR_GUARDIAN, availableElixirs);
+            sSpellMgr.GetSetOfSpellsInSpellGroup(SPELL_GROUP_ELIXIR_GUARDIAN, availableElixirs);
         if (!battleFound)
-            sSpellMgr->GetSetOfSpellsInSpellGroup(SPELL_GROUP_ELIXIR_BATTLE, availableElixirs);
+            sSpellMgr.GetSetOfSpellsInSpellGroup(SPELL_GROUP_ELIXIR_BATTLE, availableElixirs);
         for (std::set<uint32>::iterator itr = availableElixirs.begin(); itr != availableElixirs.end();)
         {
-            SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(*itr);
+            SpellInfo const* spellInfo = sSpellMgr.AssertSpellInfo(*itr);
             if (spellInfo->SpellLevel < m_spellInfo->SpellLevel || spellInfo->SpellLevel > unitTarget->GetLevel())
                 availableElixirs.erase(itr++);
             else
@@ -2515,7 +2515,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
             int32 basePoints = m_spellInfo->Effects[effIndex].CalcValue();
             if (basePoints > 1) // xinef: some summoning spells have value 1 - indicates vehicle seat
             {
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(basePoints);
+                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(basePoints);
                 if (spellInfo && spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE))
                     spellId = spellInfo->Id;
             }
@@ -2999,7 +2999,7 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
                 return;
         }
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell_id);
         if (!spellInfo)
         {
             LOG_ERROR("spells.effect", "Spell::EffectEnchantItemTmp: unknown spell id {}", spell_id);
@@ -3272,7 +3272,7 @@ void Spell::EffectLearnPetSpell(SpellEffIndex effIndex)
     if (!pet)
         return;
 
-    SpellInfo const* learn_spellproto = sSpellMgr->GetSpellInfo(m_spellInfo->Effects[effIndex].TriggerSpell);
+    SpellInfo const* learn_spellproto = sSpellMgr.GetSpellInfo(m_spellInfo->Effects[effIndex].TriggerSpell);
     if (!learn_spellproto)
         return;
 
@@ -5275,7 +5275,7 @@ void Spell::EffectDestroyAllTotems(SpellEffIndex /*effIndex*/)
         if (totem && totem->IsTotem())
         {
             uint32 spell_id = totem->GetUInt32Value(UNIT_CREATED_BY_SPELL);
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell_id);
             if (spellInfo)
             {
                 mana += spellInfo->ManaCost;
@@ -6239,7 +6239,7 @@ void Spell::EffectCastButtons(SpellEffIndex effIndex)
         if (!spell_id)
             continue;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spell_id);
         if (!spellInfo)
             continue;
 

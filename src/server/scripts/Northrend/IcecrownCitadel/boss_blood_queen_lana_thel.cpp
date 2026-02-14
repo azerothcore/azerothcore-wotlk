@@ -598,7 +598,7 @@ class spell_blood_queen_pact_of_the_darkfallen_dmg_aura : public AuraScript
     {
         if ((aurEff->GetTickNumber() % 2) == 0)
             return;
-        SpellInfo const* damageSpell = sSpellMgr->AssertSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
+        SpellInfo const* damageSpell = sSpellMgr.AssertSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
         int32 damage = damageSpell->Effects[EFFECT_0].CalcValue();
         float herobonus = ((GetTarget()->FindMap() && GetTarget()->FindMap()->IsHeroic()) ? 0.2f : 0.0f);
         float multiplier = 0.5f + herobonus + 0.1f * uint32(aurEff->GetTickNumber() / 10); // do not convert to 0.01f - we need tick number/10 as INT (damage increases every 10 ticks)
@@ -826,7 +826,7 @@ class spell_blood_queen_vampiric_bite : public SpellScript
         if (!instance || instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != IN_PROGRESS)
             return;
 
-        uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
+        uint32 spellId = sSpellMgr.GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
         GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
         GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
 

@@ -380,7 +380,7 @@ SpellInfo const* ScriptedAI::SelectSpell(Unit* target, uint32 school, uint32 mec
     //Check if each spell is viable(set it to null if not)
     for (uint32 i = 0; i < MAX_CREATURE_SPELLS; i++)
     {
-        tempSpell = sSpellMgr->GetSpellInfo(me->m_spells[i]);
+        tempSpell = sSpellMgr.GetSpellInfo(me->m_spells[i]);
 
         //This spell doesn't exist
         if (!tempSpell)

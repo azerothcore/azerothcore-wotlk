@@ -638,8 +638,12 @@ private:
 
     // Accessors (const or static functions)
 public:
-    static SpellMgr* instance();
+    static SpellMgr& instance()
+    {
+        static SpellMgr instance;
 
+        return instance;
+    }
     // Spell correctness for client using
     static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
     static bool IsSpellValid(SpellInfo const* spellInfo);

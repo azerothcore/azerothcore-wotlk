@@ -240,9 +240,9 @@ class spell_item_with_mount_speed : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (!sSpellMgr->GetSpellInfo(SPELL_MOUNT_SPEED_CARROT)
-            || !sSpellMgr->GetSpellInfo(SPELL_MITHRIL_SPURS)
-            || !sSpellMgr->GetSpellInfo(SPELL_MOUNT_SPEED_RIDING))
+        if (!sSpellMgr.GetSpellInfo(SPELL_MOUNT_SPEED_CARROT)
+            || !sSpellMgr.GetSpellInfo(SPELL_MITHRIL_SPURS)
+            || !sSpellMgr.GetSpellInfo(SPELL_MOUNT_SPEED_RIDING))
         {
             return false;
         }
@@ -1010,7 +1010,7 @@ class spell_item_blade_ward_enchant : public AuraScript
             return;
         }
 
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64442 /*SPELL_BLADE_WARDING*/))
+        if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(64442 /*SPELL_BLADE_WARDING*/))
         {
             int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
             eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
@@ -1035,14 +1035,14 @@ class spell_item_blood_draining_enchant : public AuraScript
             return;
         }
 
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/))
+        if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/))
         {
             int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
             eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
             eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
         }
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
+        SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(64569 /*SPELL_BLOOD_RESERVE*/);
         int32 basepoints = spellInfo->Effects[EFFECT_0].CalcValue() * this->GetStackAmount();
         eventInfo.GetActionTarget()->CastCustomSpell(spellInfo->Id, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
         eventInfo.GetActionTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id); // Remove rest auras
@@ -1550,7 +1550,7 @@ public:
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (_failSpell && !sSpellMgr->GetSpellInfo(_failSpell))
+        if (_failSpell && !sSpellMgr.GetSpellInfo(_failSpell))
             return false;
         return true;
     }
@@ -2150,7 +2150,7 @@ class spell_item_savory_deviate_delight : public SpellScript
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         for (uint32 spellId = SPELL_FLIP_OUT_MALE; spellId <= SPELL_YAAARRRR_FEMALE; ++spellId)
-            if (!sSpellMgr->GetSpellInfo(spellId))
+            if (!sSpellMgr.GetSpellInfo(spellId))
                 return false;
         return true;
     }
@@ -3739,7 +3739,7 @@ class spell_item_recall : public SpellScript
         TeamId bgTeam = player->GetBgTeamId();
         if (player->GetTeamId(true) != bgTeam)
         {
-            if (SpellTargetPosition const* recallSpellTarget = sSpellMgr->GetSpellTargetPosition(bgTeam == TEAM_HORDE ? SPELL_RECALL_HORDE : SPELL_RECALL_ALLIANCE, EFFECT_0))
+            if (SpellTargetPosition const* recallSpellTarget = sSpellMgr.GetSpellTargetPosition(bgTeam == TEAM_HORDE ? SPELL_RECALL_HORDE : SPELL_RECALL_ALLIANCE, EFFECT_0))
             {
                 Position pos = Position(recallSpellTarget->target_X, recallSpellTarget->target_Y, recallSpellTarget->target_Z, recallSpellTarget->target_Orientation);
                 dest.Relocate(pos);

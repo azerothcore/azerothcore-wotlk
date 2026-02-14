@@ -88,7 +88,7 @@ public:
     {
         ClearGossipMenuFor(player);
         CloseGossipMenuFor(player);
-        SpellInfo const* spell = sSpellMgr->GetSpellInfo(action);
+        SpellInfo const* spell = sSpellMgr.GetSpellInfo(action);
         if (!spell)
             return false;
 
@@ -114,7 +114,7 @@ public:
     {
         if (player->IsInCombat())
         {
-            if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(FROZEN_THRONE_TELEPORT))
+            if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(FROZEN_THRONE_TELEPORT))
                 Spell::SendCastResult(player, spell, 0, SPELL_FAILED_AFFECTING_COMBAT);
             return true;
         }

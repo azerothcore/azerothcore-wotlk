@@ -445,7 +445,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                                         continue;
 
                                     // check if it is valid spell
-                                    SpellInfo const* spellproto = sSpellMgr->GetSpellInfo(proto->Spells[i].SpellId);
+                                    SpellInfo const* spellproto = sSpellMgr.GetSpellInfo(proto->Spells[i].SpellId);
                                     if (!spellproto)
                                         continue;
 

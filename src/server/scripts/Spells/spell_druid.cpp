@@ -123,7 +123,7 @@ class spell_dru_t10_balance_4p_bonus : public AuraScript
         PreventDefaultAction();
 
         uint32 triggered_spell_id = 71023;
-        SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
+        SpellInfo const* triggeredSpell = sSpellMgr.GetSpellInfo(triggered_spell_id);
 
         int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
         eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0);
@@ -590,7 +590,7 @@ class spell_dru_lifebloom : public AuraScript
         // final heal
         int32 stack = GetStackAmount();
         int32 healAmount = aurEff->GetAmount();
-        SpellInfo const* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+        SpellInfo const* finalHeal = sSpellMgr.GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
 
         if (Unit* caster = GetCaster())
         {
@@ -611,7 +611,7 @@ class spell_dru_lifebloom : public AuraScript
             {
                 Unit* caster = GetCaster();
                 int32 healAmount = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster ? caster : target, 0, target) * dispelInfo->GetRemovedCharges();
-                SpellInfo const* finalHeal = sSpellMgr->GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
+                SpellInfo const* finalHeal = sSpellMgr.GetSpellInfo(SPELL_DRUID_LIFEBLOOM_FINAL_HEAL);
                 if (caster)
                 {
                     // healing with bonus
@@ -1237,7 +1237,7 @@ class spell_dru_rejuvenation_moonglade_2_set : public AuraScript
                         return;
 
                     _casterGUID = GetCasterGUID();
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DRUID_MOONGLADE_2P_BONUS);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_DRUID_MOONGLADE_2P_BONUS);
                     target->ApplyRatingMod(CR_DODGE, spellInfo->Effects[EFFECT_0].CalcValue(), true); // 35 rating
                 }
     }
@@ -1250,7 +1250,7 @@ class spell_dru_rejuvenation_moonglade_2_set : public AuraScript
             if (!target)
                 return;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DRUID_MOONGLADE_2P_BONUS);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_DRUID_MOONGLADE_2P_BONUS);
             target->ApplyRatingMod(CR_DODGE, spellInfo->Effects[EFFECT_0].CalcValue(), false); // 35 rating
         }
     }

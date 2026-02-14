@@ -73,14 +73,14 @@ void LoadSkillPerfectItemTable()
 
         uint32 spellId = fields[0].Get<uint32>();
 
-        if (!sSpellMgr->GetSpellInfo(spellId))
+        if (!sSpellMgr.GetSpellInfo(spellId))
         {
             LOG_ERROR("sql.sql", "Skill perfection data for spell {} has non-existent spell id in `skill_perfect_item_template`!", spellId);
             continue;
         }
 
         uint32 requiredSpecialization = fields[1].Get<uint32>();
-        if (!sSpellMgr->GetSpellInfo(requiredSpecialization))
+        if (!sSpellMgr.GetSpellInfo(requiredSpecialization))
         {
             LOG_ERROR("sql.sql", "Skill perfection data for spell {} has non-existent required specialization spell id {} in `skill_perfect_item_template`!", spellId, requiredSpecialization);
             continue;
@@ -159,14 +159,14 @@ void LoadSkillExtraItemTable()
 
         uint32 spellId = fields[0].Get<uint32>();
 
-        if (!sSpellMgr->GetSpellInfo(spellId))
+        if (!sSpellMgr.GetSpellInfo(spellId))
         {
             LOG_ERROR("sql.sql", "Skill specialization {} has non-existent spell id in `skill_extra_item_template`!", spellId);
             continue;
         }
 
         uint32 requiredSpecialization = fields[1].Get<uint32>();
-        if (!sSpellMgr->GetSpellInfo(requiredSpecialization))
+        if (!sSpellMgr.GetSpellInfo(requiredSpecialization))
         {
             LOG_ERROR("sql.sql", "Skill specialization {} have not existed required specialization spell id {} in `skill_extra_item_template`!", spellId, requiredSpecialization);
             continue;

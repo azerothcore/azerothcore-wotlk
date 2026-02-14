@@ -1523,7 +1523,7 @@ public:
 
         if (player->IsInFlight() || player->IsInCombat())
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(7355);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(7355);
             if (!spellInfo)
                 return false;
 
@@ -2934,7 +2934,7 @@ public:
         {
             handler->PSendSysMessage(LANG_COMMAND_FREEZE, target->GetName());
 
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_FREEZE))
+            if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_FREEZE))
             {
                 Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, playerTarget, playerTarget);
             }
@@ -2945,7 +2945,7 @@ public:
         {
             handler->PSendSysMessage(LANG_COMMAND_FREEZE, GetLocalizeCreatureName(creatureTarget, handler->GetSessionDbcLocale()));
 
-            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_FREEZE))
+            if (SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(SPELL_FREEZE))
             {
                 Aura::TryRefreshStackOrCreate(spellInfo, MAX_EFFECT_MASK, creatureTarget, creatureTarget);
             }

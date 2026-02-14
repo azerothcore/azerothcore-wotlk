@@ -49,7 +49,7 @@ bool Acore::PlayerCommand::HandleLearnSpellCommand(ChatHandler* handler, Player*
     {
         uint32 spellId = spell->Id;
 
-        while ((spellId = sSpellMgr->GetNextSpellInChain(spellId)))
+        while ((spellId = sSpellMgr.GetNextSpellInChain(spellId)))
         {
             targetPlayer->learnSpell(spellId, false);
         }
@@ -69,7 +69,7 @@ bool Acore::PlayerCommand::HandleUnlearnSpellCommand(ChatHandler* handler, Playe
 
     if (allRanks)
     {
-        spellId = sSpellMgr->GetFirstSpellInChain(spellId);
+        spellId = sSpellMgr.GetFirstSpellInChain(spellId);
     }
 
     if (target->HasSpell(spellId))

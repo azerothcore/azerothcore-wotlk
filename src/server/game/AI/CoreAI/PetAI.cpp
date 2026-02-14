@@ -123,7 +123,7 @@ bool PetAI::_canMeleeAttack()
                         case WATER_ELEMENTAL_WATERBOLT_1:
                         case WATER_ELEMENTAL_WATERBOLT_2:
                             {
-                                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+                                SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellID);
                                 int32 mana = me->GetPower(POWER_MANA);
 
                                 if (mana >= spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
@@ -241,7 +241,7 @@ void PetAI::UpdateAI(uint32 diff)
             if (!spellID)
                 continue;
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellID);
             if (!spellInfo)
                 continue;
 

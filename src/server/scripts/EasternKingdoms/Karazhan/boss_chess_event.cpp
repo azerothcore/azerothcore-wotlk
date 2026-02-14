@@ -1539,7 +1539,7 @@ struct npc_chesspiece : public ScriptedAI
                 for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
                 {
                     uint32 spellId = me->m_spells[i];
-                    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                    SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(spellId);
                     if (!spellInfo)
                     {
                         data << uint16(0) << uint8(0) << uint8(i + 8);

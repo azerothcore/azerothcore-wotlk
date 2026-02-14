@@ -143,7 +143,7 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (damage >= RAID_MODE(3000U, 5000U) && me->GetAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_BRITTLE, me)))
+            if (damage >= RAID_MODE(3000U, 5000U) && me->GetAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_BRITTLE, me)))
             {
                 me->CastSpell(me, SPELL_SHATTER, true);
                 Unit::Kill(attacker, me);

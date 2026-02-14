@@ -1447,7 +1447,7 @@ public:
                 return true;
             }
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(stoneSpell);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(stoneSpell);
             if (!spellInfo)
             {
                 return true;
@@ -1456,7 +1456,7 @@ public:
             stoneId = spellInfo->Effects[EFFECT_0].ItemType;
             if (!stoneId)
             {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(stoneSpell))
+                if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(stoneSpell))
                 {
                     Spell::SendCastResult(player, spell, 0, SPELL_FAILED_ERROR);
                 }
@@ -1465,7 +1465,7 @@ public:
 
             if (!owner->IsPlayer() || !player->IsInSameRaidWith(owner->ToPlayer()))
             {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(stoneSpell))
+                if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(stoneSpell))
                 {
                     Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TARGET_NOT_IN_RAID);
                 }
@@ -1475,7 +1475,7 @@ public:
             // Don't try to add a stone if we already have one.
             if (player->HasItemCount(stoneId))
             {
-                if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(stoneSpell))
+                if (SpellInfo const* spell = sSpellMgr.GetSpellInfo(stoneSpell))
                 {
                     Spell::SendCastResult(player, spell, 0, SPELL_FAILED_TOO_MANY_OF_ITEM);
                 }

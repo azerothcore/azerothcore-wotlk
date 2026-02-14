@@ -1017,9 +1017,9 @@ public:
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         // Search in Spell.dbc
-        for (uint32 id = 0; id < sSpellMgr->GetSpellInfoStoreSize(); id++)
+        for (uint32 id = 0; id < sSpellMgr.GetSpellInfoStoreSize(); id++)
         {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(id);
+            SpellInfo const* spellInfo = sSpellMgr.GetSpellInfo(id);
             if (spellInfo)
             {
                 int locale = handler->GetSessionDbcLocale();
@@ -1063,7 +1063,7 @@ public:
                     bool known = target && target->HasSpell(id);
                     bool learn = (spellInfo->Effects[0].Effect == SPELL_EFFECT_LEARN_SPELL);
 
-                    SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spellInfo->Effects[0].TriggerSpell);
+                    SpellInfo const* learnSpellInfo = sSpellMgr.GetSpellInfo(spellInfo->Effects[0].TriggerSpell);
 
                     uint32 talentCost = GetTalentSpellCost(id);
 
@@ -1178,7 +1178,7 @@ public:
             bool known = target && target->HasSpell(spell->Id);
             bool learn = (spell->Effects[0].Effect == SPELL_EFFECT_LEARN_SPELL);
 
-            SpellInfo const* learnSpellInfo = sSpellMgr->GetSpellInfo(spell->Effects[0].TriggerSpell);
+            SpellInfo const* learnSpellInfo = sSpellMgr.GetSpellInfo(spell->Effects[0].TriggerSpell);
 
             uint32 talentCost = GetTalentSpellCost(spell->Id);
 

@@ -162,7 +162,7 @@ public:
             events.Reset();
             bIntro = false;
             bPhase3 = false;
-            me->ApplySpellImmune(0, IMMUNITY_ID, sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me), true);
+            me->ApplySpellImmune(0, IMMUNITY_ID, sSpellMgr.GetSpellIdForDifficulty(SPELL_PERMAFROST, me), true);
             me->m_SightDistance = 90.0f; // for MoveInLineOfSight distance
         }
 
@@ -680,7 +680,7 @@ public:
                     events.Repeat(30s, 45s);
                     break;
                 case EVENT_SUBMERGE:
-                    if (HealthBelowPct(80) && !me->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_PERMAFROST, me))) // not having permafrost - allow submerge
+                    if (HealthBelowPct(80) && !me->HasAura(sSpellMgr.GetSpellIdForDifficulty(SPELL_PERMAFROST, me))) // not having permafrost - allow submerge
                     {
                         me->GetMotionMaster()->MoveIdle();
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
