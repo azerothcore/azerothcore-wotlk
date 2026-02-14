@@ -2422,6 +2422,13 @@ Rate.XP.BattlegroundKillSOTA = 1
 Rate.XP.BattlegroundKillIC   = 1
 
 #
+#    Rate.XP.BattlegroundBonus
+#        Description: Experience rate multiplier for battleground objectives (flag captures, base assaults, etc.).
+#        Default:     1
+
+Rate.XP.BattlegroundBonus = 1
+
+#
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
 #       The lower the rate the less experience is required.
