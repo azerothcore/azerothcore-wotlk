@@ -2186,7 +2186,9 @@ Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
 #     LevelReq.Trade
-#        Description: Level requirement for characters to be able to initiate a trade.
+#        Description: Minimum level required for characters to be able to initiate a trade.
+#                     This restriction applies only to initiating trades; characters below this level
+#                     can still receive trades if initiated by someone else.
 #        Default:     1
 
 LevelReq.Trade = 1
