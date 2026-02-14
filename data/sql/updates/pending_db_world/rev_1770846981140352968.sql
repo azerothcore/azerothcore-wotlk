@@ -1,8 +1,5 @@
 -- ZAP FARFLINGER (Engineering(260 / Goblin Engineer)) - Dimensional Ripper: Everlook
 
--- Update Broadcast Text for base gossip to fix spacing
-UPDATE `broadcast_text` SET `MaleText` = 'I have just completed a new dimensional imploder that will make me rich beyond my wildest goblin dreams! All I need to do is get a skilled Goblin Engineer to build a dimensional ripper that connects to it and try it!' WHERE (`ID` = 9993);
-
 -- Update NPC Text for base gossip to fix spacing
 UPDATE `npc_text` SET `text0_0` = 'I have just completed a new dimensional imploder that will make me rich beyond my wildest goblin dreams! All I need to do is get a skilled Goblin Engineer to build a dimensional ripper that connects to it and try it!' WHERE (`ID` = 7249);DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` = 6092) AND (`SourceEntry` = 7249) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 25) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 23486) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
 

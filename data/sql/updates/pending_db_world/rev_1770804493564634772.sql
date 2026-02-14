@@ -1,25 +1,13 @@
 -- SMILES O'BYRON (Engineering(350 / Gnomish Engineer) - Ultrasafe Transporter: Toshley's Station)
 
--- Update Broadcast Text for base gossip to fix spacing
-UPDATE `broadcast_text` SET `MaleText` = 'With the help of Engineer Lapforge from Gadgetzan I have built a powerful gnomish transporter here at Toshley''s Station! I would be happy to help any gnomish engineer with enough skill to build their own personal transport beacon.' WHERE (`ID` = 19282);
-
 -- Update NPC Text for base gossip to fix spacing
 UPDATE `npc_text` SET `text0_0` = 'With the help of Engineer Lapforge from Gadgetzan I have built a powerful gnomish transporter here at Toshley''s Station! I would be happy to help any gnomish engineer with enough skill to build their own personal transport beacon.' WHERE (`ID` = 10410);
-
--- Update Brodcast Text for gossip option 1 to fix spacing
-UPDATE `broadcast_text` SET `MaleText` = 'I cannot believe they made me move my transporter out of town! Most of the gnomes affected by the accident regained some sort of humanoid form within a few weeks and it should have been an honor to be a participant in such a grand gnomish experiment!$B$BBesides, we needed the eggs!' WHERE (`ID` = 19132);
 
 -- Update NPC Text for gossip option 1 to fix spacing
 UPDATE `npc_text` SET `text0_0` = 'I cannot believe they made me move my transporter out of town! Most of the gnomes affected by the accident regained some sort of humanoid form within a few weeks and it should have been an honor to be a participant in such a grand gnomish experiment!$B$BBesides, we needed the eggs!' WHERE (`ID` = 10363);
 
--- Update Broadcast Text for already learned schematic gossip
-UPDATE `broadcast_text` SET `MaleText` = 'I hope the Ultrasafe Transporter never lets you down! I just know it won''t but I would recommend carrying a parachute cloak just in case!' WHERE (`ID` = 19136);
-
 -- Update NPC Text for already learned schematic gossip
 UPDATE `npc_text` SET `text0_0` = 'I hope the Ultrasafe Transporter never lets you down! I just know it won''t but I would recommend carrying a parachute cloak just in case!' WHERE (`ID` = 10368);
-
--- Update Broadcast Text for learn Ultrasafe Transporter gossip to fix spacing
-UPDATE `broadcast_text` SET `MaleText` = 'Once you have built the device, you simply activate the device to be transported to Toshley''s Station! A few people have reported being transformed into chickens, but I am sure they were exaggerating!$B$BIf possible I would try and not use the device on a day when someone else has, but it will probably work out alright even if you do!' WHERE (`ID` = 19133);
 
 -- Add NPC Text for learn Ultrasafe Transporter gossip concurrent to already learned schematic gossip
 DELETE FROM `npc_text` WHERE (`ID` = 10369);
