@@ -2230,6 +2230,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
                 {
                     if (!(aurEff->GetMiscValue() & schoolMask))
                         return false;
+
                     if (!aurEff->IsAffectedOnSpell(spellInfo))
                         return false;
 
