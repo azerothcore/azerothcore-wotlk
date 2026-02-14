@@ -98,6 +98,15 @@ public:
             return false;
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (unit->IsPlayer() && GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
+            {
+                if (Creature* brann = GetCreature(NPC_BRANN))
+                    brann->AI()->DoAction(ACTION_PLAYER_DEATH_IN_TRIBUNAL);
+            }
+        }
+
         void OnGameObjectCreate(GameObject* go) override
         {
             switch (go->GetEntry())
@@ -126,7 +135,7 @@ public:
                     break;
                 case GO_SJONNIR_DOOR:
                     goSjonnirDoorGUID = go->GetGUID();
-                    if (Encounter[BOSS_TRIBUNAL_OF_AGES] == DONE)
+                    if (GetBossState(BRANN_DOOR) == DONE)
                         go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_LEFT_PIPE:
@@ -146,7 +155,6 @@ public:
                     BrannGUID = creature->GetGUID();
                     break;
             }
-
             InstanceScript::OnCreatureCreate(creature);
         }
 
@@ -191,6 +199,7 @@ public:
                 case BOSS_TRIBUNAL_OF_AGES:
                 case BOSS_SJONNIR:
                 case BRANN_BRONZEBEARD:
+                case BRANN_DOOR:
                     return Encounter[id];
             }
 
@@ -308,6 +317,12 @@ public:
                     pSkyRoomFloor->SetGoState(GO_STATE_READY);
             }
 
+            if (type == BRANN_DOOR && data == DONE)
+            {
+                if (GameObject* pSjonnirDoor = instance->GetGameObject(goSjonnirDoorGUID))
+                    pSjonnirDoor->SetGoState(GO_STATE_ACTIVE);
+            }
+
             if (type == DATA_BRANN_ACHIEVEMENT)
             {
                 brannAchievement = (bool)data;
@@ -330,6 +345,7 @@ public:
             data >> Encounter[2];
             data >> Encounter[3];
             data >> Encounter[4];
+            data >> Encounter[5];
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
@@ -338,7 +354,8 @@ public:
                 << Encounter[1] << ' '
                 << Encounter[2] << ' '
                 << Encounter[3] << ' '
-                << Encounter[4] << ' ';
+                << Encounter[4] << ' '
+                << Encounter[5] << ' ';
         }
     };
 };

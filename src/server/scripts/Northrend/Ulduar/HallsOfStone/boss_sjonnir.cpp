@@ -107,17 +107,19 @@ public:
             SlugeCount = 0;
             instance->SetData(DATA_SJONNIR_ACHIEVEMENT, false);
 
-            if (instance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
+            if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
             {
                 if (GameObject* console = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_READY);
 
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
-                {
-                    brann->setDeathState(DeathState::JustDied);
-                    brann->Respawn();
                     brann->AI()->DoAction(ACTION_SJONNIR_WIPE_START);
-                }
+            }
+
+            if (instance && instance->GetBossState(BRANN_DOOR) == DONE)
+            {
+                if (GameObject* doors = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))
+                    doors->SetGoState(GO_STATE_ACTIVE);
             }
 
             ScheduleHealthCheckEvent(75, [&] {
@@ -220,7 +222,7 @@ public:
             if (GameObject* doors = me->GetMap()->GetGameObject(instance->GetGuidData(GO_SJONNIR_DOOR)))
                 doors->SetGoState(GO_STATE_READY);
 
-            if (instance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
+            if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRANN)))
                     brann->AI()->DoAction(ACTION_START_SJONNIR_FIGHT);
         }
