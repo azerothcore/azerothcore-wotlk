@@ -128,7 +128,7 @@ enum SMART_EVENT
     SMART_EVENT_CHARMED                  = 29,      // onRemove (0 - on apply, 1 - on remove)
     SMART_EVENT_CHARMED_TARGET           = 30,      // NONE
     SMART_EVENT_SPELLHIT_TARGET          = 31,      // SpellID, School, CooldownMin, CooldownMax
-    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax, hpPct (if set: health check mode, one-shot)
+    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax, rangeMin (hpPct, if set: health check mode, one-shot)
     SMART_EVENT_DAMAGED_TARGET           = 33,      // MinDmg, MaxDmg, CooldownMin, CooldownMax
     SMART_EVENT_MOVEMENTINFORM           = 34,      // MovementType(any), PointID, PathId(0 - any)
     SMART_EVENT_SUMMON_DESPAWNED         = 35,      // Entry, CooldownMin, CooldownMax
