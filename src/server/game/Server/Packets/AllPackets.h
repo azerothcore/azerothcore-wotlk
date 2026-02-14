@@ -25,6 +25,7 @@
 #include "CombatLogPackets.h"
 #include "CombatPackets.h"
 #include "GuildPackets.h"
+#include "InstancePackets.h"
 #include "ItemPackets.h"
 #include "LFGPackets.h"
 #include "MiscPackets.h"

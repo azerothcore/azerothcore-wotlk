@@ -204,6 +204,14 @@ namespace WorldPackets
         class Hello;
         class TrainerBuySpell;
     }
+
+    namespace Instance
+    {
+        class SetDungeonDifficultyClient;
+        class SetRaidDifficultyClient;
+        class ResetInstances;
+        class InstanceLockResponse;
+    }
 }
 
 enum AccountDataType
@@ -988,16 +996,16 @@ public:                                                 // opcodes handlers
     void HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet);
     void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
-    void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
-    void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
+    void HandleSetDungeonDifficultyOpcode(WorldPackets::Instance::SetDungeonDifficultyClient& packet);
+    void HandleSetRaidDifficultyOpcode(WorldPackets::Instance::SetRaidDifficultyClient& packet);
     void HandleMoveFlagChangeOpcode(WorldPacket& recvData);
     void HandleSetTitleOpcode(WorldPacket& recvData);
     void HandleRealmSplitOpcode(WorldPacket& recvData);
     void HandleTimeSyncResp(WorldPacket& recvData);
     void HandleWhoisOpcode(WorldPacket& recvData);
-    void HandleResetInstancesOpcode(WorldPacket& recvData);
+    void HandleResetInstancesOpcode(WorldPackets::Instance::ResetInstances& packet);
     void HandleHearthAndResurrect(WorldPacket& recvData);
-    void HandleInstanceLockResponse(WorldPacket& recvPacket);
+    void HandleInstanceLockResponse(WorldPackets::Instance::InstanceLockResponse& packet);
     void HandleUpdateMissileTrajectory(WorldPacket& recvPacket);
 
     // Battlefield
