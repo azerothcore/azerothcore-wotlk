@@ -439,11 +439,8 @@ void WorldSession::HandleGroupDisbandOpcode(WorldPacket& /*recvData*/)
     if (!grp && !grpInvite)
         return;
 
-    if (_player->InBattleground())
-    {
-        SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
+    if (_player->InBattleground()) // Do not leave group, give no error. Verified on TBC Classic
         return;
-    }
 
     /** error handling **/
     /********************/
