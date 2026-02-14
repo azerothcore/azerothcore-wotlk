@@ -1014,19 +1014,30 @@ protected:
 
 struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
 {
-    explicit boss_sartharion_tenebron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_TENEBRON) { }
+    explicit boss_sartharion_tenebron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_TENEBRON), summons2(creature) { }
 
     void Reset() override
     {
         boss_sartharion_dragonAI::Reset();
+        if (!isCalledBySartharion)
+            summons2.DespawnAll();
 
         events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
         events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
         events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() != NPC_TWILIGHT_EGG)
+            summons.Summon(summon);
+        // Summons to Sartharion are linked manually
+    }
+
     void JustDied(Unit* killer) override
     {
+        if (!isCalledBySartharion)
+            summons2.DespawnAll();
 
         boss_sartharion_dragonAI::JustDied(killer);
     }
@@ -1071,8 +1082,18 @@ struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
             {
                 Talk(WHISPER_HATCH_EGGS);
                 for (uint8 i = 0; i < MAX_TENEBORN_EGGS_SUMMONS; ++i)
+                {
                     if (Creature* egg = me->SummonCreature(NPC_TWILIGHT_EGG, TenebronEggsPos[isCalledBySartharion ? 1 : 0][i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                    {
+                        summons.Summon(egg);
+                        if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
+                        {
+                            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
+                                sartharion->AI()->JustSummoned(egg);
+                        }
                         egg->SetPhaseMask(16, true);
+                    }
+                }
 
                 events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25s);
                 break;
@@ -1087,7 +1108,15 @@ struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
                     if (!summon || !summon->IsAlive() || summon->GetEntry() != NPC_TWILIGHT_EGG)
                         continue;
 
-                    me->SummonCreature(NPC_TWILIGHT_WHELP, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+                    if (Creature* whelp = me->SummonCreature(NPC_TWILIGHT_WHELP, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                    {
+                        summons2.Summon(whelp);
+                        if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
+                        {
+                            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
+                                sartharion->AI()->JustSummoned(whelp);
+                        }
+                    }
                 }
 
                 if (!isCalledBySartharion)
