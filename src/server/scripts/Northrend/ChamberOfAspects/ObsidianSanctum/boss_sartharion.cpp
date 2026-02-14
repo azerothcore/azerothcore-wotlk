@@ -89,6 +89,7 @@ enum Spells
     SPELL_LAVA_STRIKE_SUMMON                    = 57572,
     SPELL_SARTHARION_PYROBUFFET                 = 56916,
     SPELL_SARTHARION_BERSERK                    = 61632,
+    SPELL_SARTHARION_ENRAGE                     = 56916,
     SPELL_SARTHARION_TWILIGHT_REVENGE           = 60639,
 
     // Sartharion with drakes
@@ -304,7 +305,7 @@ static Position const& GetDragonLandingPos(uint32 entry)
 
 struct boss_sartharion : public BossAI
 {
-    boss_sartharion(Creature* creature) : BossAI(creature, DATA_SARTHARION),
+    explicit boss_sartharion(Creature* creature) : BossAI(creature, DATA_SARTHARION),
         dragonsCount(0),
         lastLavaSide(LAVA_RIGHT_SIDE),
         usedBerserk(false),
@@ -316,13 +317,28 @@ struct boss_sartharion : public BossAI
     {
         _Reset();
         extraEvents.Reset();
-        RespawnDragons(false);
+
         SummonStartingTriggers();
         usedBerserk = false;
         below11PctReached = false;
         dragonsCount = 0;
         volcanoBlows.clear();
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+
+        // Despawn drakes
+        for (uint32 i : dragons)
+        {
+            if (instance->GetBossState(i) == DONE)
+                continue;
+
+            if (Creature* boss = instance->GetCreature(i) )
+                boss->DespawnOnEvade();
+        }
     }
 
     void DoAction(int32 param) override
@@ -335,6 +351,7 @@ struct boss_sartharion : public BossAI
     {
         _JustEngagedWith();
         DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
+        ScheduleEnrageTimer(SPELL_SARTHARION_ENRAGE, 15min);
         Talk(SAY_SARTHARION_AGGRO);
 
         // Combat events
@@ -394,7 +411,6 @@ struct boss_sartharion : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        RespawnDragons(true);
         _JustDied();
         Talk(SAY_SARTHARION_DEATH);
     }
@@ -537,6 +553,8 @@ struct boss_sartharion : public BossAI
 
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -597,6 +615,8 @@ struct boss_sartharion : public BossAI
                     summons.DespawnEntry(NPC_SAFE_AREA_TRIGGER);
                     break;
                 }
+                default:
+                    break;
             }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -609,15 +629,11 @@ struct boss_sartharion : public BossAI
 private:
     void SummonStartingTriggers()
     {
-        for (uint8 i = 0; i < MAX_CYCLONE_COUNT; ++i)
-        {
-            me->SummonCreature(NPC_FIRE_CYCLONE, CycloneSummonPos[i]);
-        }
+        for (auto const& CycloneSummonPo : CycloneSummonPos)
+            me->SummonCreature(NPC_FIRE_CYCLONE, CycloneSummonPo);
 
-        for (uint8 i = 0; i < MAX_AREA_TRIGGER_COUNT; ++i)
-        {
-            me->SummonCreature(NPC_SAFE_AREA_TRIGGER, AreaTriggerSummonPos[i]);
-        }
+        for (auto const& AreaTriggerSummonPo : AreaTriggerSummonPos)
+            me->SummonCreature(NPC_SAFE_AREA_TRIGGER, AreaTriggerSummonPo);
     }
 
     void SummonLavaWaves()
@@ -679,26 +695,6 @@ private:
         }
     }
 
-    void RespawnDragons(bool checkCombat)
-    {
-        for (uint8 i = 0; i < MAX_DRAGONS; ++i)
-        {
-            if (instance->GetBossState(dragons[i]) == DONE)
-                continue;
-
-            if (Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(dragons[i])))
-            {
-                if (checkCombat && dragon->IsInCombat())
-                    continue;
-
-                dragon->DespawnOrUnsummon();
-                dragon->SetRespawnTime(5);
-            }
-        }
-
-        dragonsCount = 0;
-    }
-
     EventMap extraEvents;
     std::list<uint32> volcanoBlows;
     uint8 dragonsCount;
@@ -709,14 +705,13 @@ private:
 
 struct boss_sartharion_dragonAI : public BossAI
 {
-    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false), currentPatrolPoint(0)
-    {
-    }
+    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false), currentPatrolPoint(0) { }
 
     void Reset() override
     {
         _Reset();
         events.Reset();
+        extraEvents.Reset();
         ClearInstance();
 
         me->SetImmuneToNPC(false);
@@ -1019,32 +1014,19 @@ protected:
 
 struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
 {
-    boss_sartharion_tenebron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_TENEBRON), summons2(creature)
-    {
-    }
+    explicit boss_sartharion_tenebron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_TENEBRON) { }
 
     void Reset() override
     {
         boss_sartharion_dragonAI::Reset();
-        if (!isCalledBySartharion)
-            summons2.DespawnAll();
 
         events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
         events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
         events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
     }
 
-    void JustSummoned(Creature* summon) override
-    {
-        if (summon->GetEntry() != NPC_TWILIGHT_EGG)
-            summons.Summon(summon);
-        // Summons to Sartharion are linked manually
-    }
-
     void JustDied(Unit* killer) override
     {
-        if (!isCalledBySartharion)
-            summons2.DespawnAll();
 
         boss_sartharion_dragonAI::JustDied(killer);
     }
@@ -1089,18 +1071,8 @@ struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
             {
                 Talk(WHISPER_HATCH_EGGS);
                 for (uint8 i = 0; i < MAX_TENEBORN_EGGS_SUMMONS; ++i)
-                {
                     if (Creature* egg = me->SummonCreature(NPC_TWILIGHT_EGG, TenebronEggsPos[isCalledBySartharion ? 1 : 0][i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-                    {
-                        summons.Summon(egg);
-                        if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
-                        {
-                            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-                                sartharion->AI()->JustSummoned(egg);
-                        }
                         egg->SetPhaseMask(16, true);
-                    }
-                }
 
                 events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25s);
                 break;
@@ -1115,15 +1087,7 @@ struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
                     if (!summon || !summon->IsAlive() || summon->GetEntry() != NPC_TWILIGHT_EGG)
                         continue;
 
-                    if (Creature* whelp = me->SummonCreature(NPC_TWILIGHT_WHELP, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-                    {
-                        summons2.Summon(whelp);
-                        if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
-                        {
-                            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-                                sartharion->AI()->JustSummoned(whelp);
-                        }
-                    }
+                    me->SummonCreature(NPC_TWILIGHT_WHELP, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
                 }
 
                 if (!isCalledBySartharion)
@@ -1139,17 +1103,10 @@ struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
                 summons.DoAction(ACTION_SWITCH_PHASE, pred);
                 break;
             }
+            default:
+                break;
         }
     }
-
-    void ClearInstance() override
-    {
-        boss_sartharion_dragonAI::ClearInstance();
-        summons2.DespawnAll();
-    }
-
-private:
-    SummonList summons2;
 };
 
 /////////////////////////////
@@ -1158,9 +1115,7 @@ private:
 
 struct boss_sartharion_shadron : public boss_sartharion_dragonAI
 {
-    boss_sartharion_shadron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_SHADRON)
-    {
-    }
+    explicit boss_sartharion_shadron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_SHADRON) { }
 
     void Reset() override
     {
@@ -1239,6 +1194,8 @@ struct boss_sartharion_shadron : public boss_sartharion_dragonAI
 
                 break;
             }
+            default:
+                break;
         }
     }
 };
@@ -1249,9 +1206,7 @@ struct boss_sartharion_shadron : public boss_sartharion_dragonAI
 
 struct boss_sartharion_vesperon : public boss_sartharion_dragonAI
 {
-    boss_sartharion_vesperon(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_VESPERON)
-    {
-    }
+    explicit boss_sartharion_vesperon(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_VESPERON) { }
 
     void Reset() override
     {
@@ -1322,6 +1277,8 @@ struct boss_sartharion_vesperon : public boss_sartharion_dragonAI
 
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -1339,9 +1296,7 @@ private:
 // other
 struct npc_twilight_summon : public ScriptedAI
 {
-    npc_twilight_summon(Creature* creature) : ScriptedAI(creature),
-        fadeArmorTimer(urand(0, 15000))
-    {
+    explicit npc_twilight_summon(Creature* creature) : ScriptedAI(creature), fadeArmorTimer(urand(0, 15000)) {
     }
 
     void Reset() override
@@ -1430,7 +1385,7 @@ class spell_sartharion_lava_strike : public SpellScript
     }
 
 private:
-    bool _spawned;
+    bool _spawned{false};
 };
 
 // 57491 - Flame Tsunami
