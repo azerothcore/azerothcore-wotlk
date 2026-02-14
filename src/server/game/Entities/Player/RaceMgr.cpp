@@ -74,6 +74,4 @@ void RaceMgr::LoadRaces()
         else if (alliance == ALLIANCE_ALLIANCE)
             _allianceRaceMask |= raceBit;
     }
-
-    return;
 }
