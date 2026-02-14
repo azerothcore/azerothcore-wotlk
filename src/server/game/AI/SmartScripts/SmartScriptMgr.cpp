@@ -1078,7 +1078,16 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     return false;
                 break;
             case SMART_EVENT_DAMAGED:
-                if (!e.event.minMaxRepeat.rangeMin) // normal mode
+                if (e.event.minMaxRepeat.rangeMin) // health check mode
+                {
+                    if (e.event.minMaxRepeat.rangeMin > 100)
+                    {
+                        LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid health pct value ({}), must be between 1 and 100, skipped.",
+                                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.minMaxRepeat.rangeMin);
+                        return false;
+                    }
+                }
+                else // normal mode
                 {
                     if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                         return false;
