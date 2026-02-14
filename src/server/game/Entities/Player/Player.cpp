@@ -6217,7 +6217,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             // Xinef: Only for BG activities
             if (!uVictim)
             {
-                uint32 xp = uint32(honor * (3 + GetLevel() * 0.30f));
+                uint32 xp = static_cast<uint32>(honor * (3 + GetLevel() * 0.30f) * sWorld->getRate(RATE_XP_BATTLEGROUND_BONUS));
                 sScriptMgr->OnPlayerGiveXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
                 GiveXP(xp, nullptr);
             }
