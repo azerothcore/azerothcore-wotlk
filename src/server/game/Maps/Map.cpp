@@ -1040,7 +1040,11 @@ void Map::UnloadAll()
         MapGridType* grid = i->GetSource();
         ++i;
         if (grid)
-            UnloadGrid(*grid); // deletes the grid and removes it from the GridRefMgr
+        {
+            uint32 const x = grid->GetX();
+            uint32 const y = grid->GetY();
+            _mapGridManager.UnloadGrid(x, y); // deletes the grid and removes it from the GridRefMgr
+        }
     }
 
     // pussywizard: crashfix, some npc can be left on transport (not a default passenger)
