@@ -204,7 +204,7 @@ struct boss_kologarnAI : public BossAI
             if (instance)
             {
                 // Open the door inside Kologarn chamber
-                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(GO_KOLOGARN_DOORS)))
+                if (GameObject* door = instance->GetGameObject(DATA_KOLOGARN_DOORS))
                     door->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -254,7 +254,7 @@ struct boss_kologarnAI : public BossAI
 
         void SummonedCreatureDespawn(Creature* cr) override
         {
-            if (instance->GetData(TYPE_KOLOGARN) > NOT_STARTED)
+            if (instance->GetData(BOSS_KOLOGARN) > NOT_STARTED)
                 return;
 
             if (cr->GetEntry() == NPC_LEFT_ARM)
@@ -280,7 +280,7 @@ struct boss_kologarnAI : public BossAI
             if (instance)
             {
                 // Open the door inside Kologarn chamber
-                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(GO_KOLOGARN_DOORS)))
+                if (GameObject* door = instance->GetGameObject(DATA_KOLOGARN_DOORS))
                     door->SetGoState(GO_STATE_ACTIVE);
             }
 
@@ -313,7 +313,7 @@ struct boss_kologarnAI : public BossAI
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
-            if (!me->IsAlive() || instance->GetData(TYPE_KOLOGARN) != IN_PROGRESS)
+            if (!me->IsAlive() || instance->GetData(BOSS_KOLOGARN) != IN_PROGRESS)
                 return;
 
             if (!apply)
@@ -371,7 +371,7 @@ struct boss_kologarnAI : public BossAI
             // Close the door inside Kologarn chamber
             if (instance)
             {
-                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(GO_KOLOGARN_DOORS)))
+                if (GameObject* door = instance->GetGameObject(DATA_KOLOGARN_DOORS))
                 {
                     door->SetGoState(GO_STATE_READY);
                 }
@@ -471,173 +471,151 @@ struct boss_kologarnAI : public BossAI
                 me->resetAttackTimer();
             }
         }
-    };
 };
 
 // also used for left arm, all functions except JustDied wont be used by left arm
-class boss_kologarn_arms : public CreatureScript
+struct boss_kologarn_arms : public ScriptedAI
 {
-public:
-    boss_kologarn_arms() : CreatureScript("boss_kologarn_arms") { }
+    boss_kologarn_arms(Creature* c) : ScriptedAI(c) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    int32 _damageDone;
+    bool _combatStarted;
+
+    void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override {}
+    void MoveInLineOfSight(Unit*) override {}
+    void AttackStart(Unit*) override {}
+    void UpdateAI(uint32  /*diff*/) override {}
+
+    void Reset() override
     {
-        return GetUlduarAI<boss_kologarn_armsAI>(pCreature);
+        _combatStarted = false;
+        _damageDone = 0;
     }
 
-    struct boss_kologarn_armsAI : public ScriptedAI
+    void PassengerBoarded(Unit*  /*who*/, int8  /*seatId*/, bool apply) override
     {
-        boss_kologarn_armsAI(Creature* c) : ScriptedAI(c) { }
-
-        int32 _damageDone;
-        bool _combatStarted;
-
-        void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override {}
-        void MoveInLineOfSight(Unit*) override {}
-        void AttackStart(Unit*) override {}
-        void UpdateAI(uint32  /*diff*/) override {}
-
-        void Reset() override
-        {
-            _combatStarted = false;
+        if (!apply)
             _damageDone = 0;
+        else
+        {
+            //who->ClearUnitState(UNIT_STATE_ONVEHICLE);
+            if (!_damageDone)
+                _damageDone = RAID_MODE(80000, 380000);
+        }
+    }
+
+    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!_combatStarted)
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
+                {
+                    _combatStarted = true;
+                    if (!cr->IsInCombat() && who)
+                        cr->AI()->AttackStart(who);
+                }
+
+        if (_damageDone > 0)
+        {
+            _damageDone -= damage;
+            if (_damageDone <= 0 || damage >= me->GetHealth())
+                me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE);
+        }
+    }
+
+    void JustDied(Unit*) override
+    {
+        float x, y, z;
+        // left arm
+        if (me->GetEntry() == NPC_LEFT_ARM )
+        {
+            x = 1776.97f;
+            y = -44.8396f;
+            z = 448.888f;
+        }
+        else
+        {
+            x = 1777.82f;
+            y = -3.50803f;
+            z = 448.888f;
         }
 
-        void PassengerBoarded(Unit*  /*who*/, int8  /*seatId*/, bool apply) override
+        if (Creature* cr = me->SummonTrigger(x, y, z, 0, 5000))
         {
-            if (!apply)
-                _damageDone = 0;
-            else
-            {
-                //who->ClearUnitState(UNIT_STATE_ONVEHICLE);
-                if (!_damageDone)
-                    _damageDone = RAID_MODE(80000, 380000);
-            }
-        }
-
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!_combatStarted)
-                if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_KOLOGARN)))
-                    {
-                        _combatStarted = true;
-                        if (!cr->IsInCombat() && who)
-                            cr->AI()->AttackStart(who);
-                    }
-
-            if (_damageDone > 0)
-            {
-                _damageDone -= damage;
-                if (_damageDone <= 0 || damage >= me->GetHealth())
-                    me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE);
-            }
-        }
-
-        void JustDied(Unit*) override
-        {
-            float x, y, z;
-            // left arm
-            if (me->GetEntry() == NPC_LEFT_ARM )
-            {
-                x = 1776.97f;
-                y = -44.8396f;
-                z = 448.888f;
-            }
-            else
-            {
-                x = 1777.82f;
-                y = -3.50803f;
-                z = 448.888f;
-            }
-
-            if (Creature* cr = me->SummonTrigger(x, y, z, 0, 5000))
-            {
-                cr->CastSpell(cr, SPELL_RUBBLE_FALL, true);
-
-                if (me->GetInstanceScript())
-                    if (Creature* kologarn = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
-                        for (uint8 i = 0; i < 5; ++i)
-                            if (Creature* cr2 = kologarn->SummonCreature(NPC_RUBBLE_SUMMON, cr->GetPositionX() + irand(-5, 5), cr->GetPositionY() + irand(-5, 5), cr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
-                            {
-                                cr2->SetInCombatWithZone();
-                                if (Unit* target = SelectTargetFromPlayerList(100))
-                                    cr2->AI()->AttackStart(target);
-                            }
-            }
+            cr->CastSpell(cr, SPELL_RUBBLE_FALL, true);
 
             if (me->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
-                    cr->AI()->DoAction(DATA_KOLOGARN_RUBBLE_ACHIEV);
-
-            me->ExitVehicle();
+                if (Creature* kologarn = me->GetInstanceScript()->GetCreature(BOSS_KOLOGARN))
+                    for (uint8 i = 0; i < 5; ++i)
+                        if (Creature* cr2 = kologarn->SummonCreature(NPC_RUBBLE_SUMMON, cr->GetPositionX() + irand(-5, 5), cr->GetPositionY() + irand(-5, 5), cr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                        {
+                            cr2->SetInCombatWithZone();
+                            if (Unit* target = SelectTargetFromPlayerList(100))
+                                cr2->AI()->AttackStart(target);
+                        }
         }
-    };
+
+        if (me->GetInstanceScript())
+            if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_KOLOGARN))
+                cr->AI()->DoAction(DATA_KOLOGARN_RUBBLE_ACHIEV);
+
+        me->ExitVehicle();
+    }
 };
 
-class boss_kologarn_eyebeam : public CreatureScript
+struct boss_kologarn_eyebeam : public ScriptedAI
 {
-public:
-    boss_kologarn_eyebeam() : CreatureScript("boss_kologarn_eyebeam") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_kologarn_eyebeam(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false)
     {
-        return GetUlduarAI<boss_kologarn_eyebeamAI>(pCreature);
+        m_pInstance = (InstanceScript*)c->GetInstanceScript();
     }
-    struct boss_kologarn_eyebeamAI : public ScriptedAI
+
+    InstanceScript* m_pInstance;
+    uint32 _timer;
+    bool _damaged;
+
+    void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
-        boss_kologarn_eyebeamAI(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false)
+        if (damage > 0 && !_damaged && me->GetInstanceScript())
         {
-            m_pInstance = (InstanceScript*)c->GetInstanceScript();
+            _damaged = true;
+            if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_KOLOGARN))
+                cr->AI()->DoAction(DATA_KOLOGARN_LOOKS_ACHIEV);
+        }
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (!summoner)
+        {
+            return;
         }
 
-        InstanceScript* m_pInstance;
-        uint32 _timer;
-        bool _damaged;
-
-        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
+        // Should only work on playable characters
+        if (Player* player = summoner->ToPlayer())
         {
-            if (damage > 0 && !_damaged && me->GetInstanceScript())
+            me->Attack(player, false);
+            me->GetMotionMaster()->MoveChase(player);
+
+            if (Creature* cr = m_pInstance->GetCreature(BOSS_KOLOGARN))
             {
-                _damaged = true;
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_KOLOGARN)))
-                    cr->AI()->DoAction(DATA_KOLOGARN_LOOKS_ACHIEV);
+                me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
             }
         }
+    }
 
-        void IsSummonedBy(WorldObject* summoner) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (_timer)
         {
-            if (!summoner)
+            _timer += diff;
+            if (_timer >= 2000)
             {
-                return;
-            }
-
-            // Should only work on playable characters
-            if (Player* player = summoner->ToPlayer())
-            {
-                me->Attack(player, false);
-                me->GetMotionMaster()->MoveChase(player);
-
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_KOLOGARN)))
-                {
-                    me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
-                }
+                me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
+                _timer = 0;
             }
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_timer)
-            {
-                _timer += diff;
-                if (_timer >= 2000)
-                {
-                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
-                    _timer = 0;
-                }
-            }
-        }
-    };
+    }
 };
 
 class spell_kologarn_focused_eyebeam : public SpellScript
@@ -847,7 +825,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
                     return cr->AI()->GetData(DATA_KOLOGARN_LOOKS_ACHIEV);
 
         return false;
@@ -863,7 +841,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
                     return cr->AI()->GetData(DATA_KOLOGARN_RUBBLE_ACHIEV);
 
         return false;
@@ -879,7 +857,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_KOLOGARN)))
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
                     return cr->AI()->GetData(DATA_KOLOGARN_ARMS_ACHIEV);
 
         return false;
@@ -890,8 +868,8 @@ void AddSC_boss_kologarn()
 {
     // Npcs
     RegisterUlduarCreatureAI(boss_kologarnAI);
-    new boss_kologarn_arms();
-    new boss_kologarn_eyebeam();
+    RegisterUlduarCreatureAI(boss_kologarn_arms);
+    RegisterUlduarCreatureAI(boss_kologarn_eyebeam);
     RegisterUlduarCreatureAI(boss_kologarn_pit_kill_bunny);
 
     // Spells

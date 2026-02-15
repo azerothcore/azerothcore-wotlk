@@ -352,91 +352,69 @@ struct boss_vezaxAI : public BossAI
     void MoveInLineOfSight(Unit*  /*who*/) override {}
 };
 
-class npc_ulduar_saronite_vapors : public CreatureScript
+struct npc_ulduar_saronite_vapors : public NullCreatureAI
 {
-public:
-    npc_ulduar_saronite_vapors() : CreatureScript("npc_ulduar_saronite_vapors") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_ulduar_saronite_vapors(Creature* pCreature) : NullCreatureAI(pCreature)
     {
-        return GetUlduarAI<npc_ulduar_saronite_vaporsAI>(pCreature);
+        pInstance = pCreature->GetInstanceScript();
+        me->GetMotionMaster()->MoveRandom(4.0f);
     }
 
-    struct npc_ulduar_saronite_vaporsAI : public NullCreatureAI
+    InstanceScript* pInstance;
+
+    void JustDied(Unit*  /*killer*/) override
     {
-        npc_ulduar_saronite_vaporsAI(Creature* pCreature) : NullCreatureAI(pCreature)
-        {
-            pInstance = pCreature->GetInstanceScript();
-            me->GetMotionMaster()->MoveRandom(4.0f);
-        }
+        me->CastSpell(me, SPELL_SARONITE_VAPORS_AURA, true);
 
-        InstanceScript* pInstance;
+        // killed saronite vapors, hard mode unavailable
+        if (pInstance)
+            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
+                vezax->AI()->DoAction(1);
+    }
 
-        void JustDied(Unit*  /*killer*/) override
-        {
-            me->CastSpell(me, SPELL_SARONITE_VAPORS_AURA, true);
-
-            // killed saronite vapors, hard mode unavailable
-            if (pInstance)
-                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
-                    vezax->AI()->DoAction(1);
-        }
-
-        void IsSummonedBy(WorldObject* /*summoner*/) override
-        {
-            Talk(SAY_EMOTE_VAPORS);
-        }
-    };
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        Talk(SAY_EMOTE_VAPORS);
+    }
 };
 
-class npc_ulduar_saronite_animus : public CreatureScript
+struct npc_ulduar_saronite_animus : public ScriptedAI
 {
-public:
-    npc_ulduar_saronite_animus() : CreatureScript("npc_ulduar_saronite_animus") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_ulduar_saronite_animus(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        return GetUlduarAI<npc_ulduar_saronite_animusAI>(pCreature);
+        pInstance = pCreature->GetInstanceScript();
+        if (pInstance)
+            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
+                vezax->AI()->JustSummoned(me);
+        timer = 0;
+        me->SetInCombatWithZone();
     }
 
-    struct npc_ulduar_saronite_animusAI : public ScriptedAI
+    InstanceScript* pInstance;
+    uint16 timer;
+
+    void JustDied(Unit*  /*killer*/) override
     {
-        npc_ulduar_saronite_animusAI(Creature* pCreature) : ScriptedAI(pCreature)
+        me->DespawnOrUnsummon(3s);
+
+        if (pInstance)
+            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
+                vezax->AI()->DoAction(2);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        UpdateVictim();
+
+        timer += diff;
+        if (timer >= 2000)
         {
-            pInstance = pCreature->GetInstanceScript();
-            if (pInstance)
-                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
-                    vezax->AI()->JustSummoned(me);
-            timer = 0;
-            me->SetInCombatWithZone();
+            me->CastSpell(me, SPELL_PROFOUND_DARKNESS, true);
+            timer -= 2000;
         }
 
-        InstanceScript* pInstance;
-        uint16 timer;
-
-        void JustDied(Unit*  /*killer*/) override
-        {
-            me->DespawnOrUnsummon(3s);
-
-            if (pInstance)
-                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
-                    vezax->AI()->DoAction(2);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            UpdateVictim();
-
-            timer += diff;
-            if (timer >= 2000)
-            {
-                me->CastSpell(me, SPELL_PROFOUND_DARKNESS, true);
-                timer -= 2000;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 class spell_aura_of_despair_aura : public AuraScript
@@ -607,7 +585,7 @@ public:
             return false;
 
         if (InstanceScript* pInstance = go->GetInstanceScript())
-            if (pInstance->GetData(TYPE_XT002) != DONE && pInstance->GetData(TYPE_MIMIRON) != DONE && pInstance->GetData(TYPE_THORIM) != DONE && pInstance->GetData(TYPE_FREYA) != DONE && pInstance->GetData(TYPE_HODIR) != DONE)
+            if (pInstance->GetData(BOSS_XT002) != DONE && pInstance->GetData(BOSS_MIMIRON) != DONE && pInstance->GetData(BOSS_THORIM) != DONE && pInstance->GetData(BOSS_FREYA) != DONE && pInstance->GetData(BOSS_HODIR) != DONE)
             {
                 std::string accountName;
                 AccountMgr::GetName(plr->GetSession()->GetAccountId(), accountName);
@@ -622,8 +600,8 @@ public:
 void AddSC_boss_vezax()
 {
     RegisterUlduarCreatureAI(boss_vezaxAI);
-    new npc_ulduar_saronite_vapors();
-    new npc_ulduar_saronite_animus();
+    RegisterUlduarCreatureAI(npc_ulduar_saronite_vapors);
+    RegisterUlduarCreatureAI(npc_ulduar_saronite_animus);
 
     RegisterSpellScript(spell_aura_of_despair_aura);
     RegisterSpellScript(spell_mark_of_the_faceless_periodic_aura);

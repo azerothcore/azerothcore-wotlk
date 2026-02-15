@@ -77,112 +77,101 @@ enum eEvents
     EVENT_GRAB,
 };
 
-class npc_ulduar_iron_construct : public CreatureScript
+struct npc_ulduar_iron_construct : public ScriptedAI
 {
-public:
-    npc_ulduar_iron_construct() : CreatureScript("npc_ulduar_iron_construct") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_ulduar_iron_construct(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        return GetUlduarAI<npc_ulduar_iron_constructAI>(pCreature);
+        me->CastSpell(me, 38757, true);
     }
 
-    struct npc_ulduar_iron_constructAI : public ScriptedAI
+    uint16 timer;
+
+    void Reset() override
     {
-        npc_ulduar_iron_constructAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-            me->CastSpell(me, 38757, true);
-        }
+        timer = 1000;
+        me->SetReactState(REACT_PASSIVE);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+    }
 
-        uint16 timer;
+    void JustReachedHome() override
+    {
+        me->CastSpell(me, 38757, true);
+    }
 
-        void Reset() override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
         {
-            timer = 1000;
-            me->SetReactState(REACT_PASSIVE);
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-        void JustReachedHome() override
-        {
-            me->CastSpell(me, 38757, true);
-        }
-
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_ACTIVATE_CONSTRUCT)
-            {
-                me->RemoveAura(38757);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->SetReactState(REACT_AGGRESSIVE);
-                if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
-                    {
-                        ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
-                        AttackStart(ignis->GetVictim());
-                        DoZoneInCombat();
-                    }
-            }
-            else if (spell->Id == SPELL_HEAT_BUFF)
-            {
-                if (Aura* heat = me->GetAura(SPELL_HEAT_BUFF))
+            me->RemoveAura(38757);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_AGGRESSIVE);
+            if (InstanceScript* instance = me->GetInstanceScript())
+                if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
                 {
-                    if (heat->GetStackAmount() >= 10)
+                    ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
+                    AttackStart(ignis->GetVictim());
+                    DoZoneInCombat();
+                }
+        }
+        else if (spell->Id == SPELL_HEAT_BUFF)
+        {
+            if (Aura* heat = me->GetAura(SPELL_HEAT_BUFF))
+            {
+                if (heat->GetStackAmount() >= 10)
+                {
+                    if (heat->GetStackAmount() > 10)
                     {
-                        if (heat->GetStackAmount() > 10)
-                        {
-                            heat->ModStackAmount(-1);
-                        }
-                        me->CastSpell(me, SPELL_MOLTEN, true);
-                        me->GetThreatMgr().ResetAllThreat();
+                        heat->ModStackAmount(-1);
                     }
+                    me->CastSpell(me, SPELL_MOLTEN, true);
+                    me->GetThreatMgr().ResetAllThreat();
                 }
             }
         }
+    }
 
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= RAID_MODE(3000U, 5000U) && me->GetAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_BRITTLE, me)))
         {
-            if (damage >= RAID_MODE(3000U, 5000U) && me->GetAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_BRITTLE, me)))
-            {
-                me->CastSpell(me, SPELL_SHATTER, true);
-                Unit::Kill(attacker, me);
+            me->CastSpell(me, SPELL_SHATTER, true);
+            Unit::Kill(attacker, me);
 
-                if (InstanceScript* instance = me->GetInstanceScript())
-                    if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
-                        ignis->AI()->SetData(1337, 0);
-            }
-        }
-
-        void JustDied(Unit*  /*killer*/) override
-        {
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_IGNIS)))
-                    ignis->RemoveAuraFromStack(SPELL_STRENGTH_OF_THE_CREATOR);
+                if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
+                    ignis->AI()->SetData(1337, 0);
         }
+    }
 
-        void UpdateAI(uint32 diff) override
+    void JustDied(Unit*  /*killer*/) override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
+                ignis->RemoveAuraFromStack(SPELL_STRENGTH_OF_THE_CREATOR);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        if (timer <= diff)
         {
-            if (!UpdateVictim())
-                return;
-
-            if (timer <= diff)
-            {
-                timer = 1000;
-                if (Aura* a = me->GetAura(SPELL_MOLTEN))
-                    if (me->FindNearestCreature(NPC_WATER_TRIGGER, 18.0f, true))
-                    {
-                        me->RemoveAura(a);
-                        me->CastSpell(me, SPELL_BRITTLE, true);
-                    }
-            }
-            else
-                timer -= diff;
-
-            DoMeleeAttackIfReady();
+            timer = 1000;
+            if (Aura* a = me->GetAura(SPELL_MOLTEN))
+                if (me->FindNearestCreature(NPC_WATER_TRIGGER, 18.0f, true))
+                {
+                    me->RemoveAura(a);
+                    me->CastSpell(me, SPELL_BRITTLE, true);
+                }
         }
+        else
+            timer -= diff;
 
-        void MoveInLineOfSight(Unit* /*who*/) override {}
-    };
+        DoMeleeAttackIfReady();
+    }
+
+    void MoveInLineOfSight(Unit* /*who*/) override {}
 };
 
 struct boss_ignisAI : public BossAI
@@ -525,7 +514,7 @@ public:
 void AddSC_boss_ignis()
 {
     RegisterUlduarCreatureAI(boss_ignisAI);
-    new npc_ulduar_iron_construct();
+    RegisterUlduarCreatureAI(npc_ulduar_iron_construct);
     RegisterSpellScript(spell_ignis_scorch_aura);
     RegisterSpellScript(spell_ignis_grab_initial);
     RegisterSpellScript(spell_ignis_slag_pot_aura);
