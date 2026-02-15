@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "Map.h"
 #include "MapMgr.h"
+#include "MapPartition.h"
 #include "Metric.h"
 
 class UpdateRequest
@@ -90,6 +91,29 @@ private:
     uint32 m_diff;
 };
 
+class MapPartitionUpdateRequest : public UpdateRequest
+{
+public:
+    MapPartitionUpdateRequest(MapPartition& p, MapUpdater& u, uint32 d, uint32 sd)
+        : m_partition(p), m_updater(u), m_diff(d), s_diff(sd)
+    {
+    }
+
+    void call() override
+    {
+        METRIC_TIMER("partition_update_time_diff", 
+            METRIC_TAG("partition_id", std::to_string(m_partition.GetPartitionId())));
+        m_partition.Update(m_diff, s_diff);
+        m_updater.update_finished();
+    }
+
+private:
+    MapPartition& m_partition;
+    MapUpdater& m_updater;
+    uint32 m_diff;
+    uint32 s_diff;
+};
+
 MapUpdater::MapUpdater() : pending_requests(0), _cancelationToken(false)
 {
 }
@@ -141,6 +165,11 @@ void MapUpdater::schedule_task(UpdateRequest* request)
 void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
     schedule_task(new MapUpdateRequest(map, *this, diff, s_diff));
+}
+
+void MapUpdater::schedule_partition_update(MapPartition& partition, uint32 diff, uint32 s_diff)
+{
+    schedule_task(new MapPartitionUpdateRequest(partition, *this, diff, s_diff));
 }
 
 void MapUpdater::schedule_map_preload(uint32 mapid)

@@ -286,6 +286,8 @@ public:
 
     [[nodiscard]] const char* GetMapName() const;
 
+    [[nodiscard]] virtual bool IsPartitioned() const { return false; }
+
     // have meaning only for instanced map (that have set real difficulty)
     [[nodiscard]] Difficulty GetDifficulty() const { return Difficulty(GetSpawnMode()); }
     [[nodiscard]] bool IsRegularDifficulty() const { return GetDifficulty() == REGULAR_DIFFICULTY; }
