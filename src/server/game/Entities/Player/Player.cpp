@@ -6217,7 +6217,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             // Xinef: Only for BG activities
             if (!uVictim)
             {
-                uint32 xp = uint32(honor * (3 + GetLevel() * 0.30f));
+                uint32 xp = static_cast<uint32>(honor * (3 + GetLevel() * 0.30f) * sWorld->getRate(RATE_XP_BATTLEGROUND_BONUS));
                 sScriptMgr->OnPlayerGiveXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
                 GiveXP(xp, nullptr);
             }
@@ -11993,7 +11993,17 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 {
     uint32 raceMask  = getRaceMask();
     uint32 classMask = getClassMask();
-    for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+
+    // Get all abilities for this skill and sort by MinSkillLineRank (lowest to highest)
+    auto abilities = GetSkillLineAbilitiesBySkillLine(skill_id);
+    std::vector<SkillLineAbilityEntry const*> sortedAbilities(abilities.begin(), abilities.end());
+    std::sort(sortedAbilities.begin(), sortedAbilities.end(),
+        [](SkillLineAbilityEntry const* a, SkillLineAbilityEntry const* b)
+        {
+            return a->MinSkillLineRank < b->MinSkillLineRank;
+        });
+
+    for (SkillLineAbilityEntry const* pAbility : sortedAbilities)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pAbility->Spell);
         if (!spellInfo)
@@ -12323,23 +12333,33 @@ bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const
 
 float Player::GetReputationPriceDiscount(Creature const* creature) const
 {
-    return GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    float discount = GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, creature, discount);
+    return discount;
 }
 
 float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
 {
+    float discount = 1.0f;
+
     if (!factionTemplate || !factionTemplate->faction)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
     ReputationRank rank = GetReputationRank(factionTemplate->faction);
+
     if (rank <= REP_NEUTRAL)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
-    return 1.0f - 0.05f * (rank - REP_NEUTRAL);
+    discount = discount - 0.05f * (rank - REP_NEUTRAL);
+
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+    return discount;
 }
 
 bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const

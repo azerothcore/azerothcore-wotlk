@@ -32,9 +32,11 @@ enum Says
     SAY_SARTHARION_CALL_TENEBRON                = 4,
     SAY_SARTHARION_CALL_VESPERON                = 5,
     SAY_SARTHARION_DEATH                        = 6,
-    SAY_SARTHARION_SPECIAL                      = 7,
+    SAY_SARTHARION_CYCLONE                      = 7,
     SAY_SARTHARION_SLAY                         = 8,
-    SAY_SARTHARION_SPECIAL_4                    = 10, // 9 is whisper
+    SAY_SARTHARION_LAVA                         = 10,
+
+    SAY_DRAKE_RESPOND                           = 4,
 
     // TENEBRON
     SAY_TENEBRON_AGGRO                          = 0,
@@ -87,6 +89,7 @@ enum Spells
     SPELL_LAVA_STRIKE_SUMMON                    = 57572,
     SPELL_SARTHARION_PYROBUFFET                 = 56916,
     SPELL_SARTHARION_BERSERK                    = 61632,
+    SPELL_SARTHARION_ENRAGE                     = 56916,
     SPELL_SARTHARION_TWILIGHT_REVENGE           = 60639,
 
     // Sartharion with drakes
@@ -105,6 +108,7 @@ enum Spells
     SPELL_FLAME_TSUNAMI_DAMAGE_AURA             = 57492,
     SPELL_FLAME_TSUNAMI_LEAP                    = 60241,
     SPELL_SARTHARION_PYROBUFFET_TRIGGER         = 57557,
+    SPELL_FULL_HEAL                             = 43978,
 };
 
 enum NPCs
@@ -130,9 +134,7 @@ enum Misc
     ACTION_DRAKE_DIED                           = 3,
 
     // Movement points
-    POINT_FINAL_TENEBRON                        = 9,
-    POINT_FINAL_SHADRON                         = 5,
-    POINT_FINAL_VESPERON                        = 5,
+    POINT_LANDING                               = 1,
 
     // Lava directions. Its used to identify to which side lava was moving by last time
     LAVA_LEFT_SIDE                              = 0,
@@ -145,7 +147,6 @@ enum Misc
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
     MAX_TENEBORN_EGGS_SUMMONS                   = 6,
-    MAX_BOUNDARY_POSITIONS                      = 4,
 };
 
 enum Events
@@ -157,6 +158,8 @@ enum Events
     EVENT_MINIBOSS_OPEN_PORTAL                  = 4,
     EVENT_MINIBOSS_SPAWN_HELPERS                = 5,
     EVENT_MINIBOSS_RESPOND                      = 6,
+    EVENT_DRAGON_START_PATROL                   = 7,
+    EVENT_DRAGON_PATROL_WAYPOINT                = 8,
 
     // Sartharion abilities
     EVENT_SARTHARION_CAST_CLEAVE                = 10,
@@ -173,7 +176,6 @@ enum Events
     EVENT_SARTHARION_CALL_SHADRON               = 31,
     EVENT_SARTHARION_CALL_VESPERON              = 32,
 
-    EVENT_SARTHARION_BOUNDARY                   = 33,
     EVENT_MINIDRAKE_SPEECH                      = 34,
 };
 
@@ -224,12 +226,43 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
 };
 
-float const SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
+// Patrol waypoints for Vesperon (circular patrol above Sartharion)
+const Position VesperonPatrolPath[8] =
 {
-    3218.86f,   // South X
-    3275.69f,   // North X
-    484.68f,    // East Y
-    572.4f      // West Y
+    { 3296.785f, 555.0555f, 87.29027f, 0.0f },
+    { 3266.8242f, 575.95245f, 89.76242f, 0.0f },
+    { 3227.2224f, 577.1228f, 89.87349f, 0.0f },
+    { 3197.2644f, 553.5248f, 88.651405f, 0.0f },
+    { 3195.9875f, 507.7954f, 87.45695f, 0.0f },
+    { 3224.5435f, 481.11807f, 84.70684f, 0.0f },
+    { 3265.2356f, 481.7216f, 83.595764f, 0.0f },
+    { 3299.8765f, 506.4301f, 83.87355f, 0.0f },
+};
+
+// Patrol waypoints for Tenebron (circular patrol above Sartharion)
+const Position TenebronPatrolPath[8] =
+{
+    { 3232.0261f, 569.16376f, 97.53158f, 0.0f },
+    { 3203.6875f, 548.84595f, 98.50729f, 0.0f },
+    { 3206.0713f, 513.54425f, 99.3684f, 0.0f },
+    { 3234.5671f, 489.96832f, 99.47933f, 0.0f },
+    { 3265.446f, 490.026f, 98.423836f, 0.0f },
+    { 3287.5674f, 503.39835f, 97.645226f, 0.0f },
+    { 3288.8157f, 549.16187f, 96.70078f, 0.0f },
+    { 3264.5164f, 568.97516f, 95.97868f, 0.0f },
+};
+
+// Patrol waypoints for Shadron (circular patrol above Sartharion)
+const Position ShadronPatrolPath[8] =
+{
+    { 3196.095f, 548.7049f, 115.83286f, 0.0f },
+    { 3224.809f, 573.8922f, 116.08303f, 0.0f },
+    { 3270.8267f, 572.1468f, 112.77744f, 0.0f },
+    { 3295.5364f, 547.12506f, 109.66705f, 0.0f },
+    { 3296.5833f, 503.22397f, 106.95133f, 0.0f },
+    { 3254.0688f, 489.25906f, 108.92368f, 0.0f },
+    { 3223.111f, 488.90338f, 110.53484f, 0.0f },
+    { 3197.9263f, 511.4375f, 113.22937f, 0.0f },
 };
 
 float const FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
@@ -249,510 +282,429 @@ const Position bigIslandMiddlePos = { 3242.822754f, 477.279816f, 57.430473f };
 
 const uint32 dragons[MAX_DRAGONS] = { DATA_TENEBRON, DATA_VESPERON, DATA_SHADRON };
 
+const Position dragonLandingPos[MAX_DRAGONS] ={
+    {3249.75f, 566.95184f, 59.424007f, 0}, // Tenebron
+    {3230.4963f, 533.0001f, 59.5598f, 0}, // Shadron
+    {3269.7134f, 532.7908f, 59.51278f, 0} // Vesperon
+ };
+
+static Position const& GetDragonLandingPos(uint32 entry)
+{
+    switch (entry)
+    {
+        case NPC_TENEBRON: return dragonLandingPos[0];
+        case NPC_SHADRON:  return dragonLandingPos[1];
+        case NPC_VESPERON: return dragonLandingPos[2];
+        default:           return dragonLandingPos[0];
+    }
+}
+
 /////////////////////////////
 // SARTHARION
 /////////////////////////////
 
-class boss_sartharion : public CreatureScript
+struct boss_sartharion : public BossAI
 {
-public:
-    boss_sartharion() : CreatureScript("boss_sartharion") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetObsidianSanctumAI<boss_sartharionAI> (pCreature);
-    }
-
-    struct boss_sartharionAI : public BossAI
-    {
-        boss_sartharionAI(Creature* pCreature) : BossAI(pCreature, DATA_SARTHARION),
-            dragonsCount(0),
-            lastLavaSide(LAVA_RIGHT_SIDE),
-            usedBerserk(false),
-            below11PctReached(false)
-        {
-        }
-
-        void Reset() override
-        {
-            _Reset();
-            extraEvents.Reset();
-            RespawnDragons(false);
-            SummonStartingTriggers();
-            usedBerserk = false;
-            below11PctReached = false;
-            dragonsCount = 0;
-            volcanoBlows.clear();
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_DRAKE_DIED)
-            {
-                DoCastSelf(SPELL_SARTHARION_TWILIGHT_REVENGE, true);
-            }
-        }
-
-        void JustEngagedWith(Unit* pWho) override
-        {
-            if (pWho && !IsTargetInBounds(pWho))
-            {
-                EnterEvadeMode();
-                return;
-            }
-
-            _JustEngagedWith();
-            DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
-            Talk(SAY_SARTHARION_AGGRO);
-
-            // Combat events
-            events.ScheduleEvent(EVENT_SARTHARION_CAST_CLEAVE, 7s);
-            events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 15s);
-            events.ScheduleEvent(EVENT_SARTHARION_CAST_TAIL_LASH, 11s);
-
-            // Extra events
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20s);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5s);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 15min);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 250ms);
-
-            // Store dragons
-            for (uint8 i = 0; i < MAX_DRAGONS; ++i)
-            {
-                Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(dragons[i]));
-                if (!dragon || !dragon->IsAlive() || instance->GetBossState(dragons[i]) == DONE)
-                {
-                    continue;
-                }
-
-                dragon->SetImmuneToNPC(true);
-                dragon->SetFullHealth();
-
-                ++dragonsCount;
-                me->AddLootMode(1 << dragonsCount);
-
-                switch (dragons[i])
-                {
-                    case DATA_TENEBRON:
-                    {
-                        dragon->CastSpell(dragon, SPELL_POWER_OF_TENEBRON, true);
-                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 10s);
-                        break;
-                    }
-                    case DATA_SHADRON:
-                    {
-                        dragon->CastSpell(dragon, SPELL_POWER_OF_SHADRON, true);
-                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 65s);
-                        break;
-                    }
-                    case DATA_VESPERON:
-                    {
-                        dragon->CastSpell(dragon, SPELL_POWER_OF_VESPERON, true);
-                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 115s);
-                        break;
-                    }
-                }
-            }
-
-            if (dragonsCount)
-            {
-                DoCastSelf(SPELL_WILL_OF_SARTHARION, true);
-            }
-
-            me->CallForHelp(500.0f);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            RespawnDragons(true);
-            _JustDied();
-            Talk(SAY_SARTHARION_DEATH);
-        }
-
-        void SetData(uint32 type, uint32 data) override
-        {
-            if (type == DATA_VOLCANO_BLOWS && data)
-            {
-                if (!volcanoBlows.empty() && std::find(volcanoBlows.begin(), volcanoBlows.end(), data) != volcanoBlows.end())
-                {
-                    return;
-                }
-
-                volcanoBlows.push_back(data);
-            }
-        }
-
-        uint32 GetData(uint32 dataOrGuid) const override
-        {
-            // it means we want dragons count
-            if (dataOrGuid == DATA_ACHIEVEMENT_DRAGONS_COUNT)
-            {
-                return dragonsCount;
-            }
-
-            // otherwise it is guid to check if player was hit by lava strike :)
-            if (!volcanoBlows.empty() && std::find(volcanoBlows.begin(), volcanoBlows.end(), dataOrGuid) != volcanoBlows.end())
-            {
-                return 1;
-            }
-
-            return 0;
-        }
-
-        void KilledUnit(Unit* pVictim) override
-        {
-            if (!urand(0, 2) && pVictim->IsPlayer())
-            {
-                Talk(SAY_SARTHARION_SLAY);
-            }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            switch (summon->GetEntry())
-            {
-                case NPC_FLAME_TSUNAMI:
-                {
-                    summon->SetSpeed(MOVE_FLIGHT, 1.5f);
-                    break;
-                }
-                case NPC_FIRE_CYCLONE:
-                {
-                    summon->GetMotionMaster()->MoveRandom(5.0f);
-                    break;
-                }
-            }
-
-            summons.Summon(summon);
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
-        {
-            // Temporal hack, by some case some melee spells can bypass this aura damage reduction
-            if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE))
-            {
-                damage = 0;
-                return;
-            }
-
-            if (!usedBerserk && me->HealthBelowPctDamaged(30, damage))
-            {
-                DoCastSelf(SPELL_SARTHARION_BERSERK, true);
-                usedBerserk = true;
-                return;
-            }
-
-            // Soft enrage
-            if (!below11PctReached && me->HealthBelowPctDamaged(10, damage))
-            {
-                summons.RemoveNotExisting();
-                if (!summons.empty())
-                {
-                    for (ObjectGuid const& summonGuid : summons)
-                    {
-                        Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
-                        if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
-                        {
-                            summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
-                        }
-                    }
-                }
-                Talk(SAY_SARTHARION_BERSERK);
-                below11PctReached = true;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-            {
-                return;
-            }
-
-            extraEvents.Update(diff);
-
-            // Special events which needs to be fired immidiately
-            while (uint32 const eventId = extraEvents.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_SARTHARION_BOUNDARY:
-                    {
-                        if (!IsTargetInBounds(me->GetVictim()))
-                        {
-                            EnterEvadeMode();
-                        }
-                        else
-                        {
-                            extraEvents.Repeat(250ms);
-                        }
-                        break;
-                    }
-                    case EVENT_SARTHARION_SUMMON_LAVA:
-                    {
-                        if (!urand(0, 3))
-                        {
-                            Talk(SAY_SARTHARION_SPECIAL);
-                        }
-
-                        SummonLavaWaves();
-                        extraEvents.Repeat(25s);
-                        return;
-                    }
-                    case EVENT_SARTHARION_START_LAVA:
-                    {
-                        SendLavaWaves(true);
-                        return;
-                    }
-                    case EVENT_SARTHARION_FINISH_LAVA:
-                    {
-                        SendLavaWaves(false);
-                        return;
-                    }
-                    // Handling of Drakes Events
-                    // Dragon Calls
-                    case EVENT_SARTHARION_CALL_TENEBRON:
-                    {
-                        Talk(SAY_SARTHARION_CALL_TENEBRON);
-                        if (Creature* tenebron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TENEBRON)))
-                        {
-                            tenebron->AI()->DoAction(ACTION_CALL_DRAGON);
-                        }
-                        break;
-                    }
-                    case EVENT_SARTHARION_CALL_SHADRON:
-                    {
-                        Talk(SAY_SARTHARION_CALL_SHADRON);
-                        if (Creature* shadron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SHADRON)))
-                        {
-                            shadron->AI()->DoAction(ACTION_CALL_DRAGON);
-                        }
-                        break;
-                    }
-                    case EVENT_SARTHARION_CALL_VESPERON:
-                    {
-                        Talk(SAY_SARTHARION_CALL_VESPERON);
-                        if (Creature* vesperon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VESPERON)))
-                        {
-                            vesperon->AI()->DoAction(ACTION_CALL_DRAGON);
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-            // Handle Sartharion combat abbilities
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_SARTHARION_CAST_CLEAVE:
-                    {
-                        DoCastVictim(SPELL_SARTHARION_CLEAVE, false);
-                        events.Repeat(10s);
-                        break;
-                    }
-                    case EVENT_SARTHARION_CAST_FLAME_BREATH:
-                    {
-                        DoCastVictim(SPELL_SARTHARION_FLAME_BREATH, false);
-                        events.Repeat(20s);
-                        break;
-                    }
-                    case EVENT_SARTHARION_CAST_TAIL_LASH:
-                    {
-                        DoCastSelf(SPELL_SARTHARION_TAIL_LASH, false);
-                        events.Repeat(18s);
-                        break;
-                    }
-                    case EVENT_SARTHARION_LAVA_STRIKE:
-                    {
-                        if (!urand(0, 2))
-                        {
-                            Talk(SAY_SARTHARION_SPECIAL_4);
-                        }
-
-                        summons.RemoveNotExisting();
-                        uint8 rand = urand(0, MAX_CYCLONE_COUNT - 1); // 5 - numer of cyclones
-                        uint8 iter = 0;
-                        if (!summons.empty())
-                        {
-                            for (ObjectGuid const& summonGuid : summons)
-                            {
-                                Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
-                                if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE && iter == rand)
-                                {
-                                    summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
-                                    ++iter;
-                                }
-                            }
-                        }
-
-                        events.Repeat((below11PctReached ? randtime(1400ms, 2s) : randtime(5s, 20s)));
-                        break;
-                    }
-                    case EVENT_SARTHARION_BERSERK:
-                    {
-                        summons.DespawnEntry(NPC_SAFE_AREA_TRIGGER);
-                        break;
-                    }
-                }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                {
-                    return;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        void SummonStartingTriggers()
-        {
-            for (uint8 i = 0; i < MAX_CYCLONE_COUNT; ++i)
-            {
-                me->SummonCreature(NPC_FIRE_CYCLONE, CycloneSummonPos[i]);
-            }
-
-            for (uint8 i = 0; i < MAX_AREA_TRIGGER_COUNT; ++i)
-            {
-                me->SummonCreature(NPC_SAFE_AREA_TRIGGER, AreaTriggerSummonPos[i]);
-            }
-        }
-
-        void SummonLavaWaves()
-        {
-            summons.RemoveNotExisting();
-            Talk(WHISPER_LAVA_CHURN);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 3600ms);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 11s);
-
-            // Send wave from left
-            if (lastLavaSide == LAVA_RIGHT_SIDE)
-            {
-                for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
-                {
-                    Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3211.0f, FlameTsunamiLeftOffsets[i], 57.083332f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13500);
-
-                    if (((i - 2) % 3 == 0) && tsunami) // If center of wave
-                        tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
-                }
-
-                lastLavaSide = LAVA_LEFT_SIDE;
-            }
-            // from right
-            else
-            {
-                for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
-                {
-                    Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3286.0f, FlameTsunamiRightOffsets[i], 57.083332f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 13500);
-
-                    if (((i - 2) % 3 == 0) && tsunami) // If center of wave
-                        tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
-                }
-
-                lastLavaSide = LAVA_RIGHT_SIDE;
-            }
-        }
-
-        void SendLavaWaves(bool start)
-        {
-            if (summons.empty())
-                return;
-
-            for (ObjectGuid const& guid : summons)
-            {
-                Creature* tsunami = ObjectAccessor::GetCreature(*me, guid);
-                if (!tsunami || tsunami->GetEntry() != NPC_FLAME_TSUNAMI)
-                    continue;
-
-                if (start) // Movement possibly simplified from official, ideally reevaluate in the future.
-                {
-                    tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_DAMAGE_AURA, true);
-                    tsunami->GetMotionMaster()->MovePoint(0, ((tsunami->GetPositionX() < 3250.0f) ? 3286.0f : 3211.0f), tsunami->GetPositionY(), tsunami->GetPositionZ());
-                }
-                else
-                {
-                    tsunami->RemoveAura(SPELL_FLAME_TSUNAMI_DAMAGE_AURA);
-                    tsunami->SetObjectScale(0.1f);
-                }
-            }
-        }
-
-        void RespawnDragons(bool checkCombat)
-        {
-            for (uint8 i = 0; i < MAX_DRAGONS; ++i)
-            {
-                if (instance->GetBossState(dragons[i]) == DONE)
-                {
-                    continue;
-                }
-
-                if (Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(dragons[i])))
-                {
-                    if (checkCombat && dragon->IsInCombat())
-                    {
-                        continue;
-                    }
-
-                    dragon->DespawnOrUnsummon();
-                    dragon->SetRespawnTime(5);
-                }
-            }
-
-            dragonsCount = 0;
-        }
-
-        bool IsTargetInBounds(Unit const* victim) const
-        {
-            if (!victim || victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() > SartharionBoundary[3])
-            {
-                return false;
-            }
-
-            // Big island handling
-            if (victim->GetPositionY() < SartharionBoundary[2])
-            {
-                return victim->GetDistance(bigIslandMiddlePos) <= 6.0f;
-            }
-
-            return true;
-        }
-
-        EventMap extraEvents;
-        std::list<uint32> volcanoBlows;
-        uint8 dragonsCount;
-        uint8 lastLavaSide; // 0 = left, 1 = right
-        bool usedBerserk;
-        bool below11PctReached;
-    };
-};
-
-struct boss_sartharion_dragonAI : public BossAI
-{
-    boss_sartharion_dragonAI(Creature* pCreature, uint32 bossId) : BossAI(pCreature, bossId), isCalledBySartharion(false)
+    explicit boss_sartharion(Creature* creature) : BossAI(creature, DATA_SARTHARION),
+        dragonsCount(0),
+        lastLavaSide(LAVA_RIGHT_SIDE),
+        usedBerserk(false),
+        below11PctReached(false)
     {
     }
 
     void Reset() override
     {
         _Reset();
+        extraEvents.Reset();
+
+        SummonStartingTriggers();
+        usedBerserk = false;
+        below11PctReached = false;
+        dragonsCount = 0;
+        volcanoBlows.clear();
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+
+        // Despawn drakes
+        for (uint32 i : dragons)
+        {
+            if (instance->GetBossState(i) == DONE)
+                continue;
+
+            if (Creature* boss = instance->GetCreature(i) )
+                boss->DespawnOnEvade();
+        }
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_DRAKE_DIED)
+            DoCastSelf(SPELL_SARTHARION_TWILIGHT_REVENGE, true);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
+        ScheduleEnrageTimer(SPELL_SARTHARION_ENRAGE, 15min);
+        Talk(SAY_SARTHARION_AGGRO);
+
+        // Combat events
+        events.ScheduleEvent(EVENT_SARTHARION_CAST_CLEAVE, 7s);
+        events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 6s);
+        events.ScheduleEvent(EVENT_SARTHARION_CAST_TAIL_LASH, 11s);
+
+        // Extra events
+        extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20s);
+        extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 15s);
+        extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 15min);
+
+        // Store dragons
+        for (uint8 i = 0; i < MAX_DRAGONS; ++i)
+        {
+            Creature* dragon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(dragons[i]));
+            if (!dragon || !dragon->IsAlive() || instance->GetBossState(dragons[i]) == DONE)
+                continue;
+
+            dragon->SetImmuneToNPC(true);
+            dragon->CastSpell(dragon, SPELL_FULL_HEAL, true);
+
+            ++dragonsCount;
+            me->AddLootMode(1 << dragonsCount);
+
+            switch (dragons[i])
+            {
+                case DATA_TENEBRON:
+                {
+                    dragon->CastSpell(dragon, SPELL_POWER_OF_TENEBRON, true);
+                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 20s);
+                    break;
+                }
+                case DATA_SHADRON:
+                {
+                    dragon->CastSpell(dragon, SPELL_POWER_OF_SHADRON, true);
+                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 60s);
+                    break;
+                }
+                case DATA_VESPERON:
+                {
+                    dragon->CastSpell(dragon, SPELL_POWER_OF_VESPERON, true);
+                    extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 120s);
+                    break;
+                }
+            }
+        }
+
+        if (dragonsCount)
+        {
+            DoCastSelf(SPELL_WILL_OF_SARTHARION, true);
+            instance->DoAction(ACTION_START_PATROL);
+        }
+
+        me->CallForHelp(500.0f);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_SARTHARION_DEATH);
+    }
+
+    void SetData(uint32 type, uint32 data) override
+    {
+        if (type == DATA_VOLCANO_BLOWS && data)
+        {
+            if (!volcanoBlows.empty() && std::find(volcanoBlows.begin(), volcanoBlows.end(), data) != volcanoBlows.end())
+                return;
+
+            volcanoBlows.push_back(data);
+        }
+    }
+
+    uint32 GetData(uint32 dataOrGuid) const override
+    {
+        // it means we want dragons count
+        if (dataOrGuid == DATA_ACHIEVEMENT_DRAGONS_COUNT)
+            return dragonsCount;
+
+        // otherwise it is guid to check if player was hit by lava strike :)
+        if (!volcanoBlows.empty() && std::find(volcanoBlows.begin(), volcanoBlows.end(), dataOrGuid) != volcanoBlows.end())
+            return 1;
+
+        return 0;
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (!urand(0, 2) && victim->IsPlayer())
+            Talk(SAY_SARTHARION_SLAY);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        switch (summon->GetEntry())
+        {
+            case NPC_FLAME_TSUNAMI:
+            {
+                summon->SetSpeed(MOVE_FLIGHT, 1.5f);
+                break;
+            }
+            case NPC_FIRE_CYCLONE:
+            {
+                summon->GetMotionMaster()->MoveRandom(5.0f);
+                break;
+            }
+        }
+
+        summons.Summon(summon);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*dmgType*/, SpellSchoolMask /*school*/) override
+    {
+        // Temporal hack, by some case some melee spells can bypass this aura damage reduction
+        if (me->HasAura(SPELL_GIFT_OF_TWILIGHT_FIRE))
+        {
+            damage = 0;
+            return;
+        }
+
+        if (!usedBerserk && me->HealthBelowPctDamaged(30, damage))
+        {
+            DoCastSelf(SPELL_SARTHARION_BERSERK, true);
+            usedBerserk = true;
+            return;
+        }
+
+        // Soft enrage
+        if (!below11PctReached && me->HealthBelowPctDamaged(10, damage))
+        {
+            summons.RemoveNotExisting();
+            if (!summons.empty())
+            {
+                for (ObjectGuid const& summonGuid : summons)
+                {
+                    Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
+                    if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
+                        summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
+                }
+            }
+            Talk(SAY_SARTHARION_BERSERK);
+            below11PctReached = true;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        extraEvents.Update(diff);
+
+        // Special events which needs to be fired immediately
+        while (uint32 const eventId = extraEvents.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_SARTHARION_SUMMON_LAVA:
+                {
+                    Talk(SAY_SARTHARION_LAVA);
+
+                    SummonLavaWaves();
+                    extraEvents.Repeat(25s);
+                    return;
+                }
+                case EVENT_SARTHARION_START_LAVA:
+                {
+                    SendLavaWaves(true);
+                    return;
+                }
+                case EVENT_SARTHARION_FINISH_LAVA:
+                {
+                    SendLavaWaves(false);
+                    return;
+                }
+                // Handling of Drakes Events
+                // Dragon Calls
+                case EVENT_SARTHARION_CALL_TENEBRON:
+                {
+                    Talk(SAY_SARTHARION_CALL_TENEBRON);
+                    if (Creature* tenebron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TENEBRON)))
+                        tenebron->AI()->DoAction(ACTION_CALL_DRAGON);
+                    break;
+                }
+                case EVENT_SARTHARION_CALL_SHADRON:
+                {
+                    Talk(SAY_SARTHARION_CALL_SHADRON);
+                    if (Creature* shadron = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SHADRON)))
+                        shadron->AI()->DoAction(ACTION_CALL_DRAGON);
+                    break;
+                }
+                case EVENT_SARTHARION_CALL_VESPERON:
+                {
+                    Talk(SAY_SARTHARION_CALL_VESPERON);
+                    if (Creature* vesperon = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VESPERON)))
+                        vesperon->AI()->DoAction(ACTION_CALL_DRAGON);
+
+                    break;
+                }
+                case EVENT_SARTHARION_LAVA_STRIKE:
+                {
+                    Talk(SAY_SARTHARION_CYCLONE);
+                    summons.RemoveNotExisting();
+                    if (auto summon = summons.GetRandomCreatureWithEntry(NPC_FIRE_CYCLONE))
+                        summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
+
+                    extraEvents.Repeat((below11PctReached ? randtime(1400ms, 2s) : 25s));
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+
+        // Handle Sartharion combat abilities
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 const eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_SARTHARION_CAST_CLEAVE:
+                {
+                    DoCastVictim(SPELL_SARTHARION_CLEAVE, false);
+                    events.Repeat(10s);
+                    break;
+                }
+                case EVENT_SARTHARION_CAST_FLAME_BREATH:
+                {
+                    DoCastVictim(SPELL_SARTHARION_FLAME_BREATH, false);
+                    events.Repeat(10s);
+                    break;
+                }
+                case EVENT_SARTHARION_CAST_TAIL_LASH:
+                {
+                    DoCastSelf(SPELL_SARTHARION_TAIL_LASH, false);
+                    events.Repeat(18s);
+                    break;
+                }
+                case EVENT_SARTHARION_BERSERK:
+                {
+                    summons.DespawnEntry(NPC_SAFE_AREA_TRIGGER);
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    void SummonStartingTriggers()
+    {
+        for (auto const& CycloneSummonPo : CycloneSummonPos)
+            me->SummonCreature(NPC_FIRE_CYCLONE, CycloneSummonPo);
+
+        for (auto const& AreaTriggerSummonPo : AreaTriggerSummonPos)
+            me->SummonCreature(NPC_SAFE_AREA_TRIGGER, AreaTriggerSummonPo);
+    }
+
+    void SummonLavaWaves()
+    {
+        summons.RemoveNotExisting();
+        Talk(WHISPER_LAVA_CHURN);
+        extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 3600ms);
+        extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 11s);
+
+        // Send wave from left
+        if (lastLavaSide == LAVA_RIGHT_SIDE)
+        {
+            for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
+            {
+                Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3211.0f, FlameTsunamiLeftOffsets[i], 57.083332f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13500);
+
+                if (((i - 2) % 3 == 0) && tsunami) // If center of wave
+                    tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
+            }
+
+            lastLavaSide = LAVA_LEFT_SIDE;
+        }
+        // from right
+        else
+        {
+            for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
+            {
+                Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3286.0f, FlameTsunamiRightOffsets[i], 57.083332f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 13500);
+
+                if (((i - 2) % 3 == 0) && tsunami) // If center of wave
+                    tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
+            }
+
+            lastLavaSide = LAVA_RIGHT_SIDE;
+        }
+    }
+
+    void SendLavaWaves(bool start)
+    {
+        if (summons.empty())
+            return;
+
+        for (ObjectGuid const& guid : summons)
+        {
+            Creature* tsunami = ObjectAccessor::GetCreature(*me, guid);
+            if (!tsunami || tsunami->GetEntry() != NPC_FLAME_TSUNAMI)
+                continue;
+
+            if (start) // Movement possibly simplified from official, ideally reevaluate in the future.
+            {
+                tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_DAMAGE_AURA, true);
+                tsunami->GetMotionMaster()->MovePoint(0, ((tsunami->GetPositionX() < 3250.0f) ? 3286.0f : 3211.0f), tsunami->GetPositionY(), tsunami->GetPositionZ());
+            }
+            else
+            {
+                tsunami->RemoveAura(SPELL_FLAME_TSUNAMI_DAMAGE_AURA);
+                tsunami->SetObjectScale(0.1f);
+            }
+        }
+    }
+
+    EventMap extraEvents;
+    std::list<uint32> volcanoBlows;
+    uint8 dragonsCount;
+    uint8 lastLavaSide; // 0 = left, 1 = right
+    bool usedBerserk;
+    bool below11PctReached;
+};
+
+struct boss_sartharion_dragonAI : public BossAI
+{
+    boss_sartharion_dragonAI(Creature* creature, uint32 bossId) : BossAI(creature, bossId), isCalledBySartharion(false), currentPatrolPoint(0) { }
+
+    void Reset() override
+    {
+        _Reset();
         events.Reset();
+        extraEvents.Reset();
         ClearInstance();
 
         me->SetImmuneToNPC(false);
         me->SetSpeed(MOVE_FLIGHT, 1.0f);
-        me->SetCanFly(false);
+        me->SetDisableGravity(false);
+        me->SetHover(true);
         me->ResetLootMode();
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         portalGUID.Clear();
         isCalledBySartharion = false;
         instance->DoAction(ACTION_CLEAR_PORTAL);
@@ -765,11 +717,14 @@ struct boss_sartharion_dragonAI : public BossAI
             isCalledBySartharion = true;
             extraEvents.RescheduleEvent(EVENT_MINIDRAKE_SPEECH, 4s);
         }
+        else if (param == ACTION_START_PATROL)
+            extraEvents.ScheduleEvent(EVENT_DRAGON_START_PATROL, 500ms);
     }
 
     void MoveInLineOfSight(Unit* who) final
     {
-        if (isCalledBySartharion)
+        // Prevent aggro during patrol (NOT_SELECTABLE set) and while flying to landing position
+        if (isCalledBySartharion || me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
             return;
 
         ScriptedAI::MoveInLineOfSight(who);
@@ -777,41 +732,21 @@ struct boss_sartharion_dragonAI : public BossAI
 
     void MovementInform(uint32 type, uint32 pointId) final
     {
-        if (type != WAYPOINT_MOTION_TYPE)
+        if (type == POINT_MOTION_TYPE && pointId == POINT_LANDING)
         {
-            return;
+            // Dragon has landed - set ground flags
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetDisableGravity(false);
+            me->SetHover(false);
+            me->SetAnimTier(AnimTier::Ground);
+            me->SetImmuneToNPC(false);
+            me->SetInCombatWithZone();
         }
-
-        switch (me->GetEntry())
+        else if (type == POINT_MOTION_TYPE && pointId >= 100 && pointId < 200)
         {
-            case NPC_TENEBRON:
-            {
-                if (pointId != POINT_FINAL_TENEBRON)
-                {
-                    return;
-                }
-                break;
-            }
-            case NPC_SHADRON:
-            {
-                if (pointId != POINT_FINAL_SHADRON)
-                {
-                    return;
-                }
-                break;
-            }
-            case NPC_VESPERON:
-            {
-                if (pointId != POINT_FINAL_VESPERON)
-                {
-                    return;
-                }
-                break;
-            }
+            // Patrol waypoint reached - schedule next waypoint
+            extraEvents.ScheduleEvent(EVENT_DRAGON_PATROL_WAYPOINT, 100ms);
         }
-
-        me->SetImmuneToNPC(false);
-        me->SetInCombatWithZone();
     }
 
     void JustSummoned(Creature* summon) override
@@ -820,9 +755,7 @@ struct boss_sartharion_dragonAI : public BossAI
         if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
         {
             if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-            {
                 sartharion->AI()->JustSummoned(summon);
-            }
         }
 
         BossAI::JustSummoned(summon);
@@ -837,7 +770,6 @@ struct boss_sartharion_dragonAI : public BossAI
         if (me->IsFlying())
         {
             me->SetSpeed(MOVE_FLIGHT, 1.0f);
-            me->SetCanFly(false);
         }
 
         if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
@@ -863,16 +795,12 @@ struct boss_sartharion_dragonAI : public BossAI
         }
 
         if (isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) == DONE)
-        {
             me->SetLootMode(0);
-        }
 
         if (isCalledBySartharion)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 500, true, false))
-            {
                 AttackStart(target);
-            }
         }
     }
 
@@ -883,9 +811,7 @@ struct boss_sartharion_dragonAI : public BossAI
 
         // Despawn minions only if not called by Sartharion
         if (!isCalledBySartharion)
-        {
             summons.DespawnAll();
-        }
 
         switch (me->GetEntry())
         {
@@ -893,9 +819,7 @@ struct boss_sartharion_dragonAI : public BossAI
             {
                 Talk(SAY_TENEBRON_DEATH);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
-                {
                     instance->SetBossState(DATA_TENEBRON, DONE);
-                }
                 break;
             }
             case NPC_SHADRON:
@@ -904,15 +828,11 @@ struct boss_sartharion_dragonAI : public BossAI
                 if (isCalledBySartharion)
                 {
                     if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-                    {
                         sartharion->RemoveAura(SPELL_GIFT_OF_TWILIGHT_FIRE);
-                    }
                 }
 
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
-                {
                     instance->SetBossState(DATA_SHADRON, DONE);
-                }
                 break;
             }
             case NPC_VESPERON:
@@ -920,32 +840,24 @@ struct boss_sartharion_dragonAI : public BossAI
                 Talk(SAY_VESPERON_DEATH);
                 instance->DoAction(ACTION_CLEAR_PORTAL);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
-                {
                     instance->SetBossState(DATA_VESPERON, DONE);
-                }
                 break;
             }
         }
 
         if (!isCalledBySartharion)
-        {
             ClearInstance();
-        }
         else
         {
             if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-            {
                 sartharion->AI()->DoAction(ACTION_DRAKE_DIED);
-            }
         }
     }
 
     void KilledUnit(Unit* victim) final
     {
         if (!victim->IsPlayer() || urand(0, 2))
-        {
             return;
-        }
 
         switch (me->GetEntry())
         {
@@ -976,25 +888,19 @@ struct boss_sartharion_dragonAI : public BossAI
         }
 
         if (!UpdateVictim())
-        {
             return;
-        }
 
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
             return;
-        }
 
         while (uint32 const eventId = events.ExecuteEvent())
         {
             ExecuteEvent(eventId);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
                 return;
-            }
         }
 
         DoMeleeAttackIfReady();
@@ -1009,16 +915,73 @@ struct boss_sartharion_dragonAI : public BossAI
         RemoveTwilightPortal();
     }
 
-    virtual void HandleExtraEvent(uint32 const /*eventId*/) { }
+    void HandleExtraEvent(uint32 const eventId)
+    {
+        if (eventId == EVENT_MINIDRAKE_SPEECH)
+        {
+            // Dragon speaks and starts flying to landing position
+            Talk(SAY_DRAKE_RESPOND);
+            me->GetMotionMaster()->Clear();
+            me->SetDisableGravity(true);
+            me->SetHover(true);
+            me->SetAnimTier(AnimTier::Fly);
+            me->SetSpeed(MOVE_FLIGHT, 3.0f);
+            me->GetMotionMaster()->MovePoint(POINT_LANDING, GetDragonLandingPos(me->GetEntry()));
+        }
+        else if (eventId == EVENT_DRAGON_START_PATROL)
+        {
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetDisableGravity(true);
+            me->SetHover(true);
+            me->SetAnimTier(AnimTier::Fly);
+            currentPatrolPoint = 0;
+
+            // Start patrol using custom waypoint system
+            extraEvents.ScheduleEvent(EVENT_DRAGON_PATROL_WAYPOINT, 100ms);
+        }
+        else if (eventId == EVENT_DRAGON_PATROL_WAYPOINT)
+        {
+            // Only continue patrol if not in combat and still selectable flag is set
+            if (!me->IsInCombat() && me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                // Ensure flying flags are maintained
+                me->SetDisableGravity(true);
+                me->SetHover(true);
+                me->SetAnimTier(AnimTier::Fly);
+
+                // Get the appropriate patrol path based on creature entry
+                Position const* patrolPath = nullptr;
+                switch (me->GetEntry())
+                {
+                    case NPC_VESPERON:
+                        patrolPath = VesperonPatrolPath;
+                        break;
+                    case NPC_TENEBRON:
+                        patrolPath = TenebronPatrolPath;
+                        break;
+                    case NPC_SHADRON:
+                        patrolPath = ShadronPatrolPath;
+                        break;
+                    default:
+                        return;
+                }
+
+                // Move to next patrol point (use pointId 100+ to identify patrol points)
+                me->GetMotionMaster()->MovePoint(100 + currentPatrolPoint, patrolPath[currentPatrolPoint]);
+
+                // Cycle to next waypoint
+                currentPatrolPoint = (currentPatrolPoint + 1) % 8;
+            }
+        }
+    }
+
 protected:
     void RemoveTwilightPortal()
     {
         if (portalGUID)
         {
             if (GameObject* gobj = me->GetMap()->GetGameObject(portalGUID))
-            {
                 gobj->Delete();
-            }
 
             portalGUID.Clear();
         }
@@ -1027,508 +990,374 @@ protected:
     EventMap extraEvents;
     ObjectGuid portalGUID;
     bool isCalledBySartharion;
+    uint8 currentPatrolPoint;
 };
 
 /////////////////////////////
 // TENEBRON
 /////////////////////////////
 
-class boss_sartharion_tenebron : public CreatureScript
+struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
 {
-public:
-    boss_sartharion_tenebron() : CreatureScript("boss_sartharion_tenebron") { }
+    explicit boss_sartharion_tenebron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_TENEBRON), summons2(creature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void Reset() override
     {
-        return GetObsidianSanctumAI<boss_sartharion_tenebronAI>(pCreature);
+        boss_sartharion_dragonAI::Reset();
+        if (!isCalledBySartharion)
+            summons2.DespawnAll();
+
+        events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
+        events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
+        events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
     }
 
-    struct boss_sartharion_tenebronAI : public boss_sartharion_dragonAI
+    void JustSummoned(Creature* summon) override
     {
-        boss_sartharion_tenebronAI(Creature* pCreature) : boss_sartharion_dragonAI(pCreature, DATA_TENEBRON), summons2(pCreature)
-        {
-        }
+        if (summon->GetEntry() != NPC_TWILIGHT_EGG)
+            summons.Summon(summon);
+        // Summons to Sartharion are linked manually
+    }
 
-        void Reset() override
-        {
-            boss_sartharion_dragonAI::Reset();
-            if (!isCalledBySartharion)
-            {
-                summons2.DespawnAll();
-            }
-
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            if (summon->GetEntry() != NPC_TWILIGHT_EGG)
-            {
-                summons.Summon(summon);
-            }
-            // Summons to Sartharion are linked manually
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            if (!isCalledBySartharion)
-            {
-                summons2.DespawnAll();
-            }
-
-            boss_sartharion_dragonAI::JustDied(killer);
-        }
-
-        void HandleExtraEvent(uint32 const eventId) override
-        {
-            if (eventId == EVENT_MINIDRAKE_SPEECH)
-            {
-                Talk(SAY_TENEBRON_RESPOND);
-                me->SetCanFly(true);
-                me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
-            }
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
-            {
-                case EVENT_MINIBOSS_SHADOW_BREATH:
-                {
-                    if (!urand(0, 10))
-                    {
-                        Talk(SAY_TENEBRON_BREATH);
-                    }
-                    DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.Repeat(17500ms);
-                    break;
-                }
-                case EVENT_MINIBOSS_SHADOW_FISSURE:
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
-                        DoCast(target, SPELL_SHADOW_FISSURE, false);
-                    }
-                    events.Repeat(22500ms);
-                    break;
-                }
-                case EVENT_MINIBOSS_OPEN_PORTAL:
-                {
-                    Talk(WHISPER_OPEN_PORTAL);
-                    Talk(SAY_TENEBRON_SPECIAL);
-
-                    if (!isCalledBySartharion)
-                    {
-                        if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_TENEBRON].GetPositionX(), portalPos[DATA_TENEBRON].GetPositionY(), portalPos[DATA_TENEBRON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                        {
-                            portalGUID = Portal->GetGUID();
-                        }
-                    }
-                    else
-                    {
-                        instance->DoAction(ACTION_ADD_PORTAL);
-                    }
-
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
-                    events.Repeat(60s);
-                    break;
-                }
-                case EVENT_MINIBOSS_SPAWN_HELPERS:
-                {
-                    Talk(WHISPER_HATCH_EGGS);
-                    for (uint8 i = 0; i < MAX_TENEBORN_EGGS_SUMMONS; ++i)
-                    {
-                        if (Creature* egg = me->SummonCreature(NPC_TWILIGHT_EGG, TenebronEggsPos[isCalledBySartharion ? 1 : 0][i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-                        {
-                            summons.Summon(egg);
-                            if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
-                            {
-                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-                                {
-                                    sartharion->AI()->JustSummoned(egg);
-                                }
-                            }
-                            egg->SetPhaseMask(16, true);
-                        }
-                    }
-
-                    events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25s);
-                    break;
-                }
-                case EVENT_MINIBOSS_HATCH_EGGS:
-                {
-                    summons.RemoveNotExisting();
-                    summons.DespawnEntry(NPC_TWILIGHT_WHELP);
-                    for (ObjectGuid const& summonGuid : summons)
-                    {
-                        Creature const* summon = ObjectAccessor::GetCreature(*me, summonGuid);
-                        if (!summon || !summon->IsAlive() || summon->GetEntry() != NPC_TWILIGHT_EGG)
-                        {
-                            continue;
-                        }
-
-                        if (Creature* whelp = me->SummonCreature(NPC_TWILIGHT_WHELP, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
-                        {
-                            summons2.Summon(whelp);
-                            if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
-                            {
-                                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-                                {
-                                    sartharion->AI()->JustSummoned(whelp);
-                                }
-                            }
-                        }
-                    }
-
-                    if (!isCalledBySartharion)
-                    {
-                        // Remove phase shift
-                        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
-                        RemoveTwilightPortal();
-                    }
-                    else
-                    {
-                        instance->DoAction(ACTION_CLEAR_PORTAL);
-                    }
-
-                    EntryCheckPredicate pred(NPC_TWILIGHT_EGG);
-                    summons.DoAction(ACTION_SWITCH_PHASE, pred);
-                    break;
-                }
-            }
-        }
-
-        void ClearInstance() override
-        {
-            boss_sartharion_dragonAI::ClearInstance();
+    void JustDied(Unit* killer) override
+    {
+        if (!isCalledBySartharion)
             summons2.DespawnAll();
-        }
 
-    private:
-        SummonList summons2;
-    };
+        boss_sartharion_dragonAI::JustDied(killer);
+    }
+
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
+        {
+            case EVENT_MINIBOSS_SHADOW_BREATH:
+            {
+                if (!urand(0, 10))
+                    Talk(SAY_TENEBRON_BREATH);
+                DoCastVictim(SPELL_SHADOW_BREATH, false);
+                events.Repeat(17500ms);
+                break;
+            }
+            case EVENT_MINIBOSS_SHADOW_FISSURE:
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    DoCast(target, SPELL_SHADOW_FISSURE, false);
+                events.Repeat(22500ms);
+                break;
+            }
+            case EVENT_MINIBOSS_OPEN_PORTAL:
+            {
+                Talk(WHISPER_OPEN_PORTAL);
+                Talk(SAY_TENEBRON_SPECIAL);
+
+                if (!isCalledBySartharion)
+                {
+                    if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_TENEBRON].GetPositionX(), portalPos[DATA_TENEBRON].GetPositionY(), portalPos[DATA_TENEBRON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                        portalGUID = Portal->GetGUID();
+                }
+                else
+                    instance->DoAction(ACTION_ADD_PORTAL);
+
+                events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
+                events.Repeat(60s);
+                break;
+            }
+            case EVENT_MINIBOSS_SPAWN_HELPERS:
+            {
+                Talk(WHISPER_HATCH_EGGS);
+                for (uint8 i = 0; i < MAX_TENEBORN_EGGS_SUMMONS; ++i)
+                {
+                    if (Creature* egg = me->SummonCreature(NPC_TWILIGHT_EGG, TenebronEggsPos[isCalledBySartharion ? 1 : 0][i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                    {
+                        summons.Summon(egg);
+                        if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
+                        {
+                            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
+                                sartharion->AI()->JustSummoned(egg);
+                        }
+                        egg->SetPhaseMask(16, true);
+                    }
+                }
+
+                events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25s);
+                break;
+            }
+            case EVENT_MINIBOSS_HATCH_EGGS:
+            {
+                summons.RemoveNotExisting();
+                summons.DespawnEntry(NPC_TWILIGHT_WHELP);
+                for (ObjectGuid const& summonGuid : summons)
+                {
+                    Creature const* summon = ObjectAccessor::GetCreature(*me, summonGuid);
+                    if (!summon || !summon->IsAlive() || summon->GetEntry() != NPC_TWILIGHT_EGG)
+                        continue;
+
+                    if (Creature* whelp = me->SummonCreature(NPC_TWILIGHT_WHELP, summon->GetPosition(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
+                    {
+                        summons2.Summon(whelp);
+                        if (isCalledBySartharion && instance->GetBossState(DATA_SARTHARION) == IN_PROGRESS)
+                        {
+                            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
+                                sartharion->AI()->JustSummoned(whelp);
+                        }
+                    }
+                }
+
+                if (!isCalledBySartharion)
+                {
+                    // Remove phase shift
+                    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_SHIFT);
+                    RemoveTwilightPortal();
+                }
+                else
+                    instance->DoAction(ACTION_CLEAR_PORTAL);
+
+                EntryCheckPredicate pred(NPC_TWILIGHT_EGG);
+                summons.DoAction(ACTION_SWITCH_PHASE, pred);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    void ClearInstance() override
+    {
+        boss_sartharion_dragonAI::ClearInstance();
+        summons2.DespawnAll();
+    }
+
+private:
+    SummonList summons2;
 };
 
 /////////////////////////////
 // SHADRON
 /////////////////////////////
 
-class boss_sartharion_shadron : public CreatureScript
+struct boss_sartharion_shadron : public boss_sartharion_dragonAI
 {
-public:
-    boss_sartharion_shadron() : CreatureScript("boss_sartharion_shadron") { }
+    explicit boss_sartharion_shadron(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_SHADRON) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void Reset() override
     {
-        return GetObsidianSanctumAI<boss_sartharion_shadronAI>(pCreature);
+        boss_sartharion_dragonAI::Reset();
+        events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
+        events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
+        events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
     }
 
-    struct boss_sartharion_shadronAI : public boss_sartharion_dragonAI
+    void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
     {
-        boss_sartharion_shadronAI(Creature* pCreature) : boss_sartharion_dragonAI(pCreature, DATA_SHADRON)
+        if (isCalledBySartharion)
         {
+            // Acolytes are dead
+            if (!summons.HasEntry(NPC_ACOLYTE_OF_SHADRON))
+                instance->DoAction(ACTION_CLEAR_PORTAL);
+
+            if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
+                sartharion->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGHT_FIRE);
+        }
+        else
+        {
+            ClearInstance();
+            me->RemoveAura(SPELL_GIFT_OF_TWILIGHT_SHADOW);
         }
 
-        void Reset() override
-        {
-            boss_sartharion_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
-        }
+        events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
+    }
 
-        void SummonedCreatureDies(Creature* /*summon*/, Unit* /*summon*/) override
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
         {
-            if (isCalledBySartharion)
+            case EVENT_MINIBOSS_SHADOW_BREATH:
             {
-                // Acolytes are dead
-                if (!summons.HasEntry(NPC_ACOLYTE_OF_SHADRON))
-                {
-                    instance->DoAction(ACTION_CLEAR_PORTAL);
-                }
+                if (!urand(0, 10))
+                    Talk(SAY_SHADRON_BREATH);
 
-                if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
-                {
-                    sartharion->RemoveAurasDueToSpell(SPELL_GIFT_OF_TWILIGHT_FIRE);
-                }
+                DoCastVictim(SPELL_SHADOW_BREATH, false);
+                events.Repeat(17500ms);
+                break;
             }
-            else
+            case EVENT_MINIBOSS_SHADOW_FISSURE:
             {
-                ClearInstance();
-                me->RemoveAura(SPELL_GIFT_OF_TWILIGHT_SHADOW);
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    DoCast(target, SPELL_SHADOW_FISSURE, false);
+                events.Repeat(22500ms);
+                break;
             }
-
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
-        }
-
-        void HandleExtraEvent(uint32 const eventId) override
-        {
-            if (eventId == EVENT_MINIDRAKE_SPEECH)
+            case EVENT_MINIBOSS_OPEN_PORTAL:
             {
-                Talk(SAY_SHADRON_RESPOND);
-                me->SetCanFly(true);
-                me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
-            }
-        }
+                Talk(WHISPER_OPEN_PORTAL);
+                Talk(SAY_SHADRON_SPECIAL);
+                if (!isCalledBySartharion)
+                {
+                    if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_SHADRON].GetPositionX(), portalPos[DATA_SHADRON].GetPositionY(), portalPos[DATA_SHADRON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                        portalGUID = Portal->GetGUID();
+                }
+                else
+                    instance->DoAction(ACTION_ADD_PORTAL);
 
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
+                events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
+                break;
+            }
+            case EVENT_MINIBOSS_SPAWN_HELPERS:
             {
-                case EVENT_MINIBOSS_SHADOW_BREATH:
-                {
-                    if (!urand(0, 10))
-                    {
-                        Talk(SAY_SHADRON_BREATH);
-                    }
+                Talk(WHISPER_SUMMON_DICIPLE);
+                DoCastAOE(static_cast<uint32>((isCalledBySartharion ? SPELL_GIFT_OF_TWILIGHT_FIRE : SPELL_GIFT_OF_TWILIGHT_SHADOW)), true);
 
-                    DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.Repeat(17500ms);
-                    break;
-                }
-                case EVENT_MINIBOSS_SHADOW_FISSURE:
+                if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
-                        DoCast(target, SPELL_SHADOW_FISSURE, false);
-                    }
-                    events.Repeat(22500ms);
-                    break;
+                    /// @todo: inspect JustSummoned
+                    summons.Summon(acolyte);
+                    acolyte->SetPhaseMask(16, true);
                 }
-                case EVENT_MINIBOSS_OPEN_PORTAL:
-                {
-                    Talk(WHISPER_OPEN_PORTAL);
-                    Talk(SAY_SHADRON_SPECIAL);
-                    if (!isCalledBySartharion)
-                    {
-                        if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_SHADRON].GetPositionX(), portalPos[DATA_SHADRON].GetPositionY(), portalPos[DATA_SHADRON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                        {
-                            portalGUID = Portal->GetGUID();
-                        }
-                    }
-                    else
-                    {
-                        instance->DoAction(ACTION_ADD_PORTAL);
-                    }
 
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
-                    break;
-                }
-                case EVENT_MINIBOSS_SPAWN_HELPERS:
-                {
-                    Talk(WHISPER_SUMMON_DICIPLE);
-                    DoCastAOE(static_cast<uint32>((isCalledBySartharion ? SPELL_GIFT_OF_TWILIGHT_FIRE : SPELL_GIFT_OF_TWILIGHT_SHADOW)), true);
-
-                    if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
-                    {
-                        /// @todo: inpect JustSummoned
-                        summons.Summon(acolyte);
-                        acolyte->SetPhaseMask(16, true);
-                    }
-
-                    break;
-                }
+                break;
             }
+            default:
+                break;
         }
-    };
+    }
 };
 
 /////////////////////////////
 // VESPERON
 /////////////////////////////
 
-class boss_sartharion_vesperon : public CreatureScript
+struct boss_sartharion_vesperon : public boss_sartharion_dragonAI
 {
-public:
-    boss_sartharion_vesperon() : CreatureScript("boss_sartharion_vesperon") { }
+    explicit boss_sartharion_vesperon(Creature* creature) : boss_sartharion_dragonAI(creature, DATA_VESPERON) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void Reset() override
     {
-        return GetObsidianSanctumAI<boss_sartharion_vesperonAI>(pCreature);
+        boss_sartharion_dragonAI::Reset();
+        events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
+        events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
+        events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
     }
 
-    struct boss_sartharion_vesperonAI : public boss_sartharion_dragonAI
+    void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
     {
-        boss_sartharion_vesperonAI(Creature* pCreature) : boss_sartharion_dragonAI(pCreature, DATA_VESPERON)
+        if (!isCalledBySartharion)
+            ClearInstance();
+        else
         {
-        }
-
-        void Reset() override
-        {
-            boss_sartharion_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
-        }
-
-        void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
-        {
-            if (!isCalledBySartharion)
-            {
-                ClearInstance();
-            }
-            else
-            {
-                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
-                instance->DoAction(ACTION_CLEAR_PORTAL);
-            }
-
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
-        }
-
-        void HandleExtraEvent(uint32 const eventId) override
-        {
-            if (eventId == EVENT_MINIDRAKE_SPEECH)
-            {
-                Talk(SAY_SHADRON_RESPOND);
-                me->SetCanFly(true);
-                me->SetSpeed(MOVE_FLIGHT, 3.0f);
-                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
-            }
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
-            {
-                case EVENT_MINIBOSS_SHADOW_BREATH:
-                {
-                    if (!urand(0, 10))
-                    {
-                        Talk(SAY_SHADRON_BREATH);
-                    }
-
-                    DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.Repeat(17s + 500ms);
-                    break;
-                }
-                case EVENT_MINIBOSS_SHADOW_FISSURE:
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
-                        DoCast(target, SPELL_SHADOW_FISSURE, false);
-                    }
-
-                    events.Repeat(22s + 500ms);
-                    break;
-                }
-                case EVENT_MINIBOSS_OPEN_PORTAL:
-                {
-                    Talk(WHISPER_OPEN_PORTAL);
-                    Talk(SAY_VESPERON_SPECIAL);
-                    if (!isCalledBySartharion)
-                    {
-                        if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_VESPERON].GetPositionX(), portalPos[DATA_VESPERON].GetPositionY(), portalPos[DATA_VESPERON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                        {
-                            portalGUID = Portal->GetGUID();
-                        }
-                    }
-                    else
-                    {
-                        instance->DoAction(ACTION_ADD_PORTAL);
-                    }
-
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
-                    break;
-                }
-                case EVENT_MINIBOSS_SPAWN_HELPERS:
-                {
-                    Talk(WHISPER_SUMMON_DICIPLE);
-                    DoCastSelf(isCalledBySartharion ? static_cast<uint32>(SPELL_TWILIGHT_TORMENT_SARTHARION) : static_cast<uint32>(SPELL_TWILIGHT_TORMENT_VESPERON), true);
-                    if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_VESPERON : NPC_DISCIPLE_OF_VESPERON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
-                    {
-                        summons.Summon(acolyte);
-                        acolyte->SetPhaseMask(16, true);
-                    }
-
-                    break;
-                }
-            }
-        }
-
-    private:
-        void ClearInstance() override
-        {
-            boss_sartharion_dragonAI::ClearInstance();
-
-            // Remove phase shift
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_VESPERON);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
+            instance->DoAction(ACTION_CLEAR_PORTAL);
         }
-    };
+
+        events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
+    }
+
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
+        {
+            case EVENT_MINIBOSS_SHADOW_BREATH:
+            {
+                if (!urand(0, 10))
+                    Talk(SAY_SHADRON_BREATH);
+
+                DoCastVictim(SPELL_SHADOW_BREATH, false);
+                events.Repeat(17s + 500ms);
+                break;
+            }
+            case EVENT_MINIBOSS_SHADOW_FISSURE:
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+                    DoCast(target, SPELL_SHADOW_FISSURE, false);
+
+                events.Repeat(22s + 500ms);
+                break;
+            }
+            case EVENT_MINIBOSS_OPEN_PORTAL:
+            {
+                Talk(WHISPER_OPEN_PORTAL);
+                Talk(SAY_VESPERON_SPECIAL);
+                if (!isCalledBySartharion)
+                {
+                    if (GameObject* Portal = me->GetVictim()->SummonGameObject(GO_TWILIGHT_PORTAL, portalPos[DATA_VESPERON].GetPositionX(), portalPos[DATA_VESPERON].GetPositionY(), portalPos[DATA_VESPERON].GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+                        portalGUID = Portal->GetGUID();
+                }
+                else
+                    instance->DoAction(ACTION_ADD_PORTAL);
+
+                events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
+                break;
+            }
+            case EVENT_MINIBOSS_SPAWN_HELPERS:
+            {
+                Talk(WHISPER_SUMMON_DICIPLE);
+                DoCastSelf(isCalledBySartharion ? static_cast<uint32>(SPELL_TWILIGHT_TORMENT_SARTHARION) : static_cast<uint32>(SPELL_TWILIGHT_TORMENT_VESPERON), true);
+                if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_VESPERON : NPC_DISCIPLE_OF_VESPERON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
+                {
+                    summons.Summon(acolyte);
+                    acolyte->SetPhaseMask(16, true);
+                }
+
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+private:
+    void ClearInstance() override
+    {
+        boss_sartharion_dragonAI::ClearInstance();
+
+        // Remove phase shift
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_VESPERON);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
+    }
 };
 
 // other
-class npc_twilight_summon : public CreatureScript
+struct npc_twilight_summon : public ScriptedAI
 {
-public:
-    npc_twilight_summon() : CreatureScript("npc_twilight_summon") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetObsidianSanctumAI<npc_twilight_summonAI>(pCreature);
+    explicit npc_twilight_summon(Creature* creature) : ScriptedAI(creature), fadeArmorTimer(urand(0, 15000)) {
     }
 
-    struct npc_twilight_summonAI : public ScriptedAI
+    void Reset() override
     {
-        npc_twilight_summonAI(Creature* pCreature) : ScriptedAI(pCreature),
-            fadeArmorTimer(urand(0, 15000))
-        {
-        }
+        fadeArmorTimer = urand(0, 15000);
+        if (me->GetEntry() == NPC_TWILIGHT_EGG)
+            me->SetControlled(true, UNIT_STATE_STUNNED);
+        else
+            me->SetInCombatWithZone();
+    }
 
-        void Reset() override
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_SWITCH_PHASE)
+            me->DespawnOrUnsummon(1ms);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim() || me->GetEntry() == NPC_TWILIGHT_EGG)
+            return;
+
+        fadeArmorTimer += diff;
+        if (fadeArmorTimer >= 15000)
         {
-            fadeArmorTimer = urand(0, 15000);
-            if (me->GetEntry() == NPC_TWILIGHT_EGG)
-            {
-                me->SetControlled(true, UNIT_STATE_STUNNED);
-            }
+            if (Aura* aur = me->GetVictim()->GetAura(SPELL_FADE_ARMOR))
+                aur->ModStackAmount(1);
             else
-            {
-                me->SetInCombatWithZone();
-            }
+                DoCastVictim(SPELL_FADE_ARMOR, false);
+
+            fadeArmorTimer = 0;
         }
 
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_SWITCH_PHASE)
-            {
-                me->DespawnOrUnsummon(1ms);
-            }
-        }
+        DoMeleeAttackIfReady();
+    }
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim() || me->GetEntry() == NPC_TWILIGHT_EGG)
-            {
-                return;
-            }
-
-            fadeArmorTimer += diff;
-            if (fadeArmorTimer >= 15000)
-            {
-                if (Aura* aur = me->GetVictim()->GetAura(SPELL_FADE_ARMOR))
-                {
-                    aur->ModStackAmount(1);
-                }
-                else
-                {
-                    DoCastVictim(SPELL_FADE_ARMOR, false);
-                }
-
-                fadeArmorTimer = 0;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        uint32 fadeArmorTimer;
-    };
+private:
+    uint32 fadeArmorTimer;
 };
 
 class spell_sartharion_lava_strike : public SpellScript
@@ -1549,9 +1378,7 @@ class spell_sartharion_lava_strike : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (!GetCaster() || !GetHitUnit())
-        {
             return;
-        }
 
         GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ(), SPELL_LAVA_STRIKE_DUMMY_TRIGGER, true);
     }
@@ -1559,9 +1386,7 @@ class spell_sartharion_lava_strike : public SpellScript
     void HandleSchoolDamage(SpellEffIndex /*effIndex*/)
     {
         if (!GetCaster() || !GetHitUnit() || _spawned)
-        {
             return;
-        }
 
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
         {
@@ -1577,17 +1402,13 @@ class spell_sartharion_lava_strike : public SpellScript
     void Register() override
     {
         if (m_scriptSpellId == SPELL_LAVA_STRIKE_DUMMY)
-        {
             OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
         else
-        {
             OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
     }
 
 private:
-    bool _spawned;
+    bool _spawned{false};
 };
 
 // 57491 - Flame Tsunami
@@ -1637,11 +1458,11 @@ class spell_obsidian_sanctum_flame_tsunami_leap : public SpellScript
 
 void AddSC_boss_sartharion()
 {
-    new boss_sartharion();
-    new boss_sartharion_shadron();
-    new boss_sartharion_tenebron();
-    new boss_sartharion_vesperon();
-    new npc_twilight_summon();
+    RegisterObsidianSanctumCreatureAI(boss_sartharion);
+    RegisterObsidianSanctumCreatureAI(boss_sartharion_shadron);
+    RegisterObsidianSanctumCreatureAI(boss_sartharion_tenebron);
+    RegisterObsidianSanctumCreatureAI(boss_sartharion_vesperon);
+    RegisterObsidianSanctumCreatureAI(npc_twilight_summon);
     RegisterSpellScript(spell_sartharion_lava_strike);
     RegisterSpellScript(spell_obsidian_sanctum_flame_tsunami);
     RegisterSpellScript(spell_obsidian_sanctum_flame_tsunami_leap);

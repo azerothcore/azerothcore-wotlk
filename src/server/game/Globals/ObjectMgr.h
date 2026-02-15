@@ -507,6 +507,7 @@ typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
 typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContainer;
 typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
+typedef std::map<TempSummonGroupKey, std::vector<GameObjectSummonData> > GameObjectSummonDataContainer;
 typedef std::unordered_map<uint32, CreatureLocale> CreatureLocaleContainer;
 typedef std::unordered_map<uint32, GameObjectLocale> GameObjectLocaleContainer;
 typedef std::unordered_map<uint32, ItemLocale> ItemLocaleContainer;
@@ -1036,6 +1037,7 @@ public:
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();
     void LoadTempSummons();
+    void LoadGameObjectSummons();
     void LoadCreatures();
     void LoadCreatureSparring();
     void LoadLinkedRespawn();
@@ -1208,6 +1210,15 @@ public:
         return nullptr;
     }
 
+    [[nodiscard]] std::vector<GameObjectSummonData> const* GetGameObjectSummonGroup(uint32 summonerId, SummonerType summonerType, uint8 group) const
+    {
+        GameObjectSummonDataContainer::const_iterator itr = _goSummonDataStore.find(TempSummonGroupKey(summonerId, summonerType, group));
+        if (itr != _goSummonDataStore.end())
+            return &itr->second;
+
+        return nullptr;
+    }
+
     [[nodiscard]] BroadcastText const* GetBroadcastText(uint32 id) const
     {
         BroadcastTextContainer::const_iterator itr = _broadcastTextStore.find(id);
@@ -1226,6 +1237,21 @@ public:
     [[nodiscard]] CreatureSparringContainer const& GetSparringData() const { return _creatureSparringStore; }
 
     CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
+    /**
+     * @brief Loads a single creature spawn entry from the database into the data store cache.
+     *
+     * This is needed as a prerequisite for Creature::LoadCreatureFromDB(), which reads
+     * from the in-memory cache (via GetCreatureData()) rather than querying the DB itself.
+     * For spawns not loaded during server startup, this method populates the cache so that
+     * Creature::LoadCreatureFromDB() can then create the live entity.
+     *
+     * Returns the cached data if already loaded, or nullptr if the spawn doesn't exist
+     * or fails validation.
+     *
+     * @param spawnId The creature spawn GUID to load.
+     * @return Pointer to the cached CreatureData, or nullptr on failure.
+     */
+    CreatureData const* LoadCreatureDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteCreatureData(ObjectGuid::LowType spawnId);
     [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
     {
@@ -1311,6 +1337,21 @@ public:
     [[nodiscard]] QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
+    /**
+     * @brief Loads a single gameobject spawn entry from the database into the data store cache.
+     *
+     * This is needed as a prerequisite for GameObject::LoadGameObjectFromDB(), which reads
+     * from the in-memory cache (via GetGameObjectData()) rather than querying the DB itself.
+     * For spawns not loaded during server startup, this method populates the cache so that
+     * GameObject::LoadGameObjectFromDB() can then create the live entity.
+     *
+     * Returns the cached data if already loaded, or nullptr if the spawn doesn't exist
+     * or fails validation.
+     *
+     * @param spawnId The gameobject spawn GUID to load.
+     * @return Pointer to the cached GameObjectData, or nullptr on failure.
+     */
+    GameObjectData const* LoadGameObjectDataFromDB(ObjectGuid::LowType spawnId);
     void DeleteGOData(ObjectGuid::LowType guid);
 
     [[nodiscard]] ModuleString const* GetModuleString(std::string module, uint32 id) const
@@ -1387,9 +1428,9 @@ public:
         return &iter->second;
     }
 
-    void AddVendorItem(uint32 entry, uint32 item, int32 maxcount, uint32 incrtime, uint32 extendedCost, bool persist = true); // for event
+    void AddVendorItem(uint32 entry, uint32 item, uint32 maxcount, uint32 incrtime, uint32 extendedCost, bool persist = true); // for event
     bool RemoveVendorItem(uint32 entry, uint32 item, bool persist = true); // for event
-    bool IsVendorItemValid(uint32 vendor_entry, uint32 item, int32 maxcount, uint32 ptime, uint32 ExtendedCost, Player* player = nullptr, std::set<uint32>* skip_vendors = nullptr, uint32 ORnpcflag = 0) const;
+    bool IsVendorItemValid(uint32 vendor_entry, uint32 item, uint32 maxcount, uint32 ptime, uint32 ExtendedCost, Player* player = nullptr, std::set<uint32>* skip_vendors = nullptr, uint32 ORnpcflag = 0) const;
 
     void LoadScriptNames();
     ScriptNameContainer& GetScriptNames() { return _scriptNamesStore; }
@@ -1605,6 +1646,8 @@ private:
     GameObjectTemplateAddonContainer _gameObjectTemplateAddonStore;
     /// Stores temp summon data grouped by summoner's entry, summoner's type and group id
     TempSummonDataContainer _tempSummonDataStore;
+    /// Stores gameobject summon data grouped by summoner's entry, summoner's type and group id
+    GameObjectSummonDataContainer _goSummonDataStore;
 
     BroadcastTextContainer _broadcastTextStore;
     ItemTemplateContainer _itemTemplateStore;
