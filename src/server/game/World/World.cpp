@@ -1775,6 +1775,8 @@ void World::ResetGuildCap()
 
     _nextGuildReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
     sWorldState->setWorldState(WORLD_STATE_CUSTOM_GUILD_DAILY_RESET_TIME, _nextGuildReset.count());
+
+    sGuildMgr->ResetTimes();
 }
 
 void World::CleanupOldLfgActivities()
@@ -1787,8 +1789,6 @@ void World::CleanupOldLfgActivities()
     // Run cleanup daily at 6 AM (same time as guild reset)
     _nextLfgActivitiesCleanup = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
     sLFGMgr->CleanupOldLfgActivities();
-
-    sGuildMgr->ResetTimes();
 }
 
 void World::LoadDBVersion()
