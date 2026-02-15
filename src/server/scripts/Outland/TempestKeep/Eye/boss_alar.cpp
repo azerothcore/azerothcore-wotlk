@@ -172,7 +172,7 @@ struct boss_alar : public BossAI
     {
         if (why == EVADE_REASON_BOUNDARY)
             BossAI::EnterEvadeMode(why);
-        else if (me->GetThreatMgr().GetThreatList().empty())
+        else if (me->GetThreatMgr().IsThreatListEmpty())
             BossAI::EnterEvadeMode(why);
     }
 

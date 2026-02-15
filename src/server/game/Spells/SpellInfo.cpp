@@ -914,6 +914,12 @@ bool SpellInfo::HasAreaAuraEffect() const
     return false;
 }
 
+bool SpellInfo::HasInitialAggro() const
+{
+    return !(HasAttribute(SPELL_ATTR1_NO_THREAT) ||
+             HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
+}
+
 bool SpellInfo::IsExplicitDiscovery() const
 {
     return ((Effects[0].Effect == SPELL_EFFECT_CREATE_RANDOM_ITEM

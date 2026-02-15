@@ -301,13 +301,13 @@ public:
             if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
             {
                 // reset threat
-                ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
-                for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
                 {
-                    Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->getUnitGuid());
-
-                    if (unit && DoGetThreat(unit))
-                        DoModifyThreatByPercent(unit, -100);
+                    if (Unit* unit = ref->GetVictim())
+                    {
+                        if (DoGetThreat(unit))
+                            DoModifyThreatByPercent(unit, -100);
+                    }
                 }
 
                 Talk(SAY_PHASE_2);

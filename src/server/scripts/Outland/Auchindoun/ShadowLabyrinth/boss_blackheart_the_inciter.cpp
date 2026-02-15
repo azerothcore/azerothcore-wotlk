@@ -85,15 +85,16 @@ struct boss_blackheart_the_inciter : public BossAI
             DoCastAOE(SPELL_INCITE_CHAOS);
             DoCastSelf(SPELL_LAUGHTER, true);
             uint32 inciteTriggerID = NPC_INCITE_TRIGGER;
-            std::list<HostileReference*> t_list = me->GetThreatMgr().GetThreatList();
-            for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+            for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
             {
-                Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                if (target && target->IsPlayer())
+                if (Unit* target = ref->GetVictim())
                 {
-                    if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
+                    if (target->IsPlayer())
                     {
-                        inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                        if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
+                        {
+                            inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                        }
                     }
                 }
             }

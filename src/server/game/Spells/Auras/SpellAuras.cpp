@@ -363,6 +363,22 @@ Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* 
     // m_casterLevel = cast item level/caster level, caster level should be saved to db, confirmed with sniffs
 }
 
+#ifdef AC_BUILD_TESTING
+Aura::Aura(SpellInfo const* spellproto, ObjectGuid casterGUID,
+           WorldObject* owner, bool)
+    : m_spellInfo(spellproto), m_casterGuid(casterGUID)
+    , m_castItemGuid(ObjectGuid::Empty), m_castItemEntry(0), m_applyTime(0)
+    , m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0)
+    , m_casterLevel(0), m_procCharges(0), m_stackAmount(1)
+    , m_isRemoved(false), m_isSingleTarget(false), m_isUsingCharges(false)
+    , m_triggeredByAuraSpellInfo(nullptr)
+{
+    m_maxDuration = 0;
+    m_duration = 0;
+    memset(m_effects, 0, sizeof(m_effects));
+}
+#endif
+
 AuraScript* Aura::GetScriptByName(std::string const& scriptName) const
 {
     for (std::list<AuraScript*>::const_iterator itr = m_loadedScripts.begin(); itr != m_loadedScripts.end(); ++itr)

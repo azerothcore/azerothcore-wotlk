@@ -80,14 +80,14 @@ public:
         {
             if (me->GetThreatMgr().GetThreatListSize() > 1)
             {
-                ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-                --lastRef;
-                if (Unit* lastTarget = (*lastRef)->getTarget())
+                // Check if target is the lowest threat (last in sorted list)
+                ThreatReference const* lowestRef = nullptr;
+                for (ThreatReference const* ref : me->GetThreatMgr().GetSortedThreatList())
+                    lowestRef = ref; // Last iteration will have the lowest threat target
+
+                if (lowestRef && lowestRef->GetVictim() != target)
                 {
-                    if (lastTarget != target)
-                    {
-                        return !target->HasAura(SPELL_GOUGE);
-                    }
+                    return !target->HasAura(SPELL_GOUGE);
                 }
             }
 
@@ -161,10 +161,9 @@ public:
                         if (_thousandBladesTargets.empty())
                         {
                             std::vector<Unit*> targetList;
-                            ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
-                            for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                            for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
                             {
-                                if (Unit* target = (*itr)->getTarget())
+                                if (Unit* target = ref->GetVictim())
                                 {
                                     if (target->IsAlive() && target->IsWithinDist2d(me, 100.f))
                                     {

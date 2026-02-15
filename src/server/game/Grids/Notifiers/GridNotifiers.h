@@ -1155,12 +1155,9 @@ namespace Acore
             if (!u->IsWithinLOSInMap(i_enemy))
                 return;
 
-            if (u->AI())
-            {
-                u->SetNoCallForHelp(true); // avoid recursive call for help causing stack overflow
-                u->AI()->AttackStart(i_enemy);
-                u->SetNoCallForHelp(false);
-            }
+            u->SetNoCallForHelp(true); // avoid recursive call for help causing stack overflow
+            u->EngageWithTarget(i_enemy);
+            u->SetNoCallForHelp(false);
         }
     private:
         Unit* const i_funit;

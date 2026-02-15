@@ -338,6 +338,14 @@ public:
     void HandleProcTriggerDamageAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleRaidProcFromChargeAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleRaidProcFromChargeWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+
+#ifdef AC_BUILD_TESTING
+public:
+    // Test-only constructor - skips spell calculations
+    AuraEffect(Aura* base, uint8 effIndex, int32 amount, bool /*testTag*/);
+    // Expose destructor for test cleanup
+    void TestDestroy() { delete this; }
+#endif
 };
 
 namespace Acore

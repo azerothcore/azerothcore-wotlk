@@ -138,7 +138,7 @@ public:
                     me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(SAY_EADRIC_DEFEATED);
-                    me->GetThreatMgr().clearReferences();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -281,7 +281,7 @@ public:
                     me->SetFaction(FACTION_FRIENDLY);
                     events.Reset();
                     Talk(SAY_PALETRESS_DEFEATED);
-                    me->GetThreatMgr().clearReferences();
+                    me->GetThreatMgr().ClearAllThreat();
                     me->SetRegeneratingHealth(false);
                     _EnterEvadeMode();
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);

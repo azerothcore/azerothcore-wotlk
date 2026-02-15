@@ -56,6 +56,10 @@ target_link_libraries(game
   PUBLIC
     game-interface)
 
+if (BUILD_TESTING)
+  target_compile_definitions(game PUBLIC AC_BUILD_TESTING=1)
+endif()
+
 set_target_properties(game
   PROPERTIES
     FOLDER

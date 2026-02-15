@@ -143,7 +143,6 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
         void OnCharmed(bool apply) override

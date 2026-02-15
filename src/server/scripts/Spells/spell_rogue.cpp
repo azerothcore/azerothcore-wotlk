@@ -41,6 +41,7 @@ enum RogueSpells
     SPELL_ROGUE_KILLING_SPREE_DMG_BUFF          = 61851,
     SPELL_ROGUE_PREY_ON_THE_WEAK                = 58670,
     SPELL_ROGUE_SHIV_TRIGGERED                  = 5940,
+    SPELL_ROGUE_TRICKS_OF_THE_TRADE             = 57934,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_DMG_BOOST   = 57933,
     SPELL_ROGUE_TRICKS_OF_THE_TRADE_PROC        = 59628,
 };
@@ -615,13 +616,15 @@ class spell_rog_tricks_of_the_trade : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
-            GetTarget()->ResetRedirectThreat();
+            GetTarget()->GetThreatMgr().UnregisterRedirectThreat(SPELL_ROGUE_TRICKS_OF_THE_TRADE);
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        _redirectTarget = GetTarget()->GetRedirectThreatTarget();
-        return _redirectTarget;
+        // TODO: After QAston proc system merge, store redirect target GUID on the
+        // aura script via SetRedirectTarget() from SpellScript instead of querying ThreatManager.
+        _redirectTarget = GetTarget()->GetThreatMgr().GetAnyRedirectTarget();
+        return _redirectTarget != nullptr;
     }
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
@@ -652,7 +655,7 @@ class spell_rog_tricks_of_the_trade_proc : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->ResetRedirectThreat();
+        GetTarget()->GetThreatMgr().UnregisterRedirectThreat(SPELL_ROGUE_TRICKS_OF_THE_TRADE);
     }
 
     void Register() override
