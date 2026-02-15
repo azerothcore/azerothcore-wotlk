@@ -97,7 +97,7 @@ enum Misc
 
 struct boss_auriaya : public BossAI
 {
-    boss_auriaya(Creature* creature) : BossAI(creature, TYPE_AURIAYA) { }
+    boss_auriaya(Creature* creature) : BossAI(creature, BOSS_AURIAYA) { }
 
     bool _feralDied{false};
     bool _nineLives{false};
@@ -230,8 +230,8 @@ struct npc_auriaya_sanctum_sentry : public ScriptedAI
 
     void JustEngagedWith(Unit*) override
     {
-        if (me->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_AURIAYA)))
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* cr = instance->GetCreature(BOSS_AURIAYA))
                 cr->SetInCombatWithZone();
 
         events.ScheduleEvent(EVENT_SAVAGE_POUNCE, 5s);
@@ -241,7 +241,7 @@ struct npc_auriaya_sanctum_sentry : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        me->CastSpell(me, SPELL_STRENGTH_OF_THE_PACK, true);
+        DoCastSelf(SPELL_STRENGTH_OF_THE_PACK, true);
     }
 
     void UpdateAI(uint32 diff) override
@@ -303,8 +303,8 @@ struct npc_auriaya_feral_defender : public ScriptedAI
 
     void JustDied(Unit*) override
     {
-        if (me->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_AURIAYA)))
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* cr = instance->GetCreature(BOSS_AURIAYA))
                 cr->AI()->DoAction(_feralEssenceStack ? ACTION_FERAL_DEATH_WITH_STACK : ACTION_FERAL_DEATH);
 
         if (_feralEssenceStack)
@@ -357,11 +357,11 @@ struct npc_auriaya_feral_defender : public ScriptedAI
                 DoResetThreatList();
                 if (!UpdateVictim())
                     return;
-                me->CastSpell(me->GetVictim(), SPELL_FERAL_RUSH, true);
+                DoCastVictim(SPELL_FERAL_RUSH, true);
                 events.Repeat(6s);
                 break;
             case EVENT_FERAL_POUNCE:
-                me->CastSpell(me->GetVictim(), SPELL_FERAL_POUNCE, false);
+                DoCastVictim(SPELL_FERAL_POUNCE);
                 events.Repeat(6s);
                 break;
         }
@@ -394,8 +394,8 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_AURIAYA)))
-                    return cr->AI()->GetData(DATA_CRAZY_CAT);
+                if (Creature* auriaya = instance->GetCreature(BOSS_AURIAYA))
+                    return auriaya->AI()->GetData(DATA_CRAZY_CAT);
 
         return false;
     }
@@ -410,7 +410,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_AURIAYA)))
+                if (Creature* cr = instance->GetCreature(BOSS_AURIAYA))
                     return cr->AI()->GetData(DATA_NINE_LIVES);
 
         return false;

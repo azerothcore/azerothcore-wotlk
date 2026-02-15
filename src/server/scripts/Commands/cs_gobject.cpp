@@ -15,17 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CellImpl.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
 #include "Transport.h"
+#include <unordered_set>
 
 using namespace Acore::ChatCommands;
 
@@ -497,6 +501,37 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
+        // Grid search - finds all game objects including temporary spawns
+        std::list<GameObject*> gameobjects;
+        Acore::GameObjectInRangeCheck check(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), distance);
+        Acore::GameObjectListSearcher<Acore::GameObjectInRangeCheck> searcher(player, gameobjects, check);
+        Cell::VisitObjects(player, searcher, distance);
+
+        std::unordered_set<ObjectGuid::LowType> gridSpawnIds;
+
+        for (GameObject* go : gameobjects)
+        {
+            GameObjectTemplate const* gameObjectInfo = sObjectMgr->GetGameObjectTemplate(go->GetEntry());
+            if (!gameObjectInfo)
+                continue;
+
+            handler->PSendSysMessage(LANG_GO_LIST_CHAT, go->GetSpawnId(), go->GetEntry(),
+                go->GetSpawnId(), gameObjectInfo->name,
+                go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(),
+                go->GetMapId(), "", "");
+
+            if (go->GetSpawnId())
+                gridSpawnIds.insert(go->GetSpawnId());
+            ++count;
+        }
+
+        if (count > 0 && distance <= SIZE_OF_GRIDS)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_NEAROBJMESSAGE, distance, count);
+            return true;
+        }
+
+        // Fallback to DB query
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_NEAREST);
         stmt->SetData(0, player->GetPositionX());
         stmt->SetData(1, player->GetPositionY());
@@ -515,6 +550,11 @@ public:
             {
                 Field* fields = result->Fetch();
                 ObjectGuid::LowType guid = fields[0].Get<uint32>();
+
+                // Skip entries already emitted via grid search
+                if (gridSpawnIds.count(guid))
+                    continue;
+
                 uint32 entry = fields[1].Get<uint32>();
                 float x = fields[2].Get<float>();
                 float y = fields[3].Get<float>();
