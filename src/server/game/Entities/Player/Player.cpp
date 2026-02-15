@@ -11993,7 +11993,17 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 {
     uint32 raceMask  = getRaceMask();
     uint32 classMask = getClassMask();
-    for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+
+    // Get all abilities for this skill and sort by MinSkillLineRank (lowest to highest)
+    auto abilities = GetSkillLineAbilitiesBySkillLine(skill_id);
+    std::vector<SkillLineAbilityEntry const*> sortedAbilities(abilities.begin(), abilities.end());
+    std::sort(sortedAbilities.begin(), sortedAbilities.end(),
+        [](SkillLineAbilityEntry const* a, SkillLineAbilityEntry const* b)
+        {
+            return a->MinSkillLineRank < b->MinSkillLineRank;
+        });
+
+    for (SkillLineAbilityEntry const* pAbility : sortedAbilities)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pAbility->Spell);
         if (!spellInfo)
@@ -12026,12 +12036,10 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
         // need learn
         else
         {
-            // Check if this spell is superseded by another spell in the same skill line that player qualifies for
-            bool skipCurrent = false;
-
-            // First check the SupercededBySpell field (handles forward references)
+            //used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
             if (pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pAbility->SupercededBySpell)
             {
+                bool skipCurrent = false;
                 auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
                 for (auto itr = bounds.first; itr != bounds.second; ++itr)
                 {
@@ -12041,31 +12049,19 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
                         break;
                     }
                 }
-            }
-
-            // Also check if ANY ability in the skill line supersedes THIS spell (handles out-of-order IDs)
-            if (!skipCurrent)
-            {
-                for (SkillLineAbilityEntry const* otherAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+                if (skipCurrent)
                 {
-                    if (otherAbility->SupercededBySpell == pAbility->Spell && skill_value >= otherAbility->MinSkillLineRank)
-                    {
-                        skipCurrent = true;
-                        break;
-                    }
+                    continue;
                 }
             }
 
-            if (!skipCurrent)
+            if (!IsInWorld())
             {
-                if (!IsInWorld())
-                {
-                    addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true);
-                }
-                else
-                {
-                    learnSpell(pAbility->Spell, true, true);
-                }
+                addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true);
+            }
+            else
+            {
+                learnSpell(pAbility->Spell, true, true);
             }
         }
     }
