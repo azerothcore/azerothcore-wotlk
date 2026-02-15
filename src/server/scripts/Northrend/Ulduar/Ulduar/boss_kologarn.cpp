@@ -318,7 +318,7 @@ struct boss_kologarnAI : public BossAI
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
-            if (!me->IsAlive() || instance->GetData(BOSS_KOLOGARN) != IN_PROGRESS)
+            if (!me->IsAlive() || instance->GetBossState(BOSS_KOLOGARN) != IN_PROGRESS)
                 return;
 
             if (!apply)
