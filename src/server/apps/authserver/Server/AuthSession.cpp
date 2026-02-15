@@ -162,7 +162,7 @@ void AccountInfo::LoadResult(Field* fields)
     Utf8ToUpperOnlyLatin(Login);
 }
 
-AuthSession::AuthSession(tcp::socket&& socket) :
+AuthSession::AuthSession(IoContextTcpSocket&& socket) :
     Socket(std::move(socket)), _status(STATUS_CHALLENGE), _build(0), _expversion(0) { }
 
 void AuthSession::Start()
@@ -216,7 +216,7 @@ void AuthSession::CheckIpCallback(PreparedQueryResult result)
     AsyncRead();
 }
 
-void AuthSession::ReadHandler()
+SocketReadCallbackResult AuthSession::ReadHandler()
 {
     MessageBuffer& packet = GetReadBuffer();
 
@@ -234,7 +234,7 @@ void AuthSession::ReadHandler()
         if (_status != itr->second.status)
         {
             CloseSocket();
-            return;
+            return SocketReadCallbackResult::Stop;
         }
 
         uint16 size = uint16(itr->second.packetSize);
@@ -248,7 +248,7 @@ void AuthSession::ReadHandler()
             if (size > MAX_ACCEPTED_CHALLENGE_SIZE)
             {
                 CloseSocket();
-                return;
+                return SocketReadCallbackResult::Stop;
             }
         }
 
@@ -258,13 +258,13 @@ void AuthSession::ReadHandler()
         if (!(*this.*itr->second.handler)())
         {
             CloseSocket();
-            return;
+            return SocketReadCallbackResult::Stop;
         }
 
         packet.ReadCompleted(size);
     }
 
-    AsyncRead();
+    return SocketReadCallbackResult::KeepReading;
 }
 
 void AuthSession::SendPacket(ByteBuffer& packet)

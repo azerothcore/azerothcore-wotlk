@@ -558,8 +558,10 @@ public:
         {
             uint32 dist = urand(38, 48);
             float o = rand_norm() * M_PI * 2;
-            float Zplus = (dist - 38) / 6.5f;
-            if (Creature* cr = me->SummonCreature(entry, me->GetPositionX() + dist * cos(o), me->GetPositionY() + dist * std::sin(o), 327.2 + Zplus, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
+            float spawnX = me->GetPositionX() + dist * cos(o);
+            float spawnY = me->GetPositionY() + dist * std::sin(o);
+            float spawnZ = me->GetMap()->GetHeight(me->GetPhaseMask(), spawnX, spawnY, 330.0f);
+            if (Creature* cr = me->SummonCreature(entry, spawnX, spawnY, spawnZ, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
             {
                 cr->CastSpell(cr, SPELL_TENTACLE_ERUPT, true);
                 cr->CastSpell(cr, SPELL_VOID_ZONE_SMALL, true);

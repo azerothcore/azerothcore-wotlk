@@ -108,17 +108,19 @@ public:
     static bool HandleLearnAllMyQuestSpells(ChatHandler* handler)
     {
         Player* player = handler->GetPlayer();
-        for (auto const& [id, quest] : sObjectMgr->GetQuestTemplates())
+        for (auto const& questPair : sObjectMgr->GetQuestTemplates())
+        {
+            Quest const* quest = questPair.second;
             if (quest->GetRequiredClasses() && player->SatisfyQuestClass(quest, false))
                 player->learnQuestRewardedSpells(quest);
+        }
 
         return true;
     }
 
     static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
     {
-        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass());
-        if (!classEntry)
+        if (!sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass()))
             return true;
 
         Player* player = handler->GetPlayer();
@@ -132,6 +134,7 @@ public:
             {
                 if (!trainer->IsTrainerValidForPlayer(player))
                     continue;
+
                 for (Trainer::Spell const& trainerSpell : trainer->GetSpells())
                 {
                     if (!trainer->CanTeachSpell(player, &trainerSpell))

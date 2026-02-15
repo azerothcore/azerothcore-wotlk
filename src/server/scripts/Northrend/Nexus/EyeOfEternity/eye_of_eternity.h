@@ -18,11 +18,12 @@
 #ifndef DEF_EYE_OF_ETERNITY_H
 #define DEF_EYE_OF_ETERNITY_H
 
-#include "Chat.h"
 #include "CreatureAIImpl.h"
 
 #define DataHeader "EOE"
 #define EyeOfEternityScriptName "instance_eye_of_eternity"
+
+uint32 const EncounterCount = 1;
 
 enum Objects
 {
@@ -46,15 +47,14 @@ enum NPCs
     NPC_HOVER_DISK              = 30248,
     NPC_ARCANE_OVERLOAD         = 30282,
     NPC_SURGE_OF_POWER          = 30334,
-    NPC_WYRMREST_SKYTALON       = 30161,
     NPC_STATIC_FIELD            = 30592,
     NPC_ALEXSTRASZA             = 32295,
 };
 
 enum Data
 {
+    DATA_MALYGOS                = 0,
     DATA_IRIS_ACTIVATED,
-    DATA_ENCOUNTER_STATUS,
     DATA_SET_IRIS_INACTIVE,
     DATA_HIDE_IRIS_AND_PORTAL,
     DATA_MALYGOS_GUID,
@@ -75,6 +75,8 @@ enum eSpells
     SPELL_HASTE                         = 57060,
 
     SPELL_ALEXSTRASZA_GIFT              = 61028,
+    SPELL_SUMMON_RED_DRAGON_BUDDY       = 56070,
+    SPELL_RIDE_RED_DRAGON               = 56072
 };
 
 enum eAchiev
@@ -86,9 +88,30 @@ enum eAchiev
     ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT = 20387,
 };
 
-/*** POSITIONS/WAYPOINTS BELOW ***/
+enum EoEMisc : uint32
+{
+    AREA_EYE_OF_ETERNITY                    = 4500,
+    EVENT_IRIS_ACTIVATED                    = 20158,
+    PLATFORM_DESTROY_DAMAGE                 = 6500000,
+    INTRO_MOVEMENT_INTERVAL                 = 25000,
+};
 
-#define INTRO_MOVEMENT_INTERVAL 25000
+enum EoEActions
+{
+    ACTION_POWER_SPARK_FOLLOW   = 1,
+    ACTION_POWER_SPARK_STOP     = 2,
+    ACTION_DISK_START_MOVING    = 1,
+};
+
+enum AlexstraszaEvents
+{
+    EVENT_ALEXSTRASZA_GIFT      = 1,
+    EVENT_ALEXSTRASZA_SAY_TWO   = 2,
+    EVENT_ALEXSTRASZA_SAY_THREE = 3,
+    EVENT_ALEXSTRASZA_SAY_FOUR  = 4,
+};
+
+/*** POSITIONS/WAYPOINTS BELOW ***/
 
 const Position CenterPos = {754.395f, 1301.27f, 266.10f, 0.0f};
 
@@ -102,22 +125,16 @@ const Position FourSidesPos[] =
 
 const Position Phase2NorthPos = {837.22f, 1301.676f, 296.10f, M_PI};
 
-const uint32 MalygosIntroIntervals[] = {18000, 19000, 21000, 18000, 15000};
+const Position AlexstraszaGiftPos = {773.98f, 1285.97f, 266.254f, 0.0f};
+const Position HeartOfMagicPos = {773.98f, 1275.97f, 266.254f, 0.0f};
 
-class EoEDrakeEnterVehicleEvent : public BasicEvent
-{
-public:
-    EoEDrakeEnterVehicleEvent(Creature& owner, ObjectGuid playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
-    bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override;
-private:
-    Creature& _owner;
-    ObjectGuid _playerGUID;
-};
+const uint32 MalygosIntroIntervals[] = {18000, 19000, 21000, 18000, 15000};
 
 template <class AI, class T>
 inline AI* GetEyeOfEternityAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, EyeOfEternityScriptName);
 }
+#define RegisterEoECreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetEyeOfEternityAI)
 
 #endif

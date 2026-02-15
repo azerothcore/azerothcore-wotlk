@@ -146,6 +146,9 @@ enum NaxxramasGameObjectsDisplayId
 
 enum NaxxramasCreatureId
 {
+    // Anub'Rekhan
+    NPC_CRYPT_GUARD                 = 16573,
+
     // Patchwerk
     NPC_PATCHWERK                   = 16028,
     NPC_PATCHWORK_GOLEM             = 16017,

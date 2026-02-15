@@ -979,6 +979,8 @@ struct FactionTemplateEntry
         return (hostileMask & entry.ourMask) != 0;
     }
     [[nodiscard]] bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
+    [[nodiscard]] bool IsHostileToAlliancePlayers() const { return (hostileMask & FACTION_MASK_ALLIANCE) != 0; }
+    [[nodiscard]] bool IsHostileToHordePlayers() const { return (hostileMask & FACTION_MASK_HORDE) != 0; }
     [[nodiscard]] bool IsNeutralToAll() const
     {
         for (unsigned int i : enemyFaction)

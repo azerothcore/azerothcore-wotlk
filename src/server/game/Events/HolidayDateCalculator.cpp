@@ -49,8 +49,8 @@ static const std::vector<HolidayRule> HolidayRules = {
     // Pirates' Day: Fixed Sep 19
     { HOLIDAY_PIRATES_DAY, HolidayCalculationType::FIXED_DATE, 9, 19, 0, 0 },
 
-    // Brewfest: Oktoberfest rule - first Saturday on/after Sept 15, minus 7 for holidayStage offset
-    { HOLIDAY_BREWFEST, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 },
+    // Brewfest: Fixed Sept 20 main event, prep starts Sept 13
+    { HOLIDAY_BREWFEST, HolidayCalculationType::FIXED_DATE, 9, 13, 0, 0 },
 
     // Harvest Festival: 2 days before autumn equinox (Sept 20-21)
     { HOLIDAY_HARVEST_FESTIVAL, HolidayCalculationType::AUTUMN_EQUINOX, 0, 0, 0, -2 },

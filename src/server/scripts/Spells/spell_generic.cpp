@@ -5696,6 +5696,28 @@ class spell_gen_whisper_to_controller : public SpellScript
     }
 };
 
+// 35475 Drums of War
+// 35476 Drums of Battle
+// 35478 Drums of Restoration
+class spell_gen_filter_party_level_80 : public SpellScript
+{
+    PrepareSpellScript(spell_gen_filter_party_level_80);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            Unit* unit = target->ToUnit();
+            return unit && unit->GetLevel() >= 80;
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_filter_party_level_80::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_PARTY);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5871,4 +5893,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_bm_on);
     RegisterSpellScript(spell_gen_bm_off);
     RegisterSpellScript(spell_gen_whisper_to_controller);
+    RegisterSpellScript(spell_gen_filter_party_level_80);
 }

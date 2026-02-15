@@ -840,7 +840,8 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 
     // Create gameobject
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), o);
+    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, PHASEMASK_NORMAL, x, y, z, o, rotation, 100, GO_STATE_READY))
     {
         LOG_ERROR("sql.sql", "Battlefield::SpawnGameObject: Gameobject template {} not found in database! Battlefield not created!", entry);
         LOG_ERROR("bg.battlefield", "Battlefield::SpawnGameObject: Cannot create gameobject template {}! Battlefield not created!", entry);
