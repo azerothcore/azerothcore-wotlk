@@ -52,6 +52,11 @@ DoorData const doorData[] =
     { 0,                       0,                    DOOR_TYPE_ROOM    } // END
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_KAELTHAS, new RectangleBoundary(118.64f, 178.63f, 125.69f, 210.70f) }
+};
+
 Position const KalecgosSpawnPos = { 164.3747f, -397.1197f, 2.151798f, 1.66219f };
 
 class instance_magisters_terrace : public InstanceMapScript
@@ -65,6 +70,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadBossBoundaries(boundaries);
             SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, gameobjectData);
             LoadDoorData(doorData);

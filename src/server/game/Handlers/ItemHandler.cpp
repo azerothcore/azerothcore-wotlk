@@ -602,7 +602,10 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem& packet)
     if (pItem)
     {
         if (!sScriptMgr->OnPlayerCanSellItem(_player, pItem, creature))
+        {
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, packet.ItemGuid, 0);
             return;
+        }
 
         // prevent sell not owner item
         if (_player->GetGUID() != pItem->GetOwnerGUID())

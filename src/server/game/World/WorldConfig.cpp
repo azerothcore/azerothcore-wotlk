@@ -64,6 +64,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_XP_EXPLORE, "Rate.XP.Explore", 1.0f);
     SetConfigValue<float>(RATE_XP_PET, "Rate.XP.Pet", 1.0f);
     SetConfigValue<float>(RATE_XP_PET_NEXT_LEVEL, "Rate.Pet.LevelXP", 0.05f);
+    SetConfigValue<float>(RATE_XP_BATTLEGROUND_BONUS, "Rate.XP.BattlegroundBonus", 1.0f);
     SetConfigValue<float>(RATE_REPAIRCOST, "Rate.RepairCost", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
 
     SetConfigValue<float>(RATE_SELLVALUE_ITEM_POOR, "Rate.SellValue.Item.Poor", 1.0f);
@@ -117,6 +118,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_AUCTION_CUT, "Rate.Auction.Cut", 1.0f);
     SetConfigValue<float>(RATE_HONOR, "Rate.Honor", 1.0f);
     SetConfigValue<float>(RATE_ARENA_POINTS, "Rate.ArenaPoints", 1.0f);
+    SetConfigValue<float>(RATE_ARENA_POINTS_2V2, "Rate.ArenaPoints2v2", 0.76f);
+    SetConfigValue<float>(RATE_ARENA_POINTS_3V3, "Rate.ArenaPoints3v3", 0.88f);
     SetConfigValue<float>(RATE_INSTANCE_RESET_TIME, "Rate.InstanceResetTime", 1.0f);
 
     SetConfigValue<float>(RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE, "Rate.MissChanceMultiplier.TargetCreature", 11.0f);

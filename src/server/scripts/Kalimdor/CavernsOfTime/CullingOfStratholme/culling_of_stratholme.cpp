@@ -1153,8 +1153,6 @@ public:
                             pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED);
                             if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_EXIT_GATE)))
                                 go->SetGoState(GO_STATE_ACTIVE);
-
-                            pInstance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
                         }
                         ScheduleNextEvent(currentEvent, 10s);
                         break;

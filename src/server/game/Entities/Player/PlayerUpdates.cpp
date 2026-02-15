@@ -319,23 +319,6 @@ void Player::Update(uint32 p_time)
     {
         m_regenTimer += p_time;
         RegenerateAll();
-
-        // Apply buffs from items with Apply on Equip trigger if they are not present.
-        for (uint8 i = 0; i < INVENTORY_SLOT_BAG_END; ++i)
-        {
-            if (!m_items[i])
-                continue;
-
-            std::vector<uint32> spellIDs;
-            m_items[i]->GetOnEquipSpellIDs(spellIDs);
-            bool apply = false;
-            for (uint32 spellID : spellIDs)
-                if (!apply && !HasAura(spellID))
-                    apply = true;
-
-            if (apply)
-                ApplyItemEquipSpell(m_items[i], true, false);
-        }
     }
 
     if (m_deathState == DeathState::JustDied)
@@ -1193,9 +1176,6 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
 
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
-
-    if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-        GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
 
     CheckAreaExploreAndOutdoor();
 

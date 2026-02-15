@@ -30,6 +30,7 @@
 #include "MapMgr.h"
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
+#include "PoolMgr.h"
 #include "ScriptMgr.h"
 #include "ServerMailMgr.h"
 #include "SkillDiscovery.h"
@@ -270,6 +271,7 @@ public:
 
         LOG_INFO("server.loading", "Reloading Quests Relations...");
         sObjectMgr->LoadQuestStartersAndEnders();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB tables `*_queststarter` and `*_questender` reloaded.");
         return true;
     }
@@ -490,6 +492,7 @@ public:
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`creature_queststarter`)");
         sObjectMgr->LoadCreatureQuestStarters();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB table `creature_queststarter` reloaded.");
         return true;
     }
@@ -532,6 +535,7 @@ public:
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`gameobject_queststarter`)");
         sObjectMgr->LoadGameobjectQuestStarters();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB table `gameobject_queststarter` reloaded.");
         return true;
     }

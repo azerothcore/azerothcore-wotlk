@@ -724,8 +724,9 @@ enum SMART_ACTION
     SMART_ACTION_WORLD_SCRIPT                       = 237,    // eventId, param
     SMART_ACTION_DISABLE_REWARD                     = 238,    // reputation 0/1, loot 0/1
     SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
+    SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
 
-    SMART_ACTION_AC_END                             = 240,    // placeholder
+    SMART_ACTION_AC_END                             = 241,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1281,6 +1282,7 @@ struct SmartAction
             uint32 pathId2;
             uint32 repeat;
             uint32 forcedMovement;
+            PathSource pathSource;
         } startClosestWaypoint;
 
         struct
@@ -1510,6 +1512,11 @@ struct SmartAction
         {
             uint32 animTier;
         } animTier;
+
+        struct
+        {
+            uint32 gossipMenuId;
+        } setGossipMenu;
     };
 };
 
