@@ -1,3 +1,4 @@
+-- DB update 2026_02_15_03 -> 2026_02_15_04
 -- DB update 2026_02_13_00 >> 2026_02_13_01
 -- Add gameobject_summon_groups table
 DROP TABLE IF EXISTS `gameobject_summon_groups`;
