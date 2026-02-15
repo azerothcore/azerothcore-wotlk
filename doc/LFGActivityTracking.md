@@ -15,14 +15,14 @@ LFG.StoreStatistics = 1
 # Enable automatic cleanup (optional)
 LFG.CleanupOldActivities = 1
 
-# Keep entries for 90 days (optional, range: 1-365)
-LFG.CleanupActivitiesAfterDays = 90
+# Keep entries for 30 days (optional, range: 1-365)
+LFG.CleanupActivitiesAfterDays = 30
 ```
 
 **Defaults:**
 - `LFG.StoreStatistics` = `0` (disabled)
 - `LFG.CleanupOldActivities` = `0` (disabled)
-- `LFG.CleanupActivitiesAfterDays` = `90` (days)
+- `LFG.CleanupActivitiesAfterDays` = `30` (days)
 
 ### Automatic Cleanup
 
@@ -136,8 +136,8 @@ The system provides built-in automatic cleanup functionality. Configure it in `w
 # Enable automatic cleanup
 LFG.CleanupOldActivities = 1
 
-# Keep entries for 90 days
-LFG.CleanupActivitiesAfterDays = 90
+# Keep entries for 30 days
+LFG.CleanupActivitiesAfterDays = 30
 ```
 
 The cleanup runs automatically every day at 6:00 AM server time. The retention period can be configured from 1 to 365 days.
@@ -147,9 +147,9 @@ The cleanup runs automatically every day at 6:00 AM server time. The retention p
 If you prefer manual cleanup or need to perform one-time cleanup operations:
 
 ```sql
--- Example: Delete records older than 90 days
+-- Example: Delete records older than 30 days
 DELETE FROM lfg_activity 
-WHERE timestamp < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 90 DAY))
+WHERE timestamp < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 30 DAY))
 LIMIT 10000;
 ```
 
@@ -160,8 +160,3 @@ LIMIT 10000;
 - The feature stores player GUIDs, not character names (names can be joined from `characters` table if needed)
 - Data is only collected when the feature is explicitly enabled
 - Server administrators should inform users if this data is being collected per their privacy policy
-
-## Related Resources
-
-- Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/5477
-- LFG System Documentation: [Link to docs if available]

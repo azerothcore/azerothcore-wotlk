@@ -595,6 +595,10 @@ namespace lfg
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
 
+        // Activity logging
+        void LogLfgActivity(ObjectGuid playerGuid, LfgActivityEventType eventType, uint32 dungeonId, ObjectGuid groupGuid);
+        void CleanupOldLfgActivities();
+
     private:
         TeamId GetTeam(ObjectGuid guid);
         void RestoreState(ObjectGuid guid, char const* debugMsg);
@@ -607,10 +611,6 @@ namespace lfg
         void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId = 0);
         void _SaveToDB(ObjectGuid guid);
         LFGDungeonData const* GetLFGDungeon(uint32 id);
-
-        // Activity logging
-        void LogLfgActivity(ObjectGuid playerGuid, LfgActivityEventType eventType, uint32 dungeonId, ObjectGuid groupGuid);
-        void CleanupOldLfgActivities();
 
         // Proposals
         void RemoveProposal(LfgProposalContainer::iterator itProposal, LfgUpdateType type);

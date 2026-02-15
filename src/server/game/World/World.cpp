@@ -1786,7 +1786,6 @@ void World::CleanupOldLfgActivities()
 
     LOG_INFO("server.worldserver", "Cleaning up old LFG activity entries.");
 
-    // Run cleanup daily at 6 AM (same time as guild reset to batch maintenance tasks)
     _nextLfgActivitiesCleanup = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
     sLFGMgr->CleanupOldLfgActivities();
 }

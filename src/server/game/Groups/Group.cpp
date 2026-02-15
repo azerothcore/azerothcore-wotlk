@@ -598,24 +598,14 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             {
                 uint32 dungeonId = sLFGMgr->GetDungeon(GetGUID());
                 if (method == GROUP_REMOVEMETHOD_LEAVE)
-                {
                     sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_LEFT, dungeonId, GetGUID());
-                }
                 else if (method == GROUP_REMOVEMETHOD_DEFAULT)
                 {
-                    // Default method could be disconnect
                     if (Player* removedPlayer = ObjectAccessor::FindConnectedPlayer(guid))
-                    {
-                        // Player is online, so it's a voluntary leave
-                        sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_LEFT, dungeonId, GetGUID());
-                    }
+                        sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_LEFT, dungeonId, GetGUID()); // Player is online, so it's a voluntary leave
                     else
-                    {
-                        // Player is offline, so it's a disconnect
-                        sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_DISCONNECTED, dungeonId, GetGUID());
-                    }
+                        sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_DISCONNECTED, dungeonId, GetGUID()); // Player is offline, so it's a disconnect
                 }
-                // Note: KICK_LFG is already logged in LFGMgr::UpdateBoot
             }
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);

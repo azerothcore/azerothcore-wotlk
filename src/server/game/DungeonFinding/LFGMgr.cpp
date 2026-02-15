@@ -1862,12 +1862,9 @@ namespace lfg
 
         LOG_DEBUG("lfg", "LFGMgr::UpdateProposal: Player [{}] of proposal {} selected: {}", guid.ToString(), proposalId, accept);
         
-        // Log activity: joined or refused
         uint32 dungeonId = proposal.dungeonId;
         if (accept)
-        {
             LogLfgActivity(guid, LFG_EVENT_JOINED, dungeonId, ObjectGuid::Empty);
-        }
         else
         {
             LogLfgActivity(guid, LFG_EVENT_REFUSED, dungeonId, ObjectGuid::Empty);
@@ -2147,10 +2144,9 @@ namespace lfg
         {
             if (Group* group = sGroupMgr->GetGroupByGUID(gguid.GetCounter()))
             {
-                // Log kick activity
                 uint32 dungeonId = GetDungeon(gguid);
                 LogLfgActivity(boot.victim, LFG_EVENT_KICKED, dungeonId, gguid);
-                
+
                 Player::RemoveFromGroup(group, boot.victim, GROUP_REMOVEMETHOD_KICK_LFG);
             }
 

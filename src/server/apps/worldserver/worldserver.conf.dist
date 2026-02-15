@@ -3429,9 +3429,9 @@ LFG.CleanupOldActivities = 0
 #        Description: Number of days to keep LFG activity entries before deletion.
 #                     Only used when LFG.CleanupOldActivities is enabled.
 #        Range:       1-365
-#        Default:     90
+#        Default:     30
 
-LFG.CleanupActivitiesAfterDays = 90
+LFG.CleanupActivitiesAfterDays = 30
 
 #
 ###################################################################################################
