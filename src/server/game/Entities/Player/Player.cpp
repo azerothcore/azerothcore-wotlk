@@ -11995,7 +11995,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
     uint32 classMask = getClassMask();
 
     // Get all abilities for this skill and sort by MinSkillLineRank (lowest to highest)
-    SkillLineAbilityList abilities = GetSkillLineAbilitiesBySkillLine(skill_id);
+    auto abilities = GetSkillLineAbilitiesBySkillLine(skill_id);
     std::vector<SkillLineAbilityEntry const*> sortedAbilities(abilities.begin(), abilities.end());
     std::sort(sortedAbilities.begin(), sortedAbilities.end(),
         [](SkillLineAbilityEntry const* a, SkillLineAbilityEntry const* b)
