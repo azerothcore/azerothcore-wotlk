@@ -148,8 +148,13 @@ struct boss_kologarnAI : public BossAI
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            if (!_EnterEvadeMode(why))
+            if (!CreatureAI::_EnterEvadeMode(why))
                 return;
+            if (instance && instance->GetBossState(BOSS_KOLOGARN) != DONE)
+            {
+                instance->SetBossState(BOSS_KOLOGARN, NOT_STARTED);
+                instance->SaveToDB();
+            }
             Reset();
             me->setActive(false);
         }
