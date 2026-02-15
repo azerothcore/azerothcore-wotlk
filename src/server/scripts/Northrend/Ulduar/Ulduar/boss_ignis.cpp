@@ -106,7 +106,7 @@ struct npc_ulduar_iron_construct : public ScriptedAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_AGGRESSIVE);
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = instance->GetCreature(TYPE_IGNIS))
+                if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
                 {
                     ignis->CastSpell(ignis, SPELL_STRENGTH_OF_THE_CREATOR, true);
                     AttackStart(ignis->GetVictim());
@@ -138,7 +138,7 @@ struct npc_ulduar_iron_construct : public ScriptedAI
             Unit::Kill(attacker, me);
 
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = instance->GetCreature(TYPE_IGNIS))
+                if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
                     ignis->AI()->SetData(1337, 0);
         }
     }
@@ -146,7 +146,7 @@ struct npc_ulduar_iron_construct : public ScriptedAI
     void JustDied(Unit*  /*killer*/) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* ignis = instance->GetCreature(TYPE_IGNIS))
+            if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
                 ignis->RemoveAuraFromStack(SPELL_STRENGTH_OF_THE_CREATOR);
     }
 

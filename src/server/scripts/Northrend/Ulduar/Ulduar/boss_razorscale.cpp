@@ -597,10 +597,10 @@ public:
         if (!instance)
             return true;
 
-        if (instance->GetData(TYPE_RAZORSCALE) == DONE)
+        if (instance->GetData(BOSS_RAZORSCALE) == DONE)
             return true;
 
-        Creature* razorscale = instance->GetCreature(TYPE_RAZORSCALE);
+        Creature* razorscale = instance->GetCreature(BOSS_RAZORSCALE);
         if (!razorscale || razorscale->IsInCombat())
             return true;
 
@@ -617,10 +617,10 @@ public:
         if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
             InstanceScript* instance = creature->GetInstanceScript();
-            if (!instance || instance->GetData(TYPE_RAZORSCALE) == DONE)
+            if (!instance || instance->GetData(BOSS_RAZORSCALE) == DONE)
                 return true;
 
-            Creature* razorscale = instance->GetCreature(TYPE_RAZORSCALE);
+            Creature* razorscale = instance->GetCreature(BOSS_RAZORSCALE);
             if (razorscale && !razorscale->IsInCombat())
             {
                 // Do not show gossip icon if encounter is in progress
@@ -654,7 +654,7 @@ public:
         npc_ulduar_expedition_commanderAI(Creature* creature) : NullCreatureAI(creature)
         {
             _instance = creature->GetInstanceScript();
-            _introSpoken = _instance->GetData(TYPE_RAZORSCALE) == DONE;
+            _introSpoken = _instance->GetData(BOSS_RAZORSCALE) == DONE;
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -745,7 +745,7 @@ struct npc_ulduar_harpoonfirestate : public NullCreatureAI
             case 3: // shoot
                 if (pInstance)
                 {
-                    Creature* razorscale = pInstance->GetCreature(TYPE_RAZORSCALE);
+                    Creature* razorscale = pInstance->GetCreature(BOSS_RAZORSCALE);
                     if (!razorscale)
                         return;
                     if (!razorscale->HasAura(value))
@@ -829,7 +829,7 @@ struct npc_ulduar_expedition_engineer : public NullCreatureAI
 
                 if (!fixingGUID)
                 {
-                    Creature* razorscale = pInstance->GetCreature(TYPE_RAZORSCALE);
+                    Creature* razorscale = pInstance->GetCreature(BOSS_RAZORSCALE);
 
                     if (!razorscale || !razorscale->IsInCombat())
                     {
@@ -874,7 +874,7 @@ public:
         if (!pInstance)
             return true;
 
-        Creature* rs = pInstance->GetCreature(TYPE_RAZORSCALE);
+        Creature* rs = pInstance->GetCreature(BOSS_RAZORSCALE);
 
         if (!rs || !rs->IsInCombat())
         {

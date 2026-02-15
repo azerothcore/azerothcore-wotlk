@@ -250,7 +250,7 @@ enum Texts
     TALK_COMPUTER_ZERO                              = 12,
 };
 
-#define GetMimiron() instance->GetCreature(TYPE_MIMIRON)
+#define GetMimiron() instance->GetCreature(BOSS_MIMIRON)
 #define GetLMK2() instance->GetCreature(DATA_MIMIRON_LEVIATHAN_MKII)
 #define GetVX001() instance->GetCreature(DATA_MIMIRON_VX001)
 #define GetACU() instance->GetCreature(DATA_MIMIRON_ACU)
@@ -1829,7 +1829,7 @@ class spell_ulduar_mimiron_mine_explosion : public SpellScript
     {
         if (GetHitPlayer())
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* mimi = instance->GetCreature(TYPE_MIMIRON))
+                if (Creature* mimi = instance->GetCreature(BOSS_MIMIRON))
                     mimi->AI()->SetData(0, 11);
     }
 
@@ -2054,10 +2054,10 @@ public:
 
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (instance->GetData(TYPE_MIMIRON) != NOT_STARTED)
+            if (instance->GetData(BOSS_MIMIRON) != NOT_STARTED)
                 return false;
 
-            if (Creature* c = instance->GetCreature(TYPE_MIMIRON))
+            if (Creature* c = instance->GetCreature(BOSS_MIMIRON))
             {
                 c->AI()->SetData(0, 7);
                 c->AI()->AttackStart(player);
@@ -2121,7 +2121,7 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
     void UpdateAI(uint32 diff) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (instance->GetData(TYPE_MIMIRON) != IN_PROGRESS)
+            if (instance->GetData(BOSS_MIMIRON) != IN_PROGRESS)
             {
                 RemoveAll();
                 return;

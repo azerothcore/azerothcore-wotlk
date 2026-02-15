@@ -254,7 +254,7 @@ struct boss_kologarnAI : public BossAI
 
         void SummonedCreatureDespawn(Creature* cr) override
         {
-            if (instance->GetData(TYPE_KOLOGARN) > NOT_STARTED)
+            if (instance->GetData(BOSS_KOLOGARN) > NOT_STARTED)
                 return;
 
             if (cr->GetEntry() == NPC_LEFT_ARM)
@@ -313,7 +313,7 @@ struct boss_kologarnAI : public BossAI
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
-            if (!me->IsAlive() || instance->GetData(TYPE_KOLOGARN) != IN_PROGRESS)
+            if (!me->IsAlive() || instance->GetData(BOSS_KOLOGARN) != IN_PROGRESS)
                 return;
 
             if (!apply)
@@ -508,7 +508,7 @@ struct boss_kologarn_arms : public ScriptedAI
     {
         if (!_combatStarted)
             if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* cr = instance->GetCreature(TYPE_KOLOGARN))
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
                 {
                     _combatStarted = true;
                     if (!cr->IsInCombat() && who)
@@ -545,7 +545,7 @@ struct boss_kologarn_arms : public ScriptedAI
             cr->CastSpell(cr, SPELL_RUBBLE_FALL, true);
 
             if (me->GetInstanceScript())
-                if (Creature* kologarn = me->GetInstanceScript()->GetCreature(TYPE_KOLOGARN))
+                if (Creature* kologarn = me->GetInstanceScript()->GetCreature(BOSS_KOLOGARN))
                     for (uint8 i = 0; i < 5; ++i)
                         if (Creature* cr2 = kologarn->SummonCreature(NPC_RUBBLE_SUMMON, cr->GetPositionX() + irand(-5, 5), cr->GetPositionY() + irand(-5, 5), cr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                         {
@@ -556,7 +556,7 @@ struct boss_kologarn_arms : public ScriptedAI
         }
 
         if (me->GetInstanceScript())
-            if (Creature* cr = me->GetInstanceScript()->GetCreature(TYPE_KOLOGARN))
+            if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_KOLOGARN))
                 cr->AI()->DoAction(DATA_KOLOGARN_RUBBLE_ACHIEV);
 
         me->ExitVehicle();
@@ -579,7 +579,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
         if (damage > 0 && !_damaged && me->GetInstanceScript())
         {
             _damaged = true;
-            if (Creature* cr = me->GetInstanceScript()->GetCreature(TYPE_KOLOGARN))
+            if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_KOLOGARN))
                 cr->AI()->DoAction(DATA_KOLOGARN_LOOKS_ACHIEV);
         }
     }
@@ -597,7 +597,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             me->Attack(player, false);
             me->GetMotionMaster()->MoveChase(player);
 
-            if (Creature* cr = m_pInstance->GetCreature(TYPE_KOLOGARN))
+            if (Creature* cr = m_pInstance->GetCreature(BOSS_KOLOGARN))
             {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
             }
@@ -825,7 +825,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = instance->GetCreature(TYPE_KOLOGARN))
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
                     return cr->AI()->GetData(DATA_KOLOGARN_LOOKS_ACHIEV);
 
         return false;
@@ -841,7 +841,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = instance->GetCreature(TYPE_KOLOGARN))
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
                     return cr->AI()->GetData(DATA_KOLOGARN_RUBBLE_ACHIEV);
 
         return false;
@@ -857,7 +857,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = instance->GetCreature(TYPE_KOLOGARN))
+                if (Creature* cr = instance->GetCreature(BOSS_KOLOGARN))
                     return cr->AI()->GetData(DATA_KOLOGARN_ARMS_ACHIEV);
 
         return false;

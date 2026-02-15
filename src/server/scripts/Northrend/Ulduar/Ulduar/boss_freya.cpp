@@ -624,7 +624,7 @@ struct boss_freya_elder_stonebark : public ScriptedAI
 
         // Lumberjacked
         if (me->GetInstanceScript())
-            if (Creature* freya = me->GetInstanceScript()->GetCreature(TYPE_FREYA))
+            if (Creature* freya = me->GetInstanceScript()->GetCreature(BOSS_FREYA))
                 freya->AI()->DoAction(ACTION_LUMBERJACKED);
     }
 
@@ -709,7 +709,7 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
 
         // Lumberjacked
         if (me->GetInstanceScript())
-            if (Creature* freya = me->GetInstanceScript()->GetCreature(TYPE_FREYA))
+            if (Creature* freya = me->GetInstanceScript()->GetCreature(BOSS_FREYA))
                 freya->AI()->DoAction(ACTION_LUMBERJACKED);
     }
 
@@ -809,7 +809,7 @@ struct boss_freya_elder_ironbranch : public ScriptedAI
 
         // Lumberjacked
         if (me->GetInstanceScript())
-            if (Creature* freya = me->GetInstanceScript()->GetCreature(TYPE_FREYA))
+            if (Creature* freya = me->GetInstanceScript()->GetCreature(BOSS_FREYA))
                 freya->AI()->DoAction(ACTION_LUMBERJACKED);
     }
 
@@ -954,7 +954,7 @@ struct boss_freya_summons : public ScriptedAI
     {
         if (InstanceScript* instance = me->GetInstanceScript())
         {
-            if (Creature* freya = instance->GetCreature(TYPE_FREYA))
+            if (Creature* freya = instance->GetCreature(BOSS_FREYA))
             {
                 if (!_hasDied)
                     freya->AI()->DoAction(_stackCount);

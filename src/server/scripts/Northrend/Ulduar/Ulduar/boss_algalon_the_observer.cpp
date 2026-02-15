@@ -364,7 +364,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         }
 
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_ALGALON, FAIL);
+            m_pInstance->SetData(BOSS_ALGALON, FAIL);
 
         ScriptedAI::EnterEvadeMode(why);
     }
@@ -385,13 +385,13 @@ struct boss_algalon_the_observer : public ScriptedAI
         _phaseTwo = false;
         _heraldOfTheTitans = true;
 
-        if (m_pInstance->GetData(TYPE_ALGALON) == FAIL)
+        if (m_pInstance->GetData(BOSS_ALGALON) == FAIL)
         {
             _firstPull = false;
         }
 
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
+            m_pInstance->SetData(BOSS_ALGALON, NOT_STARTED);
     }
 
     void KilledUnit(Unit* victim) override
@@ -446,7 +446,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->InterruptNonMeleeSpells(false);
                 if (m_pInstance)
-                    m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
+                    m_pInstance->SetData(BOSS_ALGALON, NOT_STARTED);
                 break;
             case ACTION_INIT_ALGALON:
                 _firstPull = false;
@@ -660,7 +660,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
             case EVENT_START_COMBAT:
-                m_pInstance->SetData(TYPE_ALGALON, IN_PROGRESS);
+                m_pInstance->SetData(BOSS_ALGALON, IN_PROGRESS);
                 Talk(SAY_ALGALON_AGGRO);
                 break;
             case EVENT_REMOVE_UNNATTACKABLE:
@@ -737,7 +737,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             case EVENT_OUTRO_START:
                 if (m_pInstance)
                 {
-                    m_pInstance->SetData(TYPE_ALGALON, DONE);
+                    m_pInstance->SetData(BOSS_ALGALON, DONE);
                     m_pInstance->SetData(DATA_ALGALON_DEFEATED, 1);
                 }
                 break;
@@ -892,7 +892,7 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
                     me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
                 break;
             case EVENT_SUMMON_ALGALON:
-                if (me->GetInstanceScript() && !me->GetInstanceScript()->GetGuidData(TYPE_ALGALON))
+                if (me->GetInstanceScript() && !me->GetInstanceScript()->GetCreature(BOSS_ALGALON))
                     if (Creature* algalon = me->GetMap()->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
                         algalon->AI()->DoAction(ACTION_START_INTRO);
                 break;

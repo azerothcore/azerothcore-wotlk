@@ -285,7 +285,7 @@ const Position KeepersPos[4] =
 
 const uint32 TABLE_KEEPER_ENTRY[4] = {NPC_FREYA_KEEPER, NPC_HODIR_KEEPER, NPC_MIMIRON_KEEPER, NPC_THORIM_KEEPER};
 const uint32 TABLE_GOSSIP_ENTRY[4] = {NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP, NPC_MIMIRON_GOSSIP, NPC_THORIM_GOSSIP};
-const uint32 TABLE_KEEPER_TYPE[4]  = {TYPE_FREYA,             TYPE_HODIR,       TYPE_MIMIRON,       TYPE_THORIM};
+const uint32 TABLE_KEEPER_TYPE[4]  = {BOSS_FREYA,             BOSS_HODIR,       BOSS_MIMIRON,       BOSS_THORIM};
 
 static LocationsXY yoggPortalLoc[] =
 {
@@ -468,7 +468,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
         {
             m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
             m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
-            m_pInstance->SetData(TYPE_YOGGSARON, NOT_STARTED);
+            m_pInstance->SetData(BOSS_YOGGSARON, NOT_STARTED);
             if (GameObject* go = m_pInstance->GetGameObject(DATA_YOGG_SARON_DOORS))
                 go->SetGoState(GO_STATE_ACTIVE);
         }
@@ -480,11 +480,11 @@ struct boss_yoggsaron_sara : public ScriptedAI
             return;
 
         // some simple hack checks
-        if (m_pInstance->GetData(TYPE_VEZAX) != DONE || m_pInstance->GetData(TYPE_XT002) != DONE)
+        if (m_pInstance->GetData(BOSS_VEZAX) != DONE || m_pInstance->GetData(BOSS_XT002) != DONE)
             return;
 
         m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
-        m_pInstance->SetData(TYPE_YOGGSARON, IN_PROGRESS);
+        m_pInstance->SetData(BOSS_YOGGSARON, IN_PROGRESS);
         me->SetInCombatWithZone();
         AttackStart(target);
 
@@ -895,7 +895,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
             case EVENT_SARA_P1_BERSERK:
                 if (me->GetInstanceScript())
                 {
-                    if (Creature* yogg = me->GetInstanceScript()->GetCreature(TYPE_YOGGSARON))
+                    if (Creature* yogg = me->GetInstanceScript()->GetCreature(BOSS_YOGGSARON))
                     {
                         yogg->AI()->Talk(EMOTE_YOGG_SARON_BERSERK);
                     }
@@ -1075,7 +1075,7 @@ struct boss_yoggsaron : public ScriptedAI
 
         if (m_pInstance)
         {
-            m_pInstance->SetData(TYPE_YOGGSARON, DONE);
+            m_pInstance->SetData(BOSS_YOGGSARON, DONE);
             if (Creature* sara = m_pInstance->GetCreature(DATA_SARA))
                 sara->AI()->DoAction(ACTION_YOGG_SARON_DEATH);
             if (GameObject* go = m_pInstance->GetGameObject(DATA_YOGG_SARON_DOORS))
@@ -2060,7 +2060,7 @@ struct boss_yoggsaron_voice : public NullCreatureAI
         {
             // Drive Me Crazy achievement failed
             if (me->GetInstanceScript())
-                if (Creature* yogg = me->GetInstanceScript()->GetCreature(TYPE_YOGGSARON))
+                if (Creature* yogg = me->GetInstanceScript()->GetCreature(BOSS_YOGGSARON))
                     yogg->AI()->DoAction(ACTION_FAILED_DRIVE_ME_CRAZY);
 
             events.ScheduleEvent(40, 2s);

@@ -45,30 +45,13 @@ enum UlduarBossIds
     MAX_ENCOUNTER                           = 14
 };
 
-// Legacy encounter type aliases for compatibility with existing scripts
-enum UlduarEncounters
-{
-    TYPE_LEVIATHAN                          = BOSS_LEVIATHAN,
-    TYPE_IGNIS                              = BOSS_IGNIS,
-    TYPE_RAZORSCALE                         = BOSS_RAZORSCALE,
-    TYPE_XT002                              = BOSS_XT002,
-    TYPE_ASSEMBLY                           = BOSS_ASSEMBLY,
-    TYPE_KOLOGARN                           = BOSS_KOLOGARN,
-    TYPE_AURIAYA                            = BOSS_AURIAYA,
-    TYPE_FREYA                              = BOSS_FREYA,
-    TYPE_HODIR                              = BOSS_HODIR,
-    TYPE_MIMIRON                            = BOSS_MIMIRON,
-    TYPE_THORIM                             = BOSS_THORIM,
-    TYPE_VEZAX                              = BOSS_VEZAX,
-    TYPE_YOGGSARON                          = BOSS_YOGGSARON,
-    TYPE_ALGALON                            = BOSS_ALGALON,
-    TYPE_WATCHERS                           = 14,
-    TYPE_HODIR_HM_FAIL                      = 15,
-    TYPE_WINTER_CACHE                       = 16
-};
-
 enum UlduarData
 {
+    // Non-boss encounter data
+    TYPE_WATCHERS                           = 14,
+    TYPE_HODIR_HM_FAIL                      = 15,
+    TYPE_WINTER_CACHE                       = 16,
+
     // Assembly of Iron
     DATA_STEELBREAKER                       = 20,
     DATA_MOLGEIM                            = 21,
@@ -158,6 +141,8 @@ enum UlduarData
     // Hodir chests (dynamically spawned)
     DATA_HODIR_CHEST_NORMAL                 = 780,
     DATA_HODIR_CHEST_HARD                   = 781,
+    DATA_HODIR_CHEST_NORMAL_HERO            = 782,
+    DATA_HODIR_CHEST_HARD_HERO              = 783,
 
     // Mage Barrier
     DATA_MAGE_BARRIER                       = 800,

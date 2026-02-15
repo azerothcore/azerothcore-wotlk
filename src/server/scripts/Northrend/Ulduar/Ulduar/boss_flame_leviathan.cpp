@@ -785,7 +785,7 @@ struct boss_flame_leviathan_defense_turret : public TurretAI
             if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
                 device->ReplaceAllUnitFlags(UNIT_FLAG_NONE); // unselectable
 
-        if (Creature* leviathan = _instance->GetCreature(TYPE_LEVIATHAN))
+        if (Creature* leviathan = _instance->GetCreature(BOSS_LEVIATHAN))
             leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
     }
 
@@ -1096,7 +1096,7 @@ struct npc_brann_radio : public NullCreatureAI
 {
     npc_brann_radio(Creature* c) : NullCreatureAI(c)
     {
-        _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(TYPE_LEVIATHAN) > NOT_STARTED);
+        _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(BOSS_LEVIATHAN) > NOT_STARTED);
         _helpLock = _lock;
     }
 

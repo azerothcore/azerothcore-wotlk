@@ -781,7 +781,7 @@ struct boss_thorim_sif : public ScriptedAI
             else if (param == ACTION_SIF_START_DOMINION)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* cr = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
+                    if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                         me->CastSpell(cr, SPELL_TOUCH_OF_DOMINION, false);
 
                 events.ScheduleEvent(EVENT_SIF_FINISH_DOMINION, 150s);
@@ -1011,7 +1011,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
             if (!_playerAttack && who && (who->IsPlayer() || who->GetOwnerGUID().IsPlayer()))
             {
                 if (me->GetInstanceScript())
-                    if (Creature* thorim = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
+                    if (Creature* thorim = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     {
                         if (!thorim->IsInCombat())
                         {
@@ -1032,7 +1032,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (Creature* thorim = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
+                if (Creature* thorim = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
         }
 
@@ -1264,7 +1264,7 @@ struct boss_thorim_runic_colossus : public ScriptedAI
                 if (GameObject* go = me->GetInstanceScript()->GetGameObject(DATA_THORIM_FIRST_DOORS))
                     go->SetGoState(GO_STATE_ACTIVE);
 
-                if (Creature* cr = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
+                if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     cr->AI()->Talk(SAY_SPECIAL_2);
             }
         }
@@ -1388,7 +1388,7 @@ struct boss_thorim_ancient_rune_giant : public ScriptedAI
             if (GameObject* go = pInstance->GetGameObject(DATA_THORIM_SECOND_DOORS))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-            if (Creature* thorim = pInstance->GetCreature(TYPE_THORIM))
+            if (Creature* thorim = pInstance->GetCreature(BOSS_THORIM))
                 thorim->AI()->DoAction(ACTION_ALLOW_HIT);
         }
     }
@@ -1623,7 +1623,7 @@ public:
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = instance->GetCreature(TYPE_THORIM))
+            if (Creature* cr = instance->GetCreature(BOSS_THORIM))
                 return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
 
         return false;
@@ -1638,7 +1638,7 @@ public:
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = instance->GetCreature(TYPE_THORIM))
+            if (Creature* cr = instance->GetCreature(BOSS_THORIM))
                 return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
 
         return false;

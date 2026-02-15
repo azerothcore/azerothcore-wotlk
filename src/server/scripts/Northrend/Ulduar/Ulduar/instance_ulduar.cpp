@@ -108,6 +108,11 @@ ObjectData const gameobjectData[] =
     { GO_MIMIRON_CALL_TRAM_MIMIRON,     DATA_MIMIRON_CALL_TRAM_MIMIRON  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND01,  DATA_MIMIRON_TRAM_TURNAROUND_1  },
     { GO_DOODAD_UL_TRAIN_TURNAROUND02,  DATA_MIMIRON_TRAM_TURNAROUND_2  },
+    // Hodir chests (dynamically spawned, one per difficulty)
+    { GO_HODIR_CHEST_NORMAL,             DATA_HODIR_CHEST_NORMAL         },
+    { GO_HODIR_CHEST_NORMAL_HERO,        DATA_HODIR_CHEST_NORMAL_HERO    },
+    { GO_HODIR_CHEST_HARD,               DATA_HODIR_CHEST_HARD           },
+    { GO_HODIR_CHEST_HARD_HERO,          DATA_HODIR_CHEST_HARD_HERO      },
     { 0,                                0                               }
 };
 
@@ -152,10 +157,8 @@ public:
         // Razorscale
         ObjectGuid m_RazorscaleHarpoonFireStateGUID[4];
 
-        // Hodir's chests
+        // Hodir
         bool hmHodir;
-        ObjectGuid m_hodirNormalChest;
-        ObjectGuid m_hodirHardmodeChest;
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
         Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
@@ -315,7 +318,7 @@ public:
                         });
                     }
                     if (type == BOSS_HODIR && state == DONE)
-                        setChestsLootable(TYPE_HODIR);
+                        setChestsLootable(BOSS_HODIR);
                     break;
                 case BOSS_ALGALON:
                     if (GameObject* go = instance->GetGameObject(DATA_SIGILDOOR_03))
@@ -382,7 +385,7 @@ public:
             {
                 case RAID_DIFFICULTY_10MAN_NORMAL: // 10 man chest
                 {
-                    if (!m_hodirNormalChest)
+                    if (!GetObjectGuid(DATA_HODIR_CHEST_NORMAL))
                     {
                         if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_NORMAL,
@@ -391,11 +394,10 @@ public:
                             normalChestPosition.GetPositionZ(),
                             normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
-                            m_hodirNormalChest = go->GetGUID();
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                     }
-                    if (!m_hodirHardmodeChest)
+                    if (!GetObjectGuid(DATA_HODIR_CHEST_HARD))
                     {
                         if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_HARD,
@@ -404,7 +406,6 @@ public:
                             hardChestPosition.GetPositionZ(),
                             hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
-                            m_hodirHardmodeChest = go->GetGUID();
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             hmHodir = true;
                         }
@@ -413,7 +414,7 @@ public:
                 }
                 case RAID_DIFFICULTY_25MAN_NORMAL: // 25 man chest
                 {
-                    if (!m_hodirNormalChest)
+                    if (!GetObjectGuid(DATA_HODIR_CHEST_NORMAL_HERO))
                     {
                         if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_NORMAL_HERO,
@@ -422,11 +423,10 @@ public:
                             normalChestPosition.GetPositionZ(),
                             normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
-                            m_hodirNormalChest = go->GetGUID();
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
                     }
-                    if (!m_hodirHardmodeChest)
+                    if (!GetObjectGuid(DATA_HODIR_CHEST_HARD_HERO))
                     {
                         if (GameObject* go = hodir->SummonGameObject(
                             GO_HODIR_CHEST_HARD_HERO,
@@ -435,7 +435,6 @@ public:
                             hardChestPosition.GetPositionZ(),
                             hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
                         {
-                            m_hodirHardmodeChest = go->GetGUID();
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             hmHodir = true;
                         }
@@ -508,6 +507,20 @@ public:
                 go->SetGoState(state);
         }
 
+        GameObject* GetHodirChest(bool hardmode)
+        {
+            if (hardmode)
+            {
+                if (GameObject* go = GetGameObject(DATA_HODIR_CHEST_HARD))
+                    return go;
+                return GetGameObject(DATA_HODIR_CHEST_HARD_HERO);
+            }
+
+            if (GameObject* go = GetGameObject(DATA_HODIR_CHEST_NORMAL))
+                return go;
+            return GetGameObject(DATA_HODIR_CHEST_NORMAL_HERO);
+        }
+
         void OnGameObjectCreate(GameObject* gameObject) override
         {
             InstanceScript::OnGameObjectCreate(gameObject);
@@ -524,72 +537,49 @@ public:
                         break;
                     }
                 case GO_LIGHTNING_WALL1:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
-                    break;
-                case GO_LIGHTNING_WALL2:
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     break;
                 case GO_MIMIRONS_TARGETTING_CRYSTAL:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[3][0] = gameObject->GetGUID();
                     break;
                 case GO_FREYAS_TARGETTING_CRYSTAL:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[0][0] = gameObject->GetGUID();
                     break;
                 case GO_HODIRS_TARGETTING_CRYSTAL:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[2][0] = gameObject->GetGUID();
                     break;
                 case GO_THORIMS_TARGETTING_CRYSTAL:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[1][0] = gameObject->GetGUID();
                     break;
                 case GO_MIMIRONS_GENERATOR:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[3][1] = gameObject->GetGUID();
                     break;
                 case GO_FREYAS_GENERATOR:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[0][1] = gameObject->GetGUID();
                     break;
                 case GO_HODIRS_GENERATOR:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[2][1] = gameObject->GetGUID();
                     break;
                 case GO_THORIMS_GENERATOR:
-                    OpenIfDone(TYPE_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
+                    OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
                     m_leviathanVisualTowers[1][1] = gameObject->GetGUID();
                     break;
                 case GO_LEVIATHAN_DOORS:
                     if (GetBossState(BOSS_LEVIATHAN) >= DONE)
                         gameObject->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     break;
-                // XT-002, Kologarn, Assembly of Iron
-                case GO_XT002_DOORS:
-                    break;
-                case GO_KOLOGARN_DOORS:
-                    break;
                 case GO_KOLOGARN_BRIDGE:
-                    OpenIfDone(TYPE_KOLOGARN, gameObject, GO_STATE_READY);
-                    break;
-                case GO_ASSEMBLY_DOORS:
+                    OpenIfDone(BOSS_KOLOGARN, gameObject, GO_STATE_READY);
                     break;
                 case GO_ARCHIVUM_DOORS:
-                    OpenIfDone(TYPE_ASSEMBLY, gameObject, GO_STATE_ACTIVE);
-                    break;
-                // Thorim
-                case GO_ARENA_LEVER_GATE:
-                    break;
-                case GO_ARENA_LEVER:
-                    break;
-                case GO_ARENA_FENCE:
-                    break;
-                case GO_FIRST_COLOSSUS_DOORS:
-                    break;
-                case GO_SECOND_COLOSSUS_DOORS:
-                    break;
-                // Yogg-Saron
-                case GO_YOGG_SARON_DOORS:
+                    OpenIfDone(BOSS_ASSEMBLY, gameObject, GO_STATE_ACTIVE);
                     break;
                 case GO_KEEPERS_GATE:
                     if (GetBossState(BOSS_MIMIRON) == DONE && GetBossState(BOSS_FREYA) == DONE && GetBossState(BOSS_HODIR) == DONE && GetBossState(BOSS_THORIM) == DONE)
@@ -598,12 +588,6 @@ public:
                 // Mimiron, Hodir, Vezax
                 case GO_MIMIRON_ELEVATOR:
                     gameObject->EnableCollision(false);
-                    break;
-                case GO_MIMIRON_DOOR_1:
-                    break;
-                case GO_MIMIRON_DOOR_2:
-                    break;
-                case GO_MIMIRON_DOOR_3:
                     break;
                 case GO_HODIR_FROZEN_DOOR:
                 case GO_HODIR_DOOR:
@@ -630,18 +614,6 @@ public:
                     if (GetBossState(BOSS_MIMIRON) == DONE)
                         m_mimironTramUsed = true;
                     break;
-                case GO_MIMIRON_TRAM_ROCKET_BOOSTER:
-                    break;
-                case GO_MIMIRON_ACTIVATE_TRAM:
-                    break;
-                case GO_MIMIRON_CALL_TRAM_CENTER:
-                    break;
-                case GO_MIMIRON_CALL_TRAM_MIMIRON:
-                    break;
-                case GO_DOODAD_UL_TRAIN_TURNAROUND01:
-                    break;
-                case GO_DOODAD_UL_TRAIN_TURNAROUND02:
-                    break;
                 // Algalon the Observer
                 case GO_CELESTIAL_PLANETARIUM_ACCESS_10:
                 case GO_CELESTIAL_PLANETARIUM_ACCESS_25:
@@ -655,16 +627,6 @@ public:
                 case GO_DOODAD_UL_SIGILDOOR_02:
                     if (m_algalonTimer)
                         gameObject->SetGoState(GO_STATE_ACTIVE);
-                    break;
-                case GO_DOODAD_UL_SIGILDOOR_03:
-                    break;
-                case GO_DOODAD_UL_UNIVERSEFLOOR_01:
-                    break;
-                case GO_DOODAD_UL_UNIVERSEFLOOR_02:
-                    break;
-                case GO_DOODAD_UL_UNIVERSEGLOBE01:
-                    break;
-                case GO_DOODAD_UL_ULDUAR_TRAPDOOR_03:
                     break;
                 // Herbs
                 case 191019: // Adder's Tongue
@@ -684,16 +646,16 @@ public:
             {
                 switch (boss)
                 {
-                    case TYPE_HODIR:
+                    case BOSS_HODIR:
                         if (hmHodir)
                         {
-                            if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
+                            if (GameObject* go = GetHodirChest(true))
                             {
                                 go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 go->SetLootRecipient(instance);
                             }
                         }
-                        if (GameObject* go = instance->GetGameObject(m_hodirNormalChest))
+                        if (GameObject* go = GetHodirChest(false))
                         {
                             go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             go->SetLootRecipient(instance);
@@ -708,11 +670,10 @@ public:
             switch (type)
             {
                 case TYPE_HODIR_HM_FAIL:
-                    if (GameObject* go = instance->GetGameObject(m_hodirHardmodeChest))
+                    if (GameObject* go = GetHodirChest(true))
                     {
                         hmHodir = false;
                         go->Delete();
-                        m_hodirHardmodeChest.Clear();
                     }
                     break;
                 case TYPE_WATCHERS:
@@ -852,12 +813,6 @@ public:
                 case DATA_HARPOON_FIRE_STATE_3:
                 case DATA_HARPOON_FIRE_STATE_4:
                     return m_RazorscaleHarpoonFireStateGUID[data - 200];
-
-                // Hodir chests
-                case DATA_HODIR_CHEST_HARD:
-                    return m_hodirHardmodeChest;
-                case DATA_HODIR_CHEST_NORMAL:
-                    return m_hodirNormalChest;
             }
 
             return GetObjectGuid(data);
@@ -913,7 +868,7 @@ public:
                 for (uint8 i = 0; i <= 12; ++i)
                 {
                     bool go = false;
-                    if (i == TYPE_LEVIATHAN)
+                    if (i == BOSS_LEVIATHAN)
                     {
                         if (Creature* c = GetCreature(BOSS_LEVIATHAN))
                             if (c->IsInCombat())
@@ -999,43 +954,43 @@ public:
             {
                 case 10042:
                 case 10352:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_LEVIATHAN)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_LEVIATHAN)) == 0;
                 case 10342:
                 case 10355:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_IGNIS)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_IGNIS)) == 0;
                 case 10340:
                 case 10353:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_RAZORSCALE)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_RAZORSCALE)) == 0;
                 case 10341:
                 case 10354:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_XT002)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_XT002)) == 0;
                 case 10598:
                 case 10599:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_ASSEMBLY)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_ASSEMBLY)) == 0;
                 case 10348:
                 case 10357:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_KOLOGARN)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_KOLOGARN)) == 0;
                 case 10351:
                 case 10363:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_AURIAYA)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_AURIAYA)) == 0;
                 case 10439:
                 case 10719:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_HODIR)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_HODIR)) == 0;
                 case 10403:
                 case 10404:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_THORIM)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_THORIM)) == 0;
                 case 10582:
                 case 10583:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_FREYA)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_FREYA)) == 0;
                 case 10347:
                 case 10361:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_MIMIRON)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_MIMIRON)) == 0;
                 case 10349:
                 case 10362:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_VEZAX)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_VEZAX)) == 0;
                 case 10350:
                 case 10364:
-                    return (C_of_Ulduar_MASK & (1 << TYPE_YOGGSARON)) == 0;
+                    return (C_of_Ulduar_MASK & (1 << BOSS_YOGGSARON)) == 0;
             }
             return false;
         }

@@ -368,7 +368,7 @@ struct npc_ulduar_saronite_vapors : public NullCreatureAI
 
         // killed saronite vapors, hard mode unavailable
         if (pInstance)
-            if (Creature* vezax = pInstance->GetCreature(TYPE_VEZAX))
+            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
                 vezax->AI()->DoAction(1);
     }
 
@@ -384,7 +384,7 @@ struct npc_ulduar_saronite_animus : public ScriptedAI
     {
         pInstance = pCreature->GetInstanceScript();
         if (pInstance)
-            if (Creature* vezax = pInstance->GetCreature(TYPE_VEZAX))
+            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
                 vezax->AI()->JustSummoned(me);
         timer = 0;
         me->SetInCombatWithZone();
@@ -398,7 +398,7 @@ struct npc_ulduar_saronite_animus : public ScriptedAI
         me->DespawnOrUnsummon(3s);
 
         if (pInstance)
-            if (Creature* vezax = pInstance->GetCreature(TYPE_VEZAX))
+            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
                 vezax->AI()->DoAction(2);
     }
 
@@ -585,7 +585,7 @@ public:
             return false;
 
         if (InstanceScript* pInstance = go->GetInstanceScript())
-            if (pInstance->GetData(TYPE_XT002) != DONE && pInstance->GetData(TYPE_MIMIRON) != DONE && pInstance->GetData(TYPE_THORIM) != DONE && pInstance->GetData(TYPE_FREYA) != DONE && pInstance->GetData(TYPE_HODIR) != DONE)
+            if (pInstance->GetData(BOSS_XT002) != DONE && pInstance->GetData(BOSS_MIMIRON) != DONE && pInstance->GetData(BOSS_THORIM) != DONE && pInstance->GetData(BOSS_FREYA) != DONE && pInstance->GetData(BOSS_HODIR) != DONE)
             {
                 std::string accountName;
                 AccountMgr::GetName(plr->GetSession()->GetAccountId(), accountName);
