@@ -601,7 +601,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
                     sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_LEFT, dungeonId, GetGUID());
                 else if (method == GROUP_REMOVEMETHOD_DEFAULT)
                 {
-                    if (Player* removedPlayer = ObjectAccessor::FindConnectedPlayer(guid))
+                    if (ObjectAccessor::FindConnectedPlayer(guid))
                         sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_LEFT, dungeonId, GetGUID()); // Player is online, so it's a voluntary leave
                     else
                         sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_DISCONNECTED, dungeonId, GetGUID()); // Player is offline, so it's a disconnect
