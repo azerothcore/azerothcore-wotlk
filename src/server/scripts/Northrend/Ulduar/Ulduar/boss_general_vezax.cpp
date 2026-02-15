@@ -570,7 +570,6 @@ public:
     }
 };
 
-
 void AddSC_boss_vezax()
 {
     RegisterUlduarCreatureAI(boss_vezaxAI);
