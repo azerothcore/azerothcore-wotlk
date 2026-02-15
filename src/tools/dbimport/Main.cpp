@@ -115,7 +115,8 @@ bool StartDB()
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")
-        .AddDatabase(WorldDatabase, "World");
+        .AddDatabase(WorldDatabase, "World")
+        .AddDatabase(DBCDatabase, "DBC");
 
     if (!loader.Load())
         return false;

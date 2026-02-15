@@ -18,6 +18,7 @@
 #include "DatabaseWorkerPool.h"
 #include "AdhocStatement.h"
 #include "CharacterDatabase.h"
+#include "DBCDatabase.h"
 #include "Errors.h"
 #include "Log.h"
 #include "LoginDatabase.h"
@@ -571,3 +572,4 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction<T>& trans, PreparedSt
 template class AC_DATABASE_API DatabaseWorkerPool<LoginDatabaseConnection>;
 template class AC_DATABASE_API DatabaseWorkerPool<WorldDatabaseConnection>;
 template class AC_DATABASE_API DatabaseWorkerPool<CharacterDatabaseConnection>;
+template class AC_DATABASE_API DatabaseWorkerPool<DBCDatabaseConnection>;
