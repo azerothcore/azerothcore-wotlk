@@ -34,6 +34,7 @@
 #include "Log.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "MiscPackets.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -119,6 +120,9 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _accountFlags(accountFlags),
     m_expansion(expansion),
     m_total_time(TotalTime),
+    _lastUpdateTime(0),
+    _createTime(GameTime::GetGameTime().count()),
+    _previousPlayTime(0),
     _logoutTime(0),
     m_inQueue(false),
     m_playerLoading(false),
@@ -223,6 +227,14 @@ bool WorldSession::IsRecurringBillingAccount() const
     return HasAccountFlag(ACCOUNT_FLAG_RECURRING_BILLING);
 }
 
+bool WorldSession::IsAffectedByCAIS() const
+{
+    // China realm system for restricting play times
+    // Don't know of any account flag or similar denoting whether an account/session is affected by CAIS (possibly just a realm-wide flag)
+    // But just in case we find something down the road, this function just acts as a switch for accounts to use the system.
+    return false;
+}
+
 uint8 WorldSession::GetBillingPlanFlags() const
 {
     uint8 flags = SESSION_NONE;
@@ -235,6 +247,9 @@ uint8 WorldSession::GetBillingPlanFlags() const
 
     if (IsInternetGameRoomAccount())
         flags |= SESSION_IGR;
+
+    if (IsAffectedByCAIS())
+        flags |= SESSION_ENABLE_CAIS;
 
     return flags;
 }
@@ -377,6 +392,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     std::vector<WorldPacket*> requeuePackets;
     uint32 processedPackets = 0;
     time_t currentTime = GameTime::GetGameTime().count();
+
+    if (GetPlayer() && GetPlayer()->IsInWorld() && IsAffectedByCAIS())
+        CheckPlayedTimeLimit(currentTime);
+
+    _lastUpdateTime = currentTime;
 
     constexpr uint32 MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE = 150;
 
@@ -636,6 +656,47 @@ void WorldSession::HandleTeleportTimeout(bool updateInSessions)
                 }
         }
     }
+}
+
+void WorldSession::CheckPlayedTimeLimit(time_t now)
+{
+    time_t const previousPlayed = GetConsecutivePlayTime(_lastUpdateTime);
+    time_t const currentPlayed = GetConsecutivePlayTime(now);
+
+    if ((previousPlayed < PLAY_TIME_LIMIT_FULL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_FULL))
+    {
+        SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+        GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+        GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+    }
+    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_FULL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_FULL))
+    {
+        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+        GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+    }
+    else if ((previousPlayed < PLAY_TIME_LIMIT_PARTIAL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_PARTIAL))
+    {
+        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+        GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+        GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+    }
+    else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_PARTIAL) &&
+        (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_PARTIAL))
+    {
+        SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32(PLAY_TIME_LIMIT_PARTIAL - currentPlayed));
+    }
+}
+
+void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemaining)
+{
+    WorldPackets::Misc::PlayTimeWarning playTimeWarning;
+    playTimeWarning.Flag = flag;
+    playTimeWarning.PlayTimeRemaining = playTimeRemaining;
+    GetPlayer()->SendDirectMessage(playTimeWarning.Write());
 }
 
 /// %Log the player out
