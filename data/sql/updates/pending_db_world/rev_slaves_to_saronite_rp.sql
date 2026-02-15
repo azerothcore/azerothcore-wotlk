@@ -72,5 +72,6 @@ UPDATE `creature_text` SET `Language`=0 WHERE `CreatureID`=31397 AND `GroupID`=1
 -- to spell 29072 and says a random whisper line. Adding spell_area so players
 -- in Icecrown (zone 210) get the aura; the mine is in this zone.
 -- Same mechanic as Whisper Gulch (27769 in area 4071).
+DELETE FROM `spell_area` WHERE `spell` = 27769 AND `area` = 210;
 INSERT INTO `spell_area` (`spell`,`area`,`quest_start`,`quest_end`,`aura_spell`,`racemask`,`gender`,`autocast`,`quest_start_status`,`quest_end_status`) VALUES
 (27769,210,0,0,0,0,2,1,64,11);
