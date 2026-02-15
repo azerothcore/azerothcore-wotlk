@@ -9,10 +9,26 @@ The LFG Activity Tracking feature stores metadata about Random Dungeon Finder (R
 Enable the feature in `worldserver.conf`:
 
 ```conf
+# Enable activity tracking
 LFG.StoreStatistics = 1
+
+# Enable automatic cleanup (optional)
+LFG.CleanupOldActivities = 1
+
+# Keep entries for 90 days (optional, range: 1-365)
+LFG.CleanupActivitiesAfterDays = 90
 ```
 
-**Default:** `0` (disabled)
+**Defaults:**
+- `LFG.StoreStatistics` = `0` (disabled)
+- `LFG.CleanupOldActivities` = `0` (disabled)
+- `LFG.CleanupActivitiesAfterDays` = `90` (days)
+
+### Automatic Cleanup
+
+When `LFG.CleanupOldActivities` is enabled, the system will automatically delete entries older than the configured number of days. The cleanup runs daily at 6:00 AM server time, alongside other maintenance tasks like guild cap resets.
+
+**Important:** Automatic cleanup is disabled by default. You must explicitly enable it if you want old entries to be removed automatically.
 
 ## Database Schema
 
@@ -112,7 +128,23 @@ ORDER BY date DESC;
 
 ## Data Retention
 
-Consider implementing a cleanup policy for old records:
+### Automatic Cleanup
+
+The system provides built-in automatic cleanup functionality. Configure it in `worldserver.conf`:
+
+```conf
+# Enable automatic cleanup
+LFG.CleanupOldActivities = 1
+
+# Keep entries for 90 days
+LFG.CleanupActivitiesAfterDays = 90
+```
+
+The cleanup runs automatically every day at 6:00 AM server time. The retention period can be configured from 1 to 365 days.
+
+### Manual Cleanup
+
+If you prefer manual cleanup or need to perform one-time cleanup operations:
 
 ```sql
 -- Example: Delete records older than 90 days
@@ -120,6 +152,8 @@ DELETE FROM lfg_activity
 WHERE timestamp < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 90 DAY))
 LIMIT 10000;
 ```
+
+**Note:** For large tables, consider deleting in smaller batches to avoid locking issues.
 
 ## Privacy Notes
 

@@ -3415,6 +3415,25 @@ DungeonFinder.AllowCompleted = 1
 LFG.StoreStatistics = 0
 
 #
+#    LFG.CleanupOldActivities
+#
+#        Description: Enable automatic cleanup of old LFG activity entries.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+LFG.CleanupOldActivities = 0
+
+#
+#    LFG.CleanupActivitiesAfterDays
+#
+#        Description: Number of days to keep LFG activity entries before deletion.
+#                     Only used when LFG.CleanupOldActivities is enabled.
+#        Range:       1-365
+#        Default:     90
+
+LFG.CleanupActivitiesAfterDays = 90
+
+#
 ###################################################################################################
 
 ###################################################################################################

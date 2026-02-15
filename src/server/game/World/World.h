@@ -256,6 +256,7 @@ protected:
     void ResetRandomBG();
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
+    void CleanupOldLfgActivities();
 private:
     WorldConfig _worldConfig;
 
@@ -296,6 +297,7 @@ private:
     Seconds _nextRandomBGReset;
     Seconds _nextCalendarOldEventsDeletionTime;
     Seconds _nextGuildReset;
+    Seconds _nextLfgActivitiesCleanup;
 
     // used versions
     std::string _dbVersion;

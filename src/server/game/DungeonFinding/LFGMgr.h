@@ -610,6 +610,7 @@ namespace lfg
 
         // Activity logging
         void LogLfgActivity(ObjectGuid playerGuid, LfgActivityEventType eventType, uint32 dungeonId, ObjectGuid groupGuid);
+        void CleanupOldLfgActivities();
 
         // Proposals
         void RemoveProposal(LfgProposalContainer::iterator itProposal, LfgUpdateType type);

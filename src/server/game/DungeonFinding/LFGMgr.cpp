@@ -118,6 +118,21 @@ namespace lfg
         CharacterDatabase.Execute(stmt);
     }
 
+    void LFGMgr::CleanupOldLfgActivities()
+    {
+        if (!sWorld->getBoolConfig(CONFIG_LFG_CLEANUP_OLD_ACTIVITIES))
+            return;
+
+        uint32 daysToKeep = sWorld->getIntConfig(CONFIG_LFG_CLEANUP_ACTIVITIES_AFTER_DAYS);
+        uint32 oldTimestamp = uint32(GameTime::GetGameTime().count() - (daysToKeep * DAY));
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_LFG_ACTIVITY_OLD);
+        stmt->SetData(0, oldTimestamp);
+        CharacterDatabase.Execute(stmt);
+
+        LOG_INFO("lfg", "LFG activity cleanup: Deleted entries older than {} days", daysToKeep);
+    }
+
     /// Load rewards for completing dungeons
     void LFGMgr::LoadRewards()
     {
