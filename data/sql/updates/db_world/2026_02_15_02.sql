@@ -1,3 +1,4 @@
+-- DB update 2026_02_15_01 -> 2026_02_15_02
 --
 DELETE FROM `acore_string` WHERE `entry` IN (5089, 5090, 5091, 5092, 5093, 5094, 5095, 5096, 5097, 5098, 5099, 5100, 5101, 5102, 5103, 5104, 5105, 5106, 5107, 5108, 5109, 5110);
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
