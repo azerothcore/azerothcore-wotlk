@@ -12018,76 +12018,48 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
             continue;
         }
 
-        // need unlearn spell
+        // Unlearn if skill requirement not met
         if (skill_value < pAbility->MinSkillLineRank && pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE)
         {
             removeSpell(pAbility->Spell, GetActiveSpec(), true);
         }
-        // need learn
-        else
+        // Learn if skill requirement met and not superseded by an available higher rank
+        else if (skill_value >= pAbility->MinSkillLineRank || pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
         {
-            //used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
-            if (pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pAbility->SupercededBySpell)
+            // Check if a higher rank of this spell is available and should be learned instead
+            bool hasHigherRank = false;
+            if (pAbility->SupercededBySpell)
             {
-                bool skipCurrent = false;
                 auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
                 for (auto itr = bounds.first; itr != bounds.second; ++itr)
                 {
-                    if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skill_value >= itr->second->MinSkillLineRank)
+                    if (itr->second->SkillLine == skill_id && skill_value >= itr->second->MinSkillLineRank)
                     {
-                        skipCurrent = true;
+                        hasHigherRank = true;
                         break;
                     }
                 }
-                if (skipCurrent)
-                {
-                    continue;
-                }
             }
 
-            if (!IsInWorld())
+            if (!hasHigherRank)
             {
-                addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true);
-            }
-            else
-            {
-                learnSpell(pAbility->Spell, true, true);
+                if (!IsInWorld())
+                    addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true);
+                else
+                    learnSpell(pAbility->Spell, true, true);
             }
         }
     }
 
-    // Remove spells that are superseded by other spells the player now knows
-    // This ensures only the highest-rank spell in a chain is kept
+    // Second pass: remove any lower-rank spells that are superseded by higher-rank spells now known
+    // This handles out-of-order spell IDs where a higher rank has a lower ID
     for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
     {
         if (!HasSpell(pAbility->Spell))
-        {
             continue;
-        }
 
-        if (pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE && pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
-        {
-            continue;
-        }
-
-        // Check if another spell in the same skill line supersedes this spell
-        // and the player has learned that superseding spell
-        for (SkillLineAbilityEntry const* otherAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
-        {
-            if (otherAbility->Spell != pAbility->SupercededBySpell)
-            {
-                continue;
-            }
-
-            if (!HasSpell(otherAbility->Spell))
-            {
-                continue;
-            }
-
-            // Remove the old spell since the player has the newer one
+        if (pAbility->SupercededBySpell && HasSpell(pAbility->SupercededBySpell))
             removeSpell(pAbility->Spell, GetActiveSpec(), true);
-            break;
-        }
     }
 }
 
