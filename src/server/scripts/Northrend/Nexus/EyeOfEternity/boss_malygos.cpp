@@ -875,25 +875,25 @@ struct npc_power_spark : public NullCreatureAI
 {
     npc_power_spark(Creature* creature) : NullCreatureAI(creature)
     {
-        pInstance = me->GetInstanceScript();
+        _instance = me->GetInstanceScript();
         me->CastSpell(me, SPELL_POWER_SPARK_VISUAL, false);
-        CheckTimer = 1000;
-        MoveTimer = 0;
+        _checkTimer = 1000;
+        _moveTimer = 0;
     }
 
     InstanceScript* _instance;
-    uint16 CheckTimer;
-    uint16 MoveTimer;
+    uint16 _checkTimer;
+    uint16 _moveTimer;
 
     void DoAction(int32 param) override
     {
         switch (param)
         {
         case ACTION_POWER_SPARK_FOLLOW:
-            MoveTimer = 1;
+            _moveTimer = 1;
             break;
         case ACTION_POWER_SPARK_STOP:
-            MoveTimer = 0;
+            _moveTimer = 0;
             me->GetMotionMaster()->MoveIdle();
             me->DisableSpline();
             me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 0.05f, FORCED_MOVEMENT_NONE, 7.0f);
@@ -910,7 +910,7 @@ struct npc_power_spark : public NullCreatureAI
         if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
             return;
 
-        MoveTimer = 0;
+        _moveTimer = 0;
         me->GetMotionMaster()->MoveIdle();
         me->DisableSpline();
         me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), CenterPos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
@@ -925,11 +925,11 @@ struct npc_power_spark : public NullCreatureAI
         if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
             return;
 
-        if (CheckTimer <= diff)
+        if (_checkTimer <= diff)
         {
-            if (pInstance)
+            if (_instance)
             {
-                if (Creature* malygos = pInstance->GetCreature(DATA_MALYGOS))
+                if (Creature* malygos = _instance->GetCreature(DATA_MALYGOS))
                 {
                     if (me->IsWithinDist3d(malygos, 12.0f))
                     {
@@ -939,20 +939,20 @@ struct npc_power_spark : public NullCreatureAI
                     }
                 }
             }
-            CheckTimer = 1000;
+            _checkTimer = 1000;
         }
         else
-            CheckTimer -= diff;
+            _checkTimer -= diff;
 
-        if (MoveTimer <= diff)
+        if (_moveTimer <= diff)
         {
-            if (pInstance)
-                if (Creature* malygos = instance->GetCreature(DATA_MALYGOS))
+            if (_instance)
+                if (Creature* malygos = _instance->GetCreature(DATA_MALYGOS))
                     me->GetMotionMaster()->MovePoint(0, *malygos);
-            MoveTimer = 2000;
+            _moveTimer = 2000;
         }
         else
-            MoveTimer -= diff;
+            _moveTimer -= diff;
     }
 };
 
@@ -1266,8 +1266,8 @@ struct go_the_focusing_iris : public GameObjectAI
 
     bool GossipHello(Player* /*user*/, bool /*reportUse*/) override
     {
-        if (InstanceScript* pInstance = me->GetInstanceScript())
-            pInstance->SetData(DATA_IRIS_ACTIVATED, 0);
+        if (InstanceScript* instance = me->GetInstanceScript())
+            instance->SetData(DATA_IRIS_ACTIVATED, 0);
 
         return true;
     }
