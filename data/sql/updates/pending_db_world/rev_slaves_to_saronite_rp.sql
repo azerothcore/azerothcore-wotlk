@@ -16,6 +16,7 @@
 -- 1. Add third random outcome (pit-jumping with yell)
 -- 2. Fix hostile behavior to use emote instead of yell
 -- 3. Fix /say messages language from Orcish to Universal
+-- 4. Add unknown voice whispers in Saronite Mines (spell_area for 27769 in Icecrown)
 
 -- ============================================================================
 -- 1. Add third behavior: Slave yells and runs to pit to jump
@@ -62,3 +63,14 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 -- ============================================================================
 -- This makes the random ambient /say messages readable by both factions
 UPDATE `creature_text` SET `Language`=0 WHERE `CreatureID`=31397 AND `GroupID`=1;
+
+-- ============================================================================
+-- 4. Unknown voice whispers in Saronite Mines (same as Whisper Gulch)
+-- ============================================================================
+-- Spell 27769 applies an aura that periodically casts 29072 on the player.
+-- NPC 29881 "An Unknown Voice" (already present in the mine at 6964,1979) reacts
+-- to spell 29072 and says a random whisper line. Adding spell_area so players
+-- in Icecrown (zone 210) get the aura; the mine is in this zone.
+-- Same mechanic as Whisper Gulch (27769 in area 4071).
+INSERT INTO `spell_area` (`spell`,`area`,`quest_start`,`quest_end`,`aura_spell`,`racemask`,`gender`,`autocast`,`quest_start_status`,`quest_end_status`) VALUES
+(27769,210,0,0,0,0,2,1,64,11);
