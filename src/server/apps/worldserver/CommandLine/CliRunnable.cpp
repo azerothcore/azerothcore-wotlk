@@ -143,6 +143,11 @@ void CliThread()
     
     // Get console input handle once for reading commands
     HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+    if (hStdIn == INVALID_HANDLE_VALUE)
+    {
+        LOG_ERROR("server.worldserver", "Failed to get console input handle");
+        return;
+    }
 #endif
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
