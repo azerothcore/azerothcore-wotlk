@@ -497,11 +497,6 @@ public:
             }
         }
 
-        void OnCreatureRemove(Creature* creature) override
-        {
-            InstanceScript::OnCreatureRemove(creature);
-        }
-
         void OpenIfDone(uint32 encounter, GameObject* go, GOState state)
         {
             if (GetBossState(encounter) == DONE)
