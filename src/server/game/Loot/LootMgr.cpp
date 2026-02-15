@@ -1303,6 +1303,12 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot& loot, Player const* pla
             LootStoreItem* item = *itr;
             float chance = item->chance;
 
+            if (player)
+            {
+                chance *= player->GetLootChanceModifier(item->itemid);
+                chance = std::min(chance, 100.0f);
+            }
+
             if (!sScriptMgr->OnItemRoll(player, item, chance, loot, store))
                 return nullptr;
 
