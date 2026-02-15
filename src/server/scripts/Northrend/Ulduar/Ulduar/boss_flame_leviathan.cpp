@@ -208,277 +208,277 @@ struct boss_flame_leviathan : public BossAI
     bool _shutdown;
     uint32 _destroyedTurretCount;
 
-        // Custom
-        void BindPlayers();
-        void RadioSay(uint8 textid);
-        void ActivateTowers();
-        void TurnGates(bool _start, bool _death);
-        void TurnHealStations(bool _apply);
-        void ScheduleEvents();
-        void SummonTowerHelpers(uint8 towerId);
+    // Custom
+    void BindPlayers();
+    void RadioSay(uint8 textid);
+    void ActivateTowers();
+    void TurnGates(bool _start, bool _death);
+    void TurnHealStations(bool _apply);
+    void ScheduleEvents();
+    void SummonTowerHelpers(uint8 towerId);
 
-        // Original
-        void JustReachedHome() override
+    // Original
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        // For achievement
+        instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+        me->setActive(false);
+    }
+
+    void MoveInLineOfSight(Unit*) override {}
+    void JustSummoned(Creature* cr)  override
+    {
+        if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
+            summons.Summon(cr);
+    }
+
+    void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
+    void JustDied(Unit*) override;
+    void KilledUnit(Unit* who) override;
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
+
+    void AttackStart(Unit* who) override
+    {
+        if (Unit* veh = who->GetVehicleBase())
+            BossAI::AttackStart(veh);
+        else
+            BossAI::AttackStart(who);
+    }
+
+    void JustEngagedWith(Unit*) override
+    {
+        ScheduleEvents();
+        Talk(FLAME_LEVIATHAN_SAY_AGGRO);
+
+        me->setActive(true);
+        me->SetHomePosition(homePos);
+        TurnHealStations(false);
+        ActivateTowers();
+        instance->SetBossState(BOSS_LEVIATHAN, SPECIAL);
+
+        BindPlayers();
+        me->SetInCombatWithZone();
+
+        if (!_startTimer)
         {
-            _JustReachedHome();
-            // For achievement
-            instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
-            me->setActive(false);
+            TurnGates(true, false);
         }
+    }
 
-        void MoveInLineOfSight(Unit*) override {}
-        void JustSummoned(Creature* cr)  override
+    void InitializeAI() override
+    {
+        if (instance->GetBossState(BOSS_LEVIATHAN) == SPECIAL)
         {
-            if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
-                summons.Summon(cr);
-        }
-
-        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
-        void JustDied(Unit*) override;
-        void KilledUnit(Unit* who) override;
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
-
-        void AttackStart(Unit* who) override
-        {
-            if (Unit* veh = who->GetVehicleBase())
-                BossAI::AttackStart(veh);
-            else
-                BossAI::AttackStart(who);
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            ScheduleEvents();
-            Talk(FLAME_LEVIATHAN_SAY_AGGRO);
-
-            me->setActive(true);
             me->SetHomePosition(homePos);
-            TurnHealStations(false);
-            ActivateTowers();
-            instance->SetBossState(BOSS_LEVIATHAN, SPECIAL);
-
-            BindPlayers();
-            me->SetInCombatWithZone();
-
-            if (!_startTimer)
-            {
-                TurnGates(true, false);
-            }
+            me->UpdatePosition(homePos);
+            me->StopMovingOnCurrentPos();
         }
 
-        void InitializeAI() override
-        {
-            if (instance->GetBossState(BOSS_LEVIATHAN) == SPECIAL)
-            {
-                me->SetHomePosition(homePos);
-                me->UpdatePosition(homePos);
-                me->StopMovingOnCurrentPos();
-            }
+        BossAI::InitializeAI();
+    }
 
-            BossAI::InitializeAI();
+    void Reset() override
+    {
+        // Special immunity case
+        me->CastSpell(me, SPELL_INVIS_AND_STEALTH_DETECT, true);
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED, true);
+
+        summons.DoAction(ACTION_DESPAWN_ADDS);
+        summons.DespawnAll();
+        events.Reset();
+
+        _shutdown = false;
+        _startTimer = 1;
+        _speakTimer = 0;
+        _towersCount = 0;
+        _destroyedTurretCount = 0;
+
+        if (instance->GetBossState(BOSS_LEVIATHAN) != SPECIAL)
+        {
+            instance->SetBossState(BOSS_LEVIATHAN, NOT_STARTED);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        }
+        else
+        {
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
+            _startTimer = 0;
         }
 
-        void Reset() override
+        TurnGates(false, false);
+        TurnHealStations(true);
+    }
+
+    uint32 GetData(uint32 param) const override
+    {
+        if (param == DATA_GET_TOWER_COUNT)
+            return _towersCount;
+        if (param == DATA_GET_SHUTDOWN)
+            return !_shutdown;
+
+        return 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        // THIS IS USED ONLY FOR FIRST ENGAGE!
+        if (_startTimer)
         {
-            // Special immunity case
-            me->CastSpell(me, SPELL_INVIS_AND_STEALTH_DETECT, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED, true);
-
-            summons.DoAction(ACTION_DESPAWN_ADDS);
-            summons.DespawnAll();
-            events.Reset();
-
-            _shutdown = false;
-            _startTimer = 1;
-            _speakTimer = 0;
-            _towersCount = 0;
-            _destroyedTurretCount = 0;
-
-            if (instance->GetBossState(BOSS_LEVIATHAN) != SPECIAL)
+            _startTimer += diff;
+            if (_startTimer >= 4000)
             {
-                instance->SetBossState(BOSS_LEVIATHAN, NOT_STARTED);
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                // Colossus dead, players in range
+                if (me->FindNearestCreature(NPC_ULDUAR_COLOSSUS, 250.0f, true) || !SelectTargetFromPlayerList(250.0f))
+                    _startTimer = 1;
+                else
+                {
+                    _startTimer = 0;
+                    _speakTimer = 1;
+                }
             }
-            else
+            return;
+        }
+
+        if (_speakTimer)
+        {
+            _speakTimer += diff;
+            if (_speakTimer <= 10000)
+            {
+                _speakTimer = 10000;
+                RadioSay(BRANN_RADIO_SAY_FL_START_0);
+            }
+            else if (_speakTimer > 16000 && _speakTimer < 20000)
+            {
+                _speakTimer = 20000;
+                RadioSay(BRANN_RADIO_SAY_FL_START_1);
+            }
+            else if (_speakTimer > 24000 && _speakTimer < 40000)
+            {
+                _speakTimer = 40000;
+                RadioSay(BRANN_RADIO_SAY_FL_START_2);
+            }
+            else if (_speakTimer > 41000 && _speakTimer < 60000)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
-                _startTimer = 0;
+                TurnGates(true, false);
+                me->GetMotionMaster()->MovePoint(0, homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
+                _speakTimer = 60000;
             }
-
-            TurnGates(false, false);
-            TurnHealStations(true);
-        }
-
-        uint32 GetData(uint32 param) const override
-        {
-            if (param == DATA_GET_TOWER_COUNT)
-                return _towersCount;
-            if (param == DATA_GET_SHUTDOWN)
-                return !_shutdown;
-
-            return 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // THIS IS USED ONLY FOR FIRST ENGAGE!
-            if (_startTimer)
+            else if (_speakTimer > 63500)
             {
-                _startTimer += diff;
-                if (_startTimer >= 4000)
+                me->SetInCombatWithZone();
+                if (!me->GetVictim())
                 {
-                    // Colossus dead, players in range
-                    if (me->FindNearestCreature(NPC_ULDUAR_COLOSSUS, 250.0f, true) || !SelectTargetFromPlayerList(250.0f))
-                        _startTimer = 1;
-                    else
-                    {
-                        _startTimer = 0;
-                        _speakTimer = 1;
-                    }
-                }
-                return;
-            }
-
-            if (_speakTimer)
-            {
-                _speakTimer += diff;
-                if (_speakTimer <= 10000)
-                {
-                    _speakTimer = 10000;
-                    RadioSay(BRANN_RADIO_SAY_FL_START_0);
-                }
-                else if (_speakTimer > 16000 && _speakTimer < 20000)
-                {
-                    _speakTimer = 20000;
-                    RadioSay(BRANN_RADIO_SAY_FL_START_1);
-                }
-                else if (_speakTimer > 24000 && _speakTimer < 40000)
-                {
-                    _speakTimer = 40000;
-                    RadioSay(BRANN_RADIO_SAY_FL_START_2);
-                }
-                else if (_speakTimer > 41000 && _speakTimer < 60000)
-                {
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    TurnGates(true, false);
-                    me->GetMotionMaster()->MovePoint(0, homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
-                    _speakTimer = 60000;
-                }
-                else if (_speakTimer > 63500)
-                {
-                    me->SetInCombatWithZone();
-                    if (!me->GetVictim())
-                    {
-                        me->CastSpell(me, SPELL_PURSUED, false);
-                        events.RescheduleEvent(EVENT_PURSUE, 31s);
-                    }
-                    _speakTimer = 0;
-                }
-                return;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_POSITION_CHECK:
-                    if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    events.Repeat(5s);
-                    break;
-                case EVENT_PURSUE:
-                    Talk(FLAME_LEVIATHAN_SAY_PURSUE);
                     me->CastSpell(me, SPELL_PURSUED, false);
                     events.RescheduleEvent(EVENT_PURSUE, 31s);
-                    return;
-                case EVENT_SPEED:
-                    me->CastSpell(me, SPELL_GATHERING_SPEED, false);
-                    events.Repeat(15s);
-                    return;
-                case EVENT_MISSILE:
-                    me->CastSpell(me, SPELL_MISSILE_BARRAGE, true);
-                    events.Repeat(4s);
-                    return;
-                case EVENT_VENT:
-                    me->CastSpell(me, SPELL_FLAME_VENTS, false);
-                    events.Repeat(20s);
-                    return;
-                case EVENT_SUMMON:
-                    if (summons.size() < 20)
-                        if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
-                            lift->GetMotionMaster()->MoveRandom(100);
-
-                    events.Repeat(4s);
-                    return;
-                case EVENT_SOUND_BEGINNING:
-                    if (_towersCount)
-                        Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
-                    else
-                        Talk(FLAME_LEVIATHAN_SAY_TOWER_NONE);
-                    return;
-                case EVENT_REINSTALL:
-                    for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
-                        if (Unit* seat = vehicle->GetPassenger(i))
-                            if (seat->IsCreature())
-                                seat->ToCreature()->AI()->EnterEvadeMode();
-                    Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
-                    return;
-                case EVENT_THORIMS_HAMMER:
-                    SummonTowerHelpers(TOWER_OF_STORMS);
-                    events.Repeat(1min, 2min);
-                    Talk(FLAME_LEVIATHAN_EMOTE_STORM);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
-                    return;
-                case EVENT_FREYA:
-                    SummonTowerHelpers(TOWER_OF_LIFE);
-                    Talk(FLAME_LEVIATHAN_EMOTE_NATURE);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
-                    return;
-                case EVENT_MIMIRONS_INFERNO:
-                    SummonTowerHelpers(TOWER_OF_FLAMES);
-                    Talk(FLAME_LEVIATHAN_EMOTE_FLAME);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
-                    return;
-                case EVENT_HODIRS_FURY:
-                    SummonTowerHelpers(TOWER_OF_FROST);
-                    Talk(FLAME_LEVIATHAN_EMOTE_FROST);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
-                    return;
-            }
-
-            if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
-            {
-                if (me->IsWithinCombatRange(me->GetVictim(), 15.0f))
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_BATTERING_RAM, false);
-                    me->resetAttackTimer();
                 }
+                _speakTimer = 0;
             }
+            return;
         }
 
-        void DoAction(int32 action) override
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (action == ACTION_DESTROYED_TURRET)
-            {
-                ++_destroyedTurretCount;
-
-                if (_destroyedTurretCount == RAID_MODE<uint32>(2, 4))
+            case EVENT_POSITION_CHECK:
+                if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
                 {
-                    _destroyedTurretCount = 0;
-                    me->CastSpell(me, SPELL_SYSTEMS_SHUTDOWN, true);
+                    EnterEvadeMode();
+                    return;
                 }
+                events.Repeat(5s);
+                break;
+            case EVENT_PURSUE:
+                Talk(FLAME_LEVIATHAN_SAY_PURSUE);
+                me->CastSpell(me, SPELL_PURSUED, false);
+                events.RescheduleEvent(EVENT_PURSUE, 31s);
+                return;
+            case EVENT_SPEED:
+                me->CastSpell(me, SPELL_GATHERING_SPEED, false);
+                events.Repeat(15s);
+                return;
+            case EVENT_MISSILE:
+                me->CastSpell(me, SPELL_MISSILE_BARRAGE, true);
+                events.Repeat(4s);
+                return;
+            case EVENT_VENT:
+                me->CastSpell(me, SPELL_FLAME_VENTS, false);
+                events.Repeat(20s);
+                return;
+            case EVENT_SUMMON:
+                if (summons.size() < 20)
+                    if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
+                        lift->GetMotionMaster()->MoveRandom(100);
+
+                events.Repeat(4s);
+                return;
+            case EVENT_SOUND_BEGINNING:
+                if (_towersCount)
+                    Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
+                else
+                    Talk(FLAME_LEVIATHAN_SAY_TOWER_NONE);
+                return;
+            case EVENT_REINSTALL:
+                for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
+                    if (Unit* seat = vehicle->GetPassenger(i))
+                        if (seat->IsCreature())
+                            seat->ToCreature()->AI()->EnterEvadeMode();
+                Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
+                return;
+            case EVENT_THORIMS_HAMMER:
+                SummonTowerHelpers(TOWER_OF_STORMS);
+                events.Repeat(1min, 2min);
+                Talk(FLAME_LEVIATHAN_EMOTE_STORM);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
+                return;
+            case EVENT_FREYA:
+                SummonTowerHelpers(TOWER_OF_LIFE);
+                Talk(FLAME_LEVIATHAN_EMOTE_NATURE);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
+                return;
+            case EVENT_MIMIRONS_INFERNO:
+                SummonTowerHelpers(TOWER_OF_FLAMES);
+                Talk(FLAME_LEVIATHAN_EMOTE_FLAME);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
+                return;
+            case EVENT_HODIRS_FURY:
+                SummonTowerHelpers(TOWER_OF_FROST);
+                Talk(FLAME_LEVIATHAN_EMOTE_FROST);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
+                return;
+        }
+
+        if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
+        {
+            if (me->IsWithinCombatRange(me->GetVictim(), 15.0f))
+            {
+                me->CastSpell(me->GetVictim(), SPELL_BATTERING_RAM, false);
+                me->resetAttackTimer();
             }
         }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_DESTROYED_TURRET)
+        {
+            ++_destroyedTurretCount;
+
+            if (_destroyedTurretCount == RAID_MODE<uint32>(2, 4))
+            {
+                _destroyedTurretCount = 0;
+                me->CastSpell(me, SPELL_SYSTEMS_SHUTDOWN, true);
+            }
+        }
+    }
 };
 
 void boss_flame_leviathan::BindPlayers()
