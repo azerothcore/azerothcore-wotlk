@@ -506,6 +506,9 @@ namespace lfg
         uint8 RemovePlayerFromGroup(ObjectGuid gguid, ObjectGuid guid);
         /// Adds player to group
         void AddPlayerToGroup(ObjectGuid gguid, ObjectGuid guid);
+        /// Store player that selected random queue to group
+        void AddPlayerQueuedForRandomDungeonToGroup(ObjectGuid gguid, ObjectGuid guid);
+        bool IsPlayerQueuedForRandomDungeon(ObjectGuid guid);
         /// Xinef: Set Random Players Count
         void SetRandomPlayersCount(ObjectGuid guid, uint8 count);
         /// Xinef: Get Random Players Count

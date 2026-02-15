@@ -26,7 +26,7 @@
 
 enum AuriayaSpells
 {
-    // BASIC
+    // Auriaya
     SPELL_TERRIFYING_SCREECH            = 64386,
     SPELL_SENTINEL_BLAST                = 64389,
     SPELL_SONIC_SCREECH                 = 64422,
@@ -56,15 +56,22 @@ enum AuriayaNPC
 
 enum AuriayaEvents
 {
+    // Auriaya
     EVENT_SUMMON_FERAL_DEFENDER         = 1,
     EVENT_TERRIFYING_SCREECH            = 2,
     EVENT_SONIC_SCREECH                 = 3,
     EVENT_GUARDIAN_SWARM                = 4,
     EVENT_SENTINEL_BLAST                = 5,
     EVENT_REMOVE_IMMUNE                 = 6,
+    EVENT_RESPAWN_FERAL_DEFENDER        = 7,
 
-    EVENT_RESPAWN_FERAL_DEFENDER        = 9,
-    EVENT_ENRAGE                        = 10,
+    // Sanctum Sentry
+    EVENT_SAVAGE_POUNCE                 = 8,
+    EVENT_RIP_FLESH                     = 9,
+
+    // Feral Defender
+    EVENT_FERAL_RUSH                    = 10,
+    EVENT_FERAL_POUNCE                  = 11,
 };
 
 enum Texts
@@ -88,333 +95,279 @@ enum Misc
     DATA_NINE_LIVES                     = 11,
 };
 
-class boss_auriaya : public CreatureScript
+struct boss_auriaya : public BossAI
 {
-public:
-    boss_auriaya() : CreatureScript("boss_auriaya") { }
+    boss_auriaya(Creature* creature) : BossAI(creature, BOSS_AURIAYA) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    bool _feralDied{false};
+    bool _nineLives{false};
+
+    void Reset() override
     {
-        return GetUlduarAI<boss_auriayaAI>(pCreature);
+        _feralDied = false;
+        _nineLives = false;
+
+        EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
+        summons.DoAction(ACTION_DESPAWN_ADDS, pred);
+
+        BossAI::Reset();
+
+        for (uint8 i = 0; i < RAID_MODE(2, 4); ++i)
+            me->SummonCreature(NPC_SANCTUM_SENTRY, me->GetPositionX() + urand(4, 12), me->GetPositionY() + urand(4, 12), me->GetPositionZ());
+
+        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
     }
 
-    struct boss_auriayaAI : public ScriptedAI
+    uint32 GetData(uint32 param) const override
     {
-        boss_auriayaAI(Creature* pCreature) : ScriptedAI(pCreature), summons(pCreature)
+        if (param == DATA_CRAZY_CAT)
+            return !_feralDied;
+        if (param == DATA_NINE_LIVES)
+            return _nineLives;
+
+        return 0;
+    }
+
+    void JustSummoned(Creature* cr) override
+    {
+        if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
+            cr->GetMotionMaster()->MoveFollow(me, 6, rand_norm() * 2 * 3.14f);
+        else
+            cr->SetInCombatWithZone();
+
+        summons.Summon(cr);
+    }
+
+    void SummonedCreatureDies(Creature* cr, Unit*) override
+    {
+        if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
+            _feralDied = true;
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+
+        events.ScheduleEvent(EVENT_TERRIFYING_SCREECH, 35s);
+        events.ScheduleEvent(EVENT_SONIC_SCREECH, 45s);
+        events.ScheduleEvent(EVENT_GUARDIAN_SWARM, 70s);
+        events.ScheduleEvent(EVENT_SUMMON_FERAL_DEFENDER, 60s);
+        events.ScheduleEvent(EVENT_SENTINEL_BLAST, 36s);
+
+        ScheduleEnrageTimer(SPELL_ENRAGE, 10min, SAY_BERSERK);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (!victim->IsPlayer() || urand(0, 2))
+            return;
+
+        Talk(SAY_SLAY);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
+        summons.DoAction(ACTION_DESPAWN_ADDS, pred);
+
+        BossAI::JustDied(killer);
+        Talk(EMOTE_DEATH);
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_FERAL_DEATH_WITH_STACK)
+            events.ScheduleEvent(EVENT_RESPAWN_FERAL_DEFENDER, 25s);
+        else if (param == ACTION_FERAL_DEATH)
+            _nineLives = true;
+    }
+
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
         {
-            m_pInstance = pCreature->GetInstanceScript();
-        }
-
-        InstanceScript* m_pInstance;
-        EventMap events;
-        SummonList summons;
-
-        bool _feralDied;
-        bool _nineLives;
-
-        void Reset() override
-        {
-            _feralDied = false;
-            _nineLives = false;
-
-            events.Reset();
-            EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
-            summons.DoAction(ACTION_DESPAWN_ADDS, pred);
-            summons.DespawnAll();
-
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_AURIAYA, NOT_STARTED);
-
-            for (uint8 i = 0; i < RAID_MODE(2, 4); ++i)
-                me->SummonCreature(NPC_SANCTUM_SENTRY, me->GetPositionX() + urand(4, 12), me->GetPositionY() + urand(4, 12), me->GetPositionZ());
-
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-        }
-
-        uint32 GetData(uint32 param) const override
-        {
-            if (param == DATA_CRAZY_CAT)
-                return !_feralDied;
-            else if (param == DATA_NINE_LIVES)
-                return _nineLives;
-
-            return 0;
-        }
-
-        void JustSummoned(Creature* cr) override
-        {
-            if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
-                cr->GetMotionMaster()->MoveFollow(me, 6, rand_norm() * 2 * 3.14f);
-            else
-                cr->SetInCombatWithZone();
-
-            summons.Summon(cr);
-        }
-
-        void SummonedCreatureDies(Creature* cr, Unit*) override
-        {
-            if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
-                _feralDied = true;
-        }
-
-        void JustReachedHome() override { me->setActive(false); }
-
-        void JustEngagedWith(Unit*  /*who*/) override
-        {
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_AURIAYA, IN_PROGRESS);
-
-            events.ScheduleEvent(EVENT_TERRIFYING_SCREECH, 35s);
-            events.ScheduleEvent(EVENT_SONIC_SCREECH, 45s);
-            events.ScheduleEvent(EVENT_GUARDIAN_SWARM, 70s);
-            events.ScheduleEvent(EVENT_SUMMON_FERAL_DEFENDER, 60s);
-            events.ScheduleEvent(EVENT_SENTINEL_BLAST, 36s);
-            events.ScheduleEvent(EVENT_ENRAGE, 10min);
-
-            summons.DoZoneInCombat(NPC_SANCTUM_SENTRY);
-
-            Talk(SAY_AGGRO);
-            me->setActive(true);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (!victim->IsPlayer() || urand(0, 2))
-                return;
-
-            Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_AURIAYA, DONE);
-
-            EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
-            summons.DoAction(ACTION_DESPAWN_ADDS, pred);
-            summons.DespawnAll();
-            Talk(EMOTE_DEATH);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_FERAL_DEATH_WITH_STACK)
-                events.ScheduleEvent(EVENT_RESPAWN_FERAL_DEFENDER, 25s);
-            else if (param == ACTION_FERAL_DEATH)
-                _nineLives = true;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            case EVENT_SUMMON_FERAL_DEFENDER:
+                Talk(EMOTE_DEFFENDER);
+                DoCastSelf(SPELL_ACTIVATE_FERAL_DEFENDER, true);
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
+                events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3s);
+                break;
+            case EVENT_REMOVE_IMMUNE:
+                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
+                break;
+            case EVENT_TERRIFYING_SCREECH:
+                Talk(EMOTE_FEAR);
+                DoCastSelf(SPELL_TERRIFYING_SCREECH);
+                events.Repeat(35s);
+                break;
+            case EVENT_SONIC_SCREECH:
+                DoCastSelf(SPELL_SONIC_SCREECH);
+                events.Repeat(50s);
+                break;
+            case EVENT_GUARDIAN_SWARM:
+                DoCastVictim(SPELL_GUARDIAN_SWARM);
+                events.Repeat(40s);
+                break;
+            case EVENT_SENTINEL_BLAST:
+                DoCastSelf(SPELL_SENTINEL_BLAST);
+                events.Repeat(35s);
+                events.DelayEvents(5s, 0);
+                break;
+            case EVENT_RESPAWN_FERAL_DEFENDER:
             {
-                case EVENT_SUMMON_FERAL_DEFENDER:
-                    Talk(EMOTE_DEFFENDER);
-                    me->CastSpell(me, SPELL_ACTIVATE_FERAL_DEFENDER, true);
-                    me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-                    events.ScheduleEvent(EVENT_REMOVE_IMMUNE, 3s);
-                    break;
-                case EVENT_REMOVE_IMMUNE:
-                    me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-                    break;
-                case EVENT_TERRIFYING_SCREECH:
-                    Talk(EMOTE_FEAR);
-                    me->CastSpell(me, SPELL_TERRIFYING_SCREECH, false);
-                    events.Repeat(35s);
-                    break;
-                case EVENT_SONIC_SCREECH:
-                    me->CastSpell(me, SPELL_SONIC_SCREECH, false);
-                    events.Repeat(50s);
-                    break;
-                case EVENT_GUARDIAN_SWARM:
-                    me->CastSpell(me->GetVictim(), SPELL_GUARDIAN_SWARM, false);
-                    events.Repeat(40s);
-                    break;
-                case EVENT_SENTINEL_BLAST:
-                    me->CastSpell(me, SPELL_SENTINEL_BLAST, false);
-                    events.Repeat(35s);
-                    events.DelayEvents(5s, 0);
-                    break;
-                case EVENT_RESPAWN_FERAL_DEFENDER:
-                    {
-                        EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
-                        summons.DoAction(ACTION_FERAL_RESPAWN, pred);
-                        break;
-                    }
-                case EVENT_ENRAGE:
-                    Talk(SAY_BERSERK);
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
+                EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
+                summons.DoAction(ACTION_FERAL_RESPAWN, pred);
+                break;
             }
-
-            DoMeleeAttackIfReady();
         }
-    };
+    }
 };
 
-class npc_auriaya_sanctum_sentry : public CreatureScript
+struct npc_auriaya_sanctum_sentry : public ScriptedAI
 {
-public:
-    npc_auriaya_sanctum_sentry() : CreatureScript("npc_auriaya_sanctum_sentry") { }
+    npc_auriaya_sanctum_sentry(Creature* creature) : ScriptedAI(creature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void JustEngagedWith(Unit*) override
     {
-        return GetUlduarAI<npc_auriaya_sanctum_sentryAI>(pCreature);
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* cr = instance->GetCreature(BOSS_AURIAYA))
+                cr->SetInCombatWithZone();
+
+        events.ScheduleEvent(EVENT_SAVAGE_POUNCE, 5s);
+        events.ScheduleEvent(EVENT_RIP_FLESH, 10s);
     }
 
-    struct npc_auriaya_sanctum_sentryAI : public ScriptedAI
+    void Reset() override
     {
-        npc_auriaya_sanctum_sentryAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+        events.Reset();
+        DoCastSelf(SPELL_STRENGTH_OF_THE_PACK, true);
+    }
 
-        uint32 _savagePounceTimer;
-        uint32 _ripFleshTimer;
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
 
-        void JustEngagedWith(Unit*) override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (me->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_AURIAYA)))
-                    cr->SetInCombatWithZone();
-        }
-
-        void Reset() override
-        {
-            _savagePounceTimer = 5000;
-            _ripFleshTimer = 0;
-
-            me->CastSpell(me, SPELL_STRENGTH_OF_THE_PACK, true);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _savagePounceTimer += diff;
-            _ripFleshTimer += diff;
-
-            if (_savagePounceTimer >= 5000)
+            case EVENT_SAVAGE_POUNCE:
             {
                 float dist = me->GetDistance(me->GetVictim());
                 if (dist >= 8 && dist < 25 && me->IsWithinLOSInMap(me->GetVictim()))
                 {
                     me->CastSpell(me->GetVictim(), SPELL_SAVAGE_POUNCE, false);
-                    _savagePounceTimer = 0;
-                    return;
+                    events.Repeat(5s);
+                    break;
                 }
-                _savagePounceTimer = 200;
+                events.Repeat(200ms);
+                break;
             }
-            else if (_ripFleshTimer >= 10000)
-            {
+            case EVENT_RIP_FLESH:
                 me->CastSpell(me->GetVictim(), SPELL_RIP_FLESH, false);
-                _ripFleshTimer = 0;
-            }
-
-            DoMeleeAttackIfReady();
+                events.Repeat(10s);
+                break;
         }
-    };
+
+        DoMeleeAttackIfReady();
+    }
 };
 
-class npc_auriaya_feral_defender : public CreatureScript
+struct npc_auriaya_feral_defender : public ScriptedAI
 {
-public:
-    npc_auriaya_feral_defender() : CreatureScript("npc_auriaya_feral_defender") { }
+    npc_auriaya_feral_defender(Creature* creature) : ScriptedAI(creature), _summons(creature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    uint8 _feralEssenceStack{8};
+    SummonList _summons;
+
+    void Reset() override
     {
-        return GetUlduarAI<npc_auriaya_feral_defenderAI>(pCreature);
+        events.Reset();
+        _summons.DespawnAll();
+        _feralEssenceStack = 8;
+
+        if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE, me))
+            aur->SetStackAmount(_feralEssenceStack);
     }
 
-    struct npc_auriaya_feral_defenderAI : public ScriptedAI
+    void JustEngagedWith(Unit*) override
     {
-        npc_auriaya_feral_defenderAI(Creature* pCreature) : ScriptedAI(pCreature), summons(pCreature) { }
+        events.ScheduleEvent(EVENT_FERAL_RUSH, 3s);
+        events.ScheduleEvent(EVENT_FERAL_POUNCE, 6s);
+    }
 
-        int32 _feralRushTimer;
-        int32 _feralPounceTimer;
-        uint8 _feralEssenceStack;
-        SummonList summons;
+    void JustDied(Unit*) override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* cr = instance->GetCreature(BOSS_AURIAYA))
+                cr->AI()->DoAction(_feralEssenceStack ? ACTION_FERAL_DEATH_WITH_STACK : ACTION_FERAL_DEATH);
 
-        void Reset() override
+        if (_feralEssenceStack)
         {
-            summons.DespawnAll();
-            _feralRushTimer = 3000;
-            _feralPounceTimer = 0;
-            _feralEssenceStack = 8;
+            if (Creature* cr = me->SummonCreature(NPC_SEEPING_FERAL_ESSENCE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f))
+                _summons.Summon(cr);
 
-            if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE, me))
-                aur->SetStackAmount(_feralEssenceStack);
+            --_feralEssenceStack;
         }
+    }
 
-        void JustDied(Unit*) override
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_FERAL_RESPAWN)
         {
-            // inform about our death, start timer
-            if (me->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_AURIAYA)))
-                    cr->AI()->DoAction(_feralEssenceStack ? ACTION_FERAL_DEATH_WITH_STACK : ACTION_FERAL_DEATH);
+            me->setDeathState(DeathState::JustRespawned);
+
+            if (Player* target = SelectTargetFromPlayerList(200))
+                AttackStart(target);
+            else
+            {
+                _summons.DespawnAll();
+                me->DespawnOrUnsummon(1ms);
+            }
 
             if (_feralEssenceStack)
-            {
-                if (Creature* cr = me->SummonCreature(NPC_SEEPING_FERAL_ESSENCE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f))
-                    summons.Summon(cr);
+                if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE, me))
+                    aur->SetStackAmount(_feralEssenceStack);
 
-                --_feralEssenceStack;
-            }
+            events.ScheduleEvent(EVENT_FERAL_RUSH, 3s);
+            events.ScheduleEvent(EVENT_FERAL_POUNCE, 6s);
         }
+        else if (param == ACTION_DESPAWN_ADDS)
+            _summons.DespawnAll();
+    }
 
-        void DoAction(int32 param) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (param == ACTION_FERAL_RESPAWN)
-            {
-                me->setDeathState(DeathState::JustRespawned);
-
-                if (Player* target = SelectTargetFromPlayerList(200))
-                    AttackStart(target);
-                else
-                {
-                    summons.DespawnAll();
-                    me->DespawnOrUnsummon(1ms);
-                }
-
-                if (_feralEssenceStack)
-                    if (Aura* aur = me->AddAura(SPELL_FERAL_ESSENCE, me))
-                        aur->SetStackAmount(_feralEssenceStack);
-            }
-            else if (param == ACTION_DESPAWN_ADDS)
-                summons.DespawnAll();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _feralRushTimer += diff;
-            _feralPounceTimer += diff;
-
-            if (_feralRushTimer >= 6000)
-            {
+            case EVENT_FERAL_RUSH:
                 DoResetThreatList();
                 if (!UpdateVictim())
                     return;
-
-                me->CastSpell(me->GetVictim(), SPELL_FERAL_RUSH, true);
-                _feralRushTimer = 0;
-            }
-            else if (_feralPounceTimer >= 6000)
-            {
-                me->CastSpell(me->GetVictim(), SPELL_FERAL_POUNCE, false);
-                _feralPounceTimer = 0;
-            }
-
-            DoMeleeAttackIfReady();
+                DoCastVictim(SPELL_FERAL_RUSH, true);
+                events.Repeat(6s);
+                break;
+            case EVENT_FERAL_POUNCE:
+                DoCastVictim(SPELL_FERAL_POUNCE);
+                events.Repeat(6s);
+                break;
         }
-    };
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 class spell_auriaya_sentinel_blast : public SpellScript
@@ -437,12 +390,12 @@ class achievement_auriaya_crazy_cat_lady : public AchievementCriteriaScript
 public:
     achievement_auriaya_crazy_cat_lady() : AchievementCriteriaScript("achievement_auriaya_crazy_cat_lady") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_AURIAYA)))
-                    return cr->AI()->GetData(DATA_CRAZY_CAT);
+                if (Creature* auriaya = instance->GetCreature(BOSS_AURIAYA))
+                    return auriaya->AI()->GetData(DATA_CRAZY_CAT);
 
         return false;
     }
@@ -453,11 +406,11 @@ class achievement_auriaya_nine_lives : public AchievementCriteriaScript
 public:
     achievement_auriaya_nine_lives() : AchievementCriteriaScript("achievement_auriaya_nine_lives") {}
 
-    bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
+    bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_AURIAYA)))
+                if (Creature* cr = instance->GetCreature(BOSS_AURIAYA))
                     return cr->AI()->GetData(DATA_NINE_LIVES);
 
         return false;
@@ -466,9 +419,9 @@ public:
 
 void AddSC_boss_auriaya()
 {
-    new boss_auriaya();
-    new npc_auriaya_sanctum_sentry();
-    new npc_auriaya_feral_defender();
+    RegisterUlduarCreatureAI(boss_auriaya);
+    RegisterUlduarCreatureAI(npc_auriaya_sanctum_sentry);
+    RegisterUlduarCreatureAI(npc_auriaya_feral_defender);
 
     RegisterSpellScript(spell_auriaya_sentinel_blast);
 

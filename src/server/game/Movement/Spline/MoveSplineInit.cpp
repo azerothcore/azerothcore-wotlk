@@ -118,7 +118,7 @@ namespace Movement
             // If spline is initialized with SetWalk method it only means we need to select
             // walk move speed for it but not add walk flag to unit
             uint32 moveFlagsForSpeed = moveFlags;
-            if (args.flags.walkmode)
+            if (args.walk)
                 moveFlagsForSpeed |= MOVEMENTFLAG_WALKING;
             else
                 moveFlagsForSpeed &= ~MOVEMENTFLAG_WALKING;
@@ -199,7 +199,7 @@ namespace Movement
         args.splineId = splineIdGen.NewId();
         args.TransformForTransport = unit->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && unit->GetTransGUID();
         // mix existing state into new
-        args.flags.walkmode = unit->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING);
+        args.walk = unit->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_WALKING);
         args.flags.flying = unit->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY));
     }
 
