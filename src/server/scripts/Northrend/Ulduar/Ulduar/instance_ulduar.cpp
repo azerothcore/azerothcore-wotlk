@@ -283,10 +283,11 @@ public:
                 case BOSS_LEVIATHAN:
                     if (state == DONE)
                     {
-                        Map::PlayerList const& pList = instance->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                            if (Creature* vehicleCreature = itr->GetSource()->GetVehicleCreatureBase())
+                        instance->DoForAllPlayers([&](Player* player)
+                        {
+                            if (Creature* vehicleCreature = player->GetVehicleCreatureBase())
                                 vehicleCreature->DespawnOrUnsummon();
+                        });
 
                         if (GameObject* go = GetGameObject(DATA_LEVIATHAN_DOORS))
                             go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
