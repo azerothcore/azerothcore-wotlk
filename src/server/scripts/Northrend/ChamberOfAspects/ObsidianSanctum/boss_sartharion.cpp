@@ -1136,15 +1136,6 @@ struct boss_sartharion_tenebron : public boss_sartharion_dragonAI
                 break;
         }
     }
-
-    void ClearInstance() override
-    {
-        boss_sartharion_dragonAI::ClearInstance();
-        summons2.DespawnAll();
-    }
-
-private:
-    SummonList summons2;
 };
 
 /////////////////////////////
