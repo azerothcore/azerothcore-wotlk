@@ -40,10 +40,10 @@ struct TempSummonData
 /// Stores data for temp gameobject summons
 struct GameObjectSummonData
 {
-    uint32 entry;        ///< Entry of summoned gameobject
-    Position pos;        ///< Position where gameobject should be spawned
-    G3D::Quat rot;      ///< Quaternion rotation
-    uint32 respawnTime;  ///< Despawn time in seconds
+    uint32 entry;
+    Position pos;
+    G3D::Quat rot;
+    uint32 respawnTime;  ///< Duration in seconds; passed to SummonGameObject's respawnTime parameter
 };
 
 class TempSummon : public Creature
