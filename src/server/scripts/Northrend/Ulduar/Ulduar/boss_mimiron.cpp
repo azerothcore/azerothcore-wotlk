@@ -2054,7 +2054,7 @@ public:
 
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (instance->GetData(BOSS_MIMIRON) != NOT_STARTED)
+            if (instance->GetBossState(BOSS_MIMIRON) != NOT_STARTED)
                 return false;
 
             if (Creature* c = instance->GetCreature(BOSS_MIMIRON))
@@ -2121,7 +2121,7 @@ struct npc_ulduar_flames_initial : public NullCreatureAI
     void UpdateAI(uint32 diff) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (instance->GetData(BOSS_MIMIRON) != IN_PROGRESS)
+            if (instance->GetBossState(BOSS_MIMIRON) != IN_PROGRESS)
             {
                 RemoveAll();
                 return;

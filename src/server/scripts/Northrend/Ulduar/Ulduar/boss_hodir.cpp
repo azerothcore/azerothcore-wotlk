@@ -422,7 +422,7 @@ struct boss_hodir : public BossAI
                 }
                 break;
             case EVENT_DESPAWN_CHEST:
-                if (instance && instance->GetData(BOSS_HODIR) != DONE)
+                if (instance && instance->GetBossState(BOSS_HODIR) != DONE)
                     instance->SetData(TYPE_HODIR_HM_FAIL, 0);
                 break;
             case EVENT_FLASH_FREEZE:
@@ -636,7 +636,7 @@ struct npc_ulduar_flash_freeze : public NullCreatureAI
     void DamageTaken(Unit* doneBy, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
     {
         if (pInstance && doneBy)
-            if (pInstance->GetData(BOSS_HODIR) == NOT_STARTED)
+            if (pInstance->GetBossState(BOSS_HODIR) == NOT_STARTED)
                 if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
                     hodir->AI()->AttackStart(doneBy);
     }
@@ -654,7 +654,7 @@ struct npc_ulduar_flash_freeze : public NullCreatureAI
                         me->DespawnOrUnsummon(2s);
                     else if (s->IsPlayer())
                         if (InstanceScript* instanceScript = me->GetInstanceScript())
-                            if (instanceScript->GetData(BOSS_HODIR) == NOT_STARTED)
+                            if (instanceScript->GetBossState(BOSS_HODIR) == NOT_STARTED)
                             {
                                 s->CastSpell(s, SPELL_FLASH_FREEZE_INSTAKILL, true);
                                 me->DespawnOrUnsummon(2s);

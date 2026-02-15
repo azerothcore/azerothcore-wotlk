@@ -480,7 +480,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
             return;
 
         // some simple hack checks
-        if (m_pInstance->GetData(BOSS_VEZAX) != DONE || m_pInstance->GetData(BOSS_XT002) != DONE)
+        if (m_pInstance->GetBossState(BOSS_VEZAX) != DONE || m_pInstance->GetBossState(BOSS_XT002) != DONE)
             return;
 
         m_pInstance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);

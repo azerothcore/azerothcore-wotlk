@@ -259,7 +259,7 @@ struct boss_kologarnAI : public BossAI
 
         void SummonedCreatureDespawn(Creature* cr) override
         {
-            if (instance->GetData(BOSS_KOLOGARN) > NOT_STARTED)
+            if (instance->GetBossState(BOSS_KOLOGARN) > NOT_STARTED)
                 return;
 
             if (cr->GetEntry() == NPC_LEFT_ARM)

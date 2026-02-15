@@ -1096,7 +1096,7 @@ struct npc_brann_radio : public NullCreatureAI
 {
     npc_brann_radio(Creature* c) : NullCreatureAI(c)
     {
-        _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(BOSS_LEVIATHAN) > NOT_STARTED);
+        _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetBossState(BOSS_LEVIATHAN) > NOT_STARTED);
         _helpLock = _lock;
     }
 

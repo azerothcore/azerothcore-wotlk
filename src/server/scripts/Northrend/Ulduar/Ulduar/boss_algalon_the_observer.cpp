@@ -385,7 +385,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         _phaseTwo = false;
         _heraldOfTheTitans = true;
 
-        if (m_pInstance->GetData(BOSS_ALGALON) == FAIL)
+        if (m_pInstance->GetBossState(BOSS_ALGALON) == FAIL)
         {
             _firstPull = false;
         }

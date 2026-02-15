@@ -596,7 +596,7 @@ public:
         if (!instance)
             return true;
 
-        if (instance->GetData(BOSS_RAZORSCALE) == DONE)
+        if (instance->GetBossState(BOSS_RAZORSCALE) == DONE)
             return true;
 
         Creature* razorscale = instance->GetCreature(BOSS_RAZORSCALE);
@@ -616,7 +616,7 @@ public:
         if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
         {
             InstanceScript* instance = creature->GetInstanceScript();
-            if (!instance || instance->GetData(BOSS_RAZORSCALE) == DONE)
+            if (!instance || instance->GetBossState(BOSS_RAZORSCALE) == DONE)
                 return true;
 
             Creature* razorscale = instance->GetCreature(BOSS_RAZORSCALE);
@@ -653,7 +653,7 @@ public:
         npc_ulduar_expedition_commanderAI(Creature* creature) : NullCreatureAI(creature)
         {
             _instance = creature->GetInstanceScript();
-            _introSpoken = _instance->GetData(BOSS_RAZORSCALE) == DONE;
+            _introSpoken = _instance->GetBossState(BOSS_RAZORSCALE) == DONE;
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
