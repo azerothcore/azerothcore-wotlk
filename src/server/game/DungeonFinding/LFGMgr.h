@@ -82,6 +82,16 @@ namespace lfg
         LFG_PROPOSAL_SUCCESS                         = 2
     };
 
+    /// Activity event types for statistics tracking
+    enum LfgActivityEventType
+    {
+        LFG_EVENT_JOINED                             = 1,
+        LFG_EVENT_REFUSED                            = 2,
+        LFG_EVENT_LEFT                               = 3,
+        LFG_EVENT_KICKED                             = 4,
+        LFG_EVENT_DISCONNECTED                       = 5
+    };
+
     /// Teleport errors
     enum LfgTeleportError
     {
@@ -597,6 +607,9 @@ namespace lfg
         void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId = 0);
         void _SaveToDB(ObjectGuid guid);
         LFGDungeonData const* GetLFGDungeon(uint32 id);
+
+        // Activity logging
+        void LogLfgActivity(ObjectGuid playerGuid, LfgActivityEventType eventType, uint32 dungeonId, ObjectGuid groupGuid);
 
         // Proposals
         void RemoveProposal(LfgProposalContainer::iterator itProposal, LfgUpdateType type);

@@ -104,6 +104,20 @@ namespace lfg
         CharacterDatabase.Execute(stmt);
     }
 
+    void LFGMgr::LogLfgActivity(ObjectGuid playerGuid, LfgActivityEventType eventType, uint32 dungeonId, ObjectGuid groupGuid)
+    {
+        if (!sWorld->getBoolConfig(CONFIG_LFG_STORE_STATISTICS))
+            return;
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_LFG_ACTIVITY);
+        stmt->SetData(0, playerGuid.GetCounter());
+        stmt->SetData(1, uint8(eventType));
+        stmt->SetData(2, dungeonId);
+        stmt->SetData(3, groupGuid.GetCounter());
+        stmt->SetData(4, uint32(GameTime::GetGameTime().count()));
+        CharacterDatabase.Execute(stmt);
+    }
+
     /// Load rewards for completing dungeons
     void LFGMgr::LoadRewards()
     {
@@ -1832,8 +1846,16 @@ namespace lfg
         player.accept = LfgAnswer(accept);
 
         LOG_DEBUG("lfg", "LFGMgr::UpdateProposal: Player [{}] of proposal {} selected: {}", guid.ToString(), proposalId, accept);
-        if (!accept)
+        
+        // Log activity: joined or refused
+        uint32 dungeonId = proposal.dungeonId;
+        if (accept)
         {
+            LogLfgActivity(guid, LFG_EVENT_JOINED, dungeonId, ObjectGuid::Empty);
+        }
+        else
+        {
+            LogLfgActivity(guid, LFG_EVENT_REFUSED, dungeonId, ObjectGuid::Empty);
             RemoveProposal(itProposal, LFG_UPDATETYPE_PROPOSAL_DECLINED);
             return;
         }
@@ -2109,7 +2131,13 @@ namespace lfg
         if (agreeNum == LFG_GROUP_KICK_VOTES_NEEDED)           // Vote passed - Kick player
         {
             if (Group* group = sGroupMgr->GetGroupByGUID(gguid.GetCounter()))
+            {
+                // Log kick activity
+                uint32 dungeonId = GetDungeon(gguid);
+                LogLfgActivity(boot.victim, LFG_EVENT_KICKED, dungeonId, gguid);
+                
                 Player::RemoveFromGroup(group, boot.victim, GROUP_REMOVEMETHOD_KICK_LFG);
+            }
 
             DecreaseKicksLeft(gguid);
         }

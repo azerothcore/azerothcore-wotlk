@@ -3405,6 +3405,16 @@ DungeonFinder.CastDeserter = 1
 DungeonFinder.AllowCompleted = 1
 
 #
+#    LFG.StoreStatistics
+#
+#        Description: Store LFG activity statistics in the database.
+#                     Tracks when players join/refuse/leave/get kicked/disconnect from LFG groups.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+LFG.StoreStatistics = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
