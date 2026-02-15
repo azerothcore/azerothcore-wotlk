@@ -1,3 +1,4 @@
+-- DB update 2026_02_15_05 -> 2026_02_15_06
 --
 DELETE FROM `item_loot_template` WHERE (`Entry` = 44663);
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
