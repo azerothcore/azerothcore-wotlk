@@ -145,7 +145,6 @@ enum Misc
     MAX_AREA_TRIGGER_COUNT                      = 2,
     MAX_CYCLONE_COUNT                           = 5,
     MAX_TENEBORN_EGGS_SUMMONS                   = 6,
-    MAX_BOUNDARY_POSITIONS                      = 4,
 };
 
 enum Events
@@ -173,7 +172,6 @@ enum Events
     EVENT_SARTHARION_CALL_SHADRON               = 31,
     EVENT_SARTHARION_CALL_VESPERON              = 32,
 
-    EVENT_SARTHARION_BOUNDARY                   = 33,
     EVENT_MINIDRAKE_SPEECH                      = 34,
 };
 
@@ -222,14 +220,6 @@ const Position AreaTriggerSummonPos[MAX_AREA_TRIGGER_COUNT] =
 {
     { 3244.14f, 512.597f, 58.6534f, 0.0f },
     { 3242.84f, 553.979f, 58.8272f, 0.0f },
-};
-
-float const SartharionBoundary[MAX_BOUNDARY_POSITIONS] =
-{
-    3218.86f,   // South X
-    3275.69f,   // North X
-    484.68f,    // East Y
-    572.4f      // West Y
 };
 
 float const FlameTsunamiLeftOffsets[MAX_LEFT_LAVA_TSUNAMIS] =
@@ -282,14 +272,8 @@ struct boss_sartharion : public BossAI
             DoCastSelf(SPELL_SARTHARION_TWILIGHT_REVENGE, true);
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        if (who && !IsTargetInBounds(who))
-        {
-            EnterEvadeMode();
-            return;
-        }
-
         _JustEngagedWith();
         DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
         Talk(SAY_SARTHARION_AGGRO);
@@ -303,7 +287,6 @@ struct boss_sartharion : public BossAI
         extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20s);
         extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5s);
         extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 15min);
-        extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 250ms);
 
         // Store dragons
         for (uint8 i = 0; i < MAX_DRAGONS; ++i)
@@ -449,14 +432,6 @@ struct boss_sartharion : public BossAI
         {
             switch (eventId)
             {
-                case EVENT_SARTHARION_BOUNDARY:
-                {
-                    if (!IsTargetInBounds(me->GetVictim()))
-                        EnterEvadeMode();
-                    else
-                        extraEvents.Repeat(250ms);
-                    break;
-                }
                 case EVENT_SARTHARION_SUMMON_LAVA:
                 {
                     if (!urand(0, 3))
@@ -660,18 +635,6 @@ private:
         }
 
         dragonsCount = 0;
-    }
-
-    bool IsTargetInBounds(Unit const* victim) const
-    {
-        if (!victim || victim->GetPositionX() < SartharionBoundary[0] || victim->GetPositionX() > SartharionBoundary[1] || victim->GetPositionY() > SartharionBoundary[3])
-            return false;
-
-        // Big island handling
-        if (victim->GetPositionY() < SartharionBoundary[2])
-            return victim->GetDistance(bigIslandMiddlePos) <= 6.0f;
-
-        return true;
     }
 
     EventMap extraEvents;
