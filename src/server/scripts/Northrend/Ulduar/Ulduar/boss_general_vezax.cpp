@@ -106,9 +106,9 @@ enum VaporsText
     SAY_EMOTE_VAPORS    = 0,
 };
 
-struct boss_vezaxAI : public BossAI
+struct boss_vezax : public BossAI
 {
-    boss_vezaxAI(Creature* pCreature) : BossAI(pCreature, BOSS_VEZAX) { }
+    boss_vezax(Creature* pCreature) : BossAI(pCreature, BOSS_VEZAX) { }
 
     uint8 vaporsCount;
     bool hardmodeAvailable;
@@ -134,9 +134,8 @@ struct boss_vezaxAI : public BossAI
     void JustEngagedWith(Unit*  /*pWho*/) override
     {
         me->setActive(true);
-        me->SetInCombatWithZone();
+        _JustEngagedWith();
 
-        events.Reset();
         events.RescheduleEvent(EVENT_SPELL_VEZAX_SHADOW_CRASH, 13s);
         events.RescheduleEvent(EVENT_SPELL_SEARING_FLAMES, 10s, 1);
         events.RescheduleEvent(EVENT_SPELL_SURGE_OF_DARKNESS, 63s);
@@ -145,9 +144,6 @@ struct boss_vezaxAI : public BossAI
         events.RescheduleEvent(EVENT_BERSERK, 10min);
 
         Talk(SAY_AGGRO);
-
-        if (instance)
-            instance->SetBossState(BOSS_VEZAX, IN_PROGRESS);
 
         me->CastSpell(me, SPELL_AURA_OF_DESPAIR_1, true);
     }
@@ -572,7 +568,7 @@ public:
 
 void AddSC_boss_vezax()
 {
-    RegisterUlduarCreatureAI(boss_vezaxAI);
+    RegisterUlduarCreatureAI(boss_vezax);
     RegisterUlduarCreatureAI(npc_ulduar_saronite_vapors);
     RegisterUlduarCreatureAI(npc_ulduar_saronite_animus);
 
