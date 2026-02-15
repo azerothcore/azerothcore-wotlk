@@ -435,7 +435,7 @@ struct boss_freya : public BossAI
             instance->SetBossState(BOSS_FREYA, IN_PROGRESS);
 
         // HARD MODE CHECKS
-        Creature* elder = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ELDER_STONEBARK));
+        Creature* elder = instance->GetCreature(DATA_ELDER_STONEBARK);
         if (elder && elder->IsAlive())
         {
             elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -446,7 +446,7 @@ struct boss_freya : public BossAI
             _elderGUID[0] = elder->GetGUID();
         }
 
-        elder = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ELDER_IRONBRANCH));
+        elder = instance->GetCreature(DATA_ELDER_IRONBRANCH);
         if (elder && elder->IsAlive())
         {
             elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -457,7 +457,7 @@ struct boss_freya : public BossAI
             _elderGUID[1] = elder->GetGUID();
         }
 
-        elder = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ELDER_BRIGHTLEAF));
+        elder = instance->GetCreature(DATA_ELDER_BRIGHTLEAF);
         if (elder && elder->IsAlive())
         {
             elder->CastSpell(elder, SPELL_DRAINED_OF_POWER, true);
@@ -624,7 +624,7 @@ struct boss_freya_elder_stonebark : public ScriptedAI
 
         // Lumberjacked
         if (me->GetInstanceScript())
-            if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
+            if (Creature* freya = me->GetInstanceScript()->GetCreature(TYPE_FREYA))
                 freya->AI()->DoAction(ACTION_LUMBERJACKED);
     }
 
@@ -709,7 +709,7 @@ struct boss_freya_elder_brightleaf : public ScriptedAI
 
         // Lumberjacked
         if (me->GetInstanceScript())
-            if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
+            if (Creature* freya = me->GetInstanceScript()->GetCreature(TYPE_FREYA))
                 freya->AI()->DoAction(ACTION_LUMBERJACKED);
     }
 
@@ -809,7 +809,7 @@ struct boss_freya_elder_ironbranch : public ScriptedAI
 
         // Lumberjacked
         if (me->GetInstanceScript())
-            if (Creature* freya = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_FREYA)))
+            if (Creature* freya = me->GetInstanceScript()->GetCreature(TYPE_FREYA))
                 freya->AI()->DoAction(ACTION_LUMBERJACKED);
     }
 
@@ -933,13 +933,11 @@ struct boss_freya_summons : public ScriptedAI
 {
     boss_freya_summons(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : ObjectGuid::Empty;
         _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
         _hasDied = false;
     }
 
     EventMap events;
-    ObjectGuid _freyaGUID;
     uint8 _stackCount;
     bool _hasDied;
     bool _isTrio;
@@ -954,15 +952,18 @@ struct boss_freya_summons : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* freya = ObjectAccessor::GetCreature(*me, _freyaGUID))
+        if (InstanceScript* instance = me->GetInstanceScript())
         {
-            if (!_hasDied)
-                freya->AI()->DoAction(_stackCount);
-
-            if (_isTrio)
+            if (Creature* freya = instance->GetCreature(TYPE_FREYA))
             {
-                freya->AI()->DoAction(ACTION_RESPAWN_TRIO);
-                _hasDied = true;
+                if (!_hasDied)
+                    freya->AI()->DoAction(_stackCount);
+
+                if (_isTrio)
+                {
+                    freya->AI()->DoAction(ACTION_RESPAWN_TRIO);
+                    _hasDied = true;
+                }
             }
         }
         if (me->GetEntry() == NPC_DETONATING_LASHER)
