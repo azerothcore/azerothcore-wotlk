@@ -12033,9 +12033,7 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
                 auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
                 for (auto itr = bounds.first; itr != bounds.second; ++itr)
                 {
-                    // Fixed: Check SkillLine to ensure we're only looking at abilities from the same skill
-                    // This handles out-of-order spell IDs (e.g., higher rank with lower ID)
-                    if (itr->second->SkillLine == skill_id && itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skill_value >= itr->second->MinSkillLineRank)
+                    if (itr->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && skill_value >= itr->second->MinSkillLineRank)
                     {
                         skipCurrent = true;
                         break;
@@ -12056,6 +12054,17 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
                 learnSpell(pAbility->Spell, true, true);
             }
         }
+    }
+
+    // Remove spells that are superseded by other spells now known
+    // Handles case where higher-rank spell has lower ID
+    for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+    {
+        if (!HasSpell(pAbility->Spell) || !pAbility->SupercededBySpell)
+            continue;
+
+        if (HasSpell(pAbility->SupercededBySpell))
+            removeSpell(pAbility->Spell, GetActiveSpec(), true);
     }
 }
 
