@@ -174,9 +174,9 @@ struct npc_ulduar_iron_construct : public ScriptedAI
     void MoveInLineOfSight(Unit* /*who*/) override {}
 };
 
-struct boss_ignisAI : public BossAI
+struct boss_ignis : public BossAI
 {
-    boss_ignisAI(Creature* pCreature) : BossAI(pCreature, BOSS_IGNIS) { }
+    boss_ignis(Creature* pCreature) : BossAI(pCreature, BOSS_IGNIS) { }
 
     uint8 counter;
     bool bShattered;
@@ -513,7 +513,7 @@ public:
 
 void AddSC_boss_ignis()
 {
-    RegisterUlduarCreatureAI(boss_ignisAI);
+    RegisterUlduarCreatureAI(boss_ignis);
     RegisterUlduarCreatureAI(npc_ulduar_iron_construct);
     RegisterSpellScript(spell_ignis_scorch_aura);
     RegisterSpellScript(spell_ignis_grab_initial);

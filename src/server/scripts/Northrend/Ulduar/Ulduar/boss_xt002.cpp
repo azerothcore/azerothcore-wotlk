@@ -112,9 +112,9 @@ enum Misc
     DATA_XT002_GRAVITY_ACHIEV   = 51,
 };
 
-struct boss_xt002AI : public BossAI
+struct boss_xt002 : public BossAI
 {
-    boss_xt002AI(Creature* pCreature) : BossAI(pCreature, BOSS_XT002) { }
+    boss_xt002(Creature* pCreature) : BossAI(pCreature, BOSS_XT002) { }
 
     uint8 _healthCheck;
     bool _hardMode;
@@ -949,7 +949,7 @@ public:
 void AddSC_boss_xt002()
 {
     // Npcs
-    RegisterUlduarCreatureAI(boss_xt002AI);
+    RegisterUlduarCreatureAI(boss_xt002);
     RegisterUlduarCreatureAI(npc_xt002_heart);
     RegisterUlduarCreatureAI(npc_xt002_scrapbot);
     RegisterUlduarCreatureAI(npc_xt002_pummeller);

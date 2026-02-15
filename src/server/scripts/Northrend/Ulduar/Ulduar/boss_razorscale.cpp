@@ -135,9 +135,9 @@ enum Misc
 const Position CORDS_GROUND                 = {588.0f, -166.0f, 391.1f};
 const Position CORDS_AIR                    = {588.0f, -178.0f, 490.0f};
 
-struct boss_razorscaleAI : public BossAI
+struct boss_razorscale : public BossAI
 {
-    boss_razorscaleAI(Creature* creature) : BossAI(creature, BOSS_RAZORSCALE)
+    boss_razorscale(Creature* creature) : BossAI(creature, BOSS_RAZORSCALE)
     {
         startPath = true;
     }
@@ -1055,7 +1055,7 @@ public:
 
 void AddSC_boss_razorscale()
 {
-    RegisterUlduarCreatureAI(boss_razorscaleAI);
+    RegisterUlduarCreatureAI(boss_razorscale);
     new npc_ulduar_expedition_commander();
     RegisterUlduarCreatureAI(npc_ulduar_harpoonfirestate);
     RegisterUlduarCreatureAI(npc_ulduar_expedition_engineer);

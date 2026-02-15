@@ -117,9 +117,9 @@ enum Misc
     DATA_KOLOGARN_ARMS_ACHIEV           = 57,
 };
 
-struct boss_kologarnAI : public BossAI
+struct boss_kologarn : public BossAI
 {
-    boss_kologarnAI(Creature* pCreature) : BossAI(pCreature, BOSS_KOLOGARN), vehicle(me->GetVehicleKit()), breathReady(false)
+    boss_kologarn(Creature* creature) : BossAI(creature, BOSS_KOLOGARN), vehicle(me->GetVehicleKit()), breathReady(false)
     {
         assert(vehicle);
         me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
@@ -872,7 +872,7 @@ public:
 void AddSC_boss_kologarn()
 {
     // Npcs
-    RegisterUlduarCreatureAI(boss_kologarnAI);
+    RegisterUlduarCreatureAI(boss_kologarn);
     RegisterUlduarCreatureAI(boss_kologarn_arms);
     RegisterUlduarCreatureAI(boss_kologarn_eyebeam);
     RegisterUlduarCreatureAI(boss_kologarn_pit_kill_bunny);
