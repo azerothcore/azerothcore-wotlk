@@ -16356,7 +16356,7 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 float Player::GetLootChanceModifier(uint32 itemID) const
 {
     // Early return if _lootChanceModifier is empty
-    if (_lootChanceModifier.empty()
+    if (_lootChanceModifier.empty())
         return 1.0f;
 
     auto itr = _lootChanceModifier.find(itemID);
