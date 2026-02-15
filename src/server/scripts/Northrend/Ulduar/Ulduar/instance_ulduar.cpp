@@ -854,9 +854,9 @@ public:
                     return m_RazorscaleHarpoonFireStateGUID[data - 200];
 
                 // Hodir chests
-                case GO_HODIR_CHEST_HARD:
+                case DATA_HODIR_CHEST_HARD:
                     return m_hodirHardmodeChest;
-                case GO_HODIR_CHEST_NORMAL:
+                case DATA_HODIR_CHEST_NORMAL:
                     return m_hodirNormalChest;
             }
 

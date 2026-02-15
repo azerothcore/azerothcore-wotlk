@@ -155,6 +155,10 @@ enum UlduarData
     DATA_ARCHIVUM_DOORS                     = 771,
     DATA_KEEPERS_GATE                       = 772,
 
+    // Hodir chests (dynamically spawned)
+    DATA_HODIR_CHEST_NORMAL                 = 780,
+    DATA_HODIR_CHEST_HARD                   = 781,
+
     // Mage Barrier
     DATA_MAGE_BARRIER                       = 800,
     DATA_BRANN_MEMOTESAY                    = 801,
