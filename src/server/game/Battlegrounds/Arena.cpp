@@ -246,9 +246,13 @@ void Arena::EndBattleground(TeamId winnerTeamId)
             trans->Append(stmt2);
 
             uint8 memberId = 0;
-            for (auto const& [playerGuid, arenaLogEntryData] : ArenaLogEntries)
+            for (auto& [playerGuid, arenaLogEntryData] : ArenaLogEntries)
             {
                 auto const& score = PlayerScores.find(playerGuid.GetCounter());
+                // Update stats from PlayerScores if player is still in arena
+                if (score != PlayerScores.end())
+                    arenaLogEntryData.SaveStats(score->second->GetDamageDone(), score->second->GetHealingDone(), score->second->GetKillingBlows());
+
                 stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_MEMBERSTATS);
                 stmt2->SetData(0, fightId);
                 stmt2->SetData(1, ++memberId);
@@ -257,18 +261,9 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                 stmt2->SetData(4, arenaLogEntryData.ArenaTeamId);
                 stmt2->SetData(5, arenaLogEntryData.Acc);
                 stmt2->SetData(6, arenaLogEntryData.IP);
-                if (score != PlayerScores.end())
-                {
-                    stmt2->SetData(7, score->second->GetDamageDone());
-                    stmt2->SetData(8, score->second->GetHealingDone());
-                    stmt2->SetData(9, score->second->GetKillingBlows());
-                }
-                else
-                {
-                    stmt2->SetData(7, 0);
-                    stmt2->SetData(8, 0);
-                    stmt2->SetData(9, 0);
-                }
+                stmt2->SetData(7, arenaLogEntryData.DamageDone);
+                stmt2->SetData(8, arenaLogEntryData.HealingDone);
+                stmt2->SetData(9, arenaLogEntryData.KillingBlows);
                 trans->Append(stmt2);
             }
 
