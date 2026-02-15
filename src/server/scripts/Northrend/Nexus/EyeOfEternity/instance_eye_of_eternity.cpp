@@ -146,6 +146,8 @@ struct instance_eye_of_eternity : public InstanceScript
                 if (Creature* malygos = GetCreature(DATA_MALYGOS))
                     malygos->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f, TEMPSUMMON_MANUAL_DESPAWN);
                 break;
+            default:
+                break;
         }
 
         return true;
