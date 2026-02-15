@@ -216,15 +216,15 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             // mimiron tram:
-            if (GameObject* MimironTram = instance->GetGameObject(DATA_MIMIRON_TRAM))
+            if (GameObject* MimironTram = GetGameObject(DATA_MIMIRON_TRAM))
             {
                 player->UpdateVisibilityOf(MimironTram);
                 if (StaticTransport* t = MimironTram->ToStaticTransport())
                 {
-                    if (GameObject* go = instance->GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
+                    if (GameObject* go = GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
                         if (!go->GetTransport())
                             t->AddPassenger(go, true);
-                    if (GameObject* go = instance->GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
+                    if (GameObject* go = GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
                         if (!go->GetTransport())
                             t->AddPassenger(go, true);
                 }
@@ -259,7 +259,7 @@ public:
 
             // Leviathan does not use IN_PROGRESS type, instead SPECIAL is set and never reset,
             // Check if he is in combat.
-            if (Unit* l = GetCreature(BOSS_LEVIATHAN))
+            if (Creature* l = instance->GetCreature(GetObjectGuid(BOSS_LEVIATHAN)))
                 if (l->IsInCombat())
                     return true;
 
@@ -288,14 +288,14 @@ public:
                             if (Creature* vehicleCreature = itr->GetSource()->GetVehicleCreatureBase())
                                 vehicleCreature->DespawnOrUnsummon();
 
-                        if (GameObject* go = instance->GetGameObject(DATA_LEVIATHAN_DOORS))
+                        if (GameObject* go = GetGameObject(DATA_LEVIATHAN_DOORS))
                             go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     }
                     break;
                 case BOSS_ASSEMBLY:
                     // Assembly doors handled by DoorData, archivum
                     // doors stay open only after DONE
-                    if (GameObject* go = instance->GetGameObject(DATA_ARCHIVUM_DOORS))
+                    if (GameObject* go = GetGameObject(DATA_ARCHIVUM_DOORS))
                         go->SetGoState(state == DONE ? GO_STATE_ACTIVE : GO_STATE_READY);
                     break;
                 case BOSS_MIMIRON:
@@ -309,7 +309,7 @@ public:
                     {
                         scheduler.Schedule(45s, [this](TaskContext /*context*/)
                         {
-                            if (GameObject* go = instance->GetGameObject(DATA_KEEPERS_GATE))
+                            if (GameObject* go = GetGameObject(DATA_KEEPERS_GATE))
                             {
                                 go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                                 if (Creature* trigger = instance->SummonCreature(NPC_ANCIENT_GATE_WORLD_TRIGGER, triggerAncientGatePosition, nullptr, 10 * IN_MILLISECONDS))
@@ -321,27 +321,27 @@ public:
                         setChestsLootable(BOSS_HODIR);
                     break;
                 case BOSS_ALGALON:
-                    if (GameObject* go = instance->GetGameObject(DATA_SIGILDOOR_03))
+                    if (GameObject* go = GetGameObject(DATA_SIGILDOOR_03))
                     {
                         go->SetGoState(state != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(DATA_UNIVERSE_FLOOR_01))
+                    if (GameObject* go = GetGameObject(DATA_UNIVERSE_FLOOR_01))
                     {
                         go->SetGoState(state != IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(DATA_UNIVERSE_FLOOR_02))
+                    if (GameObject* go = GetGameObject(DATA_UNIVERSE_FLOOR_02))
                     {
                         go->SetGoState(state == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(DATA_UNIVERSE_GLOBE))
+                    if (GameObject* go = GetGameObject(DATA_UNIVERSE_GLOBE))
                     {
                         go->SetGoState(state == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
-                    if (GameObject* go = instance->GetGameObject(DATA_ALGALON_TRAPDOOR))
+                    if (GameObject* go = GetGameObject(DATA_ALGALON_TRAPDOOR))
                     {
                         go->SetGoState(state == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
@@ -355,7 +355,7 @@ public:
             if (type == BOSS_FREYA && state == DONE)
             {
                 std::list<GameObject*> goList;
-                if (Creature* freya = instance->GetCreature(BOSS_FREYA))
+                if (Creature* freya = GetCreature(BOSS_FREYA))
                 {
                     freya->GetGameObjectListWithEntryInGrid(goList, { 191019, 190176, 190171, 190170, 189973 }, 333.0f);
 
@@ -730,52 +730,52 @@ public:
                     DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_DWARFAGEDDON);
                     return;
                 case DATA_CALL_TRAM:
-                    if (GameObject* MimironTram = instance->GetGameObject(DATA_MIMIRON_TRAM))
+                    if (GameObject* MimironTram = GetGameObject(DATA_MIMIRON_TRAM))
                         if (StaticTransport* t = MimironTram->ToStaticTransport())
                         {
                             if (data == 0 && t->GetGoState() == GO_STATE_ACTIVE && t->GetPathProgress() == t->GetPauseTime())
                             {
                                 MimironTram->SetGoState(GO_STATE_READY);
-                                if (GameObject* rocketBooster = instance->GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
+                                if (GameObject* rocketBooster = GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
                                     rocketBooster->SetGoState(GO_STATE_ACTIVE);
-                                if (GameObject* activateTramButton = instance->GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
+                                if (GameObject* activateTramButton = GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
                                     activateTramButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                                if (GameObject* callTramCenterButton = instance->GetGameObject(DATA_MIMIRON_CALL_TRAM_CENTER))
+                                if (GameObject* callTramCenterButton = GetGameObject(DATA_MIMIRON_CALL_TRAM_CENTER))
                                     callTramCenterButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 scheduler.Schedule(30s, [this](TaskContext /*context*/)
                                 {
-                                    if (GameObject* turnaround1 = instance->GetGameObject(DATA_MIMIRON_TRAM_TURNAROUND_1))
+                                    if (GameObject* turnaround1 = GetGameObject(DATA_MIMIRON_TRAM_TURNAROUND_1))
                                         turnaround1->UseDoorOrButton();
-                                    if (GameObject* rocketBooster = instance->GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
+                                    if (GameObject* rocketBooster = GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
                                         rocketBooster->SetGoState(GO_STATE_READY);
                                 }).Schedule(60s, [this](TaskContext /*context*/)
                                 {
-                                    if (GameObject* activateTramButton = instance->GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
+                                    if (GameObject* activateTramButton = GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
                                         activateTramButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                                    if (GameObject* callTramMimironButton = instance->GetGameObject(DATA_MIMIRON_CALL_TRAM_MIMIRON))
+                                    if (GameObject* callTramMimironButton = GetGameObject(DATA_MIMIRON_CALL_TRAM_MIMIRON))
                                         callTramMimironButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 });
                             }
                             if (data == 1 && t->GetGoState() == GO_STATE_READY && t->GetPathProgress() == 0)
                             {
                                 MimironTram->SetGoState(GO_STATE_ACTIVE);
-                                if (GameObject* rocketBooster = instance->GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
+                                if (GameObject* rocketBooster = GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
                                     rocketBooster->SetGoState(GO_STATE_ACTIVE);
-                                if (GameObject* activateTramButton = instance->GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
+                                if (GameObject* activateTramButton = GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
                                     activateTramButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                                if (GameObject* callTramMimironButton = instance->GetGameObject(DATA_MIMIRON_CALL_TRAM_MIMIRON))
+                                if (GameObject* callTramMimironButton = GetGameObject(DATA_MIMIRON_CALL_TRAM_MIMIRON))
                                     callTramMimironButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 scheduler.Schedule(33s, [this](TaskContext /*context*/)
                                 {
-                                    if (GameObject* turnaround2 = instance->GetGameObject(DATA_MIMIRON_TRAM_TURNAROUND_2))
+                                    if (GameObject* turnaround2 = GetGameObject(DATA_MIMIRON_TRAM_TURNAROUND_2))
                                         turnaround2->UseDoorOrButton();
-                                    if (GameObject* rocketBooster = instance->GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
+                                    if (GameObject* rocketBooster = GetGameObject(DATA_MIMIRON_TRAM_ROCKET_BOOSTER))
                                         rocketBooster->SetGoState(GO_STATE_READY);
                                 }).Schedule(63s, [this](TaskContext /*context*/)
                                 {
-                                    if (GameObject* activateTramButton = instance->GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
+                                    if (GameObject* activateTramButton = GetGameObject(DATA_MIMIRON_ACTIVATE_TRAM))
                                         activateTramButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                                    if (GameObject* callTramCenterButton = instance->GetGameObject(DATA_MIMIRON_CALL_TRAM_CENTER))
+                                    if (GameObject* callTramCenterButton = GetGameObject(DATA_MIMIRON_CALL_TRAM_CENTER))
                                         callTramCenterButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                                 });
                             }
