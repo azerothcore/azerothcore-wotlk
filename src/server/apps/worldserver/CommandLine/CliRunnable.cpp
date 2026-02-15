@@ -26,6 +26,7 @@
 #include <fmt/core.h>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#include <windows.h>
 #include <io.h>
 #include <fcntl.h>
 #else
