@@ -12333,23 +12333,33 @@ bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const
 
 float Player::GetReputationPriceDiscount(Creature const* creature) const
 {
-    return GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    float discount = GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, creature, discount);
+    return discount;
 }
 
 float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
 {
+    float discount = 1.0f;
+
     if (!factionTemplate || !factionTemplate->faction)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
     ReputationRank rank = GetReputationRank(factionTemplate->faction);
+
     if (rank <= REP_NEUTRAL)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
-    return 1.0f - 0.05f * (rank - REP_NEUTRAL);
+    discount = discount - 0.05f * (rank - REP_NEUTRAL);
+
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+    return discount;
 }
 
 bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
