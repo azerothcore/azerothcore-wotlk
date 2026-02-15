@@ -108,9 +108,12 @@ public:
     static bool HandleLearnAllMyQuestSpells(ChatHandler* handler)
     {
         Player* player = handler->GetPlayer();
-        for (auto const& [id, quest] : sObjectMgr->GetQuestTemplates())
+        for (auto const& questPair : sObjectMgr->GetQuestTemplates())
+        {
+            Quest const* quest = questPair.second;
             if (quest->GetRequiredClasses() && player->SatisfyQuestClass(quest, false))
                 player->learnQuestRewardedSpells(quest);
+        }
 
         return true;
     }
