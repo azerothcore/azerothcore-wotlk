@@ -593,6 +593,21 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
         // Remove player from group in DB
         if (!isBGGroup() && !isBFGroup())
         {
+            // Log LFG activity if this is an LFG group
+            if (isLFGGroup())
+            {
+                uint32 dungeonId = sLFGMgr->GetDungeon(GetGUID());
+                if (method == GROUP_REMOVEMETHOD_LEAVE)
+                    sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_LEFT, dungeonId, GetGUID());
+                else if (method == GROUP_REMOVEMETHOD_DEFAULT)
+                {
+                    if (Player* removedPlayer = ObjectAccessor::FindConnectedPlayer(guid))
+                        sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_LEFT, dungeonId, GetGUID()); // Player is online, so it's a voluntary leave
+                    else
+                        sLFGMgr->LogLfgActivity(guid, lfg::LFG_EVENT_DISCONNECTED, dungeonId, GetGUID()); // Player is offline, so it's a disconnect
+                }
+            }
+
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GROUP_MEMBER);
             stmt->SetData(0, guid.GetCounter());
             stmt->SetData(1, GetGUID().GetCounter());

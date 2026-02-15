@@ -82,6 +82,16 @@ namespace lfg
         LFG_PROPOSAL_SUCCESS                         = 2
     };
 
+    /// Activity event types for statistics tracking
+    enum LfgActivityEventType
+    {
+        LFG_EVENT_JOINED                             = 1,
+        LFG_EVENT_REFUSED                            = 2,
+        LFG_EVENT_LEFT                               = 3,
+        LFG_EVENT_KICKED                             = 4,
+        LFG_EVENT_DISCONNECTED                       = 5
+    };
+
     /// Teleport errors
     enum LfgTeleportError
     {
@@ -584,6 +594,10 @@ namespace lfg
         [[nodiscard]] bool IsTesting() const { return m_Testing; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
+
+        // Activity logging
+        void LogLfgActivity(ObjectGuid playerGuid, LfgActivityEventType eventType, uint32 dungeonId, ObjectGuid groupGuid);
+        void CleanupOldLfgActivities();
 
     private:
         TeamId GetTeam(ObjectGuid guid);

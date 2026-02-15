@@ -123,6 +123,7 @@ World::World()
     _nextRandomBGReset = 0s;
     _nextCalendarOldEventsDeletionTime = 0s;
     _nextGuildReset = 0s;
+    _nextLfgActivitiesCleanup = 0s;
     _defaultDbcLocale = LOCALE_enUS;
     _mail_expire_check_timer = 0s;
     _isClosed = false;
@@ -1171,6 +1172,12 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
+    if (currentGameTime > _nextLfgActivitiesCleanup)
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Cleanup old LFG activities"));
+        CleanupOldLfgActivities();
+    }
+
     {
         // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
@@ -1770,6 +1777,17 @@ void World::ResetGuildCap()
     sWorldState->setWorldState(WORLD_STATE_CUSTOM_GUILD_DAILY_RESET_TIME, _nextGuildReset.count());
 
     sGuildMgr->ResetTimes();
+}
+
+void World::CleanupOldLfgActivities()
+{
+    if (!getBoolConfig(CONFIG_LFG_CLEANUP_OLD_ACTIVITIES))
+        return;
+
+    LOG_INFO("server.worldserver", "Cleaning up old LFG activity entries.");
+
+    _nextLfgActivitiesCleanup = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
+    sLFGMgr->CleanupOldLfgActivities();
 }
 
 void World::LoadDBVersion()
