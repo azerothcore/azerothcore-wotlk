@@ -111,7 +111,7 @@ public:
 
     void KilledUnit(Unit * victim) override
     {
-        if (!_recentlySpoken && victim->IsPlayer())
+        if (!_recentlySpoken && victim->IsPlayer() && me->IsAlive())
         {
             Talk(SAY_ONSLAY);
             _recentlySpoken = true;

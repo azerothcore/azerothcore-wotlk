@@ -15,17 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AreaBoundary.h"
 #include "CreatureAIImpl.h"
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
-
-BossBoundaryData const boundaries =
-{
-    { DATA_SARTHARION, new RectangleBoundary(3218.86f, 3275.69f, 484.68f, 572.4f) }
-};
 
 class instance_obsidian_sanctum : public InstanceMapScript
 {
@@ -43,7 +37,6 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
-            LoadBossBoundaries(boundaries);
         }
 
         void OnCreatureCreate(Creature* pCreature) override
