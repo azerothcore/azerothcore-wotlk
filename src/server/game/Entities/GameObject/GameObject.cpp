@@ -2209,6 +2209,10 @@ void GameObject::UpdatePackedRotation()
 void GameObject::SetWorldRotation(G3D::Quat const& rot)
 {
     G3D::Quat rotation = rot;
+    // If the quaternion is zero (e.g. dynamically spawned GOs with no rotation),
+    // fall back to computing rotation from orientation to avoid NaN from unitize()
+    if (G3D::fuzzyEq(rotation.magnitude(), 0.0f))
+        rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), GetOrientation());
     rotation.unitize();
     WorldRotation = rotation;
     UpdatePackedRotation();

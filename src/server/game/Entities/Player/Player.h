@@ -794,6 +794,13 @@ enum InstanceResetWarningType
     RAID_INSTANCE_EXPIRED           = 5
 };
 
+enum InstanceResetFailureReason : uint32
+{
+    INSTANCE_RESET_FAILED         = 0, // Cannot reset %s.  There are players still inside the instance.
+    INSTANCE_RESET_FAILED_OFFLINE = 1, // Cannot reset %s.  There are players offline in your party.
+    INSTANCE_RESET_FAILED_ZONING  = 2, // Cannot reset %s.  There are players in your party attempting to zone into an instance.
+};
+
 class InstanceSave;
 
 enum RestFlag
@@ -1050,6 +1057,18 @@ struct EntryPointData
     [[nodiscard]] bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
 };
 
+struct TradeStatusInfo
+{
+    TradeStatusInfo() = default;
+
+    TradeStatus Status{TRADE_STATUS_BUSY};
+    ObjectGuid TraderGuid{};
+    InventoryResult Result{EQUIP_ERR_OK};
+    bool IsTargetResult{false};
+    uint32 ItemLimitedByLimitCategory{0};
+    uint8 Slot{0};
+};
+
 struct PendingSpellCastRequest
 {
     uint32 spellId;
@@ -1270,12 +1289,17 @@ public:
     bool CanNoReagentCast(SpellInfo const* spellInfo) const;
     [[nodiscard]] bool HasItemOrGemWithIdEquipped(uint32 item, uint32 count, uint8 except_slot = NULL_SLOT) const;
     [[nodiscard]] bool HasItemOrGemWithLimitCategoryEquipped(uint32 limitCategory, uint32 count, uint8 except_slot = NULL_SLOT) const;
-    InventoryResult CanTakeMoreSimilarItems(Item* pItem) const { return CanTakeMoreSimilarItems(pItem->GetEntry(), pItem->GetCount(), pItem); }
-    [[nodiscard]] InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count) const { return CanTakeMoreSimilarItems(entry, count, nullptr); }
+
+    InventoryResult CanTakeMoreSimilarItems(Item* item, uint32* itemLimitedByLimitCategory = nullptr) const
+    {
+        return CanTakeMoreSimilarItems(item->GetEntry(), item->GetCount(), item, nullptr, itemLimitedByLimitCategory);
+    }
+    InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, uint32* itemLimitedByLimitCategory = nullptr) const { return CanTakeMoreSimilarItems(entry, count, nullptr, nullptr, itemLimitedByLimitCategory); }
     InventoryResult CanStoreNewItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 item, uint32 count, uint32* no_space_count = nullptr) const
     {
         return CanStoreItem(bag, slot, dest, item, count, nullptr, false, no_space_count);
     }
+
     InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap = false) const
     {
         if (!pItem)
@@ -1283,7 +1307,7 @@ public:
         uint32 count = pItem->GetCount();
         return CanStoreItem(bag, slot, dest, pItem->GetEntry(), count, pItem, swap, nullptr);
     }
-    InventoryResult CanStoreItems(Item** pItem, int32 count) const;
+    InventoryResult CanStoreItems(Item** items, int count, uint32* itemLimitedByLimitCategory) const;
     InventoryResult CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const;
     InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
 
@@ -1311,7 +1335,7 @@ public:
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();
 
-    InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
+    InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* item, uint32* no_space_count = nullptr, uint32* itemLimitCategory = nullptr) const;
     InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
 
     void AddRefundReference(ObjectGuid itemGUID);
@@ -2010,7 +2034,7 @@ public:
     void SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty = -1);
     static void ResetInstances(ObjectGuid guid, uint8 method, bool isRaid);
     void SendResetInstanceSuccess(uint32 MapId);
-    void SendResetInstanceFailed(uint32 reason, uint32 MapId);
+    void SendResetInstanceFailed(InstanceResetFailureReason reason, uint32 MapId);
     void SendResetFailedNotify(uint32 mapid);
 
     bool UpdatePosition(float x, float y, float z, float orientation, bool teleport = false) override;
