@@ -27,8 +27,6 @@
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <windows.h>
-#include <io.h>
-#include <fcntl.h>
 #else
 #include "Chat.h"
 #include "ChatCommand.h"
@@ -112,10 +110,8 @@ int kb_hit_return()
 void CliThread()
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-    // Set stdin to UTF-16 mode to properly read wide characters
-    _setmode(_fileno(stdin), _O_U16TEXT);
-    
-    // Set console code page to UTF-8 for output
+    // Set console code pages to UTF-8
+    SetConsoleCP(CP_UTF8);
     SetConsoleOutputCP(CP_UTF8);
 
     // print this here the first time
