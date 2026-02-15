@@ -32,9 +32,9 @@ enum Says
     SAY_SARTHARION_CALL_TENEBRON                = 4,
     SAY_SARTHARION_CALL_VESPERON                = 5,
     SAY_SARTHARION_DEATH                        = 6,
-    SAY_SARTHARION_SPECIAL                      = 7,
+    SAY_SARTHARION_CYCLONE                      = 7,
     SAY_SARTHARION_SLAY                         = 8,
-    SAY_SARTHARION_SPECIAL_4                    = 10, // 9 is whisper
+    SAY_SARTHARION_LAVA                         = 10,
 
     SAY_DRAKE_RESPOND                           = 4,
 
@@ -356,12 +356,12 @@ struct boss_sartharion : public BossAI
 
         // Combat events
         events.ScheduleEvent(EVENT_SARTHARION_CAST_CLEAVE, 7s);
-        events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 15s);
+        events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 6s);
         events.ScheduleEvent(EVENT_SARTHARION_CAST_TAIL_LASH, 11s);
 
         // Extra events
         extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20s);
-        extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5s);
+        extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 15s);
         extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 15min);
 
         // Store dragons
@@ -512,8 +512,7 @@ struct boss_sartharion : public BossAI
             {
                 case EVENT_SARTHARION_SUMMON_LAVA:
                 {
-                    if (!urand(0, 3))
-                        Talk(SAY_SARTHARION_SPECIAL);
+                    Talk(SAY_SARTHARION_LAVA);
 
                     SummonLavaWaves();
                     extraEvents.Repeat(25s);
@@ -553,6 +552,16 @@ struct boss_sartharion : public BossAI
 
                     break;
                 }
+                case EVENT_SARTHARION_LAVA_STRIKE:
+                {
+                    Talk(SAY_SARTHARION_CYCLONE);
+                    summons.RemoveNotExisting();
+                    if (auto summon = summons.GetRandomCreatureWithEntry(NPC_FIRE_CYCLONE))
+                        summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
+
+                    extraEvents.Repeat((below11PctReached ? randtime(1400ms, 2s) : 25s));
+                    break;
+                }
                 default:
                     break;
             }
@@ -577,37 +586,13 @@ struct boss_sartharion : public BossAI
                 case EVENT_SARTHARION_CAST_FLAME_BREATH:
                 {
                     DoCastVictim(SPELL_SARTHARION_FLAME_BREATH, false);
-                    events.Repeat(20s);
+                    events.Repeat(10s);
                     break;
                 }
                 case EVENT_SARTHARION_CAST_TAIL_LASH:
                 {
                     DoCastSelf(SPELL_SARTHARION_TAIL_LASH, false);
                     events.Repeat(18s);
-                    break;
-                }
-                case EVENT_SARTHARION_LAVA_STRIKE:
-                {
-                    if (!urand(0, 2))
-                        Talk(SAY_SARTHARION_SPECIAL_4);
-
-                    summons.RemoveNotExisting();
-                    uint8 rand = urand(0, MAX_CYCLONE_COUNT - 1); // 5 - number of cyclones
-                    uint8 iter = 0;
-                    if (!summons.empty())
-                    {
-                        for (ObjectGuid const& summonGuid : summons)
-                        {
-                            Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
-                            if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE && iter == rand)
-                            {
-                                summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
-                                ++iter;
-                            }
-                        }
-                    }
-
-                    events.Repeat((below11PctReached ? randtime(1400ms, 2s) : randtime(5s, 20s)));
                     break;
                 }
                 case EVENT_SARTHARION_BERSERK:
