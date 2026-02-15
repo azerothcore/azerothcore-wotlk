@@ -256,11 +256,9 @@ public:
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
 
-            if (instance->GetBossState(BOSS_HORSEMAN) == DONE)
-                if (!me->GetMap()->GetPlayers().IsEmpty())
-                    if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
-                        if (GameObject* chest = player->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
-                            chest->SetLootRecipient(me);
+            if (instance->IsBossDone(BOSS_HORSEMAN))
+                if (GameObject* chest = me->GetMap()->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
+                    chest->SetLootRecipient(me);
         }
 
         void JustEngagedWith(Unit* who) override
