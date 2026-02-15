@@ -469,7 +469,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
             m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
             m_pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
             m_pInstance->SetData(TYPE_YOGGSARON, NOT_STARTED);
-            if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
+            if (GameObject* go = m_pInstance->GetGameObject(DATA_YOGG_SARON_DOORS))
                 go->SetGoState(GO_STATE_ACTIVE);
         }
     }
@@ -678,7 +678,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
             return;
 
         // Illusion shatters (param - stun time)
-        if (Creature* yoggb = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
+        if (Creature* yoggb = me->GetInstanceScript()->GetCreature(DATA_BRAIN_OF_YOGG_SARON))
         {
             yoggb->AI()->Talk(EMOTE_YOGG_SARON_BRAIN_SHATTERED);
         }
@@ -785,7 +785,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 me->SummonCreature(NPC_VOICE_OF_YOGG_SARON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
 
                 if (m_pInstance)
-                    if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
+                    if (GameObject* go = m_pInstance->GetGameObject(DATA_YOGG_SARON_DOORS))
                         go->SetGoState(GO_STATE_READY);
 
                 events.ScheduleEvent(EVENT_SARA_P1_SPELLS, 0ms, 1, EVENT_PHASE_ONE);
@@ -895,7 +895,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
             case EVENT_SARA_P1_BERSERK:
                 if (me->GetInstanceScript())
                 {
-                    if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
+                    if (Creature* yogg = me->GetInstanceScript()->GetCreature(TYPE_YOGGSARON))
                     {
                         yogg->AI()->Talk(EMOTE_YOGG_SARON_BERSERK);
                     }
@@ -925,7 +925,7 @@ struct boss_yoggsaron_cloud : public npc_escortAI
 
         _isSummoning = false;
         if (me->GetInstanceScript())
-            if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
+            if (Creature* sara = me->GetInstanceScript()->GetCreature(DATA_SARA))
                 sara->AI()->JustSummoned(cr);
     }
 
@@ -1076,9 +1076,9 @@ struct boss_yoggsaron : public ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_YOGGSARON, DONE);
-            if (Creature* sara = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_SARA)))
+            if (Creature* sara = m_pInstance->GetCreature(DATA_SARA))
                 sara->AI()->DoAction(ACTION_YOGG_SARON_DEATH);
-            if (GameObject* go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_YOGG_SARON_DOORS)))
+            if (GameObject* go = m_pInstance->GetGameObject(DATA_YOGG_SARON_DOORS))
                 go->SetGoState(GO_STATE_ACTIVE);
         }
 
@@ -1348,7 +1348,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
             {
                 // Stun
                 if (me->GetInstanceScript())
-                    if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
+                    if (Creature* sara = me->GetInstanceScript()->GetCreature(DATA_SARA))
                         sara->AI()->DoAction(MINUTE * IN_MILLISECONDS - std::min((uint32)MINUTE * IN_MILLISECONDS, _induceTimer));
 
                 _induceTimer = 0;
@@ -1415,7 +1415,7 @@ struct boss_yoggsaron_brain : public NullCreatureAI
 
                 me->CastSpell(me, SPELL_BRAIN_HURT_VISUAL, true);
                 if (me->GetInstanceScript())
-                    if (Creature* sara = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(NPC_SARA)))
+                    if (Creature* sara = me->GetInstanceScript()->GetCreature(DATA_SARA))
                         sara->AI()->DoAction(ACTION_BRAIN_DAMAGED);
             }
         }
@@ -2060,7 +2060,7 @@ struct boss_yoggsaron_voice : public NullCreatureAI
         {
             // Drive Me Crazy achievement failed
             if (me->GetInstanceScript())
-                if (Creature* yogg = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_YOGGSARON)))
+                if (Creature* yogg = me->GetInstanceScript()->GetCreature(TYPE_YOGGSARON))
                     yogg->AI()->DoAction(ACTION_FAILED_DRIVE_ME_CRAZY);
 
             events.ScheduleEvent(40, 2s);
@@ -2718,7 +2718,7 @@ public:
     bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
-            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_SARA)))
+            if (Creature* sara = player->GetInstanceScript()->GetCreature(DATA_SARA))
                 return sara->GetAI()->GetData(DATA_GET_KEEPERS_COUNT) <= _keepersCount;
 
         return false;
@@ -2739,7 +2739,7 @@ public:
     bool OnCheck(Player* player, Unit*  /*target*/ /*Yogg-Saron*/, uint32 /*criteria_id*/) override
     {
         if (player->GetInstanceScript())
-            if (Creature* sara = ObjectAccessor::GetCreature(*player, player->GetInstanceScript()->GetGuidData(NPC_BRAIN_OF_YOGG_SARON)))
+            if (Creature* sara = player->GetInstanceScript()->GetCreature(DATA_BRAIN_OF_YOGG_SARON))
                 return sara->GetAI()->GetData(DATA_GET_CURRENT_ILLUSION) == _requiredIllusion;
 
         return false;

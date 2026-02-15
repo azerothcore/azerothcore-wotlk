@@ -537,24 +537,24 @@ void boss_flame_leviathan::TurnGates(bool _start, bool _death)
     {
         // first one is ALWAYS turned on, unless leviathan is beaten
         GameObject* go = nullptr;
-        if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_LIGHTNING_WALL2))))
+        if ((go = instance->GetGameObject(DATA_LIGHTNING_WALL2)))
             go->SetGoState(GO_STATE_READY);
 
         if (instance->GetBossState(BOSS_LEVIATHAN) == NOT_STARTED)
-            if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_LEVIATHAN_DOORS))))
+            if ((go = instance->GetGameObject(DATA_LEVIATHAN_DOORS)))
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
     }
     else
     {
         GameObject* go = nullptr;
         if (_death)
-            if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_LIGHTNING_WALL1))))
+            if ((go = instance->GetGameObject(DATA_LIGHTNING_WALL1)))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_LIGHTNING_WALL2))))
+        if ((go = instance->GetGameObject(DATA_LIGHTNING_WALL2)))
             go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_LEVIATHAN_DOORS))))
+        if ((go = instance->GetGameObject(DATA_LEVIATHAN_DOORS)))
         {
             if (instance->GetBossState(BOSS_LEVIATHAN) == SPECIAL || instance->GetBossState(BOSS_LEVIATHAN) == DONE)
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
@@ -572,16 +572,16 @@ void boss_flame_leviathan::TurnHealStations(bool _apply)
     GameObject* go = nullptr;
     if (_apply)
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_REPAIR_STATION1))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION1)))
             go->SetLootState(GO_READY);
-        if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_REPAIR_STATION2))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION2)))
             go->SetLootState(GO_READY);
     }
     else
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_REPAIR_STATION1))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION1)))
             go->SetLootState(GO_ACTIVATED);
-        if ((go = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_REPAIR_STATION2))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION2)))
             go->SetLootState(GO_ACTIVATED);
     }
 }
@@ -785,7 +785,7 @@ struct boss_flame_leviathan_defense_turret : public TurretAI
             if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
                 device->ReplaceAllUnitFlags(UNIT_FLAG_NONE); // unselectable
 
-        if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(TYPE_LEVIATHAN)))
+        if (Creature* leviathan = _instance->GetCreature(TYPE_LEVIATHAN))
             leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
     }
 

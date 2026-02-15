@@ -272,7 +272,7 @@ struct boss_hodir : public BossAI
                 case EVENT_FAIL_HM:
                     if (instance)
                     {
-                        if (GameObject* go = instance->instance->GetGameObject(instance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                        if (GameObject* go = instance->GetGameObject(DATA_HODIR_CHEST_HARD))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                             events.ScheduleEvent(EVENT_DESPAWN_CHEST, 3s);
@@ -409,7 +409,7 @@ struct boss_hodir : public BossAI
                     bAchievCacheRare = false;
                     if (instance)
                     {
-                        if (GameObject* go = instance->instance->GetGameObject(instance->GetGuidData(GO_HODIR_CHEST_HARD)))
+                        if (GameObject* go = instance->GetGameObject(DATA_HODIR_CHEST_HARD))
                         {
                             me->CastSpell(go, SPELL_SHATTER_CHEST, false);
                         }
@@ -632,7 +632,7 @@ struct npc_ulduar_flash_freeze : public NullCreatureAI
     {
         if (pInstance && doneBy)
             if (pInstance->GetData(TYPE_HODIR) == NOT_STARTED)
-                if (Creature* hodir = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_HODIR)))
+                if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                     hodir->AI()->AttackStart(doneBy);
     }
 
@@ -746,8 +746,7 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
                         if (pInstance)
-                            if (ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR))
-                                if (Creature* hodir = ObjectAccessor::GetCreature(*me, g))
+                            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -780,7 +779,7 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         if (pInstance)
-            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
+            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
@@ -832,8 +831,7 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
                         if (pInstance)
-                            if (ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR))
-                                if (Creature* hodir = ObjectAccessor::GetCreature(*me, g))
+                            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -867,7 +865,7 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         if (pInstance)
-            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
+            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
@@ -927,8 +925,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
                         if (pInstance)
-                            if (ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR))
-                                if (Creature* hodir = ObjectAccessor::GetCreature(*me, g))
+                            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -961,7 +958,7 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         if (pInstance)
-            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
+            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
@@ -1014,8 +1011,7 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
                         if (pInstance)
-                            if (ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR))
-                                if (Creature* hodir = ObjectAccessor::GetCreature(*me, g))
+                            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -1066,7 +1062,7 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         if (pInstance)
-            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
+            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
@@ -1162,7 +1158,7 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
                 {
                     if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
                         if (InstanceScript* pInstance = target->GetInstanceScript())
-                            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
+                            if (Creature* hodir = pInstance->GetCreature(TYPE_HODIR))
                                 hodir->AI()->SetData(2, 1);
                     ModStackAmount(1);
                     _counter = 0;
