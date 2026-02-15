@@ -20,6 +20,7 @@
 
 #include "ScriptObject.h"
 #include "SharedDefines.h"
+#include "DBCStructure.h"
 #include <vector>
 
 // TODO to remove
@@ -207,6 +208,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
+    PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_END
 };
 
@@ -796,6 +798,24 @@ public:
      * @param vendorEntry Entry of the vendor player is interacting with
      */
     virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. This then uses this information to call OnPlayerGetReputationPriceDiscoun(Player, FactionTemplateEntry, float)
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the creature involved in the transaction
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, Creature const* /*creature*/, float& /*discount*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. It is also called when continuing along taxis
+     *
+     * @param player Contains information about the Player
+     * @param factionTemplate Contains information about the faction template involved in the transaction. Can be null!
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
 };
 
 #endif

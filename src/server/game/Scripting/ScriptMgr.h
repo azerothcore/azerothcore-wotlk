@@ -462,6 +462,8 @@ public: /* PlayerScript */
     bool OnPlayerCanResurrect(Player* player);
     bool OnPlayerCanGiveLevel(Player* player, uint8 newLevel);
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
+    void OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount);
+    void OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
