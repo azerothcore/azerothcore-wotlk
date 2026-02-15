@@ -556,24 +556,9 @@ struct boss_sartharion : public BossAI
                 {
                     Talk(SAY_SARTHARION_CYCLONE);
                     summons.RemoveNotExisting();
-                    uint8 rand = urand(0, MAX_CYCLONE_COUNT - 1); // 5 - number of cyclones
-                    uint8 iter = 0;
-                    if (!summons.empty())
-                    {
-                        for (ObjectGuid const& summonGuid : summons)
-                        {
-                            Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
-                            if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
-                            {
-                                if (iter == rand)
-                                {
-                                    summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
-                                    break;
-                                }
-                                ++iter;
-                            }
-                        }
-                    }
+                    if (auto summon = summons.GetRandomCreatureWithEntry(NPC_FIRE_CYCLONE))
+                        summon->CastSpell(summon, SPELL_CYCLONE_AURA_PERIODIC, true);
+
                     extraEvents.Repeat((below11PctReached ? randtime(1400ms, 2s) : 25s));
                     break;
                 }
