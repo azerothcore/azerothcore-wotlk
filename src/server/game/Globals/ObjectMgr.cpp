@@ -2224,6 +2224,87 @@ void ObjectMgr::LoadTempSummons()
     LOG_INFO("server.loading", " ");
 }
 
+void ObjectMgr::LoadGameObjectSummons()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _goSummonDataStore.clear();
+
+    //                                                    0           1             2        3      4           5           6           7            8          9          10         11           12
+    QueryResult result = WorldDatabase.Query("SELECT summonerId, summonerType, groupId, entry, position_x, position_y, position_z, orientation, rotation0, rotation1, rotation2, rotation3, respawnTime FROM gameobject_summon_groups");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 gameobject summons. DB table `gameobject_summon_groups` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 summonerId               = fields[0].Get<uint32>();
+        SummonerType summonerType       = SummonerType(fields[1].Get<uint8>());
+        uint8 group                     = fields[2].Get<uint8>();
+
+        switch (summonerType)
+        {
+            case SUMMONER_TYPE_CREATURE:
+                if (!GetCreatureTemplate(summonerId))
+                {
+                    LOG_ERROR("sql.sql", "Table `gameobject_summon_groups` has summoner with non existing entry {} for creature summoner type, skipped.", summonerId);
+                    continue;
+                }
+                break;
+            case SUMMONER_TYPE_GAMEOBJECT:
+                if (!GetGameObjectTemplate(summonerId))
+                {
+                    LOG_ERROR("sql.sql", "Table `gameobject_summon_groups` has summoner with non existing entry {} for gameobject summoner type, skipped.", summonerId);
+                    continue;
+                }
+                break;
+            case SUMMONER_TYPE_MAP:
+                if (!sMapStore.LookupEntry(summonerId))
+                {
+                    LOG_ERROR("sql.sql", "Table `gameobject_summon_groups` has summoner with non existing entry {} for map summoner type, skipped.", summonerId);
+                    continue;
+                }
+                break;
+            default:
+                LOG_ERROR("sql.sql", "Table `gameobject_summon_groups` has unhandled summoner type {} for summoner {}, skipped.", summonerType, summonerId);
+                continue;
+        }
+
+        GameObjectSummonData data;
+        data.entry                      = fields[3].Get<uint32>();
+
+        if (!GetGameObjectTemplate(data.entry))
+        {
+            LOG_ERROR("sql.sql", "Table `gameobject_summon_groups` has gameobject in group [Summoner ID: {}, Summoner Type: {}, Group ID: {}] with non existing gameobject entry {}, skipped.", summonerId, summonerType, group, data.entry);
+            continue;
+        }
+
+        float posX                      = fields[4].Get<float>();
+        float posY                      = fields[5].Get<float>();
+        float posZ                      = fields[6].Get<float>();
+        float orientation               = fields[7].Get<float>();
+
+        data.pos.Relocate(posX, posY, posZ, orientation);
+
+        data.rot                        = G3D::Quat(fields[8].Get<float>(), fields[9].Get<float>(), fields[10].Get<float>(), fields[11].Get<float>());
+        data.respawnTime                = fields[12].Get<uint32>();
+
+        TempSummonGroupKey key(summonerId, summonerType, group);
+        _goSummonDataStore[key].push_back(data);
+
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Gameobject Summons in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 void ObjectMgr::LoadCreatures()
 {
     uint32 oldMSTime = getMSTime();

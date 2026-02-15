@@ -2284,6 +2284,18 @@ void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= null
                 list->push_back(summon);
 }
 
+void Map::SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list /*= nullptr*/)
+{
+    std::vector<GameObjectSummonData> const* data = sObjectMgr->GetGameObjectSummonGroup(GetId(), SUMMONER_TYPE_MAP, group);
+    if (!data)
+        return;
+
+    for (std::vector<GameObjectSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (GameObject* go = SummonGameObject(itr->entry, itr->pos.GetPositionX(), itr->pos.GetPositionY(), itr->pos.GetPositionZ(), itr->pos.GetOrientation(), itr->rot.x, itr->rot.y, itr->rot.z, itr->rot.w, itr->respawnTime))
+            if (list)
+                list->push_back(go);
+}
+
 TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly)
 {
     if (!x && !y && !z)
@@ -2438,6 +2450,20 @@ void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list 
         if (TempSummon* summon = SummonCreature(itr->entry, itr->pos, itr->type, itr->time))
             if (list)
                 list->push_back(summon);
+}
+
+void WorldObject::SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list /*= nullptr*/)
+{
+    ASSERT((IsGameObject() || IsCreature()) && "Only GOs and creatures can summon gameobject groups!");
+
+    std::vector<GameObjectSummonData> const* data = sObjectMgr->GetGameObjectSummonGroup(GetEntry(), IsGameObject() ? SUMMONER_TYPE_GAMEOBJECT : SUMMONER_TYPE_CREATURE, group);
+    if (!data)
+        return;
+
+    for (std::vector<GameObjectSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (GameObject* go = SummonGameObject(itr->entry, itr->pos.GetPositionX(), itr->pos.GetPositionY(), itr->pos.GetPositionZ(), itr->pos.GetOrientation(), itr->rot.x, itr->rot.y, itr->rot.z, itr->rot.w, itr->respawnTime))
+            if (list)
+                list->push_back(go);
 }
 
 Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive) const
