@@ -184,7 +184,7 @@ struct boss_steelbreaker : public ScriptedAI
         _phase = 0;
         events.Reset();
         if (pInstance)
-            pInstance->SetData(BOSS_ASSEMBLY, NOT_STARTED);
+            pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
     }
 
     void JustReachedHome() override
@@ -196,7 +196,7 @@ struct boss_steelbreaker : public ScriptedAI
     void JustEngagedWith(Unit* who) override
     {
         if (pInstance)
-            pInstance->SetData(BOSS_ASSEMBLY, IN_PROGRESS);
+            pInstance->SetBossState(BOSS_ASSEMBLY, IN_PROGRESS);
 
         me->setActive(true);
         me->SetInCombatWithZone();
@@ -258,7 +258,7 @@ struct boss_steelbreaker : public ScriptedAI
 
         if (IsEncounterComplete(pInstance, me))
         {
-            pInstance->SetData(BOSS_ASSEMBLY, DONE);
+            pInstance->SetBossState(BOSS_ASSEMBLY, DONE);
             me->CastSpell(me, 65195, true); // credit
             Talk(SAY_STEELBREAKER_ENCOUNTER_DEFEATED);
         }
@@ -367,7 +367,7 @@ struct boss_runemaster_molgeim : public ScriptedAI
         summons.DespawnAll();
 
         if (pInstance)
-            pInstance->SetData(BOSS_ASSEMBLY, NOT_STARTED);
+            pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
 
         me->m_Events.AddEventAtOffset(new CastRunesEvent(*me), 8s);
     }
@@ -425,7 +425,7 @@ struct boss_runemaster_molgeim : public ScriptedAI
 
         if (IsEncounterComplete(pInstance, me))
         {
-            pInstance->SetData(BOSS_ASSEMBLY, DONE);
+            pInstance->SetBossState(BOSS_ASSEMBLY, DONE);
             me->CastSpell(me, 65195, true); // credit
             Talk(SAY_MOLGEIM_ENCOUNTER_DEFEATED);
         }
@@ -564,7 +564,7 @@ struct boss_stormcaller_brundir : public ScriptedAI
         me->SetRegeneratingHealth(true);
         me->SetReactState(REACT_AGGRESSIVE);
         if (pInstance)
-            pInstance->SetData(BOSS_ASSEMBLY, NOT_STARTED);
+            pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
     }
 
     void JustReachedHome() override

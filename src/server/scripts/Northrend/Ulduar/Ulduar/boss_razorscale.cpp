@@ -205,11 +205,6 @@ struct boss_razorscaleAI : public BossAI
             CommanderGUID = c->GetGUID();
     }
 
-    void JustDied(Unit* killer) override
-    {
-        _JustDied();
-    }
-
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
         if (!caster || !instance)
