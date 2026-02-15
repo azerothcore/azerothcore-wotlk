@@ -1078,7 +1078,7 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_cold_snap);
     RegisterSpellScript(spell_mage_fire_frost_ward);
     RegisterSpellScript(spell_mage_focus_magic);
-    RegisterSpellScript(spell_mage_ice_barrier);
+    RegisterSpellAndAuraScriptPair(spell_mage_ice_barrier, spell_mage_ice_barrier_aura);
     RegisterSpellScript(spell_mage_ignite);
     RegisterSpellScript(spell_mage_living_bomb);
     RegisterSpellScript(spell_mage_mana_shield);
