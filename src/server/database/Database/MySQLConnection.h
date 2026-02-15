@@ -55,7 +55,7 @@ class AC_DATABASE_API MySQLConnection
 {
 template <class T>
 friend class DatabaseWorkerPool;
-
+friend class ModuleDatabasePool;
 friend class PingOperation;
 
 public:
