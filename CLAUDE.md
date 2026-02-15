@@ -10,6 +10,8 @@ AzerothCore is an open-source MMORPG server emulator for World of Warcraft patch
 
 ### Configure and build (out-of-source build required)
 
+- Skip building unless explicitly requested.
+
 ```bash
 # Create build directory and configure
 mkdir -p build && cd build
@@ -84,7 +86,9 @@ Scripts follow a registration pattern:
 - **acore_characters** - Character data, inventories, progress (`data/sql/base/db_characters/`)
 - **acore_world** - Game content: creatures, items, quests, spells, loot (`data/sql/base/db_world/`)
 
-SQL updates go in `data/sql/updates/` with separate subdirectories per database.
+- SQL updates go in `data/sql/updates/pending_*` with separate subdirectories per database until pull request is merged. Pending SQL files are assigned random names.
+- SQL updates go in `data/sql/updates/` with separate subdirectories per database after their pull request is merged.
+- SQL files outside the `data/sql/updates/pending_*` folders should never be updated.
 
 ### Module system
 
@@ -111,6 +115,8 @@ Type(Scope/Subscope): Short description (max 50 chars)
 - 2-space indentation for JSON, YAML, shell scripts
 - UTF-8 encoding, LF line endings
 - Max 80 character line length
+- No braces around single-line statements
+- Use {} to parse variables into output instead of %u etc.
 - CI enforces code style checks and compiles with `-Werror`
 
 ## PR Requirements
