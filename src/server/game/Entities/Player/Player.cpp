@@ -12026,10 +12026,12 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
         // need learn
         else
         {
-            //used to avoid double Seal of Righteousness on paladins, it's the only player spell which has both spell and forward spell in auto learn
+            // Check if this spell is superseded by another spell in the same skill line that player qualifies for
+            bool skipCurrent = false;
+
+            // First check the SupercededBySpell field (handles forward references)
             if (pAbility->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && pAbility->SupercededBySpell)
             {
-                bool skipCurrent = false;
                 auto bounds = sSpellMgr->GetSkillLineAbilityMapBounds(pAbility->SupercededBySpell);
                 for (auto itr = bounds.first; itr != bounds.second; ++itr)
                 {
@@ -12039,32 +12041,33 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
                         break;
                     }
                 }
-                if (skipCurrent)
+            }
+
+            // Also check if ANY ability in the skill line supersedes THIS spell (handles out-of-order IDs)
+            if (!skipCurrent)
+            {
+                for (SkillLineAbilityEntry const* otherAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
                 {
-                    continue;
+                    if (otherAbility->SupercededBySpell == pAbility->Spell && skill_value >= otherAbility->MinSkillLineRank)
+                    {
+                        skipCurrent = true;
+                        break;
+                    }
                 }
             }
 
-            if (!IsInWorld())
+            if (!skipCurrent)
             {
-                addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true);
-            }
-            else
-            {
-                learnSpell(pAbility->Spell, true, true);
+                if (!IsInWorld())
+                {
+                    addSpell(pAbility->Spell, SPEC_MASK_ALL, true, true);
+                }
+                else
+                {
+                    learnSpell(pAbility->Spell, true, true);
+                }
             }
         }
-    }
-
-    // Remove spells that are superseded by other spells now known
-    // Handles case where higher-rank spell has lower ID
-    for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
-    {
-        if (!HasSpell(pAbility->Spell) || !pAbility->SupercededBySpell)
-            continue;
-
-        if (HasSpell(pAbility->SupercededBySpell))
-            removeSpell(pAbility->Spell, GetActiveSpec(), true);
     }
 }
 
