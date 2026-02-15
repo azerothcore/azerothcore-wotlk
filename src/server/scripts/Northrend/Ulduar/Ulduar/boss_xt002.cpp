@@ -56,6 +56,9 @@ enum XT002Spells
     SPELL_SPARK_SUMMON          = 64210,
     SPELL_SPARK_DAMAGE          = 64227,
     SPELL_SPARK_MELEE           = 64230,
+
+    // ACHIEVEMENT
+    SPELL_ACHIEVEMENT_CREDIT_NERF_SCRAPBOTS = 65037,
 };
 
 enum XT002Events
@@ -946,6 +949,36 @@ public:
     }
 };
 
+// 65032 - 321 Boombot Aura
+class spell_xt002_321_boombot_aura : public AuraScript
+{
+    PrepareAuraScript(spell_xt002_321_boombot_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ACHIEVEMENT_CREDIT_NERF_SCRAPBOTS });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        if (eventInfo.GetActionTarget()->GetEntry() != NPC_XS013_SCRAPBOT)
+            return false;
+        return true;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        if (InstanceScript* instance = eventInfo.GetActor()->GetInstanceScript())
+            instance->DoCastSpellOnPlayers(SPELL_ACHIEVEMENT_CREDIT_NERF_SCRAPBOTS);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_xt002_321_boombot_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_xt002_321_boombot_aura::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_boss_xt002()
 {
     // Npcs
@@ -961,6 +994,7 @@ void AddSC_boss_xt002()
     RegisterSpellAndAuraScriptPair(spell_xt002_gravity_bomb, spell_xt002_gravity_bomb_aura);
     RegisterSpellScript(spell_xt002_gravity_bomb_damage);
     RegisterSpellAndAuraScriptPair(spell_xt002_searing_light_spawn_life_spark, spell_xt002_searing_light_spawn_life_spark_aura);
+    RegisterSpellScript(spell_xt002_321_boombot_aura);
 
     // Achievements
     new achievement_xt002_nerf_engineering();
