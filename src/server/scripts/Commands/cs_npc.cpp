@@ -15,11 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CellImpl.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
 #include "GameTime.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
@@ -728,6 +731,33 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
+        // Grid search - finds all creatures including temporary spawns
+        std::list<Creature*> creatures;
+        Acore::AllWorldObjectsInRange check(player, distance);
+        Acore::CreatureListSearcher<Acore::AllWorldObjectsInRange> searcher(player, creatures, check);
+        Cell::VisitObjects(player, searcher, distance);
+
+        if (!creatures.empty())
+        {
+            for (Creature* creature : creatures)
+            {
+                CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
+                if (!creatureTemplate)
+                    continue;
+
+                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, creature->GetSpawnId(), creature->GetEntry(),
+                    creature->GetSpawnId(), creatureTemplate->Name,
+                    creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(),
+                    creature->GetMapId(), "", "");
+
+                ++count;
+            }
+
+            handler->PSendSysMessage(LANG_COMMAND_NEAR_NPC_MESSAGE, distance, count);
+            return true;
+        }
+
+        // Fallback to DB query
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_NEAREST);
         stmt->SetData(0, player->GetPositionX());
         stmt->SetData(1, player->GetPositionY());
