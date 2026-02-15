@@ -22,4 +22,4 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (5107, '  - Seasonal quest already completed this season.'),
 (5108, '  - Condition requirements not met:'),
 (5109, '  - Quest log is full.'),
-(5110, '    - Condition not met: type {} value1: {} value2: {} value3: {}');
+(5110, ' - Condition not met: type {} value1: {} value2: {} value3: {}');
