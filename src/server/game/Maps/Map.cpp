@@ -1041,8 +1041,8 @@ void Map::UnloadAll()
         ++i;
         if (grid)
         {
-            uint32 const x = grid->GetX();
-            uint32 const y = grid->GetY();
+            uint16 const x = grid->GetX();
+            uint16 const y = grid->GetY();
             _mapGridManager.UnloadGrid(x, y); // deletes the grid and removes it from the GridRefMgr
         }
     }
