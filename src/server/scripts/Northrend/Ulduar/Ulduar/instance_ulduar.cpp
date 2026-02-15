@@ -181,7 +181,7 @@ public:
         void Initialize() override
         {
             // Bosses
-            memset(&m_watchersMask, 0, sizeof(m_watchersMask));
+            m_watchersMask = 0;
             C_of_Ulduar_MASK = 0;
 
             // Flame Leviathan
