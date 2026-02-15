@@ -365,300 +365,267 @@ struct boss_xt002AI : public BossAI
     }
 };
 
-class npc_xt002_heart : public CreatureScript
+struct npc_xt002_heart : public PassiveAI
 {
-public:
-    npc_xt002_heart() : CreatureScript("npc_xt002_heart") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_xt002_heart(Creature* pCreature) : PassiveAI(pCreature), summons(me)
     {
-        return GetUlduarAI<npc_xt002_heartAI>(pCreature);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
     }
 
-    struct npc_xt002_heartAI : public PassiveAI
+    SummonList summons;
+    uint32 _damageDone;
+    uint32 _timerSpawn;
+
+    uint8 _spawnSelection;
+    uint8 _pummelerCount;
+
+    void MoveInLineOfSight(Unit*) override { }
+    void AttackStart(Unit*) override { }
+    void JustSummoned(Creature* cr) override
     {
-        npc_xt002_heartAI(Creature* pCreature) : PassiveAI(pCreature), summons(me)
+        summons.Summon(cr);
+        if (Unit* owner = me->GetVehicleBase())
+            if (owner->IsCreature())
+                owner->ToCreature()->AI()->JustSummoned(cr);
+    }
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        _damageDone += damage;
+    }
+
+    void SummonPiles()
+    {
+        me->SummonCreature(NPC_PILE_TRIGGER, 893.290f, 66.820f, 409.81f, 4.2f);
+        me->SummonCreature(NPC_PILE_TRIGGER, 898.099f, -88.9115f, 409.887f, 2.23402f);
+        me->SummonCreature(NPC_PILE_TRIGGER, 793.096f, -95.158f,  409.887f, 0.855211f);
+        me->SummonCreature(NPC_PILE_TRIGGER, 794.600f, 59.660f, 409.82f, 5.34f);
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_AWAKEN_HEART)
         {
+            _pummelerCount = 0;
+            _spawnSelection = 0;
+            _damageDone = 0;
+            _timerSpawn = 0;
+            me->SetHealth(me->GetMaxHealth());
+            me->CastSpell(me, SPELL_HEART_OVERLOAD, true);
+            me->CastSpell(me, SPELL_EXPOSED_HEART, false);    // Channeled
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+
+            if (!summons.HasEntry(NPC_PILE_TRIGGER))
+                SummonPiles();
+        }
+        else if (param == ACTION_HIDE_HEART)
+        {
+            if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
+                if (pXT002->AI())
+                {
+                    pXT002->AI()->DoAction(_damageDone);
+                    _damageDone = 0;
+                }
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
-
-        SummonList summons;
-        uint32 _damageDone;
-        uint32 _timerSpawn;
-
-        uint8 _spawnSelection;
-        uint8 _pummelerCount;
-
-        void MoveInLineOfSight(Unit*) override { }
-        void AttackStart(Unit*) override { }
-        void JustSummoned(Creature* cr) override
-        {
-            summons.Summon(cr);
-            if (Unit* owner = me->GetVehicleBase())
-                if (owner->IsCreature())
-                    owner->ToCreature()->AI()->JustSummoned(cr);
-        }
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            _damageDone += damage;
-        }
-
-        void SummonPiles()
-        {
-            me->SummonCreature(NPC_PILE_TRIGGER, 893.290f, 66.820f, 409.81f, 4.2f);
-            me->SummonCreature(NPC_PILE_TRIGGER, 898.099f, -88.9115f, 409.887f, 2.23402f);
-            me->SummonCreature(NPC_PILE_TRIGGER, 793.096f, -95.158f,  409.887f, 0.855211f);
-            me->SummonCreature(NPC_PILE_TRIGGER, 794.600f, 59.660f, 409.82f, 5.34f);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_AWAKEN_HEART)
-            {
-                _pummelerCount = 0;
-                _spawnSelection = 0;
-                _damageDone = 0;
-                _timerSpawn = 0;
-                me->SetHealth(me->GetMaxHealth());
-                me->CastSpell(me, SPELL_HEART_OVERLOAD, true);
-                me->CastSpell(me, SPELL_EXPOSED_HEART, false);    // Channeled
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-
-                if (!summons.HasEntry(NPC_PILE_TRIGGER))
-                    SummonPiles();
-            }
-            else if (param == ACTION_HIDE_HEART)
-            {
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
-                    if (pXT002->AI())
-                    {
-                        pXT002->AI()->DoAction(_damageDone);
-                        _damageDone = 0;
-                    }
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            }
-        }
-
-        void SendEnergyToCorner()
-        {
-            Unit* pile = nullptr;
-            uint8 num = urand(1, 4);
-            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-                if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
-                    if (summon->GetEntry() == NPC_PILE_TRIGGER)
-                    {
-                        pile = summon;
-                        if ((--num) == 0)
-                            break;
-                    }
-
-            if (pile)
-                me->CastSpell(pile, SPELL_ENERGY_ORB, true);
-        }
-
-        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-        {
-            // spawn not-so-random robots
-            if (spellInfo->Id == SPELL_ENERGY_ORB_TRIGGER && target->GetEntry() == NPC_PILE_TRIGGER)
-                switch (_spawnSelection)
-                {
-                    case 0:
-                        for (uint8 i = 0; i < 5; ++i)
-                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
-                        _spawnSelection++;
-                        break;
-                    case 1:
-                        me->SummonCreature(NPC_XE321_BOOMBOT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-                        _spawnSelection++;
-                        break;
-                    case 2:
-                        for (uint8 i = 0; i < 5; ++i)
-                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
-                        _spawnSelection++;
-                        break;
-                    case 3:
-                        if (_pummelerCount < 2)
-                            me->SummonCreature(NPC_XM024_PUMMELLER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-
-                        _pummelerCount++;
-                        _spawnSelection++;
-                        break;
-                    case 4:
-                        for (uint8 i = 0; i < 5; ++i)
-                            me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
-                        _spawnSelection = 0;
-                        break;
-                }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            me->SetVisible(false);
-            if (me->GetInstanceScript())
-                if (Creature* XT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
-                    if (XT002->AI())
-                        XT002->AI()->DoAction(ACTION_HEART_BROKEN);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
-            {
-                _timerSpawn += diff;
-                if (_timerSpawn >= 1900)
-                {
-                    SendEnergyToCorner();
-                    _timerSpawn -= 1900;
-                }
-            }
-        }
-    };
-};
-
-class npc_xt002_scrapbot : public CreatureScript
-{
-public:
-    npc_xt002_scrapbot() : CreatureScript("npc_xt002_scrapbot") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<npc_xt002_scrapbotAI>(pCreature);
     }
 
-    struct npc_xt002_scrapbotAI : public PassiveAI
+    void SendEnergyToCorner()
     {
-        npc_xt002_scrapbotAI(Creature* pCreature) : PassiveAI(pCreature) { }
+        Unit* pile = nullptr;
+        uint8 num = urand(1, 4);
+        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+            if (Creature* summon = ObjectAccessor::GetCreature(*me, *itr))
+                if (summon->GetEntry() == NPC_PILE_TRIGGER)
+                {
+                    pile = summon;
+                    if ((--num) == 0)
+                        break;
+                }
 
-        bool _locked;
-        void Reset() override
+        if (pile)
+            me->CastSpell(pile, SPELL_ENERGY_ORB, true);
+    }
+
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+    {
+        // spawn not-so-random robots
+        if (spellInfo->Id == SPELL_ENERGY_ORB_TRIGGER && target->GetEntry() == NPC_PILE_TRIGGER)
+            switch (_spawnSelection)
+            {
+                case 0:
+                    for (uint8 i = 0; i < 5; ++i)
+                        me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                    _spawnSelection++;
+                    break;
+                case 1:
+                    me->SummonCreature(NPC_XE321_BOOMBOT, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                    _spawnSelection++;
+                    break;
+                case 2:
+                    for (uint8 i = 0; i < 5; ++i)
+                        me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                    _spawnSelection++;
+                    break;
+                case 3:
+                    if (_pummelerCount < 2)
+                        me->SummonCreature(NPC_XM024_PUMMELLER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
+                    _pummelerCount++;
+                    _spawnSelection++;
+                    break;
+                case 4:
+                    for (uint8 i = 0; i < 5; ++i)
+                        me->SummonCreature(NPC_XS013_SCRAPBOT, target->GetPositionX() + irand(-3, 3), target->GetPositionY() + irand(-3, 3), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1000);
+                    _spawnSelection = 0;
+                    break;
+            }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->SetVisible(false);
+        if (me->GetInstanceScript())
+            if (Creature* XT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
+                if (XT002->AI())
+                    XT002->AI()->DoAction(ACTION_HEART_BROKEN);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
         {
-            me->StopMoving();
-            _locked = true;
-            me->SetWalk(true);
+            _timerSpawn += diff;
+            if (_timerSpawn >= 1900)
+            {
+                SendEnergyToCorner();
+                _timerSpawn -= 1900;
+            }
+        }
+    }
+};
 
+struct npc_xt002_scrapbot : public PassiveAI
+{
+    npc_xt002_scrapbot(Creature* pCreature) : PassiveAI(pCreature) { }
+
+    bool _locked;
+    void Reset() override
+    {
+        me->StopMoving();
+        _locked = true;
+        me->SetWalk(true);
+
+        if (me->GetInstanceScript())
+            if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
+            {
+                if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
+                    me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
+                else
+                    _locked = false;
+            }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        // Nerf Scrapbots achievement
+        if (killer && killer->GetEntry() == NPC_XE321_BOOMBOT)
+            if (me->GetInstanceScript())
+            {
+                me->GetInstanceScript()->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, 65037);
+                me->GetInstanceScript()->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 65037);
+            }
+    }
+
+    // tc use updateAI, while we have movementinform
+    void MovementInform(uint32 type, uint32  /*param*/) override
+    {
+        if (type == POINT_MOTION_TYPE)
+        {
+            _locked = false;
+            return;
+        }
+
+        // we reached the target :)
+        if (type == FOLLOW_MOTION_TYPE && me->GetInstanceScript())
+            if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
+            {
+                if (pXT002->IsAlive())
+                {
+                    pXT002->AI()->DoAction(DATA_XT002_NERF_ENGINEERING);
+                    pXT002->ModifyHealth(pXT002->GetMaxHealth() * 0.01f);
+                }
+
+                if (!urand(0, 2))
+                    pXT002->AI()->Talk(EMOTE_SCRAPBOT);
+
+                me->DespawnOrUnsummon(1ms);
+            }
+    }
+
+    void UpdateAI(uint32  /*diff*/) override
+    {
+        if (!_locked)
+        {
             if (me->GetInstanceScript())
                 if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
-                    if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
-                        me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
-                    else
-                        _locked = false;
+                    me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
+                    _locked = true;
                 }
         }
-
-        void JustDied(Unit* killer) override
-        {
-            // Nerf Scrapbots achievement
-            if (killer && killer->GetEntry() == NPC_XE321_BOOMBOT)
-                if (me->GetInstanceScript())
-                {
-                    me->GetInstanceScript()->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_SPELL_TARGET, 65037);
-                    me->GetInstanceScript()->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 65037);
-                }
-        }
-
-        // tc use updateAI, while we have movementinform
-        void MovementInform(uint32 type, uint32  /*param*/) override
-        {
-            if (type == POINT_MOTION_TYPE)
-            {
-                _locked = false;
-                return;
-            }
-
-            // we reached the target :)
-            if (type == FOLLOW_MOTION_TYPE && me->GetInstanceScript())
-                if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
-                {
-                    if (pXT002->IsAlive())
-                    {
-                        pXT002->AI()->DoAction(DATA_XT002_NERF_ENGINEERING);
-                        pXT002->ModifyHealth(pXT002->GetMaxHealth() * 0.01f);
-                    }
-
-                    if (!urand(0, 2))
-                        pXT002->AI()->Talk(EMOTE_SCRAPBOT);
-
-                    me->DespawnOrUnsummon(1ms);
-                }
-        }
-
-        void UpdateAI(uint32  /*diff*/) override
-        {
-            if (!_locked)
-            {
-                if (me->GetInstanceScript())
-                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
-                    {
-                        me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
-                        _locked = true;
-                    }
-            }
-        }
-    };
+    }
 };
 
-class npc_xt002_pummeller : public CreatureScript
+struct npc_xt002_pummeller : public ScriptedAI
 {
-public:
-    npc_xt002_pummeller() : CreatureScript("npc_xt002_pummeller") { }
+    npc_xt002_pummeller(Creature* pCreature) : ScriptedAI(pCreature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    int32 _arcingSmashTimer;
+    int32 _trampleTimer;
+    int32 _uppercutTimer;
+
+    void Reset() override
     {
-        return GetUlduarAI<npc_xt002_pummellerAI>(pCreature);
+        _arcingSmashTimer = 0;
+        _trampleTimer = 0;
+        _uppercutTimer = 0;
+
+        if (Unit* target = SelectTargetFromPlayerList(200))
+            AttackStart(target);
+        else
+            me->DespawnOrUnsummon(500ms);
     }
 
-    struct npc_xt002_pummellerAI : public ScriptedAI
+    void UpdateAI(uint32 diff) override
     {
-        npc_xt002_pummellerAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+        if (!UpdateVictim())
+            return;
 
-        int32 _arcingSmashTimer;
-        int32 _trampleTimer;
-        int32 _uppercutTimer;
+        _arcingSmashTimer += diff;
+        _trampleTimer += diff;
+        _uppercutTimer += diff;
 
-        void Reset() override
+        if (_arcingSmashTimer >= 8000)
         {
+            me->CastSpell(me->GetVictim(), SPELL_ARCING_SMASH, false);
             _arcingSmashTimer = 0;
-            _trampleTimer = 0;
-            _uppercutTimer = 0;
-
-            if (Unit* target = SelectTargetFromPlayerList(200))
-                AttackStart(target);
-            else
-                me->DespawnOrUnsummon(500ms);
+            return;
         }
-
-        void UpdateAI(uint32 diff) override
+        if (_trampleTimer >= 11000)
         {
-            if (!UpdateVictim())
-                return;
-
-            _arcingSmashTimer += diff;
-            _trampleTimer += diff;
-            _uppercutTimer += diff;
-
-            if (_arcingSmashTimer >= 8000)
-            {
-                me->CastSpell(me->GetVictim(), SPELL_ARCING_SMASH, false);
-                _arcingSmashTimer = 0;
-                return;
-            }
-            if (_trampleTimer >= 11000)
-            {
-                me->CastSpell(me->GetVictim(), SPELL_TRAMPLE, false);
-                _trampleTimer = 0;
-                return;
-            }
-            if (_uppercutTimer >= 14000)
-            {
-                me->CastSpell(me->GetVictim(), SPELL_UPPERCUT, false);
-                _uppercutTimer = 0;
-                return;
-            }
-
-            DoMeleeAttackIfReady();
+            me->CastSpell(me->GetVictim(), SPELL_TRAMPLE, false);
+            _trampleTimer = 0;
+            return;
         }
-    };
+        if (_uppercutTimer >= 14000)
+        {
+            me->CastSpell(me->GetVictim(), SPELL_UPPERCUT, false);
+            _uppercutTimer = 0;
+            return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 class BoomEvent : public BasicEvent
@@ -684,144 +651,122 @@ private:
     Creature* _me;
 };
 
-class npc_xt002_boombot : public CreatureScript
+struct npc_xt002_boombot : public PassiveAI
 {
-public:
-    npc_xt002_boombot() : CreatureScript("npc_xt002_boombot") { }
+    npc_xt002_boombot(Creature* pCreature) : PassiveAI(pCreature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    bool _locked;
+    bool _boomed;
+    void Reset() override
     {
-        return GetUlduarAI<npc_xt002_boombotAI>(pCreature);
+        me->StopMoving();
+        _locked = true;
+        _boomed = false;
+        me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+
+        if (me->GetInstanceScript())
+            if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
+            {
+                if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
+                    me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
+                else
+                    _locked = false;
+            }
     }
 
-    struct npc_xt002_boombotAI : public PassiveAI
+    void Explode()
     {
-        npc_xt002_boombotAI(Creature* pCreature) : PassiveAI(pCreature) { }
+        if (_boomed)
+            return;
 
-        bool _locked;
-        bool _boomed;
-        void Reset() override
+        _boomed = true; // Prevent recursive calls
+
+        WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8 + 8 + 4);
+        data << me->GetGUID();
+        data << me->GetGUID();
+        data << uint32(SPELL_BOOM);
+        me->SendMessageToSet(&data, false);
+
+        me->KillSelf();
+
+        // Visual only seems to work if the instant kill event is delayed or the spell itself is delayed
+        // Casting done from player and caster source has the same targetinfo flags,
+        // so that can't be the issue
+        // See BoomEvent class
+        // Schedule 1s delayed
+        me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (_boomed)
+            damage = 0;
+
+        if (me->HealthBelowPctDamaged(50, damage) && !_boomed)
         {
-            me->StopMoving();
-            _locked = true;
-            _boomed = false;
-            me->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
+            damage = 0;
+            Explode();
+        }
+    }
 
+    // tc they use updateAI, while we have movementinform
+    void MovementInform(uint32 type, uint32  /*param*/) override
+    {
+        if (type == POINT_MOTION_TYPE)
+        {
+            _locked = false;
+            return;
+        }
+        // we reached the target :)
+        //if (type == FOLLOW_MOTION_TYPE)
+        //  _kill = true;
+    }
+
+    void UpdateAI(uint32  /*diff*/) override
+    {
+        if (!_locked)
+        {
             if (me->GetInstanceScript())
                 if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
                 {
-                    if (pXT002->GetPositionZ() > 411.0f) // he is on stairs... idiot cryness protection
-                        me->GetMotionMaster()->MovePoint(0, 884.028931f, -14.593809f, 409.786987f);
-                    else
-                        _locked = false;
+                    me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
+                    _locked = true;
                 }
         }
-
-        void Explode()
-        {
-            if (_boomed)
-                return;
-
-            _boomed = true; // Prevent recursive calls
-
-            WorldPacket data(SMSG_SPELLINSTAKILLLOG, 8 + 8 + 4);
-            data << me->GetGUID();
-            data << me->GetGUID();
-            data << uint32(SPELL_BOOM);
-            me->SendMessageToSet(&data, false);
-
-            me->KillSelf();
-
-            // Visual only seems to work if the instant kill event is delayed or the spell itself is delayed
-            // Casting done from player and caster source has the same targetinfo flags,
-            // so that can't be the issue
-            // See BoomEvent class
-            // Schedule 1s delayed
-            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            me->m_Events.AddEventAtOffset(new BoomEvent(me), 1s);
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (_boomed)
-                damage = 0;
-
-            if (me->HealthBelowPctDamaged(50, damage) && !_boomed)
-            {
-                damage = 0;
-                Explode();
-            }
-        }
-
-        // tc they use updateAI, while we have movementinform
-        void MovementInform(uint32 type, uint32  /*param*/) override
-        {
-            if (type == POINT_MOTION_TYPE)
-            {
-                _locked = false;
-                return;
-            }
-            // we reached the target :)
-            //if (type == FOLLOW_MOTION_TYPE)
-            //  _kill = true;
-        }
-
-        void UpdateAI(uint32  /*diff*/) override
-        {
-            if (!_locked)
-            {
-                if (me->GetInstanceScript())
-                    if (Creature* pXT002 = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_XT002)))
-                    {
-                        me->GetMotionMaster()->MoveFollow(pXT002, 0.0f, 0.0f);
-                        _locked = true;
-                    }
-            }
-        }
-    };
+    }
 };
 
-class npc_xt002_life_spark : public CreatureScript
+struct npc_xt002_life_spark : public ScriptedAI
 {
-public:
-    npc_xt002_life_spark() : CreatureScript("npc_xt002_life_spark") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_xt002_life_spark(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        return GetUlduarAI<npc_xt002_life_sparkAI>(pCreature);
+        me->SetMaxHealth(RAID_MODE(54000, 172000));
+        me->SetHealth(me->GetMaxHealth());
+        me->CastSpell(me, SPELL_SPARK_DAMAGE, true);
     }
 
-    struct npc_xt002_life_sparkAI : public ScriptedAI
+    uint32 _attackTimer;
+    void Reset() override
     {
-        npc_xt002_life_sparkAI(Creature* pCreature) : ScriptedAI(pCreature)
-        {
-            me->SetMaxHealth(RAID_MODE(54000, 172000));
-            me->SetHealth(me->GetMaxHealth());
-            me->CastSpell(me, SPELL_SPARK_DAMAGE, true);
-        }
+        if (Unit* target = SelectTargetFromPlayerList(200))
+            AttackStart(target);
+        else
+            me->DespawnOrUnsummon();
+    }
 
-        uint32 _attackTimer;
-        void Reset() override
-        {
-            if (Unit* target = SelectTargetFromPlayerList(200))
-                AttackStart(target);
-            else
-                me->DespawnOrUnsummon();
-        }
+    void UpdateAI(uint32  /*diff*/) override
+    {
+        if (!UpdateVictim())
+            return;
 
-        void UpdateAI(uint32  /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            me->CastSpell(me->GetVictim(), SPELL_SPARK_MELEE, false);
-            DoMeleeAttackIfReady();
-        }
-    };
+        me->CastSpell(me->GetVictim(), SPELL_SPARK_MELEE, false);
+        DoMeleeAttackIfReady();
+    }
 };
 
 // 62775 - Tympanic Tantrum
@@ -1005,11 +950,11 @@ void AddSC_boss_xt002()
 {
     // Npcs
     RegisterUlduarCreatureAI(boss_xt002AI);
-    new npc_xt002_heart();
-    new npc_xt002_scrapbot();
-    new npc_xt002_pummeller();
-    new npc_xt002_boombot();
-    new npc_xt002_life_spark();
+    RegisterUlduarCreatureAI(npc_xt002_heart);
+    RegisterUlduarCreatureAI(npc_xt002_scrapbot);
+    RegisterUlduarCreatureAI(npc_xt002_pummeller);
+    RegisterUlduarCreatureAI(npc_xt002_boombot);
+    RegisterUlduarCreatureAI(npc_xt002_life_spark);
 
     // Spells
     RegisterSpellScript(spell_xt002_tympanic_tantrum);
