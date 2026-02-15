@@ -351,14 +351,10 @@ void Arena::EndBattleground(TeamId winnerTeamId)
 
                         // Last standing - Rated 5v5 arena & be solely alive player
                         if (GetArenaType() == ARENA_TYPE_5v5 && aliveWinners == 1 && player->IsAlive())
-                        {
                             player->CastSpell(player, SPELL_LAST_MAN_STANDING, true);
-                        }
 
                         if (!sScriptMgr->OnBeforeArenaTeamMemberUpdate(winnerArenaTeam, player, true, loserMatchmakerRating, winnerMatchmakerChange))
-                        {
                             winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
-                        }
                     }
                 }
                 else
