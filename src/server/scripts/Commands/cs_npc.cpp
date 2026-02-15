@@ -32,6 +32,7 @@
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
 #include <string>
+#include <unordered_set>
 
 using namespace Acore::ChatCommands;
 
@@ -737,22 +738,26 @@ public:
         Acore::CreatureListSearcher<Acore::AllWorldObjectsInRange> searcher(player, creatures, check);
         Cell::VisitObjects(player, searcher, distance);
 
-        if (!creatures.empty())
+        std::unordered_set<ObjectGuid::LowType> gridSpawnIds;
+
+        for (Creature* creature : creatures)
         {
-            for (Creature* creature : creatures)
-            {
-                CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
-                if (!creatureTemplate)
-                    continue;
+            CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
+            if (!creatureTemplate)
+                continue;
 
-                handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, creature->GetSpawnId(), creature->GetEntry(),
-                    creature->GetSpawnId(), creatureTemplate->Name,
-                    creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(),
-                    creature->GetMapId(), "", "");
+            handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, creature->GetSpawnId(), creature->GetEntry(),
+                creature->GetSpawnId(), creatureTemplate->Name,
+                creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(),
+                creature->GetMapId(), "", "");
 
-                ++count;
-            }
+            if (creature->GetSpawnId())
+                gridSpawnIds.insert(creature->GetSpawnId());
+            ++count;
+        }
 
+        if (count > 0 && distance <= SIZE_OF_GRIDS)
+        {
             handler->PSendSysMessage(LANG_COMMAND_NEAR_NPC_MESSAGE, distance, count);
             return true;
         }
@@ -776,6 +781,11 @@ public:
             {
                 Field* fields = result->Fetch();
                 ObjectGuid::LowType guid = fields[0].Get<uint32>();
+
+                // Skip entries already emitted via grid search
+                if (gridSpawnIds.count(guid))
+                    continue;
+
                 uint32 entry = fields[1].Get<uint32>();
                 //uint32 entry2 = fields[2].Get<uint32>();
                 //uint32 entry3 = fields[3].Get<uint32>();
