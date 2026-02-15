@@ -621,7 +621,7 @@ struct boss_stormcaller_brundir : public ScriptedAI
         me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), 427.5, me->GetOrientation());
         if (IsEncounterComplete(pInstance, me))
         {
-            pInstance->SetData(BOSS_ASSEMBLY, DONE);
+            pInstance->SetBossState(BOSS_ASSEMBLY, DONE);
             me->CastSpell(me, 65195, true); // credit
             Talk(SAY_BRUNDIR_ENCOUNTER_DEFEATED);
         }
