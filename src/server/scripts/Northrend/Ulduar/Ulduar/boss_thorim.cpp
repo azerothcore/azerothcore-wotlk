@@ -336,7 +336,7 @@ struct boss_thorim : public BossAI
 
     GameObject* GetThorimObject(uint32 entry)
     {
-        return ObjectAccessor::GetGameObject(*me, instance->GetGuidData(entry));
+        return instance->GetGameObject(entry);
     }
 
     void SpawnAllNPCs()
@@ -781,7 +781,7 @@ struct boss_thorim_sif : public ScriptedAI
             else if (param == ACTION_SIF_START_DOMINION)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                    if (Creature* cr = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
                         me->CastSpell(cr, SPELL_TOUCH_OF_DOMINION, false);
 
                 events.ScheduleEvent(EVENT_SIF_FINISH_DOMINION, 150s);
@@ -1011,7 +1011,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
             if (!_playerAttack && who && (who->IsPlayer() || who->GetOwnerGUID().IsPlayer()))
             {
                 if (me->GetInstanceScript())
-                    if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                    if (Creature* thorim = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
                     {
                         if (!thorim->IsInCombat())
                         {
@@ -1032,7 +1032,7 @@ struct boss_thorim_start_npcs : public ScriptedAI
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                if (Creature* thorim = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
                     thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
         }
 
@@ -1261,10 +1261,10 @@ struct boss_thorim_runic_colossus : public ScriptedAI
         {
             if (me->GetInstanceScript())
             {
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(DATA_THORIM_FIRST_DOORS)))
+                if (GameObject* go = me->GetInstanceScript()->GetGameObject(DATA_THORIM_FIRST_DOORS))
                     go->SetGoState(GO_STATE_ACTIVE);
 
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                if (Creature* cr = me->GetInstanceScript()->GetCreature(TYPE_THORIM))
                     cr->AI()->Talk(SAY_SPECIAL_2);
             }
         }
@@ -1385,10 +1385,10 @@ struct boss_thorim_ancient_rune_giant : public ScriptedAI
     {
         if (InstanceScript* pInstance = me->GetInstanceScript())
         {
-            if (GameObject* go = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(DATA_THORIM_SECOND_DOORS)))
+            if (GameObject* go = pInstance->GetGameObject(DATA_THORIM_SECOND_DOORS))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-            if (Creature* thorim = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_THORIM)))
+            if (Creature* thorim = pInstance->GetCreature(TYPE_THORIM))
                 thorim->AI()->DoAction(ACTION_ALLOW_HIT);
         }
     }
@@ -1623,7 +1623,7 @@ public:
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
+            if (Creature* cr = instance->GetCreature(TYPE_THORIM))
                 return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
 
         return false;
@@ -1638,7 +1638,7 @@ public:
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
+            if (Creature* cr = instance->GetCreature(TYPE_THORIM))
                 return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
 
         return false;

@@ -456,8 +456,7 @@ struct boss_razorscaleAI : public BossAI
                 me->SetInCombatWithZone(); // just in case
                 if (instance)
                     for( int i = 0; i < 4; ++i )
-                        if (ObjectGuid guid = instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i))
-                            if (Creature* hfs = ObjectAccessor::GetCreature(*me, guid))
+                        if (Creature* hfs = instance->GetCreature(DATA_HARPOON_FIRE_STATE_1 + i))
                             {
                                 me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
                                 hfs->AI()->SetData(1, 0);
@@ -601,7 +600,7 @@ public:
         if (instance->GetData(TYPE_RAZORSCALE) == DONE)
             return true;
 
-        Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
+        Creature* razorscale = instance->GetCreature(TYPE_RAZORSCALE);
         if (!razorscale || razorscale->IsInCombat())
             return true;
 
@@ -621,7 +620,7 @@ public:
             if (!instance || instance->GetData(TYPE_RAZORSCALE) == DONE)
                 return true;
 
-            Creature* razorscale = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(TYPE_RAZORSCALE));
+            Creature* razorscale = instance->GetCreature(TYPE_RAZORSCALE);
             if (razorscale && !razorscale->IsInCombat())
             {
                 // Do not show gossip icon if encounter is in progress
@@ -629,7 +628,7 @@ public:
 
                 // reset npcs NPC_HARPOON_FIRE_STATE
                 for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* hfs = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i)))
+                    if (Creature* hfs = instance->GetCreature(DATA_HARPOON_FIRE_STATE_1 + i))
                         hfs->AI()->SetData(1, 0);
 
                 if (razorscale->AI())
@@ -746,7 +745,7 @@ struct npc_ulduar_harpoonfirestate : public NullCreatureAI
             case 3: // shoot
                 if (pInstance)
                 {
-                    Creature* razorscale = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_RAZORSCALE));
+                    Creature* razorscale = pInstance->GetCreature(TYPE_RAZORSCALE);
                     if (!razorscale)
                         return;
                     if (!razorscale->HasAura(value))
@@ -830,9 +829,7 @@ struct npc_ulduar_expedition_engineer : public NullCreatureAI
 
                 if (!fixingGUID)
                 {
-                    Creature* razorscale = nullptr;
-                    if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE))
-                        razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
+                    Creature* razorscale = pInstance->GetCreature(TYPE_RAZORSCALE);
 
                     if (!razorscale || !razorscale->IsInCombat())
                     {
@@ -842,8 +839,7 @@ struct npc_ulduar_expedition_engineer : public NullCreatureAI
                     }
 
                     for( int i = 0; i < 4; ++i )
-                        if (ObjectGuid fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i))
-                            if (Creature* fs = ObjectAccessor::GetCreature(*me, fs_GUID))
+                        if (Creature* fs = pInstance->GetCreature(DATA_HARPOON_FIRE_STATE_1 + i))
                                 if (!fs->AI()->GetData(2))
                                 {
                                     float a = rand_norm() * M_PI;
@@ -878,9 +874,7 @@ public:
         if (!pInstance)
             return true;
 
-        Creature* rs = nullptr;
-        if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE))
-            rs = ObjectAccessor::GetCreature(*go, rsGUID);
+        Creature* rs = pInstance->GetCreature(TYPE_RAZORSCALE);
 
         if (!rs || !rs->IsInCombat())
         {
@@ -911,8 +905,7 @@ public:
                 break;
         }
 
-        if (ObjectGuid g = pInstance->GetGuidData(npc))
-            if (Creature* hfs = ObjectAccessor::GetCreature(*go, g))
+        if (Creature* hfs = pInstance->GetCreature(npc))
                 hfs->AI()->SetData(3, spell);
 
         go->SetLootState(GO_JUST_DEACTIVATED);

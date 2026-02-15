@@ -250,10 +250,10 @@ enum Texts
     TALK_COMPUTER_ZERO                              = 12,
 };
 
-#define GetMimiron() ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_MIMIRON))
-#define GetLMK2() ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MIMIRON_LEVIATHAN_MKII))
-#define GetVX001() ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MIMIRON_VX001))
-#define GetACU() ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_MIMIRON_ACU))
+#define GetMimiron() instance->GetCreature(TYPE_MIMIRON)
+#define GetLMK2() instance->GetCreature(DATA_MIMIRON_LEVIATHAN_MKII)
+#define GetVX001() instance->GetCreature(DATA_MIMIRON_VX001)
+#define GetACU() instance->GetCreature(DATA_MIMIRON_ACU)
 
 struct boss_mimiron : public BossAI
 {
@@ -738,8 +738,7 @@ struct boss_mimiron : public BossAI
 
                     if (instance)
                         for( uint16 i = 0; i < 3; ++i )
-                            if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
-                                if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
+                            if (GameObject* door = instance->GetGameObject(DATA_GO_MIMIRON_DOOR_1 + i))
                                     if (door->GetGoState() != GO_STATE_ACTIVE )
                                     {
                                         door->SetLootState(GO_READY);
@@ -826,9 +825,8 @@ struct boss_mimiron : public BossAI
     void ResetGameObjects()
     {
         for (uint16 i = 0; i < 3; ++i)
-            if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
-                if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
-                    if (door->GetGoState() != GO_STATE_ACTIVE)
+            if (GameObject* door = instance->GetGameObject(DATA_GO_MIMIRON_DOOR_1 + i))
+                if (door->GetGoState() != GO_STATE_ACTIVE)
                     {
                         door->SetLootState(GO_READY);
                         door->UseDoorOrButton(0, false);
@@ -856,9 +854,8 @@ struct boss_mimiron : public BossAI
     void CloseDoorAndButton()
     {
         for (uint16 i = 0; i < 3; ++i)
-            if (ObjectGuid guid = instance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
-                if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
-                    if (door->GetGoState() != GO_STATE_READY)
+            if (GameObject* door = instance->GetGameObject(DATA_GO_MIMIRON_DOOR_1 + i))
+                if (door->GetGoState() != GO_STATE_READY)
                     {
                         door->SetLootState(GO_READY);
                         door->UseDoorOrButton(0, false);
@@ -2060,7 +2057,7 @@ public:
             if (instance->GetData(TYPE_MIMIRON) != NOT_STARTED)
                 return false;
 
-            if (Creature* c = ObjectAccessor::GetCreature(*go, instance->GetGuidData(TYPE_MIMIRON)))
+            if (Creature* c = instance->GetCreature(TYPE_MIMIRON))
             {
                 c->AI()->SetData(0, 7);
                 c->AI()->AttackStart(player);

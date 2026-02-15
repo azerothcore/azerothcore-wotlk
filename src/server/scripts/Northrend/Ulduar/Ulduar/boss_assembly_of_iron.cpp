@@ -128,11 +128,7 @@ bool IsEncounterComplete(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        ObjectGuid guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
-        if (!guid)
-            return false;
-
-        if (Creature* boss = (ObjectAccessor::GetCreature(*me, guid)))
+        if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + i))
         {
             if (boss->IsAlive())
                 return false;
@@ -151,24 +147,20 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        ObjectGuid guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
-        if (!guid)
-            return;
-
-        if (Creature* boss = (ObjectAccessor::GetCreature((*me), guid)))
+        if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + i))
             if (!boss->IsAlive())
                 boss->Respawn();
     }
     return;
 }
 
-void RestoreAssemblyHealth(ObjectGuid guid1, ObjectGuid guid2, Creature* me)
+void RestoreAssemblyHealth(uint32 dataId1, uint32 dataId2, InstanceScript* pInstance)
 {
-    if (Creature* cr = ObjectAccessor::GetCreature(*me, guid1))
+    if (Creature* cr = pInstance->GetCreature(dataId1))
         if (cr->IsAlive())
             cr->SetHealth(cr->GetMaxHealth());
 
-    if (Creature* cr2 = ObjectAccessor::GetCreature(*me, guid2))
+    if (Creature* cr2 = pInstance->GetCreature(dataId2))
         if (cr2->IsAlive())
             cr2->SetHealth(cr2->GetMaxHealth());
 }
@@ -215,7 +207,7 @@ struct boss_steelbreaker : public ScriptedAI
         if (!pInstance)
             return;
 
-        if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + urand(0, 2))))
+        if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + urand(0, 2)))
         {
             switch (boss->GetEntry())
             {
@@ -232,7 +224,7 @@ struct boss_steelbreaker : public ScriptedAI
         }
 
         for (uint8 i = 0; i < 3; ++i)
-            if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + i)))
+            if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + i))
                 if (!boss->IsInCombat())
                     boss->AI()->AttackStart(who);
     }
@@ -272,7 +264,7 @@ struct boss_steelbreaker : public ScriptedAI
         }
         else
         {
-            RestoreAssemblyHealth(pInstance->GetGuidData(DATA_BRUNDIR), pInstance->GetGuidData(DATA_MOLGEIM), me);
+            RestoreAssemblyHealth(DATA_BRUNDIR, DATA_MOLGEIM, pInstance);
             me->CastSpell(me, SPELL_SUPERCHARGE, true);
             Talk(SAY_STEELBREAKER_DEATH);
         }
@@ -398,7 +390,7 @@ struct boss_runemaster_molgeim : public ScriptedAI
             return;
 
         for (uint8 i = 0; i < 3; ++i)
-            if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + i)))
+            if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + i))
                 if (!boss->IsInCombat())
                     boss->AI()->AttackStart(who);
     }
@@ -439,7 +431,7 @@ struct boss_runemaster_molgeim : public ScriptedAI
         }
         else
         {
-            RestoreAssemblyHealth(pInstance->GetGuidData(DATA_STEELBREAKER), pInstance->GetGuidData(DATA_BRUNDIR), me);
+            RestoreAssemblyHealth(DATA_STEELBREAKER, DATA_BRUNDIR, pInstance);
             me->CastSpell(me, SPELL_SUPERCHARGE, true);
             Talk(SAY_MOLGEIM_DEATH);
         }
@@ -593,7 +585,7 @@ struct boss_stormcaller_brundir : public ScriptedAI
             return;
 
         for (uint8 i = 0; i < 3; ++i)
-            if (Creature* boss = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_STEELBREAKER + i)))
+            if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + i))
                 if (!boss->IsInCombat())
                     boss->AI()->AttackStart(who);
     }
@@ -635,7 +627,7 @@ struct boss_stormcaller_brundir : public ScriptedAI
         }
         else
         {
-            RestoreAssemblyHealth(pInstance->GetGuidData(DATA_STEELBREAKER), pInstance->GetGuidData(DATA_MOLGEIM), me);
+            RestoreAssemblyHealth(DATA_STEELBREAKER, DATA_MOLGEIM, pInstance);
             me->CastSpell(me, SPELL_SUPERCHARGE, true);
             Talk(SAY_BRUNDIR_DEATH);
         }
@@ -809,7 +801,7 @@ class spell_assembly_meltdown : public SpellScript
     void HandleInstaKill(SpellEffIndex /*effIndex*/)
     {
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-            if (Creature* Steelbreaker = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_STEELBREAKER)))
+            if (Creature* Steelbreaker = instance->GetCreature(DATA_STEELBREAKER))
                 Steelbreaker->AI()->DoAction(ACTION_ADD_CHARGE);
     }
 
@@ -877,7 +869,7 @@ public:
             return false;
 
         if (InstanceScript* instance = target->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BRUNDIR)))
+            if (Creature* cr = instance->GetCreature(DATA_BRUNDIR))
                 return cr->AI()->GetData(DATA_BRUNDIR);
 
         return false;
