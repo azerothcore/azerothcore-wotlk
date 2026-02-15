@@ -1861,7 +1861,7 @@ namespace lfg
         player.accept = LfgAnswer(accept);
 
         LOG_DEBUG("lfg", "LFGMgr::UpdateProposal: Player [{}] of proposal {} selected: {}", guid.ToString(), proposalId, accept);
-        
+
         uint32 dungeonId = proposal.dungeonId;
         if (accept)
             LogLfgActivity(guid, LFG_EVENT_JOINED, dungeonId, ObjectGuid::Empty);

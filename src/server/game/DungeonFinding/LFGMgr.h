@@ -83,7 +83,7 @@ namespace lfg
     };
 
     /// Activity event types for statistics tracking
-    enum LfgActivityEventType
+    enum LfgActivityEventType : uint8
     {
         LFG_EVENT_JOINED                             = 1,
         LFG_EVENT_REFUSED                            = 2,
