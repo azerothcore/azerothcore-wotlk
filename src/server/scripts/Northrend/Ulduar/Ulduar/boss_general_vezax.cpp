@@ -15,18 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AccountMgr.h"
 #include "AchievementCriteriaScript.h"
 #include "AreaDefines.h"
-#include "BanMgr.h"
 #include "CreatureScript.h"
-#include "GameObjectScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "WorldSession.h"
 #include "ulduar.h"
 
 enum VezaxSpellData
@@ -574,28 +570,6 @@ public:
     }
 };
 
-class go_ulduar_pure_saronite_deposit : public GameObjectScript
-{
-public:
-    go_ulduar_pure_saronite_deposit() : GameObjectScript("go_ulduar_pure_saronite_deposit") { }
-
-    bool OnGossipHello(Player* plr, GameObject* go) override
-    {
-        if (plr->IsGameMaster())
-            return false;
-
-        if (InstanceScript* pInstance = go->GetInstanceScript())
-            if (pInstance->GetData(BOSS_XT002) != DONE && pInstance->GetData(BOSS_MIMIRON) != DONE && pInstance->GetData(BOSS_THORIM) != DONE && pInstance->GetData(BOSS_FREYA) != DONE && pInstance->GetData(BOSS_HODIR) != DONE)
-            {
-                std::string accountName;
-                AccountMgr::GetName(plr->GetSession()->GetAccountId(), accountName);
-                sBan->BanAccount(accountName, "0s", "Tele hack", "Server");
-                return true;
-            }
-
-        return false;
-    }
-};
 
 void AddSC_boss_vezax()
 {
@@ -612,5 +586,4 @@ void AddSC_boss_vezax()
     new achievement_smell_saronite();
     new achievement_shadowdodger();
 
-    new go_ulduar_pure_saronite_deposit();
 }
