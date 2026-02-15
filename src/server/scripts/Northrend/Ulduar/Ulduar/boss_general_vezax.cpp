@@ -368,7 +368,7 @@ struct npc_ulduar_saronite_vapors : public NullCreatureAI
 
         // killed saronite vapors, hard mode unavailable
         if (pInstance)
-            if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
+            if (Creature* vezax = pInstance->GetCreature(TYPE_VEZAX))
                 vezax->AI()->DoAction(1);
     }
 
@@ -384,7 +384,7 @@ struct npc_ulduar_saronite_animus : public ScriptedAI
     {
         pInstance = pCreature->GetInstanceScript();
         if (pInstance)
-            if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
+            if (Creature* vezax = pInstance->GetCreature(TYPE_VEZAX))
                 vezax->AI()->JustSummoned(me);
         timer = 0;
         me->SetInCombatWithZone();
@@ -398,7 +398,7 @@ struct npc_ulduar_saronite_animus : public ScriptedAI
         me->DespawnOrUnsummon(3s);
 
         if (pInstance)
-            if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
+            if (Creature* vezax = pInstance->GetCreature(TYPE_VEZAX))
                 vezax->AI()->DoAction(2);
     }
 

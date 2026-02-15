@@ -656,7 +656,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             case EVENT_INTRO_FINISH:
                 events.Reset();
                 me->SetImmuneToPC(false);
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_BRANN_BRONZBEARD_ALG)))
+                if (Creature* brann = m_pInstance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
             case EVENT_START_COMBAT:
@@ -1098,10 +1098,10 @@ public:
             if (InstanceScript* instance = me->GetInstanceScript())
             {
                 instance->SetData(DATA_ALGALON_SUMMON_STATE, 1);
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
+                if (GameObject* sigil = instance->GetGameObject(DATA_SIGILDOOR_01))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
+                if (GameObject* sigil = instance->GetGameObject(DATA_SIGILDOOR_02))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
                 if (Map* map = player->GetMap())

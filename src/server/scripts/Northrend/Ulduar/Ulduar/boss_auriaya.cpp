@@ -231,7 +231,7 @@ struct npc_auriaya_sanctum_sentry : public ScriptedAI
     void JustEngagedWith(Unit*) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(TYPE_AURIAYA)))
+            if (Creature* cr = instance->GetCreature(TYPE_AURIAYA))
                 cr->SetInCombatWithZone();
 
         events.ScheduleEvent(EVENT_SAVAGE_POUNCE, 5s);
@@ -303,8 +303,8 @@ struct npc_auriaya_feral_defender : public ScriptedAI
 
     void JustDied(Unit*) override
     {
-        if (me->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_AURIAYA)))
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* cr = instance->GetCreature(TYPE_AURIAYA))
                 cr->AI()->DoAction(_feralEssenceStack ? ACTION_FERAL_DEATH_WITH_STACK : ACTION_FERAL_DEATH);
 
         if (_feralEssenceStack)
@@ -410,7 +410,7 @@ public:
     {
         if (target)
             if (InstanceScript* instance = target->GetInstanceScript())
-                if (Creature* cr = ObjectAccessor::GetCreature(*target, instance->GetGuidData(TYPE_AURIAYA)))
+                if (Creature* cr = instance->GetCreature(TYPE_AURIAYA))
                     return cr->AI()->GetData(DATA_NINE_LIVES);
 
         return false;
