@@ -117,8 +117,7 @@ public:
 
     static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
     {
-        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass());
-        if (!classEntry)
+        if (!sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass()))
             return true;
 
         Player* player = handler->GetPlayer();
