@@ -73,14 +73,14 @@ enum WorldTimers
 enum BillingPlanFlags
 {
     SESSION_NONE            = 0x00,
-    SESSION_UNUSED          = 0x01,
+    SESSION_UNUSED          = 0x01, // Unk, NYI
     SESSION_RECURRING_BILL  = 0x02,
     SESSION_FREE_TRIAL      = 0x04,
-    SESSION_IGR             = 0x08,
-    SESSION_USAGE           = 0x10,
-    SESSION_TIME_MIXTURE    = 0x20,
-    SESSION_RESTRICTED      = 0x40,
-    SESSION_ENABLE_CAIS     = 0x80,
+    SESSION_IGR             = 0x08, // Internet Game Room
+    SESSION_USAGE           = 0x10, // Unk, NYI
+    SESSION_TIME_MIXTURE    = 0x20, // Unk, NYI
+    SESSION_RESTRICTED      = 0x40, // Unk, NYI
+    SESSION_ENABLE_CAIS     = 0x80, // Unk, NYI, possibly account play time limit related for China?
 };
 
 enum RealmZone

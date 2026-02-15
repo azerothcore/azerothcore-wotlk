@@ -1038,6 +1038,20 @@ void PoolMgr::ChangeWeeklyQuests()
     SaveQuestsToDB(false, true, false);
 }
 
+void PoolMgr::ReSpawnPoolQuests()
+{
+    for (auto& [questId, poolId] : mQuestSearchMap)
+    {
+        if (IsSpawnedObject<Quest>(questId))
+        {
+            PoolObject tempObj(questId, 0.0f);
+            auto it = mPoolQuestGroups.find(poolId);
+            if (it != mPoolQuestGroups.end())
+                it->second.Spawn1Object(&tempObj);
+        }
+    }
+}
+
 // Call to spawn a pool, if cache if true the method will spawn only if cached entry is different
 // If it's same, the creature is respawned only (added back to map)
 template<>

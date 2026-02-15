@@ -203,109 +203,67 @@ public:
 
 enum eTimeLost
 {
-    NPC_TIME_LOST_PROTO_DRAKE   = 32491,
-    NPC_VYRAGOSA                = 32630,
+    NPC_TIME_LOST_PROTO_DRAKE = 32491,
+    NPC_VYRAGOSA = 32630,
 
-    SPELL_TIME_SHIFT            = 61084,
-    SPELL_TIME_LAPSE            = 51020,
-    SPELL_FROST_BREATH          = 47425,
-    SPELL_FROST_CLEAVE          = 51857,
+    SPELL_TIME_SHIFT = 61084,
+    SPELL_TIME_LAPSE = 51020,
+    SPELL_FROST_BREATH = 47425,
+    SPELL_FROST_CLEAVE = 51857,
 };
 
 class npc_time_lost_proto_drake : public CreatureScript
 {
 public:
-    npc_time_lost_proto_drake() : CreatureScript("npc_time_lost_proto_drake") { }
+    npc_time_lost_proto_drake() : CreatureScript("npc_time_lost_proto_drake") {}
 
-    struct npc_time_lost_proto_drakeAI : public npc_escortAI
+    struct npc_time_lost_proto_drakeAI : public ScriptedAI
     {
-        npc_time_lost_proto_drakeAI(Creature* creature) : npc_escortAI(creature)
+        npc_time_lost_proto_drakeAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void InitializeAI() override
         {
-            rollPath = false;
-            setVisible = false;
+            ScriptedAI::InitializeAI();
+            me->SetAnimTier(AnimTier::Fly);
             me->setActive(true);
             me->SetVisible(false);
+
+            me->m_Events.AddEventAtOffset([&] {
+                me->SetVisible(true);
+            }, Hours(urand(6, 22)));
         }
 
-        EventMap events;
-        bool rollPath;
-        bool setVisible;
-
-        void Reset() override
+        void JustEngagedWith(Unit* who) override
         {
-            npc_escortAI::Reset();
-            if (me->HasUnitState(UNIT_STATE_EVADE))
-                return;
-            me->SetVisible(false); // pussywizard: zeby nie dostawali info o npc w miejscu spawna (kampienie z addonem npc scan)
-            rollPath = true;
-        }
+            ScriptedAI::JustEngagedWith(who);
 
-        void RollPath()
-        {
-            me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            Start(true, ObjectGuid::Empty, 0, false, true, true);
-            SetNextWaypoint(urand(0, 250), true);
-            me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
-        }
-
-        void WaypointReached(uint32  /*pointId*/) override { }
-
-        void JustEngagedWith(Unit*) override
-        {
-            events.Reset();
             if (me->GetEntry() == NPC_TIME_LOST_PROTO_DRAKE)
             {
-                events.ScheduleEvent(SPELL_TIME_SHIFT, 10s);
-                events.ScheduleEvent(SPELL_TIME_LAPSE, 5s);
+                ScheduleTimedEvent(5s, [&] {
+                    DoCastVictim(SPELL_TIME_LAPSE);
+                }, 12s);
+                ScheduleTimedEvent(10s, [&] {
+                    DoCastSelf(SPELL_TIME_SHIFT);
+                }, 18s);
             }
             else
             {
-                events.ScheduleEvent(SPELL_FROST_BREATH, 8s);
-                events.ScheduleEvent(SPELL_FROST_CLEAVE, 5s);
+                ScheduleTimedEvent(5s, [&] {
+                    DoCastVictim(SPELL_FROST_CLEAVE);
+                }, 8s);
+                ScheduleTimedEvent(8s, [&] {
+                    DoCastVictim(SPELL_FROST_BREATH);
+                }, 12s);
             }
         }
 
-        void UpdateEscortAI(uint32 diff) override
+        void UpdateAI(uint32 diff) override
         {
-            if (rollPath)
-            {
-                RollPath();
-                rollPath = false;
-                setVisible = true;
-                return;
-            }
-
-            if (setVisible)
-            {
-                me->SetVisible(true);
-                setVisible = false;
-            }
-
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case SPELL_TIME_SHIFT:
-                    me->CastSpell(me, SPELL_TIME_SHIFT, false);
-                    events.Repeat(18s);
-                    break;
-                case SPELL_TIME_LAPSE:
-                    me->CastSpell(me->GetVictim(), SPELL_TIME_LAPSE, false);
-                    events.Repeat(12s);
-                    break;
-                case SPELL_FROST_BREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_FROST_BREATH, false);
-                    events.Repeat(12s);
-                    break;
-                case SPELL_FROST_CLEAVE:
-                    me->CastSpell(me->GetVictim(), SPELL_FROST_CLEAVE, false);
-                    events.Repeat(8s);
-                    break;
-            }
-
             DoMeleeAttackIfReady();
+            scheduler.Update(diff);
         }
     };
 
