@@ -356,7 +356,7 @@ struct boss_sartharion : public BossAI
 
         // Combat events
         events.ScheduleEvent(EVENT_SARTHARION_CAST_CLEAVE, 7s);
-        events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 15s);
+        events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 6s);
         events.ScheduleEvent(EVENT_SARTHARION_CAST_TAIL_LASH, 11s);
 
         // Extra events
@@ -586,7 +586,7 @@ struct boss_sartharion : public BossAI
                 case EVENT_SARTHARION_CAST_FLAME_BREATH:
                 {
                     DoCastVictim(SPELL_SARTHARION_FLAME_BREATH, false);
-                    events.Repeat(20s);
+                    events.Repeat(10s);
                     break;
                 }
                 case EVENT_SARTHARION_CAST_TAIL_LASH:
