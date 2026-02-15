@@ -12055,6 +12055,40 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
             }
         }
     }
+
+    // Remove spells that are superseded by other spells the player now knows
+    // This ensures only the highest-rank spell in a chain is kept
+    for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+    {
+        if (!HasSpell(pAbility->Spell))
+        {
+            continue;
+        }
+
+        if (pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_VALUE && pAbility->AcquireMethod != SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN)
+        {
+            continue;
+        }
+
+        // Check if another spell in the same skill line supersedes this spell
+        // and the player has learned that superseding spell
+        for (SkillLineAbilityEntry const* otherAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+        {
+            if (otherAbility->Spell != pAbility->SupercededBySpell)
+            {
+                continue;
+            }
+
+            if (!HasSpell(otherAbility->Spell))
+            {
+                continue;
+            }
+
+            // Remove the old spell since the player has the newer one
+            removeSpell(pAbility->Spell, GetActiveSpec(), true);
+            break;
+        }
+    }
 }
 
 void Player::GetAurasForTarget(Unit* target, bool force /*= false*/)
