@@ -1179,12 +1179,149 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     return mapHeight;                               // explicitly use map data
 }
 
+namespace { constexpr float INV_SQRT2 = 0.70710678118654752440f; }
+
+float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
+    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta) const
+{
+    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
+    auto sample = [&](float sx, float sy) -> float
+    {
+        float h = vmgr->getHeight(GetId(), sx, sy, z, DEFAULT_HEIGHT_SEARCH);
+        return (h > INVALID_HEIGHT) ? h : std::numeric_limits<float>::quiet_NaN();
+    };
+
+    float h0 = sample(x, y);
+    if (!std::isfinite(h0))
+        return VMAP_INVALID_HEIGHT_VALUE;
+
+    if (radius <= 0.0f)
+        return h0;
+
+    const float d = (sampleDelta > 0.0f) ? sampleDelta
+                    : std::max(0.05f, std::min(0.5f, radius * 0.5f));
+
+    float hx1 = sample(x + d, y), hx2 = sample(x - d, y);
+    float hy1 = sample(x, y + d), hy2 = sample(x, y - d);
+
+    auto diff = [&](float p, float m) -> float
+    {
+        if (std::isfinite(p) && std::isfinite(m)) return (p - m) / (2.0f * d);
+        if (std::isfinite(p))                     return (p - h0) / d;
+        if (std::isfinite(m))                     return (h0 - m) / d;
+        return 0.0f;
+    };
+
+    float gx = diff(hx1, hx2);  // dz/dx
+    float gy = diff(hy1, hy2);  // dz/dy
+
+    if (clamp > 0.0f)
+    {
+        float g2 = gx*gx + gy*gy, c2 = clamp*clamp;
+        if (g2 > c2)
+        {
+            float s = clamp / std::sqrt(g2);
+            gx *= s; gy *= s;
+        }
+    }
+
+    float slopeL2 = std::sqrt(std::max(0.0f, gx*gx + gy*gy));
+    float totalSlope = slopeL2;
+
+    if (shape == GridTerrainData::GroundFootprintShape::Square && blend < 1.0f)
+    {
+        float c = std::cos(yaw), s = std::sin(yaw);
+        float rx =  gx * c + gy * s, ry = -gx * s + gy * c;
+        float slopeL1 = std::abs(rx) + std::abs(ry);
+        totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
+    }
+    return h0 + radius * totalSlope;
+}
+
+float Map::GetHeightAccurate(float x, float y, float z, float radius, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{
+    return GetHeightAccurate(x, y, z, radius, 0.0f, checkVMap, maxSearchDist);
+}
+
+float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{
+    // find raw .map surface under Z coordinates
+    float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
+    float gridHeight = GetGridHeightAccurate(x, y, radius, yaw);
+    if (gridHeight > INVALID_HEIGHT)
+    {
+        const float tol = std::max(0.1f, 0.5f * radius); // dynamic tolerance based on the size of the collider
+        if (G3D::fuzzyGe(z, gridHeight - tol))
+            mapHeight = gridHeight;
+    }
+
+    float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
+    if (checkVMap)
+    {
+        const bool useAccurateVMap = (sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_VMAP_ENABLE) != 0);
+        if (useAccurateVMap)
+        {
+            auto shape = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
+            float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+            float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
+            float delta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA);
+            vmapHeight = GetVMapHeightAccurate(x, y, z, radius, yaw, shape, blend, clamp, delta);
+        }
+        else
+        {
+            VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
+            vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);
+        }
+    }
+
+    // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
+    // vmapheight set for any under Z value or <= INVALID_HEIGHT
+    if (vmapHeight > INVALID_HEIGHT)
+    {
+        if (mapHeight > INVALID_HEIGHT)
+        {
+            // we have mapheight and vmapheight and must select more appropriate
+
+            // we are already under the surface or vmap height above map heigt
+            // or if the distance of the vmap height is less the land height distance
+            if (vmapHeight > mapHeight || std::fabs(mapHeight - z) > std::fabs(vmapHeight - z))
+                return vmapHeight;
+            else
+                return mapHeight;                           // better use .map surface height
+        }
+        else
+            return vmapHeight;                              // we have only vmapHeight (if have)
+    }
+
+    return mapHeight;                               // explicitly use map data
+}
+
 float Map::GetGridHeight(float x, float y) const
 {
     if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
         return gmap->getHeight(x, y);
 
     return INVALID_HEIGHT;
+}
+
+float Map::GetGridHeightAccurate(float x, float y, float radius, float yaw) const
+{
+    if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
+    {
+        auto const shape = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
+        float const blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        float const clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
+        uint32 const mode = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_GRADIENT_MODE);
+        float const eps = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_NORMAL_EPS);
+        return gmap->GetHeightAccurate(x, y, radius, shape, yaw, blend, clamp, mode, eps);
+    }
+
+    return INVALID_HEIGHT;
+}
+
+float Map::GetGridHeightAccurate(float x, float y, float radius) const
+{
+    return GetGridHeightAccurate(x, y, radius, 0.0f);
 }
 
 float Map::GetMinHeight(float x, float y) const
@@ -1589,6 +1726,35 @@ float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=tr
     h1 = GetHeight(x, y, z, vmap, maxSearchDist);
     h2 = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
     return std::max<float>(h1, h2);
+}
+
+float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius,
+                             bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{
+    return GetHeightAccurate(phasemask, x, y, z, radius, 0.0f, vmap, maxSearchDist);
+}
+
+float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius, float yaw,
+                             bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{
+    const float hMapMix = GetHeightAccurate(x, y, z, radius, yaw, vmap, maxSearchDist);
+
+    float hDyn;
+    const bool dynAcc = (sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_ENABLE) != 0);
+    if (dynAcc)
+    {
+        const auto shape  = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
+        const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        const float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
+        const float dlt   = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_DELTA);
+        const float effBlend = (shape == GridTerrainData::GroundFootprintShape::Square) ? blend : 1.0f;
+        hDyn = _dynamicTree.getHeightAccurate(x, y, z, maxSearchDist, phasemask, radius, yaw, effBlend, clamp, dlt);
+    }
+    else
+    {
+        hDyn = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+    }
+    return std::max<float>(hMapMix, hDyn);
 }
 
 bool Map::IsInWater(uint32 phaseMask, float x, float y, float pZ, float collisionHeight) const
