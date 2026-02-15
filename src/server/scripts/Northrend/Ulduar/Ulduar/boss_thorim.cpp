@@ -303,7 +303,8 @@ struct boss_thorim : public BossAI
 {
     boss_thorim(Creature* creature) : BossAI(creature, BOSS_THORIM)
     {
-        if ((_encounterFinished = (!me->IsAlive())))
+        _encounterFinished = !me->IsAlive();
+        if (_encounterFinished)
             instance->SetBossState(BOSS_THORIM, DONE);
     }
 
