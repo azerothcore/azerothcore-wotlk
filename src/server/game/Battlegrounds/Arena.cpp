@@ -360,9 +360,7 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                 else
                 {
                     if (!sScriptMgr->OnBeforeArenaTeamMemberUpdate(loserArenaTeam, player, false, winnerMatchmakerRating, loserMatchmakerChange))
-                    {
                         loserArenaTeam->MemberLost(player, winnerMatchmakerRating, loserMatchmakerChange);
-                    }
 
                     // Arena lost => reset the win_rated_arena having the "no_lose" condition
                     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE, 0);
