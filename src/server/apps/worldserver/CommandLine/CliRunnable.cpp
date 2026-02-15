@@ -151,12 +151,19 @@ void CliThread()
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
         wchar_t commandbuf[256];
-        if (fgetws(commandbuf, sizeof(commandbuf), stdin))
+        DWORD charsRead = 0;
+        HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+        
+        if (ReadConsoleW(hStdIn, commandbuf, sizeof(commandbuf) / sizeof(wchar_t) - 1, &charsRead, nullptr))
         {
-            if (!WStrToUtf8(commandbuf, wcslen(commandbuf), command))
+            if (charsRead > 0)
             {
-                PrintCliPrefix();
-                continue;
+                commandbuf[charsRead] = L'\0';
+                if (!WStrToUtf8(commandbuf, charsRead, command))
+                {
+                    PrintCliPrefix();
+                    continue;
+                }
             }
         }
 #else
