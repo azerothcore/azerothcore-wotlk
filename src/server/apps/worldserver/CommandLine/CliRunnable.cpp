@@ -140,6 +140,9 @@ void CliThread()
         fInfo.dwTimeout = 0;
         FlashWindowEx(&fInfo);
     }
+    
+    // Get console input handle once for reading commands
+    HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
 #endif
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
@@ -152,7 +155,6 @@ void CliThread()
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
         wchar_t commandbuf[256];
         DWORD charsRead = 0;
-        HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
         
         if (ReadConsoleW(hStdIn, commandbuf, sizeof(commandbuf) / sizeof(wchar_t) - 1, &charsRead, nullptr))
         {
