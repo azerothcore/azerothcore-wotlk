@@ -108,6 +108,10 @@ int kb_hit_return()
 void CliThread()
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    // Set console code page to UTF-8 to support full range of characters
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
+
     // print this here the first time
     // later it will be printed after command queue updates
     PrintCliPrefix();
