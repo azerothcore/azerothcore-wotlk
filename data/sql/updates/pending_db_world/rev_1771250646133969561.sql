@@ -15,7 +15,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (30680, 0, 1, 0, 0, 0, 100, 0, 5000, 6000, 7000, 8000, 0, 0, 11, 13737, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - In Combat - Cast \'Mortal Strike\''),
 (30680, 0, 2, 0, 0, 0, 100, 0, 15000, 15000, 40000, 40000, 0, 0, 11, 57733, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - In Combat - Cast \'Draconic Rage\''),
 (30680, 0, 3, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 57742, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - On Just Died - Cast \'Avenging Fury\''),
-(30680, 0, 4, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - On Initialize - Say Line 0');
+(30680, 0, 4, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 'Onyx Brood General - On Initialize - Say Line 0');
 
 DELETE FROM `spelldifficulty_dbc` WHERE `ID`=57733;
 INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`, `DifficultySpellID_3`, `DifficultySpellID_4`) VALUES
