@@ -596,6 +596,8 @@ public: /* BGScript */
     void OnBattlegroundEnd(Battleground* bg, TeamId winnerTeamId);
     void OnBattlegroundDestroy(Battleground* bg);
     void OnBattlegroundCreate(Battleground* bg);
+    bool CanAddGroupToMatchingPool(BattlegroundQueue* queue, GroupQueueInfo* group, uint32 poolPlayerCount, Battleground* bg, BattlegroundBracketId bracketId);
+    bool GetPlayerMatchmakingRating(ObjectGuid playerGuid, BattlegroundTypeId bgTypeId, float& outRating);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
@@ -651,6 +653,8 @@ public: /* ArenaScript */
     bool CanSaveToDB(ArenaTeam* team);
     bool OnBeforeArenaCheckWinConditions(Battleground* const bg);
     void OnArenaStart(Battleground* const bg);
+    bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* team, Player* player, bool won, uint32 opponentMatchmakerRating, int32 matchmakerChange);
+    bool CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGuid);
 
 public: /* MiscScript */
 
