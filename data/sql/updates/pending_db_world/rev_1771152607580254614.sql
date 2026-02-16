@@ -1,4 +1,4 @@
--- GREYHEART SPELLBINDER 1
+-- GREYHEART SPELLBINDER
 
 -- Add SmartAI component to respawn all Greyheart Spellbinders (in 1000 radius) when any spellbinder resets
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 21806) AND (`source_type` = 0) AND (`id` IN (6));
