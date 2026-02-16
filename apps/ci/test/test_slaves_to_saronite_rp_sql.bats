@@ -53,8 +53,8 @@ setup() {
     grep -q 'Language.*0' "$SQL_FILE" && grep -q '31397.*GroupID.*1' "$SQL_FILE"
 }
 
-@test "Slaves to Saronite: spell_area for whisper aura in Icecrown" {
+@test "Slaves to Saronite: spell_area for whisper aura in Saronite Mines" {
     grep -q '27769' "$SQL_FILE"
-    grep -q '210' "$SQL_FILE"
+    grep -q '4514' "$SQL_FILE"
     grep -q 'spell_area' "$SQL_FILE"
 }
