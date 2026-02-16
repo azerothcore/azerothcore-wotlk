@@ -1768,8 +1768,8 @@ public:
             handler->SendSysMessage("");
         } while (result->NextRow());
 
-        handler->PSendSysMessage("Found a total of: {} accounts", count);
-        handler->PSendSysMessage("Found a total of: {} characters", counter);
+        handler->PSendSysMessage(LANG_LOOKUP_TOTAL_ACCOUNTS, count);
+        handler->PSendSysMessage(LANG_LOOKUP_TOTAL_CHARACTERS, counter);
 
         return true;
     }
