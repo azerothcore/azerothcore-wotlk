@@ -4865,7 +4865,7 @@ void Player::_LoadArenaTeamInfo()
             ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
             if (!arenaTeam)
             {
-                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: No arena team was found.");
+                LOG_ERROR("bg.arena", "Player::_LoadArenaTeamInfo: Team with ID {} not found.", arenaTeamId);
                 continue;
             }
             ArenaTeamMember const* member = arenaTeam->GetMember(GetGUID());
