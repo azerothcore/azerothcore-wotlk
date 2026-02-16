@@ -630,6 +630,7 @@ public:
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
     Creature*   SummonTrigger(float x, float y, float z, float ang, uint32 dur, bool setLevel = false, CreatureAI * (*GetAI)(Creature*) = nullptr);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
+    void SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list = nullptr);
 
     [[nodiscard]] Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
     [[nodiscard]] GameObject* FindNearestGameObject(uint32 entry, float range, bool onlySpawned = false) const;

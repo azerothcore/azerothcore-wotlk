@@ -15,11 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CellImpl.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "CreatureAI.h"
 #include "CreatureGroups.h"
 #include "GameTime.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
@@ -29,6 +32,7 @@
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
 #include <string>
+#include <unordered_set>
 
 using namespace Acore::ChatCommands;
 
@@ -728,6 +732,37 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
+        // Grid search - finds all creatures including temporary spawns
+        std::list<Creature*> creatures;
+        Acore::AllWorldObjectsInRange check(player, distance);
+        Acore::CreatureListSearcher<Acore::AllWorldObjectsInRange> searcher(player, creatures, check);
+        Cell::VisitObjects(player, searcher, distance);
+
+        std::unordered_set<ObjectGuid::LowType> gridSpawnIds;
+
+        for (Creature* creature : creatures)
+        {
+            CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
+            if (!creatureTemplate)
+                continue;
+
+            handler->PSendSysMessage(LANG_CREATURE_LIST_CHAT, creature->GetSpawnId(), creature->GetEntry(),
+                creature->GetSpawnId(), creatureTemplate->Name,
+                creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(),
+                creature->GetMapId(), "", "");
+
+            if (creature->GetSpawnId())
+                gridSpawnIds.insert(creature->GetSpawnId());
+            ++count;
+        }
+
+        if (count > 0 && distance <= SIZE_OF_GRIDS)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_NEAR_NPC_MESSAGE, distance, count);
+            return true;
+        }
+
+        // Fallback to DB query
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_CREATURE_NEAREST);
         stmt->SetData(0, player->GetPositionX());
         stmt->SetData(1, player->GetPositionY());
@@ -746,6 +781,11 @@ public:
             {
                 Field* fields = result->Fetch();
                 ObjectGuid::LowType guid = fields[0].Get<uint32>();
+
+                // Skip entries already emitted via grid search
+                if (gridSpawnIds.count(guid))
+                    continue;
+
                 uint32 entry = fields[1].Get<uint32>();
                 //uint32 entry2 = fields[2].Get<uint32>();
                 //uint32 entry3 = fields[3].Get<uint32>();
