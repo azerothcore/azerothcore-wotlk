@@ -13,21 +13,32 @@
 -- 3. Slave yells one of their quotes and runs to pit to jump (NEW)
 --
 -- Changes:
--- 1. Add third random outcome (pit-jumping with yell)
--- 2. Fix hostile behavior to use emote instead of yell
--- 3. Fix /say messages language from Orcish to Universal
--- 4. Add unknown voice whispers in Saronite Mines (spell_area for 27769 in Icecrown)
+-- 1. Gossip: cast 5429 on player; NpcFlags/EmoteState reset on respawn (template)
+-- 2. Add third random outcome (pit-jumping with yell); three pit waypoints per sniffs
+-- 3. Fix hostile behavior to use emote instead of yell
+-- 4. Fix /say messages language from Orcish to Universal
+-- 5. Add unknown voice whispers in Saronite Mines (spell_area 27769, area 4514)
+-- 6. Freedom path and pit coordinates from in-game research (Gultask)
 
 -- ============================================================================
--- 1. Add third behavior: Slave yells and runs to pit to jump
+-- 1. Gossip: Cast 5429 on player, then run random script (link chain)
 -- ============================================================================
+DELETE FROM `smart_scripts` WHERE `entryorguid`=31397 AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(31397,0,0,1,62,0,100,512,10137,0,0,0,0,0,11,5429,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Gossip - Cast 5429 on Player'),
+(31397,0,1,0,61,0,100,0,0,0,0,0,0,0,87,3139700,3139701,3139702,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Link - Run Random Script'),
+(31397,0,2,0,0,0,100,0,1000,1000,14000,14000,0,0,11,3148,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Saronite Mine Slave - IC - Cast Head Crack'),
+(31397,0,3,0,1,0,15,0,10000,30000,50000,70000,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - OOC - Say text2');
 
--- Update gossip script to include third random outcome
-UPDATE `smart_scripts` SET `action_param3`=3139702
-WHERE `entryorguid`=31397 AND `source_type`=0 AND `id`=0 AND `event_type`=62;
+-- ============================================================================
+-- 2a. Freedom path: move to exact point (7026.46, 1877.16, 533.62), then despawn
+-- ============================================================================
+UPDATE `smart_scripts` SET `target_x`=7026.46,`target_y`=1877.1602,`target_z`=533.62744
+WHERE `entryorguid`=3139700 AND `source_type`=9 AND `id`=3;
 
--- Add new action list for pit-jumping behavior (script 3139702)
--- Slave yells, gives quest credit, then runs to pit and jumps
+-- ============================================================================
+-- 2b. Pit outcome: yell, then run to one of three pits (random, approximates closest)
+-- ============================================================================
 DELETE FROM `smart_scripts` WHERE `entryorguid`=3139702 AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (3139702,9,0,0,0,0,100,0,0,0,0,0,0,0,72,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Close Gossip'),
@@ -35,9 +46,19 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (3139702,9,2,0,0,0,100,0,0,0,0,0,0,0,33,31866,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Quest Credit'),
 (3139702,9,3,0,0,0,100,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Yell (GroupID 0)'),
 (3139702,9,4,0,0,0,100,0,500,500,0,0,0,0,59,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Set Run On'),
-(3139702,9,5,0,0,0,100,0,0,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,0,6931,2014,519,0,'Saronite Mine Slave - On Script - Move to Pit Edge'),
-(3139702,9,6,0,0,0,100,0,4000,4000,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6940,2020,450,0,'Saronite Mine Slave - On Script - Jump Into Pit'),
-(3139702,9,7,0,0,0,100,0,3000,3000,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Despawn');
+(3139702,9,5,0,0,0,100,0,0,0,0,0,0,0,87,3139703,3139704,3139705,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Run to Random Pit');
+
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN (3139703,3139704,3139705) AND `source_type`=9;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(3139703,9,0,0,0,0,100,0,0,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,0,6966.371,2050.5237,519.42505,0,'Pit 1 - Move to edge'),
+(3139703,9,1,0,0,0,100,0,4000,4000,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6966.75,2067.58,482.553,0,'Pit 1 - Jump'),
+(3139703,9,2,0,0,0,100,0,3000,3000,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit 1 - Despawn'),
+(3139704,9,0,0,0,0,100,0,0,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,0,6915.9272,2025.5466,518.6113,0,'Pit 2 - Move to edge'),
+(3139704,9,1,0,0,0,100,0,4000,4000,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6904.17,2026.23,482.964,0,'Pit 2 - Jump'),
+(3139704,9,2,0,0,0,100,0,3000,3000,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit 2 - Despawn'),
+(3139705,9,0,0,0,0,100,0,0,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,0,6921.0854,1972.6857,523.33716,0,'Pit 3 - Move to edge'),
+(3139705,9,1,0,0,0,100,0,4000,4000,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6911.13,1969.18,488.24,0,'Pit 3 - Jump'),
+(3139705,9,2,0,0,0,100,0,3000,3000,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit 3 - Despawn');
 
 -- ============================================================================
 -- 2. Fix hostile behavior: emote "goes into a frenzy!" instead of yelling

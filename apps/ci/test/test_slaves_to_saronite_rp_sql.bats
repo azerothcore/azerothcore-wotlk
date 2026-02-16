@@ -25,17 +25,18 @@ setup() {
     grep -q '24157' "$SQL_FILE"
 }
 
-@test "Slaves to Saronite: gossip script includes third outcome 3139702" {
-    grep -q 'action_param3.*3139702' "$SQL_FILE"
-    grep -q 'entryorguid.*31397.*event_type.*62' "$SQL_FILE"
+@test "Slaves to Saronite: gossip cast 5429 and random script (3139700,3139701,3139702)" {
+    grep -q '11,5429,' "$SQL_FILE"
+    grep -q '87,3139700,3139701,3139702' "$SQL_FILE"
 }
 
 @test "Slaves to Saronite: pit script 3139702 has required actions" {
     grep -q '3139702,9,0,' "$SQL_FILE"   # close gossip (action 72)
     grep -q '33,31866,0,0,0,0,0,7,' "$SQL_FILE"  # quest credit
     grep -q '3139702,9,3,' "$SQL_FILE"   # yell group 0
-    grep -q '3139702,9,5,' "$SQL_FILE"   # move to pit (69)
-    grep -q '3139702,9,6,' "$SQL_FILE" && grep -q '97,15,15' "$SQL_FILE"   # jump
+    grep -q '3139702,9,5,' "$SQL_FILE"   # call random pit (87 -> 3139703,3139704,3139705)
+    grep -q '3139703,9,0,' "$SQL_FILE" && grep -q '3139704,9,0,' "$SQL_FILE" && grep -q '3139705,9,0,' "$SQL_FILE"
+    grep -q '97,15,15' "$SQL_FILE"   # jump in pit scripts
 }
 
 @test "Slaves to Saronite: frenzy emote (GroupID 2) for hostile behavior" {
