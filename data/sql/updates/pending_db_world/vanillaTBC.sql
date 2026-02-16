@@ -4560,7 +4560,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Chance`, `GroupId`, `Item`, `Co
 (1084660, 0, 1, 21949, 'Design: Ruby Serpent'),
 (1084660, 0, 1, 16044, 'Schematic: Lifelike Mechanical Toad'),
 (1084660, 0, 1, 14474, 'Pattern: Frostweave Gloves'),
-(1080003, 0, 1, 8028, 'Plans: Runed Mithril Hammer'),
+(1084660, 0, 1, 8028, 'Plans: Runed Mithril Hammer'),
 (1084660, 0, 1, 12689, 'Plans: Radiant Breastplate'),
 (1084660, 0, 1, 12691, 'Plans: Wildthorn Mail'),
 (1084660, 0, 1, 16218, 'Formula: Enchant Bracer - Superior Spirit'),
