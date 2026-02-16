@@ -162,8 +162,8 @@ namespace MMAP
 
         if (fileHeader.mmapVersion != MMAP_VERSION)
         {
-            LOG_ERROR("maps", "MMAP:loadMap: {:03}{:02}{:02}.mmtile was built with generator v{}, expected v{}. {}",
-                mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION, "Re-extract your maps, delete the old ones and add the new ones.");
+                LOG_ERROR("maps", "MMAP:loadMap: MMAP Version Mismatch {:03}{:02}{:02}.mmtile was built with generator v{}, expected v{}. Re-generate your MMAPs, delete the old ones and add the new ones.",
+                         mapId, x, y, fileHeader.mmapVersion, MMAP_VERSION);
             fclose(file);
             return false;
         }

@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "Collision/VMapDefinitions.h"
 
 void GridTerrainLoader::LoadTerrain()
 {
@@ -137,6 +138,7 @@ bool GridTerrainLoader::ExistVMap(uint32 mapid, int gx, int gy)
                     return false;
                 case VMAP::LoadResult::VersionMismatch:
                     LOG_ERROR("maps", "VMap file '{}' couldn't be loaded", (sWorld->GetDataPath() + "vmaps/" + name));
+                    // Try to read the actual version string from the file
                     std::string vmapFile = sWorld->GetDataPath() + "vmaps/" + name;
                     char fileMagic[9] = {0};
                     FILE* f = fopen(vmapFile.c_str(), "rb");
@@ -145,7 +147,7 @@ bool GridTerrainLoader::ExistVMap(uint32 mapid, int gx, int gy)
                         fread(fileMagic, 1, 8, f);
                         fclose(f);
                     }
-                    LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}, VMAP file has version: {}. {}", static_cast<const char*>(VMAP::VMAP_MAGIC), fileMagic, "Re-extract your maps, delete the old ones and add the new ones.");
+                    LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}, VMAP file has version: {}. Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC), fileMagic);
                     return false;
             }
         }

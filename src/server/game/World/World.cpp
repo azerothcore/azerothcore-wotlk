@@ -90,6 +90,10 @@
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
+#include "Collision/Maps/MapDefines.h" // for Core MMAP version on initiation
+#include "Collision/VMapDefinitions.h" // for Core VMAP version on initiation
+#include "Grids/GridTerrainData.h" // for Core Map version on initiation
+#include <filesystem>
 #include "WhoListCacheMgr.h"
 #include "WorldGlobals.h"
 #include "WorldPacket.h"
@@ -282,6 +286,9 @@ void World::LoadConfigSettings(bool reload)
         LOG_INFO("server.loading", "Using DataDir {}", _dataPath);
     }
 
+    LOG_INFO("server.loading", "Core Map Version: {}", MapVersionMagic);
+    LOG_INFO("server.loading", "Core MMAP Version: {}", MMAP_VERSION);
+    LOG_INFO("server.loading", "Core VMAP Version: {}", static_cast<const char*>(VMAP::VMAP_MAGIC));
     bool const enableIndoor = getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
     bool const enableLOS = sConfigMgr->GetOption<bool>("vmap.enableLOS", true);
     bool const enablePetLOS = getBoolConfig(CONFIG_PET_LOS);
@@ -327,6 +334,19 @@ void World::SetInitialWorldSettings()
 
     if (!sConfigMgr->isDryRun())
     {
+        // Validate DataDir before checking map files
+        std::string dataDir = _dataPath;
+        if (!std::filesystem::exists(dataDir) || !std::filesystem::is_directory(dataDir))
+        {
+            LOG_ERROR("server.loading", "DataDir '{}' does not exist or is not a directory", dataDir);
+            exit(1);
+        }
+        bool isEmpty = std::filesystem::directory_iterator(dataDir) == std::filesystem::directory_iterator();
+        if (isEmpty)
+        {
+            LOG_ERROR("server.loading", "DataDir '{}' exists but is empty", dataDir);
+            exit(1);
+        }
         ///- Check the existence of the map files for all starting areas.
         if (!MapMgr::ExistMapAndVMap(MAP_EASTERN_KINGDOMS, -6240.32f, 331.033f)
                 || !MapMgr::ExistMapAndVMap(MAP_EASTERN_KINGDOMS, -8949.95f, -132.493f)
@@ -338,7 +358,7 @@ void World::SetInitialWorldSettings()
                         !MapMgr::ExistMapAndVMap(MAP_OUTLAND, 10349.6f, -6357.29f) ||
                         !MapMgr::ExistMapAndVMap(MAP_OUTLAND, -3961.64f, -13931.2f))))
         {
-            LOG_ERROR("server.loading", "Failed to find map files for starting areas");
+            LOG_ERROR("server.loading", "Failed to find map files for starting areas, check your map files!");
             exit(1);
         }
     }
