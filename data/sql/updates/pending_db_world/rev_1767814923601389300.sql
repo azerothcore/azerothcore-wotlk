@@ -75,35 +75,35 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 (@GUID+24, 25451, 571, 1, 1, 0, 2588.501, 6063.269, 147.57248, 3.455328941345214843, 120, -52237, 2, 'Part of What The Cold Wind Brings... Event');
 
 -- Create Event
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @GUID+1 AND @GUID+24 AND `eventEntry` = 91;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @GUID+1 AND @GUID+24 AND `eventEntry` = 92;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
-(91, @GUID+1 ),
-(91, @GUID+3 ),
-(91, @GUID+4 ),
-(91, @GUID+5 ),
-(91, @GUID+6 ),
-(91, @GUID+7 ),
-(91, @GUID+8 ),
-(91, @GUID+9 ),
-(91, @GUID+10),
-(91, @GUID+11),
-(91, @GUID+12),
-(91, @GUID+13),
-(91, @GUID+14),
-(91, @GUID+15),
-(91, @GUID+16),
-(91, @GUID+17),
-(91, @GUID+18),
-(91, @GUID+19),
-(91, @GUID+20),
-(91, @GUID+21),
-(91, @GUID+22),
-(91, @GUID+23),
-(91, @GUID+24);
+(92, @GUID+1 ),
+(92, @GUID+3 ),
+(92, @GUID+4 ),
+(92, @GUID+5 ),
+(92, @GUID+6 ),
+(92, @GUID+7 ),
+(92, @GUID+8 ),
+(92, @GUID+9 ),
+(92, @GUID+10),
+(92, @GUID+11),
+(92, @GUID+12),
+(92, @GUID+13),
+(92, @GUID+14),
+(92, @GUID+15),
+(92, @GUID+16),
+(92, @GUID+17),
+(92, @GUID+18),
+(92, @GUID+19),
+(92, @GUID+20),
+(92, @GUID+21),
+(92, @GUID+22),
+(92, @GUID+23),
+(92, @GUID+24);
 
-DELETE FROM `game_event` WHERE `eventEntry` = 91 AND `description` = 'What the Cold Wind Brings...';
+DELETE FROM `game_event` WHERE `eventEntry` = 92 AND `description` = 'What the Cold Wind Brings...';
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `description`, `announce`) VALUES
-(91, '2026-01-07 20:00:00', '2030-12-31 12:00:00', @EVENT_OCCURENCE, @EVENT_LENGTH, 'What the Cold Wind Brings...', 0);
+(92, '2026-01-07 20:00:00', '2030-12-31 12:00:00', @EVENT_OCCURENCE, @EVENT_LENGTH, 'What the Cold Wind Brings...', 0);
 
 DELETE FROM `waypoint_data` WHERE `id` = 254391;
 DELETE FROM `waypoint_data` WHERE `id` IN (@GUID+1,@GUID+2,@GUID+3,@GUID+4,@GUID+5,@GUID+6,@GUID+7,@GUID+8,@GUID+9,@GUID+10,@GUID+11,@GUID+12,@GUID+13,@GUID+14,@GUID+15,@GUID+16,@GUID+17,@GUID+18,@GUID+19,@GUID+20,@GUID+21,@GUID+22,@GUID+23,@GUID+24);
@@ -247,8 +247,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25446, 0, 4, 0, 72, 0, 100, 0, 1, 0, 0, 0, 0, 0, 80, 2544600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Ith\'rix Started Event, Summoned Warsong Scout, Scout Relayed Action to Captain - Run Script'),
 (25446, 0, 5, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 80, 2544601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Action Received from Ith\'rix - Run Script End Event'),
 (25446, 0, 6, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2544602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Reached Carapace - Run Gloat Script'),
-(25446, 0, 7, 0, 68, 0, 100, 0, 91, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event 91 Started - Set Invincibility Hp 1'),
-(25446, 0, 8, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event 91 Ended - Reset Invincibility Hp');
+(25446, 0, 7, 0, 68, 0, 100, 0, 92, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event \'What the Cold Wind Brings...\' Started - Set Invincibility Hp 1'),
+(25446, 0, 8, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event \'What the Cold Wind Brings...\' Ended - Reset Invincibility Hp');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -272,7 +272,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2544601, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 111, 91, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - End Event'),
+(2544601, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 111, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - End Event'),
 (2544601, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Set Run Off'),
 (2544601, 9, 2, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 0, 69, 1, 0, 0, 5, 0, 0, 20, 187674, 60, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Move To Gameobject \'Ith\'rix\'s Hardened Carapace\'');
 
@@ -320,73 +320,73 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@GUID+3), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+3), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+3), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+3), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+3), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+3), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+3), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+4), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+4), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+4), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+4), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+4), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+4), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+4), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+4), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+5), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+5), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+5), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+5), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+5), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+5), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+5), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+5), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+6), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+6), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+6), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+6), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+6), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+6), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+6), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+6), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+7), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+7), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+7), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+7), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+7), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+7), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+7), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+7), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+8), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+8), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+8), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+8), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+8), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+8), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+8), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+8), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+9), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+9), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+9), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+9), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+9), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+9), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+9), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+9), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+10), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+10), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+10), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+10), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+10), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+10), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+10), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+10), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+11), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+11), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+11), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+11), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+11), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+11), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+11), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+11), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+12), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+12), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+12), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+12), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+12), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+12), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+12), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+12), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+13), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+13), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+13), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+13), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+13), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+13), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+13), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
+(-(@GUID+13), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+14), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+14), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+14), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+14), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+14), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+14), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+14), 0, 1004, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self');
+(-(@GUID+14), 0, 1004, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Event Ended - Stop Respawning Self');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2524400);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -407,52 +407,52 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@GUID+15), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+15), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+15), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+15), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+15), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+15), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+16), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+16), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+16), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+16), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+16), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+16), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+17), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+17), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+17), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+17), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+17), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+17), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+18), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+18), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+18), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+18), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+18), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+18), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+19), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+19), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+19), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+19), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+19), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+19), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+20), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+20), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+20), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+20), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+20), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+20), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+21), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+21), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+21), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+21), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+21), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+21), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+22), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+22), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+22), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+22), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+22), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+22), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+23), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+23), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+23), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+23), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+23), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
+(-(@GUID+23), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self'),
 
 (-(@GUID+24), 0, 1000, 0, 37, 0, 100, 256, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Initialize - Scripted Spawn Off Creature'),
 (-(@GUID+24), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+24), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
 (-(@GUID+24), 0, 1002, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Increment Sky Darkener Kill Count'),
-(-(@GUID+24), 0, 1003, 0, 69, 0, 100, 0, 91, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self');
+(-(@GUID+24), 0, 1003, 0, 69, 0, 100, 0, 92, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Event Ended - Stop Respawning Self');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25453;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25453);
