@@ -355,7 +355,7 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                             player->CastSpell(player, SPELL_LAST_MAN_STANDING, true);
                         }
 
-                        if (!sScriptMgr->OnBeforeArenaTeamMemberUpdate(winnerArenaTeam, player, true, loserMatchmakerRating, winnerMatchmakerChange))
+                        if (sScriptMgr->OnBeforeArenaTeamMemberUpdate(winnerArenaTeam, player, true, loserMatchmakerRating, winnerMatchmakerChange))
                         {
                             winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
                         }
@@ -363,7 +363,7 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                 }
                 else
                 {
-                    if (!sScriptMgr->OnBeforeArenaTeamMemberUpdate(loserArenaTeam, player, false, winnerMatchmakerRating, loserMatchmakerChange))
+                    if (sScriptMgr->OnBeforeArenaTeamMemberUpdate(loserArenaTeam, player, false, winnerMatchmakerRating, loserMatchmakerChange))
                     {
                         loserArenaTeam->MemberLost(player, winnerMatchmakerRating, loserMatchmakerChange);
                     }
