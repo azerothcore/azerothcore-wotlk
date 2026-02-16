@@ -1684,10 +1684,11 @@ public:
                 LoginDatabasePreparedStatement* stmtLock = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LOCK);
                 stmtLock->SetData(0, accountId);
                 PreparedQueryResult lockResult = LoginDatabase.Query(stmtLock);
-                if (lockResult)
+                if (lockResult && lockResult->GetRowCount() > 0)
                 {
                     Field* lockFields = lockResult->Fetch();
-                    locked = lockFields[0].Get<uint8>() != 0;
+                    if (lockFields)
+                        locked = lockFields[0].Get<uint8>() != 0;
                 }
             }
             bool muted = false;
