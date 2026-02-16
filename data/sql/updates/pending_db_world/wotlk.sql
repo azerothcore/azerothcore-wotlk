@@ -4249,7 +4249,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `C
 (30952, 33470, 1270001, 25, 'Hungering Plaguehound - Frostweave Cloth Normal'),
 (30957, 33470, 1270001, 25, 'Death Knight Initiate - Frostweave Cloth Normal'),
 (30958, 33470, 1270001, 25, 'Death Knight Initiate - Frostweave Cloth Normal'),
-(30960, 33470, 1270001, 25, 'Risen Soldier - Frostweave Cloth Normal'),
+-- (30960, 33470, 1270001, 25, 'Risen Soldier - Frostweave Cloth Normal'),
 (31037, 33470, 1270001, 25, 'Forgotten Depths High Priest - Frostweave Cloth Normal'),
 (31039, 33470, 1270001, 25, 'Forgotten Depths Underking - Frostweave Cloth Normal'),
 (31042, 33470, 1270001, 25, 'Death Knight Adept - Frostweave Cloth Normal'),

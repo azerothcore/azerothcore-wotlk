@@ -13442,8 +13442,8 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (24819, 2, 1000150, 0, 5, 'Anvilrage Enforcer - World Loot Level 50');
 
 -- Those that shouldn't drop anything from what I noticed
-DELETE FROM `creature_loot_template` WHERE (`Entry` IN (2058, 3661, 3692, 3994, 10637, 499, 1949, 7843));
-UPDATE `creature_template` SET `lootid` = 0 WHERE (`entry` IN (2058, 3661, 3692, 3994, 10637, 499, 1949, 7843));
+DELETE FROM `creature_loot_template` WHERE (`Entry` IN (2058, 3661, 3692, 3994, 10637, 499, 1949, 7843, 19759));
+UPDATE `creature_template` SET `lootid` = 0 WHERE (`entry` IN (2058, 3661, 3692, 3994, 10637, 499, 1949, 7843, 19759));
 
 -- Clear some trash
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 822) AND (`Item` IN (159, 787, 2589, 4536, 4540, 4604, 4656));
@@ -16343,7 +16343,6 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (11441, 429, 1429000, 3, 3, 'Gordok Brute - Dire Maul Librams'),
 (11444, 429, 1429000, 3, 3, 'Gordok Mage-Lord - Dire Maul Librams'),
 (11445, 429, 1429000, 3, 3, 'Gordok Captain - Dire Maul Librams'),
-(11446, 429, 1429000, 3, 3, 'Gordok Spirit - Dire Maul Librams'),
 (11448, 429, 1429000, 3, 3, 'Gordok Warlock - Dire Maul Librams'),
 (11450, 429, 1429000, 3, 3, 'Gordok Reaver - Dire Maul Librams'),
 (11451, 429, 1429000, 3, 3, 'Wildspawn Satyr - Dire Maul Librams'),
@@ -16359,7 +16358,6 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `G
 (11462, 429, 1429000, 3, 3, 'Warpwood Treant - Dire Maul Librams'),
 (11464, 429, 1429000, 3, 3, 'Warpwood Tangler - Dire Maul Librams'),
 (11465, 429, 1429000, 3, 3, 'Warpwood Stomper - Dire Maul Librams'),
-(11466, 429, 1429000, 3, 3, 'Highborne Summoner - Dire Maul Librams'),
 (11469, 429, 1429000, 3, 3, 'Eldreth Seether - Dire Maul Librams'),
 (11470, 429, 1429000, 3, 3, 'Eldreth Sorcerer - Dire Maul Librams'),
 (11471, 429, 1429000, 3, 3, 'Eldreth Apparition - Dire Maul Librams'),
