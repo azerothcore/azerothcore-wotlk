@@ -1,3 +1,4 @@
+-- DB update 2026_02_15_07 -> 2026_02_16_00
 -- Onyx Blaze Mistress
 -- Updates comments, add Conjure Flame Orb
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 30681);
