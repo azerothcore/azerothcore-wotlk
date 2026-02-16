@@ -54,10 +54,12 @@ enum NPCs
 enum Data
 {
     DATA_MALYGOS                = 0,
+    DATA_IRIS,
+    DATA_EXIT_PORTAL,
+    DATA_NEXUS_PLATFORM,
     DATA_IRIS_ACTIVATED,
     DATA_SET_IRIS_INACTIVE,
     DATA_HIDE_IRIS_AND_PORTAL,
-    DATA_MALYGOS_GUID,
 };
 
 enum eSpells
