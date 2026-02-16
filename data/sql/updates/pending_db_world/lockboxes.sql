@@ -158,7 +158,7 @@ INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Quest
 (5758, 14, 1084055, 2.5, 0, 1, 1, 1, 1, 'Vanilla Patterns 40-55 Level Range'),
 (5758, 15, 1084660, 2.5, 0, 1, 1, 1, 1, 'Vanilla Patterns 46-60 Level Range'),
 (5758, 16, 1085063, 2.5, 0, 1, 1, 1, 1, 'Vanilla Patterns 50-63 Level Range'),
-(5758, 17, 1085563, 2.5, 0, 1, 1, 1, 1, 'Vanilla Patterns 55-63 Level Range'),
+(5758, 17, 1085663, 2.5, 0, 1, 1, 1, 1, 'Vanilla Patterns 56-63 Level Range'),
 (5758, 18, 1095162, 5, 0, 1, 1, 1, 1, 'Vanilla Bags 14 and 16 Slots');
 
 -- Thorium Lockbox

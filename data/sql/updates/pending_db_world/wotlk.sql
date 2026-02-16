@@ -4506,4 +4506,5 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `C
 (32191, 33470, 1270002, 25, 'Azure Stalker - Frostweave Cloth Elite'),
 (32192, 33470, 1270002, 25, 'Azure Stalker (1) - Frostweave Cloth Elite');
 
+DELETE FROM `creature_loot_template` WHERE `Entry` = 30960;
 UPDATE `creature_template` SET `lootid` = 0 WHERE `entry` = 30960;
