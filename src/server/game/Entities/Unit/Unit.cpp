@@ -2226,15 +2226,19 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         {
             if (attacker)
             {
-                AuraEffectList const& ResIgnoreAurasAb = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
-                for (AuraEffectList::const_iterator j = ResIgnoreAurasAb.begin(); j != ResIgnoreAurasAb.end(); ++j)
-                    if (((*j)->GetMiscValue() & schoolMask) && (*j)->IsAffectedOnSpell(spellInfo))
-                        AddPct(damageResisted, -(*j)->GetAmount());
+                float mult = attacker->GetTotalAuraMultiplier(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST, [schoolMask, spellInfo](AuraEffect const* aurEff)
+                {
+                    if (!(aurEff->GetMiscValue() & schoolMask))
+                        return false;
 
-                AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-                for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-                    if ((*j)->GetMiscValue() & schoolMask)
-                        AddPct(damageResisted, -(*j)->GetAmount());
+                    if (!aurEff->IsAffectedOnSpell(spellInfo))
+                        return false;
+
+                    return true;
+                });
+                damageResisted -= damageResisted * (mult - 1.0f);
+                mult = attacker->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_IGNORE_TARGET_RESIST, schoolMask);
+                damageResisted -= damageResisted * (mult - 1.0f);
             }
 
             // pussywizard:
@@ -2254,25 +2258,17 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
     float auraAbsorbMod = 0;
     if (attacker)
     {
-        AuraEffectList const& AbsIgnoreAurasA = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_TARGET_ABSORB_SCHOOL);
-        for (AuraEffectList::const_iterator itr = AbsIgnoreAurasA.begin(); itr != AbsIgnoreAurasA.end(); ++itr)
+        auraAbsorbMod = attacker->GetMaxPositiveAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_ABSORB_SCHOOL, schoolMask);
+        auraAbsorbMod = std::max(auraAbsorbMod, float(attacker->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, [spellInfo, schoolMask](AuraEffect const* aurEff)
         {
-            if (!((*itr)->GetMiscValue() & schoolMask))
-                continue;
+            if (!(aurEff->GetMiscValue() & schoolMask))
+                return false;
 
-            if ((*itr)->GetAmount() > auraAbsorbMod)
-                auraAbsorbMod = float((*itr)->GetAmount());
-        }
+            if (!aurEff->IsAffectedOnSpell(spellInfo))
+                return false;
 
-        AuraEffectList const& AbsIgnoreAurasB = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL);
-        for (AuraEffectList::const_iterator itr = AbsIgnoreAurasB.begin(); itr != AbsIgnoreAurasB.end(); ++itr)
-        {
-            if (!((*itr)->GetMiscValue() & schoolMask))
-                continue;
-
-            if (((*itr)->GetAmount() > auraAbsorbMod) && (*itr)->IsAffectedOnSpell(spellInfo))
-                auraAbsorbMod = float((*itr)->GetAmount());
-        }
+            return true;
+        })));
         RoundToInterval(auraAbsorbMod, 0.0f, 100.0f);
     }
 
@@ -11871,13 +11867,12 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
     int32 DoneAdvertisedBenefit = 0;
-    AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-    for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
+    DoneAdvertisedBenefit += owner->GetTotalAuraModifier(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS, [spellProto](AuraEffect const* aurEff)
     {
-        if (!(*i)->IsAffectedOnSpell(spellProto))
-            continue;
+        if (!aurEff->IsAffectedOnSpell(spellProto))
+            return false;
 
-        switch ((*i)->GetMiscValue())
+        switch (aurEff->GetMiscValue())
         {
             case 4418: // Increased Shock Damage
             case 4554: // Increased Lightning Damage
@@ -11887,12 +11882,14 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             case 5148: // Idol of the Shooting Star
             case 6008: // Increased Lightning Damage
             case 8627: // Totem of Hex
-            {
-                DoneAdvertisedBenefit += (*i)->GetAmount();
+                return true;
                 break;
-            }
+            default:
+                break;
         }
-    }
+
+        return false;
+    });
 
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
