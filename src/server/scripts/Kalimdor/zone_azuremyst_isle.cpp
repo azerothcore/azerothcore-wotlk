@@ -559,6 +559,34 @@ public:
     }
 };
 
+/*######
+## spell_surveyor_candress_fireball
+######*/
+
+constexpr uint32 NPC_SURVEYOR_CANDRESS = 16522;
+
+class spell_surveyor_candress_fireball : public SpellScript
+{
+    PrepareSpellScript(spell_surveyor_candress_fireball);
+
+    void HandleDamage(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            // Check if the caster is Surveyor Candress to avoid breaking other NPCs sharing this spell
+            // PTR Data: Damage is 6-8 (Current core scaling is too high at ~16-26)
+            if (caster->GetEntry() == NPC_SURVEYOR_CANDRESS)
+                SetHitDamage(urand(6, 8));
+
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_surveyor_candress_fireball::HandleDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_azuremyst_isle()
 {
     new npc_draenei_survivor();
@@ -569,4 +597,5 @@ void AddSC_azuremyst_isle()
     new npc_stillpine_capitive();
     new go_bristlelimb_cage();
     RegisterSpellScript(spell_inoculate_nestlewood_owlkin);
+    RegisterSpellScript(spell_surveyor_candress_fireball);
 }
