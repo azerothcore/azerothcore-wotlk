@@ -501,7 +501,7 @@ void ClearOnlineAccounts()
 /// Migrate DBC tables from acore_world to acore_dbc if EnableDBCDatabase is enabled
 void MigrateDBCTablesToSeparateDatabase()
 {
-    if (!sConfigMgr->GetOption<bool>("EnableDBCDatabase", false))
+    if (!sConfigMgr->GetOption<bool>("EnableDBCDatabase", true))
     {
         LOG_INFO("server.loading", ">> DBC Database migration disabled (EnableDBCDatabase = 0). Using fallback mode.");
         return;
