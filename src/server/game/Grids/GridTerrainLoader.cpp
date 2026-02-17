@@ -141,13 +141,23 @@ bool GridTerrainLoader::ExistVMap(uint32 mapid, int gx, int gy)
                     // Try to read the actual version string from the file
                     std::string vmapFile = sWorld->GetDataPath() + "vmaps/" + name;
                     char fileMagic[9] = {0};
+                    bool versionRead = false;
                     FILE* f = fopen(vmapFile.c_str(), "rb");
                     if (f)
                     {
-                        fread(fileMagic, 1, 8, f);
+                        size_t bytesRead = fread(fileMagic, 1, 8, f);
                         fclose(f);
+                        if (bytesRead == 8)
+                            versionRead = true;
                     }
-                    LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}, VMAP file has version: {}. Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC), fileMagic);
+                    if (versionRead)
+                    {
+                        LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}, VMAP file has version: {}. Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC), fileMagic);
+                    }
+                    else
+                    {
+                        LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}, VMAP file version could not be read (file missing or corrupt). Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC));
+                    }
                     return false;
             }
         }
