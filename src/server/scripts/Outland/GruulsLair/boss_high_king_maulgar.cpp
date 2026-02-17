@@ -188,15 +188,6 @@ struct boss_olm_the_summoner : public ScriptedAI
         instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
     }
 
-    void AttackStart(Unit* who) override
-    {
-        if (!who)
-            return;
-
-        if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
-    }
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
@@ -268,7 +259,7 @@ struct boss_kiggler_the_crazed : public ScriptedAI
             return;
 
         if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
+            me->GetMotionMaster()->MoveChase(who, 40.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
