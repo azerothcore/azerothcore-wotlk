@@ -22,13 +22,20 @@
 
 -- ============================================================================
 -- 1. Gossip: Cast 5429 on player, then run random script (link chain)
+--    Plus MovementInform (event 34, type 8 = Point, pointId 1/2/3): jump then despawn 4000ms
 -- ============================================================================
 DELETE FROM `smart_scripts` WHERE `entryorguid`=31397 AND `source_type`=0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (31397,0,0,1,62,0,100,512,10137,0,0,0,0,0,11,5429,0,0,0,0,0,7,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Gossip - Cast 5429 on Player'),
 (31397,0,1,0,61,0,100,0,0,0,0,0,0,0,87,3139700,3139701,3139702,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Link - Run Random Script'),
 (31397,0,2,0,0,0,100,0,1000,1000,14000,14000,0,0,11,3148,0,0,0,0,0,2,0,0,0,0,0,0,0,0,'Saronite Mine Slave - IC - Cast Head Crack'),
-(31397,0,3,0,1,0,15,0,10000,30000,50000,70000,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - OOC - Say text2');
+(31397,0,3,0,1,0,15,0,10000,30000,50000,70000,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - OOC - Say text2'),
+(31397,0,4,1,34,0,100,0,8,1,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6966.75,2067.58,482.553,0,'Saronite Mine Slave - MovementInform Point 1 - Jump to pit'),
+(31397,0,5,0,61,0,100,0,0,0,0,0,0,0,41,4000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Link - Despawn 4000ms'),
+(31397,0,6,1,34,0,100,0,8,2,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6904.17,2026.23,482.964,0,'Saronite Mine Slave - MovementInform Point 2 - Jump to pit'),
+(31397,0,7,0,61,0,100,0,0,0,0,0,0,0,41,4000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Link - Despawn 4000ms'),
+(31397,0,8,1,34,0,100,0,8,3,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6911.13,1969.18,488.24,0,'Saronite Mine Slave - MovementInform Point 3 - Jump to pit'),
+(31397,0,9,0,61,0,100,0,0,0,0,0,0,0,41,4000,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Link - Despawn 4000ms');
 
 -- ============================================================================
 -- 2a. Freedom path: move to exact point (7026.46, 1877.16, 533.62), then despawn
@@ -37,7 +44,8 @@ UPDATE `smart_scripts` SET `target_x`=7026.46,`target_y`=1877.1602,`target_z`=53
 WHERE `entryorguid`=3139700 AND `source_type`=9 AND `id`=3;
 
 -- ============================================================================
--- 2b. Pit outcome: yell, then run to one of three pits (random, approximates closest)
+-- 2b. Pit outcome: yell, then move to one of three pits (PointId 1/2/3).
+--    On MovementInform (event 34) creature jumps and despawns (see 31397 id 4-9).
 -- ============================================================================
 DELETE FROM `smart_scripts` WHERE `entryorguid`=3139702 AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
@@ -48,17 +56,12 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (3139702,9,4,0,0,0,100,0,500,500,0,0,0,0,59,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Set Run On'),
 (3139702,9,5,0,0,0,100,0,0,0,0,0,0,0,87,3139703,3139704,3139705,0,0,0,1,0,0,0,0,0,0,0,0,'Saronite Mine Slave - On Script - Run to Random Pit');
 
+-- Pit scripts: only Move to Pos with PointId; MovementInform on 31397 handles jump + despawn
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (3139703,3139704,3139705) AND `source_type`=9;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`event_param5`,`event_param6`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_param4`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(3139703,9,0,0,0,0,100,0,0,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,0,6966.371,2050.5237,519.42505,0,'Pit 1 - Move to edge'),
-(3139703,9,1,0,0,0,100,0,4000,4000,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6966.75,2067.58,482.553,0,'Pit 1 - Jump'),
-(3139703,9,2,0,0,0,100,0,3000,3000,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit 1 - Despawn'),
-(3139704,9,0,0,0,0,100,0,0,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,0,6915.9272,2025.5466,518.6113,0,'Pit 2 - Move to edge'),
-(3139704,9,1,0,0,0,100,0,4000,4000,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6904.17,2026.23,482.964,0,'Pit 2 - Jump'),
-(3139704,9,2,0,0,0,100,0,3000,3000,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit 2 - Despawn'),
-(3139705,9,0,0,0,0,100,0,0,0,0,0,0,0,69,0,0,0,0,0,0,8,0,0,0,0,6921.0854,1972.6857,523.33716,0,'Pit 3 - Move to edge'),
-(3139705,9,1,0,0,0,100,0,4000,4000,0,0,0,0,97,15,15,0,0,0,0,8,0,0,0,0,6911.13,1969.18,488.24,0,'Pit 3 - Jump'),
-(3139705,9,2,0,0,0,100,0,3000,3000,0,0,0,0,41,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Pit 3 - Despawn');
+(3139703,9,0,0,0,0,100,0,0,0,0,0,0,0,69,1,0,0,0,0,0,8,0,0,0,0,6966.371,2050.5237,519.42505,0,'Pit 1 - Move to pos PointId 1'),
+(3139704,9,0,0,0,0,100,0,0,0,0,0,0,0,69,2,0,0,0,0,0,8,0,0,0,0,6915.9272,2025.5466,518.6113,0,'Pit 2 - Move to pos PointId 2'),
+(3139705,9,0,0,0,0,100,0,0,0,0,0,0,0,69,3,0,0,0,0,0,8,0,0,0,0,6921.0854,1972.6857,523.33716,0,'Pit 3 - Move to pos PointId 3');
 
 -- ============================================================================
 -- 2. Fix hostile behavior: emote "goes into a frenzy!" instead of yelling
