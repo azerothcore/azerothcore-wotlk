@@ -175,6 +175,10 @@ enum Misc
     ACTION_FORCE_CHANGE_LOCK                = 2,
 
     POINT_CHRONOS                           = 1,
+
+    // Brandon Eiredeck crowd
+    NPC_BRANDON_EIREDECK                    = 31023,
+    SAY_BRANDON_CROWD_AMBIENT               = 3,
 };
 
 enum Events
@@ -1518,12 +1522,17 @@ public:
             pInstance = me->GetInstanceScript();
             if (!pInstance || pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_FINISHED_CITY_INTRO)
                 allowTimer++;
+
+            isBrandonCrowd = me->GetDistance(2267.86f, 1144.93f, 138.403f) < 10.0f;
+            ambientTalkTimer = isBrandonCrowd ? urand(5000, 15000) : 0;
         }
 
         bool locked;
         uint32 changeTimer;
         InstanceScript* pInstance;
         uint32 allowTimer;
+        bool isBrandonCrowd;
+        uint32 ambientTalkTimer;
 
         void Reset() override
         {
@@ -1583,6 +1592,19 @@ public:
         void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
+
+            if (isBrandonCrowd && ambientTalkTimer)
+            {
+                if (ambientTalkTimer <= diff)
+                {
+                    Talk(SAY_BRANDON_CROWD_AMBIENT);
+                    ambientTalkTimer = urand(15000, 25000);
+                }
+                else
+                    ambientTalkTimer -= diff;
+
+                return;
+            }
 
             if (allowTimer)
             {
