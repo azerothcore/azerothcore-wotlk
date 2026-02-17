@@ -648,8 +648,16 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             owner->UpdateAllowedPositionZ(x, y, z);
 
         bool success = i_path->CalculatePath(x, y, z, forceDest);
-        if (!success || (i_path->GetPathType() & PATHFIND_NOPATH && !followingMaster))
+
+        bool cannotReachTarget = !success || (i_path->GetPathType() & PATHFIND_NOPATH && !followingMaster);
+        if (oPet && followingMaster && !owner->CanFly() && (i_path->GetPathType() & PATHFIND_NOT_USING_PATH))
+            cannotReachTarget = true;
+
+        if (cannotReachTarget)
         {
+            if (oPet && followingMaster)
+                cOwner->SetCannotReachTarget(target->GetGUID());
+
             if (!owner->IsStopped())
                 owner->StopMoving();
 
