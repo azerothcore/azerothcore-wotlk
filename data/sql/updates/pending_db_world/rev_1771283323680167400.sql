@@ -1,4 +1,4 @@
---
+-- Gluth
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 15932) AND `GroupId` = 2;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (15932, 39139, 0, 0, 0, 1, 2, 1, 1, 'Gluth - Ravaging Sabatons'),
