@@ -24,6 +24,7 @@
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
@@ -667,7 +668,7 @@ void SmartAI::MovementInform(uint32 MovementType, uint32 Data)
         MovepointReached(Data);
 }
 
-void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
+void SmartAI::EnterEvadeMode(EvadeReason why)
 {
     if (mEvadeDisabled)
     {
@@ -711,6 +712,8 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
         if (!me->HasUnitState(UNIT_STATE_EVADE))
             GetScript()->OnReset();
     }
+
+    sScriptMgr->OnUnitEnterEvadeMode(me, why);
 }
 
 void SmartAI::MoveInLineOfSight(Unit* who)
