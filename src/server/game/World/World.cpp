@@ -336,15 +336,25 @@ void World::SetInitialWorldSettings()
     {
         // Validate DataDir before checking map files
         std::string dataDir = _dataPath;
-        if (!std::filesystem::exists(dataDir) || !std::filesystem::is_directory(dataDir))
+        std::error_code ec;
+        if (!std::filesystem::exists(dataDir, ec))
         {
-            LOG_ERROR("server.loading", "DataDir '{}' does not exist or is not a directory", dataDir);
+            LOG_ERROR("server.loading", "DataDir '{}' does not exist ({}).", dataDir, ec ? ec.message() : "");
             exit(1);
         }
-        bool isEmpty = std::filesystem::directory_iterator(dataDir) == std::filesystem::directory_iterator();
-        if (isEmpty)
+        if (!std::filesystem::is_directory(dataDir, ec))
         {
-            LOG_ERROR("server.loading", "DataDir '{}' exists but is empty", dataDir);
+            LOG_ERROR("server.loading", "DataDir '{}' is not a directory ({}).", dataDir, ec ? ec.message() : "");
+            exit(1);
+        }
+        if (std::filesystem::is_empty(dataDir, ec))
+        {
+            LOG_ERROR("server.loading", "DataDir '{}' exists but is empty ({}).", dataDir, ec ? ec.message() : "");
+            exit(1);
+        }
+        if (ec)
+        {
+            LOG_ERROR("server.loading", "Error checking DataDir '{}': {}", dataDir, ec.message());
             exit(1);
         }
         ///- Check the existence of the map files for all starting areas.
