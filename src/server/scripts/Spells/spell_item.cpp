@@ -98,6 +98,62 @@ class spell_item_titanium_seal_of_dalaran : public SpellScript
     }
 };
 
+constexpr float MODIFIER_COPPER_COIN = 1.5f;
+constexpr float MODIFIER_SILVER_COIN = 2.25f;
+constexpr float MODIFIER_GOLD_COIN = 3.0f;
+static constexpr std::array<uint32, 23> CopperCoinIDs =
+{
+    43701,43702,43703,43704,43705,43706,43707,43708,43709,43710,43711,43712,43713,43714,43715,43716,43717,43718,43719,43720,43721,43722,43723
+};
+static constexpr std::array<uint32, 15> SilverCoinIDs =
+{
+    43643,43644,43675,43676,43677,43678,43679,43680,43681,43682,43683,43684,43685,43686,43687
+};
+static constexpr std::array<uint32, 16> GoldCoinIDs =
+{
+    43627,43628,43629,43630,43631,43632,43633,43634,43635,43636,43637,43638,43639,43640,43641,45978
+};
+
+// 59125 - Lucky
+class spell_item_lucky : public AuraScript
+{
+    PrepareAuraScript(spell_item_lucky)
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (Player* player = caster->ToPlayer())
+        {
+            for (uint32 itemID : CopperCoinIDs)
+                player->SetLootChanceModifier(itemID, MODIFIER_COPPER_COIN);
+            for (uint32 itemID : SilverCoinIDs)
+                player->SetLootChanceModifier(itemID, MODIFIER_SILVER_COIN);
+            for (uint32 itemID : GoldCoinIDs)
+                player->SetLootChanceModifier(itemID, MODIFIER_GOLD_COIN);
+        }
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (Player* player = caster->ToPlayer())
+        {
+            for (uint32 itemID : CopperCoinIDs)
+                player->RemoveLootChanceModifier(itemID);
+            for (uint32 itemID : SilverCoinIDs)
+                player->RemoveLootChanceModifier(itemID);
+            for (uint32 itemID : GoldCoinIDs)
+                player->RemoveLootChanceModifier(itemID);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_item_lucky::OnApply, EFFECT_1, SPELL_AURA_MOD_RATING, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_lucky::OnRemove, EFFECT_1, SPELL_AURA_MOD_RATING, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 enum AmplifyDish
 {
     SPELL_AMPLIFY_30S               = 13180,
@@ -4423,4 +4479,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_multiphase_goggles);
     RegisterSpellScript(spell_item_bloodsail_admiral_hat);
     RegisterSpellScript(spell_item_brewfest_hops);
+    RegisterSpellScript(spell_item_lucky);
 }
