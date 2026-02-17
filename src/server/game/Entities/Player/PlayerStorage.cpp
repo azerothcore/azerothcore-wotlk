@@ -4421,6 +4421,30 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                     break;
                 case ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL:
                     // processed in Player::CastItemCombatSpell
+                    // When unequipping, remove any proc auras that were triggered by this enchant
+                    if (!apply && enchant_spell_id)
+                    {
+                        // Check if this is the main proc spell (with PROC_TRIGGER_SPELL aura)
+                        SpellInfo const* procSpellInfo = sSpellMgr->GetSpellInfo(enchant_spell_id);
+                        if (procSpellInfo)
+                        {
+                            // Remove the proc trigger spell aura itself if any
+                            RemoveAurasDueToItemSpell(enchant_spell_id, item->GetGUID());
+
+                            // Also check if this proc spell triggers another spell (the actual buff)
+                            // For enchants like Mongoose, the enchant spell procs a buff spell
+                            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            {
+                                if (procSpellInfo->Effects[i].Effect == SPELL_EFFECT_TRIGGER_SPELL ||
+                                    procSpellInfo->Effects[i].TriggerSpell)
+                                {
+                                    uint32 triggeredSpellId = procSpellInfo->Effects[i].TriggerSpell;
+                                    if (triggeredSpellId)
+                                        RemoveAurasDueToItemSpell(triggeredSpellId, item->GetGUID());
+                                }
+                            }
+                        }
+                    }
                     break;
                 case ITEM_ENCHANTMENT_TYPE_DAMAGE:
                 {
