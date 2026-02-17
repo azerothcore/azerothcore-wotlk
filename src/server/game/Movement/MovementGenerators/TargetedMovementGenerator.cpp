@@ -720,6 +720,105 @@ void FollowMovementGenerator<T>::MovementInform(T* owner)
         AI->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
 }
 
+template<class T>
+bool HauntMovementGenerator<T>::DoUpdate(T* owner, uint32 /*time_diff*/)
+{
+    if (!i_target.isValid() || !i_target->IsInWorld() || !owner || !owner->IsInMap(i_target.getTarget()))
+       return false;
+
+    Unit* target = i_target.getTarget();
+    Position targetPos = target->GetPosition();
+
+    float distance = owner->GetDistance(target);
+
+    if (distance <= 4.0f)
+    {
+        if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE))
+        {
+            owner->ClearUnitState(UNIT_STATE_FOLLOW_MOVE);
+            i_path = nullptr;
+        }
+
+        owner->SetFacingToObject(target);
+        return true;
+    }
+
+    if (distance < 9.0f && !owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE))
+    {
+        owner->SetFacingToObject(target);
+        return true;
+    }
+
+    if (!i_path)
+        i_path = std::make_unique<PathGenerator>(owner);
+    else
+        i_path->Clear();
+
+    bool targetIsMoving = target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_BACKWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT);
+
+    if (targetIsMoving)
+        targetPos = PredictPosition(target);
+
+    target->MovePositionToFirstCollision(targetPos, 5.0f, 0.0f);
+
+    float x, y, z;
+    targetPos.GetPosition(x, y, z);
+
+    bool success = i_path->CalculatePath(x, y, z, false);
+    if (!success || (i_path->GetPathType() & PATHFIND_NOPATH))
+    {
+        if (!owner->IsStopped())
+            owner->StopMoving();
+
+        return true;
+    }
+
+    owner->AddUnitState(UNIT_STATE_FOLLOW_MOVE);
+
+    Movement::MoveSplineInit init(owner);
+    init.SetFacing(target);
+
+    // Catch up if too far away
+    if (distance > 100.0f)
+        init.SetVelocity(owner->GetSpeed(MOVE_RUN) * 3);
+    else
+        init.SetVelocity(owner->GetSpeed(MOVE_RUN) * 0.5);
+
+    init.MovebyPath(i_path->GetPath());
+    init.Launch();
+    return true;
+}
+
+template<class T>
+void HauntMovementGenerator<T>::DoInitialize(T* owner)
+{
+    i_path = nullptr;
+    owner->AddUnitState(UNIT_STATE_FOLLOW);
+}
+
+template<class T>
+void HauntMovementGenerator<T>::DoFinalize(T* owner)
+{
+    owner->ClearUnitState(UNIT_STATE_FOLLOW | UNIT_STATE_FOLLOW_MOVE);
+}
+
+template<class T>
+void HauntMovementGenerator<T>::DoReset(T* owner)
+{
+    DoInitialize(owner);
+}
+
+template<class T>
+void HauntMovementGenerator<T>::MovementInform(T* owner)
+{
+    if (!owner->IsCreature())
+        return;
+
+    // Pass back the GUIDLow of the target
+    if (CreatureAI* AI = owner->ToCreature()->AI())
+        AI->MovementInform(FOLLOW_MOTION_TYPE, i_target.getTarget()->GetGUID().GetCounter());
+}
+
 //-----------------------------------------------//
 
 template void ChaseMovementGenerator<Player>::DoFinalize(Player*);
@@ -745,3 +844,9 @@ template void FollowMovementGenerator<Player>::DoReset(Player*);
 template void FollowMovementGenerator<Creature>::DoReset(Creature*);
 template bool FollowMovementGenerator<Player>::DoUpdate(Player*, uint32);
 template bool FollowMovementGenerator<Creature>::DoUpdate(Creature*, uint32);
+
+template void HauntMovementGenerator<Creature>::DoInitialize(Creature*);
+template void HauntMovementGenerator<Creature>::DoFinalize(Creature*);
+template void HauntMovementGenerator<Creature>::DoReset(Creature*);
+template bool HauntMovementGenerator<Creature>::DoUpdate(Creature*, uint32);
+template void HauntMovementGenerator<Creature>::MovementInform(Creature*);

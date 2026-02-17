@@ -24,6 +24,7 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CreatureScript.h"
+#include "MapMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -1108,16 +1109,6 @@ class spell_gen_haunted : public SpellScript
     void HandleOnEffectHit(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-
-        if (Unit* caster = GetCaster())
-        {
-            Position pos = caster->GetRandomNearPosition(5.0f);
-            if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
-            {
-                haunt->SetSpeed(MOVE_RUN, 0.5, true);
-                haunt->GetMotionMaster()->MoveFollow(caster, 1, M_PI);
-            }
-        }
     }
 
     void Register() override
@@ -1130,40 +1121,80 @@ class spell_gen_haunted_aura : public AuraScript
 {
     PrepareAuraScript(spell_gen_haunted_aura);
 
+    void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        CreateHaunt();
+   }
+
+    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        RemoveHaunt();
+    }
+
     void HandleEffectCalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
     {
         isPeriodic = true;
-        amplitude  = urand(120, 300) * IN_MILLISECONDS;
+        amplitude  = 5000;
     }
 
-    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
         {
-            Position pos = caster->GetRandomNearPosition(5.0f);
-            if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_TIMED_DESPAWN, urand(10, 20) * IN_MILLISECONDS))
+            // Map change, recreate haunt
+            if (_hauntMapId != caster->GetMapId() || _hauntInstanceId != caster->GetInstanceId())
             {
-                haunt->SetSpeed(MOVE_RUN, 0.5, true);
-                haunt->GetMotionMaster()->MoveFollow(caster, 1, M_PI);
+                RemoveHaunt();
+                CreateHaunt();
             }
         }
     }
 
-    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* caster = GetCaster())
-            if (Creature* haunt = caster->FindNearestCreature(NPC_SCOURGE_HAUNT, 5.0f, true))
-                haunt->DespawnOrUnsummon();
-    }
-
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_haunted_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_DUMMY);
-        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_haunted_aura::HandleEffectCalcPeriodic, EFFECT_1, SPELL_AURA_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_gen_haunted_aura::HandleOnEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_gen_haunted_aura::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_haunted_aura::HandlePeriodic, EFFECT_1, SPELL_AURA_DUMMY);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_haunted_aura::HandleEffectCalcPeriodic, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+private:
+    ObjectGuid _hauntGuid;
+    uint32 _hauntMapId = 0;
+    uint32 _hauntInstanceId = 0;
+
+    void CreateHaunt()
+    {
+        Unit* caster = GetCaster();
+
+        if (!caster)
+            return;
+
+        Position pos = caster->GetRandomNearPosition(5.0f);
+
+        if (Creature* haunt = caster->SummonCreature(NPC_SCOURGE_HAUNT, pos, TEMPSUMMON_CORPSE_DESPAWN, 0))
+        {
+            haunt->SetSpeed(MOVE_RUN, 0.5, true);
+            haunt->GetMotionMaster()->MoveHaunt(caster);
+            _hauntGuid = haunt->GetGUID();
+            _hauntMapId = caster->GetMapId();
+            _hauntInstanceId = caster->GetInstanceId();
+        }
+    }
+
+    void RemoveHaunt()
+    {
+        if (_hauntGuid.IsEmpty())
+            return;
+
+        if (Map* hauntMap = sMapMgr->FindMap(_hauntMapId, _hauntInstanceId))
+        {
+            if (Creature* haunt = hauntMap->GetCreature(_hauntGuid))
+                haunt->DespawnOrUnsummon();
+        }
+
+        _hauntGuid.Clear();
     }
 };
-
 /* 39228 - Argussian Compass
    60218 - Essence of Gossamer
    64765 - The General's Heart */
