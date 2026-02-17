@@ -165,14 +165,20 @@ public:
             me->GetMotionMaster()->MovePoint(currentWaypoint, WaypointPositions[currentWaypoint]);
         }
 
-        bool IsInRoom()
+        void EnterEvadeMode(EvadeReason why) override
         {
-            if (me->GetExactDist(2535.1f, -2968.7f, 241.3f) > 100.0f)
+            if (why == EVADE_REASON_BOUNDARY)
             {
-                EnterEvadeMode();
-                return false;
+                if (Creature* cr = instance->GetCreature(DATA_BARON_RIVENDARE_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                if (Creature* cr = instance->GetCreature(DATA_LADY_BLAUMEUX_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                if (Creature* cr = instance->GetCreature(DATA_SIR_ZELIEK_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
+                if (Creature* cr = instance->GetCreature(DATA_THANE_KORTHAZZ_BOSS))
+                    cr->AI()->EnterEvadeMode(EVADE_REASON_OTHER);
             }
-            return true;
+            BossAI::EnterEvadeMode();
         }
 
         void Reset() override
@@ -208,7 +214,7 @@ public:
                 me->SetInCombatWithZone();
                 if (!UpdateVictim())
                 {
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
                     return;
                 }
                 if (me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK)
@@ -250,11 +256,9 @@ public:
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
 
-            if (instance->GetBossState(BOSS_HORSEMAN) == DONE)
-                if (!me->GetMap()->GetPlayers().IsEmpty())
-                    if (Player* player = me->GetMap()->GetPlayers().getFirst()->GetSource())
-                        if (GameObject* chest = player->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
-                            chest->SetLootRecipient(me);
+            if (instance->IsBossDone(BOSS_HORSEMAN))
+                if (GameObject* chest = me->GetMap()->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
+                    chest->SetLootRecipient(me);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -277,9 +281,6 @@ public:
                 me->GetMotionMaster()->MovePoint(currentWaypoint, WaypointPositions[currentWaypoint]);
                 currentWaypoint = 0;
             }
-
-            if (!IsInRoom())
-                return;
 
             if (movementPhase < MOVE_PHASE_FINISHED || !UpdateVictim())
                 return;

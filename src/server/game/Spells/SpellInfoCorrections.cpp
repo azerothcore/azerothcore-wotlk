@@ -5162,6 +5162,44 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcCharges = 1;
     });
 
+    ApplySpellFix({
+        56917, // To Icecrown Airship - Teleport to Airship (A)
+        57417, // To Icecrown Airship - Teleport to Airship (H)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100 yards
+    });
+
+    ApplySpellFix({
+        60586, // Mighty Spear Thrust
+        60776, // Claw Swipe
+        60881, // Fatal Strike
+        60864, // Jaws of Death
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS;
+    });
+
+    // The Brothers Bronzebeard
+    ApplySpellFix({
+        56675, // Summon Brann Bronzebeard
+        56676, // Summon Yorg Stormheart
+        56697, // Summon Magni Bronzebeard
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValueB = 64;
+    });
+
+    ApplySpellFix({
+        57374, // Shadow Bolt (Lady Blaumeux 10m)
+        57464, // Shadow Bolt (Lady Blaumeux 25m)
+        57376, // Holy Bolt (Sir Zeliek 10m)
+        57465, // Holy Bolt (Sir Zeliek 25m)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

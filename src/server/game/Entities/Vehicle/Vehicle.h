@@ -51,6 +51,7 @@ public:
     void RemoveAllPassengers();
     void Dismiss();
     bool IsVehicleInUse();
+    [[nodiscard]] bool IsControllableVehicle() const;
     void TeleportVehicle(float x, float y, float z, float ang);
 
     SeatMap Seats;

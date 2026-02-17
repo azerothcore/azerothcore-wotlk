@@ -219,7 +219,7 @@ enum WeaponAttackType : uint8
     MAX_ATTACK
 };
 
-enum CombatRating
+enum CombatRating : uint8
 {
     CR_WEAPON_SKILL             = 0,
     CR_DEFENSE_SKILL            = 1,
@@ -773,6 +773,8 @@ public:
 
     inline bool IsCrowdControlled() const { return HasFlag(UNIT_FIELD_FLAGS, (UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_STUNNED)); }
     inline bool IsImmobilizedState() const { return HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED); }
+
+    void SetAnimTier(AnimTier animTier);
 
     /*********************************************************/
     /***           UNIT TYPES, CLASSES, RACES...           ***/

@@ -194,7 +194,7 @@ class spell_dk_raise_ally : public SpellScript
 
                 // DK Ghoul haste refresh
                 float val = (GetCaster()->m_modAttackSpeedPct[BASE_ATTACK] - 1.0f) * 100.0f;
-                val *= 2000.0f + 2000.0f * ((100.0f + val) / 100.0f);
+                val = 2000.0f * (100.0f + val) / 100.0f;
                 ghoul->m_modAttackSpeedPct[BASE_ATTACK] = GetCaster()->m_modAttackSpeedPct[BASE_ATTACK];
                 ghoul->SetFloatValue(UNIT_FIELD_BASEATTACKTIME, val);
 
@@ -2314,6 +2314,26 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
     }
 };
 
+// -49182 Blade Barrier
+class spell_dk_blade_barrier : public AuraScript
+{
+    PrepareAuraScript(spell_dk_blade_barrier);
+
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            if (player->getClass() == CLASS_DEATH_KNIGHT && player->IsBaseRuneSlotsOnCooldown(RUNE_BLOOD))
+                return true;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dk_blade_barrier::CheckProc);
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     RegisterSpellScript(spell_dk_wandering_plague);
@@ -2362,4 +2382,5 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_will_of_the_necropolis);
     RegisterSpellScript(spell_dk_ghoul_thrash);
     RegisterSpellScript(spell_dk_army_of_the_dead_passive);
+    RegisterSpellScript(spell_dk_blade_barrier);
 }

@@ -2679,6 +2679,60 @@ struct npc_controller : public PossessedAI
     }
 };
 
+enum TravelerMammothVendor
+{
+    SAY_DISMISS      = 0,
+};
+
+struct npc_traveler_mammoth_vendor : public ScriptedAI
+{
+    npc_traveler_mammoth_vendor(Creature* creature) : ScriptedAI(creature) { }
+
+    bool _hasEjected = false;
+    ObjectGuid _playerGuid;
+
+    void Reset() override
+    {
+        _hasEjected = false;
+        _playerGuid.Clear();
+
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && !me->GetMap()->IsBattlegroundOrArena())
+            me->SetFaction(FACTION_FRIENDLY);
+
+        me->m_Events.KillAllEvents(false);
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (_playerGuid.IsEmpty() && me->GetVehicle())
+        {
+            _playerGuid = me->GetVehicleBase()->GetGUID();
+        }
+        if (!me->GetVehicle() && !_hasEjected)
+        {
+            _hasEjected = true;
+
+            me->m_Events.AddEventAtOffset([this] {
+                if (Unit* driver = ObjectAccessor::GetUnit(*me, _playerGuid))
+                    me->SetFacingToObject(driver);
+            }, 2500ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_VENDOR_MASK);
+            }, 3300ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_DISMISS);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+            }, 4100ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                me->DespawnOrUnsummon();
+            }, 10200ms);
+        }
+    }
+};
+
 void AddSC_npcs_special()
 {
     new npc_elder_clearwater();
@@ -2705,4 +2759,5 @@ void AddSC_npcs_special()
     RegisterCreatureAI(npc_arcanite_dragonling);
     RegisterCreatureAI(npc_crashin_thrashin_robot);
     RegisterCreatureAI(npc_controller);
+    RegisterCreatureAI(npc_traveler_mammoth_vendor);
 }

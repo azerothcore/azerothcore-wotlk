@@ -596,7 +596,7 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
         DisableSpline();
 
         if (movespline->HasAnimation() && IsCreature() && IsAlive())
-            SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, movespline->GetAnimationType());
+            SetAnimTier(AnimTier(movespline->GetAnimationType()));
     }
 
     // pussywizard: update always! not every 400ms, because movement generators need the actual position
@@ -628,7 +628,7 @@ void Unit::UpdateSplinePosition()
     //if (HasUnitState(UNIT_STATE_CANNOT_TURN))
     //    loc.orientation = GetOrientation();
 
-    if (IsPlayer())
+    if (IsPlayer() || IsPet())
         UpdatePosition(loc.x, loc.y, loc.z, loc.orientation);
     else
         ToCreature()->SetPosition(loc.x, loc.y, loc.z, loc.orientation);
@@ -1345,7 +1345,7 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
     }
 
     int32 cleanDamage = 0;
-    if (Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
+    if (!spellInfo->HasAttribute(SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS) && Unit::IsDamageReducedByArmor(damageSchoolMask, spellInfo))
     {
         int32 oldDamage = damage;
         damage = Unit::CalcArmorReducedDamage(this, victim, damage, spellInfo, 0, attackType);
@@ -2148,7 +2148,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
 
 float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim)
 {
-    float victimResistance = float(victim->GetResistance(schoolMask));
+    float victimResistance = static_cast<float>(victim->GetResistance(schoolMask));
     if (owner)
     {
         // Xinef: pets inherit 100% of masters penetration
@@ -2156,28 +2156,28 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
         Player const* player = owner->GetSpellModOwner();
         if (player && owner->GetEntry() != WORLD_TRIGGER)
         {
-            victimResistance += float(player->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
-            victimResistance -= float(player->GetSpellPenetrationItemMod());
+            victimResistance += static_cast<float>(player->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
+            victimResistance -= static_cast<float>(player->GetSpellPenetrationItemMod());
         }
         else
-            victimResistance += float(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
+            victimResistance += static_cast<float>(owner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask));
     }
 
     victimResistance = std::max(victimResistance, 0.0f);
     if (owner)
-        victimResistance += std::max((float(victim->GetLevel()) - float(owner->GetLevel())) * 5.0f, 0.0f);
+        victimResistance += std::max(static_cast<float>(victim->GetLevel() - owner->GetLevel()) * 5.0f, 0.0f);
 
-    static uint32 const BOSS_LEVEL = 83;
-    static float const BOSS_RESISTANCE_CONSTANT = 510.0f;
-    uint32 level = victim->GetLevel();
+    float level = static_cast<float>(victim->GetLevel());
     float resistanceConstant = 0.0f;
 
-    if (level == BOSS_LEVEL)
-        resistanceConstant = BOSS_RESISTANCE_CONSTANT;
+    if (level > 60.0f)
+        resistanceConstant = 150.0f + (level - 60.0f) * (level - 67.5f);
+    else if (level > 20.0f)
+        resistanceConstant = 50.0f + (level - 20.0f) * 2.5f;
     else
-        resistanceConstant = level * 5.0f;
+        resistanceConstant = 50.0f;
 
-    return victimResistance / (victimResistance + resistanceConstant);
+    return std::min(victimResistance / (victimResistance + resistanceConstant), 0.75f);
 }
 
 void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
@@ -2226,15 +2226,19 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         {
             if (attacker)
             {
-                AuraEffectList const& ResIgnoreAurasAb = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
-                for (AuraEffectList::const_iterator j = ResIgnoreAurasAb.begin(); j != ResIgnoreAurasAb.end(); ++j)
-                    if (((*j)->GetMiscValue() & schoolMask) && (*j)->IsAffectedOnSpell(spellInfo))
-                        AddPct(damageResisted, -(*j)->GetAmount());
+                float mult = attacker->GetTotalAuraMultiplier(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST, [schoolMask, spellInfo](AuraEffect const* aurEff)
+                {
+                    if (!(aurEff->GetMiscValue() & schoolMask))
+                        return false;
 
-                AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-                for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-                    if ((*j)->GetMiscValue() & schoolMask)
-                        AddPct(damageResisted, -(*j)->GetAmount());
+                    if (!aurEff->IsAffectedOnSpell(spellInfo))
+                        return false;
+
+                    return true;
+                });
+                damageResisted -= damageResisted * (mult - 1.0f);
+                mult = attacker->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_IGNORE_TARGET_RESIST, schoolMask);
+                damageResisted -= damageResisted * (mult - 1.0f);
             }
 
             // pussywizard:
@@ -2254,25 +2258,17 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
     float auraAbsorbMod = 0;
     if (attacker)
     {
-        AuraEffectList const& AbsIgnoreAurasA = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_TARGET_ABSORB_SCHOOL);
-        for (AuraEffectList::const_iterator itr = AbsIgnoreAurasA.begin(); itr != AbsIgnoreAurasA.end(); ++itr)
+        auraAbsorbMod = attacker->GetMaxPositiveAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_ABSORB_SCHOOL, schoolMask);
+        auraAbsorbMod = std::max(auraAbsorbMod, float(attacker->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL, [spellInfo, schoolMask](AuraEffect const* aurEff)
         {
-            if (!((*itr)->GetMiscValue() & schoolMask))
-                continue;
+            if (!(aurEff->GetMiscValue() & schoolMask))
+                return false;
 
-            if ((*itr)->GetAmount() > auraAbsorbMod)
-                auraAbsorbMod = float((*itr)->GetAmount());
-        }
+            if (!aurEff->IsAffectedOnSpell(spellInfo))
+                return false;
 
-        AuraEffectList const& AbsIgnoreAurasB = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_TARGET_ABILITY_ABSORB_SCHOOL);
-        for (AuraEffectList::const_iterator itr = AbsIgnoreAurasB.begin(); itr != AbsIgnoreAurasB.end(); ++itr)
-        {
-            if (!((*itr)->GetMiscValue() & schoolMask))
-                continue;
-
-            if (((*itr)->GetAmount() > auraAbsorbMod) && (*itr)->IsAffectedOnSpell(spellInfo))
-                auraAbsorbMod = float((*itr)->GetAmount());
-        }
+            return true;
+        })));
         RoundToInterval(auraAbsorbMod, 0.0f, 100.0f);
     }
 
@@ -3977,6 +3973,10 @@ void Unit::_UpdateAutoRepeatSpell()
 
         // Reset attack
         resetAttackTimer(RANGED_ATTACK);
+
+        // Blizzlike: Reset melee swing timers when performing ranged attack
+        resetAttackTimer(BASE_ATTACK);
+        resetAttackTimer(OFF_ATTACK);
     }
 }
 
@@ -5173,7 +5173,7 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, U
                 // Xinef: if stealer has same aura
                 Aura* curAura = stealer->GetAura(aura->GetId());
                 if (!curAura || (!curAura->IsPermanent() && curAura->GetDuration() < (int32)dur))
-                    if (Aura* newAura = Aura::TryRefreshStackOrCreate(aura->GetSpellInfo(), effMask, stealer, nullptr, &baseDamage[0], nullptr, aura->GetCasterGUID()))
+                    if (Aura* newAura = Aura::TryRefreshStackOrCreate(aura->GetSpellInfo(), effMask, stealer, nullptr, &baseDamage[0], nullptr, stealer->GetGUID()))
                     {
                         // created aura must not be single target aura,, so stealer won't loose it on recast
                         if (newAura->IsSingleTarget())
@@ -5185,6 +5185,13 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, U
                         }
                         // FIXME: using aura->GetMaxDuration() maybe not blizzlike but it fixes stealing of spells like Innervate
                         newAura->SetLoadedState(aura->GetMaxDuration(), int32(dur), stealCharge ? 1 : aura->GetCharges(), 1, recalculateMask, &damage[0]);
+
+                        // Reset periodic timers so stolen HoTs tick properly
+                        // For stolen auras we need fresh tick counters since no ticks have occurred yet
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (AuraEffect* aurEff = newAura->GetEffect(i))
+                                aurEff->ResetPeriodic(true);
+
                         newAura->ApplyForTargets();
                     }
             }
@@ -6557,7 +6564,6 @@ void Unit::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log)
     data << uint8 (log->physicalLog);                       // if 1, then client show spell name (example: %s's ranged shot hit %s for %u school or %s suffers %u school damage from %s's spell_name
     data << uint8 (log->unused);                            // unused
     data << uint32(log->blocked);                           // blocked
-    data << uint32(log->HitInfo);
     data << uint32(log->HitInfo);
     data << uint8(log->HitInfo & (SPELL_HIT_TYPE_CRIT_DEBUG | SPELL_HIT_TYPE_HIT_DEBUG | SPELL_HIT_TYPE_ATTACK_TABLE_DEBUG));
     //if (log->HitInfo & SPELL_HIT_TYPE_CRIT_DEBUG)
@@ -11114,6 +11120,8 @@ void Unit::SetCharm(Unit* charm, bool apply)
     }
     else
     {
+        charm->ClearUnitState(UNIT_STATE_CHARMED);
+
         if (IsPlayer())
         {
             if (!RemoveGuidValue(UNIT_FIELD_CHARM, charm->GetGUID()))
@@ -11859,13 +11867,12 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
     int32 DoneAdvertisedBenefit = 0;
-    AuraEffectList const& mOverrideClassScript = owner->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-    for (AuraEffectList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
+    DoneAdvertisedBenefit += owner->GetTotalAuraModifier(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS, [spellProto](AuraEffect const* aurEff)
     {
-        if (!(*i)->IsAffectedOnSpell(spellProto))
-            continue;
+        if (!aurEff->IsAffectedOnSpell(spellProto))
+            return false;
 
-        switch ((*i)->GetMiscValue())
+        switch (aurEff->GetMiscValue())
         {
             case 4418: // Increased Shock Damage
             case 4554: // Increased Lightning Damage
@@ -11875,12 +11882,14 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             case 5148: // Idol of the Shooting Star
             case 6008: // Increased Lightning Damage
             case 8627: // Totem of Hex
-            {
-                DoneAdvertisedBenefit += (*i)->GetAmount();
+                return true;
                 break;
-            }
+            default:
+                break;
         }
-    }
+
+        return false;
+    });
 
     // Custom scripted damage
     switch (spellProto->SpellFamilyName)
@@ -13465,7 +13474,12 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
 
         if (mechanicMask)
         {
-            TakenTotalMod *= GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, mechanicMask);
+            TakenTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, [mechanicMask](AuraEffect const* aurEff) -> bool
+            {
+                if (mechanicMask & uint32(1 << (aurEff->GetMiscValue())))
+                    return true;
+                return false;
+            });
         }
     }
 
@@ -15277,6 +15291,11 @@ float Unit::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spell
     }
 
     return spellInfo->GetMinRange(!IsHostileTo(target));
+}
+
+void Unit::SetAnimTier(AnimTier animTier)
+{
+    SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, uint8(animTier));
 }
 
 uint32 Unit::GetCreatureType() const
@@ -18604,7 +18623,7 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     ASSERT(type != CHARM_TYPE_POSSESS || charmer->IsPlayer());
     if (type == CHARM_TYPE_VEHICLE && !IsVehicle()) // pussywizard
         throw 1;
-    ASSERT((type == CHARM_TYPE_VEHICLE) == IsVehicle());
+    ASSERT((type == CHARM_TYPE_VEHICLE) == (GetVehicleKit() && GetVehicleKit()->IsControllableVehicle()));
 
     LOG_DEBUG("entities.unit", "SetCharmedBy: charmer {} ({}), charmed {} ({}), type {}.",
         charmer->GetEntry(), charmer->GetGUID().ToString(), GetEntry(), GetGUID().ToString(), uint32(type));
@@ -18776,6 +18795,8 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     }
     else if (IsPlayer())
         RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+
+    AddUnitState(UNIT_STATE_CHARMED);
 
     if (Creature* creature = ToCreature())
         creature->RefreshSwimmingFlag();
@@ -20943,7 +20964,7 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
             appendValue &= ~UNIT_NPC_FLAG_VENDOR_MASK;
         }
 
-        if (!creature->IsValidTrainerForPlayer(target, &appendValue))
+        if (!target->CanSeeTrainer(creature))
             appendValue &= ~UNIT_NPC_FLAG_TRAINER;
 
         valuesUpdateBuf.put(posPointers.UnitNPCFlagsPos, appendValue);

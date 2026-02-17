@@ -506,6 +506,9 @@ namespace lfg
         uint8 RemovePlayerFromGroup(ObjectGuid gguid, ObjectGuid guid);
         /// Adds player to group
         void AddPlayerToGroup(ObjectGuid gguid, ObjectGuid guid);
+        /// Store player that selected random queue to group
+        void AddPlayerQueuedForRandomDungeonToGroup(ObjectGuid gguid, ObjectGuid guid);
+        bool IsPlayerQueuedForRandomDungeon(ObjectGuid guid);
         /// Xinef: Set Random Players Count
         void SetRandomPlayersCount(ObjectGuid guid, uint8 count);
         /// Xinef: Get Random Players Count
@@ -518,6 +521,8 @@ namespace lfg
         LfgUpdateData GetLfgStatus(ObjectGuid guid);
         /// Checks if Seasonal dungeon is active
         bool IsSeasonActive(uint32 dungeonId);
+        /// Checks if given dungeon map is disabled
+        bool IsDungeonDisabled(uint32 mapId, Difficulty difficulty) const;
         /// Gets the random dungeon reward corresponding to given dungeon and player level
         LfgReward const* GetRandomDungeonReward(uint32 dungeon, uint8 level);
         /// Returns all random and seasonal dungeons for given level and expansion
@@ -589,7 +594,7 @@ namespace lfg
         void DecreaseKicksLeft(ObjectGuid guid);
         void SetState(ObjectGuid guid, LfgState state);
         void SetCanOverrideRBState(ObjectGuid guid, bool val);
-        void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap);
+        void GetCompatibleDungeons(LfgDungeonSet& dungeons, LfgGuidSet const& players, LfgLockPartyMap& lockMap, uint32 randomDungeonId = 0);
         void _SaveToDB(ObjectGuid guid);
         LFGDungeonData const* GetLFGDungeon(uint32 id);
 
