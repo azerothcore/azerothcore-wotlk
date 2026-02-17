@@ -175,6 +175,14 @@ enum Misc
     ACTION_FORCE_CHANGE_LOCK                = 2,
 
     POINT_CHRONOS                           = 1,
+
+    // Stephanie Sindree crowd
+    NPC_STEPHANIE_SINDREE                   = 31019,
+    SAY_STEPHANIE_CROWD_1                   = 4,
+    SAY_STEPHANIE_CROWD_2                   = 5,
+    SAY_STEPHANIE_CROWD_3                   = 6,
+    SAY_STEPHANIE_RESPONSE_1                = 0,
+    SAY_STEPHANIE_RESPONSE_2                = 1,
 };
 
 enum Events
@@ -1518,12 +1526,19 @@ public:
             pInstance = me->GetInstanceScript();
             if (!pInstance || pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_FINISHED_CITY_INTRO)
                 allowTimer++;
+
+            isStephanieCrowd = me->GetEntry() == NPC_CITY_MAN3 && me->GetDistance(2149.56f, 1339.46f, 132.531f) < 10.0f;
+            stephanieDialogueTimer = isStephanieCrowd ? urand(5000, 15000) : 0;
+            stephanieDialoguePhase = 0;
         }
 
         bool locked;
         uint32 changeTimer;
         InstanceScript* pInstance;
         uint32 allowTimer;
+        bool isStephanieCrowd;
+        uint32 stephanieDialogueTimer;
+        uint8 stephanieDialoguePhase;
 
         void Reset() override
         {
@@ -1583,6 +1598,48 @@ public:
         void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
+
+            if (isStephanieCrowd && stephanieDialogueTimer)
+            {
+                if (stephanieDialogueTimer <= diff)
+                {
+                    Creature* stephanie = me->FindNearestCreature(NPC_STEPHANIE_SINDREE, 10.0f);
+                    switch (stephanieDialoguePhase)
+                    {
+                        case 0:
+                            Talk(SAY_STEPHANIE_CROWD_1);
+                            stephanieDialogueTimer = 5000;
+                            stephanieDialoguePhase = 1;
+                            break;
+                        case 1:
+                            if (stephanie)
+                                stephanie->AI()->Talk(SAY_STEPHANIE_RESPONSE_1);
+                            stephanieDialogueTimer = 5000;
+                            stephanieDialoguePhase = 2;
+                            break;
+                        case 2:
+                            Talk(SAY_STEPHANIE_CROWD_2);
+                            stephanieDialogueTimer = 5000;
+                            stephanieDialoguePhase = 3;
+                            break;
+                        case 3:
+                            if (stephanie)
+                                stephanie->AI()->Talk(SAY_STEPHANIE_RESPONSE_2);
+                            stephanieDialogueTimer = 8000;
+                            stephanieDialoguePhase = 4;
+                            break;
+                        case 4:
+                            Talk(SAY_STEPHANIE_CROWD_3);
+                            stephanieDialogueTimer = urand(45000, 60000);
+                            stephanieDialoguePhase = 0;
+                            break;
+                    }
+                }
+                else
+                    stephanieDialogueTimer -= diff;
+
+                return;
+            }
 
             if (allowTimer)
             {
