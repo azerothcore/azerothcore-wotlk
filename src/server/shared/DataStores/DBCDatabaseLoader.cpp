@@ -43,7 +43,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     // spell_dbc remains in World database for legacy/compatibility reasons
     // All other DBC tables are in the DBC database
     bool useWorldDB = (std::string(_sqlTableName) == "spell_dbc");
-    bool enableDBCDatabase = sConfigMgr->GetOption<bool>("EnableDBCDatabase", false);
+    bool enableDBCDatabase = sConfigMgr->GetOption<bool>("EnableDBCDatabase", true);
 
     // Query DBC database first (or World for spell_dbc)
     QueryResult result = useWorldDB ? WorldDatabase.Query(query) : DBCDatabase.Query(query);
