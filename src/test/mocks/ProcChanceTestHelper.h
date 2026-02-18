@@ -185,6 +185,31 @@ public:
     static constexpr uint32 WEAPON_SPEED_NORMAL_SWORD = 2500;  // 2.5 sec
     static constexpr uint32 WEAPON_SPEED_SLOW_2H = 3300;       // 3.3 sec
     static constexpr uint32 WEAPON_SPEED_VERY_SLOW = 3800;     // 3.8 sec
+    static constexpr uint32 WEAPON_SPEED_STAFF = 3600;         // 3.6 sec (common feral staff)
+
+    /**
+     * @brief Shapeshift form base attack speeds (from SpellShapeshiftForm.dbc)
+     */
+    static constexpr uint32 FORM_SPEED_CAT = 1000;             // Cat Form: 1.0 sec
+    static constexpr uint32 FORM_SPEED_BEAR = 2500;            // Bear/Dire Bear: 2.5 sec
+
+    /**
+     * @brief Simulate effective procs per minute
+     *
+     * Given a per-swing chance and the actual swing interval, calculate
+     * how many procs occur per minute on average.
+     *
+     * @param chancePerSwing Proc chance per swing (0-100+)
+     * @param actualSwingSpeedMs Actual time between swings in milliseconds
+     * @return Average procs per minute
+     */
+    static float CalculateEffectivePPM(float chancePerSwing, uint32 actualSwingSpeedMs)
+    {
+        if (actualSwingSpeedMs == 0)
+            return 0.0f;
+        float swingsPerMinute = 60000.0f / static_cast<float>(actualSwingSpeedMs);
+        return swingsPerMinute * (chancePerSwing / 100.0f);
+    }
 
     /**
      * @brief Common PPM values from spell_proc database

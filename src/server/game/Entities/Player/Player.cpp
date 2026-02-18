@@ -7372,7 +7372,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (entry)
             {
                 if (entry->PPMChance)
-                    chance = GetPPMProcChance(proto->Delay, entry->PPMChance, spellInfo);
+                    chance = GetPPMProcChance(GetAttackTime(attType), entry->PPMChance, spellInfo);
                 else if (entry->customChance)
                     chance = (float)entry->customChance;
             }

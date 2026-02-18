@@ -224,3 +224,154 @@ TEST_F(SpellProcPPMTest, EdgeCase_FractionalPPM)
     // 2400 * 2.5 / 600 = 10%
     EXPECT_NEAR(result, 10.0f, 0.01f);
 }
+
+// =============================================================================
+// Shapeshifter Enchant PPM Bug Tests
+//
+// Player::CastItemCombatSpell has two PPM paths:
+//   1) Item spells (line ~7308): uses GetAttackTime(attType) - CORRECT
+//   2) Enchantment procs (line ~7375): uses proto->Delay    - BUG
+//
+// For non-shapeshifted players these return the same value, but for
+// Feral Druids proto->Delay reflects the weapon (e.g. 3.6s staff)
+// while GetAttackTime returns the form speed (1.0s Cat, 2.5s Bear).
+// =============================================================================
+
+TEST_F(SpellProcPPMTest, ShapeshiftBug_NonShifted_NoDiscrepancy)
+{
+    // A warrior with a 3.6s weapon: proto->Delay == GetAttackTime()
+    constexpr uint32 WEAPON_DELAY = ProcChanceTestHelper::WEAPON_SPEED_STAFF;
+    constexpr float MONGOOSE_PPM = 1.0f;
+
+    _unit->SetAttackTime(0, WEAPON_DELAY);
+
+    float chanceFromProtoDelay = ProcChanceTestHelper::CalculatePPMChance(WEAPON_DELAY, MONGOOSE_PPM);
+    float chanceFromGetAttackTime = ProcChanceTestHelper::CalculatePPMChance(
+        _unit->GetAttackTime(0), MONGOOSE_PPM);
+
+    EXPECT_FLOAT_EQ(chanceFromProtoDelay, chanceFromGetAttackTime)
+        << "Non-shapeshifted: proto->Delay and GetAttackTime() should be identical";
+}
+
+TEST_F(SpellProcPPMTest, ShapeshiftBug_CatForm_ProtoDelayInflatesChance)
+{
+    // Druid in Cat Form with a 3.6s staff equipped
+    // proto->Delay = 3600ms (the staff), GetAttackTime = 1000ms (Cat Form)
+    constexpr uint32 STAFF_DELAY = ProcChanceTestHelper::WEAPON_SPEED_STAFF;
+    constexpr uint32 CAT_SPEED = ProcChanceTestHelper::FORM_SPEED_CAT;
+    constexpr float MONGOOSE_PPM = 1.0f;
+
+    _unit->SetAttackTime(0, CAT_SPEED);
+
+    float buggyChance = ProcChanceTestHelper::CalculatePPMChance(STAFF_DELAY, MONGOOSE_PPM);
+    float correctChance = ProcChanceTestHelper::CalculatePPMChance(CAT_SPEED, MONGOOSE_PPM);
+
+    // proto->Delay gives 3600 * 1 / 600 = 6.0% per swing
+    EXPECT_NEAR(buggyChance, 6.0f, 0.01f);
+    // GetAttackTime gives 1000 * 1 / 600 = 1.67% per swing
+    EXPECT_NEAR(correctChance, 1.67f, 0.01f);
+
+    // The bug inflates chance per swing by weapon_speed / form_speed
+    EXPECT_NEAR(buggyChance / correctChance,
+        static_cast<float>(STAFF_DELAY) / static_cast<float>(CAT_SPEED), 0.01f)
+        << "Bug inflates per-swing chance by ratio of weapon speed to form speed";
+}
+
+TEST_F(SpellProcPPMTest, ShapeshiftBug_CatForm_EffectivePPMIs3Point6x)
+{
+    // Cat Form attacks every 1.0s (60 swings/min)
+    // With the buggy 6.0% chance per swing: 60 * 0.06 = 3.6 procs/min
+    // With the correct 1.67% chance: 60 * 0.0167 = 1.0 procs/min
+    constexpr uint32 STAFF_DELAY = ProcChanceTestHelper::WEAPON_SPEED_STAFF;
+    constexpr uint32 CAT_SPEED = ProcChanceTestHelper::FORM_SPEED_CAT;
+    constexpr float MONGOOSE_PPM = 1.0f;
+
+    float buggyChance = ProcChanceTestHelper::CalculatePPMChance(STAFF_DELAY, MONGOOSE_PPM);
+    float correctChance = ProcChanceTestHelper::CalculatePPMChance(CAT_SPEED, MONGOOSE_PPM);
+
+    float buggyEffectivePPM = ProcChanceTestHelper::CalculateEffectivePPM(buggyChance, CAT_SPEED);
+    float correctEffectivePPM = ProcChanceTestHelper::CalculateEffectivePPM(correctChance, CAT_SPEED);
+
+    // Buggy: effective PPM is 3.6 instead of 1.0
+    EXPECT_NEAR(buggyEffectivePPM, 3.6f, 0.01f)
+        << "Bug: Cat Form Mongoose procs 3.6 times/min instead of 1.0";
+    // Correct: effective PPM matches the intended value
+    EXPECT_NEAR(correctEffectivePPM, MONGOOSE_PPM, 0.01f)
+        << "Fix: Cat Form Mongoose should proc exactly 1.0 times/min";
+}
+
+TEST_F(SpellProcPPMTest, ShapeshiftBug_BearForm_ProtoDelayInflatesChance)
+{
+    // Bear Form with 3.6s staff: proto->Delay = 3600, GetAttackTime = 2500
+    constexpr uint32 STAFF_DELAY = ProcChanceTestHelper::WEAPON_SPEED_STAFF;
+    constexpr uint32 BEAR_SPEED = ProcChanceTestHelper::FORM_SPEED_BEAR;
+    constexpr float MONGOOSE_PPM = 1.0f;
+
+    _unit->SetAttackTime(0, BEAR_SPEED);
+
+    float buggyChance = ProcChanceTestHelper::CalculatePPMChance(STAFF_DELAY, MONGOOSE_PPM);
+    float correctChance = ProcChanceTestHelper::CalculatePPMChance(BEAR_SPEED, MONGOOSE_PPM);
+
+    float buggyEffectivePPM = ProcChanceTestHelper::CalculateEffectivePPM(buggyChance, BEAR_SPEED);
+    float correctEffectivePPM = ProcChanceTestHelper::CalculateEffectivePPM(correctChance, BEAR_SPEED);
+
+    // Buggy: 1.44 PPM instead of 1.0
+    EXPECT_NEAR(buggyEffectivePPM, 1.44f, 0.01f)
+        << "Bug: Bear Form Mongoose procs 1.44 times/min instead of 1.0";
+    EXPECT_NEAR(correctEffectivePPM, MONGOOSE_PPM, 0.01f)
+        << "Fix: Bear Form Mongoose should proc exactly 1.0 times/min";
+}
+
+TEST_F(SpellProcPPMTest, ShapeshiftBug_CatForm_FieryWeapon6PPM)
+{
+    // Fiery Weapon (6 PPM) in Cat Form with 3.6s staff
+    constexpr uint32 STAFF_DELAY = ProcChanceTestHelper::WEAPON_SPEED_STAFF;
+    constexpr uint32 CAT_SPEED = ProcChanceTestHelper::FORM_SPEED_CAT;
+    constexpr float FIERY_PPM = 6.0f;
+
+    float buggyChance = ProcChanceTestHelper::CalculatePPMChance(STAFF_DELAY, FIERY_PPM);
+    float correctChance = ProcChanceTestHelper::CalculatePPMChance(CAT_SPEED, FIERY_PPM);
+
+    float buggyEffectivePPM = ProcChanceTestHelper::CalculateEffectivePPM(buggyChance, CAT_SPEED);
+    float correctEffectivePPM = ProcChanceTestHelper::CalculateEffectivePPM(correctChance, CAT_SPEED);
+
+    // Buggy: 36% chance per swing → 21.6 procs/min instead of 6.0
+    EXPECT_NEAR(buggyChance, 36.0f, 0.01f);
+    EXPECT_NEAR(correctChance, 10.0f, 0.01f);
+    EXPECT_NEAR(buggyEffectivePPM, 21.6f, 0.01f)
+        << "Bug: Cat Form Fiery Weapon procs 21.6 times/min instead of 6.0";
+    EXPECT_NEAR(correctEffectivePPM, FIERY_PPM, 0.01f)
+        << "Fix: Cat Form Fiery Weapon should proc exactly 6.0 times/min";
+}
+
+TEST_F(SpellProcPPMTest, ShapeshiftBug_ItemSpellPath_AlreadyCorrect)
+{
+    // The item spell PPM path (line ~7308) already uses GetAttackTime.
+    // Verify that using GetAttackTime gives correct PPM for all forms.
+    constexpr float PPM = 1.0f;
+
+    struct FormScenario
+    {
+        const char* name;
+        uint32 formSpeed;
+    };
+
+    FormScenario scenarios[] = {
+        {"Normal (3.6s weapon)", ProcChanceTestHelper::WEAPON_SPEED_STAFF},
+        {"Cat Form", ProcChanceTestHelper::FORM_SPEED_CAT},
+        {"Bear Form", ProcChanceTestHelper::FORM_SPEED_BEAR},
+    };
+
+    for (auto const& scenario : scenarios)
+    {
+        _unit->SetAttackTime(0, scenario.formSpeed);
+
+        float chance = ProcChanceTestHelper::CalculatePPMChance(
+            _unit->GetAttackTime(0), PPM);
+        float effectivePPM = ProcChanceTestHelper::CalculateEffectivePPM(
+            chance, scenario.formSpeed);
+
+        EXPECT_NEAR(effectivePPM, PPM, 0.01f)
+            << scenario.name << ": GetAttackTime-based PPM should always match intended PPM";
+    }
+}
