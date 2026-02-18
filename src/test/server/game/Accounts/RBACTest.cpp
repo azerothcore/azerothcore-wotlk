@@ -78,7 +78,7 @@ TEST_F(RBACPermissionTest, AddLinkedPermission_AddsToSet)
     permission->AddLinkedPermission(TEST_PERM_2);
     permission->AddLinkedPermission(TEST_PERM_3);
 
-    const auto& linked = permission->GetLinkedPermissions();
+    auto const& linked = permission->GetLinkedPermissions();
     EXPECT_EQ(linked.size(), 2u);
     EXPECT_TRUE(linked.count(TEST_PERM_2) > 0);
     EXPECT_TRUE(linked.count(TEST_PERM_3) > 0);
@@ -339,7 +339,7 @@ TEST_F(RBACLinkedPermissionsTest, GrantedPermission_IsInGrantedList)
 {
     rbacData->GrantPermission(TEST_PERM_1);
 
-    const auto& granted = rbacData->GetGrantedPermissions();
+    auto const& granted = rbacData->GetGrantedPermissions();
     EXPECT_TRUE(granted.count(TEST_PERM_1) > 0);
 }
 
@@ -347,7 +347,7 @@ TEST_F(RBACLinkedPermissionsTest, DeniedPermission_IsInDeniedList)
 {
     rbacData->DenyPermission(TEST_PERM_1);
 
-    const auto& denied = rbacData->GetDeniedPermissions();
+    auto const& denied = rbacData->GetDeniedPermissions();
     EXPECT_TRUE(denied.count(TEST_PERM_1) > 0);
 }
 
