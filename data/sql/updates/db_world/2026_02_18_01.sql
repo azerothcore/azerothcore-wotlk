@@ -1,3 +1,4 @@
+-- DB update 2026_02_18_00 -> 2026_02_18_01
 -- QAston Proc System - Base spell_proc entries
 -- Port from TrinityCore QAston proc system commits
 

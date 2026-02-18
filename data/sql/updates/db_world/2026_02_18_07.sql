@@ -1,3 +1,4 @@
+-- DB update 2026_02_18_06 -> 2026_02_18_07
 --
 -- The Lightning Capacitor, Thunder Capacitor, Reign of the Dead/Unliving trinkets
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (37657, 54841, 67712, 67758);

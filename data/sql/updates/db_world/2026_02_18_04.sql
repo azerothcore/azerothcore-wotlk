@@ -1,3 +1,4 @@
+-- DB update 2026_02_18_03 -> 2026_02_18_04
 -- Register Nether Protection spell script
 DELETE FROM `spell_script_names` WHERE `spell_id` = -30299;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES

@@ -1,3 +1,4 @@
+-- DB update 2026_02_18_01 -> 2026_02_18_02
 -- Lock and Load - Add spell_proc entry with correct SpellPhaseMask for periodic damage procs
 -- SpellPhaseMask changed from 4 (PROC_SPELL_PHASE_FINISH) to 2 (PROC_SPELL_PHASE_HIT)
 -- This allows Black Arrow, Explosive Trap, and Immolation Trap periodic damage to trigger Lock and Load
