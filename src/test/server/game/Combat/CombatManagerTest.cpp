@@ -101,6 +101,7 @@ protected:
 // SetInCombatWith Tests
 // ============================================================================
 
+// cppcheck-suppress syntaxError
 TEST_F(CombatManagerIntegrationTest, SetInCombatWith_CreatesReference)
 {
     EXPECT_FALSE(_creatureA->TestGetCombatMgr().HasCombat());

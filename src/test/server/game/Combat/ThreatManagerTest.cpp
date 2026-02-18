@@ -102,6 +102,7 @@ protected:
 // Static Method Tests
 // ============================================================================
 
+// cppcheck-suppress syntaxError
 TEST_F(ThreatManagerIntegrationTest, CanHaveThreatList_NullUnit_ReturnsFalse)
 {
     EXPECT_FALSE(ThreatManager::CanHaveThreatList(nullptr));
