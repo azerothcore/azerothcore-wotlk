@@ -1,3 +1,4 @@
+-- DB update 2026_02_18_07 -> 2026_02_18_08
 -- Fix Slaves to Saronite RP scripting (Issue #24157)
 -- https://github.com/azerothcore/azerothcore-wotlk/issues/24157
 --
