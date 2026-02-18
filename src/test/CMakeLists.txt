@@ -15,7 +15,7 @@ CollectSourceFiles(
 )
 
 include_directories(
-        "mocks"
+        "${CMAKE_CURRENT_SOURCE_DIR}/mocks"
 )
 
 add_executable(
