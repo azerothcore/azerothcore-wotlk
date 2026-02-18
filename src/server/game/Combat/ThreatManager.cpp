@@ -94,7 +94,7 @@ void ThreatReference::UpdateOffline()
 
 /*static*/ bool ThreatReference::FlagsAllowFighting(Unit const* a, Unit const* b)
 {
-    if (a->GetTypeId() == TYPEID_UNIT && a->ToCreature()->IsTrigger())
+    if (a->IsCreature() && a->ToCreature()->IsTrigger())
         return false;
     if (a->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
     {
@@ -854,26 +854,6 @@ void ThreatManager::UnregisterRedirectThreat(uint32 spellId, ObjectGuid const& v
     victimMap.erase(it2);
     if (victimMap.empty())
         _redirectRegistry.erase(it);
-    UpdateRedirectInfo();
-}
-
-Unit* ThreatManager::GetAnyRedirectTarget() const
-{
-    if (_redirectInfo.empty())
-        return nullptr;
-    return ObjectAccessor::GetUnit(*_owner, _redirectInfo.front().first);
-}
-
-void ThreatManager::ModifyRedirectPercentage(int32 pctDelta)
-{
-    for (auto& [spellId, victimMap] : _redirectRegistry)
-    {
-        for (auto& [guid, pct] : victimMap)
-        {
-            int32 newPct = int32(pct) + pctDelta;
-            pct = uint32(std::max(0, std::min(100, newPct)));
-        }
-    }
     UpdateRedirectInfo();
 }
 

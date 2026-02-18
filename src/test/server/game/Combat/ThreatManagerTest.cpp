@@ -921,61 +921,6 @@ TEST_F(ThreatManagerIntegrationTest,
 }
 
 TEST_F(ThreatManagerIntegrationTest,
-       RedirectThreat_ModifyPercentage_AdjustsRedirect)
-{
-    TestCreature* creatureC = new TestCreature();
-    creatureC->SetupForCombatTest(_map, 3, 12347);
-    creatureC->SetFaction(90002);
-
-    // Pre-establish C on A's threat list (ObjectAccessor unavailable in tests)
-    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 0.0f, nullptr, true, true);
-
-    // Register 50% redirect
-    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
-        34477, creatureC->GetGUID(), 50);
-
-    // Increase by +20% to 70%
-    _creatureB->TestGetThreatMgr().ModifyRedirectPercentage(20);
-
-    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
-
-    // B should have 30 (100 - 70%), C should have 70
-    EXPECT_FLOAT_EQ(
-        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 30.0f);
-    EXPECT_FLOAT_EQ(
-        _creatureA->TestGetThreatMgr().GetThreat(creatureC), 70.0f);
-
-    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
-    creatureC->CleanupCombatState();
-    delete creatureC;
-}
-
-TEST_F(ThreatManagerIntegrationTest,
-       RedirectThreat_ModifyPercentage_ClampsToZero)
-{
-    TestCreature* creatureC = new TestCreature();
-    creatureC->SetupForCombatTest(_map, 3, 12347);
-    creatureC->SetFaction(90002);
-
-    // Register 30% redirect, then decrease by 50% (should clamp to 0)
-    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
-        34477, creatureC->GetGUID(), 30);
-    _creatureB->TestGetThreatMgr().ModifyRedirectPercentage(-50);
-
-    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f, nullptr, true);
-
-    // 0% redirect — all threat goes to B
-    EXPECT_FLOAT_EQ(
-        _creatureA->TestGetThreatMgr().GetThreat(_creatureB), 100.0f);
-    // C should not be on the threat list (0% redirect is pruned by UpdateRedirectInfo)
-    EXPECT_FALSE(_creatureA->TestGetThreatMgr().IsThreatenedBy(creatureC));
-
-    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
-    creatureC->CleanupCombatState();
-    delete creatureC;
-}
-
-TEST_F(ThreatManagerIntegrationTest,
        RedirectThreat_UnregisterPerSpellPerVictim)
 {
     TestCreature* creatureC = new TestCreature();
@@ -1008,27 +953,6 @@ TEST_F(ThreatManagerIntegrationTest,
     creatureD->CleanupCombatState();
     delete creatureC;
     delete creatureD;
-}
-
-TEST_F(ThreatManagerIntegrationTest,
-       RedirectThreat_GetAnyRedirectTarget_ReturnsTarget)
-{
-    TestCreature* creatureC = new TestCreature();
-    creatureC->SetupForCombatTest(_map, 3, 12347);
-    creatureC->SetFaction(90002);
-
-    EXPECT_EQ(_creatureB->TestGetThreatMgr().GetAnyRedirectTarget(), nullptr);
-
-    _creatureB->TestGetThreatMgr().RegisterRedirectThreat(
-        34477, creatureC->GetGUID(), 50);
-
-    // GetAnyRedirectTarget uses ObjectAccessor which won't work in tests,
-    // but at least verify HasRedirects is true
-    EXPECT_TRUE(_creatureB->TestGetThreatMgr().HasRedirects());
-
-    _creatureB->TestGetThreatMgr().UnregisterRedirectThreat(34477);
-    creatureC->CleanupCombatState();
-    delete creatureC;
 }
 
 // ============================================================================

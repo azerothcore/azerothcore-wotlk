@@ -187,10 +187,8 @@ public:
     void RegisterRedirectThreat(uint32 spellId, ObjectGuid const& victim, uint32 pct);
     void UnregisterRedirectThreat(uint32 spellId);
     void UnregisterRedirectThreat(uint32 spellId, ObjectGuid const& victim);
-    void ModifyRedirectPercentage(int32 pctDelta);
     bool HasRedirects() const { return !_redirectRegistry.empty(); }
     void ResetAllRedirects() { _redirectRegistry.clear(); UpdateRedirectInfo(); }
-    Unit* GetAnyRedirectTarget() const;
 
 private:
     Unit* const _owner;

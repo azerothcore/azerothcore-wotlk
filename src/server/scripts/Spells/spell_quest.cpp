@@ -1308,6 +1308,7 @@ class spell_q12683_take_sputum_sample : public SpellScript
         {
             uint32 spellId = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
             caster->CastSpell(caster, spellId, true, nullptr);
+            caster->RemoveAurasDueToSpell(reqAuraId); // consuming the sample clears Hydra Sputum
         }
     }
 

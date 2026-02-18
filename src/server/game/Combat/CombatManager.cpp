@@ -184,7 +184,7 @@ bool CombatManager::HasPvECombat() const
 bool CombatManager::HasPvECombatWithPlayers() const
 {
     for (std::pair<ObjectGuid const, CombatReference*> const& reference : _pveRefs)
-        if (!reference.second->IsSuppressedFor(_owner) && reference.second->GetOther(_owner)->GetTypeId() == TYPEID_PLAYER)
+        if (!reference.second->IsSuppressedFor(_owner) && reference.second->GetOther(_owner)->IsPlayer())
             return true;
 
     return false;
@@ -414,14 +414,14 @@ bool CombatManager::UpdateOwnerCombatState() const
     {
         _owner->SetUnitFlag(UNIT_FLAG_IN_COMBAT);
         _owner->AtEnterCombat();
-        if (_owner->GetTypeId() != TYPEID_UNIT)
+        if (!_owner->IsCreature())
             _owner->AtEngage(GetAnyTarget());
     }
     else
     {
         _owner->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
         _owner->AtExitCombat();
-        if (_owner->GetTypeId() != TYPEID_UNIT)
+        if (!_owner->IsCreature())
             _owner->AtDisengage();
     }
 
