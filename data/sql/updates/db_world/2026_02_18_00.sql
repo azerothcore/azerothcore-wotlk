@@ -1,3 +1,4 @@
+-- DB update 2026_02_16_00 -> 2026_02_18_00
 -- Update gameobject 'Valentine Arch (x2.00)' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (201940)) AND (`guid` IN (242244, 242245, 242246, 242247, 242248, 242249, 242250, 242251));
