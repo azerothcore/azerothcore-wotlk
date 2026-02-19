@@ -210,9 +210,11 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             init.SetAnimation(AnimTier::Hover);
             break;
         case WAYPOINT_MOVE_TYPE_RUN:
+            creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
             init.SetWalk(false);
             break;
         case WAYPOINT_MOVE_TYPE_WALK:
+            creature->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
             init.SetWalk(true);
             break;
         default:
