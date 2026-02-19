@@ -90,10 +90,9 @@
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
-#include "Collision/Maps/MapDefines.h" // for Core MMAP version on initiation
-#include "Collision/VMapDefinitions.h" // for Core VMAP version on initiation
-#include "Grids/GridTerrainData.h" // for Core Map version on initiation
-#include <filesystem>
+#include "Collision/Maps/MapDefines.h" // MMAP Version
+#include "Collision/VMapDefinitions.h" // VMAP Version
+#include "Grids/GridTerrainData.h" // Map Version
 #include "WhoListCacheMgr.h"
 #include "WorldGlobals.h"
 #include "WorldPacket.h"
@@ -103,6 +102,7 @@
 #include "WorldStateDefines.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
+#include <filesystem>
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
@@ -278,7 +278,7 @@ void World::LoadConfigSettings(bool reload)
     if (reload)
     {
         if (dataPath != _dataPath)
-            LOG_ERROR("server.loading", "DataDir option can't be changed at worldserver.conf reload, using current value ({}).", _dataPath);
+            LOG_ERROR("server.loading", "DataDir option can't be changed at worldserver.conf reload, using current value {}.", _dataPath);
     }
     else
     {
@@ -289,6 +289,7 @@ void World::LoadConfigSettings(bool reload)
     LOG_INFO("server.loading", "Core Map Version: {}", MapVersionMagic);
     LOG_INFO("server.loading", "Core MMAP Version: {}", MMAP_VERSION);
     LOG_INFO("server.loading", "Core VMAP Version: {}", static_cast<const char*>(VMAP::VMAP_MAGIC));
+    LOG_INFO("server.loading", "{}", GitRevision::GetFullVersion());
     bool const enableIndoor = getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
     bool const enableLOS = sConfigMgr->GetOption<bool>("vmap.enableLOS", true);
     bool const enablePetLOS = getBoolConfig(CONFIG_PET_LOS);
@@ -339,17 +340,17 @@ void World::SetInitialWorldSettings()
         std::error_code ec;
         if (!std::filesystem::exists(dataDir, ec))
         {
-            LOG_ERROR("server.loading", "DataDir '{}' does not exist ({}).", dataDir, ec ? ec.message() : "");
+            LOG_ERROR("server.loading", "DataDir '{}' does not exist {}", dataDir, ec ? ec.message() : "");
             exit(1);
         }
         if (!std::filesystem::is_directory(dataDir, ec))
         {
-            LOG_ERROR("server.loading", "DataDir '{}' is not a directory ({}).", dataDir, ec ? ec.message() : "");
+            LOG_ERROR("server.loading", "DataDir '{}' is not a directory {}", dataDir, ec ? ec.message() : "");
             exit(1);
         }
         if (std::filesystem::is_empty(dataDir, ec))
         {
-            LOG_ERROR("server.loading", "DataDir '{}' exists but is empty ({}).", dataDir, ec ? ec.message() : "");
+            LOG_ERROR("server.loading", "DataDir '{}' exists but is empty {}", dataDir, ec ? ec.message() : "");
             exit(1);
         }
         if (ec)
