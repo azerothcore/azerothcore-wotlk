@@ -1,3 +1,4 @@
+-- DB update 2026_02_19_06 -> 2026_02_19_07
 -- Update gameobject 'Ghostly Cooking Fire' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (195087)) AND (`guid` IN (240012, 240013, 240017, 240018, 240019, 240020, 240021, 240022, 240023, 240024));
