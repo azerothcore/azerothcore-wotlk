@@ -2287,8 +2287,7 @@ float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& event
             uint32 attackSpeed = 0;
             if (!procSpell || procSpell->DmgClass == SPELL_DAMAGE_CLASS_MELEE || procSpell->IsRangedWeaponSpell())
             {
-                if (eventInfo.GetDamageInfo())
-                    attackSpeed = caster->GetAttackTime(eventInfo.GetDamageInfo()->GetAttackType());
+                attackSpeed = caster->GetAttackTime(eventInfo.GetDamageInfo()->GetAttackType());
             }
             else // spells use their cast time for PPM calculations
             {
