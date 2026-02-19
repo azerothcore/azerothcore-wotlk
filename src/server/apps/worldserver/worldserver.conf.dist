@@ -1413,6 +1413,79 @@ vmap.BlizzlikeLOSInOpenWorld = 1
 vmap.enableIndoorCheck = 1
 
 #
+#    Accurate ground settlement (cylinder–plane) settings
+#    0 = cylinder-circle footprint (recommended),
+#    1 = square footprint (upside-down-pyramid)
+#
+
+Height.Accurate.Shape = 0
+
+#
+# Scale factor applied to the probe radius (safety margin, do not abuse)
+#
+
+Height.Accurate.RadiusScale = 1.0
+
+#
+# Square and cylinder mix [0..1]
+# 0.00 = pure square
+# 1.00 = cylinder (circle) (equal to Shape=0)
+# Recommended for QA: 0.15–0.25
+#
+
+Height.Accurate.SquareBlend = 0.2
+
+#
+# Optional slope clamp (rise/run). 0.0 disables clamping.
+# This limits the gradient magnitude used by both circle and square footprints,
+# preventing extreme lifts on near-vertical faces. Safe upper bound: ~5.0 (≈78.7°).
+#
+
+Height.Accurate.SlopeClamp = 0.0
+
+#
+# Gradient mode
+# 0 = Plane   (exact face-plane gradient; maximizes geometric accuracy)
+# 1 = LS      (least-squares gradient; smoother, slightly less exact)
+#
+
+Height.Accurate.GradientMode = 0
+
+#
+# Normal epsilon used to detect degenerate faces (|nz| < eps)
+# Recommended: 1e-6 .. 1e-5
+#
+
+Height.Accurate.NormalEps = 0.000001
+
+#
+# Accurate VMAP height (apply same footprint & slope logic on VMAP)
+# 1 = enable (recommended), 0 = legacy point-ray height
+#
+
+Height.Accurate.VMap.Enable = 1
+
+#
+# Lateral sample delta (meters) to estimate VMAP gradient with 4 extra rays:
+# (x±delta,y) and (x,y±delta). Typical 0.15..0.35. Affects precision & cost.
+#
+
+Height.Accurate.VMap.Delta  = 0.25
+
+#
+# -- Accurate DYNAMIC (MMAP) planar offset (gradient sampling) --
+# 1 = enable (recommended), 0 = legacy point ray
+#
+
+Height.Accurate.Dynamic.Enable = 1
+
+#
+# Gradient sampling delta for Dynamic (meters). Typical 0.15..0.35
+#
+
+Height.Accurate.Dynamic.Delta  = 0.25
+
+#
 #    DetectPosCollision
 #        Description: Check final move position, summon position, etc for visible collision with
 #                     other objects or walls (walls only if vmaps are enabled).

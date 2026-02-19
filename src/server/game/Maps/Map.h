@@ -238,8 +238,12 @@ public:
 
     // some calls like isInWater should not use vmaps due to processor power
     // can return INVALID_HEIGHT if under z+2 z coord not found height
+    [[nodiscard]] float GetHeightAccurate(float x, float y, float z, float radius, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const; // wrapper yaw=0
+    [[nodiscard]] float GetHeightAccurate(float x, float y, float z, float radius, float yaw, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] float GetGridHeight(float x, float y) const;
+    [[nodiscard]] float GetGridHeightAccurate(float x, float y, float radius) const; // wrapper yaw=0
+    [[nodiscard]] float GetGridHeightAccurate(float x, float y, float radius, float yaw) const;
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
@@ -383,6 +387,8 @@ public:
 
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
+    [[nodiscard]] float GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const; // wrapper yaw=0
+    [[nodiscard]] float GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius, float yaw, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
@@ -539,6 +545,9 @@ private:
 
     bool EnsureGridLoaded(Cell const& cell);
     MapGridType* GetMapGrid(uint16 const x, uint16 const y);
+
+    [[nodiscard]] float GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
+    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta) const;
 
     void ScriptsProcess();
 

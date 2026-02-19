@@ -30,6 +30,7 @@
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include <G3D/Vector3.h>
+#include <numbers>
 
 using VMAP::ModelInstance;
 
@@ -287,6 +288,84 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
     {
         return -G3D::finf();
     }
+}
+
+namespace
+{
+    bool isFiniteF(float v) { return std::isfinite(v); }
+    constexpr float INV_SQRT2 = std::numbers::sqrt2 / 2.0f;
+}
+
+float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSearchDist, uint32 phasemask,
+                                        float radius, float yaw, float blend, float clamp, float sampleDelta) const
+{
+    auto sample = [&](float sx, float sy) -> float
+    {
+        G3D::Vector3 v(sx, sy, z);
+        G3D::Ray r(v, G3D::Vector3(0, 0, -1));
+        float dist = maxSearchDist;
+        DynamicTreeIntersectionCallback cb(phasemask, VMAP::ModelIgnoreFlags::Nothing);
+        impl->intersectZAllignedRay(r, cb, dist);
+        if (cb.didHit())
+            return z - dist;
+        return std::numeric_limits<float>::quiet_NaN();
+    };
+
+    float const h0 = sample(x, y);
+    if (!isFiniteF(h0))
+        return -G3D::finf();
+
+    if (radius <= 0.0f)
+        return h0;
+
+    float const d = (sampleDelta > 0.0f) ? sampleDelta : std::max(0.05f, std::min(0.5f, radius * 0.5f));
+
+    float const hx1 = sample(x + d, y);
+    float const hx2 = sample(x - d, y);
+    float const hy1 = sample(x, y + d);
+    float const hy2 = sample(x, y - d);
+
+    auto diff = [&](float p, float m) -> float
+    {
+        if (isFiniteF(p) && isFiniteF(m))
+            return (p - m) / (2.0f * d);
+
+        if (isFiniteF(p))
+            return (p - h0) / d;
+
+        if (isFiniteF(m))
+            return (h0 - m) / d;
+
+        return 0.0f;
+    };
+
+    float gx = diff(hx1, hx2); // dz/dx
+    float gy = diff(hy1, hy2); // dz/dy
+
+    if (clamp > 0.0f)
+    {
+        float const g2 = gx * gx + gy * gy;
+        float const c2 = clamp * clamp;
+        if (g2 > c2)
+        {
+            float const s = clamp / std::sqrt(g2);
+            gx *= s; gy *= s;
+        }
+    }
+
+    float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
+    float totalSlope = slopeL2;
+
+    if (blend < 1.0f)
+    {
+        float c = std::cos(yaw), s = std::sin(yaw);
+        float rx = gx * c + gy * s;
+        float ry = -gx * s + gy * c;
+        float slopeL1 = std::abs(rx) + std::abs(ry);
+        totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
+    }
+
+    return h0 + radius * totalSlope;
 }
 
 bool DynamicMapTree::GetAreaAndLiquidData(float x, float y, float z, uint32 phasemask, Optional<uint8> reqLiquidType, VMAP::AreaAndLiquidData& data) const

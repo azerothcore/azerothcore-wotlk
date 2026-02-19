@@ -3,6 +3,7 @@
 #include "GridTerrainData.h"
 #include "Log.h"
 #include "MapDefines.h"
+#include "World.h"
 #include <filesystem>
 #include <G3D/Ray.h>
 
@@ -616,4 +617,213 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
     }
 
     return liquidData;
+}
+
+namespace
+{
+    constexpr float INV_SQRT2 = 0.70710678118654752440f; // 1/sqrt(2)
+}
+
+static inline float CELL_SIZE() { return SIZE_OF_GRIDS / float(MAP_RESOLUTION); } // ≈ 4.1666667f
+
+bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const
+{
+    if (!_loadedHeightData)
+        return false;
+
+    // FLOAT
+    if (_loadedHeightData->floatHeightData)
+    {
+        auto const& v9 = _loadedHeightData->floatHeightData->v9;
+        auto const& v8 = _loadedHeightData->floatHeightData->v8;
+
+        h1 = v9[xInt * 129 + yInt];
+        h2 = v9[(xInt + 1) * 129 + yInt];
+        h3 = v9[xInt * 129 + yInt + 1];
+        h4 = v9[(xInt + 1) * 129 + yInt + 1];
+        h5 = v8[xInt * 128 + yInt];
+        return true;
+    }
+
+    // UINT8
+    if (_loadedHeightData->uint8HeightData)
+    {
+        auto const& d = *_loadedHeightData->uint8HeightData;
+        float k = d.gridIntHeightMultiplier;
+        float base = _loadedHeightData->gridHeight;
+
+        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
+        h1 = float(v9ptr[0]) * k + base;
+        h2 = float(v9ptr[129]) * k + base;
+        h3 = float(v9ptr[1]) * k + base;
+        h4 = float(v9ptr[130]) * k + base;
+
+        uint8 v8val = d.v8[xInt * 128 + yInt];
+        h5 = float(v8val) * k + base;
+        return true;
+    }
+
+    // UINT16
+    if (_loadedHeightData->uint16HeightData)
+    {
+        auto const& d = *_loadedHeightData->uint16HeightData;
+        float k = d.gridIntHeightMultiplier;
+        float base = _loadedHeightData->gridHeight;
+
+        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
+        h1 = float(v9ptr[0]) * k + base;
+        h2 = float(v9ptr[129]) * k + base;
+        h3 = float(v9ptr[1]) * k + base;
+        h4 = float(v9ptr[130]) * k + base;
+
+        uint16 v8val = d.v8[xInt * 128 + yInt];
+        h5 = float(v8val) * k + base;
+        return true;
+    }
+
+    return false;
+}
+
+float GridTerrainData::GetHeightAccurate(float x, float y, float radius) const
+{
+    return GetHeightAccurate(x, y, radius, GroundFootprintShape::Circle, 0.0f, 1.0f, 0.0f, 0u, 1.0e-6f);
+}
+
+float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const
+{
+    return GetHeightAccurate(x, y, radius, shape, 0.0f, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f, 0u, 1.0e-6f);
+}
+
+float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw) const
+{
+    // Wrapper with default blend = 1 for circle, 0 for square.
+    return GetHeightAccurate(x, y, radius, shape, yaw, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f, 0u, 1.0e-6f);
+}
+
+float GridTerrainData::GetHeightAccurate(
+    float x, float y, float radius, GroundFootprintShape shape, float yaw, float squareBlend, float slopeClamp, uint32 gradientMode, float normalEps) const
+{
+    if (!_loadedHeightData)
+        return INVALID_HEIGHT;
+
+    float xf = MAP_RESOLUTION * (32.0f - x / SIZE_OF_GRIDS);
+    float yf = MAP_RESOLUTION * (32.0f - y / SIZE_OF_GRIDS);
+
+    int xInt = static_cast<int>(std::floor(xf));
+    int yInt = static_cast<int>(std::floor(yf));
+    float fx = xf - static_cast<float>(xInt);
+    float fy = yf - static_cast<float>(yInt);
+
+    if (fx < 0.0f) { fx += 1.0f; --xInt; }
+    if (fy < 0.0f) { fy += 1.0f; --yInt; }
+    if (fx >= 1.0f) { fx -= 1.0f; ++xInt; }
+    if (fy >= 1.0f) { fy -= 1.0f; ++yInt; }
+    xInt &= (MAP_RESOLUTION - 1);
+    yInt &= (MAP_RESOLUTION - 1);
+
+    if (isHole(xInt, yInt))
+        return INVALID_HEIGHT;
+
+    float h1, h2, h3, h4, h5;
+    if (!SampleHeights(xInt, yInt, h1, h2, h3, h4, h5))
+        return INVALID_HEIGHT;
+
+    // h1 -> (0,0)
+    // h2 -> (S,0)
+    // h3 -> (0,S)
+    // h4 -> (S,S)
+    // h5 -> (S/2, S/2)
+    float const S = CELL_SIZE();
+    float const S2 = S * 0.5f;
+
+    G3D::Vector3 P(fx * S, fy * S, 0.0f);
+
+    G3D::Vector3 A(S2, S2, h5);
+
+    float const eps = 1e-6f;
+    float const blend = std::max(0.0f, std::min(1.0f, squareBlend));
+
+    bool const right = (P.x >= A.x);
+    bool const top = (P.y >= A.y);
+    G3D::Vector3 B, C;
+    if (right && !top)
+    {
+        B = G3D::Vector3(S, 0.0f, h2);
+        C = G3D::Vector3(0.0f, 0.0f, h1);
+    } // BR
+    else if (right && top)
+    {
+        B = G3D::Vector3(S, S, h4);
+        C = G3D::Vector3(S, 0.0f, h2);
+    } // TR
+    else if (!right && top)
+    {
+        B = G3D::Vector3(0.0f, S, h3);
+        C = G3D::Vector3(S, S, h4);
+    } // TL
+    else /* !right && !top */
+    {
+        B = G3D::Vector3(0.0f, 0.0f, h1);
+        C = G3D::Vector3(0.0f, S, h3);
+    } // BL
+
+    G3D::Vector3 const U = B - A;
+    G3D::Vector3 const V = C - A;
+    G3D::Vector3 const n = U.cross(V);
+    float const nzAbs = std::abs(n.z);
+    if (nzAbs < std::max(eps, normalEps))
+        return getHeight(x, y);
+
+    float const zPlane = A.z - (n.x * (P.x - A.x) + n.y * (P.y - A.y)) / n.z;
+    float const inv2S = 1.0f / (2.0f * S);
+    float gx, gy;
+
+    if (gradientMode == 0u)
+    {
+        // Plane-exact gradient: z = (-n.x*x - n.y*y - d)/n.z  =>  ∇z = (-n.x/n.z, -n.y/n.z)
+        gx = -n.x / n.z;
+        gy = -n.y / n.z;
+    }
+    else
+    {
+        // LS gradient (smoother)
+        gx = ((h2 + h4) - (h1 + h3)) * inv2S;
+        gy = ((h3 + h4) - (h1 + h2)) * inv2S;
+    }
+
+    // Optional clamp
+    if (slopeClamp > 0.0f)
+    {
+        float const g2 = gx * gx + gy * gy;
+        float const c2 = slopeClamp * slopeClamp;
+        if (g2 > c2)
+        {
+            float const s = slopeClamp / std::sqrt(g2);
+            gx *= s; gy *= s;
+        }
+    }
+
+    float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
+
+    // Fast‑path radius 0
+    if (radius <= 0.0f)
+        return zPlane;
+
+    float totalSlope = slopeL2; // default: circle (or blend==1)
+    if (shape == GroundFootprintShape::Square && blend < 1.0f)
+    {
+        float slopeL1 = 0.0f;
+        if (!(gx == 0.0f && gy == 0.0f))
+        {
+            float const c = std::cos(yaw);
+            float const s = std::sin(yaw);
+            float const rx = gx * c + gy * s;
+            float const ry = -gx * s + gy * c;
+            slopeL1 = std::abs(rx) + std::abs(ry);
+        }
+        totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
+    }
+
+    // Final height (Minkowski): base + radius * slope
+    return zPlane + radius * totalSlope;
 }

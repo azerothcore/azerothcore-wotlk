@@ -620,6 +620,7 @@ public:
         AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
         AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
+        Map* map = object->GetMap();
         float zoneX = object->GetPositionX();
         float zoneY = object->GetPositionY();
 
@@ -627,6 +628,22 @@ public:
 
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
+        float const probeR = object->GetGroundProbeRadius(); // pre-scale
+        float const rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+        float const blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        float const clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
+        uint32 const gmode = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_GRADIENT_MODE);
+        float const neps = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_NORMAL_EPS);
+        uint32 const vmapAcc = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_VMAP_ENABLE);
+        float const vdelta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA);
+        uint32 const dynAcc = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_ENABLE);
+        float const dyndelta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_DELTA);
+        float const yaw = object->GetOrientation();
+        float const probeRScaled = probeR * rScale;
+
+        float const GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
+        float const MapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, probeR);
+        char const* shapeStr = GridTerrainData::ToString(static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE)));
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
@@ -656,6 +673,12 @@ public:
                                  object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), object->GetOrientation(),
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
+
+        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f}, SlopeClamp: {:0.2f}, GradMode: {}, NormalEps: {:0.6f}, VMapAccurate: {}, VMapDelta: {:0.2f}, DynAccurate: {}, DynDelta: {:0.2f})",
+            shapeStr, blend, rScale, clamp, gmode, neps, vmapAcc, vdelta, dynAcc, dyndelta);
+        handler->PSendSysMessage("Accurate Height Grid: {}", GridZAccurate);
+        handler->PSendSysMessage("Accurate Height Map: {}", MapZAccurate);
+        handler->PSendSysMessage("Probe radius (pre-scale): {:.3f}", probeR);
 
         LiquidData const& liquidData = object->GetLiquidData();
 

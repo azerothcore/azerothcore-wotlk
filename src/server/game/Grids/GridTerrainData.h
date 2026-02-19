@@ -220,36 +220,62 @@ enum class TerrainMapDataReadResult
 
 class GridTerrainData
 {
-    bool LoadAreaData(std::ifstream& fileStream, uint32 const offset);
-    bool LoadHeightData(std::ifstream& fileStream, uint32 const offset);
-    bool LoadLiquidData(std::ifstream& fileStream, uint32 const offset);
-    bool LoadHolesData(std::ifstream& fileStream, uint32 const offset);
+    bool LoadAreaData(std::ifstream& fileStream, uint32 offset);
+    bool LoadHeightData(std::ifstream& fileStream, uint32 offset);
+    bool LoadLiquidData(std::ifstream& fileStream, uint32 offset);
+    bool LoadHolesData(std::ifstream& fileStream, uint32 offset);
 
     std::unique_ptr<LoadedAreaData> _loadedAreaData;
     std::unique_ptr<LoadedHeightData> _loadedHeightData;
     std::unique_ptr<LoadedLiquidData> _loadedLiquidData;
     std::unique_ptr<LoadedHoleData> _loadedHoleData;
 
-    bool isHole(int row, int col) const;
+    [[nodiscard]] bool isHole(int row, int col) const;
 
     // Get height functions and pointers
     typedef float (GridTerrainData::* GetHeightPtr) (float x, float y) const;
     GetHeightPtr _gridGetHeight;
-    float getHeightFromFloat(float x, float y) const;
-    float getHeightFromUint16(float x, float y) const;
-    float getHeightFromUint8(float x, float y) const;
-    float getHeightFromFlat(float x, float y) const;
+    [[nodiscard]] float getHeightFromFloat(float x, float y) const;
+    [[nodiscard]] float getHeightFromUint16(float x, float y) const;
+    [[nodiscard]] float getHeightFromUint8(float x, float y) const;
+    [[nodiscard]] float getHeightFromFlat(float x, float y) const;
 
 public:
     GridTerrainData();
-    ~GridTerrainData() { };
+    ~GridTerrainData() = default;
     TerrainMapDataReadResult Load(std::string const& mapFileName);
 
-    uint16 getArea(float x, float y) const;
-    inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
-    float getMinHeight(float x, float y) const;
-    float getLiquidLevel(float x, float y) const;
-    LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType) const;
+    enum class GroundFootprintShape : uint8
+    {
+        Circle = 0,   // cylinder-plane
+        Square = 1    // upside-down pyramid
+    };
+
+    static inline const char* ToString(GroundFootprintShape s)
+    {
+        switch (s)
+        {
+            case GroundFootprintShape::Circle: return "circle";
+            case GroundFootprintShape::Square: return "square";
+        }
+        return "unknown";
+    }
+
+    // Accurate height with footprint & yaw. squareBlend in [0..1]. slopeClamp in [0..10] (0 disables).
+    [[nodiscard]] float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw,
+                            float squareBlend, float slopeClamp, uint32 gradientMode, float normalEps) const;
+    // Convenience wrappers (kept for compatibility).
+    [[nodiscard]] float GetHeightAccurate(float x, float y, float radius) const;
+    [[nodiscard]] float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const;
+    [[nodiscard]] float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw /*rads*/) const;
+    static inline std::string to_string(GridTerrainData::GroundFootprintShape s) { return GridTerrainData::ToString(s); }
+    [[nodiscard]] uint16 getArea(float x, float y) const;
+    [[nodiscard]] inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
+    [[nodiscard]] float getMinHeight(float x, float y) const;
+    [[nodiscard]] float getLiquidLevel(float x, float y) const;
+    [[nodiscard]] LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType) const;
+private:
+    bool SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const;
 };
 
 #endif
