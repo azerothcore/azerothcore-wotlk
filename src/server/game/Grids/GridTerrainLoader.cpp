@@ -137,27 +137,7 @@ bool GridTerrainLoader::ExistVMap(uint32 mapid, int gx, int gy)
                     LOG_DEBUG("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
                     return false;
                 case VMAP::LoadResult::VersionMismatch:
-                    LOG_ERROR("maps", "VMap file '{}' couldn't be loaded", (sWorld->GetDataPath() + "vmaps/" + name));
-                    // Try to read the actual version string from the file
-                    std::string vmapFile = sWorld->GetDataPath() + "vmaps/" + name;
-                    char fileMagic[9] = {0};
-                    bool versionRead = false;
-                    FILE* f = fopen(vmapFile.c_str(), "rb");
-                    if (f)
-                    {
-                        size_t bytesRead = fread(fileMagic, 1, 8, f);
-                        fclose(f);
-                        if (bytesRead == 8)
-                            versionRead = true;
-                    }
-                    if (versionRead)
-                    {
-                        LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}, VMAP file has version: {}. Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC), fileMagic);
-                    }
-                    else
-                    {
-                        LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}, VMAP file version could not be read (file missing or corrupt). Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC));
-                    }
+                    LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}. Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC));
                     return false;
             }
         }
