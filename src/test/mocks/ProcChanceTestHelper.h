@@ -79,6 +79,7 @@ public:
      * @param chanceModifier Talent/aura modifier to chance
      * @param ppmModifier Talent/aura modifier to PPM
      * @param hasDamageInfo Whether a DamageInfo is present (enables PPM)
+     * @param hasHealInfo Whether a HealInfo is present (also enables PPM)
      * @return Calculated proc chance
      */
     static float SimulateCalcProcChance(
@@ -87,12 +88,13 @@ public:
         uint32 weaponSpeed = 2500,
         float chanceModifier = 0.0f,
         float ppmModifier = 0.0f,
-        bool hasDamageInfo = true)
+        bool hasDamageInfo = true,
+        bool hasHealInfo = false)
     {
         float chance = procEntry.Chance;
 
-        // PPM calculation overrides base chance if PPM > 0 and we have DamageInfo
-        if (hasDamageInfo && procEntry.ProcsPerMinute > 0.0f)
+        // PPM calculation overrides base chance if PPM > 0 and we have DamageInfo or HealInfo
+        if ((hasDamageInfo || hasHealInfo) && procEntry.ProcsPerMinute > 0.0f)
         {
             chance = CalculatePPMChance(weaponSpeed, procEntry.ProcsPerMinute, ppmModifier);
         }
