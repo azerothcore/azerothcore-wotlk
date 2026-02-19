@@ -286,10 +286,13 @@ void World::LoadConfigSettings(bool reload)
         LOG_INFO("server.loading", "Using DataDir {}", _dataPath);
     }
 
-    LOG_INFO("server.loading", "Core Map Version: {}", MapVersionMagic);
-    LOG_INFO("server.loading", "Core MMAP Version: {}", MMAP_VERSION);
-    LOG_INFO("server.loading", "Core VMAP Version: {}", VMAP::VMAP_MAGIC);
-    LOG_INFO("server.loading", "{}", GitRevision::GetFullVersion());
+    if (!reload)
+    {
+        LOG_INFO("server.loading", "Core Map Version: {}", MapVersionMagic);
+        LOG_INFO("server.loading", "Core MMAP Version: {}", MMAP_VERSION);
+        LOG_INFO("server.loading", "Core VMAP Version: {}", VMAP::VMAP_MAGIC);
+        LOG_INFO("server.loading", "{}", GitRevision::GetFullVersion());
+    }
     bool const enableIndoor = getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
     bool const enableLOS = sConfigMgr->GetOption<bool>("vmap.enableLOS", true);
     bool const enablePetLOS = getBoolConfig(CONFIG_PET_LOS);
