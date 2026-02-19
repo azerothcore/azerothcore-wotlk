@@ -966,12 +966,15 @@ void ArenaTeam::SaveToDB(bool forceMemberSave)
         stmt->SetData(6, itr->Guid.GetCounter());
         trans->Append(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_ARENA_STATS);
-        stmt->SetData(0, itr->Guid.GetCounter());
-        stmt->SetData(1, GetSlot());
-        stmt->SetData(2, itr->MatchMakerRating);
-        stmt->SetData(3, itr->MaxMMR);
-        trans->Append(stmt);
+        if (sScriptMgr->CanSaveArenaStatsForMember(this, itr->Guid))
+        {
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_ARENA_STATS);
+            stmt->SetData(0, itr->Guid.GetCounter());
+            stmt->SetData(1, GetSlot());
+            stmt->SetData(2, itr->MatchMakerRating);
+            stmt->SetData(3, itr->MaxMMR);
+            trans->Append(stmt);
+        }
     }
 
     CharacterDatabase.CommitTransaction(trans);

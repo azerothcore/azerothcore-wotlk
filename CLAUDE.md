@@ -10,6 +10,8 @@ AzerothCore is an open-source MMORPG server emulator for World of Warcraft patch
 
 ### Configure and build (out-of-source build required)
 
+- Skip building unless explicitly requested.
+
 ```bash
 # Create build directory and configure
 mkdir -p build && cd build
