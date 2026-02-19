@@ -1,3 +1,4 @@
+-- DB update 2026_02_18_08 -> 2026_02_19_00
 -- Update gameobject 'InnTableTiny' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180885)) AND (`guid` IN (240279, 240280, 240281, 240282, 240283, 240284));

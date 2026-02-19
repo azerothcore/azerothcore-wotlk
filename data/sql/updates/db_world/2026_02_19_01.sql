@@ -1,3 +1,4 @@
+-- DB update 2026_02_19_00 -> 2026_02_19_01
 -- Update gameobject 'Candy Skulls' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (195069)) AND (`guid` IN (240004, 240286, 240287, 240289, 240290, 240291, 240294, 240295, 240298, 240302, 240303, 240304, 240307, 240309, 240310, 240312, 240315, 240316));
