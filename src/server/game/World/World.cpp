@@ -343,31 +343,16 @@ void World::SetInitialWorldSettings()
             LOG_ERROR("server.loading", "DataDir '{}' does not exist{}{}", dataDir, ec ? ": " : "", ec ? ec.message() : "");
             exit(1);
         }
-        if (ec)
-        {
-            LOG_ERROR("server.loading", "Error during std::filesystem::exists for DataDir '{}': {}", dataDir, ec.message());
-            exit(1);
-        }
         ec.clear();
         if (!std::filesystem::is_directory(dataDir, ec))
         {
             LOG_ERROR("server.loading", "DataDir '{}' is not a directory{}{}", dataDir, ec ? ": " : "", ec ? ec.message() : "");
             exit(1);
         }
-        if (ec)
-        {
-            LOG_ERROR("server.loading", "Error during std::filesystem::is_directory for DataDir '{}': {}", dataDir, ec.message());
-            exit(1);
-        }
         ec.clear();
         if (std::filesystem::is_empty(dataDir, ec))
         {
             LOG_ERROR("server.loading", "DataDir '{}' exists but is empty{}{}", dataDir, ec ? ": " : "", ec ? ec.message() : "");
-            exit(1);
-        }
-        if (ec)
-        {
-            LOG_ERROR("server.loading", "Error during std::filesystem::is_empty for DataDir '{}': {}", dataDir, ec.message());
             exit(1);
         }
         ///- Check the existence of the map files for all starting areas.
