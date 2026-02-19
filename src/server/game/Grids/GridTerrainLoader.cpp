@@ -137,7 +137,7 @@ bool GridTerrainLoader::ExistVMap(uint32 mapid, int gx, int gy)
                     LOG_DEBUG("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
                     return false;
                 case VMAP::LoadResult::VersionMismatch:
-                    LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}. Re-extract your maps, delete the old ones and add the new ones.", static_cast<const char*>(VMAP::VMAP_MAGIC));
+                    LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}. Re-extract your maps, delete the old ones and add the new ones.", VMAP::VMAP_MAGIC);
                     return false;
             }
         }
