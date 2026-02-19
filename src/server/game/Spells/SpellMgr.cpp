@@ -1773,6 +1773,7 @@ void SpellMgr::LoadSpellGroupStackRules()
 static bool InitTriggerAuraData();
 static bool isTriggerAura[TOTAL_AURAS];
 static bool isAlwaysTriggeredAura[TOTAL_AURAS];
+static uint32 spellTypeMask[TOTAL_AURAS];
 static bool procPrepared = InitTriggerAuraData();
 
 // List of auras that CAN trigger but may not exist in spell_proc
@@ -1785,6 +1786,7 @@ bool InitTriggerAuraData()
     {
         isTriggerAura[i] = false;
         isAlwaysTriggeredAura[i] = false;
+        spellTypeMask[i] = PROC_SPELL_TYPE_MASK_ALL;
     }
     isTriggerAura[SPELL_AURA_DUMMY] = true;                                 // Most dummy auras should require scripting
     isTriggerAura[SPELL_AURA_MOD_CONFUSE] = true;                           // "Any direct damaging attack will revive targets"
@@ -1827,6 +1829,13 @@ bool InitTriggerAuraData()
     isAlwaysTriggeredAura[SPELL_AURA_SPELL_MAGNET] = true;
     isAlwaysTriggeredAura[SPELL_AURA_SCHOOL_ABSORB] = true;
     isAlwaysTriggeredAura[SPELL_AURA_MOD_STEALTH] = true;
+
+    spellTypeMask[SPELL_AURA_MOD_STEALTH]       = PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_NO_DMG_HEAL;
+    spellTypeMask[SPELL_AURA_MOD_CONFUSE]        = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_MOD_FEAR]           = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_MOD_ROOT]           = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_MOD_STUN]           = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_TRANSFORM]          = PROC_SPELL_TYPE_DAMAGE;
 
     return true;
 }
@@ -2000,6 +2009,7 @@ void SpellMgr::LoadSpellProcs()
 
         // Check if spell has any trigger aura effects
         bool found = false, addTriggerFlag = false;
+        uint32 procSpellTypeMask = PROC_SPELL_TYPE_NONE;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (!spellInfo->Effects[i].IsEffect())
@@ -2013,10 +2023,10 @@ void SpellMgr::LoadSpellProcs()
                 continue;
 
             found = true;
+            procSpellTypeMask |= spellTypeMask[auraName];
 
             if (!addTriggerFlag && isAlwaysTriggeredAura[auraName])
                 addTriggerFlag = true;
-            break;
         }
 
         if (!found)
@@ -2038,7 +2048,7 @@ void SpellMgr::LoadSpellProcs()
                 procEntry.SpellFamilyMask |= spellInfo->Effects[i].SpellClassMask;
 
         procEntry.ProcFlags = spellInfo->ProcFlags;
-        procEntry.SpellTypeMask   = PROC_SPELL_TYPE_MASK_ALL;
+        procEntry.SpellTypeMask   = procSpellTypeMask;
         procEntry.SpellPhaseMask  = PROC_SPELL_PHASE_HIT;
         procEntry.HitMask         = PROC_HIT_NONE; // uses default proc @see SpellMgr::CanSpellTriggerProcOnEvent
 
