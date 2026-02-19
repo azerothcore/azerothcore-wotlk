@@ -1,3 +1,4 @@
+-- DB update 2026_02_19_03 -> 2026_02_19_04
 -- Soul Preserver (60510): add spell_proc entry to fix proc for non-Paladin healers
 -- Auto-generated entry had SpellFamilyName=10 (Paladin) which blocked other classes
 -- ProcFlags 0x4400: DONE_SPELL_MAGIC_DMG_CLASS_POS + DONE_SPELL_NONE_DMG_CLASS_POS (direct heals + HoTs)
