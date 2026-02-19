@@ -37,6 +37,7 @@ enum MageSpells
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
     SPELL_MAGE_COMBUSTION                        = 11129,
+    SPELL_MAGE_COMBUSTION_PROC                   = 28682,
     SPELL_MAGE_COLD_SNAP                         = 11958,
     SPELL_MAGE_FOCUS_MAGIC_PROC                  = 54648,
     SPELL_MAGE_FROST_WARDING_R1                  = 11189,
@@ -997,10 +998,21 @@ class spell_mage_combustion : public AuraScript
 {
     PrepareAuraScript(spell_mage_combustion);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGE_COMBUSTION_PROC });
+    }
+
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Prevent charge consumption on non-crits
-        return eventInfo.GetHitMask() & PROC_EX_CRITICAL_HIT;
+        // Do not take charges, add a stack of crit buff
+        if (!(eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
+        {
+            eventInfo.GetActor()->CastSpell(static_cast<Unit*>(nullptr), SPELL_MAGE_COMBUSTION_PROC, true);
+            return false;
+        }
+
+        return true;
     }
 
     void Register() override
