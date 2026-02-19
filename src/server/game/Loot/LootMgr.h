@@ -258,9 +258,9 @@ public:
     bool CopyConditions(LootItem* li, uint32 conditionLootId = 0) const;
 
     // True if template includes at least 1 quest drop entry
-    [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store, uint8 groupId = 0) const;
+    [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store) const;
     // True if template includes at least 1 quest drop for an active quest of the player
-    bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 groupId = 0) const;
+    bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player) const;
 
     // Checks integrity of the template
     void Verify(LootStore const& store, uint32 Id) const;
