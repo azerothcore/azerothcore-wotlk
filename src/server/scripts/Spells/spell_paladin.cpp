@@ -2063,7 +2063,7 @@ private:
     bool _isVengeance = true;
 };
 
-// -20234 - Illumination
+// -20210 - Illumination
 class spell_pal_illumination : public AuraScript
 {
     PrepareAuraScript(spell_pal_illumination);
@@ -2095,7 +2095,8 @@ class spell_pal_illumination : public AuraScript
             if (originalSpell && aurEff->GetSpellInfo())
             {
                 Unit* target = eventInfo.GetActor(); // Paladin is the target of the energize
-                int32 bp = CalculatePct(static_cast<int32>(originalSpell->CalcPowerCost(target, originalSpell->GetSchoolMask())), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+                int32 baseCost = originalSpell->ManaCost + int32(CalculatePct(target->GetCreateMana(), originalSpell->ManaCostPercentage));
+                int32 bp = CalculatePct(baseCost, aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue());
                 target->CastCustomSpell(target, SPELL_PALADIN_ILLUMINATION_ENERGIZE, &bp, nullptr, nullptr, true, nullptr, aurEff);
             }
         }
