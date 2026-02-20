@@ -246,7 +246,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
     {
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_MAIL_ITEM);
         stmt->SetData(0, mailId);
-        stmt->SetData(1, mailItemIter->second->GetGUID().GetCounter());
+        stmt->SetData(1, static_cast<uint64>(mailItemIter->second->GetDbGuid()));
         stmt->SetData(2, receiver.GetPlayerGUIDLow());
         trans->Append(stmt);
     }

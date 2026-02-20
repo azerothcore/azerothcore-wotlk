@@ -27,6 +27,7 @@
 #include "DBCStructure.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
+#include "Entities/Item/ItemGuidMap.h"
 #include "GameEventMgr.h"
 #include "GameObjectAIFactory.h"
 #include "GameTime.h"
@@ -6721,7 +6722,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
         do
         {
             Field* fields = items->Fetch();
-            item.item_guid = fields[0].Get<uint32>();
+            item.item_guid = fields[0].Get<uint64>();
             item.item_template = fields[1].Get<uint32>();
             uint32 mailId = fields[2].Get<uint32>();
             itemsCache[mailId].push_back(item);
@@ -7589,14 +7590,11 @@ void ObjectMgr::SetHighestGuids()
         GetGuidSequenceGenerator<HighGuid::Player>().Set((*result)[0].Get<uint32>() + 1);
 
     result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
-    if (result)
-        GetGuidSequenceGenerator<HighGuid::Item>().Set((*result)[0].Get<uint32>() + 1);
+    // Initialize persistent item DB GUID starting point (64-bit)
+    // NOTE: In decoupled mode, item low GUIDs are process-local and not persisted.
+    if (QueryResult itemMax = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance"))
+        sItemGuidMap->InitDbGuidSeed((*itemMax)[0].Get<uint64>() + 1u);
 
-    // Cleanup other tables from not existed guids ( >= _hiItemGuid)
-    CharacterDatabase.Execute("DELETE FROM character_inventory WHERE item >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());     // One-time query
-    CharacterDatabase.Execute("DELETE FROM mail_items WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());         // One-time query
-    CharacterDatabase.Execute("DELETE FROM auctionhouse WHERE itemguid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
-    CharacterDatabase.Execute("DELETE FROM guild_bank_item WHERE item_guid >= '{}'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
 
     result = WorldDatabase.Query("SELECT MAX(guid) FROM transports");
     if (result)
