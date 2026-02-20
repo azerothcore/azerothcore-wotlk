@@ -91,17 +91,48 @@ TEST_F(SpellProcChanceTest, PPM_OverridesBaseChance_WithDamageInfo)
     EXPECT_NEAR(result, 25.0f, 0.01f);
 }
 
-TEST_F(SpellProcChanceTest, PPM_NotApplied_WithoutDamageInfo)
+TEST_F(SpellProcChanceTest, PPM_NotApplied_WithoutDamageOrHealInfo)
 {
     auto procEntry = SpellProcEntryBuilder()
         .WithChance(50.0f)
         .WithProcsPerMinute(6.0f)
         .Build();
 
-    // Without DamageInfo, base chance is used
+    // Without DamageInfo or HealInfo, base chance is used
     float result = ProcChanceTestHelper::SimulateCalcProcChance(
-        procEntry, 80, 2500, 0.0f, 0.0f, false);
+        procEntry, 80, 2500, 0.0f, 0.0f, false, false);
     EXPECT_NEAR(result, 50.0f, 0.01f);
+}
+
+TEST_F(SpellProcChanceTest, PPM_Applied_WithHealInfo)
+{
+    auto procEntry = SpellProcEntryBuilder()
+        .WithChance(0.0f)
+        .WithProcsPerMinute(3.5f)
+        .Build();
+
+    // With HealInfo (no DamageInfo), PPM should still calculate
+    // 3000ms cast time * 3.5 PPM / 600 = 17.5%
+    float result = ProcChanceTestHelper::SimulateCalcProcChance(
+        procEntry, 80, 3000, 0.0f, 0.0f, false, true);
+    EXPECT_NEAR(result, 17.5f, 0.01f);
+}
+
+TEST_F(SpellProcChanceTest, PPM_HealInfo_ZeroBaseChance_WouldBeZeroWithoutFix)
+{
+    // Reproduces the Omen of Clarity healing bug:
+    // PPM=3.5, Chance=0, and only HealInfo present (no DamageInfo)
+    // Without the fix, chance would be 0% because PPM branch was skipped
+    auto procEntry = SpellProcEntryBuilder()
+        .WithChance(0.0f)
+        .WithProcsPerMinute(3.5f)
+        .Build();
+
+    // Instant cast uses 1500ms minimum
+    float result = ProcChanceTestHelper::SimulateCalcProcChance(
+        procEntry, 80, 1500, 0.0f, 0.0f, false, true);
+    EXPECT_NEAR(result, 8.75f, 0.01f);
+    EXPECT_GT(result, 0.0f) << "PPM with HealInfo must produce non-zero chance";
 }
 
 TEST_F(SpellProcChanceTest, PPM_WithWeaponSpeedVariation)

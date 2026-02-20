@@ -2266,6 +2266,7 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
     }
 
     float procChance = CalcProcChance(*procEntry, eventInfo);
+
     if (roll_chance_f(procChance))
         return procEffectMask;
 
@@ -2280,7 +2281,7 @@ float Aura::CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& event
     if (Unit* caster = GetCaster())
     {
         // If PPM exists calculate chance from PPM
-        if (eventInfo.GetDamageInfo() && procEntry.ProcsPerMinute != 0)
+        if ((eventInfo.GetDamageInfo() || eventInfo.GetHealInfo()) && procEntry.ProcsPerMinute != 0)
         {
             SpellInfo const* procSpell = eventInfo.GetSpellInfo();
             uint32 attackSpeed = 0;
