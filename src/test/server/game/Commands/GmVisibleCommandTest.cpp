@@ -159,6 +159,7 @@ protected:
     TestPlayer* player = nullptr;
 };
 
+// cppcheck-suppress syntaxError
 TEST_F(GmVisibleCommandTest, SetsPlayerInvisibleAndInvokesHook)
 {
     SimulateGmVisibleOff();
