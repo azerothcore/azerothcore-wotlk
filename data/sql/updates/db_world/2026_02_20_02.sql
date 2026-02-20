@@ -1,3 +1,4 @@
+-- DB update 2026_02_20_01 -> 2026_02_20_02
 -- Ornate Bronze Lockbox
 DELETE FROM `item_loot_template` WHERE (`Entry` = 4632);
 INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
