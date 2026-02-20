@@ -25,13 +25,13 @@
 class WorldSocketThread : public NetworkThread<WorldSocket>
 {
 public:
-    void SocketAdded(std::shared_ptr<WorldSocket> sock) override
+    void SocketAdded(std::shared_ptr<WorldSocket> const& sock) override
     {
         sock->SetSendBufferSize(sWorldSocketMgr.GetApplicationSendBufferSize());
         sScriptMgr->OnSocketOpen(sock);
     }
 
-    void SocketRemoved(std::shared_ptr<WorldSocket> sock) override
+    void SocketRemoved(std::shared_ptr<WorldSocket> const& sock) override
     {
         sScriptMgr->OnSocketClose(sock);
     }
@@ -81,7 +81,7 @@ void WorldSocketMgr::StopNetwork()
     sScriptMgr->OnNetworkStop();
 }
 
-void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
+void WorldSocketMgr::OnSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex)
 {
     // set some options here
     if (_socketSystemSendBufferSize >= 0)
@@ -109,7 +109,7 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
         }
     }
 
-    BaseSocketMgr::OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
+    BaseSocketMgr::OnSocketOpen(std::move(sock), threadIndex);
 }
 
 NetworkThread<WorldSocket>* WorldSocketMgr::CreateThreads() const

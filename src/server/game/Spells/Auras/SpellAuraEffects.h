@@ -98,6 +98,7 @@ public:
     void PeriodicTick(AuraApplication* aurApp, Unit* caster) const;
 
     void HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    bool CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventInfo) const;
 
     void CleanupTriggeredSpells(Unit* target);
 
@@ -112,8 +113,6 @@ public:
     float GetPctMods() const { return m_pctMods; }
     void SetPctMods(float pctMods) { m_pctMods = pctMods; }
 
-    // xinef: stacking
-    uint32 GetAuraGroup() const { return m_auraGroup; }
     int32 GetOldAmount() const { return m_oldAmount; }
     void SetOldAmount(int32 amount) { m_oldAmount = amount; }
     void SetEnabled(bool enabled) { m_isAuraEnabled = enabled; }
@@ -131,8 +130,6 @@ private:
     float m_critChance;
     float m_pctMods;
 
-    // xinef: stacking
-    uint32 m_auraGroup;
     int32 m_oldAmount;
     bool m_isAuraEnabled;
     // xinef: channel information for channel triggering
@@ -299,6 +296,7 @@ public:
     void HandleModDamagePercentDone(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModOffhandDamagePercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleShieldBlockValue(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleShieldBlockValuePercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     //  power cost
     void HandleModPowerCostPCT(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModPowerCost(AuraApplication const* aurApp, uint8 mode, bool apply) const;

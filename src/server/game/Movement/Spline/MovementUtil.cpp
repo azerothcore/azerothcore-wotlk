@@ -153,7 +153,7 @@ namespace Movement
         STR(Falling      ), // 0x00000200,           // Not Compartible With Trajectory Movement
         STR(No_Spline    ), // 0x00000400,
         STR(Trajectory   ), // 0x00000800,           // Not Compartible With Fall Movement
-        STR(Walkmode     ), // 0x00001000,
+        STR(CanSwim      ), // 0x00001000,
         STR(Flying       ), // 0x00002000,           // Smooth Movement(Catmullrom Interpolation Mode), Flying Animation
         STR(Knockback    ), // 0x00004000,           // Model Orientation Fixed
         STR(Final_Point  ), // 0x00008000,

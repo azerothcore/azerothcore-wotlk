@@ -20,8 +20,8 @@
 
 // For static or at-server-startup loaded spell data
 
-#include "Common.h"
 #include "Log.h"
+#include "IteratorPair.h"
 #include "SharedDefines.h"
 #include "Unit.h"
 
@@ -154,21 +154,23 @@ enum ProcFlags
                                                 | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS,
 
     SPELL_PROC_FLAG_MASK                      = PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS
+                                                | PROC_FLAG_DONE_RANGED_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
                                                 | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_POS
                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_NONE_DMG_CLASS_NEG
                                                 | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS
-                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG,
-
-    SPELL_CAST_PROC_FLAG_MASK                  = SPELL_PROC_FLAG_MASK | PROC_FLAG_DONE_TRAP_ACTIVATION | RANGED_PROC_FLAG_MASK,
+                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG | PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_NEG
+                                                | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_TAKEN_PERIODIC
+                                                | PROC_FLAG_DONE_TRAP_ACTIVATION,
 
     PERIODIC_PROC_FLAG_MASK                    = PROC_FLAG_DONE_PERIODIC | PROC_FLAG_TAKEN_PERIODIC,
 
     DONE_HIT_PROC_FLAG_MASK                    = PROC_FLAG_DONE_MELEE_AUTO_ATTACK | PROC_FLAG_DONE_RANGED_AUTO_ATTACK
-                                                | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS
-                                                | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG
-                                                | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG
-                                                | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
+                                                 | PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS | PROC_FLAG_DONE_SPELL_RANGED_DMG_CLASS
+                                                 | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG
+                                                 | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG
+                                                 | PROC_FLAG_DONE_PERIODIC | PROC_FLAG_DONE_TRAP_ACTIVATION
+                                                 | PROC_FLAG_DONE_MAINHAND_ATTACK | PROC_FLAG_DONE_OFFHAND_ATTACK,
 
     TAKEN_HIT_PROC_FLAG_MASK                   = PROC_FLAG_TAKEN_MELEE_AUTO_ATTACK | PROC_FLAG_TAKEN_RANGED_AUTO_ATTACK
                                                 | PROC_FLAG_TAKEN_SPELL_MELEE_DMG_CLASS | PROC_FLAG_TAKEN_SPELL_RANGED_DMG_CLASS
@@ -268,23 +270,14 @@ enum ProcFlagsHit
 
 enum ProcAttributes
 {
-    PROC_ATTR_REQ_EXP_OR_HONOR   = 0x0000010,
+    PROC_ATTR_REQ_EXP_OR_HONOR          = 0x0000001, // requires proc target to give exp or honor for aura proc
+    PROC_ATTR_TRIGGERED_CAN_PROC        = 0x0000002, // aura can proc even with triggered spells
+    PROC_ATTR_REQ_MANA_COST             = 0x0000004, // requires triggering spell to have a mana cost for aura proc
+    PROC_ATTR_REQ_SPELLMOD              = 0x0000008, // requires triggering spell to be affected by proccing aura to drop charges
+    PROC_ATTR_USE_STACKS_FOR_CHARGES    = 0x0000010, // consuming proc drops a stack from proccing aura instead of charge
+    PROC_ATTR_REDUCE_PROC_60            = 0x0000080, // aura should have a reduced chance to proc if level of proc actor > 60
+    PROC_ATTR_CANT_PROC_FROM_ITEM_CAST  = 0x0000100, // do not allow aura proc if proc is caused by a spell casted by item
 };
-
-struct SpellProcEventEntry
-{
-    uint32      schoolMask;                                 // if nonzero - bit mask for matching proc condition based on spell candidate's school: Fire=2, Mask=1<<(2-1)=2
-    uint32      spellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyNamer value
-    flag96      spellFamilyMask;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
-    uint32      procFlags;                                  // bitmask for matching proc event
-    uint32      procEx;                                     // proc Extend info (see ProcFlagsEx)
-    uint32      procPhase;                                  // proc phase (see ProcFlagsSpellPhase)
-    float       ppmRate;                                    // for melee (ranged?) damage spells - proc rate per minute. if zero, falls back to flat chance from Spell.dbc
-    float       customChance;                               // Owerride chance (in most cases for debug only)
-    uint32      cooldown;                                   // hidden cooldown used for some spell proc events, applied to _triggered_spell_
-};
-
-typedef std::unordered_map<uint32, SpellProcEventEntry> SpellProcEventMap;
 
 struct SpellProcEntry
 {
@@ -296,6 +289,7 @@ struct SpellProcEntry
     uint32       SpellPhaseMask;                             // if nonzero - bitmask for matching phase of a spellcast on which proc occurs, see enum ProcFlagsSpellPhase
     uint32       HitMask;                                    // if nonzero - bitmask for matching proc condition based on hit result, see enum ProcFlagsHit
     uint32       AttributesMask;                             // bitmask, see ProcAttributes
+    uint32       DisableEffectsMask;                         // bitmask of effects to disable from triggering proc
     float        ProcsPerMinute;                             // if nonzero - chance to proc is equal to value * aura caster's weapon speed / 60
     float        Chance;                                     // if nonzero - owerwrite procChance field for given Spell.dbc entry, defines chance of proc to occur, not used if ProcsPerMinute set
     Milliseconds Cooldown;                                   // if nonzero - cooldown in secs for aura proc, applied to aura
@@ -330,56 +324,49 @@ struct SpellBonusEntry
 
 typedef std::unordered_map<uint32, SpellBonusEntry>     SpellBonusMap;
 
-enum SpellGroupSpecialFlags
+enum SpellGroup
 {
-    SPELL_GROUP_SPECIAL_FLAG_NONE                       = 0x000,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE              = 0x001,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN            = 0x002,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_UNSTABLE            = 0x004,
-    SPELL_GROUP_SPECIAL_FLAG_ELIXIR_SHATTRATH           = 0x008,
-    SPELL_GROUP_SPECIAL_FLAG_STACK_EXCLUSIVE_MAX        = 0x00F,
-    SPELL_GROUP_SPECIAL_FLAG_FORCED_STRONGEST           = 0x010, // xinef: specially helpful flag if some spells have different auras, but only one should be present
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_CHECK        = 0x020,
-    SPELL_GROUP_SPECIAL_FLAG_BASE_AMOUNT_CHECK          = 0x040,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY1                  = 0x100,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY2                  = 0x200,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY3                  = 0x400,
-    SPELL_GROUP_SPECIAL_FLAG_PRIORITY4                  = 0x800,
-    SPELL_GROUP_SPECIAL_FLAG_SAME_SPELL_CHECK           = 0x1000,
-    SPELL_GROUP_SPECIAL_FLAG_SKIP_STRONGER_SAME_SPELL   = 0x2000,
-    SPELL_GROUP_SPECIAL_FLAG_MAX                        = 0x4000,
-
-    SPELL_GROUP_SPECIAL_FLAG_FLASK                      = SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE | SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN
+    SPELL_GROUP_NONE             = 0,
+    SPELL_GROUP_ELIXIR_BATTLE    = 1,
+    SPELL_GROUP_ELIXIR_GUARDIAN  = 2,
+    SPELL_GROUP_CORE_RANGE_MAX   = 3
 };
 
-enum SpellGroupStackFlags
+namespace std
 {
-    SPELL_GROUP_STACK_FLAG_NONE                 = 0x00,
-    SPELL_GROUP_STACK_FLAG_EXCLUSIVE            = 0x01,
-    SPELL_GROUP_STACK_FLAG_NOT_SAME_CASTER      = 0x02,
-    SPELL_GROUP_STACK_FLAG_FLAGGED              = 0x04, // xinef: just a marker
-    SPELL_GROUP_STACK_FLAG_NEVER_STACK          = 0x08,
-    SPELL_GROUP_STACK_FLAG_EFFECT_EXCLUSIVE     = 0x10,
-    SPELL_GROUP_STACK_FLAG_MAX                  = 0x20,
+    template<>
+    struct hash<SpellGroup>
+    {
+        size_t operator()(SpellGroup const& group) const
+        {
+            return hash<uint32>()(uint32(group));
+        }
+    };
+}
 
-    // Internal use
-    SPELL_GROUP_STACK_FLAG_FORCED_STRONGEST     = 0x100,
-    SPELL_GROUP_STACK_FLAG_FORCED_WEAKEST       = 0x200,
+#define SPELL_GROUP_DB_RANGE_MIN 1000
+
+//                  spell_id, group_id
+typedef std::unordered_multimap<uint32, SpellGroup> SpellSpellGroupMap;
+typedef std::pair<SpellSpellGroupMap::const_iterator, SpellSpellGroupMap::const_iterator> SpellSpellGroupMapBounds;
+
+//                      group_id, spell_id
+typedef std::unordered_multimap<SpellGroup, int32> SpellGroupSpellMap;
+typedef std::pair<SpellGroupSpellMap::const_iterator, SpellGroupSpellMap::const_iterator> SpellGroupSpellMapBounds;
+
+enum SpellGroupStackRule
+{
+    SPELL_GROUP_STACK_RULE_DEFAULT,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE_FROM_SAME_CASTER,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE_SAME_EFFECT,
+    SPELL_GROUP_STACK_RULE_EXCLUSIVE_HIGHEST,
+    SPELL_GROUP_STACK_RULE_MAX
 };
 
-enum SpellGroupIDs
-{
-    SPELL_GROUP_GUARDIAN_AND_BATTLE_ELIXIRS     = 1
-};
+typedef std::unordered_map<SpellGroup, SpellGroupStackRule> SpellGroupStackMap;
 
-struct SpellStackInfo
-{
-    uint32 groupId;
-    SpellGroupSpecialFlags specialFlags;
-};
-//             spell_id, group_id
-typedef std::map<uint32, SpellStackInfo> SpellGroupMap;
-typedef std::map<uint32, SpellGroupStackFlags> SpellGroupStackMap;
+typedef std::unordered_map<SpellGroup, std::unordered_set<uint32 /*auraName*/>> SameEffectStackMap;
 
 struct SpellThreatEntry
 {
@@ -669,7 +656,7 @@ public:
     [[nodiscard]] uint32 GetSpellWithRank(uint32 spell_id, uint32 rank, bool strict = false) const;
 
     // Spell Required table
-    [[nodiscard]] SpellRequiredMapBounds GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
+    [[nodiscard]] Acore::IteratorPair<SpellRequiredMap::const_iterator>GetSpellsRequiredForSpellBounds(uint32 spell_id) const;
     [[nodiscard]] SpellsRequiringSpellMapBounds GetSpellsRequiringSpellBounds(uint32 spell_id) const;
     [[nodiscard]] bool IsSpellRequiringSpell(uint32 spellid, uint32 req_spellid) const;
 
@@ -679,16 +666,18 @@ public:
     // Spell target coordinates
     [[nodiscard]] SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
 
-    // Spell Groups
-    [[nodiscard]] uint32 GetSpellGroup(uint32 spellid) const;
-    [[nodiscard]] SpellGroupSpecialFlags GetSpellGroupSpecialFlags(uint32 spell_id) const;
-    [[nodiscard]] SpellGroupStackFlags GetGroupStackFlags(uint32 groupid) const;
-    SpellGroupStackFlags CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2, bool remove, bool areaAura) const;
-    void GetSetOfSpellsInSpellGroupWithFlag(uint32 group_id, SpellGroupSpecialFlags flag, std::set<uint32>& availableElixirs) const;
+    // Spell Groups table
+    SpellSpellGroupMapBounds GetSpellSpellGroupMapBounds(uint32 spell_id) const;
+    bool IsSpellMemberOfSpellGroup(uint32 spell_id, SpellGroup group_id) const;
 
-    // Spell proc event table
-    [[nodiscard]] SpellProcEventEntry const* GetSpellProcEvent(uint32 spellId) const;
-    bool IsSpellProcEventCanTriggeredBy(SpellInfo const* spellProto, SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, ProcEventInfo const& eventInfo, bool active) const;
+    SpellGroupSpellMapBounds GetSpellGroupSpellMapBounds(SpellGroup group_id) const;
+    void GetSetOfSpellsInSpellGroup(SpellGroup group_id, std::set<uint32>& foundSpells) const;
+    void GetSetOfSpellsInSpellGroup(SpellGroup group_id, std::set<uint32>& foundSpells, std::set<SpellGroup>& usedGroups) const;
+
+    // Spell Group Stack Rules table
+    bool AddSameEffectStackRuleSpellGroups(SpellInfo const* spellInfo, uint32 auraType, int32 amount, std::map<SpellGroup, int32>& groups) const;
+    SpellGroupStackRule CheckSpellGroupStackRules(SpellInfo const* spellInfo1, SpellInfo const* spellInfo2) const;
+    SpellGroupStackRule GetSpellGroupStackRule(SpellGroup group_id) const;
 
     // Spell proc table
     [[nodiscard]] SpellProcEntry const* GetSpellProcEntry(uint32 spellId) const;
@@ -770,7 +759,6 @@ public:
     void LoadSpellTargetPositions();
     void LoadSpellGroups();
     void LoadSpellGroupStackRules();
-    void LoadSpellProcEvents();
     void LoadSpellProcs();
     void LoadSpellBonuses();
     void LoadSpellThreats();
@@ -798,9 +786,10 @@ private:
     SpellRequiredMap           mSpellReq;
     SpellLearnSkillMap         mSpellLearnSkills;
     SpellTargetPositionMap     mSpellTargetPositions;
-    SpellGroupMap              mSpellGroupMap;
-    SpellGroupStackMap         mSpellGroupStackMap;
-    SpellProcEventMap          mSpellProcEventMap;
+    SpellSpellGroupMap         mSpellSpellGroup;
+    SpellGroupSpellMap         mSpellGroupSpell;
+    SpellGroupStackMap         mSpellGroupStack;
+    SameEffectStackMap         mSpellSameEffectStack;
     SpellProcMap               mSpellProcMap;
     SpellBonusMap              mSpellBonusMap;
     SpellThreatMap             mSpellThreatMap;

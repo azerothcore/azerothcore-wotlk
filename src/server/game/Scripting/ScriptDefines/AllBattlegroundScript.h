@@ -18,6 +18,7 @@
 #ifndef SCRIPT_OBJECT_ALL_BATTLEGROUND_SCRIPT_H_
 #define SCRIPT_OBJECT_ALL_BATTLEGROUND_SCRIPT_H_
 
+#include "ObjectGuid.h"
 #include "ScriptObject.h"
 #include <vector>
 
@@ -40,12 +41,17 @@ enum AllBattlegroundHook
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_END,
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_DESTROY,
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_CREATE,
+    ALLBATTLEGROUNDHOOK_CAN_ADD_GROUP_TO_MATCHING_POOL,
+    ALLBATTLEGROUNDHOOK_GET_PLAYER_MATCHMAKING_RATING,
     ALLBATTLEGROUNDHOOK_END
 };
 
 enum BattlegroundBracketId : uint8;
 enum BattlegroundTypeId : uint8;
 enum TeamId : uint8;
+
+class BattlegroundQueue;
+struct GroupQueueInfo;
 
 class AllBattlegroundScript : public ScriptObject
 {
@@ -132,6 +138,34 @@ public:
      * @param bg Contains information about the Battleground
      */
     virtual void OnBattlegroundCreate(Battleground* /*bg*/) { }
+
+    /**
+     * @brief This hook runs before adding a group to the battleground matching pool
+     *
+     * Allows modules to filter groups based on custom criteria (e.g., MMR matching).
+     * Called during FillPlayersToBG before each group is added to the SelectionPool.
+     *
+     * @param queue The battleground queue
+     * @param group The group being considered for addition
+     * @param poolPlayerCount Current number of players already in the selection pool
+     * @param bg The battleground instance
+     * @param bracketId The bracket ID
+     * @return True to allow adding this group, false to skip it
+     */
+    [[nodiscard]] virtual bool CanAddGroupToMatchingPool(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*group*/, uint32 /*poolPlayerCount*/, Battleground* /*bg*/, BattlegroundBracketId /*bracketId*/) { return true; }
+
+    /**
+     * @brief This hook allows modules to provide matchmaking rating for a player
+     *
+     * Modules implementing MMR systems can use this hook to provide player ratings
+     * for use in matchmaking algorithms.
+     *
+     * @param playerGuid The player's GUID
+     * @param bgTypeId The battleground type
+     * @param outRating Reference to store the rating value
+     * @return True if rating was provided, false otherwise
+     */
+    [[nodiscard]] virtual bool GetPlayerMatchmakingRating(ObjectGuid /*playerGuid*/, BattlegroundTypeId /*bgTypeId*/, float& /*outRating*/) { return false; }
 };
 
 // Compatibility for old scripts

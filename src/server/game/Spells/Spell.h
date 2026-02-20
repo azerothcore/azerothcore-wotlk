@@ -599,6 +599,7 @@ public:
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
 
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
+    [[nodiscard]] SpellInfo const* GetTriggeredByAuraSpellInfo() const { return m_triggeredByAuraSpell.spellInfo; }
 
     [[nodiscard]] TriggerCastFlags GetTriggeredCastFlags() const { return _triggeredCastFlags; }
 
@@ -666,6 +667,9 @@ public:
     WorldLocation* destTarget;
     int32 damage;
     SpellEffectHandleMode effectHandleMode;
+    Unit* m_reflectionTarget;
+    ObjectGuid m_reflectionTargetGuid;
+    Position m_reflectionTargetPosition;
     // used in effects handlers
     Aura* m_spellAura;
 

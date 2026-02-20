@@ -82,30 +82,33 @@ struct npc_dragonflayer_forge_master : public ScriptedAI
 
 enum EnslavedProtoDrake
 {
-    TYPE_PROTODRAKE_AT      = 28,
-    DATA_PROTODRAKE_MOVE    = 6,
-
-    PATH_PROTODRAKE         = 125946,
-
-    EVENT_REND              = 1,
-    EVENT_FLAME_BREATH      = 2,
-    EVENT_KNOCKAWAY         = 3,
-
     SPELL_REND              = 43931,
     SPELL_FLAME_BREATH      = 50653,
     SPELL_KNOCK_AWAY        = 49722,
 
-    POINT_LAST              = 6,
+    EVENT_REND              = 1,
+    EVENT_FLAME_BREATH      = 2,
+    EVENT_KNOCKAWAY         = 3,
+    // Special
+    EVENT_PRE_LAND          = 4,
+    EVENT_LAND              = 5,
+
+    // Special
+    TYPE_PROTODRAKE_AT      = 28,
+    DATA_PROTODRAKE_MOVE    = 6,
+    POINT_TAKE_OFF          = 1,
+    POINT_PRE_LAND          = 2,
+    POINT_LAND              = 3,
 };
 
-const Position protodrakeCheckPos = {206.24f, -190.28f, 200.11f, 0.f};
+const Position protodrakeCheckPos{206.24f, -190.28f, 200.11f, 0.f};
+const Position protodrakeTakeOffPos{209.1206f, -187.86578f, 215.00346f};
+const Position protodrakePreLandPos{230.80234f, -164.99632f, 196.74878f};
+const Position protodrakeLandPos{241.2079f, -163.06265f, 193.47125f};
 
 struct npc_enslaved_proto_drake : public ScriptedAI
 {
-    npc_enslaved_proto_drake(Creature* creature) : ScriptedAI(creature)
-    {
-        _setData = false;
-    }
+    explicit npc_enslaved_proto_drake(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
@@ -113,22 +116,35 @@ struct npc_enslaved_proto_drake : public ScriptedAI
         _events.ScheduleEvent(EVENT_REND, 2s, 3s);
         _events.ScheduleEvent(EVENT_FLAME_BREATH, 5500ms, 7s);
         _events.ScheduleEvent(EVENT_KNOCKAWAY, 3500ms, 6s);
+        scheduler.CancelAll();
     }
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type == WAYPOINT_MOTION_TYPE && id == POINT_LAST)
+        if (type == EFFECT_MOTION_TYPE && id == POINT_TAKE_OFF)
         {
+            ScheduleUniqueTimedEvent(500ms, [&]
+            {
+                me->GetMotionMaster()->MovePoint(POINT_PRE_LAND, protodrakePreLandPos);
+            }, EVENT_PRE_LAND);
+        }
+
+        if (type == POINT_MOTION_TYPE && id == POINT_PRE_LAND)
+        {
+            ScheduleUniqueTimedEvent(0s, [&]
+            {
+                me->GetMotionMaster()->MovePoint(POINT_LAND, protodrakeLandPos);
+            }, EVENT_LAND);
+        }
+
+        if (type == POINT_MOTION_TYPE && id == POINT_LAND)
+        {
+            me->SetFacingTo(0.25f);
             me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
             if (Vehicle* v = me->GetVehicleKit())
                 if (Unit* p = v->GetPassenger(0))
                     if (Creature* rider = p->ToCreature())
                         rider->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
-
-            me->SetCanFly(false);
-            me->SetDisableGravity(false);
-            me->SetFacingTo(0.25f);
-            me->SetImmuneToAll(false);
         }
     }
 
@@ -137,14 +153,14 @@ struct npc_enslaved_proto_drake : public ScriptedAI
         if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
         {
             _setData = true;
-            me->SetCanFly(true);
-            me->SetDisableGravity(true);
-            me->GetMotionMaster()->MoveWaypoint(PATH_PROTODRAKE, false);
+            me->GetMotionMaster()->MoveTakeoff(POINT_TAKE_OFF, protodrakeTakeOffPos,  8.0f);
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
@@ -178,13 +194,51 @@ struct npc_enslaved_proto_drake : public ScriptedAI
     }
 
 private:
-    bool _setData;
+    bool _setData{false};
     EventMap _events;
 };
 
 enum TickingTimeBomb
 {
     SPELL_TICKING_TIME_BOMB_EXPLODE = 59687
+};
+
+enum SecondWind
+{
+    SPELL_SECOND_WIND_TRIGGER = 42771
+};
+
+// 42770 - Second Wind
+class spell_uk_second_wind : public AuraScript
+{
+    PrepareAuraScript(spell_uk_second_wind);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SECOND_WIND_TRIGGER });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_STUN))) != 0;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActionTarget();
+        caster->CastSpell(caster, SPELL_SECOND_WIND_TRIGGER, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_uk_second_wind::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_uk_second_wind::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
 };
 
 class spell_ticking_time_bomb_aura : public AuraScript
@@ -215,5 +269,6 @@ void AddSC_utgarde_keep()
     RegisterUtgardeKeepCreatureAI(npc_dragonflayer_forge_master);
     RegisterUtgardeKeepCreatureAI(npc_enslaved_proto_drake);
 
+    RegisterSpellScript(spell_uk_second_wind);
     RegisterSpellScript(spell_ticking_time_bomb_aura);
 }

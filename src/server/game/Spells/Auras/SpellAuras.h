@@ -153,6 +153,7 @@ public:
 
     uint8 GetCasterLevel() const { return m_casterLevel; }
 
+    bool HasMoreThanOneEffectForType(AuraType auraType) const;
     bool IsArea() const;
     bool IsPassive() const;
     bool IsDeathPersistent() const;
@@ -188,21 +189,21 @@ public:
     void HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, bool apply, bool onReapply);
     bool CanBeAppliedOn(Unit* target);
     bool CheckAreaTarget(Unit* target);
-    bool CanStackWith(Aura const* checkAura, bool remove) const;
+    bool CanStackWith(Aura const* existingAura) const;
     bool IsAuraStronger(Aura const* newAura) const;
 
     // Proc system
-    // this subsystem is not yet in use - the core of it is functional, but still some research has to be done
-    // and some dependant problems fixed before it can replace old proc system (for example cooldown handling)
-    // currently proc system functionality is implemented in Unit::ProcDamageAndSpell
-    bool IsProcOnCooldown() const;
-    void AddProcCooldown(Milliseconds msec);
+    bool IsProcOnCooldown(TimePoint now) const;
+    void AddProcCooldown(TimePoint cooldownEnd);
+    void AddProcCooldown(SpellProcEntry const* procEntry, TimePoint now);
+    void ResetProcCooldown();
     bool IsUsingCharges() const { return m_isUsingCharges; }
     void SetUsingCharges(bool val) { m_isUsingCharges = val; }
-    void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo);
-    bool IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo) const;
+    void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now);
+    uint8 GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now) const;
     float CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
-    void TriggerProcOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    void TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    void ConsumeProcCharges(SpellProcEntry const* procEntry);
 
     // AuraScript
     void LoadScripts();
@@ -226,6 +227,7 @@ public:
 
     // Spell Proc Hooks
     bool CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
+    bool CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent);
     bool CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
@@ -268,6 +270,8 @@ protected:
     bool m_isRemoved: 1;
     bool m_isSingleTarget: 1;                       // true if it's a single target spell and registered at caster - can change at spell steal for example
     bool m_isUsingCharges: 1;
+
+    TimePoint m_procCooldown;
 
 private:
     Unit::AuraApplicationList m_removedApplications;

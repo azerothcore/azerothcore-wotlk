@@ -23,12 +23,14 @@ DROP TABLE IF EXISTS `petition_sign`;
 CREATE TABLE `petition_sign` (
   `ownerguid` int unsigned NOT NULL,
   `petitionguid` int unsigned NOT NULL DEFAULT '0',
+  `petition_id` int unsigned NOT NULL DEFAULT '0',
   `playerguid` int unsigned NOT NULL DEFAULT '0',
   `player_account` int unsigned NOT NULL DEFAULT '0',
   `type` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`petitionguid`,`playerguid`),
   KEY `Idx_playerguid` (`playerguid`),
-  KEY `Idx_ownerguid` (`ownerguid`)
+  KEY `Idx_ownerguid` (`ownerguid`),
+  KEY `idx_petition_id_player` (`petition_id`,`playerguid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Guild System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -49,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:10:15
+-- Dump completed on 2025-12-29 17:55:13
