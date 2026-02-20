@@ -62,6 +62,7 @@ protected:
     std::unique_ptr<rbac::RBACPermission> permission;
 };
 
+// cppcheck-suppress syntaxError
 TEST_F(RBACPermissionTest, Constructor_SetsIdAndName)
 {
     EXPECT_EQ(permission->GetId(), TEST_PERM_1);
