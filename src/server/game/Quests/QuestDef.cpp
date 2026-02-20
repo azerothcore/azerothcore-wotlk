@@ -177,17 +177,18 @@ void Quest::LoadQuestTemplateAddon(Field* fields)
     PrevQuestId = fields[4].Get<int32>();
     NextQuestId = fields[5].Get<uint32>();
     ExclusiveGroup = fields[6].Get<int32>();
-    RewardMailTemplateId = fields[7].Get<uint32>();
-    RewardMailDelay = fields[8].Get<uint32>();
-    RequiredSkillId = fields[9].Get<uint16>();
-    RequiredSkillPoints = fields[10].Get<uint16>();
-    RequiredMinRepFaction = fields[11].Get<uint16>();
-    RequiredMaxRepFaction = fields[12].Get<uint16>();
-    RequiredMinRepValue = fields[13].Get<int32>();
-    RequiredMaxRepValue = fields[14].Get<int32>();
-    StartItemCount = fields[15].Get<uint8>();
-    RewardMailSenderEntry = fields[16].Get<uint32>();
-    SpecialFlags = fields[17].Get<uint32>();
+    BreadcrumbForQuestId = fields[7].Get<uint32>();
+    RewardMailTemplateId = fields[8].Get<uint32>();
+    RewardMailDelay = fields[9].Get<uint32>();
+    RequiredSkillId = fields[10].Get<uint16>();
+    RequiredSkillPoints = fields[11].Get<uint16>();
+    RequiredMinRepFaction = fields[12].Get<uint16>();
+    RequiredMaxRepFaction = fields[13].Get<uint16>();
+    RequiredMinRepValue = fields[14].Get<int32>();
+    RequiredMaxRepValue = fields[15].Get<int32>();
+    StartItemCount = fields[16].Get<uint8>();
+    RewardMailSenderEntry = fields[17].Get<uint32>();
+    SpecialFlags = fields[18].Get<uint32>();
 
     if ((SpecialFlags & QUEST_SPECIAL_FLAGS_AUTO_ACCEPT) && !sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_AUTO_ACCEPT))
     {

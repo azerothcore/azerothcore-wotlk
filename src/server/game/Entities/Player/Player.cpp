@@ -1642,12 +1642,9 @@ void Player::ProcessDelayedOperations()
     if (m_DelayedOperations & DELAYED_SAVE_PLAYER)
         SaveToDB(false, false);
 
-    if (m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
-    {
-        Aura* aura = GetAura(26013);
-        if (!aura || aura->GetDuration() <= 900000)
+    if ((m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
+        && !GetAura(26013))
             CastSpell(this, 26013, true);
-    }
 
     if (m_DelayedOperations & DELAYED_BG_MOUNT_RESTORE)
     {
@@ -5993,6 +5990,19 @@ void Player::RewardReputation(Unit* victim)
     }
 }
 
+FactionTemplateEntry const* GetAnyFactionTemplateForFaction(uint32 factionId)
+{
+    for (uint32 i = 0; i < sFactionTemplateStore.GetNumRows(); ++i)
+    {
+        if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(i))
+        {
+            if (factionTemplate->faction == factionId)
+                return factionTemplate;
+        }
+    }
+    return nullptr;
+}
+
 // Calculate how many reputation points player gain with the quest
 void Player::RewardReputation(Quest const* quest)
 {
@@ -6046,10 +6056,24 @@ void Player::RewardReputation(Quest const* quest)
             sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_QUEST);
         }
 
-        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
+        FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]);
+        if (!factionEntry)
+            continue;
+
+        FactionTemplateEntry const* templateEntry = GetAnyFactionTemplateForFaction(factionEntry->ID);
+        if (templateEntry)
         {
-            GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
+            bool hostile = (GetTeamId() == TEAM_ALLIANCE) ? templateEntry->IsHostileToAlliancePlayers()
+                                                          : templateEntry->IsHostileToHordePlayers();
+
+            if (hostile)
+            {
+                LOG_DEBUG("sql.sql", "RewardReputation: {} is hostile with player ({}), skipping!", templateEntry->ID, GetGUID().ToString());
+                continue;
+            }
         }
+
+        GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
     }
 }
 
@@ -6193,7 +6217,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             // Xinef: Only for BG activities
             if (!uVictim)
             {
-                uint32 xp = uint32(honor * (3 + GetLevel() * 0.30f));
+                uint32 xp = static_cast<uint32>(honor * (3 + GetLevel() * 0.30f) * sWorld->getRate(RATE_XP_BATTLEGROUND_BONUS));
                 sScriptMgr->OnPlayerGiveXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
                 GiveXP(xp, nullptr);
             }
@@ -7348,7 +7372,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (entry)
             {
                 if (entry->PPMChance)
-                    chance = GetPPMProcChance(proto->Delay, entry->PPMChance, spellInfo);
+                    chance = GetPPMProcChance(GetAttackTime(attType), entry->PPMChance, spellInfo);
                 else if (entry->customChance)
                     chance = (float)entry->customChance;
             }
@@ -9077,13 +9101,6 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     if (pet)
     {
-        // xinef: dont save dead pet as current, save him not in slot
-        if (!pet->IsAlive() && mode == PET_SAVE_AS_CURRENT && pet->getPetType() == HUNTER_PET)
-        {
-            mode = PET_SAVE_NOT_IN_SLOT;
-            m_temporaryUnsummonedPetNumber = 0;
-        }
-
         LOG_DEBUG("entities.pet", "RemovePet {}, {}, {}", pet->GetEntry(), mode, returnreagent);
         if (pet->m_removed)
             return;
@@ -9728,8 +9745,8 @@ bool Player::IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod
     if (!mod || !spellInfo)
         return false;
 
-    // Mod out of charges
-    if (spell && mod->charges == -1 && spell->m_appliedMods.find(mod->ownerAura) == spell->m_appliedMods.end())
+    // First time this aura applies a mod to us and is out of charges
+    if (spell && mod->ownerAura && mod->ownerAura->IsUsingCharges() && !mod->ownerAura->GetCharges() && !spell->m_appliedMods.count(mod->ownerAura))
         return false;
 
     // +duration to infinite duration spells making them limited
@@ -9752,7 +9769,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
     auto calculateSpellMod = [&](SpellModifier* mod)
     {
         // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
-        if (temporaryPet && mod->charges != 0)
+        if (temporaryPet && mod->ownerAura && mod->ownerAura->IsUsingCharges())
             return;
 
         // skip if already instant or cost is free
@@ -9784,10 +9801,10 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
             if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
                 return;
             // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
-            else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
+            else if (mod->op == SPELLMOD_CRITICAL_CHANCE && !HasSpellModApplied(mod, spell))
                 return;
             // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
-            else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
+            else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && !HasSpellModApplied(mod, spell))
                 return;
 
             // xinef: those two mods should be multiplicative (Glyph of Renew)
@@ -9797,7 +9814,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
                 totalmul += CalculatePct(1.0f, mod->value);
         }
 
-        DropModCharge(mod, spell);
+        ApplyModToSpell(mod, spell);
     };
 
     // Drop charges for triggering spells instead of triggered ones
@@ -9806,10 +9823,6 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
 
     for (auto mod : m_spellMods[op])
     {
-        // Charges can be set only for mods with auras
-        if (!mod->ownerAura)
-            ASSERT(!mod->charges);
-
         if (!IsAffectedBySpellmod(spellInfo, mod, spell))
             continue;
 
@@ -9825,17 +9838,6 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
 template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, int32& basevalue, Spell* spell, bool temporaryPet);
 template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, uint32& basevalue, Spell* spell, bool temporaryPet);
 template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, float& basevalue, Spell* spell, bool temporaryPet);
-
-// Binary predicate for sorting SpellModifiers
-struct SpellModPredicate
-{
-    bool operator() (SpellModifier const* a, SpellModifier const* b) const
-    {
-        if (a->type != b->type)
-            return a->type == SPELLMOD_FLAT;
-        return a->priority > b->priority;
-    }
-};
 
 void Player::AddSpellMod(SpellModifier* mod, bool apply)
 {
@@ -9853,7 +9855,7 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
         if (mod->mask & _mask)
         {
             int32 val = 0;
-            for (SpellModList::iterator itr = m_spellMods[mod->op].begin(); itr != m_spellMods[mod->op].end(); ++itr)
+            for (SpellModContainer::iterator itr = m_spellMods[mod->op].begin(); itr != m_spellMods[mod->op].end(); ++itr)
             {
                 if ((*itr)->type == mod->type && (*itr)->mask & _mask)
                     val += (*itr)->value;
@@ -9869,12 +9871,11 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
 
     if (apply)
     {
-        m_spellMods[mod->op].push_back(mod);
-        m_spellMods[mod->op].sort(SpellModPredicate());
+        m_spellMods[mod->op].insert(mod);
     }
     else
     {
-        m_spellMods[mod->op].remove(mod);
+        m_spellMods[mod->op].erase(mod);
         // mods bound to aura will be removed in AuraEffect::~AuraEffect
         if (!mod->ownerAura)
             delete mod;
@@ -9891,7 +9892,7 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
 
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
-        for (SpellModList::iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
+        for (SpellModContainer::iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
         {
             SpellModifier* mod = *itr;
 
@@ -9920,20 +9921,6 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
             // from applied mods (Else, an aura with two mods on the current spell would
             // only see the first of its modifier restored)
             aurasQueue.push_back(mod->ownerAura);
-
-            // add mod charges back to mod
-            if (mod->charges == -1)
-                mod->charges = 1;
-            else
-                mod->charges++;
-
-            // Do not set more spellmods than available
-            if (mod->ownerAura->GetCharges() < mod->charges)
-                mod->charges = mod->ownerAura->GetCharges();
-
-            // Skip this check for now - aura charges may change due to various reason
-            /// @todo track these changes correctly
-            //ASSERT (mod->ownerAura->GetCharges() <= mod->charges);
         }
     }
 
@@ -9968,14 +9955,14 @@ void Player::RemoveSpellMods(Spell* spell)
 
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
-        for (SpellModList::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
+        for (SpellModContainer::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
         {
             SpellModifier* mod = *itr;
             ++itr;
 
-            // don't handle spells with proc_event entry defined
+            // don't handle spells with spell_proc entry defined
             // this is a temporary workaround, because all spellmods should be handled like that
-            if (sSpellMgr->GetSpellProcEvent(mod->spellId))
+            if (sSpellMgr->GetSpellProcEntry(mod->spellId))
             {
                 continue;
             }
@@ -10001,20 +9988,14 @@ void Player::RemoveSpellMods(Spell* spell)
                 if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
                     if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
                         if (roll_chance_i(aurEff->GetAmount()))
-                        {
-                            mod->charges = 1;
-                            continue;
-                        }
+                            continue; // don't consume charge
             }
             // ROGUE MUTILATE WITH COLD BLOOD
             if (spellInfo->Id == 5374)
             {
                 SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
                 if (sp->Id == 14177) // Cold Blood
-                {
-                    mod->charges = 1;
-                    continue;
-                }
+                    continue; // don't consume charge
             }
 
             if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
@@ -10023,15 +10004,25 @@ void Player::RemoveSpellMods(Spell* spell)
     }
 }
 
-void Player::DropModCharge(SpellModifier* mod, Spell* spell)
+void Player::ApplyModToSpell(SpellModifier* mod, Spell* spell)
 {
-    if (spell && mod->ownerAura && mod->charges > 0)
-    {
-        if (--mod->charges == 0)
-            mod->charges = -1;
+    if (!spell)
+        return;
 
-        spell->m_appliedMods.insert(mod->ownerAura);
-    }
+    // don't do anything with no charges
+    if (mod->ownerAura->IsUsingCharges() && !mod->ownerAura->GetCharges())
+        return;
+
+    // register inside spell, proc system uses this to drop charges
+    spell->m_appliedMods.insert(mod->ownerAura);
+}
+
+bool Player::HasSpellModApplied(SpellModifier* mod, Spell* spell)
+{
+    if (!spell)
+        return false;
+
+    return spell->m_appliedMods.count(mod->ownerAura) != 0;
 }
 
 void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
@@ -11753,6 +11744,9 @@ void Player::ApplyEquipCooldown(Item* pItem)
     if (pItem->GetTemplate()->HasFlag(ITEM_FLAG_NO_EQUIP_COOLDOWN))
         return;
 
+    if (GetCommandStatus(CHEAT_COOLDOWN))
+        return;
+
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
         _Spell const& spellData = pItem->GetTemplate()->Spells[i];
@@ -11761,11 +11755,15 @@ void Player::ApplyEquipCooldown(Item* pItem)
         if (!spellData.SpellId)
             continue;
 
-        // xinef: apply hidden cooldown for procs
+        // apply proc cooldown to equip auras if we have any
         if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP)
         {
-            // xinef: uint32(-1) special marker for proc cooldowns
-            AddSpellCooldown(spellData.SpellId, uint32(-1), 30 * IN_MILLISECONDS);
+            SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(spellData.SpellId);
+            if (!procEntry)
+                continue;
+
+            if (Aura* itemAura = GetAura(spellData.SpellId, GetGUID(), pItem->GetGUID()))
+                itemAura->AddProcCooldown(std::chrono::steady_clock::now() + std::chrono::seconds(30));
             continue;
         }
 
@@ -11976,7 +11974,17 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 {
     uint32 raceMask  = getRaceMask();
     uint32 classMask = getClassMask();
-    for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+
+    // Get all abilities for this skill and sort by MinSkillLineRank (lowest to highest)
+    auto abilities = GetSkillLineAbilitiesBySkillLine(skill_id);
+    std::vector<SkillLineAbilityEntry const*> sortedAbilities(abilities.begin(), abilities.end());
+    std::sort(sortedAbilities.begin(), sortedAbilities.end(),
+        [](SkillLineAbilityEntry const* a, SkillLineAbilityEntry const* b)
+        {
+            return a->MinSkillLineRank < b->MinSkillLineRank;
+        });
+
+    for (SkillLineAbilityEntry const* pAbility : sortedAbilities)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pAbility->Spell);
         if (!spellInfo)
@@ -12306,23 +12314,33 @@ bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const
 
 float Player::GetReputationPriceDiscount(Creature const* creature) const
 {
-    return GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    float discount = GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, creature, discount);
+    return discount;
 }
 
 float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
 {
+    float discount = 1.0f;
+
     if (!factionTemplate || !factionTemplate->faction)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
     ReputationRank rank = GetReputationRank(factionTemplate->faction);
+
     if (rank <= REP_NEUTRAL)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
-    return 1.0f - 0.05f * (rank - REP_NEUTRAL);
+    discount = discount - 0.05f * (rank - REP_NEUTRAL);
+
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+    return discount;
 }
 
 bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
@@ -12342,6 +12360,10 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
 
         // skip wrong class skills
         if (_spell_idx->second->ClassMask && (_spell_idx->second->ClassMask & classmask) == 0)
+            continue;
+
+        // skip wrong class and race skill saved in SkillRaceClassInfo.dbc
+        if (!GetSkillRaceClassInfo(_spell_idx->second->SkillLine, getRace(), getClass()))
             continue;
 
         return true;
@@ -12822,9 +12844,21 @@ void Player::ResurectUsingRequestData()
 
 void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= false*/)
 {
+    ASSERT(target);
+    // refuse to grant control if target has UNIT_STATE_CHARMED
+    if (target->HasUnitState(UNIT_STATE_CHARMED) && (GetGUID() != target->GetCharmerGUID()))
+    {
+        LOG_ERROR("entities.player", "Player '{}' attempt to client control '{}', which is charmed by GUID {}", GetName(), target->GetName(), target->GetCharmerGUID().ToString());
+        return;
+    }
+
+    // still affected by some aura that shouldn't allow control, only allow on last such aura to be removed
+    if (target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
+        allowMove = false;
+
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
-    data << uint8((allowMove && !target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED)) ? 1 : 0);
+    data << uint8(allowMove ? 1 : 0);
     SendDirectMessage(&data);
 
     // We want to set the packet only
@@ -14345,7 +14379,7 @@ bool Player::CanSeeVendor(Creature const* creature) const
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
         return false;
 
-    uint32 const menuId = creature->GetCreatureTemplate()->GossipMenuId;
+    uint32 const menuId = creature->GetGossipMenuId();
     if (!AnyVendorOptionAvailable(menuId, creature))
         return false;
 
