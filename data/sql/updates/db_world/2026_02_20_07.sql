@@ -1,3 +1,4 @@
+-- DB update 2026_02_20_06 -> 2026_02_20_07
 -- Inner Focus (14751) - Add spell_proc entry with PROC_ATTR_REQ_SPELLMOD
 -- Without this, the proc system consumes the charge on the spell's own cast
 -- because Inner Focus's SpellFamilyFlags overlap with its EffectSpellClassMask.
