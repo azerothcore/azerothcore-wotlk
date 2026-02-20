@@ -1,3 +1,4 @@
+-- DB update 2026_02_20_04 -> 2026_02_20_05
 --
 DELETE FROM `waypoint_data` WHERE `id` IN (244401, 244402, 244403, 244404, 244411, 244412, 244413, 244414, 244415, 244416, 244417, 244418);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`) VALUES
