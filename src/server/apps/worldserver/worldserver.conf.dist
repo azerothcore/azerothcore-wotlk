@@ -2186,7 +2186,7 @@ Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
 #     LevelReq.Trade
-#        Description: Level requirement for characters to be able to trade.
+#        Description: Level requirement for characters to be able to initiate a trade.
 #        Default:     1
 
 LevelReq.Trade = 1
@@ -2422,6 +2422,13 @@ Rate.XP.BattlegroundKillSOTA = 1
 Rate.XP.BattlegroundKillIC   = 1
 
 #
+#    Rate.XP.BattlegroundBonus
+#        Description: Experience rate multiplier for battleground objectives (flag captures, base assaults, etc.).
+#        Default:     1
+
+Rate.XP.BattlegroundBonus = 1
+
+#
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
 #       The lower the rate the less experience is required.
@@ -2500,6 +2507,20 @@ Arena.LegacyArenaPoints = 0
 #        Default:     1
 
 Rate.ArenaPoints = 1
+
+#
+#    Rate.ArenaPoints2v2
+#        Description: Arena points gain rate for 2v2 bracket.
+#        Default:     0.76
+
+Rate.ArenaPoints2v2 = 0.76
+
+#
+#    Rate.ArenaPoints3v3
+#        Description: Arena points gain rate for 3v3 bracket.
+#        Default:     0.88
+
+Rate.ArenaPoints3v3 = 0.88
 
 #
 #    PvPToken.Enable

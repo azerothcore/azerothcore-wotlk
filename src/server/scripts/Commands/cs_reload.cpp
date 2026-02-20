@@ -30,6 +30,7 @@
 #include "MapMgr.h"
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
+#include "PoolMgr.h"
 #include "ScriptMgr.h"
 #include "ServerMailMgr.h"
 #include "SkillDiscovery.h"
@@ -156,7 +157,6 @@ public:
             { "spell_loot_template",           HandleReloadLootTemplatesSpellCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "spell_linked_spell",            HandleReloadSpellLinkedSpellCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "spell_pet_auras",               HandleReloadSpellPetAurasCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "spell_proc_event",              HandleReloadSpellProcEventCommand,             SEC_ADMINISTRATOR, Console::Yes },
             { "spell_proc",                    HandleReloadSpellProcsCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "spell_scripts",                 HandleReloadSpellScriptsCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "spell_target_position",         HandleReloadSpellTargetPositionCommand,        SEC_ADMINISTRATOR, Console::Yes },
@@ -270,6 +270,7 @@ public:
 
         LOG_INFO("server.loading", "Reloading Quests Relations...");
         sObjectMgr->LoadQuestStartersAndEnders();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB tables `*_queststarter` and `*_questender` reloaded.");
         return true;
     }
@@ -299,7 +300,6 @@ public:
         HandleReloadSpellAreaCommand(handler);
         HandleReloadSpellGroupsCommand(handler);
         HandleReloadSpellLinkedSpellCommand(handler);
-        HandleReloadSpellProcEventCommand(handler);
         HandleReloadSpellProcsCommand(handler);
         HandleReloadSpellBonusesCommand(handler);
         HandleReloadSpellTargetPositionCommand(handler);
@@ -490,6 +490,7 @@ public:
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`creature_queststarter`)");
         sObjectMgr->LoadCreatureQuestStarters();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB table `creature_queststarter` reloaded.");
         return true;
     }
@@ -532,6 +533,7 @@ public:
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`gameobject_queststarter`)");
         sObjectMgr->LoadGameobjectQuestStarters();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB table `gameobject_queststarter` reloaded.");
         return true;
     }
@@ -894,14 +896,6 @@ public:
         LOG_INFO("server.loading", "Reloading Spell Linked Spells...");
         sSpellMgr->LoadSpellLinked();
         handler->SendGlobalGMSysMessage("DB table `spell_linked_spell` reloaded.");
-        return true;
-    }
-
-    static bool HandleReloadSpellProcEventCommand(ChatHandler* handler)
-    {
-        LOG_INFO("server.loading", "Reloading Spell Proc Event conditions...");
-        sSpellMgr->LoadSpellProcEvents();
-        handler->SendGlobalGMSysMessage("DB table `spell_proc_event` (spell proc trigger requirements) reloaded.");
         return true;
     }
 
