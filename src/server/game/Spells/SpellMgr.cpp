@@ -1804,21 +1804,22 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL] = true;
     isTriggerAura[SPELL_AURA_PROC_TRIGGER_DAMAGE] = true;
     isTriggerAura[SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK] = true;
+    isTriggerAura[SPELL_AURA_SCHOOL_ABSORB] = true;                         // Savage Defense untested
     isTriggerAura[SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT] = true;
     isTriggerAura[SPELL_AURA_MOD_POWER_COST_SCHOOL] = true;
     isTriggerAura[SPELL_AURA_REFLECT_SPELLS_SCHOOL] = true;
+    isTriggerAura[SPELL_AURA_MECHANIC_IMMUNITY] = true;
     isTriggerAura[SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN] = true;
+    isTriggerAura[SPELL_AURA_SPELL_MAGNET] = true;
     isTriggerAura[SPELL_AURA_MOD_ATTACK_POWER] = true;
-    isTriggerAura[SPELL_AURA_ADD_CASTER_HIT_TRIGGER] = true;
+    isTriggerAura[SPELL_AURA_MOD_POWER_REGEN_PERCENT] = true;
     isTriggerAura[SPELL_AURA_OVERRIDE_CLASS_SCRIPTS] = true;
+    isTriggerAura[SPELL_AURA_MOD_MECHANIC_RESISTANCE] = true;
+    isTriggerAura[SPELL_AURA_RANGED_ATTACK_POWER_ATTACKER_BONUS] = true;
     isTriggerAura[SPELL_AURA_MOD_MELEE_HASTE] = true;
     isTriggerAura[SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE] = true;
-    isTriggerAura[SPELL_AURA_RAID_PROC_FROM_CHARGE] = true;
-    isTriggerAura[SPELL_AURA_RAID_PROC_FROM_CHARGE_WITH_VALUE] = true;
     isTriggerAura[SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE] = true;
     isTriggerAura[SPELL_AURA_MOD_SPELL_CRIT_CHANCE] = true;
-    isTriggerAura[SPELL_AURA_ADD_FLAT_MODIFIER] = true;
-    isTriggerAura[SPELL_AURA_ADD_PCT_MODIFIER] = true;
     isTriggerAura[SPELL_AURA_ABILITY_IGNORE_AURASTATE] = true;
 
     isAlwaysTriggeredAura[SPELL_AURA_OVERRIDE_CLASS_SCRIPTS] = true;
@@ -2003,13 +2004,17 @@ void SpellMgr::LoadSpellProcs()
         if (!spellInfo)
             continue;
 
-        // Skip if already has explicit entry
+        // Data already present in DB, overwrites default proc
         if (mSpellProcMap.find(spellInfo->Id) != mSpellProcMap.end())
             continue;
 
-        // Check if spell has any trigger aura effects
-        bool found = false, addTriggerFlag = false;
+        // Nothing to do if no flags set
+        if (!spellInfo->ProcFlags)
+            continue;
+
+        bool addTriggerFlag = false;
         uint32 procSpellTypeMask = PROC_SPELL_TYPE_NONE;
+        uint32 nonProcMask = 0;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (!spellInfo->Effects[i].IsEffect())
@@ -2020,26 +2025,50 @@ void SpellMgr::LoadSpellProcs()
                 continue;
 
             if (!isTriggerAura[auraName])
+            {
+                // explicitly disable non proccing auras to avoid losing charges on self proc
+                nonProcMask |= 1u << i;
                 continue;
+            }
 
-            found = true;
             procSpellTypeMask |= spellTypeMask[auraName];
-
-            if (!addTriggerFlag && isAlwaysTriggeredAura[auraName])
+            if (isAlwaysTriggeredAura[auraName])
                 addTriggerFlag = true;
+
+            // many proc auras with taken procFlag mask don't have attribute "can proc with triggered"
+            // they should proc nevertheless (example mage armor spells with judgement)
+            if (!addTriggerFlag && (spellInfo->ProcFlags & TAKEN_HIT_PROC_FLAG_MASK) != 0)
+            {
+                switch (auraName)
+                {
+                    case SPELL_AURA_PROC_TRIGGER_SPELL:
+                    case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+                        addTriggerFlag = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
-        if (!found)
+        if (!procSpellTypeMask)
+        {
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (spellInfo->Effects[i].IsAura())
+                {
+                    LOG_ERROR("sql.sql", "Spell Id {} has DBC ProcFlags {}, but it's of non-proc aura type, it probably needs an entry in `spell_proc` table to be handled correctly.",
+                        spellInfo->Id, spellInfo->ProcFlags);
+                    break;
+                }
+            }
             continue;
+        }
 
-        // Skip if no proc flags in DBC
-        if (!spellInfo->ProcFlags)
-            continue;
-
-        // Generate default proc entry from DBC data
         SpellProcEntry procEntry;
         procEntry.SchoolMask      = 0;
-        procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
+        procEntry.ProcFlags       = spellInfo->ProcFlags;
+        procEntry.SpellFamilyName = 0;
         procEntry.SpellFamilyMask[0] = 0;
         procEntry.SpellFamilyMask[1] = 0;
         procEntry.SpellFamilyMask[2] = 0;
@@ -2047,37 +2076,37 @@ void SpellMgr::LoadSpellProcs()
             if (spellInfo->Effects[i].IsEffect() && isTriggerAura[spellInfo->Effects[i].ApplyAuraName])
                 procEntry.SpellFamilyMask |= spellInfo->Effects[i].SpellClassMask;
 
-        procEntry.ProcFlags = spellInfo->ProcFlags;
+        if (procEntry.SpellFamilyMask)
+            procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
+
         procEntry.SpellTypeMask   = procSpellTypeMask;
         procEntry.SpellPhaseMask  = PROC_SPELL_PHASE_HIT;
         procEntry.HitMask         = PROC_HIT_NONE; // uses default proc @see SpellMgr::CanSpellTriggerProcOnEvent
 
-        // Reflect auras should only proc off reflects
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
-            if (spellInfo->Effects[i].IsAura(SPELL_AURA_REFLECT_SPELLS) || spellInfo->Effects[i].IsAura(SPELL_AURA_REFLECT_SPELLS_SCHOOL))
+            if (!spellInfo->Effects[i].IsAura())
+                continue;
+
+            switch (spellInfo->Effects[i].ApplyAuraName)
             {
-                procEntry.HitMask = PROC_HIT_REFLECT;
-                break;
+                // Reflect auras should only proc off reflects
+                case SPELL_AURA_REFLECT_SPELLS:
+                case SPELL_AURA_REFLECT_SPELLS_SCHOOL:
+                    procEntry.HitMask = PROC_HIT_REFLECT;
+                    break;
+                default:
+                    continue;
             }
+            break;
         }
 
         procEntry.AttributesMask  = 0;
+        procEntry.DisableEffectsMask = nonProcMask;
         if (spellInfo->ProcFlags & PROC_FLAG_KILL)
             procEntry.AttributesMask |= PROC_ATTR_REQ_EXP_OR_HONOR;
         if (addTriggerFlag)
             procEntry.AttributesMask |= PROC_ATTR_TRIGGERED_CAN_PROC;
-
-        // Calculate DisableEffectsMask for effects that shouldn't trigger procs
-        uint32 nonProcMask = 0;
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-        {
-            if (!spellInfo->Effects[i].IsAura())
-                continue;
-            if (!isTriggerAura[spellInfo->Effects[i].ApplyAuraName])
-                nonProcMask |= 1u << i;
-        }
-        procEntry.DisableEffectsMask = nonProcMask;
 
         procEntry.ProcsPerMinute  = 0;
         procEntry.Chance          = static_cast<float>(spellInfo->ProcChance);

@@ -9963,9 +9963,7 @@ void Player::RemoveSpellMods(Spell* spell)
             // don't handle spells with spell_proc entry defined
             // this is a temporary workaround, because all spellmods should be handled like that
             if (sSpellMgr->GetSpellProcEntry(mod->spellId))
-            {
                 continue;
-            }
 
             // spellmods without aura set cannot be charged
             if (!mod->ownerAura || !mod->ownerAura->IsUsingCharges())
