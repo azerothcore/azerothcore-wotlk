@@ -930,8 +930,6 @@ class spell_mage_summon_water_elemental : public SpellScript
 };
 
 // 74396 - Fingers of Frost
-// Charge consumption is handled by the default proc system in PrepareProcToTrigger
-// This script only handles removing the aura state aura (44544) when the buff expires
 class spell_mage_fingers_of_frost : public AuraScript
 {
     PrepareAuraScript(spell_mage_fingers_of_frost);
@@ -941,6 +939,27 @@ class spell_mage_fingers_of_frost : public AuraScript
         return ValidateSpellInfo({ SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA });
     }
 
+    void PrepareProc(ProcEventInfo& eventInfo)
+    {
+        if (Spell const* spell = eventInfo.GetProcSpell())
+        {
+            bool isTriggered = spell->IsTriggered();
+            bool isCastPhase = (eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST) != 0;
+            bool isChanneled = spell->GetSpellInfo()->IsChanneled();
+            bool prevent = false;
+
+            if (isTriggered)
+                prevent = false;
+            else if (isChanneled)
+                prevent = true;
+            else if (!isCastPhase)
+                prevent = true;
+
+            if (prevent)
+                PreventDefaultAction();
+        }
+    }
+
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
@@ -948,6 +967,7 @@ class spell_mage_fingers_of_frost : public AuraScript
 
     void Register() override
     {
+        DoPrepareProc += AuraProcFn(spell_mage_fingers_of_frost::PrepareProc);
         AfterEffectRemove += AuraEffectRemoveFn(spell_mage_fingers_of_frost::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
@@ -1245,7 +1265,8 @@ class spell_mage_imp_blizzard : public AuraScript
             {
                 SPELL_MAGE_CHILLED_R1,
                 SPELL_MAGE_CHILLED_R2,
-                SPELL_MAGE_CHILLED_R3
+                SPELL_MAGE_CHILLED_R3,
+                SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA
             });
     }
 
@@ -1262,8 +1283,14 @@ class spell_mage_imp_blizzard : public AuraScript
             default: return;
         }
 
+        Unit* caster = GetTarget();
         if (Unit* target = eventInfo.GetProcTarget())
-            GetTarget()->CastSpell(target, spellId, true, nullptr, aurEff);
+            caster->CastSpell(target, spellId, true, nullptr, aurEff);
+
+        // Fingers of Frost: Blizzard chill effects can trigger FoF
+        if (AuraEffect const* fofTalent = caster->GetAuraEffectOfRankedSpell(SPELL_MAGE_FINGERS_OF_FROST, EFFECT_0))
+            if (roll_chance_i(fofTalent->GetAmount()))
+                caster->CastSpell(caster, SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA, true);
     }
 
     void Register() override
