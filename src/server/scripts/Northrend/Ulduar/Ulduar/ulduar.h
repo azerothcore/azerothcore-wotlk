@@ -25,31 +25,38 @@
 
 #define UlduarScriptName "instance_ulduar"
 
-enum UlduarEncounters
+enum UlduarBossIds
 {
-    MAX_ENCOUNTER                           = 15,
-
-    TYPE_LEVIATHAN                          = 0,
-    TYPE_IGNIS                              = 1,
-    TYPE_RAZORSCALE                         = 2,
-    TYPE_XT002                              = 3,
-    TYPE_ASSEMBLY                           = 4,
-    TYPE_KOLOGARN                           = 5,
-    TYPE_AURIAYA                            = 6,
-    TYPE_FREYA                              = 7,
-    TYPE_HODIR                              = 8,
-    TYPE_MIMIRON                            = 9,
-    TYPE_THORIM                             = 10,
-    TYPE_VEZAX                              = 11,
-    TYPE_YOGGSARON                          = 12,
-    TYPE_ALGALON                            = 13,
-    TYPE_WATCHERS                           = 14,
-    TYPE_HODIR_HM_FAIL                      = 15,
-    TYPE_WINTER_CACHE                       = 16
+    // Boss IDs used by SetBossNumber/SetBossState (0-indexed)
+    BOSS_LEVIATHAN                          = 0,
+    BOSS_IGNIS                              = 1,
+    BOSS_RAZORSCALE                         = 2,
+    BOSS_XT002                              = 3,
+    BOSS_ASSEMBLY                           = 4,
+    BOSS_KOLOGARN                           = 5,
+    BOSS_AURIAYA                            = 6,
+    BOSS_FREYA                              = 7,
+    BOSS_HODIR                              = 8,
+    BOSS_MIMIRON                            = 9,
+    BOSS_THORIM                             = 10,
+    BOSS_VEZAX                              = 11,
+    BOSS_YOGGSARON                          = 12,
+    BOSS_ALGALON                            = 13,
+    MAX_ENCOUNTER                           = 14
 };
 
 enum UlduarData
 {
+    // Non-boss encounter data
+    TYPE_WATCHERS                           = 14,
+    TYPE_HODIR_HM_FAIL                      = 15,
+    TYPE_WINTER_CACHE                       = 16,
+
+    // Assembly of Iron
+    DATA_STEELBREAKER                       = 20,
+    DATA_MOLGEIM                            = 21,
+    DATA_BRUNDIR                            = 22,
+
     // Flame Leviathan
     DATA_VEHICLE_SPAWN                      = 100,
     DATA_LIGHTNING_WALL1                    = 101,
@@ -57,6 +64,7 @@ enum UlduarData
     DATA_REPAIR_STATION1                    = 103,
     DATA_REPAIR_STATION2                    = 104,
     DATA_UNBROKEN_ACHIEVEMENT               = 105,
+    DATA_LEVIATHAN_DOORS                    = 106,
 
     // Razorscales Harpoon Fire State GUIDs
     DATA_HARPOON_FIRE_STATE_1               = 200,
@@ -64,15 +72,30 @@ enum UlduarData
     DATA_HARPOON_FIRE_STATE_3               = 202,
     DATA_HARPOON_FIRE_STATE_4               = 203,
 
-    // Mimiron's first vehicle (spawned by default)
+    // Mimiron creatures
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
     DATA_MIMIRON_VX001                      = 302,
     DATA_MIMIRON_ACU                        = 303,
 
-    // Mimiron's Doors
+    // Mimiron doors
     DATA_GO_MIMIRON_DOOR_1                  = 311,
     DATA_GO_MIMIRON_DOOR_2                  = 312,
     DATA_GO_MIMIRON_DOOR_3                  = 313,
+
+    // Mimiron tram
+    DATA_MIMIRON_TRAM                       = 320,
+    DATA_MIMIRON_ACTIVATE_TRAM              = 321,
+    DATA_MIMIRON_TRAM_ROCKET_BOOSTER        = 322,
+    DATA_MIMIRON_CALL_TRAM_CENTER           = 323,
+    DATA_MIMIRON_CALL_TRAM_MIMIRON          = 324,
+    DATA_MIMIRON_TRAM_TURNAROUND_1          = 325,
+    DATA_MIMIRON_TRAM_TURNAROUND_2          = 326,
+
+    // XT-002
+    DATA_XT002_DOORS                        = 400,
+
+    // Kologarn
+    DATA_KOLOGARN_DOORS                     = 410,
 
     // Thorim
     DATA_THORIM_LEVER_GATE                  = 500,
@@ -81,15 +104,18 @@ enum UlduarData
     DATA_THORIM_FIRST_DOORS                 = 503,
     DATA_THORIM_SECOND_DOORS                = 504,
 
-    // Assembly of Iron
-    DATA_STEELBREAKER                       = 20,
-    DATA_MOLGEIM                            = 21,
-    DATA_BRUNDIR                            = 22,
-
     // Algalon the Observer
     DATA_ALGALON_SUMMON_STATE               = 600,
     DATA_DESPAWN_ALGALON                    = 601,
     DATA_ALGALON_DEFEATED                   = 602,
+    DATA_SIGILDOOR_01                       = 603,
+    DATA_SIGILDOOR_02                       = 604,
+    DATA_SIGILDOOR_03                       = 605,
+    DATA_UNIVERSE_FLOOR_01                  = 606,
+    DATA_UNIVERSE_FLOOR_02                  = 607,
+    DATA_UNIVERSE_GLOBE                     = 608,
+    DATA_ALGALON_TRAPDOOR                   = 609,
+    DATA_BRANN_BRONZEBEARD_ALG              = 610,
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
@@ -97,10 +123,32 @@ enum UlduarData
     // Tram
     DATA_CALL_TRAM                          = 710,
 
+    // Freya elders
+    DATA_ELDER_IRONBRANCH                   = 750,
+    DATA_ELDER_STONEBARK                    = 751,
+    DATA_ELDER_BRIGHTLEAF                   = 752,
+
+    // Yogg-Saron
+    DATA_SARA                               = 760,
+    DATA_BRAIN_OF_YOGG_SARON               = 761,
+    DATA_YOGG_SARON_DOORS                   = 762,
+
+    // Middle section
+    DATA_ASSEMBLY_DOORS                     = 770,
+    DATA_ARCHIVUM_DOORS                     = 771,
+    DATA_KEEPERS_GATE                       = 772,
+
+    // Hodir chests (dynamically spawned)
+    DATA_HODIR_CHEST_NORMAL                 = 780,
+    DATA_HODIR_CHEST_HARD                   = 781,
+    DATA_HODIR_CHEST_NORMAL_HERO            = 782,
+    DATA_HODIR_CHEST_HARD_HERO              = 783,
+
     // Mage Barrier
     DATA_MAGE_BARRIER                       = 800,
     DATA_BRANN_MEMOTESAY                    = 801,
     DATA_BRANN_EASY_MODE                    = 802,
+    DATA_BRANN_BASE_CAMP                    = 803,
 };
 
 enum UlduarNPCs

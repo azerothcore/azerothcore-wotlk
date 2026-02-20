@@ -130,10 +130,12 @@ public:
 
     void ChangeDailyQuests();
     void ChangeWeeklyQuests();
+    void ReSpawnPoolQuests();
 
     PooledQuestRelation mQuestCreatureRelation;
     PooledQuestRelation mQuestGORelation;
 
+    friend class PoolQuestReloadFixTest;
 private:
     template<typename T>
     void SpawnPool(uint32 pool_id, uint32 db_guid_or_pool_id);

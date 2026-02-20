@@ -495,9 +495,6 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Spell Learn Skills...");
     sSpellMgr->LoadSpellLearnSkills();                           // must be after LoadSpellRanks
 
-    LOG_INFO("server.loading", "Loading Spell Proc Event Conditions...");
-    sSpellMgr->LoadSpellProcEvents();
-
     LOG_INFO("server.loading", "Loading Spell Proc Conditions and Data...");
     sSpellMgr->LoadSpellProcs();
 
@@ -569,6 +566,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Temporary Summon Data...");
     sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
+
+    LOG_INFO("server.loading", "Loading Gameobject Summon Data...");
+    sObjectMgr->LoadGameObjectSummons();                         // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
 
     LOG_INFO("server.loading", "Loading Pet Levelup Spells...");
     sSpellMgr->LoadPetLevelupSpellMap();
@@ -766,6 +766,12 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading GameTeleports...");
     sObjectMgr->LoadGameTele();
 
+    LOG_INFO("server.loading", "Loading Trainers..."); // must be after LoadCreatureTemplates
+    sObjectMgr->LoadTrainers();
+
+    LOG_INFO("server.loading", "Loading Creature default trainers...");
+    sObjectMgr->LoadCreatureDefaultTrainers();
+
     LOG_INFO("server.loading", "Loading Gossip Menu...");
     sObjectMgr->LoadGossipMenu();
 
@@ -774,9 +780,6 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Vendors...");
     sObjectMgr->LoadVendors();                                   // must be after load CreatureTemplate and ItemTemplate
-
-    LOG_INFO("server.loading", "Loading Trainers...");
-    sObjectMgr->LoadTrainerSpell();                              // must be after load CreatureTemplate
 
     LOG_INFO("server.loading", "Loading Waypoints...");
     sWaypointMgr->Load();

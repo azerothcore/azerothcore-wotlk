@@ -620,5 +620,7 @@ private:
 
     // Achievement: Not Even a Scratch
     bool _notEvenAScratch[PVP_TEAMS_COUNT];
+    /// Toggle for alternating player spawns between East and West ships (true = first/East ship, false = second/West ship)
+    bool _nextShipIsEast;
 };
 #endif
