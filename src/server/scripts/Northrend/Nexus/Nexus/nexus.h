@@ -50,6 +50,7 @@ enum Npcs
 
     NPC_COMMANDER_STOUTBEARD        = 26796,
     NPC_COMMANDER_KOLURG            = 26798,
+    NPC_CRYSTALLINE_FRAYER          = 26793,
 
     GO_TELESTRA_SPHERE              = 188526,
     GO_ANOMALUS_SPHERE              = 188527,
