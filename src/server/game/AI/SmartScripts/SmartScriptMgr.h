@@ -1421,12 +1421,12 @@ struct SmartAction
 
         struct
         {
-            SAIBool state;
+            uint32 state;
             uint32 spawnTimerMin;
             uint32 spawnTimerMax;
             uint32 respawnDelay;
             uint32 corpseDelay;
-            SAIBool dontDespawn;
+            uint32 dontDespawn;
         } scriptSpawn;
 
         struct
