@@ -447,6 +447,9 @@ public:
     void LoadPermissions();
     QueryCallback LoadPermissionsAsync();
     void InvalidateRBACData();
+
+    /// For unit testing - initializes RBAC data without database access
+    void InitRBACDataForTest();
     uint32 GetAccountId() const { return _accountId; }
     Player* GetPlayer() const { return _player; }
     std::string const& GetPlayerName() const;

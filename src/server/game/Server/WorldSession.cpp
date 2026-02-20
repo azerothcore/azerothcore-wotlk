@@ -1595,3 +1595,10 @@ void WorldSession::InvalidateRBACData()
     delete _RBACData;
     _RBACData = nullptr;
 }
+
+void WorldSession::InitRBACDataForTest()
+{
+    delete _RBACData;
+    _RBACData = new rbac::RBACData(_accountId, _accountName, realm.Id.Realm, _security);
+    _RBACData->LoadFromDBCallback(nullptr);
+}
