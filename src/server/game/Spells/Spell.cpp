@@ -3201,6 +3201,10 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
     /// @todo: move this code to scripts
     if (m_preCastSpell)
     {
+        // Avenging Wrath - also apply Immune Shield Marker
+        if (m_preCastSpell == 61987)
+            m_caster->CastSpell(unit, 61988, true);
+
         // Fearie Fire (Feral) - damage
         if (m_preCastSpell == 60089)
             m_caster->CastSpell(unit, m_preCastSpell, true);
