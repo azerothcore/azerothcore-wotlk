@@ -64,7 +64,6 @@ enum MalygosSpells
     SPELL_VORTEX_DUMMY                  = 56105,
     SPELL_VORTEX_TELEPORT               = 73040,
     SPELL_VORTEX_CONTROL_VEHICLE        = 56263,
-    SPELL_FREEZE_ANIM                   = 55883,
 
     SPELL_ARCANE_OVERLOAD               = 56430,
     SPELL_ARCANE_OVERLOAD_SUMMON        = 56429,
