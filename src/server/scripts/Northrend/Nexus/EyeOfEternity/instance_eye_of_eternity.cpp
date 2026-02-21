@@ -48,6 +48,52 @@ struct instance_eye_of_eternity : public InstanceScript
     }
 
     bool _pokeAchievementValid = false;
+    GuidVector _vortexTriggers;
+
+    void OnCreatureCreate(Creature* creature) override
+    {
+        InstanceScript::OnCreatureCreate(creature);
+
+        if (creature->GetEntry() == NPC_VORTEX)
+            _vortexTriggers.push_back(creature->GetGUID());
+    }
+
+    ObjectGuid GetGuidData(uint32 data) const override
+    {
+        if (data == DATA_VORTEX_TRIGGER)
+            return !_vortexTriggers.empty() ? _vortexTriggers.front() : ObjectGuid::Empty;
+
+        return InstanceScript::GetGuidData(data);
+    }
+
+    void VortexHandling()
+    {
+        Creature* malygos = GetCreature(DATA_MALYGOS);
+        if (!malygos)
+            return;
+
+        for (ObjectGuid const& guid : _vortexTriggers)
+        {
+            uint8 counter = 0;
+            if (Creature* trigger = instance->GetCreature(guid))
+            {
+                for (auto* ref : malygos->GetThreatMgr().GetUnsortedThreatList())
+                {
+                    if (counter >= 5)
+                        break;
+
+                    if (Player* player = ref->GetVictim()->ToPlayer())
+                    {
+                        if (player->IsGameMaster() || player->HasAura(SPELL_VORTEX_4))
+                            continue;
+
+                        player->CastSpell(trigger, SPELL_VORTEX_4, true);
+                        counter++;
+                    }
+                }
+            }
+        }
+    }
 
     void OnPlayerEnter(Player* player) override
     {
@@ -107,6 +153,9 @@ struct instance_eye_of_eternity : public InstanceScript
                     iris->SetPhaseMask(2, true);
                 if (GameObject* portal = GetGameObject(DATA_EXIT_PORTAL))
                     portal->SetPhaseMask(2, true);
+                break;
+            case DATA_VORTEX_HANDLING:
+                VortexHandling();
                 break;
         }
     }

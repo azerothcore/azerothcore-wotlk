@@ -1892,12 +1892,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
     });
 
-    // Vortex (freeze anim)
-    ApplySpellFix({ 55883 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
-    });
-
     // Hurl Pyrite
     ApplySpellFix({ 62490 }, [](SpellInfo* spellInfo)
     {
