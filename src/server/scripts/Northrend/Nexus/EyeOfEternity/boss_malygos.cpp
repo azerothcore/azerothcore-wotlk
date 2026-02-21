@@ -61,7 +61,10 @@ enum MalygosSpells
     SPELL_ARCANE_BREATH                 = 56272,
     SPELL_ARCANE_STORM                  = 61693,
 
+    SPELL_VORTEX_1                      = 56237,
     SPELL_VORTEX_VISUAL                 = 55873,
+    SPELL_VORTEX_DUMMY                  = 56105,
+    SPELL_VORTEX_TELEPORT               = 73040,
     SPELL_VORTEX_CONTROL_VEHICLE        = 56263,
     SPELL_FREEZE_ANIM                   = 55883,
 
@@ -195,6 +198,7 @@ struct boss_malygos : public BossAI
     uint32 timer1, timer2;
     uint8 IntroCounter;
     bool bLockHealthCheck;
+    bool _executingVortex;
 
     void InitializeAI() override
     {
@@ -210,6 +214,7 @@ struct boss_malygos : public BossAI
         timer2 = INTRO_MOVEMENT_INTERVAL;
         IntroCounter = 0;
         bLockHealthCheck = false;
+        _executingVortex = false;
 
         SetInvincibility(true);
         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -384,10 +389,20 @@ struct boss_malygos : public BossAI
             break;
         }
         case EVENT_SPELL_ARCANE_BREATH:
+            if (_executingVortex)
+            {
+                events.Repeat(12s, 15s);
+                break;
+            }
             me->CastSpell(me->GetVictim(), SPELL_ARCANE_BREATH, false);
             events.Repeat(12s, 15s);
             break;
         case EVENT_SPELL_ARCANE_STORM:
+            if (_executingVortex)
+            {
+                events.Repeat(10s, 15s);
+                break;
+            }
             me->CastCustomSpell(SPELL_ARCANE_STORM, SPELLVALUE_MAX_TARGETS, DUNGEON_MODE(5, 12), me, true);
             events.Repeat(10s, 15s);
             break;
@@ -407,6 +422,7 @@ struct boss_malygos : public BossAI
         break;
         case EVENT_START_VORTEX_0:
         {
+            _executingVortex = true;
             bLockHealthCheck = true;
             Talk(SAY_MAGIC_BLAST);
             EntryCheckPredicate pred(NPC_POWER_SPARK);
@@ -433,63 +449,9 @@ struct boss_malygos : public BossAI
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
             me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
 
-            Position pos;
-            float angle = (me->GetOrientation() >= M_PI / 4 ? me->GetOrientation() - M_PI / 4 : 7 * M_PI / 4 + me->GetOrientation());
-            pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
-            pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
-            pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
-            pos.SetOrientation(pos.GetAngle(&CenterPos));
-
-            if (Creature* vp = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
-            {
-                vp->SetDisableGravity(true);
-
-                me->GetMap()->DoForAllPlayers([&](Player* player)
-                {
-                    if (!player->IsAlive() || player->IsGameMaster())
-                        return;
-
-                    Position plrpos;
-                    float playerAngle = CenterPos.GetAngle(player);
-                    plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
-                    plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
-                    plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
-                    plrpos.SetOrientation(plrpos.GetAngle(&CenterPos));
-
-                    if (Creature* vortex = me->SummonCreature(NPC_VORTEX, plrpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                    {
-                        player->CastSpell(player, SPELL_FREEZE_ANIM, true);
-                        player->CastSpell(vortex, SPELL_VORTEX_CONTROL_VEHICLE, true);
-                        if (!player->GetVehicle()) // didn't work somehow, try again with a different way, if fails - break
-                        {
-                            player->EnterVehicle(vortex, 0);
-                            if (!player->GetVehicle())
-                                return;
-                        }
-                        //player->ClearUnitState(UNIT_STATE_ONVEHICLE);
-
-                        Movement::MoveSplineInit init(player); // TODO: has to be removed and handled with vehicle exit and vehicle enter code
-                        init.MoveTo(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ());
-                        init.SetFacing(player->GetOrientation());
-                        init.SetTransportExit();
-                        init.Launch();
-
-                        player->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
-                        player->SetDisableGravity(true);
-
-                        WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                        data << player->GetPackGUID();
-                        player->SendMessageToSet(&data, true);
-
-                        sScriptMgr->AnticheatSetUnderACKmount(player);
-
-                        player->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
-                        vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    }
-                });
-            }
-
-            events.RescheduleEvent(EVENT_VORTEX_LAND_0, 11s, 1);
+            me->CastSpell(me, SPELL_VORTEX_1, true);
+            me->CastSpell(me, SPELL_VORTEX_VISUAL, true);
+            me->CastSpell(me, SPELL_VORTEX_DUMMY, true);
             break;
         }
         case EVENT_VORTEX_LAND_0:
@@ -497,6 +459,7 @@ struct boss_malygos : public BossAI
             break;
         case EVENT_VORTEX_LAND_1:
         {
+            _executingVortex = false;
             bLockHealthCheck = false;
             EntryCheckPredicate pred(NPC_POWER_SPARK);
             summons.DoAction(ACTION_POWER_SPARK_FOLLOW, pred);
@@ -948,7 +911,15 @@ struct npc_power_spark : public NullCreatureAI
         {
             if (_instance)
                 if (Creature* malygos = _instance->GetCreature(DATA_MALYGOS))
+                {
+                    if (malygos->HasAura(SPELL_VORTEX_1))
+                    {
+                        me->GetMotionMaster()->MoveIdle();
+                        _moveTimer = 2000;
+                        return;
+                    }
                     me->GetMotionMaster()->MovePoint(0, *malygos);
+                }
             _moveTimer = 2000;
         }
         else
@@ -1273,6 +1244,127 @@ struct go_the_focusing_iris : public GameObjectAI
     }
 };
 
+// 56105 - Vortex
+class spell_malygos_vortex_dummy : public SpellScript
+{
+    PrepareSpellScript(spell_malygos_vortex_dummy);
+
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
+            return;
+
+        Position pos;
+        float angle = (caster->GetOrientation() >= M_PI / 4 ? caster->GetOrientation() - M_PI / 4 : 7 * M_PI / 4 + caster->GetOrientation());
+        pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
+        pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
+        pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
+        pos.SetOrientation(pos.GetAngle(&CenterPos));
+
+        if (Creature* vp = caster->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
+        {
+            vp->SetDisableGravity(true);
+
+            caster->GetMap()->DoForAllPlayers([&](Player* player)
+            {
+                if (!player->IsAlive() || player->IsGameMaster())
+                    return;
+
+                Position plrpos;
+                float playerAngle = CenterPos.GetAngle(player);
+                plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
+                plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
+                plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
+                plrpos.SetOrientation(plrpos.GetAngle(&CenterPos));
+
+                if (Creature* vortex = caster->SummonCreature(NPC_VORTEX, plrpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
+                {
+                    player->CastSpell(player, SPELL_FREEZE_ANIM, true);
+                    player->CastSpell(vortex, SPELL_VORTEX_CONTROL_VEHICLE, true);
+                    if (!player->GetVehicle())
+                    {
+                        player->EnterVehicle(vortex, 0);
+                        if (!player->GetVehicle())
+                            return;
+                    }
+
+                    Movement::MoveSplineInit init(player);
+                    init.MoveTo(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ());
+                    init.SetFacing(player->GetOrientation());
+                    init.SetTransportExit();
+                    init.Launch();
+
+                    player->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
+                    player->SetDisableGravity(true);
+
+                    WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                    data << player->GetPackGUID();
+                    player->SendMessageToSet(&data, true);
+
+                    sScriptMgr->AnticheatSetUnderACKmount(player);
+
+                    player->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
+                    vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                }
+            });
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_malygos_vortex_dummy::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 55873 - Vortex
+class spell_malygos_vortex_visual : public AuraScript
+{
+    PrepareAuraScript(spell_malygos_vortex_visual);
+
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_VORTEX_1, SPELL_VORTEX_TELEPORT });
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
+            return;
+
+        caster->GetMap()->DoForAllPlayers([&](Player* player)
+        {
+            if (player->IsGameMaster())
+                return;
+
+            if (player->IsAlive())
+                caster->CastSpell(player, SPELL_VORTEX_TELEPORT, true);
+        });
+
+        caster->GetMotionMaster()->MovePoint(
+            MI_POINT_VORTEX_LAND, CenterPos,
+            FORCED_MOVEMENT_RUN, 0.f, true, true,
+            AnimTier::Ground);
+        caster->RemoveAura(SPELL_VORTEX_1);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_malygos_vortex_visual::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 class spell_eoe_ph3_surge_of_power : public SpellScript
 {
     PrepareSpellScript(spell_eoe_ph3_surge_of_power);
@@ -1374,4 +1466,6 @@ void AddSC_boss_malygos()
     RegisterSpellScript(spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger);
 
     RegisterSpellScript(spell_eoe_ph3_surge_of_power);
+    RegisterSpellScript(spell_malygos_vortex_dummy);
+    RegisterSpellScript(spell_malygos_vortex_visual);
 }
