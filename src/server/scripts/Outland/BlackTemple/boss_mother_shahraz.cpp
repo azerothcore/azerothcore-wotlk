@@ -296,10 +296,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     {
         targets.remove_if([&](WorldObject const* target) -> bool
             {
-                if (!target->ToPlayer())
-                    return true;
-
-                return false;
+                return !target->ToPlayer();
             });
 
         Acore::Containers::RandomResize(targets, 3);
