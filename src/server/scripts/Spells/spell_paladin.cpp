@@ -556,18 +556,15 @@ class spell_pal_avenging_wrath : public AuraScript
         });
     }
 
-    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
+
         if (AuraEffect const* sanctifiedWrathAurEff = target->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1, EFFECT_2))
         {
             int32 basepoints = sanctifiedWrathAurEff->GetAmount();
             target->CastCustomSpell(target, SPELL_PALADIN_SANCTIFIED_WRATH, &basepoints, &basepoints, nullptr, true, nullptr, sanctifiedWrathAurEff);
         }
-
-        target->CastSpell(target, SPELL_PALADIN_AVENGING_WRATH_MARKER, true, nullptr, aurEff);
-        // Blizz seems to just apply aura without bothering to cast
-        target->AddAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER, target);
     }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2218,12 +2215,18 @@ class spell_pal_light_s_beacon : public AuraScript
             SPELL_PALADIN_BEACON_OF_LIGHT_AURA,
             SPELL_PALADIN_BEACON_OF_LIGHT_FLASH,
             SPELL_PALADIN_BEACON_OF_LIGHT_HOLY,
-            SPELL_PALADIN_HOLY_LIGHT_R1
+            SPELL_PALADIN_HOLY_LIGHT_R1,
+            SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL
         });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        // Don't proc from Judgement of Light heals — JoL sets originalCaster to
+        // the paladin for combat log, but the heal is actually cast by the attacker.
+        if (eventInfo.GetSpellInfo() && eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL)
+            return false;
+
         // Don't proc if the heal target is the beacon target (no double heal)
         if (GetTarget()->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
             return false;

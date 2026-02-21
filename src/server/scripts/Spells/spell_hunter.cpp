@@ -1194,9 +1194,8 @@ class spell_hun_lock_and_load : public AuraScript
         if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_TRAP_ACTIVATION))
             return false;
 
-        // Do not proc on traps for immolation/explosive trap
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
+        if (!spellInfo || !(spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_FROST | SPELL_SCHOOL_MASK_FIRE)))
             return false;
 
         return roll_chance_i(aurEff->GetAmount());
