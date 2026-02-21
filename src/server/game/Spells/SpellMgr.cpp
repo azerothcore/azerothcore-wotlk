@@ -1788,7 +1788,7 @@ bool InitTriggerAuraData()
         isAlwaysTriggeredAura[i] = false;
         spellTypeMask[i] = PROC_SPELL_TYPE_MASK_ALL;
     }
-    isTriggerAura[SPELL_AURA_DUMMY] = true;                                 // Most dummy auras should require scripting
+    isTriggerAura[SPELL_AURA_DUMMY] = true;                                 // Most dummy auras should require scripting, but there are some exceptions (ie 12311)
     isTriggerAura[SPELL_AURA_MOD_CONFUSE] = true;                           // "Any direct damaging attack will revive targets"
     isTriggerAura[SPELL_AURA_MOD_THREAT] = true;                            // Only one spell: 28762 part of Mage T3 8p bonus
     isTriggerAura[SPELL_AURA_MOD_STUN] = true;                              // Aura does not have charges but needs to be removed on trigger
