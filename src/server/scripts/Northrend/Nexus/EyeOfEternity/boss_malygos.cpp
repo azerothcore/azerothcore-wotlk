@@ -742,98 +742,6 @@ struct boss_malygos : public BossAI
     }
 };
 
-#define VORTEX_DEFAULT_DIFF 250
-#define VORTEX_TRAVEL_TIME 3000
-
-struct npc_vortex_ride : public VehicleAI
-{
-    npc_vortex_ride(Creature* creature) : VehicleAI(creature)
-    {
-        vortexRadius = urand(22, 28);
-        float h = urand(15, 30);
-        float angle = CenterPos.GetAngle(me);
-        Position pos;
-        pos.m_positionX = CenterPos.GetPositionX() + vortexRadius * cos(angle);
-        pos.m_positionY = CenterPos.GetPositionY() + vortexRadius * std::sin(angle);
-        pos.m_positionZ = CenterPos.GetPositionZ() + h;
-        pos.SetOrientation(pos.GetAngle(&CenterPos));
-        me->SetPosition(pos);
-        timer = 0;
-        despawnTimer = 9500;
-        bUpdatedFlying = false;
-    }
-
-    uint32 timer;
-    uint32 despawnTimer;
-    bool bUpdatedFlying;
-    float vortexRadius;
-
-    void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply) override
-    {
-        if (!pass || apply || !pass->IsPlayer())
-            return;
-
-        Player* player = pass->ToPlayer();
-        float speed = player->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1.0f * 0.001f);
-        player->SetDisableGravity(false); // packet only would lead to issues elsewhere
-        player->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
-        player->RemoveAura(SPELL_FREEZE_ANIM);
-        player->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
-
-        sScriptMgr->AnticheatSetCanFlybyServer(player, false);
-        sScriptMgr->AnticheatSetUnderACKmount(player);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (despawnTimer <= diff)
-        {
-            despawnTimer = 0;
-            me->UpdatePosition(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() + 18.0f, 0.0f, true);
-            me->StopMovingOnCurrentPos();
-            if (Vehicle* vehicle = me->GetVehicleKit())
-                vehicle->RemoveAllPassengers();
-            me->DespawnOrUnsummon();
-            return;
-        }
-        else
-            despawnTimer -= diff;
-
-        if (timer <= diff)
-        {
-            float angle = CenterPos.GetAngle(me);
-            float newangle = angle + 2 * M_PI / ((float)VORTEX_TRAVEL_TIME / VORTEX_DEFAULT_DIFF);
-            if (newangle >= 2 * M_PI)
-                newangle -= 2 * M_PI;
-            float newx = CenterPos.GetPositionX() + vortexRadius * cos(newangle);
-            float newy = CenterPos.GetPositionY() + vortexRadius * std::sin(newangle);
-            float arcangle = me->GetAngle(newx, newy);
-            float dist = 2 * me->GetDistance2d(newx, newy);
-            if (me->GetVehicleKit())
-                if (Unit* pass = me->GetVehicleKit()->GetPassenger(0))
-                    if (Player* player = pass->ToPlayer())
-                    {
-                        if (!bUpdatedFlying && timer)
-                        {
-                            bUpdatedFlying = true;
-                            player->SetDisableGravity(true);
-                        }
-
-                        player->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * std::sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
-                        me->Relocate(newx, newy);
-                    }
-
-            timer = (diff - timer <= VORTEX_DEFAULT_DIFF) ? VORTEX_DEFAULT_DIFF - (diff - timer) : 0;
-        }
-        else
-            timer -= diff;
-    }
-
-    void AttackStart(Unit*  /*who*/) override {}
-    void MoveInLineOfSight(Unit*  /*who*/) override {}
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; }
-};
-
 struct npc_power_spark : public NullCreatureAI
 {
     npc_power_spark(Creature* creature) : NullCreatureAI(creature)
@@ -1301,8 +1209,7 @@ class spell_malygos_vortex_visual : public AuraScript
                 if (InstanceScript* instance =caster->GetInstanceScript())
                 {
                     if (Creature* trigger =ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_VORTEX_TRIGGER)))
-                        trigger->CastSpell(player,
-                            SPELL_VORTEX_TELEPORT, true);
+                        trigger->CastSpell(player, SPELL_VORTEX_TELEPORT, true);
                 }
             }
         }
@@ -1409,7 +1316,6 @@ void AddSC_boss_malygos()
 {
     RegisterEoECreatureAI(boss_malygos);
     RegisterEoECreatureAI(npc_power_spark);
-    RegisterEoECreatureAI(npc_vortex_ride);
     RegisterEoECreatureAI(npc_alexstrasza);
     RegisterGameObjectAI(go_the_focusing_iris);
     RegisterEoECreatureAI(npc_nexus_lord);
