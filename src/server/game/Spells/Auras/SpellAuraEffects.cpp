@@ -1254,6 +1254,13 @@ void AuraEffect::HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
 
     switch (GetAuraType())
     {
+        case SPELL_AURA_MOD_CONFUSE:
+        case SPELL_AURA_MOD_FEAR:
+        case SPELL_AURA_MOD_STUN:
+        case SPELL_AURA_MOD_ROOT:
+        case SPELL_AURA_TRANSFORM:
+            HandleBreakableCCAuraProc(aurApp, eventInfo);
+            break;
         case SPELL_AURA_PROC_TRIGGER_SPELL:
             HandleProcTriggerSpellAuraProc(aurApp, eventInfo);
             break;
@@ -7212,6 +7219,16 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
     DamageInfo dmgInfo(damageInfo, DOT, BASE_ATTACK, SPELL_MISS_NONE);
     uint32 hitMask = dmgInfo.GetHitMask() | PROC_EX_INTERNAL_DOT;
     Unit::ProcSkillsAndAuras(caster, damageInfo.target, procAttacker, procVictim, hitMask, damageInfo.damage, BASE_ATTACK, spellProto, nullptr, GetEffIndex(), nullptr, &dmgInfo);
+}
+
+void AuraEffect::HandleBreakableCCAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
+{
+    int32 const damageLeft = GetAmount() - static_cast<int32>(eventInfo.GetDamageInfo()->GetDamage());
+
+    if (damageLeft <= 0)
+        aurApp->GetTarget()->RemoveAura(aurApp);
+    else
+        SetAmount(damageLeft);
 }
 
 void AuraEffect::HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo)
