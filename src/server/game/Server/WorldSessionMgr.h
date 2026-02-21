@@ -23,6 +23,7 @@
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
 #include <list>
+#include <map>
 #include <unordered_map>
 
 class Player;
@@ -91,6 +92,7 @@ private:
 
     SessionMap _sessions;
     SessionMap _offlineSessions;
+    std::map<uint32 /*accountId*/, AccountPlayHistory> _accountsPlayHistory;
 
     typedef std::unordered_map<uint32, time_t> DisconnectMap;
     DisconnectMap _disconnects;

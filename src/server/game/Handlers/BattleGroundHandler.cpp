@@ -765,13 +765,11 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     {
         lfg::LfgState lfgState = sLFGMgr->GetState(GetPlayer()->GetGUID());
         if (GetPlayer()->InBattleground()) // currently in battleground
-        {
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        }
         else if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))) // using lfg system
-        {
             err = ERR_LFG_CANT_USE_BATTLEGROUND;
-        }
+        else if (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME)) // Assumed to only apply to full restriction rather than partial
+            err = ERR_GROUP_JOIN_BATTLEGROUND_FAIL; // ERR_ARENA_EXPIRED_CAIS does not seem to be a result, so using this error instead
 
         if (err <= 0)
         {
@@ -844,9 +842,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
             grp->DoForAllMembers([&bgQueue, &err](Player* member)
             {
                 if (bgQueue.IsPlayerInvitedToRatedArena(member->GetGUID()))
-                {
                     err = ERR_BATTLEGROUND_JOIN_FAILED;
-                }
             });
         }
 

@@ -25,7 +25,7 @@ void WorldSession::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
     packet << uint8(code);
     packet << uint32(0); // BillingTimeRemaining
     packet << GetBillingPlanFlags();
-    packet << uint32(0); // BillingTimeRested
+    packet << uint32(0); // BillingTimeRested (in minutes) Needs to be added
     uint8 exp = Expansion(); // 0 - normal, 1 - TBC, 2 - WotLK, must be set in database manually for each account
 
     if (exp >= MAX_EXPANSIONS)

@@ -468,8 +468,8 @@ enum PlayerFlags : uint32
     PLAYER_FLAGS_IN_PVP            = 0x00000200,
     PLAYER_FLAGS_HIDE_HELM         = 0x00000400,
     PLAYER_FLAGS_HIDE_CLOAK        = 0x00000800,
-    PLAYER_FLAGS_PLAYED_LONG_TIME  = 0x00001000,               // played long time
-    PLAYER_FLAGS_PLAYED_TOO_LONG   = 0x00002000,               // played too long time
+    PLAYER_FLAGS_PARTIAL_PLAY_TIME = 0x00001000,               // played long time
+    PLAYER_FLAGS_NO_PLAY_TIME      = 0x00002000,               // played too long time
     PLAYER_FLAGS_IS_OUT_OF_BOUNDS  = 0x00004000,
     PLAYER_FLAGS_DEVELOPER         = 0x00008000,               // <Dev> prefix for something?
     PLAYER_FLAGS_UNK16             = 0x00010000,               // pre-3.0.3 PLAYER_FLAGS_SANCTUARY flag for player entered sanctuary

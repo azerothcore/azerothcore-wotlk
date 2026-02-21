@@ -200,25 +200,47 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
             for (std::vector<Player*>::const_iterator i = playersNear.begin(); i != playersNear.end(); ++i)
             {
-                (*i)->ModifyMoney(goldPerPlayer);
-                (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, goldPerPlayer);
+                uint32 finalGold = goldPerPlayer;
+
+                if ((*i)->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+                    continue;
+
+                if ((*i)->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+                    finalGold /= 2;
+
+                if (!finalGold)
+                    continue;
+
+                (*i)->ModifyMoney(finalGold);
+                (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
 
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
-                data << uint32(goldPerPlayer);
+                data << uint32(finalGold);
                 data << uint8(playersNear.size() > 1 ? 0 : 1);     // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
                 (*i)->SendDirectMessage(&data);
             }
         }
         else
         {
-            sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
-            player->ModifyMoney(loot->gold);
-            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, loot->gold);
+            uint32 finalGold = loot->gold;
 
-            WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
-            data << uint32(loot->gold);
-            data << uint8(1);   // "You loot..."
-            SendPacket(&data);
+            if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+                finalGold = 0;
+
+            if (player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+                finalGold /= 2;
+
+            if (finalGold)
+            {
+                sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
+                player->ModifyMoney(finalGold);
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
+
+                WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
+                data << uint32(finalGold);
+                data << uint8(1);   // "You loot..."
+                SendPacket(&data);
+            }
         }
 
         sScriptMgr->OnLootMoney(player, loot->gold);
@@ -242,15 +264,23 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
+    Player* player = GetPlayer();
+
     // Check possible cheat
-    if (!GetPlayer()->IsAlive() || !guid.IsCreatureOrVehicle())
+    if (!player->IsAlive() || !guid.IsCreatureOrVehicle())
         return;
 
-    // interrupt cast
-    if (GetPlayer()->IsNonMeleeSpellCast(false))
-        GetPlayer()->InterruptNonMeleeSpells(false);
+    if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        player->SendLootError(guid, LOOT_ERROR_PLAY_TIME_EXCEEDED);
+        return;
+    }
 
-    GetPlayer()->SendLoot(guid, LOOT_CORPSE);
+    // interrupt cast
+    if (player->IsNonMeleeSpellCast(false))
+        player->InterruptNonMeleeSpells(false);
+
+    player->SendLoot(guid, LOOT_CORPSE);
 }
 
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
@@ -446,7 +476,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!_player->IsInRaidWith(target))
+    if (!_player->IsInRaidWith(target) || target->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
         //LOG_DEBUG("network", "MasterLootItem: Player {} tried to give an item to ineligible player {} !", GetPlayer()->GetName(), target->GetName());
