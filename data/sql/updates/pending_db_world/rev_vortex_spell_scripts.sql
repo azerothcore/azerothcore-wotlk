@@ -20,5 +20,5 @@ VALUES
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|33554432, `VehicleId` = 214, `flags_extra` = `flags_extra`|2|128, `ScriptName` = '' WHERE `entry` = 30090;
 
 DELETE FROM `creature_template_addon` WHERE `entry` = 30090;
-INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(30090, 0, 0, 0, 0, 0, 0, '55853');
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(30090, 0, 0, 0, 0, 0, 0, '55883');
