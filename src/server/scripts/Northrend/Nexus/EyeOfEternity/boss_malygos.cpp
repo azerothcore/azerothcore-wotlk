@@ -19,8 +19,6 @@
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
-#include "MoveSplineInit.h"
-#include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -250,9 +248,8 @@ struct boss_malygos : public BossAI
             events.RescheduleEvent(EVENT_INTRO_LAND, 0ms, 1);
             break;
         case MI_POINT_VORTEX_CENTER:
-            if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                trigger->CastSpell(trigger, SPELL_VORTEX_VISUAL, true);
-            events.RescheduleEvent(EVENT_START_VORTEX_REAL, 1s, 1);
+            me->GetMotionMaster()->MoveIdle();
+            events.RescheduleEvent(EVENT_START_VORTEX_REAL, 0ms, 1);
             break;
         case MI_POINT_CENTER_GROUND_PH_2:
             events.RescheduleEvent(EVENT_START_PHASE_2_FLY_UP, 0ms, 1);
@@ -441,7 +438,9 @@ struct boss_malygos : public BossAI
         }
         break;
         case EVENT_VORTEX_FLY_TO_CENTER:
-            me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_CENTER, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() + 20.0f);
+            me->SetReactState(REACT_PASSIVE);
+            me->AttackStop();
+            me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_CENTER, VortexPos);
             break;
         case EVENT_START_VORTEX_REAL:
         {
@@ -464,6 +463,7 @@ struct boss_malygos : public BossAI
             EntryCheckPredicate pred(NPC_POWER_SPARK);
             summons.DoAction(ACTION_POWER_SPARK_FOLLOW, pred);
             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
+            me->SetReactState(REACT_AGGRESSIVE);
             me->ResumeChasingVictim();
             events.RescheduleEvent(EVENT_START_VORTEX_0, 60s, 1);
             break;
@@ -1260,60 +1260,8 @@ class spell_malygos_vortex_dummy : public SpellScript
         if (!caster)
             return;
 
-        Position pos;
-        float angle = (caster->GetOrientation() >= M_PI / 4 ? caster->GetOrientation() - M_PI / 4 : 7 * M_PI / 4 + caster->GetOrientation());
-        pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
-        pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
-        pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
-        pos.SetOrientation(pos.GetAngle(&CenterPos));
-
-        if (Creature* vp = caster->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
-        {
-            vp->SetDisableGravity(true);
-
-            caster->GetMap()->DoForAllPlayers([&](Player* player)
-            {
-                if (!player->IsAlive() || player->IsGameMaster())
-                    return;
-
-                Position plrpos;
-                float playerAngle = CenterPos.GetAngle(player);
-                plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
-                plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
-                plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
-                plrpos.SetOrientation(plrpos.GetAngle(&CenterPos));
-
-                if (Creature* vortex = caster->SummonCreature(NPC_VORTEX, plrpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                {
-                    player->CastSpell(player, SPELL_FREEZE_ANIM, true);
-                    player->CastSpell(vortex, SPELL_VORTEX_CONTROL_VEHICLE, true);
-                    if (!player->GetVehicle())
-                    {
-                        player->EnterVehicle(vortex, 0);
-                        if (!player->GetVehicle())
-                            return;
-                    }
-
-                    Movement::MoveSplineInit init(player);
-                    init.MoveTo(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ());
-                    init.SetFacing(player->GetOrientation());
-                    init.SetTransportExit();
-                    init.Launch();
-
-                    player->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
-                    player->SetDisableGravity(true);
-
-                    WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                    data << player->GetPackGUID();
-                    player->SendMessageToSet(&data, true);
-
-                    sScriptMgr->AnticheatSetUnderACKmount(player);
-
-                    player->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
-                    vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                }
-            });
-        }
+        if (InstanceScript* instance = caster->GetInstanceScript())
+            instance->SetData(DATA_VORTEX_HANDLING, 0);
     }
 
     void Register() override
@@ -1343,25 +1291,37 @@ class spell_malygos_vortex_visual : public AuraScript
         if (!caster)
             return;
 
-        caster->GetMap()->DoForAllPlayers([&](Player* player)
+        for (auto const* ref :
+            caster->GetThreatManager().GetUnsortedThreatList())
         {
-            if (player->IsGameMaster())
-                return;
+            if (Player* player = ref->GetVictim()->ToPlayer())
+            {
+                if (player->IsGameMaster())
+                    continue;
 
-            if (player->IsAlive())
-                caster->CastSpell(player, SPELL_VORTEX_TELEPORT, true);
-        });
+                if (InstanceScript* instance =
+                        caster->GetInstanceScript())
+                {
+                    if (Creature* trigger =
+                            ObjectAccessor::GetCreature(*caster,
+                                instance->GetGuidData(
+                                    DATA_VORTEX_TRIGGER)))
+                        trigger->CastSpell(player,
+                            SPELL_VORTEX_TELEPORT, true);
+                }
+            }
+        }
 
-        caster->GetMotionMaster()->MovePoint(
-            MI_POINT_VORTEX_LAND, CenterPos,
-            FORCED_MOVEMENT_RUN, 0.f, true, true,
-            AnimTier::Ground);
+        caster->GetMotionMaster()->MoveLand(
+            MI_POINT_VORTEX_LAND, VortexLandPos);
         caster->RemoveAura(SPELL_VORTEX_1);
     }
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_malygos_vortex_visual::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(
+            spell_malygos_vortex_visual::OnRemove,
+            EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
