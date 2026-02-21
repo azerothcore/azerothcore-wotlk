@@ -294,6 +294,14 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
+        targets.remove_if([&](WorldObject const* target) -> bool
+            {
+                if (!target->ToPlayer())
+                    return true;
+
+                return false;
+            });
+
         Acore::Containers::RandomResize(targets, 3);
         targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SABER_LASH_IMMUNITY));
     }
