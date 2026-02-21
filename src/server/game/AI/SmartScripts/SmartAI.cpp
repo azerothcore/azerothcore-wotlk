@@ -109,6 +109,45 @@ void SmartAI::UpdateDespawn(const uint32 diff)
         mDespawnTime -= diff;
 }
 
+void SmartAI::UpdateFollow(const uint32 diff)
+{
+    if (!mFollowGuid)
+        return;
+
+    if (mFollowArrivedTimer < diff)
+    {
+        if (me->FindNearestCreature(mFollowArrivedEntry, INTERACTION_DISTANCE, mFollowArrivedAlive))
+            StopFollow(true);
+        else
+            mFollowArrivedTimer = 1000;
+    }
+    else
+        mFollowArrivedTimer -= diff;
+
+    if (mFollowGuid.IsPlayer())
+    {
+        if (_followCheckTimer < diff)
+        {
+            bool shouldDespawn = false;
+            if (Player* player = ObjectAccessor::FindPlayer(mFollowGuid))
+            {
+                float checkDist = me->GetInstanceScript() ? SMART_ESCORT_MAX_PLAYER_DIST * 2 : SMART_ESCORT_MAX_PLAYER_DIST;
+                if (!me->IsWithinDistInMap(player, checkDist))
+                    shouldDespawn = true;
+            }
+            else
+                shouldDespawn = true;
+
+            if (shouldDespawn)
+                me->DespawnOrUnsummon();
+
+            _followCheckTimer = 1000;
+        }
+        else
+            _followCheckTimer -= diff;
+    }
+}
+
 WaypointData const* SmartAI::GetNextWayPoint()
 {
     if (!mWayPoints || mWayPoints->empty())
@@ -528,23 +567,7 @@ void SmartAI::UpdateAI(uint32 diff)
     GetScript()->OnUpdate(diff);
     UpdatePath(diff);
     UpdateDespawn(diff);
-
-    //TODO move to void
-    if (mFollowGuid)
-    {
-        if (mFollowArrivedTimer < diff)
-        {
-            if (me->FindNearestCreature(mFollowArrivedEntry, INTERACTION_DISTANCE, mFollowArrivedAlive))
-            {
-                StopFollow(true);
-                return;
-            }
-
-            mFollowArrivedTimer = 1000;
-        }
-        else
-            mFollowArrivedTimer -= diff;
-    }
+    UpdateFollow(diff);
 
     if (!IsAIControlled())
     {
