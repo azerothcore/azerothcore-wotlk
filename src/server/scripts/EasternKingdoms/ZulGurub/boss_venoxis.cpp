@@ -123,7 +123,8 @@ public:
             context.Repeat(25s, 30s);
         }).Schedule(15s, 25s, PHASE_ONE, [this](TaskContext context)
         {
-            DoCastVictim(SPELL_HOLY_WRATH);
+            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 100.0f, true))
+                DoCast(target, SPELL_HOLY_WRATH);
             context.Repeat(12s, 22s);
         });
 
