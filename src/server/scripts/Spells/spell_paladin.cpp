@@ -556,18 +556,15 @@ class spell_pal_avenging_wrath : public AuraScript
         });
     }
 
-    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
+
         if (AuraEffect const* sanctifiedWrathAurEff = target->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1, EFFECT_2))
         {
             int32 basepoints = sanctifiedWrathAurEff->GetAmount();
             target->CastCustomSpell(target, SPELL_PALADIN_SANCTIFIED_WRATH, &basepoints, &basepoints, nullptr, true, nullptr, sanctifiedWrathAurEff);
         }
-
-        target->CastSpell(target, SPELL_PALADIN_AVENGING_WRATH_MARKER, true, nullptr, aurEff);
-        // Blizz seems to just apply aura without bothering to cast
-        target->AddAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER, target);
     }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
