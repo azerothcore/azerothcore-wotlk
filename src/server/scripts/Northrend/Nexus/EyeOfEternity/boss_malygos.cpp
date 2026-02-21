@@ -226,7 +226,7 @@ struct boss_malygos : public BossAI
 
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type != POINT_MOTION_TYPE)
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
             return;
 
         switch (id)
@@ -1291,29 +1291,23 @@ class spell_malygos_vortex_visual : public AuraScript
         if (!caster)
             return;
 
-        for (auto const* ref :
-            caster->GetThreatManager().GetUnsortedThreatList())
+        for (auto const* ref : caster->GetThreatMgr().GetUnsortedThreatList())
         {
             if (Player* player = ref->GetVictim()->ToPlayer())
             {
                 if (player->IsGameMaster())
                     continue;
 
-                if (InstanceScript* instance =
-                        caster->GetInstanceScript())
+                if (InstanceScript* instance =caster->GetInstanceScript())
                 {
-                    if (Creature* trigger =
-                            ObjectAccessor::GetCreature(*caster,
-                                instance->GetGuidData(
-                                    DATA_VORTEX_TRIGGER)))
+                    if (Creature* trigger =ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_VORTEX_TRIGGER)))
                         trigger->CastSpell(player,
                             SPELL_VORTEX_TELEPORT, true);
                 }
             }
         }
 
-        caster->GetMotionMaster()->MoveLand(
-            MI_POINT_VORTEX_LAND, VortexLandPos);
+        caster->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, VortexLandPos);
         caster->RemoveAura(SPELL_VORTEX_1);
     }
 

@@ -77,7 +77,7 @@ struct instance_eye_of_eternity : public InstanceScript
             uint8 counter = 0;
             if (Creature* trigger = instance->GetCreature(guid))
             {
-                for (auto* ref : malygos->GetThreatManager().GetUnsortedThreatList())
+                for (auto* ref : malygos->GetThreatMgr().GetUnsortedThreatList())
                 {
                     if (counter >= 5)
                         break;
