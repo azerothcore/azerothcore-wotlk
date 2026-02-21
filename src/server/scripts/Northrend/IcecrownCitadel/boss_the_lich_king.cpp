@@ -1137,7 +1137,7 @@ public:
                     {
                         me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_SPECIAL);
                         Talk(SAY_LK_SUMMON_VALKYR);
-                        DoCastSelf(IsHeroic() ? SPELL_SUMMON_VALKYR_PERIODIC : SPELL_SUMMON_VALKYR);
+                        DoCastSelf(Is25ManRaid() ? SPELL_SUMMON_VALKYR_PERIODIC : SPELL_SUMMON_VALKYR);
                         events.ScheduleEvent(EVENT_SUMMON_VALKYR, 45s, EVENT_GROUP_ABILITIES);
 
                         // schedule a defile (or reschedule it) if next defile event

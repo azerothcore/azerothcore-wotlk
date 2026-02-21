@@ -91,7 +91,7 @@ public:
             _threads[i].Wait();
     }
 
-    virtual void OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
+    virtual void OnSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
         try
         {
@@ -117,7 +117,7 @@ public:
         return min;
     }
 
-    std::pair<tcp::socket*, uint32> GetSocketForAccept()
+    std::pair<IoContextTcpSocket*, uint32> GetSocketForAccept()
     {
         uint32 threadIndex = SelectThreadWithMinConnections();
         return { _threads[threadIndex].GetSocketForAccept(), threadIndex };
