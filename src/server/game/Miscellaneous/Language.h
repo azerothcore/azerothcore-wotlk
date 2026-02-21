@@ -672,8 +672,13 @@ enum AcoreStrings
     LANG_REWARDED                       = 602,
 
     LANG_NPC_DO_ACTION                  = 603,
+    LANG_IP_NOT_FOUND                   = 604,
+    LANG_EMAIL_NOT_FOUND                = 605,
+    LANG_LOOKUP_NOT_VALID               = 606,
+    LANG_LOOKUP_TOTAL_ACCOUNTS          = 607,
+    LANG_LOOKUP_TOTAL_CHARACTERS        = 608,
 
-    // 603-704 - free
+    // 609-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
     LANG_NOT_EQUIPPED_ITEM              = 706,
