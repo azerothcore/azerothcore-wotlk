@@ -18,21 +18,9 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "halls_of_stone.h"
-
-#define GOSSIP_ITEM_1       "Brann, it would be our honor!"
-#define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
-#define GOSSIP_ITEM_3       "There will be plenty of time for this later Brann, we need to get moving!"
-#define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
-#define TEXT_ID_START           13100
-#define TEXT_ID_TRIBUNAL_START  13101
-#define TEXT_ID_TRIBUNAL_END    14176
-#define TEXT_ID_SJONNIR_DOOR    13883
-#define TEXT_ID_SJONNIR_END     13308
 
 enum NPCs
 {
@@ -52,6 +40,7 @@ enum Misc
     SPELL_DARK_MATTER_VISUAL_CHANNEL= 51001,
     SPELL_DARK_MATTER               = 51012,
     SPELL_SEARING_GAZE              = 51136,
+    SPELL_STEALTH                   = 58506,
 
     // Serverside
     SPELL_TRIBUNAL_CREDIT_MARKER    = 59046,
@@ -60,855 +49,879 @@ enum Misc
     QUEST_HALLS_OF_STONE            = 13207,
 };
 
-enum events
+enum BrannMovement
 {
-    // BRANN AND TRIBUNAL
-    EVENT_ABEDNEUM_VISUAL = 1,
-    EVENT_KADDRAK_VISUAL = 2,
-    EVENT_MARNAK_VISUAL = 3,
-    EVENT_ABEDNEUM_HEAD = 4,
-    EVENT_KADDRAK_HEAD = 5,
-    EVENT_MARNAK_HEAD = 6,
-    EVENT_KADDRAK_SWITCH_EYE = 7,
-    EVENT_SUMMON_MONSTERS = 8,
-    EVENT_SUMMON_STORMCALLER = 9,
-    EVENT_SUMMON_CUSTODIAN = 10,
-    EVENT_DARK_MATTER_START = 11,
-    EVENT_DARK_MATTER_END = 12,
+    PATH_ESCORT            = 280701,
+    PATH_SJONNIR_FIGHT     = 280702,
 
-    EVENT_TRIBUNAL_END = 13,
-    EVENT_BREEN_WAITING = 14,
-    EVENT_TALK_FACE_CHANGE = 15,
-    EVENT_SKY_ROOM_FLOOR_CHANGE = 16,
-
-    //BRANN AND SJONNIR
-    EVENT_GO_TO_SJONNIR = 17,
-    EVENT_DOOR_OPEN = 18,
-    EVENT_RESUME_ESCORT = 19,
-    EVENT_SJONNIR_END_BRANN_YELL = 20,
-    EVENT_SJONNIR_END_BRANN_LAST_YELL = 21,
+    POINT_TRIBUNAL_CONSOLE = 1,
+    POINT_TRIBUNAL_LORE    = 2,
+    POINT_TRIBUNAL_LEAVE   = 3,
+    POINT_SJONNIR_DOOR     = 4,
+    POINT_SJONNIR_FIGHT    = 5,
+    POINT_SJONNIR_DEAD     = 6,
 };
 
-struct Yells
+enum ContextGroups
 {
-    uint32 sound;
-    const char* text;
-    uint32 creature, timer;
+    CONTEXT_GROUP_KADDRAK       = 1,
+    CONTEXT_GROUP_MARNAK,
+    CONTEXT_GROUP_ABEDNEUM,
+    CONTEXT_GROUP_PROTECTORS,
+    CONTEXT_GROUP_STORMCALLERS,
+    CONTEXT_GROUP_GOLEMS,
+    CONTEXT_GROUP_TRANSITION,
 };
 
-static Yells Conversation[] =
+enum TalkGroups
 {
-    {14248, "Now keep an eye out! I'll have this licked in two shakes of a--", NPC_BRANN, 8000},
-    {13765, "Warning: life form pattern not recognized. Archival processing terminated. Continued interference will result in targeted response.", NPC_ABEDNEUM, 13000},
-    {14249, "Oh, that doesn't sound good. We might have a complication or two...", NPC_BRANN, 24000},
-    {13756, "Security breach in progress. Analysis of historical archives transferred to lower-priority queue. Countermeasures engaged.", NPC_KADDRAK, 30500},
-    {14250, "Ah, you want to play hardball, eh? That's just my game!", NPC_BRANN, 42000},
-    {14251, "Couple more minutes and I'll--", NPC_BRANN, 102000},
-    {13761, "Threat index threshold exceeded. Celestial archive aborted. Security level heightened.", NPC_MARNAK, 105000},
-    {14252, "Heightened? What's the good news?", NPC_BRANN, 113000},
-    {14253, "So that was the problem? Now I'm makin' progress...", NPC_BRANN, 201000},
-    {13767, "Critical threat index. Void analysis diverted. Initiating sanitization protocol.", NPC_ABEDNEUM, 207500 },
-    {14254, "Hang on! Nobody's gonna' be sanitized as long as I have a say in it!", NPC_BRANN, 214000},
-    {14255, "Ha! The old magic fingers finally won through! Now let's get down to--", NPC_BRANN, 305000},
-    {13768, "Alert: security fail-safes deactivated. Beginning memory purge and... ", NPC_ABEDNEUM, 310000},
-    //The fight is completed at this point.d
-    {14256, "Purge? No no no no no.. where did I-- Aha, this should do the trick...", NPC_BRANN, 316000},
-    {13769, "System online. Life form pattern recognized. Welcome, Branbronzan. Query?", NPC_ABEDNEUM, 322000},
-    {14263, "Query? What do you think I'm here for, tea and biscuits? Spill the beans already!", NPC_BRANN, 330000},
-    {14264, "Tell me how the dwarves came to be, and start at the beginning!", NPC_BRANN, 336000},
-    {13770, "Accessing prehistoric data... retrieved. In the beginning the earthen were created to--", NPC_ABEDNEUM, 341000},
-    {14265, "Right, right... I know the earthen were made from stone to shape the deep regions o' the world. But what about the anomalies? Matrix non-stabilizin' and what-not?", NPC_BRANN, 348000},
-    {13771, "Accessing... In the early stages of it's development cycle, Azeroth suffered infection by parasitic necrophotic symbiotes.", NPC_ABEDNEUM, 360000},
-    {14266, "Necrowhatinthe-- Speak bloody Common, will ye?", NPC_BRANN, 372000},
-    {13772, "Designation: Old Gods. Old Gods rendered all systems, including earthen, defenseless in order to facilitate assimilation. This matrix destabilization has been termed the Curse of Flesh. Effects of destabilization increased over time.", NPC_ABEDNEUM, 377000},
-    {14267, "Old Gods, huh? So they zapped the earthen with this Curse of Flesh... and then what?", NPC_BRANN, 400000},
-    {13757, "Accessing... Creators arrived to extirpate symbiotic infection. Assessment revealed that Old God infestation had grown malignant. Excising parasites would result in loss of host--", NPC_KADDRAK, 407500},
-    {14268, "If they killed the Old Gods, Azeroth would've been destroyed...", NPC_BRANN, 424000},
-    {13758, "Correct. Creators neutralized parasitic threat and contained it within the host. Forge of Wills and other systems were instituted to create new earthen. Safeguards were implemented, and protectors were appointed.", NPC_KADDRAK, 431000},
-    {14269, "What protectors?", NPC_BRANN, 450000},
-    {13759, "Designations: Aesir and Vanir. Or in the common nomenclature, storm and earth giants. Sentinel Loken designated supreme. Dragon Aspects appointed to monitor evolution on Azeroth.", NPC_KADDRAK, 453000},
-    {14270, "Aesir and Vanir... Okay, so the Forge o' Wills started makin' new earthen... but what happened to the old ones?", NPC_BRANN, 472000},
-    {13762, "Additional background is relevant to your query: following global combat between Aesir and Vanir--", NPC_MARNAK, 483000},
-    {14271, "Hold everything! The Aesir and Vanir went to war? Why?", NPC_BRANN, 489000},
-    {13763, "Unknown. Data suggests that impetus for global combat originated with prime designate Loken, who neutralized all remaining Aesir and Vanir, affecting termination of conflict. Prime designate Loken then initiated stasis of several seed races, including earthen, giants and vrykul, at designated holding facilities.", NPC_MARNAK, 495000},
-    {14272, "This Loken sounds like a nasty character. Glad we don't have to worry about the likes o' him anymore. So... if I'm understandin' ye right, the original earthen eventually woke up from this stasis, and by that time the destabili-whatever had turned 'em into proper dwarves. Or at least... dwarf ancestors.", NPC_BRANN, 519000},
-    {13764, "Essentially that is correct.", NPC_MARNAK, 543000},
-    {14273, "Well, now... that's a lot to digest. I'm gonna need some time to take all this in. Thank ye.", NPC_BRANN, 546000},
-    {13773, "Acknowledged, Branbronzan. Session terminated.", NPC_ABEDNEUM, 554000},
-    //Go to Sjonnir's door
-    {0, "I think it's time to see what's behind the door near the entrance. I'm going to sneak over there, nice and quiet. Meet me at the door and I'll get us in.", NPC_BRANN, 561000},
+    TALK_GROUP_PHASE1       = 1,
+    TALK_GROUP_PHASE2,
+    TALK_GROUP_PHASE3,
+    TALK_GROUP_EVENT_END,
 };
 
-class brann_bronzebeard : public CreatureScript
+enum AbedneumTexts
 {
-public:
-    brann_bronzebeard() : CreatureScript("brann_bronzebeard") { }
+    SAY_ABEDNEUM_WARNING      = 0, // Warning: life form pattern not recognized...
+    SAY_ABEDNEUM_CRITICAL     = 1, // Critical threat index...
+    SAY_ABEDNEUM_FAILSAFE     = 2, // Alert: security fail-safes deactivated...
+    SAY_ABEDNEUM_ONLINE       = 3, // System online...
+    SAY_ABEDNEUM_LORE_1       = 4, // Accessing prehistoric data...
+    SAY_ABEDNEUM_LORE_2       = 5, // Accessing... In the early stages...
+    SAY_ABEDNEUM_LORE_3       = 6, // Designation: Old Gods...
+    SAY_ABEDNEUM_SESSION_END  = 7, // Acknowledged, Branbronzan...
+};
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+enum KaddrakTexts
+{
+    SAY_KADDRAK_SECURITY  = 0, // Security breach in progress...
+    SAY_KADDRAK_LORE_1    = 1, // Accessing... Creators arrived...
+    SAY_KADDRAK_LORE_2    = 2, // Correct. Creators neutralized...
+    SAY_KADDRAK_LORE_3    = 3, // Designations: Aesir and Vanir...
+};
+
+enum MarnakTexts
+{
+    SAY_MARNAK_THREAT   = 0, // Threat index threshold exceeded...
+    SAY_MARNAK_LORE_1   = 1, // Additional background...
+    SAY_MARNAK_LORE_2   = 2, // Unknown. Data suggests...
+    SAY_MARNAK_LORE_3   = 3, // Essentially that is correct.
+};
+
+enum GossipIDs
+{
+    TRIBUNAL_BEFORE = 9669,
+    TRIBUNAL_START  = 9670,
+    TRIBUNAL_END    = 10206,
+    SJONNIR_DOOR    = 10012,
+    SJONNIR_END     = 9725,
+};
+
+Position brannEscortDonePoint = { 939.6467f, 375.48926f, 207.41608f, 0.f };
+Position brannTribunalEventDonePoint = { 1199.685f, 667.15497f, 196.32364f, 3.124139f };
+Position brannDoorDone = { 1256.33f, 667.028f, 189.59921f, 0.f };
+
+struct brann_bronzebeard : public ScriptedAI
+{
+    brann_bronzebeard(Creature* creature) : ScriptedAI(creature), summons(me), _recentlySpoken(false)
     {
-        InstanceScript* pInstance = (creature->GetInstanceScript());
+        instance = creature->GetInstanceScript();
+    }
 
-        player->TalkedToCreature(creature->GetEntry(), creature->GetGUID());
-        player->PrepareGossipMenu(creature, 0, true);
-        if (pInstance)
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->m_Events.KillAllEvents(false);
+        me->SetRegeneratingHealth(false);
+        me->SetGossipMenuId(TRIBUNAL_BEFORE);
+        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+        me->SetReactState(REACT_PASSIVE);
+        summons.DespawnAll();
+
+        // Escort to Tribunal of Ages failed, respawn at original location
+        if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
         {
-            uint32 brann = pInstance->GetData(BRANN_BRONZEBEARD);
-            switch (brann)
+            me->SetReactState(REACT_AGGRESSIVE);
+        }
+
+        // Respawn Handling
+        if (instance && instance->GetBossState(BRANN_DOOR) == DONE)
+        {
+            // Past Sjonnir's Door
+            me->NearTeleportTo(brannDoorDone);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
+            me->SetImmuneToAll(true);
+        }
+        else if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
+        {
+            // In front of Sjonnir's Door
+            me->NearTeleportTo(brannTribunalEventDonePoint);
+            me->SetGossipMenuId(SJONNIR_DOOR);
+            DoCastSelf(SPELL_STEALTH);
+            me->SetImmuneToAll(true);
+        }
+        else if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == DONE)
+        {
+            // Escort to Tribunal of Ages arena Finished
+            me->NearTeleportTo(brannEscortDonePoint);
+            me->SetGossipMenuId(TRIBUNAL_START);
+        }
+    }
+
+    void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32  /*action*/) override
+    {
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+        switch (me->GetGossipMenuId())
+        {
+        case TRIBUNAL_BEFORE:
+            me->AI()->DoAction(ACTION_START_ESCORT_EVENT);
+            break;
+        case TRIBUNAL_START:
+            me->AI()->DoAction(ACTION_START_TRIBUNAL);
+            break;
+        case TRIBUNAL_END:
+            me->AI()->DoAction(ACTION_GO_TO_SJONNIR);
+            break;
+        case SJONNIR_DOOR:
+            me->AI()->DoAction(ACTION_OPEN_DOOR);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+        case ACTION_START_ESCORT_EVENT: // Received via gossip
+            Talk(SAY_BRANN_ESCORT_START);
+            me->LoadPath(PATH_ESCORT);
+            me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetImmuneToAll(true); // @TODO: He is cancelling the path when entering combat or when interacted with. Dunno fix for that yet.
+            me->SetRegeneratingHealth(true);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            instance->SetBossState(BRANN_BRONZEBEARD, IN_PROGRESS);
+            break;
+        case ACTION_START_TRIBUNAL: // Received via gossip
+        {
+            // DoCastSelf 51810 Brann Health Checker
+            me->SetImmuneToAll(false); // @TODO
+            me->SetReactState(REACT_PASSIVE);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_CONSOLE, 897.1759f, 331.77386f, 203.70638f);
+            InitializeEvent();
+            break;
+        }
+        case ACTION_GO_TO_SJONNIR: // Received via gossip
+            me->m_Events.KillAllEvents(false);
+            scheduler.CancelAll();
+
+            Talk(SAY_BRANN_ENTRANCE_MEET);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetRegeneratingHealth(true);
+
+            ResetEvent();
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            DoCast(me, 58506, false);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
+
+            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LEAVE, 935.955f, 371.031f, 207.41751f);
+            break;
+        case ACTION_OPEN_DOOR: // Received via gossip
+            me->RemoveAura(SPELL_STEALTH);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+            me->SetWalk(true);
+            me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DOOR, 1202.91f, 667.049f, 196.23315f);
+            break;
+        case ACTION_START_SJONNIR_FIGHT: // Received by Sjonnir
+            me->GetMotionMaster()->MovePath(PATH_SJONNIR_FIGHT);
+            break;
+        case ACTION_SJONNIR_DEAD: // Received by Sjonnir
+            me->m_Events.KillAllEvents(false);
+            scheduler.CancelAll();
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetGossipMenuId(SJONNIR_END);
+            me->SetFacingTo(3.147235631942749023f);
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_VICTORY_SJONNIR_1);
+            }, 10s);
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_VICTORY_SJONNIR_2);
+            }, 22500ms);
+            me->m_Events.AddEventAtOffset([this] {
+                me->GetMotionMaster()->MovePoint(POINT_SJONNIR_DEAD, 1308.33f, 666.755f, 189.5994f);
+            }, 23500ms);
+            break;
+        case ACTION_SJONNIR_WIPE_START: // Received by Sjonnir
+            me->DespawnOrUnsummon(0s, 5s);
+            break;
+        case ACTION_PLAYER_DEATH_IN_TRIBUNAL: // Received via Instance
+            if (!_recentlySpoken)
             {
-                case 1:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                    SendGossipMenuFor(player, TEXT_ID_START, creature->GetGUID());
-                    break;
-                case 2:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                    SendGossipMenuFor(player, TEXT_ID_TRIBUNAL_START, creature->GetGUID());
-                    break;
-                case 3:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                    SendGossipMenuFor(player, TEXT_ID_TRIBUNAL_END, creature->GetGUID());
-                    break;
-                case 4:
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-                    SendGossipMenuFor(player, TEXT_ID_SJONNIR_DOOR, creature->GetGUID());
-                    break;
-                case 5:
-                    SendGossipMenuFor(player, TEXT_ID_SJONNIR_END, creature->GetGUID());
-                    break;
-                default:
-                    break;
+                Talk(SAY_BRANN_PLAYER_DEATH);
+                _recentlySpoken = true;
+                me->m_Events.AddEventAtOffset([this] {
+                    _recentlySpoken = false;
+                }, 6s);
+            }
+            break;
+        case ACTION_SKIP_PHASE: // Debug, received by player
+            if (_currentPhase >= 1 && _currentPhase < 3)
+                TransitionToPhase(_currentPhase + 1);
+            else if (_currentPhase == 3)
+                EndTribunalFight();
+            break;
+        default:
+            break;
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        /* Movement:
+        *  Path to Tribunal Start
+        *  Point to Tribunal Console
+        *  Point to Tribunal Lore
+        *  Point to Tribunal Leave
+        *  Point to Sjonnir's Door to Open
+        *  Point to Sjonnir's Arena to Fight
+        *  Path to Sjonnir's Console
+        *  Point to Sjonnir's Console Again after his defeat
+        */
+        if (type == POINT_MOTION_TYPE)
+        {
+            switch (id)
+            {
+            case POINT_TRIBUNAL_CONSOLE:
+                me->SetEmoteState(EMOTE_STATE_USE_STANDING);
+                break;
+            case POINT_TRIBUNAL_LORE:
+                me->SetFacingTo(3.926990747451782226f);
+                me->SetGossipMenuId(TRIBUNAL_END);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                break;
+            case POINT_TRIBUNAL_LEAVE:
+                // Will respawn in front of Sjonnir's Door
+                // Sniff reveals different GUID, same entry
+                me->DespawnOrUnsummon(0s, 5s);
+                break;
+            case POINT_SJONNIR_DOOR:
+                me->SetEmoteState(EMOTE_STATE_USE_STANDING);
+                me->SetWalk(false);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->SetEmoteState(EMOTE_ONESHOT_NONE);
+                    instance->SetBossState(BRANN_DOOR, DONE); // Opens Door to Sjonnir
+                    instance->SetData(BRANN_DOOR, DONE);
+                }, 3200ms);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->GetMotionMaster()->MovePoint(POINT_SJONNIR_FIGHT, 1256.33f, 667.028f, 189.59921);
+                }, 5600ms);
+                break;
+            case POINT_SJONNIR_FIGHT:
+                me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
+                Talk(SAY_BRANN_FRONT_OF_SJONNIR);
+                break;
+            case POINT_SJONNIR_DEAD:
+                me->SetFacingTo(0.104719758033752441f);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                me->SetGossipMenuId(SJONNIR_END);
+                break;
+            default:
+                break;
             }
         }
-        return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*sender*/, uint32 action) override
+    void PathEndReached(uint32 pathId) override
     {
-        if (action)
+        if (pathId == PATH_ESCORT)
         {
-            switch (action)
+            instance->SetBossState(BRANN_BRONZEBEARD, DONE);
+            Talk(SAY_BRANN_EVENT_INTRO_1);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetRegeneratingHealth(false);
+            me->SetGossipMenuId(TRIBUNAL_START);
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+        }
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
+        {
+            // During escort: clear combat but don't call MoveTargetedHome(),
+            // so the WaypointMovementGenerator stays active and resumes.
+            _EnterEvadeMode(why);
+            return;
+        }
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
+    void JustSummoned(Creature* cr) override
+    {
+        if (cr->GetEntry() == NPC_ABEDNEUM || cr->GetEntry() == NPC_KADDRAK || cr->GetEntry() == NPC_MARNAK)
+            cr->SetCanFly(true);
+        else
+            summons.Summon(cr);
+    }
+
+    void InitializeEvent()
+    {
+        // There are 3 phases in this event, each transition contains dialogue.
+        // Each phase has one additional NPC and one head active.
+        // Each phase takes approximately 100s
+        instance->SetBossState(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
+
+        if (Creature* cr = me->SummonCreature(NPC_KADDRAK, 928.0f, 331.276f, 219.73332f, 1.8326f, TEMPSUMMON_TIMED_DESPAWN, 580000))
+            KaddrakGUID = cr->GetGUID();
+
+        if (Creature* cr = me->SummonCreature(NPC_MARNAK, 891.309f, 359.38196f, 217.42168f, 4.6774f, TEMPSUMMON_TIMED_DESPAWN, 580000))
+            MarnakGUID = cr->GetGUID();
+
+        if (Creature* cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86833f, 0.68067f, TEMPSUMMON_TIMED_DESPAWN, 580000)) // Left Eye Position, actual position: 896.07965f, 330.89822f, 237.91263f, 3.5779f
+            AbedneumGUID = cr->GetGUID();
+
+        _currentPhase = 1;
+        SchedulePhaseTalks(1);
+        SchedulePhaseAbilities(1);
+        ScheduleNextTransition();
+    }
+
+    void ResetEvent()
+    {
+        if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
+            tribunal->SetGoState(GO_STATE_READY);
+
+        if (GameObject* tribunalSkyFloor = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SKY_FLOOR)))
+            tribunalSkyFloor->SetGoState(GO_STATE_READY);
+
+        scheduler.CancelAll();
+        me->m_Events.KillAllEvents(false);
+        summons.DespawnAll();
+        DespawnHeads();
+
+        _currentPhase = 0;
+    }
+
+    void SwitchHeadVisual(uint8 headMask, bool activate)
+    {
+        if (!instance)
+            return;
+
+        GameObject* go = nullptr;
+        if (headMask & 0x1) // Kaddrak
+            if ((go = me->GetMap()->GetGameObject(instance->GetGuidData(GO_KADDRAK))))
             {
-                case GOSSIP_ACTION_INFO_DEF+1:
-                    creature->AI()->DoAction(ACTION_START_ESCORT_EVENT);
-                    CloseGossipMenuFor(player);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF+2:
-                    creature->AI()->DoAction(ACTION_START_TRIBUNAL);
-                    CloseGossipMenuFor(player);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF+3:
-                    creature->AI()->DoAction(ACTION_GO_TO_SJONNIR);
-                    CloseGossipMenuFor(player);
-                    break;
-                case GOSSIP_ACTION_INFO_DEF+4:
-                    creature->AI()->DoAction(ACTION_OPEN_DOOR);
-                    CloseGossipMenuFor(player);
-                    break;
+                if (activate)
+                {
+                    go->SendCustomAnim(0);
+                }
+                else
+                {
+                    go->SendCustomAnim(1);
+                    if (go->GetGoState() == GO_STATE_ACTIVE)
+                        go->SetGoState(GO_STATE_READY);
+                }
             }
-        }
-        return true;
+        if (headMask & 0x2) // Marnak
+            if ((go = me->GetMap()->GetGameObject(instance->GetGuidData(GO_MARNAK))))
+            {
+                if (activate)
+                {
+                    go->SendCustomAnim(0);
+                }
+                else
+                {
+                    go->SendCustomAnim(1);
+                    if (go->GetGoState() == GO_STATE_ACTIVE)
+                        go->SetGoState(GO_STATE_READY);
+                }
+            }
+        if (headMask & 0x4) // Abedneum
+            if ((go = me->GetMap()->GetGameObject(instance->GetGuidData(GO_ABEDNEUM))))
+            {
+                if (activate)
+                {
+                    go->SendCustomAnim(0);
+                }
+                else
+                {
+                    go->SendCustomAnim(1);
+                    if (go->GetGoState() == GO_STATE_ACTIVE)
+                        go->SetGoState(GO_STATE_READY);
+                }
+            }
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    Creature* GetAbedneum() { return ObjectAccessor::GetCreature(*me, AbedneumGUID); }
+    Creature* GetMarnak() { return ObjectAccessor::GetCreature(*me, MarnakGUID); }
+    Creature* GetKaddrak() { return ObjectAccessor::GetCreature(*me, KaddrakGUID); }
+
+    void DespawnHeads()
     {
-        return new brann_bronzebeardAI (creature);
+        Creature* cr;
+        if ((cr = GetAbedneum())) cr->DespawnOrUnsummon();
+        if ((cr = GetMarnak())) cr->DespawnOrUnsummon();
+        if ((cr = GetKaddrak())) cr->DespawnOrUnsummon();
+
+        SwitchHeadVisual(0x7, false);
     }
 
-    struct brann_bronzebeardAI : public npc_escortAI
+    void SummonCreatures(uint32 entry)
     {
-        brann_bronzebeardAI(Creature* c) : npc_escortAI(c), summons(me)
+        switch (entry)
         {
-            pInstance = c->GetInstanceScript();
+        case NPC_DARK_RUNE_PROTECTOR:
+            me->SummonCreatureGroup(0);
+            break;
+        case NPC_DARK_RUNE_STORMCALLER:
+            me->SummonCreatureGroup(1);
+            break;
+        case NPC_IRON_GOLEM_CUSTODIAN:
+            me->SummonCreatureGroup(2);
+            break;
         }
+    }
 
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-        ObjectGuid AbedneumGUID;
-        ObjectGuid MarnakGUID;
-        ObjectGuid KaddrakGUID;
-        ObjectGuid darkMatterTargetGUID;
+    void TransitionToPhase(uint8 phase)
+    {
+        _currentPhase = phase;
+        me->m_Events.CancelEventGroup(phase - 1); // Cancel previous phase's remaining talks
+        SchedulePhaseTalks(phase);
+        SchedulePhaseAbilities(phase);
+        ScheduleNextTransition();
+    }
 
-        uint8 WaveNum;
-
-        bool TalkEvent;
-        uint32 SpeechCount, SpeechPause;
-        bool canExecuteEvents = true;
-
-        void DespawnHeads()
+    void ScheduleNextTransition()
+    {
+        scheduler.CancelGroup(CONTEXT_GROUP_TRANSITION);
+        switch (_currentPhase)
         {
-            Creature* cr;
-            if ((cr = GetAbedneum())) cr->DespawnOrUnsummon();
-            if ((cr = GetMarnak())) cr->DespawnOrUnsummon();
-            if ((cr = GetKaddrak())) cr->DespawnOrUnsummon();
-
-            SwitchHeadVisaul(0x7, false);
+        case 1:
+            scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
+                TransitionToPhase(2);
+            });
+            break;
+        case 2:
+            scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
+                TransitionToPhase(3);
+            });
+            break;
+        case 3:
+            scheduler.Schedule(100s, CONTEXT_GROUP_TRANSITION, [this](TaskContext) {
+                EndTribunalFight();
+            });
+            break;
+        default:
+            break;
         }
+    }
 
-        void SwitchHeadVisaul(uint8 headMask, bool activate)
+    void SchedulePhaseTalks(uint8 phase)
+    {
+        switch (phase)
         {
-            if (!pInstance)
+        case 1:
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_EVENT_INTRO_2);
+            }, 0ms, TALK_GROUP_PHASE1);
+
+            me->m_Events.AddEventAtOffset([this] {
+                if (Creature* abedneum = GetAbedneum())
+                    abedneum->AI()->Talk(SAY_ABEDNEUM_WARNING);
+            }, 12500ms, TALK_GROUP_PHASE1);
+
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_EVENT_A_1);
+            }, 23500ms, TALK_GROUP_PHASE1);
+
+            me->m_Events.AddEventAtOffset([this] {
+                if (Creature* kaddrak = GetKaddrak())
+                    kaddrak->AI()->Talk(SAY_KADDRAK_SECURITY);
+            }, 29500ms, TALK_GROUP_PHASE1);
+
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_EVENT_A_3);
+            }, 41500ms, TALK_GROUP_PHASE1);
+
+            break;
+        case 2:
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_EVENT_B_1);
+            }, 0ms, TALK_GROUP_PHASE2);
+
+            me->m_Events.AddEventAtOffset([this] {
+                if (Creature* marnak = GetMarnak())
+                    marnak->AI()->Talk(SAY_MARNAK_THREAT);
+            }, 3s, TALK_GROUP_PHASE2);
+
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_EVENT_B_3);
+            }, 11s, TALK_GROUP_PHASE2);
+
+            break;
+        case 3:
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_EVENT_C_1);
+            }, 0ms, TALK_GROUP_PHASE3);
+
+            me->m_Events.AddEventAtOffset([this] {
+                if (Creature* abedneum = GetAbedneum())
+                    abedneum->AI()->Talk(SAY_ABEDNEUM_CRITICAL);
+            }, 5s, TALK_GROUP_PHASE3);
+
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_BRANN_EVENT_C_3);
+            }, 12s, TALK_GROUP_PHASE3);
+
+            break;
+        }
+    }
+
+    void SchedulePhaseAbilities(uint8 phase)
+    {
+        switch (phase)
+        {
+        case 1:
+            // Kaddrak head visual activates
+            scheduler.Schedule(30s, [this](TaskContext) {
+                SwitchHeadVisual(0x1, true);
+            });
+            // Kaddrak glare of the tribunal
+            scheduler.Schedule(47s, [this](TaskContext context) {
+                if (Creature* kaddrak = GetKaddrak())
+                    if (Player* plr = SelectTargetFromPlayerList(100.0f))
+                        kaddrak->CastSpell(plr, SPELL_GLARE_OF_THE_TRIBUNAL, true);
+                // Alternate eye position 1s after each glare
+                scheduler.Schedule(1s, [this](TaskContext) {
+                    if (Creature* kaddrak = GetKaddrak())
+                    {
+                        if (_leftEye)
+                            kaddrak->UpdatePosition(923.5f, 326.358f, 219.73332f, 2.28638f, true);
+                        else
+                            kaddrak->UpdatePosition(928.f, 331.276f, 219.73332f, 1.83259f, true);
+                        _leftEye = !_leftEye;
+                        kaddrak->StopMovingOnCurrentPos();
+                    }
+                });
+                context.SetGroup(CONTEXT_GROUP_KADDRAK);
+                context.Repeat(1500ms);
+            });
+            // Protector spawning
+            scheduler.Schedule(52s, [this](TaskContext context) {
+                SummonCreatures(NPC_DARK_RUNE_PROTECTOR);
+                context.SetGroup(CONTEXT_GROUP_PROTECTORS);
+                context.Repeat(me->GetMap()->IsHeroic() ? 23500ms : 32500ms);
+            });
+            break;
+        case 2:
+            // Marnak head visual activates
+            scheduler.Schedule(3s, [this](TaskContext) {
+                SwitchHeadVisual(0x2, true);
+            });
+            // Marnak dark matter
+            scheduler.Schedule(13s, [this](TaskContext context) {
+                DoMarnakDarkMatter();
+                context.SetGroup(CONTEXT_GROUP_MARNAK);
+                context.Repeat(30s);
+            });
+            // Stormcaller spawning
+            scheduler.Schedule(20s, [this](TaskContext context) {
+                SummonCreatures(NPC_DARK_RUNE_STORMCALLER);
+                context.SetGroup(CONTEXT_GROUP_STORMCALLERS);
+                context.Repeat(me->GetMap()->IsHeroic() ? 32s : 41500ms);
+            });
+            break;
+        case 3:
+            // Abedneum head visual activates
+            scheduler.Schedule(6s, [this](TaskContext) {
+                SwitchHeadVisual(0x4, true);
+            });
+            // Abedneum searing gaze
+            scheduler.Schedule(16s, [this](TaskContext context) {
+                DoAbedneumSearingGaze();
+                context.SetGroup(CONTEXT_GROUP_ABEDNEUM);
+                context.Repeat(15s);
+            });
+            // Golem spawning
+            scheduler.Schedule(27s, [this](TaskContext context) {
+                SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN);
+                context.SetGroup(CONTEXT_GROUP_GOLEMS);
+                context.Repeat(me->GetMap()->IsHeroic() ? 32s : 45s);
+            });
+            break;
+        }
+    }
+
+    void EndTribunalFight()
+    {
+        // Stop all combat abilities and spawning
+        scheduler.CancelAll();
+
+        // Schedule end sequence talks
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_D_1);
+        }, 0ms, TALK_GROUP_EVENT_END);
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* abedneum = GetAbedneum())
+                abedneum->AI()->Talk(SAY_ABEDNEUM_FAILSAFE);
+        }, 5s, TALK_GROUP_EVENT_END);
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_D_3);
+        }, 11s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            // Fight complete - system online
+            if (Creature* abedneum = GetAbedneum())
+                abedneum->AI()->Talk(SAY_ABEDNEUM_ONLINE);
+
+            summons.DespawnAll();
+            me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LORE, 917.253f, 351.925f, 203.69878f);
+            instance->SetBossState(BOSS_TRIBUNAL_OF_AGES, DONE);
+            me->CastSpell(me, SPELL_TRIBUNAL_CREDIT_MARKER, true);
+
+            // Spawn chest
+            if (Player* plr = SelectTargetFromPlayerList(200.0f))
+            {
+                if (GameObject* go = plr->SummonGameObject(
+                    (me->GetMap()->IsHeroic() ? GO_TRIBUNAL_CHEST_H : GO_TRIBUNAL_CHEST),
+                    880.406f, 345.164f, 203.706f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0))
+                {
+                    plr->RemoveGameObject(go, false);
+                    go->SetLootMode(1);
+                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                }
+                plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
+            }
+
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+        }, 17s, TALK_GROUP_EVENT_END);
+
+        // Post-fight lore conversation
+        SchedulePostFightConversation();
+    }
+
+    void SchedulePostFightConversation()
+    {
+        // Offsets from the end of the fight (relative to EndTribunalFight call)
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_01);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, SPECIAL); // Sky floor
+        }, 25s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_02);
+        }, 31s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* abedneum = GetAbedneum())
+                abedneum->AI()->Talk(SAY_ABEDNEUM_LORE_1);
+        }, 36s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_04);
+        }, 43s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* abedneum = GetAbedneum())
+                abedneum->AI()->Talk(SAY_ABEDNEUM_LORE_2);
+        }, 55s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_06);
+        }, 67s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* abedneum = GetAbedneum())
+                abedneum->AI()->Talk(SAY_ABEDNEUM_LORE_3);
+        }, 72s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_08);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE); // Head switch
+        }, 95s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* kaddrak = GetKaddrak())
+                kaddrak->AI()->Talk(SAY_KADDRAK_LORE_1);
+        }, 102s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_10);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, SPECIAL);
+        }, 119s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* kaddrak = GetKaddrak())
+                kaddrak->AI()->Talk(SAY_KADDRAK_LORE_2);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
+        }, 126s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_12);
+        }, 145s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* kaddrak = GetKaddrak())
+                kaddrak->AI()->Talk(SAY_KADDRAK_LORE_3);
+        }, 148s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_14);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, SPECIAL);
+        }, 167s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* marnak = GetMarnak())
+                marnak->AI()->Talk(SAY_MARNAK_LORE_1);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
+        }, 178s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_16);
+        }, 184s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* marnak = GetMarnak())
+                marnak->AI()->Talk(SAY_MARNAK_LORE_2);
+        }, 190s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_18);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, SPECIAL);
+        }, 214s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* marnak = GetMarnak())
+                marnak->AI()->Talk(SAY_MARNAK_LORE_3);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
+        }, 238s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_EVENT_END_20);
+        }, 240s, TALK_GROUP_EVENT_END);
+
+        me->m_Events.AddEventAtOffset([this] {
+            if (Creature* abedneum = GetAbedneum())
+                abedneum->AI()->Talk(SAY_ABEDNEUM_SESSION_END);
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, SPECIAL);
+        }, 249s, TALK_GROUP_EVENT_END);
+
+        // Gossip to go to Sjonnir or auto-transition
+        me->m_Events.AddEventAtOffset([this] {
+            Talk(SAY_BRANN_ENTRANCE_MEET);
+        }, 256s, TALK_GROUP_EVENT_END);
+    }
+
+    void DoMarnakDarkMatter()
+    {
+        Creature* marnak = GetMarnak();
+        if (!marnak)
+            return;
+
+        Creature* target = me->SummonCreature(NPC_DARK_MATTER_TARGET, 899.843f, 355.271f, 214.301f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
+        if (!target)
+            return;
+
+        target->SetCanFly(true);
+        darkMatterTargetGUID = target->GetGUID();
+
+        // Right eye visual
+        if (Creature* cra = me->SummonCreature(NPC_DARK_MATTER, 891.30902f, 359.38195f, 217.421676f + 2.f /* +2 hacked: too low otherwise */, 4.67748f, TEMPSUMMON_TIMED_DESPAWN, 5000))
+            cra->CastSpell(cra, SPELL_DARK_MATTER_VISUAL_CHANNEL, false);
+
+        // Left eye visual
+        if (Creature* crb = me->SummonCreature(NPC_DARK_MATTER, 895.93292f, 363.52789f, 219.33831f, 5.58505f, TEMPSUMMON_TIMED_DESPAWN, 5000))
+            crb->CastSpell(crb, SPELL_DARK_MATTER_VISUAL_CHANNEL, false);
+
+        // After 5s, start chasing player
+        me->m_Events.AddEventAtOffset([this] {
+            Creature* darkMatterTarget = ObjectAccessor::GetCreature(*me, darkMatterTargetGUID);
+            if (!darkMatterTarget)
                 return;
 
-            GameObject* go = nullptr;
-            if (headMask & 0x1) // Kaddrak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_KADDRAK))))
-                {
-                    if (activate)
-                    {
-                        go->SendCustomAnim(0);
-                    }
-                    else
-                    {
-                        go->SendCustomAnim(1);
-                        if (go->GetGoState() == GO_STATE_ACTIVE)
-                            go->SetGoState(GO_STATE_READY);
-                    }
-                }
-            if (headMask & 0x2) // Marnak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_MARNAK))))
-                {
-                    if (activate)
-                    {
-                        go->SendCustomAnim(0);
-                    }
-                    else
-                    {
-                        go->SendCustomAnim(1);
-                        if (go->GetGoState() == GO_STATE_ACTIVE)
-                            go->SetGoState(GO_STATE_READY);
-                    }
-                }
-            if (headMask & 0x4) // Abedneum
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_ABEDNEUM))))
-                {
-                    if (activate)
-                    {
-                        go->SendCustomAnim(0);
-                    }
-                    else
-                    {
-                        go->SendCustomAnim(1);
-                        if (go->GetGoState() == GO_STATE_ACTIVE)
-                            go->SetGoState(GO_STATE_READY);
-                    }
-                }
-        }
+            darkMatterTarget->CastSpell(darkMatterTarget, SPELL_DARK_MATTER_VISUAL, false);
+            Player* plr = SelectTargetFromPlayerList(100.0f);
+            if (!plr)
+                return;
 
-        void ResetEvent()
-        {
-            if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
-                tribunal->SetGoState(GO_STATE_READY);
+            darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ());
 
-            if (GameObject* tribunalSkyFloor = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SKY_FLOOR)))
-                tribunalSkyFloor->SetGoState(GO_STATE_READY);
-
-            events.Reset();
-            summons.DespawnAll();
-            DespawnHeads();
-
-            WaveNum = 0;
-            SpeechCount = 0;
-            SpeechPause = 0;
-            TalkEvent = false;
-        }
-
-        void WaypointReached(uint32 id) override;
-        void InitializeEvent();
-
-        Creature* GetAbedneum() { return ObjectAccessor::GetCreature(*me, AbedneumGUID); }
-        Creature* GetMarnak() { return ObjectAccessor::GetCreature(*me, MarnakGUID); }
-        Creature* GetKaddrak() { return ObjectAccessor::GetCreature(*me, KaddrakGUID); }
-
-        bool leftEye = true;
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage && pInstance)
-                pInstance->SetData(DATA_BRANN_ACHIEVEMENT, false);
-        }
-
-        void Reset() override
-        {
-            RemoveEscortState(0x7); // all states
-            SetDespawnAtFar(false);
-            SetDespawnAtEnd(false);
-            ResetEvent();
-
-            me->SetReactState(REACT_PASSIVE);
-            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-
-            if (pInstance)
-            {
-                pInstance->SetData(BRANN_BRONZEBEARD, 1);
-                pInstance->SetData(DATA_BRANN_ACHIEVEMENT, true);
-
-                if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
-                {
-                    pInstance->SetData(BRANN_BRONZEBEARD, 4);
-                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_TRIBUNAL_ACCESS_DOOR)))
-                        door->SetGoState(GO_STATE_ACTIVE);
-                }
-
-                if (pInstance->GetData(BOSS_SJONNIR) == DONE)
-                {
-                    pInstance->SetData(BRANN_BRONZEBEARD, 5);
-                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_DOOR)))
-                        door->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-                case ACTION_START_ESCORT_EVENT:
-                    Start(false, ObjectGuid::Empty, 0, true, false);
-                    Talk(SAY_BRANN_ESCORT_START);
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetRegeneratingHealth(true);
-                    break;
-                case ACTION_START_TRIBUNAL:
-                {
-                    me->SetReactState(REACT_PASSIVE);
-                    SetEscortPaused(false);
-                    InitializeEvent();
-                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-                    break;
-                }
-                case ACTION_TRIBUNAL_WIPE_START:
-                    SetNextWaypoint(1, false);
-                    SetEscortPaused(false);
-                    ResetEvent();
-                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-                    break;
-                case ACTION_GO_TO_SJONNIR:
-                    Talk(SAY_BRANN_ENTRANCE_MEET);
-                    me->SetReactState(REACT_PASSIVE);
-                    me->SetRegeneratingHealth(true);
-                    SetEscortPaused(false);
-                    ResetEvent();
-                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-                    DoCast(me, 58506, false);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
-                    me->SendMovementFlagUpdate();
-                    me->SetImmuneToAll(true);
-                    break;
-                case ACTION_START_SJONNIR_FIGHT:
-                    SetEscortPaused(false);
-                    break;
-                case ACTION_SJONNIR_DEAD:
-                    if (pInstance)
-                        pInstance->SetData(BRANN_BRONZEBEARD, 5);
-                    SetEscortPaused(false);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
-                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                    me->SetOrientation(3.132660f);
-                    me->SendMovementFlagUpdate();
-                    events.ScheduleEvent(EVENT_SJONNIR_END_BRANN_YELL, 10s);
-                    events.ScheduleEvent(EVENT_SJONNIR_END_BRANN_LAST_YELL, 22s);
-                    break;
-                case ACTION_SJONNIR_WIPE_START:
-                    Reset();
-                    SetNextWaypoint(33, true);
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
-                    me->StopMovingOnCurrentPos();
-                    DoCast(me, 58506, false);
-                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_DOOR)))
-                        door->SetGoState(GO_STATE_READY);
-                    break;
-                case ACTION_OPEN_DOOR:
-                    Start(false, ObjectGuid::Empty, 0, true, false);
-                    SetNextWaypoint(34, false);
-                    SetEscortPaused(false);
-                    me->RemoveAura(58506);
-                    me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-                    me->SetWalk(true);
-                    me->SetSpeed(MOVE_WALK, 1.0f);
-                    break;
-            }
-        }
-
-        void JustSummoned(Creature* cr) override
-        {
-            if (cr->GetEntry() == NPC_ABEDNEUM || cr->GetEntry() == NPC_KADDRAK || cr->GetEntry() == NPC_MARNAK)
-                cr->SetCanFly(true);
+            Milliseconds delay;
+            if (darkMatterTarget->GetDistance(plr) < 5.0f)
+                delay = 3s;
+            else if (darkMatterTarget->GetDistance(plr) < 30.0f)
+                delay = 3500ms;
             else
-                summons.Summon(cr);
-        }
+                delay = 4500ms;
 
-        void UpdateEscortAI(uint32 diff) override
+            // After reaching player, explode
+            me->m_Events.AddEventAtOffset([this] {
+                if (Creature* dm = ObjectAccessor::GetCreature(*me, darkMatterTargetGUID))
+                {
+                    dm->CastSpell(dm, SPELL_DARK_MATTER, true);
+                    dm->DespawnOrUnsummon(500ms);
+                }
+            }, delay);
+        }, 5s);
+    }
+
+    void DoAbedneumSearingGaze()
+    {
+        if (!GetAbedneum())
+            return;
+
+        Player* plr = SelectTargetFromPlayerList(100.0f);
+        if (!plr)
+            return;
+
+        if (Creature* cr = me->SummonCreature(NPC_SEARING_GAZE_TRIGGER, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
         {
-            events.Update(diff);
-
-            if (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_KADDRAK_VISUAL:
-                    {
-                        SwitchHeadVisaul(0x1, true);
-                        break;
-                    }
-                    case EVENT_MARNAK_VISUAL:
-                    {
-                        SwitchHeadVisaul(0x2, true);
-                        break;
-                    }
-                    case EVENT_ABEDNEUM_VISUAL:
-                    {
-                        SwitchHeadVisaul(0x4, true);
-                        break;
-                    }
-                    case EVENT_KADDRAK_HEAD: // Phase 1
-                    {
-                        if (!canExecuteEvents)
-                            return;
-                        if (Creature* kaddrak = GetKaddrak())
-                        {
-                            if (Player* plr = SelectTargetFromPlayerList(100.0f))
-                                kaddrak->CastSpell(plr, SPELL_GLARE_OF_THE_TRIBUNAL, true);
-                        }
-
-                        events.RescheduleEvent(EVENT_KADDRAK_SWITCH_EYE, 1s);
-                        events.Repeat(1500ms);
-                        break;
-                    }
-                    case EVENT_KADDRAK_SWITCH_EYE:
-                    {
-                        if (!canExecuteEvents)
-                            return;
-                        if (Creature* kaddrak = GetKaddrak())
-                        {
-                            if (leftEye)
-                                kaddrak->UpdatePosition(927.9f, 330.9f, 219.4f, 2.4f, true);
-                            else
-                                kaddrak->UpdatePosition(923.7f, 326.9f, 219.5f, 2.1f, true);
-
-                            leftEye = !leftEye;
-                            kaddrak->StopMovingOnCurrentPos();
-                        }
-
-                        break;
-                    }
-                    case EVENT_MARNAK_HEAD: // Phase 2
-                    {
-                        if (!canExecuteEvents)
-                            return;
-
-                        if (Creature* marnak = GetMarnak())
-                        {
-                            if (Creature* cr = me->SummonCreature(NPC_DARK_MATTER_TARGET, 899.843f, 355.271f, 214.301f, 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                            {
-                                cr->SetCanFly(true);
-
-                                //right eye
-                                if (Creature* cra = me->SummonCreature(NPC_DARK_MATTER, marnak->GetPositionX(), marnak->GetPositionY(), marnak->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
-                                    cra->CastSpell(cra, SPELL_DARK_MATTER_VISUAL_CHANNEL, false);
-
-                                //left eye
-                                if (Creature* crb = me->SummonCreature(NPC_DARK_MATTER, 891.543f, 359.5252f, 219.338f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
-                                    crb->CastSpell(crb, SPELL_DARK_MATTER_VISUAL_CHANNEL, false);
-
-                                darkMatterTargetGUID = cr->GetGUID();
-
-                                events.RescheduleEvent(EVENT_DARK_MATTER_START, 5s);
-                            }
-                        }
-                        events.Repeat(30s);
-                        break;
-                    }
-                    case EVENT_DARK_MATTER_START:
-                    {
-                        if (Creature* darkMatterTarget = ObjectAccessor::GetCreature(*me, darkMatterTargetGUID))
-                        {
-                            darkMatterTarget->CastSpell(darkMatterTarget, SPELL_DARK_MATTER_VISUAL, false);
-                            if (Player* plr = SelectTargetFromPlayerList(100.0f))
-                            {
-                                if (!plr)
-                                    return; //no target
-
-                                darkMatterTarget->GetMotionMaster()->MovePoint(0, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ());
-
-                                if (darkMatterTarget->GetDistance(plr) < 5.0f)
-                                {
-                                    events.RescheduleEvent(EVENT_DARK_MATTER_END, 3s);
-                                }
-                                else if (darkMatterTarget->GetDistance(plr) < 30.0f)
-                                {
-                                    events.RescheduleEvent(EVENT_DARK_MATTER_END, 3500ms);
-                                }
-                                else
-                                {
-                                    events.RescheduleEvent(EVENT_DARK_MATTER_END, 4500ms);
-                                }
-                            }
-                        }
-                        break;
-                    }
-                    case EVENT_DARK_MATTER_END:
-                    {
-                        if (Creature* darkMatterTarget = ObjectAccessor::GetCreature(*me, darkMatterTargetGUID))
-                        {
-                            darkMatterTarget->CastSpell(darkMatterTarget, SPELL_DARK_MATTER, true);
-                            darkMatterTarget->DespawnOrUnsummon(500ms);
-                        }
-                        break;
-                    }
-                    case EVENT_ABEDNEUM_HEAD: // Phase 3
-                    {
-                        if (!canExecuteEvents)
-                            return;
-                        if (GetAbedneum())
-                        {
-                            Player* plr = SelectTargetFromPlayerList(100.0f);
-                            if (!plr)
-                                break;
-
-                            if (Creature* cr = me->SummonCreature(NPC_SEARING_GAZE_TRIGGER, plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                            {
-                                // summon another abedneum to create double beam, despawn just after trigger despawn
-                                me->SummonCreature(NPC_ABEDNEUM, 897.0f, 326.9f, 223.5f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
-                                cr->CastSpell(cr, SPELL_SEARING_GAZE, true);
-                            }
-                        }
-                        events.Repeat(15s);
-                        break;
-                    }
-                    case EVENT_SUMMON_MONSTERS:
-                    {
-                        if (!canExecuteEvents)
-                            return;
-                        SummonCreatures(NPC_DARK_RUNE_PROTECTOR, 3, 0);
-                        events.Repeat(IsHeroic() ? 23500ms : 32500ms);
-                        break;
-                    }
-                    case EVENT_SUMMON_STORMCALLER:
-                    {
-                        if (!canExecuteEvents)
-                            return;
-
-                        SummonCreatures(NPC_DARK_RUNE_STORMCALLER, 2, 1);
-                        events.Repeat(IsHeroic() ? 32s : 41500ms);
-                        break;
-                    }
-                    case EVENT_SUMMON_CUSTODIAN:
-                    {
-                        if (!canExecuteEvents)
-                            return;
-
-                        SummonCreatures(NPC_IRON_GOLEM_CUSTODIAN, 1, 1);
-                        events.Repeat(IsHeroic() ? 32s : 45s);
-                        break;
-                    }
-                    case EVENT_TRIBUNAL_END:
-                    {
-                        canExecuteEvents = false;
-                        // Has to be here!
-                        events.Reset();
-                        //DespawnHeads();
-                        summons.DespawnAll();
-
-                        // Spawn Chest and quest credit
-                        if (Player* plr = SelectTargetFromPlayerList(200.0f))
-                        {
-                            if (GameObject* go = plr->SummonGameObject((IsHeroic() ? GO_TRIBUNAL_CHEST_H : GO_TRIBUNAL_CHEST), 880.406f, 345.164f, 203.706f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0))
-                            {
-                                plr->RemoveGameObject(go, false);
-                                go->SetLootMode(1);
-                                go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                            }
-
-                            plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
-                        }
-
-                        events.ScheduleEvent(EVENT_BREEN_WAITING, 11s);
-                        events.ScheduleEvent(EVENT_SKY_ROOM_FLOOR_CHANGE, 92s);
-                        events.ScheduleEvent(EVENT_TALK_FACE_CHANGE, 97s);          //kaddrak speaks
-                        events.ScheduleEvent(EVENT_SKY_ROOM_FLOOR_CHANGE, 168s);
-                        events.ScheduleEvent(EVENT_TALK_FACE_CHANGE, 173s);         //marnak speaks
-                        events.ScheduleEvent(EVENT_SKY_ROOM_FLOOR_CHANGE, 239s);
-                        events.ScheduleEvent(EVENT_TALK_FACE_CHANGE, 244s);         //abedneum speaks
-                        events.ScheduleEvent(EVENT_GO_TO_SJONNIR, 251s);
-                        events.ScheduleEvent(EVENT_SKY_ROOM_FLOOR_CHANGE, 253s);
-                        break;
-                    }
-                    case EVENT_BREEN_WAITING:
-                    {
-                        SetEscortPaused(false);
-                        if (pInstance)
-                        {
-                            pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
-                            pInstance->SetData(BRANN_BRONZEBEARD, 3);
-                            me->CastSpell(me, SPELL_TRIBUNAL_CREDIT_MARKER, true); // credit
-                        }
-
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
-                        me->SendMovementFlagUpdate();
-
-                        break;
-                    }
-                    case EVENT_TALK_FACE_CHANGE:
-                    {
-                        if (pInstance)
-                            pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, DONE);
-                        break;
-                    }
-                    case EVENT_SKY_ROOM_FLOOR_CHANGE:
-                    {
-                        if (pInstance)
-                            pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, SPECIAL);
-                        break;
-                    }
-                    case EVENT_GO_TO_SJONNIR:
-                    {
-                        me->AI()->DoAction(ACTION_GO_TO_SJONNIR);
-                        break;
-                    }
-                    case EVENT_DOOR_OPEN:
-                    {
-                        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-                        me->AddUnitMovementFlag(MOVEMENTFLAG_NONE);
-
-                        if (pInstance)
-                        {
-                            if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_DOOR)))
-                            {
-                                door->SetGoState(GO_STATE_ACTIVE);
-                                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
-                                me->SendMovementFlagUpdate();
-                            }
-                        }
-
-                        break;
-                    }
-                    case EVENT_RESUME_ESCORT:
-                    {
-                        SetEscortPaused(false);
-                        break;
-                    }
-                    case EVENT_SJONNIR_END_BRANN_YELL:
-                    {
-                        Talk(SAY_BRANN_VICTORY_SJONNIR_1);
-                        break;
-                    }
-                    case EVENT_SJONNIR_END_BRANN_LAST_YELL:
-                    {
-                        events.Reset();
-                        SetEscortPaused(false);
-                        Talk(SAY_BRANN_VICTORY_SJONNIR_2);
-                        break;
-                    }
-                }
-            }
-
-            npc_escortAI::UpdateEscortAI(diff);
-
-            if (TalkEvent)
-            {
-                SpeechPause += diff;
-                if (SpeechPause >= Conversation[SpeechCount].timer)
-                {
-                    Creature* cs = nullptr;
-                    switch (Conversation[SpeechCount].creature)
-                    {
-                        case NPC_BRANN:
-                            cs = me;
-                            break;
-                        case NPC_ABEDNEUM:
-                            cs = GetAbedneum();
-                            break;
-                        case NPC_KADDRAK:
-                            cs = GetKaddrak();
-                            break;
-                        case NPC_MARNAK:
-                            cs = GetMarnak();
-                            break;
-                    }
-
-                    if (cs)
-                    {
-                        cs->Yell(Conversation[SpeechCount].text, LANG_UNIVERSAL);
-                        cs->PlayDirectSound(Conversation[SpeechCount].sound);
-                    }
-
-                    if (SpeechCount < 38)
-                        SpeechPause = Conversation[SpeechCount++].timer;
-                    else
-                        TalkEvent = false;
-                }
-            }
+            me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86833f, 0.68067f, TEMPSUMMON_TIMED_DESPAWN, 12000); // Left Eye
+            me->SummonCreature(NPC_ABEDNEUM, 896.5f, 327.f, 223.86805f, 0.645771f, TEMPSUMMON_TIMED_DESPAWN, 12000); // Right Eye
+            cr->CastSpell(cr, SPELL_SEARING_GAZE, true);
         }
+    }
 
-        void SummonCreatures(uint32 entry, uint8 count, uint8 pos)
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage && instance)
+            instance->SetData(DATA_BRANN_ACHIEVEMENT, false);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_BRANN_DEATH);
+        ResetEvent();
+        me->DespawnOrUnsummon(5s, 10s);
+
+        if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
         {
-            Creature* cr;
-            for (int i = 0; i < count; ++i)
-            {
-                if (pos == 0)
-                    cr = me->SummonCreature(entry, 943.088f + urand(0, 5), 401.378f + urand(0, 5), 206.078f, 3.8f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);     //left
-                else
-                    cr = me->SummonCreature(entry, 964.302f + urand(0, 4), 378.942f + urand(0, 4), 206.078f, 3.85f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);    //right
-
-                if (cr)
-                {
-                    cr->AI()->AttackStart(me);
-                    cr->SetInCombatWithZone();
-                }
-            }
+            instance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
         }
+    }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            ResetEvent();
-            if (pInstance)
-            {
-                if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
-                {
-                    brann->HandleEmoteCommand(EMOTE_STATE_DEAD);
-                    brann->setDeathState(DeathState::JustDied);
-                    brann->Respawn();
-                    if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) != DONE)
-                    {
-                        brann->AI()->DoAction(ACTION_TRIBUNAL_WIPE_START);
-                        pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, FAIL);
-                    }
-                    if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
-                    {
-                        brann->AI()->DoAction(ACTION_SJONNIR_WIPE_START);
-                    }
-                }
-                if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) != DONE)
-                    pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
-            }
-        }
-    };
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+
+private:
+    InstanceScript* instance;
+    SummonList summons;
+    ObjectGuid AbedneumGUID;
+    ObjectGuid MarnakGUID;
+    ObjectGuid KaddrakGUID;
+    ObjectGuid darkMatterTargetGUID;
+    bool _recentlySpoken;
+    bool _leftEye = true;
+    uint8 _currentPhase = 0;
 };
-
-void brann_bronzebeard::brann_bronzebeardAI::InitializeEvent()
-{
-    Creature* cr = nullptr;
-    if ((cr = me->SummonCreature(NPC_KADDRAK, 923.7f, 326.9f, 219.5f, 2.1f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
-    {
-        KaddrakGUID = cr->GetGUID();
-    }
-    if ((cr = me->SummonCreature(NPC_MARNAK, 895.974f, 363.571f, 219.337f, 5.5f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
-    {
-        MarnakGUID = cr->GetGUID();
-    }
-    if ((cr = me->SummonCreature(NPC_ABEDNEUM, 892.25f, 331.25f, 223.86f, 0.6f, TEMPSUMMON_TIMED_DESPAWN, 580000)))
-    {
-        AbedneumGUID = cr->GetGUID();
-    }
-
-    TalkEvent = true;
-
-    events.Reset();
-
-    // Viusals
-    events.ScheduleEvent(EVENT_KADDRAK_VISUAL, 30s);
-    events.ScheduleEvent(EVENT_MARNAK_VISUAL, 105s);
-    events.ScheduleEvent(EVENT_ABEDNEUM_VISUAL, 207s);
-
-    events.ScheduleEvent(EVENT_SUMMON_MONSTERS, 52s);
-    events.ScheduleEvent(EVENT_SUMMON_STORMCALLER, 122s);
-    events.ScheduleEvent(EVENT_SUMMON_CUSTODIAN, 228s);
-    events.ScheduleEvent(EVENT_KADDRAK_HEAD, 47s);
-    events.ScheduleEvent(EVENT_MARNAK_HEAD, 115s);
-    events.ScheduleEvent(EVENT_ABEDNEUM_HEAD, 217s);
-    events.ScheduleEvent(EVENT_TRIBUNAL_END, 310s);
-}
-
-void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
-{
-    switch (id)
-    {
-        // Stop before stairs and ask to start
-        case 14:
-            SetEscortPaused(true);
-            if (pInstance)
-            {
-                me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                Talk(SAY_BRANN_EVENT_INTRO_1);
-                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                pInstance->SetData(BRANN_BRONZEBEARD, 2);
-            }
-            break;
-        // In front of Console
-        case 16:
-            SetEscortPaused(true);
-            if (pInstance)
-            {
-                pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-                if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
-                    tribunal->SetGoState(GO_STATE_ACTIVE);
-            }
-            break;
-        //Tribunal end, stand in the middle of the sky room
-        case 17:
-            SetEscortPaused(true);
-            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetOrientation(3.91672f);
-            me->SendMovementFlagUpdate();
-            break;
-        //Run to the skyroom door and then teleport before Sjonnir's door
-        case 18:
-            SetEscortPaused(true);
-            SetNextWaypoint(33, false);
-            if (pInstance)
-            {
-                pInstance->SetData(BRANN_BRONZEBEARD, 4);
-                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                me->SetOrientation(3.132660f);
-                DoCast(me, 58506, false);
-                me->SendMovementFlagUpdate();
-                me->SetHomePosition(1199.8f, 667.138f, 196.242f, 3.12967f);
-                me->Relocate(1199.8f, 667.138f, 196.242f, 3.12967f);
-            }
-            break;
-        // Before Sjonnir's door
-        case 33:
-            SetEscortPaused(true);
-            break;
-        //Walk to the door, run after opening it
-        case 34:
-            SetEscortPaused(true);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-            me->SendMovementFlagUpdate();
-            events.ScheduleEvent(EVENT_DOOR_OPEN, 1500ms);
-            me->SetWalk(false);
-            me->SetSpeed(MOVE_RUN, 1.0f, false);
-            events.ScheduleEvent(EVENT_RESUME_ESCORT, 3500ms);
-            break;
-        //Brann stops in front of Sjonnir and awaits the start of the battle.
-        case 36:
-            SetEscortPaused(true);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
-            me->SendMovementFlagUpdate();
-            Talk(SAY_BRANN_FRONT_OF_SJONNIR);
-            break;
-        //Brann steps back and uses the Sjonnir console.
-        case 38:
-            SetEscortPaused(true);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-            if (pInstance)
-            {
-                if (GameObject* console = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_CONSOLE)))
-                    console->SetGoState(GO_STATE_ACTIVE);
-            }
-            break;
-        //After Sjonnir's death, Brann steps away from the console and talk.
-        case 39:
-            SetEscortPaused(true);
-            break;
-        //Brann steps back and uses the Sjonnir console.
-        case 40:
-            SetEscortPaused(true);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-            break;
-    }
-}
 
 // 51774 - Taunt
 class spell_taunt_brann : public SpellScript
@@ -971,7 +984,7 @@ class spell_hos_dark_matter_size : public SpellScript
 
 void AddSC_brann_bronzebeard()
 {
-    new brann_bronzebeard();
+    RegisterCreatureAI(brann_bronzebeard);
     RegisterSpellScript(spell_hos_dark_matter);
     RegisterSpellScript(spell_hos_dark_matter_size);
     RegisterSpellScript(spell_taunt_brann);
