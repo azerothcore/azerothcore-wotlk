@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "QuestDef.h"
+#include "RaceMgr.h"
 #include "SharedDefines.h"
 #include "Timer.h"
 
@@ -247,7 +248,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             }
             break;
         case ServerMailConditionType::Race:
-            if (conditionValue & ~RACEMASK_ALL_PLAYABLE)
+            if (conditionValue & ~sRaceMgr->GetPlayableRaceMask())
             {
                 LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Race' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;

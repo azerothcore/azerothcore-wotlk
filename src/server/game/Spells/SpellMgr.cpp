@@ -23,6 +23,7 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RaceMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "Spell.h"
@@ -2761,7 +2762,7 @@ void SpellMgr::LoadSpellAreas()
             }
         }
 
-        if (spellArea.raceMask && (spellArea.raceMask & RACEMASK_ALL_PLAYABLE) == 0)
+        if (spellArea.raceMask && (spellArea.raceMask & sRaceMgr->GetPlayableRaceMask()) == 0)
         {
             LOG_ERROR("sql.sql", "Spell {} listed in `spell_area` have wrong race mask ({}) requirement", spell, spellArea.raceMask);
             continue;

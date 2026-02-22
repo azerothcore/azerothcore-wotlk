@@ -44,6 +44,7 @@
 #include "Player.h"
 #include "PlayerDump.h"
 #include "QueryHolder.h"
+#include "RaceMgr.h"
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -2030,7 +2031,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
         for (uint8 i = 0; i < 2; ++i) // check both neutral and faction-specific AH
         {
-            AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(i == 0 ? 0 : (((1 << (playerData->Race - 1)) & RACEMASK_ALLIANCE) ? 12 : 29));
+            AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(i == 0 ? 0 : (((1 << (playerData->Race - 1)) & sRaceMgr->GetAllianceRaceMask()) ? 12 : 29));
 
             for (auto const& [auID, Aentry] : auctionHouse->GetAuctions())
             {
@@ -2418,7 +2419,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             // Disable all old-faction specific quests
             for (auto const& [questID, quest] : sObjectMgr->GetQuestTemplates())
             {
-                uint32 newRaceMask = (newTeam == TEAM_ALLIANCE) ? RACEMASK_ALLIANCE : RACEMASK_HORDE;
+                uint32 newRaceMask = (newTeam == TEAM_ALLIANCE) ? sRaceMgr->GetAllianceRaceMask() : sRaceMgr->GetHordeRaceMask();
 
                 if (quest->GetAllowableRaces() && !(quest->GetAllowableRaces() & newRaceMask))
                 {
