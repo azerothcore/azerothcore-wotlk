@@ -90,7 +90,7 @@ void WaypointMgr::Load()
         }
 
         data.delay = fields[7].Get<uint32>();
-        data.event_id = fields[8].Get<uint32>();
+        data.event_id = fields[8].Get<int32>();
         data.event_chance = fields[9].Get<int16>();
 
         path.emplace(data.id, data);
