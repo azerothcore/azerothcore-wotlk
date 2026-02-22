@@ -120,34 +120,41 @@ BindIP = "0.0.0.0"
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
 CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
+DBCDatabaseInfo       = "127.0.0.1;3306;acore;acore;acore_dbc"
 
 #
 #    LoginDatabase.WorkerThreads
 #    WorldDatabase.WorkerThreads
 #    CharacterDatabase.WorkerThreads
+#    DBCDatabase.WorkerThreads
 #        Description: The amount of worker threads spawned to handle asynchronous (delayed) MySQL
 #                     statements. Each worker thread is mirrored with its own connection to the
 #                     MySQL server and their own thread on the MySQL server.
 #        Default:     1 - (LoginDatabase.WorkerThreads)
 #                     1 - (WorldDatabase.WorkerThreads)
 #                     1 - (CharacterDatabase.WorkerThreads)
+#                     1 - (DBCDatabase.WorkerThreads)
 
 LoginDatabase.WorkerThreads     = 1
 WorldDatabase.WorkerThreads     = 1
 CharacterDatabase.WorkerThreads = 1
+DBCDatabase.WorkerThreads       = 1
 
 #
 #    LoginDatabase.SynchThreads
 #    WorldDatabase.SynchThreads
 #    CharacterDatabase.SynchThreads
+#    DBCDatabase.SynchThreads
 #        Description: The amount of MySQL connections spawned to handle.
 #        Default:     1 - (LoginDatabase.SynchThreads)
 #                     1 - (WorldDatabase.SynchThreads)
 #                     1 - (CharacterDatabase.SynchThreads)
+#                     1 - (DBCDatabase.SynchThreads)
 
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
 CharacterDatabase.SynchThreads = 1
+DBCDatabase.SynchThreads       = 1
 
 #
 #    MaxPingTime
@@ -167,6 +174,25 @@ MaxPingTime = 30
 
 Database.Reconnect.Seconds = 15
 Database.Reconnect.Attempts = 20
+
+#
+#    EnableDBCDatabase
+#        Description: Enable DBC Database separation and automatic migration.
+#                     0 = Disabled (Use acore_world for DBC tables, with fallback logic)
+#                         - DBC tables are queried from acore_dbc first
+#                         - If empty, fallback to acore_world (backward compatibility)
+#                     1 = Enabled (Migrate DBC tables to acore_dbc on startup)
+#                         - Creates tables in acore_dbc if they don't exist
+#                         - Migrates data from acore_world to acore_dbc
+#                         - Drops migrated tables from acore_world
+#
+#                     Once activated, data from the _dbc tables will be migrated from your World database to DBC.
+#                     Once activated, it is impossible to deactivate it in order to retrieve the data from World again.
+#                     Once the migration is complete, the _dbc tables in World will be destroyed.
+#
+#        Default:     1 - (Enabled, automatic migration mode)
+
+EnableDBCDatabase = 1
 
 #
 ###################################################################################################
@@ -291,12 +317,13 @@ FlashAtStart = 1
 #           DATABASE_LOGIN     = 1, // Auth database
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
+#           DATABASE_DBC       = 8, // DBC database
 #
-#        Default:     7  - (All enabled)
-#                     4  - (Enable world only)
+#        Default:     15 - (All enabled: 1 + 2 + 4 + 8 = 15)
+#                     7  - (Enable all except DBC: 1 + 2 + 4 = 7)
 #                     0  - (All disabled)
 
-Updates.EnableDatabases = 7
+Updates.EnableDatabases = 15
 
 #
 #    Updates.AutoSetup

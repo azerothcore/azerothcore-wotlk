@@ -108,6 +108,7 @@ private:
 
 void SignalHandler(boost::system::error_code const& error, int signalNumber);
 void ClearOnlineAccounts();
+void MigrateDBCTablesToSeparateDatabase();
 bool StartDB();
 void StopDB();
 bool LoadRealmInfo(Acore::Asio::IoContext& ioContext);
@@ -429,7 +430,8 @@ bool StartDB()
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")
-        .AddDatabase(WorldDatabase, "World");
+        .AddDatabase(WorldDatabase, "World")
+        .AddDatabase(DBCDatabase, "DBC");
 
     if (!loader.Load())
         return false;
@@ -470,6 +472,9 @@ bool StartDB()
 
     sScriptMgr->OnAfterDatabasesLoaded(loader.GetUpdateFlags());
 
+    // Migrate DBC tables if EnableDBCDatabase is enabled
+    MigrateDBCTablesToSeparateDatabase();
+
     return true;
 }
 
@@ -491,6 +496,124 @@ void ClearOnlineAccounts()
 
     // Reset online status for all characters
     CharacterDatabase.DirectExecute("UPDATE characters SET online = 0 WHERE online <> 0");
+}
+
+/// Migrate DBC tables from acore_world to acore_dbc if EnableDBCDatabase is enabled
+void MigrateDBCTablesToSeparateDatabase()
+{
+    if (!sConfigMgr->GetOption<bool>("EnableDBCDatabase", true))
+    {
+        LOG_INFO("server.loading", ">> DBC Database migration disabled (EnableDBCDatabase = 0). Using fallback mode.");
+        return;
+    }
+
+    LOG_INFO("server.loading", ">> Starting DBC tables migration to separate database...");
+
+    std::vector<std::string> dbcTables = {
+        "achievement_category_dbc", "achievement_criteria_dbc", "achievement_dbc", "areagroup_dbc",
+        "areapoi_dbc", "areatable_dbc", "auctionhouse_dbc", "bankbagslotprices_dbc",
+        "barbershopstyle_dbc", "battlemasterlist_dbc", "charstartoutfit_dbc", "chartitles_dbc",
+        "chatchannels_dbc", "chrclasses_dbc", "chrraces_dbc", "cinematiccamera_dbc",
+        "cinematicsequences_dbc", "creaturedisplayinfo_dbc", "creaturedisplayinfoextra_dbc",
+        "creaturefamily_dbc", "creaturemodeldata_dbc", "creaturespelldata_dbc", "creaturetype_dbc",
+        "currencytypes_dbc", "destructiblemodeldata_dbc", "dungeonencounter_dbc", "durabilitycosts_dbc",
+        "durabilityquality_dbc", "emotes_dbc", "emotestext_dbc", "faction_dbc",
+        "factiontemplate_dbc", "gameobjectartkit_dbc", "gameobjectdisplayinfo_dbc", "gemproperties_dbc",
+        "glyphproperties_dbc", "glyphslot_dbc", "gtbarbershopcostbase_dbc", "gtchancetomeleecrit_dbc",
+        "gtchancetomeleecritbase_dbc", "gtchancetospellcrit_dbc", "gtchancetospellcritbase_dbc",
+        "gtcombatratings_dbc", "gtnpcmanacostscaler_dbc", "gtoctclasscombatratingscalar_dbc",
+        "gtoctregenhp_dbc", "gtregenhpperspt_dbc", "gtregenmpperspt_dbc", "holidays_dbc",
+        "item_dbc", "itembagfamily_dbc", "itemdisplayinfo_dbc", "itemextendedcost_dbc",
+        "itemlimitcategory_dbc", "itemrandomproperties_dbc", "itemrandomsuffix_dbc", "itemset_dbc",
+        "lfgdungeons_dbc", "light_dbc", "liquidtype_dbc", "lock_dbc",
+        "mailtemplate_dbc", "map_dbc", "mapdifficulty_dbc", "movie_dbc",
+        "namesprofanity_dbc", "namesreserved_dbc", "overridespelldata_dbc", "powerdisplay_dbc",
+        "pvpdifficulty_dbc", "questfactionreward_dbc", "questsort_dbc", "questxp_dbc",
+        "randproppoints_dbc", "scalingstatdistribution_dbc", "scalingstatvalues_dbc", "skillline_dbc",
+        "skilllineability_dbc", "skillraceclassinfo_dbc", "skilltiers_dbc", "soundentries_dbc",
+        "spellcasttimes_dbc", "spellcategory_dbc", "spelldifficulty_dbc", "spellduration_dbc",
+        "spellfocusobject_dbc", "spellitemenchantment_dbc", "spellitemenchantmentcondition_dbc",
+        "spellradius_dbc", "spellrange_dbc", "spellrunecost_dbc", "spellshapeshiftform_dbc",
+        "spellvisual_dbc", "stableslotprices_dbc", "summonproperties_dbc", "talent_dbc",
+        "talenttab_dbc", "taxinodes_dbc", "taxipath_dbc", "taxipathnode_dbc",
+        "teamcontributionpoints_dbc", "totemcategory_dbc", "transportanimation_dbc",
+        "transportrotation_dbc", "vehicle_dbc", "vehicleseat_dbc", "wmoareatable_dbc",
+        "worldmaparea_dbc", "worldmapoverlay_dbc"
+    };
+
+    uint32 migratedCount = 0;
+    uint32 skippedCount = 0;
+    uint32 failedCount = 0;
+
+    // Get current world database name
+    QueryResult worldDbResult = WorldDatabase.Query("SELECT DATABASE()");
+    if (!worldDbResult)
+    {
+        LOG_ERROR("server.loading", ">> Failed to retrieve World database name. Migration aborted.");
+        return;
+    }
+    std::string worldDbName = (*worldDbResult)[0].Get<std::string>();
+
+    for (auto const& tableName : dbcTables)
+    {
+        try
+        {
+            QueryResult worldCheck = WorldDatabase.Query("SHOW TABLES LIKE '{}'", tableName);
+            if (!worldCheck)
+            {
+                skippedCount++;
+                continue;
+            }
+
+            // Create table in DBC database if it doesn't exist
+            DBCDatabase.DirectExecute("CREATE TABLE IF NOT EXISTS `{}` LIKE {}.`{}`", tableName, worldDbName, tableName);
+
+            // Get row count from world database
+            QueryResult worldCountResult = WorldDatabase.Query("SELECT COUNT(*) as count FROM `{}`", tableName);
+            uint32 worldCount = worldCountResult ? (*worldCountResult)[0].Get<uint32>() : 0;
+
+            // Only migrate if world has data
+            if (worldCount > 0)
+            {
+                DBCDatabase.DirectExecute("INSERT IGNORE INTO `{}` SELECT * FROM {}.`{}`", tableName, worldDbName, tableName);
+
+                // Verify migration
+                QueryResult verifyResult = DBCDatabase.Query("SELECT COUNT(*) as count FROM `{}`", tableName);
+                uint32 afterMigrationCount = verifyResult ? (*verifyResult)[0].Get<uint32>() : 0;
+
+                if (afterMigrationCount != worldCount)
+                {
+                    LOG_ERROR("server.loading", ">> DBC migration integrity check FAILED for '{}': world={}, dbc={}", tableName, worldCount, afterMigrationCount);
+                    failedCount++;
+                    continue;
+                }
+
+                // Drop table from world database
+                WorldDatabase.DirectExecute("DROP TABLE IF EXISTS `{}`", tableName);
+
+                LOG_INFO("server.loading", ">> Migrated '{}' ({} rows)", tableName, worldCount);
+                migratedCount++;
+            }
+            else
+            {
+                // Table exists but is empty, just drop from world
+                WorldDatabase.DirectExecute("DROP TABLE IF EXISTS `{}`", tableName);
+                skippedCount++;
+            }
+        }
+        catch (...)
+        {
+            LOG_ERROR("server.loading", ">> Failed to migrate table '{}'", tableName);
+            failedCount++;
+        }
+    }
+
+    LOG_INFO("server.loading", ">> DBC tables migration complete: {} migrated, {} skipped (empty), {} failed", migratedCount, skippedCount, failedCount);
+
+    if (failedCount > 0)
+    {
+        LOG_WARN("server.loading", ">> WARNING: {} DBC table migrations failed. Check errors above.", failedCount);
+    }
 }
 
 void ShutdownCLIThread(std::thread* cliThread)
