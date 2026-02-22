@@ -5,6 +5,7 @@
 #include "ScriptMgr.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "Collision/VMapDefinitions.h"
 
 void GridTerrainLoader::LoadTerrain()
 {
@@ -129,20 +130,18 @@ bool GridTerrainLoader::ExistVMap(uint32 mapid, int gx, int gy)
             std::string name = vmgr->getDirFileName(mapid, gx, gy);
             switch (result)
             {
-            case VMAP::LoadResult::Success:
-                break;
-            case VMAP::LoadResult::FileNotFound:
-                LOG_DEBUG("maps", "VMap file '{}' does not exist", (sWorld->GetDataPath() + "vmaps/" + name));
-                LOG_DEBUG("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
-                return false;
-            case VMAP::LoadResult::VersionMismatch:
-                LOG_ERROR("maps", "VMap file '{}' couldn't be loaded", (sWorld->GetDataPath() + "vmaps/" + name));
-                LOG_ERROR("maps", "This is because the version of the VMap file and the version of this module are different, please re-extract the maps with the tools compiled with this module.");
-                return false;
+                case VMAP::LoadResult::Success:
+                    break;
+                case VMAP::LoadResult::FileNotFound:
+                    LOG_DEBUG("maps", "VMap file '{}' does not exist", (sWorld->GetDataPath() + "vmaps/" + name));
+                    LOG_DEBUG("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
+                    return false;
+                case VMAP::LoadResult::VersionMismatch:
+                    LOG_ERROR("maps", "VMAP Version Mismatch, Core expected VMAP Version: {}. Re-extract your maps, delete the old ones and add the new ones.", VMAP::VMAP_MAGIC);
+                    return false;
             }
         }
     }
-
     return true;
 }
 
