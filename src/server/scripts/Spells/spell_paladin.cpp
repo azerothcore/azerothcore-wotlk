@@ -2148,7 +2148,10 @@ class spell_pal_light_s_beacon : public AuraScript
         // Holy Light heals for 100%, Flash of Light heals for 50%
         uint32 healSpellId = procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT_R1)) ?
             SPELL_PALADIN_BEACON_OF_LIGHT_FLASH : SPELL_PALADIN_BEACON_OF_LIGHT_HOLY;
-        int32 heal = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount());
+
+        // Use heal amount before target-specific modifiers to avoid copying them
+        uint32 healAmount = healInfo->GetHealBeforeTakenMods();
+        int32 heal = CalculatePct(healAmount, aurEff->GetAmount());
 
         Unit* beaconTarget = GetCaster();
         if (!beaconTarget || !beaconTarget->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
