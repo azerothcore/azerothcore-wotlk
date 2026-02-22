@@ -713,12 +713,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
     });
 
-    // Honor Among Thieves
-    ApplySpellFix({ 51698, 51700, 51701 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 51699;
-    });
-
     ApplySpellFix({
         5171,   // Slice and Dice
         6774    // Slice and Dice
@@ -4386,6 +4380,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 18278 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND;
+    });
+
+    // Honor Among Thieves - allow area aura from different casters to coexist
+    ApplySpellFix({ 51698, 51700, 51701 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
     // Absorb Life
